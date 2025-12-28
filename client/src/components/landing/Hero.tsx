@@ -17,10 +17,10 @@ interface HeroProps {
 export function Hero({
   heading = "Build your next SaaS",
   subheading = "The Master SaaS Muse Template gives you the foundation to build production-ready applications with modern design, robust architecture, and seamless authentication.",
-  primaryCtaText = "Get Started Free",
-  primaryCtaHref = "/auth/register",
-  secondaryCtaText = "View Demo",
-  secondaryCtaHref = "/dashboard",
+  primaryCtaText = "Get Started",
+  primaryCtaHref = "/",
+  secondaryCtaText = "Learn More",
+  secondaryCtaHref = "/",
   showBadge = true,
   badgeText = "v1.0.0 Now Available",
 }: HeroProps) {
