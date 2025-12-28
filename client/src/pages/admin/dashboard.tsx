@@ -1,3 +1,5 @@
+// Module 3 - Coming soon
+/*
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -55,4 +57,9 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
+}
+*/
+
+export default function AdminDashboard() {
+  return null;
 }

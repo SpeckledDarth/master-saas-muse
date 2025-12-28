@@ -1,3 +1,5 @@
+// Module 2 - Coming soon
+/*
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -118,4 +120,9 @@ export default function DashboardOverview() {
       </div>
     </DashboardLayout>
   );
+}
+*/
+
+export default function DashboardOverview() {
+  return null;
 }

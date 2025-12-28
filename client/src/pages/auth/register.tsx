@@ -1,3 +1,5 @@
+// Module 2 - Coming soon
+/*
 import { Link } from "wouter";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -61,4 +63,9 @@ export default function Register() {
       </p>
     </AuthLayout>
   );
+}
+*/
+
+export default function Register() {
+  return null;
 }

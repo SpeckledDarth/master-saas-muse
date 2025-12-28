@@ -39,14 +39,11 @@ function Router() {
 }
 
 function App() {
-  // TODO: Replace with actual user from auth context/state
-  const user = null;
-
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TooltipProvider>
-          <Header user={user} />
+          <Header />
           <Router />
           <Toaster />
         </TooltipProvider>
