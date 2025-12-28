@@ -5,13 +5,11 @@ import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setIsMounted(true);
   }, []);
-
-  if (!mounted) return null;
 
   const toggleTheme = () => {
     if (theme === "light") {
@@ -28,6 +26,21 @@ export function ThemeToggle() {
     if (theme === "dark") return "Switch to system preference";
     return "Switch to light mode";
   };
+
+  // Render placeholder while mounting to avoid hydration mismatch
+  if (!isMounted) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        disabled
+        aria-label="Loading theme toggle"
+        className="relative rounded-full w-10 h-10"
+      >
+        <div className="absolute h-[1.2rem] w-[1.2rem] rounded-sm bg-muted animate-pulse" />
+      </Button>
+    );
+  }
 
   return (
     <Button
