@@ -1,23 +1,24 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const [isMounted, setIsMounted] = useState(false);
+  const { theme, setTheme, systemTheme } = useTheme();
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  // Determine the effective current theme (resolve "system" to actual theme)
+  const effectiveTheme = theme === "system" ? systemTheme : theme;
 
   const toggleTheme = () => {
     if (theme === "light") {
+      // Light -> Dark
       setTheme("dark");
     } else if (theme === "dark") {
+      // Dark -> System
       setTheme("system");
     } else {
-      setTheme("light");
+      // System theme -> toggle based on effective theme
+      // If system is dark, go to light. If system is light, go to dark.
+      setTheme(effectiveTheme === "dark" ? "light" : "dark");
     }
   };
 
@@ -26,21 +27,6 @@ export function ThemeToggle() {
     if (theme === "dark") return "Switch to system preference";
     return "Switch to light mode";
   };
-
-  // Render placeholder while mounting to avoid hydration mismatch
-  if (!isMounted) {
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        disabled
-        aria-label="Loading theme toggle"
-        className="relative rounded-full w-10 h-10"
-      >
-        <div className="absolute h-[1.2rem] w-[1.2rem] rounded-sm bg-muted animate-pulse" />
-      </Button>
-    );
-  }
 
   return (
     <Button
