@@ -1,5 +1,4 @@
 import { Link } from "wouter";
-import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Settings, Users, Database, ShieldAlert } from "lucide-react";
@@ -7,8 +6,7 @@ import { Settings, Users, Database, ShieldAlert } from "lucide-react";
 export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pt-24">
         <div className="mb-8">
           <h1 className="text-3xl font-display font-bold">Admin Console</h1>
           <p className="text-muted-foreground">Manage system-wide settings and users</p>
