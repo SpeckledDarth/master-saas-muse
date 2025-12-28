@@ -1,5 +1,4 @@
 import { Link } from "wouter";
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, Zap, Shield, Globe } from "lucide-react";
@@ -8,7 +7,6 @@ import { motion } from "framer-motion";
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20">
-      <Header />
 
       <main className="flex-1">
         {/* Hero Section */}

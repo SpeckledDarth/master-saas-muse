@@ -1,5 +1,4 @@
 import { Link, useLocation } from "wouter";
-import { Header } from "@/components/layout/Header";
 import { 
   LayoutDashboard, 
   Settings, 
@@ -28,8 +27,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col">
-      <Header />
-      
       <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex gap-8">
         {/* Sidebar */}
         <aside className="w-64 hidden lg:block shrink-0">
