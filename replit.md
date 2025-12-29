@@ -2,13 +2,38 @@
 
 ## Overview
 
-This is a full-stack SaaS starter template built with React, Express, and PostgreSQL. It provides a foundation for building production-ready SaaS applications with modern UI components, authentication via Supabase, and a clean monorepo structure. The template includes a landing page, authentication flows (login/signup), and a protected dashboard area.
+This is a full-stack SaaS starter template designed for building production-ready SaaS applications ("muses") with SEO-optimized pages, authentication via Supabase, multi-tenancy support, and Stripe billing. The template enables rapid cloning and customization for new SaaS products.
+
+**IMPORTANT**: We are migrating from Vite + Express to **Next.js 14 + Vercel** for proper SSR/SEO capabilities. See `docs/MASTER_PLAN.md` for the complete development roadmap.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
 
-## System Architecture
+## Strategic Decision (Dec 29, 2025)
+
+**Migration to Next.js + Vercel**
+- **Reason**: SEO is critical for organic traffic to each muse
+- **Benefits**: Built-in SSR/ISR, automatic CDN, easy domain mapping, one-click deployments
+- **Timeline**: Extended to February 2026 to allow proper migration
+- **Master Plan**: See `docs/MASTER_PLAN.md` for complete 32-module roadmap
+
+## Target Architecture (Next.js + Vercel)
+
+### Frontend & Backend (Unified)
+- **Framework**: Next.js 14+ (App Router), React 18+, TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui + next-themes
+- **State Management**: TanStack Query for server state
+
+### Database & Auth
+- **Provider**: Supabase (PostgreSQL + Auth + RLS + Storage)
+- **Multi-Tenancy**: Domain-based middleware → app_id context → RLS policies
+
+### Hosting & Deployment
+- **Platform**: Vercel
+- **Features**: Preview deploys, custom domains, edge functions
+
+## Legacy Architecture (Vite + Express - Being Migrated)
 
 ### Frontend Architecture
 - **Framework**: React 18 with TypeScript
