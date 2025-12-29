@@ -142,11 +142,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         session,
         loading,
+        role,
+        isAdmin,
         signUp,
         signIn,
         signInWithGoogle,
         signOut,
         resetPassword,
+        refreshRole,
+        bootstrapAdmin,
       }}
     >
       {children}

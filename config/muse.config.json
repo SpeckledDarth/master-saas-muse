@@ -1,0 +1,60 @@
+{
+  "_comment": "MUSE CONFIGURATION - Edit these values for each new project",
+  
+  "project": {
+    "name": "Master SaaS Muse",
+    "tagline": "Build your SaaS faster",
+    "description": "A production-ready SaaS template",
+    "version": "1.0.0"
+  },
+
+  "branding": {
+    "logo": "/logo.svg",
+    "primaryColor": "#6366f1",
+    "companyName": "Your Company",
+    "supportEmail": "support@example.com"
+  },
+
+  "features": {
+    "googleOAuth": true,
+    "emailAuth": true,
+    "avatarUpload": true,
+    "adminPanel": true,
+    "auditLogs": true
+  },
+
+  "modules": {
+    "foundation": {
+      "enabled": true,
+      "version": "1.0.0"
+    },
+    "authentication": {
+      "enabled": true,
+      "version": "1.0.0"
+    },
+    "admin": {
+      "enabled": true,
+      "version": "1.0.0"
+    }
+  },
+
+  "external_services": {
+    "_comment": "Track which external services this muse uses",
+    "supabase": {
+      "projectRef": "",
+      "region": "",
+      "storageBuckets": ["avatars"]
+    },
+    "googleCloud": {
+      "projectId": "",
+      "oauthConfigured": false
+    }
+  },
+
+  "customization": {
+    "_comment": "Add project-specific settings here",
+    "timezone": "UTC",
+    "locale": "en-US",
+    "currency": "USD"
+  }
+}

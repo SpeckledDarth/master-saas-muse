@@ -22,6 +22,26 @@ Before starting, ensure you have:
 
 ---
 
+## Quick Start (Cloning for a New Muse)
+
+If you're cloning this template for a new project, see:
+- **[MUSE_CHECKLIST.md](./MUSE_CHECKLIST.md)** - 15-minute step-by-step setup guide
+- **`.env.template`** - Copy to `.env` and fill in your credentials
+- **`config/muse.config.json`** - Update project name, branding, and settings
+
+---
+
+## Configuration Files
+
+| File | Purpose |
+|------|---------|
+| `.env.template` | Template for all environment variables and secrets |
+| `config/muse.config.json` | Project-specific settings (name, branding, features) |
+| `docs/MUSE_CHECKLIST.md` | Quick-start checklist for cloning |
+| `docs/SETUP_GUIDE.md` | This detailed setup guide |
+
+---
+
 ## Module 1: Foundation
 
 ### Overview
