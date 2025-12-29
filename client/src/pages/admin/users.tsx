@@ -18,12 +18,10 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
 interface UserWithRole {
-  id: string;
-  email: string;
-  fullName: string | null;
-  avatarUrl: string | null;
+  id: number;
+  userId: string;
   role: string;
-  createdAt: string;
+  assignedAt: string;
 }
 
 export default function UserManagement() {
@@ -70,11 +68,8 @@ export default function UserManagement() {
     );
   }
 
-  const getInitials = (name: string | null, email: string) => {
-    if (name) {
-      return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-    }
-    return email[0].toUpperCase();
+  const getInitials = (userId: string) => {
+    return userId.slice(0, 2).toUpperCase();
   };
 
   return (
@@ -116,38 +111,37 @@ export default function UserManagement() {
             <div className="space-y-4">
               {users.map((u) => (
                 <div
-                  key={u.id}
+                  key={u.userId}
                   className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-md bg-muted/30"
-                  data-testid={`user-row-${u.id}`}
+                  data-testid={`user-row-${u.userId}`}
                 >
                   <div className="flex items-center gap-3">
                     <Avatar>
-                      <AvatarImage src={u.avatarUrl || undefined} alt={u.fullName || u.email} />
-                      <AvatarFallback>{getInitials(u.fullName, u.email)}</AvatarFallback>
+                      <AvatarFallback>{getInitials(u.userId)}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium" data-testid={`text-user-name-${u.id}`}>
-                        {u.fullName || "No name"}
+                      <p className="font-medium" data-testid={`text-user-id-${u.userId}`}>
+                        User ID: {u.userId.slice(0, 8)}...
                       </p>
-                      <p className="text-sm text-muted-foreground" data-testid={`text-user-email-${u.id}`}>
-                        {u.email}
+                      <p className="text-sm text-muted-foreground" data-testid={`text-user-joined-${u.userId}`}>
+                        Joined: {new Date(u.assignedAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    {u.id === currentUser?.id && (
+                    {u.userId === currentUser?.id && (
                       <Badge variant="secondary">You</Badge>
                     )}
                     
                     <Select
                       value={u.role}
-                      onValueChange={(role) => updateRoleMutation.mutate({ userId: u.id, role })}
-                      disabled={u.id === currentUser?.id || updateRoleMutation.isPending}
+                      onValueChange={(role) => updateRoleMutation.mutate({ userId: u.userId, role })}
+                      disabled={u.userId === currentUser?.id || updateRoleMutation.isPending}
                     >
                       <SelectTrigger 
                         className="w-28" 
-                        data-testid={`select-role-${u.id}`}
+                        data-testid={`select-role-${u.userId}`}
                       >
                         <SelectValue />
                       </SelectTrigger>
