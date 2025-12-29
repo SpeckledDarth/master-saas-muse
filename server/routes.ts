@@ -138,38 +138,68 @@ export async function registerRoutes(
   // Admin: List organization settings
   app.get("/api/admin/settings", requireAdmin, async (req: AuthenticatedRequest, res) => {
     try {
-      const settings = await storage.listOrgSettings();
-      res.json(settings);
+      const settingsList = await storage.listOrgSettings();
+      // Convert key-value list to structured object for frontend
+      const settingsMap: Record<string, string> = {};
+      settingsList.forEach(s => { settingsMap[s.key] = s.value; });
+      
+      res.json({
+        id: 1,
+        name: settingsMap['org_name'] || 'My SaaS App',
+        settings: {
+          allowSignups: settingsMap['allow_signups'] !== 'false',
+          maintenanceMode: settingsMap['maintenance_mode'] === 'true',
+          supportEmail: settingsMap['support_email'] || '',
+          requireEmailVerification: settingsMap['require_email_verification'] !== 'false',
+          enableGoogleAuth: settingsMap['enable_google_auth'] !== 'false',
+        }
+      });
     } catch (error) {
       console.error('[Admin] Error listing settings:', error);
       res.status(500).json({ error: 'Failed to list settings' });
     }
   });
 
-  // Admin: Update organization setting
+  // Admin: Update organization settings
   app.put("/api/admin/settings", requireAdmin, async (req: AuthenticatedRequest, res) => {
     try {
-      const { key, value, description } = req.body;
+      const { name, settings } = req.body;
       
-      if (!key || !value) {
-        return res.status(400).json({ error: 'Key and value are required' });
+      // Save individual settings as key-value pairs
+      if (name) {
+        await storage.setOrgSetting('org_name', name, 'Organization name');
       }
-      
-      const updated = await storage.setOrgSetting(key, value, description);
+      if (settings) {
+        if (typeof settings.allowSignups === 'boolean') {
+          await storage.setOrgSetting('allow_signups', String(settings.allowSignups), 'Allow new user registrations');
+        }
+        if (typeof settings.maintenanceMode === 'boolean') {
+          await storage.setOrgSetting('maintenance_mode', String(settings.maintenanceMode), 'Show maintenance page to users');
+        }
+        if (typeof settings.supportEmail === 'string') {
+          await storage.setOrgSetting('support_email', settings.supportEmail, 'Support contact email');
+        }
+        if (typeof settings.requireEmailVerification === 'boolean') {
+          await storage.setOrgSetting('require_email_verification', String(settings.requireEmailVerification), 'Require email verification for new accounts');
+        }
+        if (typeof settings.enableGoogleAuth === 'boolean') {
+          await storage.setOrgSetting('enable_google_auth', String(settings.enableGoogleAuth), 'Enable Google OAuth login');
+        }
+      }
       
       // Log this admin action
       await storage.createAuditLog({
         userId: req.userId!,
-        action: 'update_setting',
+        action: 'update_settings',
         targetType: 'setting',
-        targetId: key,
-        metadata: { value }
+        targetId: 'organization',
+        metadata: { name, settings }
       });
       
-      res.json(updated);
+      res.json({ success: true });
     } catch (error) {
-      console.error('[Admin] Error updating setting:', error);
-      res.status(500).json({ error: 'Failed to update setting' });
+      console.error('[Admin] Error updating settings:', error);
+      res.status(500).json({ error: 'Failed to update settings' });
     }
   });
 

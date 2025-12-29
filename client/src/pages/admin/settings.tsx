@@ -29,6 +29,8 @@ interface OrganizationSettings {
     allowSignups?: boolean;
     maintenanceMode?: boolean;
     supportEmail?: string;
+    requireEmailVerification?: boolean;
+    enableGoogleAuth?: boolean;
     [key: string]: unknown;
   };
 }
@@ -38,6 +40,8 @@ const settingsSchema = z.object({
   allowSignups: z.boolean(),
   maintenanceMode: z.boolean(),
   supportEmail: z.string().email().optional().or(z.literal("")),
+  requireEmailVerification: z.boolean(),
+  enableGoogleAuth: z.boolean(),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -58,12 +62,16 @@ export default function AdminSettings() {
       allowSignups: true,
       maintenanceMode: false,
       supportEmail: "",
+      requireEmailVerification: true,
+      enableGoogleAuth: true,
     },
     values: orgSettings ? {
       name: orgSettings.name,
       allowSignups: orgSettings.settings?.allowSignups ?? true,
       maintenanceMode: orgSettings.settings?.maintenanceMode ?? false,
       supportEmail: orgSettings.settings?.supportEmail ?? "",
+      requireEmailVerification: orgSettings.settings?.requireEmailVerification ?? true,
+      enableGoogleAuth: orgSettings.settings?.enableGoogleAuth ?? true,
     } : undefined,
   });
 
@@ -75,6 +83,8 @@ export default function AdminSettings() {
           allowSignups: values.allowSignups,
           maintenanceMode: values.maintenanceMode,
           supportEmail: values.supportEmail,
+          requireEmailVerification: values.requireEmailVerification,
+          enableGoogleAuth: values.enableGoogleAuth,
         },
       });
     },
@@ -224,6 +234,50 @@ export default function AdminSettings() {
                           checked={field.value}
                           onCheckedChange={field.onChange}
                           data-testid="switch-maintenance-mode"
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="requireEmailVerification"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between gap-4">
+                      <div>
+                        <FormLabel>Require Email Verification</FormLabel>
+                        <FormDescription>
+                          Users must verify their email before accessing the app
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          data-testid="switch-require-email-verification"
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="enableGoogleAuth"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between gap-4">
+                      <div>
+                        <FormLabel>Enable Google Sign-In</FormLabel>
+                        <FormDescription>
+                          Allow users to sign in with their Google account
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          data-testid="switch-enable-google-auth"
                         />
                       </FormControl>
                     </FormItem>
