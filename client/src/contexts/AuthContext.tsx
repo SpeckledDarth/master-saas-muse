@@ -134,6 +134,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     // Sign out from Supabase with global scope to clear all sessions
     await supabase.auth.signOut({ scope: 'global' });
+    
+    // Force clear all Supabase storage (localStorage keys)
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('sb-') || key.includes('supabase'))) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
   };
 
   const resetPassword = async (email: string) => {
