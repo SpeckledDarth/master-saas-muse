@@ -101,11 +101,24 @@ The server includes middleware that extracts potential `app_id` from subdomain p
 
 ### Module 3: Admin Features (Complete)
 - Admin dashboard with metrics (/admin)
+  - Total users, admins, members counts
+  - Recent signups tracking
+  - Quick access cards to admin sections
 - User management with role editing (/admin/users)
+  - View all users with roles
+  - Change user roles (admin/member)
+  - Protection against demoting last admin
 - Settings page with feature toggles (/admin/settings)
+  - Organization name and support email
+  - Allow New Signups toggle
+  - Maintenance Mode toggle
+  - Require Email Verification toggle
+  - Enable Google Sign-In toggle
 - Role-based access control (admin/member)
 - Bootstrap admin functionality for new installations
+  - Server-side protection: only works when no admins exist
 - Audit logging for admin actions
+  - Tracks role changes, settings updates, bootstrap events
 - Database schema: user_roles, organization_settings, audit_logs
 
 ### Configuration Files

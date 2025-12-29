@@ -117,6 +117,17 @@ export async function registerRoutes(
         return res.status(400).json({ error: 'Invalid role. Must be "admin" or "member"' });
       }
       
+      // Prevent demoting the last admin
+      if (role === 'member') {
+        const currentRole = await storage.getUserRole(userId);
+        if (currentRole?.role === 'admin') {
+          const metrics = await storage.getAdminMetrics();
+          if (metrics.adminCount <= 1) {
+            return res.status(400).json({ error: 'Cannot demote the last admin. Promote another user first.' });
+          }
+        }
+      }
+      
       const updated = await storage.setUserRole(userId, role);
       
       // Log this admin action
