@@ -99,7 +99,7 @@ The server includes middleware that extracts potential `app_id` from subdomain p
 - Webhook endpoint stub at `/api/webhooks/user.created`
 - Multi-tenancy middleware (hostname logging)
 
-### Module 3: Admin Features (Complete)
+### Module 3: Admin Features (Complete - Tested Dec 29, 2025)
 - Admin dashboard with metrics (/admin)
   - Total users, admins, members counts
   - Recent signups tracking
@@ -108,6 +108,8 @@ The server includes middleware that extracts potential `app_id` from subdomain p
   - View all users with roles
   - Change user roles (admin/member)
   - Protection against demoting last admin
+  - "Currently logged in as" display showing admin's email
+  - Disabled role dropdown for current user (prevents self-demotion)
 - Settings page with feature toggles (/admin/settings)
   - Organization name and support email
   - Allow New Signups toggle
@@ -117,9 +119,17 @@ The server includes middleware that extracts potential `app_id` from subdomain p
 - Role-based access control (admin/member)
 - Bootstrap admin functionality for new installations
   - Server-side protection: only works when no admins exist
+  - Proper error handling when admin already exists
 - Audit logging for admin actions
   - Tracks role changes, settings updates, bootstrap events
+- Auto-registration: New users automatically get member role on first login
 - Database schema: user_roles, organization_settings, audit_logs
+
+### Bug Fixes (Dec 29, 2025)
+- Fixed sign-out: Session now properly clears all Supabase localStorage keys
+- Fixed sign-out flash: Navigation occurs before auth state change
+- Fixed login form: No longer requires entering credentials twice
+- Fixed bootstrap admin: Proper error message when admin already exists
 
 ### Configuration Files
 - `.env.template` - Template for all secrets and environment variables
