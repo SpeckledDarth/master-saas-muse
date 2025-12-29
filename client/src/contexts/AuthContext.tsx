@@ -126,7 +126,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Clear local state first
+    setUser(null);
+    setSession(null);
+    setRole('member');
+    setIsAdmin(false);
+    
+    // Sign out from Supabase with global scope to clear all sessions
+    await supabase.auth.signOut({ scope: 'global' });
   };
 
   const resetPassword = async (email: string) => {
