@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { Camera, Loader2, LogOut, User } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
+import { queryClient } from '@/lib/queryClient';
 
 export default function ProfilePage() {
   const { user, signOut } = useAuth();
@@ -112,8 +113,12 @@ export default function ProfilePage() {
   };
 
   const handleSignOut = async () => {
+    // Clear all cached queries first
+    queryClient.clear();
+    // Sign out from Supabase
     await signOut();
-    window.location.href = '/';
+    // Force a full page reload to ensure clean state
+    window.location.replace('/');
   };
 
   const initials = displayName
