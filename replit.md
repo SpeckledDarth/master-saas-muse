@@ -10,6 +10,33 @@ This is a full-stack SaaS starter template designed for building production-read
 
 Preferred communication style: Simple, everyday language.
 
+## Session Context (Updated Dec 29, 2025)
+
+### Development Workflow
+- **Local Environment**: Windows with PowerShell
+- **Git Experience**: Beginner - needed help with .env file (hidden .txt extension issue)
+- **Workflow**: Replit for code development → Git push → Vercel auto-deploys
+- **Styling**: User prefers original gradient font styling (deferred until after functional modules)
+
+### Supabase Project
+- **URL**: https://ghlrvygpbexawddahixa.supabase.co
+- **Redirect URLs**: Configured for both localhost:3000 and Vercel domain
+
+### Required Environment Variables (.env.local)
+```
+NEXT_PUBLIC_SUPABASE_URL=https://ghlrvygpbexawddahixa.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=(from Supabase dashboard → Settings → API → anon public)
+SUPABASE_SERVICE_ROLE_KEY=(from Supabase dashboard → Settings → API → service_role - KEEP SECRET)
+```
+
+### Vercel Environment Variables
+Same three variables above, added via Vercel Project → Settings → Environment Variables
+
+### Module 3 Architecture Notes
+- Admin API routes use server-side only to protect service role key
+- `/api/admin/users` route fetches user data using `src/lib/supabase/admin.ts`
+- Service role key must NEVER be exposed client-side (no NEXT_PUBLIC_ prefix)
+
 ## Strategic Decision (Dec 29, 2025)
 
 **Migration to Next.js + Vercel**
