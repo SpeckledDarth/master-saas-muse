@@ -6,7 +6,11 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20">
       <main className="flex-1">
         {/* Hero Section */}
-        <Hero />
+        <Hero 
+          primaryCtaHref="/auth/signup"
+          secondaryCtaHref="/auth/login"
+          secondaryCtaText="Sign In"
+        />
       </main>
 
       <Footer />
