@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -14,12 +14,23 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [resetMode, setResetMode] = useState(false);
-  const { signIn, signInWithGoogle, resetPassword } = useAuth();
+  const { user, signIn, signInWithGoogle, resetPassword } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const isSubmitting = useRef(false);
+
+  // Redirect when user becomes authenticated
+  useEffect(() => {
+    if (user && !isSubmitting.current) {
+      setLocation('/dashboard');
+    }
+  }, [user, setLocation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return; // Prevent double submission
+    
+    isSubmitting.current = true;
     setLoading(true);
 
     if (resetMode) {
@@ -37,6 +48,8 @@ export default function LoginPage() {
         });
         setResetMode(false);
       }
+      setLoading(false);
+      isSubmitting.current = false;
     } else {
       const { error } = await signIn(email, password);
       if (error) {
@@ -45,12 +58,14 @@ export default function LoginPage() {
           description: error.message,
           variant: 'destructive',
         });
+        setLoading(false);
+        isSubmitting.current = false;
       } else {
+        // Don't reset loading - the useEffect will redirect when user is set
+        // This prevents the form from flashing before redirect
         setLocation('/dashboard');
       }
     }
-
-    setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
