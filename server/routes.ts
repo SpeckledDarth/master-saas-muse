@@ -83,7 +83,13 @@ export async function registerRoutes(
   app.get("/api/admin/metrics", requireAdmin, async (req: AuthenticatedRequest, res) => {
     try {
       const metrics = await storage.getAdminMetrics();
-      res.json(metrics);
+      // Map to frontend-expected field names
+      res.json({
+        totalUsers: metrics.totalUsers,
+        adminUsers: metrics.adminCount,
+        memberUsers: metrics.memberCount,
+        recentSignups: 0 // TODO: implement recent signups tracking
+      });
     } catch (error) {
       console.error('[Admin] Error fetching metrics:', error);
       res.status(500).json({ error: 'Failed to fetch metrics' });
