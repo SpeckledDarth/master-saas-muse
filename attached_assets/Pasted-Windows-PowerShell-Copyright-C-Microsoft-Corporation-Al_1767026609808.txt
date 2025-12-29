@@ -1,0 +1,64 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Users\Chris> cd master-saas-muse
+PS C:\Users\Chris\master-saas-muse> npx shadcn@latest init
+✔ Preflight checks.
+✔ Verifying framework. Found Next.js.
+✔ Validating Tailwind CSS config. Found v4.
+✔ Validating import alias.
+√ Which color would you like to use as the base color? » Slate
+✔ Writing components.json.
+✔ Checking registry.
+✔ Updating CSS variables in src\app\globals.css
+✔ Installing dependencies.
+✔ Created 1 file:
+  - src\lib\utils.ts
+
+Success! Project initialization completed.
+You may now add components.
+
+PS C:\Users\Chris\master-saas-muse> npx shadcn@latest add button card avatar badge separator dropdown-menu toast
+
+The toast component is deprecated. Use the sonner component instead.
+
+PS C:\Users\Chris\master-saas-muse> npx shadcn@latest add button card avatar badge separator dropdown-menu sonner
+✔ Checking registry.
+✔ Installing dependencies.
+✔ Created 7 files:
+  - src\components\ui\button.tsx
+  - src\components\ui\card.tsx
+  - src\components\ui\avatar.tsx
+  - src\components\ui\badge.tsx
+  - src\components\ui\separator.tsx
+  - src\components\ui\dropdown-menu.tsx
+  - src\components\ui\sonner.tsx
+
+PS C:\Users\Chris\master-saas-muse> npm install next-themes lucide-react
+
+up to date, audited 429 packages in 892ms
+
+144 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+PS C:\Users\Chris\master-saas-muse> npm run dev
+
+> master-saas-muse@0.1.0 dev
+> next dev
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\Chris\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles:
+   * C:\Users\Chris\master-saas-muse\package-lock.json
+
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.96.0.16:3000
+
+✓ Starting...
+✓ Ready in 706ms
