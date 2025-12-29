@@ -184,16 +184,27 @@ export default function SignupPage() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
-            <Link
-              href="/auth/login"
-              className="text-primary hover:underline font-medium"
-              data-testid="link-login"
-            >
-              Sign in
-            </Link>
-          </p>
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{' '}
+              <Link
+                href="/auth/login"
+                className="text-primary hover:underline font-medium"
+                data-testid="link-login"
+              >
+                Sign in
+              </Link>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              <Link
+                href="/"
+                className="hover:text-foreground transition-colors"
+                data-testid="link-back-home"
+              >
+                Back to home
+              </Link>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

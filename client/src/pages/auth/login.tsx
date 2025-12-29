@@ -176,6 +176,15 @@ export default function LoginPage() {
                 </Link>
               </p>
             )}
+            <p className="text-sm text-muted-foreground pt-2">
+              <Link
+                href="/"
+                className="hover:text-foreground transition-colors"
+                data-testid="link-back-home"
+              >
+                Back to home
+              </Link>
+            </p>
           </div>
         </CardContent>
       </Card>
