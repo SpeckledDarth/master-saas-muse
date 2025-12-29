@@ -113,12 +113,11 @@ export default function ProfilePage() {
   };
 
   const handleSignOut = async () => {
-    // Clear all cached queries first
-    queryClient.clear();
-    // Sign out from Supabase
-    await signOut();
-    // Force a full page reload to ensure clean state
+    // Navigate first to avoid flash from ProtectedRoute redirect
     window.location.replace('/');
+    // Then clear cached queries and sign out
+    queryClient.clear();
+    await signOut();
   };
 
   const initials = displayName
