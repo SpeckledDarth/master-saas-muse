@@ -1,392 +1,339 @@
 # Master SaaS Muse Template - Setup Guide
 
-This guide provides step-by-step instructions for setting up a production-ready SaaS application using the Master SaaS Muse Template.
+This guide walks you through creating the Next.js 14 + Vercel project from scratch.
 
 ---
 
 ## Table of Contents
 
-1. [Module 1: Foundation](#module-1-foundation)
-2. [Module 2: Authentication](#module-2-authentication)
-3. [Module 3: Admin Features](#module-3-admin-features) *(Pending)*
+1. [Step 1: Create Next.js Project](#step-1-create-nextjs-project-locally)
+2. [Step 2: Push to GitHub](#step-2-initialize-git-and-push-to-github)
+3. [Step 3: Deploy to Vercel](#step-3-deploy-to-vercel)
+4. [Step 4: Install shadcn/ui](#step-4-install-shadcnui)
+5. [Step 5: Install Dependencies](#step-5-install-additional-dependencies)
+6. [Step 6: Environment Variables](#step-6-set-up-environment-variables)
+7. [Step 7: Project Structure](#step-7-project-structure)
+8. [Step 8: Configure Supabase](#step-8-configure-supabase)
+9. [Database Tables](#database-tables)
 
 ---
 
-## Prerequisites
+## Step 1: Create Next.js Project Locally
 
-Before starting, ensure you have:
-- A Replit account
-- A Supabase account (free tier works)
-- A Google Cloud account (for OAuth - optional but recommended)
-- Basic familiarity with web applications
+Open your terminal and run:
 
----
+```bash
+# Create a new Next.js 14 project with TypeScript, Tailwind, ESLint, and App Router
+npx create-next-app@latest master-saas-muse --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
 
-## Quick Start (Cloning for a New Muse)
+# Navigate into the project
+cd master-saas-muse
+```
 
-If you're cloning this template for a new project, see:
-- **[MUSE_CHECKLIST.md](./MUSE_CHECKLIST.md)** - 15-minute step-by-step setup guide
-- **`.env.template`** - Copy to `.env` and fill in your credentials
-- **`config/muse.config.json`** - Update project name, branding, and settings
-
----
-
-## Configuration Files
-
-| File | Purpose |
-|------|---------|
-| `.env.template` | Template for all environment variables and secrets |
-| `config/muse.config.json` | Project-specific settings (name, branding, features) |
-| `docs/MUSE_CHECKLIST.md` | Quick-start checklist for cloning |
-| `docs/SETUP_GUIDE.md` | This detailed setup guide |
+When prompted:
+- Would you like to use TypeScript? **Yes**
+- Would you like to use ESLint? **Yes**  
+- Would you like to use Tailwind CSS? **Yes**
+- Would you like to use `src/` directory? **Yes**
+- Would you like to use App Router? **Yes**
+- Would you like to customize the default import alias? **Yes** → Use `@/*`
 
 ---
 
-## Module 1: Foundation
+## Step 2: Initialize Git and Push to GitHub
 
-### Overview
-Module 1 establishes the core application structure including the landing page, navigation, dark/light mode toggle, and basic styling.
+```bash
+# Initialize git (if not already done)
+git init
 
-### What Gets Built
-- Landing page with Hero section
-- Header with navigation links
-- Footer component
-- Dark/light mode toggle
-- Responsive design with Tailwind CSS
+# Create your first commit
+git add .
+git commit -m "Initial Next.js 14 setup"
 
-### Key Files Created/Modified
+# Create a new repository on GitHub
+# Go to github.com → New Repository → Name: "master-saas-muse" → Create
 
-| File | Purpose |
-|------|---------|
-| `client/src/pages/home.tsx` | Landing page with Hero |
-| `client/src/components/layout/Header.tsx` | Navigation header |
-| `client/src/components/layout/Footer.tsx` | Page footer |
-| `client/src/components/layout/ThemeToggle.tsx` | Dark/light mode switch |
-| `client/src/components/landing/Hero.tsx` | Hero section component |
-
-### Setup Steps
-
-1. **Create a new Replit project** using the Vite + React + TypeScript template
-
-2. **Install core dependencies** (if not already included):
-   - `@tanstack/react-query` - Server state management
-   - `next-themes` - Theme management
-   - `framer-motion` - Animations
-   - `wouter` - Lightweight routing
-   - `tailwindcss` - Utility-first CSS
-   - shadcn/ui components
-
-3. **Configure Tailwind CSS** with dark mode support:
-   - Set `darkMode: ["class"]` in `tailwind.config.ts`
-   - Define color variables in `:root` and `.dark` classes in `index.css`
-
-4. **Create the layout components**:
-   - Header with logo, navigation links, and theme toggle
-   - Footer with copyright and links
-   - ThemeToggle using next-themes
-
-5. **Create the landing page**:
-   - Hero section with headline, description, and CTA buttons
-   - Responsive design for mobile and desktop
-
-### Verification Checklist
-- [ ] Landing page displays correctly
-- [ ] Navigation links work
-- [ ] Dark/light mode toggle functions
-- [ ] Responsive design works on mobile
-- [ ] No console errors
-
-[Screenshot: Landing page in light mode]
-[Screenshot: Landing page in dark mode]
-
----
-
-## Module 2: Authentication
-
-### Overview
-Module 2 implements user authentication using Supabase, including email/password signup, login, Google OAuth, protected routes, and user profile management with avatar uploads.
-
-### What Gets Built
-- Email/password signup with email confirmation
-- Email/password login
-- Google OAuth integration
-- Protected routes (redirect unauthenticated users)
-- User profile page with avatar upload
-- Session persistence across page refreshes
-- Webhook endpoint for new user signups
-- Multi-tenancy middleware stub
-
-### Key Files Created/Modified
-
-| File | Purpose |
-|------|---------|
-| `client/src/lib/supabase.ts` | Supabase client initialization |
-| `client/src/contexts/AuthContext.tsx` | Authentication state management |
-| `client/src/pages/auth/login.tsx` | Login page |
-| `client/src/pages/auth/signup.tsx` | Signup page |
-| `client/src/pages/dashboard/profile.tsx` | User profile with avatar |
-| `client/src/App.tsx` | Route definitions and ProtectedRoute |
-| `server/routes.ts` | Webhook endpoint |
-| `server/index.ts` | Multi-tenancy middleware |
-
----
-
-### Part 1: Supabase Project Setup
-
-#### Step 1: Create Supabase Project
-1. Go to [supabase.com](https://supabase.com) and sign in
-2. Click **New Project**
-3. Enter project name (e.g., "Master SaaS Muse")
-4. Set a secure database password (save this!)
-5. Select your region
-6. Click **Create new project**
-7. Wait for project to initialize (~2 minutes)
-
-[Screenshot: Supabase new project form]
-
-#### Step 2: Get API Credentials
-1. In Supabase dashboard, go to **Project Settings** (gear icon)
-2. Click **API** in the left sidebar
-3. Copy these values:
-   - **Project URL** (e.g., `https://xxxxx.supabase.co`)
-   - **anon public** key (under Project API keys)
-
-[Screenshot: Supabase API settings page]
-
-#### Step 3: Add Credentials to Replit
-1. In Replit, open the **Secrets** tab (lock icon)
-2. Add these secrets:
-   - `VITE_SUPABASE_URL` = your Project URL
-   - `VITE_SUPABASE_ANON_KEY` = your anon public key
-
-[Screenshot: Replit secrets panel]
-
----
-
-### Part 2: Email Authentication Setup
-
-#### Step 1: Configure Site URL
-1. In Supabase, go to **Authentication** > **URL Configuration**
-2. Set **Site URL** to your Replit app URL (e.g., `https://your-app.replit.app`)
-3. Add to **Redirect URLs**: `https://your-app.replit.app/*`
-4. Click **Save**
-
-[Screenshot: Supabase URL Configuration]
-
-#### Step 2: Configure Email Templates (Optional)
-1. Go to **Authentication** > **Email Templates**
-2. Customize the confirmation email if desired
-3. The default template works fine for development
-
-#### Step 3: Test Email Signup
-1. Navigate to your app's `/signup` page
-2. Enter a valid email and password
-3. Click **Sign Up**
-4. Check your email for confirmation link
-5. Click the confirmation link
-6. You should be redirected to the app and logged in
-
-### Troubleshooting Email Confirmation
-- If the confirmation link shows an error, check that your **Site URL** matches your Replit app URL exactly
-- The URL must include `https://` and should NOT have a trailing slash
-
----
-
-### Part 3: Google OAuth Setup
-
-#### Step 1: Create Google Cloud Project
-1. Go to [console.cloud.google.com](https://console.cloud.google.com)
-2. Click the project dropdown at the top > **New Project**
-3. Name it (e.g., "Master SaaS Muse") > **Create**
-4. Make sure this project is selected
-
-[Screenshot: Google Cloud new project]
-
-#### Step 2: Configure OAuth Consent Screen
-1. Search for **"OAuth consent screen"** in the search bar
-2. Select **External** > Click **Create**
-3. Fill in:
-   - **App name**: Your app name
-   - **User support email**: Your email
-   - **Developer contact email**: Your email
-4. Click **Save and Continue** through the remaining steps
-5. Click **Back to Dashboard**
-
-[Screenshot: OAuth consent screen configuration]
-
-#### Step 3: Create OAuth Credentials
-1. Go to **Credentials** in the left sidebar (or search for it)
-2. Click **+ Create Credentials** > **OAuth client ID**
-3. Choose **Web application**
-4. Set **Name**: "Supabase Auth"
-5. Under **Authorized JavaScript origins**, add:
-   - Your Replit app URL (e.g., `https://your-app.replit.app`)
-6. Under **Authorized redirect URIs**, add:
-   - Get this from Supabase (see next step)
-
-[Screenshot: Google OAuth client configuration]
-
-#### Step 4: Get Supabase Callback URL
-1. In Supabase, go to **Authentication** > **Providers**
-2. Click on **Google**
-3. Copy the **Callback URL** shown (format: `https://xxxxx.supabase.co/auth/v1/callback`)
-4. Paste this into Google's **Authorized redirect URIs**
-5. Click **Create** in Google Console
-6. Copy the **Client ID** and **Client Secret** shown
-
-[Screenshot: Supabase Google provider showing callback URL]
-
-#### Step 5: Configure Supabase Google Provider
-1. In Supabase **Authentication** > **Providers** > **Google**
-2. Toggle **Enable Sign in with Google** ON
-3. Paste your **Client ID**
-4. Paste your **Client Secret**
-5. Click **Save**
-
-[Screenshot: Supabase Google provider with credentials]
-
-#### Step 6: Test Google OAuth
-1. Navigate to your app's `/login` page
-2. Click **Continue with Google**
-3. Select your Google account
-4. You should be logged in and redirected to the dashboard
-
----
-
-### Part 4: Avatar Upload Setup (Supabase Storage)
-
-#### Step 1: Create Storage Bucket
-1. In Supabase, go to **Storage** in the left sidebar
-2. Click **New bucket**
-3. Name it: `avatars`
-4. Toggle **Public bucket** ON
-5. Click **Create bucket**
-
-[Screenshot: Create new bucket dialog]
-
-#### Step 2: Add Storage Policies
-Navigate to **Storage** > **Policies** tab, then add these three policies:
-
-**Policy 1: Allow authenticated uploads (INSERT)**
-1. Click **New Policy** > **For full customization**
-2. Policy name: `Allow authenticated uploads`
-3. Allowed operation: **INSERT**
-4. Target roles: **authenticated**
-5. WITH CHECK expression: `bucket_id = 'avatars'`
-6. Click **Review** > **Save policy**
-
-**Policy 2: Allow authenticated updates (UPDATE)**
-1. Click **New Policy** > **For full customization**
-2. Policy name: `Allow authenticated updates`
-3. Allowed operation: **UPDATE**
-4. Target roles: **authenticated**
-5. USING expression: `bucket_id = 'avatars'`
-6. WITH CHECK expression: `bucket_id = 'avatars'`
-7. Click **Review** > **Save policy**
-
-**Policy 3: Allow public reads (SELECT)**
-1. Click **New Policy** > **For full customization**
-2. Policy name: `Allow public reads`
-3. Allowed operation: **SELECT**
-4. Target roles: **public** (leave as default)
-5. USING expression: `bucket_id = 'avatars'`
-6. Click **Review** > **Save policy**
-
-[Screenshot: Storage policies list showing all three policies]
-
-#### Step 3: Test Avatar Upload
-1. Log in to your app
-2. Navigate to the Profile page
-3. Click the avatar area to upload an image
-4. Select an image file
-5. The avatar should update and display
-
----
-
-### Part 5: Protected Routes
-
-The app includes a `ProtectedRoute` component that:
-- Checks if the user is authenticated
-- Shows a loading state while checking
-- Redirects to `/login` if not authenticated
-- Renders the protected content if authenticated
-
-#### Usage in App.tsx
-```tsx
-<Route path="/dashboard/profile">
-  <ProtectedRoute>
-    <Profile />
-  </ProtectedRoute>
-</Route>
+# Connect and push
+git remote add origin https://github.com/YOUR_USERNAME/master-saas-muse.git
+git branch -M main
+git push -u origin main
 ```
 
 ---
 
-### Part 6: Webhook & Multi-Tenancy Stubs
+## Step 3: Deploy to Vercel
 
-#### Webhook Endpoint
-A stub endpoint exists at `/api/webhooks/user.created` for handling new user registrations. This can be configured in Supabase to trigger when users sign up.
+1. Go to [vercel.com](https://vercel.com)
+2. Click **"Add New Project"**
+3. Import your GitHub repository `master-saas-muse`
+4. Vercel will auto-detect Next.js settings
+5. Click **"Deploy"**
 
-#### Multi-Tenancy Middleware
-The server includes middleware that logs the hostname and extracts potential `app_id` from subdomain patterns. This prepares the app for future multi-tenant implementations where each customer could have their own subdomain.
-
----
-
-### Module 2 Verification Checklist
-- [ ] Email signup works and sends confirmation
-- [ ] Email confirmation link works
-- [ ] Email login works
-- [ ] Google OAuth login works
-- [ ] Protected routes redirect when not logged in
-- [ ] Session persists after page refresh
-- [ ] Avatar upload works
-- [ ] Avatar displays correctly
-- [ ] Logout works
-- [ ] No console errors
+Your app will be live at `https://master-saas-muse.vercel.app` (or similar)
 
 ---
 
-## Module 3: Admin Features
+## Step 4: Install shadcn/ui
 
-*Coming soon - this section will be updated when Module 3 is implemented.*
+```bash
+# Initialize shadcn/ui
+npx shadcn@latest init
 
-### Planned Features
-- Admin dashboard
-- User management
-- Settings management
+# When prompted:
+# - Style: Default
+# - Base color: Slate
+# - CSS variables: Yes
+
+# Install core components
+npx shadcn@latest add button card input label toast avatar badge dialog dropdown-menu separator tabs switch select textarea scroll-area form
+```
+
+---
+
+## Step 5: Install Additional Dependencies
+
+```bash
+# Core dependencies
+npm install @supabase/supabase-js @supabase/ssr next-themes @tanstack/react-query zod
+
+# Form handling
+npm install react-hook-form @hookform/resolvers
+
+# Icons
+npm install lucide-react
+
+# Development
+npm install -D @types/node
+```
+
+---
+
+## Step 6: Set Up Environment Variables
+
+Create `.env.local` file:
+
+```bash
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Stripe (for later)
+STRIPE_SECRET_KEY=
+STRIPE_PUBLISHABLE_KEY=
+STRIPE_WEBHOOK_SECRET=
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+In Vercel Dashboard:
+1. Go to Project Settings → Environment Variables
+2. Add the same variables for Production/Preview/Development
+
+---
+
+## Step 7: Project Structure
+
+After setup, your project should look like:
+
+```
+master-saas-muse/
+├── src/
+│   ├── app/
+│   │   ├── (auth)/
+│   │   │   ├── login/page.tsx
+│   │   │   ├── signup/page.tsx
+│   │   │   └── layout.tsx
+│   │   ├── (dashboard)/
+│   │   │   ├── dashboard/page.tsx
+│   │   │   ├── profile/page.tsx
+│   │   │   ├── settings/page.tsx
+│   │   │   └── layout.tsx
+│   │   ├── (marketing)/
+│   │   │   ├── page.tsx (landing)
+│   │   │   ├── pricing/page.tsx
+│   │   │   └── layout.tsx
+│   │   ├── admin/
+│   │   │   ├── page.tsx
+│   │   │   ├── users/page.tsx
+│   │   │   ├── settings/page.tsx
+│   │   │   └── layout.tsx
+│   │   ├── api/
+│   │   │   ├── auth/
+│   │   │   ├── webhooks/
+│   │   │   └── admin/
+│   │   ├── globals.css
+│   │   └── layout.tsx (root)
+│   ├── components/
+│   │   ├── ui/ (shadcn)
+│   │   ├── layout/
+│   │   │   ├── Header.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   └── ThemeToggle.tsx
+│   │   ├── auth/
+│   │   │   ├── LoginForm.tsx
+│   │   │   └── SignupForm.tsx
+│   │   └── landing/
+│   │       ├── Hero.tsx
+│   │       └── Features.tsx
+│   ├── lib/
+│   │   ├── supabase/
+│   │   │   ├── client.ts
+│   │   │   ├── server.ts
+│   │   │   └── middleware.ts
+│   │   ├── stripe/
+│   │   │   └── client.ts
+│   │   └── utils.ts
+│   ├── hooks/
+│   │   └── use-toast.ts
+│   └── types/
+│       └── database.ts
+├── middleware.ts
+├── next.config.js
+├── tailwind.config.ts
+├── package.json
+└── .env.local
+```
+
+---
+
+## Step 8: Configure Supabase
+
+1. Go to [supabase.com](https://supabase.com) → Create new project
+2. Copy Project URL and anon key to `.env.local`
+3. Enable Email provider in Authentication → Providers
+4. Enable Google OAuth:
+   - Get credentials from Google Cloud Console
+   - Add to Supabase Authentication → Providers → Google
+5. Create `avatars` storage bucket:
+   - Storage → Create bucket → Name: "avatars" → Public: Yes
+   - Add RLS policies for authenticated uploads
+
+---
+
+## Database Tables
+
+Run in Supabase SQL Editor:
+
+```sql
+-- User roles table
+CREATE TABLE user_roles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
+  app_id TEXT DEFAULT 'default',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, app_id)
+);
+
+-- Organization settings
+CREATE TABLE organization_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  app_id TEXT NOT NULL DEFAULT 'default' UNIQUE,
+  settings JSONB NOT NULL DEFAULT '{
+    "organizationName": "My SaaS",
+    "supportEmail": "support@example.com",
+    "allowNewSignups": true,
+    "maintenanceMode": false,
+    "requireEmailVerification": false,
+    "enableGoogleSignIn": true
+  }'::jsonb,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Audit logs
+CREATE TABLE audit_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  action TEXT NOT NULL,
+  details JSONB,
+  app_id TEXT DEFAULT 'default',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Plans
+CREATE TABLE plans (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  price_monthly INTEGER NOT NULL DEFAULT 0,
+  price_yearly INTEGER DEFAULT 0,
+  features JSONB NOT NULL DEFAULT '[]'::jsonb,
+  limits JSONB NOT NULL DEFAULT '{}'::jsonb,
+  stripe_price_id_monthly TEXT,
+  stripe_price_id_yearly TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- User subscriptions
+CREATE TABLE user_subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  plan_id UUID REFERENCES plans(id),
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'canceled', 'past_due', 'trialing')),
+  stripe_subscription_id TEXT,
+  stripe_customer_id TEXT,
+  current_period_end TIMESTAMPTZ,
+  app_id TEXT DEFAULT 'default',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, app_id)
+);
+
+-- Insert default plans
+INSERT INTO plans (name, slug, price_monthly, features, limits) VALUES
+  ('Free', 'free', 0, '["Basic features", "Community support"]', '{"projects": 1, "storage_mb": 100}'),
+  ('Pro', 'pro', 1999, '["All Free features", "Priority support", "Advanced analytics"]', '{"projects": 10, "storage_mb": 5000}'),
+  ('Team', 'team', 4999, '["All Pro features", "Team collaboration", "API access"]', '{"projects": -1, "storage_mb": 50000}');
+
+-- Enable RLS
+ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE organization_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_subscriptions ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies (basic - will be refined in Module 7)
+CREATE POLICY "Users can read own role" ON user_roles FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Admins can manage roles" ON user_roles FOR ALL USING (
+  EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')
+);
+
+CREATE POLICY "Anyone can read plans" ON plans FOR SELECT USING (is_active = true);
+CREATE POLICY "Users can read own subscription" ON user_subscriptions FOR SELECT USING (auth.uid() = user_id);
+```
+
+---
+
+## Next Steps
+
+Once you have completed steps 1-3 (project created, pushed to GitHub, deployed to Vercel), come back here and we'll implement each module together:
+
+1. **Module 1**: Foundation (shadcn/ui, theme, landing page)
+2. **Module 2**: Authentication (Supabase auth, protected routes)
+3. **Module 3**: Admin Features (dashboard, user management, settings)
+4. **Module 4**: Plan System (Free/Pro/Team gating)
+5. **Module 5**: Stripe Billing (checkout, webhooks, subscriptions)
 
 ---
 
 ## Quick Reference
 
-### Environment Variables
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `VITE_SUPABASE_URL` | Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key |
-
 ### Key Commands
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server |
+| `npm run dev` | Start development server (localhost:3000) |
 | `npm run build` | Build for production |
-| `npm run db:push` | Push database schema changes |
+| `npm run start` | Start production server |
+| `git push` | Deploy to Vercel (auto-deploy on push) |
 
 ### Important URLs
-- Supabase Dashboard: https://supabase.com/dashboard
-- Google Cloud Console: https://console.cloud.google.com
-- Replit: https://replit.com
+- [Supabase Dashboard](https://supabase.com/dashboard)
+- [Google Cloud Console](https://console.cloud.google.com)
+- [Vercel Dashboard](https://vercel.com/dashboard)
+- [GitHub](https://github.com)
 
 ---
 
-## Changelog
-
-| Date | Module | Changes |
-|------|--------|---------|
-| 2024-12-29 | 1 | Initial foundation complete |
-| 2024-12-29 | 2 | Authentication complete with Google OAuth |
-
----
-
-*Last updated: December 29, 2024*
+*Last updated: December 29, 2025*
