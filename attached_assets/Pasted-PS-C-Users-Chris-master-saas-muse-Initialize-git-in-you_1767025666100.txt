@@ -1,0 +1,43 @@
+PS C:\Users\Chris\master-saas-muse> # Initialize git in your project
+PS C:\Users\Chris\master-saas-muse> git init
+Initialized empty Git repository in C:/Users/Chris/master-saas-muse/.git/
+PS C:\Users\Chris\master-saas-muse>
+PS C:\Users\Chris\master-saas-muse> # Add all files
+PS C:\Users\Chris\master-saas-muse> git add .
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'eslint.config.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'next.config.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'postcss.config.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/globals.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tsconfig.json', LF will be replaced by CRLF the next time Git touches it
+PS C:\Users\Chris\master-saas-muse>
+PS C:\Users\Chris\master-saas-muse> # Make the first commit
+PS C:\Users\Chris\master-saas-muse> git commit -m "Initial Next.js 14 setup"
+Author identity unknown
+
+*** Please tell me who you are.
+
+Run
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+to set your account's default identity.
+Omit --global to set the identity only in this repository.
+
+fatal: unable to auto-detect email address (got 'Chris@DESKTOP-BNELSV5.(none)')
+PS C:\Users\Chris\master-saas-muse>
+PS C:\Users\Chris\master-saas-muse> # Connect to your GitHub repo
+PS C:\Users\Chris\master-saas-muse> git remote add origin https://github.com/SpeckledDarth/master-saas-muse.git
+PS C:\Users\Chris\master-saas-muse>
+PS C:\Users\Chris\master-saas-muse> # Push (use --force since we're starting fresh)
+PS C:\Users\Chris\master-saas-muse> git branch -M main
+PS C:\Users\Chris\master-saas-muse> git push --force origin main
+error: src refspec main does not match any
+error: failed to push some refs to 'https://github.com/SpeckledDarth/master-saas-muse.git'
+PS C:\Users\Chris\master-saas-muse>
