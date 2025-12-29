@@ -1,0 +1,71 @@
+PS C:\Users\Chris> cd master-saas-muse
+PS C:\Users\Chris\master-saas-muse> git status
+warning: could not open directory 'Application Data/': Permission denied
+warning: could not open directory 'Cookies/': Permission denied
+warning: could not open directory 'Local Settings/': Permission denied
+warning: could not open directory 'My Documents/': Permission denied
+warning: could not open directory 'NetHood/': Permission denied
+warning: could not open directory 'PrintHood/': Permission denied
+warning: could not open directory 'Recent/': Permission denied
+warning: could not open directory 'SendTo/': Permission denied
+warning: could not open directory 'Start Menu/': Permission denied
+warning: could not open directory 'Templates/': Permission denied
+On branch main
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        ../.cursor/
+        ../.docker/
+        ../.gitignore
+        ../.local/
+        ../.ollama/
+        ../.openjfx/
+        ../.vscode/
+        ../.wezterm.lua.txt
+        ../AppData/
+        ../Contacts/
+        ../Desktop/
+        ../Documents/
+        ../Downloads/
+        ../Favorites/
+        ../Links/
+        ../Master Saas Muse Template v2/
+        ../Master Saas Muse Template/
+        ../Mobius - Syncthing/
+        ../Music/
+        ../NTUSER.DAT
+        ../NTUSER.DAT{0322c9de-e9d0-11ef-a816-ead6e0a5f603}.TM.blf
+        ../NTUSER.DAT{0322c9de-e9d0-11ef-a816-ead6e0a5f603}.TMContainer00000000000000000001.regtrans-ms
+        ../NTUSER.DAT{0322c9de-e9d0-11ef-a816-ead6e0a5f603}.TMContainer00000000000000000002.regtrans-ms
+        ../OneDrive/
+        ../Pictures/
+        ../README.md
+        ../Saved Games/
+        ../Searches/
+        ../Videos/
+        ../app/
+        ../eslint.config.mjs
+        ./
+        ../next.config.ts
+        ../ntuser.dat.LOG1
+        ../ntuser.dat.LOG2
+        ../ntuser.ini
+        ../nvm-0.40.1.zip
+        ../nvm-0.40.1/
+        ../nvm-install/
+        ../package-lock.json
+        ../package.json
+        ../postcss.config.mjs
+        ../propfolia-db
+        ../propfolia-db-v1/
+        ../propfolia-ui/
+        ../propfolia/
+        ../propfolia_backup_2025-04-01/
+        ../public/
+        ../syncthing.zip
+        ../tsconfig.json
+
+nothing added to commit but untracked files present (use "git add" to track)
+PS C:\Users\Chris\master-saas-muse>
