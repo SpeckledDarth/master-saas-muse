@@ -243,20 +243,24 @@ export default function AdminDashboard() {
           </Card>
         </Link>
 
-        <Card data-testid="card-audit-logs-preview">
+        <Card 
+          className="hover-elevate cursor-pointer" 
+          data-testid="card-audit-logs-preview"
+          onClick={() => document.getElementById('recent-activity')?.scrollIntoView({ behavior: 'smooth' })}
+        >
           <CardHeader className="flex flex-row items-center gap-4">
             <div className="p-2 bg-orange-100 dark:bg-orange-900/20 text-orange-600 rounded-lg">
               <FileText className="w-6 h-6" />
             </div>
             <div>
               <CardTitle>Audit Logs</CardTitle>
-              <CardDescription>Recent activity</CardDescription>
+              <CardDescription>View recent activity below</CardDescription>
             </div>
           </CardHeader>
         </Card>
       </div>
 
-      <Card data-testid="section-recent-activity">
+      <Card id="recent-activity" data-testid="section-recent-activity">
         <CardHeader>
           <CardTitle>Recent Activity</CardTitle>
           <CardDescription>Latest audit log entries</CardDescription>
