@@ -1,0 +1,255 @@
+# v1 - Overview, Vision & Strategy Document
+**Document Title**: Overview, Vision & Strategy  
+**Version**: 1.0  
+**Date**: December 28, 2025  
+**Author**: Chris Allred
+**Status**: Approved for Development  
+
+## 1. Project Overview
+The **Master SaaS Muse Template** is a single, highly reusable Next.js + Supabase application designed to serve as the shared technical foundation ("factory") for a portfolio of niche, freemium SaaS products referred to as "muses."
+
+Each muse will operate under its own domain, branding, marketing campaigns, and P&L tracking, yet share 80–90% of the underlying code and infrastructure. The template handles all non-muse-specific functionality (authentication, multi-tenancy, billing, admin dashboard, security, monitoring, etc.), allowing rapid duplication and customization for new ideas.
+
+First muse: **ExtrusionCalculator.com** (launch target: January 24, 2026).  
+Future muses may include piggybalance.com, real estate investment tools, contractor management apps, and others.
+
+## 2. Vision
+To build a portfolio of 5–10 niche SaaS muses generating $10K–50K/month combined passive revenue within 3–5 years. The template enables a repeatable, low-maintenance process for launching and operating multiple independent SaaS products while maximizing ownership, simplicity, and scalability.
+
+## 3. Guiding Principles
+- **Simplicity First** – Avoid unnecessary complexity.  
+- **DRY - (Don't Repeat Yourself) principles.
+- **Customization Without Complexity** – Easy per-muse overrides (branding, logic) without architectural changes.
+- **Passive by Design** – Automation-first (n8n webhooks, alerts, exports) to minimize ongoing manual work.
+- **Conservative Planning** – Strict scope control, built-in buffer time, proven stack.
+- **Ethical Monetization** – Transparent freemium model, no dark patterns.
+- **Affiliate-Leveraged Growth** – Built-in support for recurring commissions.
+- **Learning Vehicle** – Each launch improves the template, creating a repeatable blueprint.
+
+## 4. Success Metrics (3-Year Horizon)
+- **Year 1**: 2–3 muses launched, ≥$60K annual profit from first muse
+- **Year 2**: 5 muses live, ≥$150K annual profit
+- **Year 3**: 10 muses live, ≥$300K annual profit, sustainable lifestyle business or acquisition target
+
+## 5. Core Strategy
+1. **Build the Master Template once** as a production-ready, duplicatable GitHub repository.
+2. **Clone & customize** for each new muse:
+   - Rename repository
+   - Update branding (logo, colors, domain)
+   - Add muse-specific schemas, pages, and logic
+   - Configure per-muse keys (Stripe, Plausible, n8n, etc.)
+   - Deploy to new Vercel project + custom domain
+3. **Multi-Tenant Isolation** via Supabase `app_id` field and domain-based middleware resolution.
+4. **Passive Operations** through n8n workflows, admin monitoring dashboards, and automated alerts.
+5. **Documentation & Backup** in an Obsidian vault with code explanations, screenshots, and decision records.
+
+## 6. Risk Mitigation Approach
+- Start with a validated niche (ExtrusionCalculator) to prove revenue before expanding.
+- Strict MVP scope with 1-week buffer.
+- Early testing of multi-tenancy and domain detection.
+- Comprehensive offline documentation for disaster recovery.
+
+**Cross-References**  
+- See *Product Requirements & Features Spec* for detailed feature list  
+- See *Technical Specifications* for stack and architecture  
+- See *Modular Development Plan* for execution timeline
+
+----
+
+# Master SaaS Muse Template – Product Requirements & Features Spec (PRD)
+
+**Document Title**: Product Requirements & Features Specification (PRD)  
+**Version**: 1.1 (Updated to include full 33-feature checklist)  
+**Date**: December 28, 2025  
+**Author**: Chris Allred
+**Status**: Approved for Development  
+
+## 1. Scope
+This PRD defines all features for the **Master SaaS Muse Template** from MVP through potential v1.3. The template itself is muse-agnostic; muse-specific features (e.g., BOM calculator logic) are added post-duplication.
+
+## 2. User Roles
+- **User** – Standard customer (Free/Pro/Team plans)
+- **Admin** – Full access to all data across apps (for operational oversight)
+
+## 3. Feature Priority Tiers
+| Priority | Tier     | Launch Timeline |
+|----------|----------|-----------------|
+| MVP      | Core     | Jan 24, 2026    |
+| v1.1     | Extension| Post-MVP        |
+| v1.2     | Growth   | 3-6 months post-v1.1 |
+| v1.3     | Advanced | 6-12 months post-v1.1 |
+
+## 4. Comprehensive Feature Table
+
+|#|Feature|Priority|Description|Implementation Notes|Dependencies|Duplication Impact|
+|---|---|---|---|---|---|---|
+|1|User Authentication & Onboarding|MVP|Email + Google signup, reset, profile; welcome tour with muse-specific hooks.|Supabase auth + Next.js pages; reusable onboarding component.|Supabase Auth|Identical; override welcome per muse.|
+|2|Plan System & Freemium Gating|MVP|Tiers (Free/Pro/Team), conditional visibility, usage limits.|User.plan field in Supabase + React conditionals.|Supabase|Identical; pricing in Stripe per muse.|
+|3|Billing & Payments Integration|MVP|Fiat recurring subs via Stripe; crypto option via Coinbase Commerce (BTC/Lightning + multi-crypto).|Stripe SDK + webhook → Transaction type; Coinbase Commerce embed/webhook as toggleable alternative.|Stripe SDK, Coinbase Commerce SDK|Identical; separate Stripe/Coinbase products/P&L per muse via App record.|
+|4|Global Navigation & UI Kit|MVP|Consistent UX with role-based menus.|Reusable React components (header, sidebar); Tailwind for styling.|Tailwind CSS|Override logo/colors/menus per muse/role.|
+|5|Core User Pages|MVP|Landing (waitlist), Dashboard (items + role views), Settings, Help.|Next.js pages with role conditionals.|Item table (generic).|Add muse/role-specific tabs.|
+|6|Admin Backend Dashboard|MVP|Users, transactions/P&L, features, content; role extensions.|Tabs + React Query RGs filtered by App/role; P&L breakdowns.|App, Transaction, FeatureRequest tables.|Own App record per muse; roles shared/filtered.|
+|7|Security & Privacy Rules|MVP|Role/plan-based access.|Supabase row-level security + React conditionals.|Supabase RLS|Copy to new tables per muse.|
+|8|Error Logging & Monitoring|MVP|Auto-logs + ops alerts.|Sentry or custom logger → Log table; admin RG.|Log table|Identical.|
+|9|Analytics & Tracking Hooks|v1.1|Events to Plausible; growth metrics per muse.|Plausible SDK + workflows.|Plausible|Identical; override events per muse.|
+|10|Affiliate System Stub|v1.1|Inbound/outbound; supplier/sales agent tracking.|Rewardful SDK + commissions queue.|Rewardful|Identical; override IDs/commissions per muse/role.|
+|11|n8n Automation Hooks|v1.1|Webhooks for ops/marketing; role-specific access.|Supabase triggers + endpoints.|n8n|Identical; n8n workflows duplicated per muse.|
+|12|Notification System|v1.1|In-app/email/SMS nudges; role-triggered.|Supabase real-time + Sendinblue/Twilio.|Sendinblue/Twilio|Identical; override messages per muse/role.|
+|13|Referral Program Stub|v1.1|Invite flows with rewards; agent tracking.|Link generator + admin payouts.|Rewardful extension|Identical; override rewards per muse.|
+|14|Feedback Modal/Poll|v1.1|User input → queue; suppliers suggest products.|Reusable form → FeatureRequest.|FeatureRequest table|Identical.|
+|15|AI Integration Hook|v1.1|OpenAI for suggestions/content (e.g., blog drafts).|OpenAI SDK + reusable prompt component.|OpenAI SDK|Identical; override prompts per muse.|
+|16|Dark/Light Mode Toggle|v1.1|User preference.|next-themes + user field.|next-themes|Identical.| (Note: Pulled into MVP for high value)
+|17|PWA Support|v1.1|Installable on mobile.|Next.js PWA plugin.|next-pwa|Identical.|
+|18|Internationalization Stub|v1.1|Multi-language toggle.|next-intl + user field.|next-intl|Identical; add languages per muse.|
+|19|A/B Testing Hooks|v1.1|Variant toggles for optimization.|LaunchDarkly or custom + admin setter.|User segment field|Identical.|
+|20|User Impersonation|v1.1|Admin troubleshooting.|Session override workflow.|None|Identical.|
+|21|Social Media Sales & Marketing Management|v1.1|Content queue + scheduling; per-muse campaigns with affiliate links.|Admin tab: BlogPost RG (drafts, SEO, images, schedule); n8n webhook for posting.|BlogPost/Lead tables; n8n|Own social accounts in App record; content filtered per muse.|
+|22|Launch Plan Tools|v1.1|Pre-launch waitlist, sequences, growth tracking.|Reusable waitlist + sequence workflows; admin checklist.|WaitlistEntry table; n8n|Identical; override sequences per muse launch.|
+|23|Operations & Support System|v1.1|Tickets, self-help KB, ops monitoring.|Ticket form → SupportTicket; admin queue; KB markdown.|SupportTicket table; n8n alerts|Identical; filter tickets per muse.|
+|24|Multi-Role Dashboards|v1.1|Customized views (admins full ops, suppliers inventory, agents leads, API users endpoints).|Conditional tabs/RGs based on User.role.|User.role field|Identical; add role logic per muse.|
+|25|Custom Domain & Branding Manager|v1.1|Admin sets per-muse domain, logo, colors, favicon, email sender.|Reusable style components + App record fields.|App table|Auto-applies per duplicate.|
+|26|Email & SMS Campaign Builder|v1.2|Drag-drop sequences (welcome, nudge); retention boost.|Repeating group editor + workflow stubs.|Sendinblue/Twilio|Identical; override sequences per muse.|
+|27|Lead & CRM Stub|v1.2|Lead capture + pipeline for B2B/sales agents.|Lead table + RG with stages.|Lead table|Identical; filter per muse.|
+|28|Product Catalog Stub (for Suppliers)|v1.2|Suppliers upload products (title, price, link, image); auto-available in outputs.|Product table + supplier dashboard RG.|Product table|Identical; filter per muse.|
+|29|Usage-Based Billing Hook|v1.2|Track actions for future add-ons/enterprise.|Counter field + Stripe metering stub.|Stripe|Identical.|
+|30|White-Label Stub|v1.3|Hide "Powered by" + custom emails for Team upsell.|Conditional branding.|None|Identical.|
+|31|Automated Onboarding Checklist|v1.3|Personalized checklist for activation boost.|Checklist table + reusable group.|Checklist table|Identical; override items per muse.|
+|32|Data Export for Users|v1.3|Self-serve CSV/PDF of items/BOMs.|Reusable workflow.|None|Identical.|
+|33|Uptime & Health Monitor|v1.3|Daily ping + alerts if down.|n8n hook + status field.|n8n|Identical.|
+
+## 5. Non-Functional Requirements
+- **Performance**: <2s page loads on Vercel Edge
+- **Accessibility**: WCAG 2.1 AA compliant where feasible
+- **SEO**: SSR for landing pages, metadata support
+- **Scalability**: Designed for 10K+ users per muse
+- **Maintainability**: Clean folder structure, TypeScript, comprehensive docs
+
+**Cross-References**  
+- See *Technical Specifications* for implementation details  
+- See *Modular Development Plan* for delivery timeline
+- See *Future Needs & Improvements Register* for tracking deferred items
+
+----
+# Tech Spec
+
+**Document Title**: Technical Specifications  
+**Version**: 1.0  
+**Date**: December 28, 2025  
+**Author**: Chris Allred
+**Status**: Approved for Development  
+
+## 1. Core Technology Stack
+
+| Layer              | Technology                                      | Rationale                                                                 |
+|--------------------|-------------------------------------------------|---------------------------------------------------------------------------|
+| Frontend           | Next.js 14+ (App Router), React 18+, TypeScript | SSR for SEO, excellent developer experience, AI tool compatibility        |
+| Styling            | Tailwind CSS + shadcn/ui + next-themes           | Rapid, consistent, dark-mode-ready UI                                      |
+| Backend / DB / Auth| Supabase (PostgreSQL + Auth + RLS + Storage)     | All-in-one BaaS, relational data, real-time, row-level security           |
+| Hosting            | Vercel                                          | Native Next.js support, preview deploys, custom domains, edge functions   |
+| State Management   | TanStack Query (server state), Zustand (optional client) | Efficient data fetching & caching                                         |
+| Payments (Fiat)    | Stripe                                          | Industry standard, webhooks, customer portal                              |
+| Payments (Crypto)  | Coinbase Commerce (v1.1)                        | Crypto support without self-custody                                       |
+| Analytics          | Plausible (free tier initially)                 | Privacy-focused, lightweight                                              |
+| Error Tracking     | Sentry (free tier)                              | Production error monitoring                                               |
+| Automation         | n8n.cloud (webhook endpoints in MVP)            | Duplicatable workflows for passive ops                                    |
+| Validation         | Zod                                             | Runtime type safety                                                       |
+| Testing            | Vitest + React Testing Library                  | Fast, modern unit/integration testing                                     |
+| CI/CD              | GitHub Actions                                  | Lint, type-check, auto-deploy to Vercel                                    |
+
+## 2. Project Structure
+
+/
+├── src/
+│   ├── app/                    # App Router pages & layouts
+│   │   ├── (auth)/
+│   │   ├── (dashboard)/
+│   │   ├── admin/
+│   │   ├── api/webhooks/
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components/             # Reusable UI (ui/, layout/, auth/, billing/, admin/)
+│   ├── lib/                    # Utilities (supabase/, stripe/, middleware/, utils.ts)
+│   ├── hooks/                  # Custom hooks
+│   ├── types/                  # TypeScript types
+│   └── server/                 # Server actions & route handlers
+├── supabase/
+│   ├── migrations/
+│   └── seed.sql
+├── middleware.ts               # Domain detection & app_id resolution
+├── docs/                       # Architecture Decision Records
+└── tests/
+
+
+## 3. Database Schema (MVP Core Tables)
+- `auth.users` → extended with profile fields
+- `apps` → multi-tenant record (domain, name, branding fields)
+- `plans` → Free / Pro / Team definitions
+- `subscriptions` → Stripe subscription metadata
+- `transactions` → All payments (app_id scoped)
+- `logs` → Error & operation logs
+- `feature_requests` → User feedback
+
+All tables include `app_id` for isolation.
+
+## 4. Key Architectural Decisions
+- **Multi-Tenancy**: Domain-based middleware → `app_id` context → RLS policies
+- **Authentication**: Supabase Auth with server-side session validation
+- **Dark Mode**: next-themes with system preference default
+- **Webhooks**: Secure API routes with signature verification
+- **Deployment**: Vercel preview per PR, production per push to main
+
+**Cross-References**  
+- See *Modular Development Plan* for implementation order  
+- See *Product Documentation* for detailed code explanations (updated during build)
+
+
+----
+# Modular Development Plan
+
+**Document Title**: Modular Development Plan  
+**Version**: 1.0  
+**Date**: December 28, 2025  
+**Author**: Chris Allred 
+**Status**: Approved for Development  
+
+## 1. Development Approach
+Stackable, self-contained modules. Each module:
+- Builds on previous ones
+- Produces a deployable preview on Vercel
+- Includes tests and documentation updates
+- Targets 1–2 weeks completion
+
+## 2. Timeline Overview
+- **Start**: December 28, 2025
+- **MVP Launch Target**: January 24, 2026
+- **Buffer**: 1 full week built-in
+
+## 3. Modules
+
+| Module | Weeks                | Key Deliverables                                                                 | Maps To Original Phases       |
+|--------|----------------------|----------------------------------------------------------------------------------|-------------------------------|
+| 1      | Week 1 (Dec 28–Jan 3) Days 1–3 | Foundation scaffold, dark mode, structure, middleware stub, Vercel deploy        | Phase 1 + partial 9           |
+| 2      | Week 1 Days 4–7      | Auth, profile, full domain detection, user.created webhook                       | Phase 2                       |
+| 3      | Week 2 (Jan 4–10) Days 1–4 | Plan system, gating, upgrade UI                                                  | Phase 3                       |
+| 4      | Week 2 Days 5–7 + Week 3 Days 1–3 | Stripe billing, transactions, subscription.created webhook                       | Phase 4 + partial 10          |
+| 5      | Week 3 Days 4–7      | Core pages (landing, dashboard, settings, help), final navigation                | Phase 5 + remaining 9         |
+| 6      | Week 4 (Jan 18–23) Days 1–4 | Admin dashboard (users, P&L, impersonation)                                      | Phase 6                       |
+| 7      | Week 4 Days 5–6      | RLS, security, full webhook implementation & signatures                          | Phase 7 + remaining 10        |
+| 8      | Week 4 Day 7 + Buffer Week | Sentry/logging, E2E testing, docs, GitHub template setup, ExtrusionCalculator integration | Phase 8 + Buffer              |
+
+## 4. Tools & Workflow
+- **Primary Editor**: Local VS Code or Replit (cloud fallback)
+- **UI Generation**: v0.dev (shadcn/ui components & pages)
+- **Code Assistance**: Grok (this AI) + Cursor.ai when stable
+- **Deployment**: Vercel previews after every module
+- **Documentation**: Update Product Documentation after each module
+
+## 5. Success Gate per Module
+- All tests pass
+- Preview deploy works
+- Documentation updated
+- No critical blockers
+
+**Cross-References**  
+- See *Technical Specifications* for stack details  
+- See *Launch Plan* for final deployment steps
