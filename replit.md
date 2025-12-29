@@ -75,7 +75,34 @@ The server includes middleware that extracts potential `app_id` from subdomain p
 
 ### Third-Party Services
 - **Supabase**: Authentication and user management
+  - Email/password authentication
+  - Google OAuth (configured via Google Cloud Console)
+  - Storage bucket `avatars` for profile pictures (with RLS policies)
 - **PostgreSQL**: Primary database (provision via Replit or external provider)
+
+## Development Progress
+
+### Module 1: Foundation (Complete)
+- Landing page with Hero section
+- Dark/light mode toggle
+- Header with navigation
+- Footer component
+
+### Module 2: Authentication (Complete)
+- Email/password signup with confirmation
+- Email/password login
+- Google OAuth integration
+- Protected routes with redirect
+- Session persistence
+- Profile page with avatar upload
+- Supabase Storage configured with RLS policies
+- Webhook endpoint stub at `/api/webhooks/user.created`
+- Multi-tenancy middleware (hostname logging)
+
+### Module 3: Admin Features (Pending)
+- Admin dashboard
+- User management
+- Settings management
 
 ### Key NPM Packages
 - `@supabase/supabase-js` - Supabase client
