@@ -13,6 +13,9 @@ import Home from "@/pages/home";
 import Login from "@/pages/auth/login";
 import Signup from "@/pages/auth/signup";
 import Profile from "@/pages/dashboard/profile";
+import AdminDashboard from "@/pages/admin/dashboard";
+import AdminUsers from "@/pages/admin/users";
+import AdminSettings from "@/pages/admin/settings";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -51,6 +54,22 @@ function Router() {
         </ProtectedRoute>
       </Route>
       
+      <Route path="/admin">
+        <ProtectedRoute>
+          <AdminDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/users">
+        <ProtectedRoute>
+          <AdminUsers />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/settings">
+        <ProtectedRoute>
+          <AdminSettings />
+        </ProtectedRoute>
+      </Route>
+      
       <Route component={NotFound} />
     </Switch>
   );
@@ -60,10 +79,11 @@ function AppContent() {
   const [location] = useLocation();
   const isAuthPage = location.startsWith('/auth/');
   const isDashboardPage = location.startsWith('/dashboard');
+  const isAdminPage = location.startsWith('/admin');
 
   return (
     <>
-      {!isAuthPage && !isDashboardPage && <Header />}
+      {!isAuthPage && !isDashboardPage && !isAdminPage && <Header />}
       <Router />
       <Toaster />
     </>

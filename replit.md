@@ -99,10 +99,19 @@ The server includes middleware that extracts potential `app_id` from subdomain p
 - Webhook endpoint stub at `/api/webhooks/user.created`
 - Multi-tenancy middleware (hostname logging)
 
-### Module 3: Admin Features (Pending)
-- Admin dashboard
-- User management
-- Settings management
+### Module 3: Admin Features (Complete)
+- Admin dashboard with metrics (/admin)
+- User management with role editing (/admin/users)
+- Settings page with feature toggles (/admin/settings)
+- Role-based access control (admin/member)
+- Bootstrap admin functionality for new installations
+- Audit logging for admin actions
+- Database schema: user_roles, organization_settings, audit_logs
+
+### Configuration Files
+- `.env.template` - Template for all secrets and environment variables
+- `config/muse.config.json` - Project-specific settings (name, branding, features)
+- `docs/MUSE_CHECKLIST.md` - Quick-start checklist for cloning template
 
 ### Key NPM Packages
 - `@supabase/supabase-js` - Supabase client
