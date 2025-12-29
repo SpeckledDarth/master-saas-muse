@@ -1,0 +1,53 @@
+PS C:\Users\Chris> # Navigate into the project
+PS C:\Users\Chris> cd master-saas-muse
+PS C:\Users\Chris\master-saas-muse> # Initialize git (if not already done)
+PS C:\Users\Chris\master-saas-muse> git init
+git : The term 'git' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ git init
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (git:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\Chris\master-saas-muse> # Create your first commit
+PS C:\Users\Chris\master-saas-muse> git add .
+git : The term 'git' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ git add .
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (git:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\Chris\master-saas-muse> git commit -m "Initial Next.js 14 setup"
+git : The term 'git' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ git commit -m "Initial Next.js 14 setup"
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (git:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\Chris\master-saas-muse> # Create a new repository on GitHub
+PS C:\Users\Chris\master-saas-muse> # Go to github.com → New Repository → Name: "master-saas-muse" → Create
+PS C:\Users\Chris\master-saas-muse> # Connect and push
+PS C:\Users\Chris\master-saas-muse> git remote add origin https://github.com/SpeckledDarth/master-saas-muse.git
+git : The term 'git' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ git remote add origin https://github.com/SpeckledDarth/master-saas-mu ...
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (git:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\Chris\master-saas-muse> git branch -M main
+git : The term 'git' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ git branch -M main
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (git:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\Chris\master-saas-muse> git push -u origin main
