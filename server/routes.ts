@@ -68,12 +68,25 @@ export async function registerRoutes(
 
   // ==================== USER ROLE ENDPOINTS ====================
   
-  // Get current user's role
+  // Get current user's role (auto-creates member role if not exists)
   app.get("/api/user/role", async (req: AuthenticatedRequest, res) => {
     if (!req.userId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
-    const role = await storage.getUserRole(req.userId);
+    let role = await storage.getUserRole(req.userId);
+    
+    // Auto-create member role for new users if they don't have one
+    if (!role) {
+      try {
+        role = await storage.setUserRole(req.userId, 'member');
+        console.log(`[Auto-role] Created member role for user: ${req.userId}`);
+      } catch (error) {
+        console.error('[Auto-role] Error creating role:', error);
+        // Still return member role even if DB insert fails
+        return res.json({ role: 'member', isAdmin: false });
+      }
+    }
+    
     res.json({ role: role?.role || 'member', isAdmin: role?.role === 'admin' });
   });
 

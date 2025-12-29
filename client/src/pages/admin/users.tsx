@@ -86,6 +86,27 @@ export default function UserManagement() {
         </div>
       </div>
 
+      {/* Current User Info */}
+      <Card className="mb-6" data-testid="card-current-user">
+        <CardContent className="py-4">
+          <div className="flex items-center gap-3">
+            <Avatar>
+              <AvatarImage src={currentUser?.user_metadata?.avatar_url} />
+              <AvatarFallback>
+                {currentUser?.email?.slice(0, 2).toUpperCase() || "??"}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-sm text-muted-foreground">Currently logged in as:</p>
+              <p className="font-medium" data-testid="text-current-user-email">
+                {currentUser?.email || "Unknown user"}
+              </p>
+            </div>
+            <Badge variant="outline" className="ml-auto">Admin</Badge>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card data-testid="card-users-list">
         <CardHeader>
           <CardTitle>All Users</CardTitle>
