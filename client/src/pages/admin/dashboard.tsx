@@ -39,7 +39,13 @@ export default function AdminDashboard() {
   });
 
   const bootstrapMutation = useMutation({
-    mutationFn: () => bootstrapAdmin(),
+    mutationFn: async () => {
+      const result = await bootstrapAdmin();
+      if (!result.success) {
+        throw new Error(result.error || "Bootstrap failed");
+      }
+      return result;
+    },
     onSuccess: async () => {
       await refreshRole();
       queryClient.invalidateQueries({ queryKey: ["/api/admin/metrics"] });
