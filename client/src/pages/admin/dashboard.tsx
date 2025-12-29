@@ -59,51 +59,93 @@ export default function AdminDashboard() {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8" data-testid="admin-not-authenticated">
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Shield className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Authentication Required</h2>
-            <p className="text-muted-foreground mb-4">Please sign in to access the admin panel.</p>
-            <Link href="/auth/login">
-              <Button data-testid="button-go-to-login">Sign In</Button>
+      <div className="min-h-screen bg-background" data-testid="admin-not-authenticated">
+        <header className="border-b">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
+            <Link href="/" data-testid="link-home">
+              <span className="font-bold text-lg">Master SaaS Muse</span>
             </Link>
-          </CardContent>
-        </Card>
+            <div className="flex items-center gap-2">
+              <Link href="/auth/login" data-testid="link-login">
+                <Button variant="ghost">Sign In</Button>
+              </Link>
+              <Link href="/auth/signup" data-testid="link-signup">
+                <Button>Sign Up</Button>
+              </Link>
+            </div>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-8">
+          <Card>
+            <CardContent className="py-12 text-center">
+              <Shield className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <h2 className="text-xl font-semibold mb-2">Authentication Required</h2>
+              <p className="text-muted-foreground mb-4">Please sign in to access the admin panel.</p>
+              <Link href="/auth/login" data-testid="link-go-to-login">
+                <Button data-testid="button-go-to-login">Sign In</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   if (!isAdmin) {
     return (
-      <div className="container mx-auto px-4 py-8" data-testid="admin-bootstrap-prompt">
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Shield className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Admin Access Required</h2>
-            <p className="text-muted-foreground mb-4">
-              You don't have admin access yet. If this is a new installation,
-              you can bootstrap yourself as the first admin.
-            </p>
-            <Button 
-              onClick={() => bootstrapMutation.mutate()}
-              disabled={bootstrapMutation.isPending}
-              data-testid="button-bootstrap-admin"
-            >
-              {bootstrapMutation.isPending ? "Setting up..." : "Become First Admin"}
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background" data-testid="admin-bootstrap-prompt">
+        <header className="border-b">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
+            <Link href="/" data-testid="link-home">
+              <span className="font-bold text-lg">Master SaaS Muse</span>
+            </Link>
+            <Link href="/dashboard" data-testid="link-dashboard">
+              <Button variant="ghost">My Dashboard</Button>
+            </Link>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-8">
+          <Card>
+            <CardContent className="py-12 text-center">
+              <Shield className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <h2 className="text-xl font-semibold mb-2">Admin Access Required</h2>
+              <p className="text-muted-foreground mb-4">
+                You don't have admin access yet. If this is a new installation,
+                you can bootstrap yourself as the first admin.
+              </p>
+              <Button 
+                onClick={() => bootstrapMutation.mutate()}
+                disabled={bootstrapMutation.isPending}
+                data-testid="button-bootstrap-admin"
+              >
+                {bootstrapMutation.isPending ? "Setting up..." : "Become First Admin"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8" data-testid="admin-dashboard">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Manage users, settings, and monitor activity</p>
-      </div>
+    <div className="min-h-screen bg-background" data-testid="admin-dashboard">
+      <header className="border-b">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
+          <Link href="/" data-testid="link-home">
+            <span className="font-bold text-lg">Master SaaS Muse</span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard" data-testid="link-user-dashboard">
+              <Button variant="ghost">My Profile</Button>
+            </Link>
+          </div>
+        </div>
+      </header>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <p className="text-muted-foreground">Manage users, settings, and monitor activity</p>
+        </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
         <Card data-testid="metric-total-users">
@@ -253,6 +295,7 @@ export default function AdminDashboard() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
