@@ -27,17 +27,15 @@ export function UserNav() {
     useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      console.log('UserNav: user =', user?.id)
       setUser(user)
 
       if (user) {
-        const { data: roleData, error } = await supabase
+        const { data: roleData } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
           .single()
 
-        console.log('UserNav: roleData =', roleData, 'error =', error)
         setIsAdmin(roleData?.role === 'admin')
       }
 
