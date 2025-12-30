@@ -183,6 +183,40 @@ The server includes middleware that extracts potential `app_id` from subdomain p
 - Fixed login form: No longer requires entering credentials twice
 - Fixed bootstrap admin: Proper error message when admin already exists
 
+## Current Issue (Dec 30, 2025) - RESUME HERE
+
+### Problem: /login returns 404 on Vercel despite code existing
+
+**What we've verified:**
+1. `src/app/(auth)/layout.tsx` EXISTS on GitHub (commit 560db37)
+2. `src/app/(auth)/login/page.tsx` EXISTS on GitHub
+3. Local project structure is correct
+4. GitHub has latest code at: https://github.com/SpeckledDarth/master-saas-muse/tree/main/src/app/(auth)
+
+**What we've tried:**
+1. Created missing `layout.tsx` for (auth) route group
+2. Fixed Windows `.txt` extension issue (file was `layout.tsx.txt`)
+3. Pushed to GitHub - confirmed commit 560db37 is there
+4. Disconnected and reconnected Vercel to GitHub
+5. Multiple redeployments with "Use existing Build Cache" unchecked
+
+**The Core Problem:**
+Vercel build logs show ONLY these routes being compiled:
+- `/`
+- `/_not-found`
+
+The `/login`, `/signup`, `/reset-password` routes are NOT appearing in build output.
+Vercel Source still shows old commit `31f21d9` instead of `560db37`.
+
+**Next Steps to Try:**
+1. Check Vercel deployment Source section after reconnection - does it now show commit 560db37?
+2. If still showing old commit, try deleting and recreating the Vercel project entirely
+3. Check Vercel Settings → General → Root Directory (should be empty/root, not a subfolder)
+4. Try manual deploy via Vercel CLI
+
+**User's GitHub:** https://github.com/SpeckledDarth/master-saas-muse
+**Vercel Domain:** master-saas-muse.vercel.app
+
 ### Configuration Files
 - `.env.template` - Template for all secrets and environment variables
 - `config/muse.config.json` - Project-specific settings (name, branding, features)
