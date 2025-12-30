@@ -1,0 +1,50 @@
+PS C:\Users\Chris\master-saas-muse> git push
+Enumerating objects: 10, done.
+Counting objects: 100% (10/10), done.
+Delta compression using up to 24 threads
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (6/6), 641 bytes | 641.00 KiB/s, done.
+Total 6 (delta 3), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
+To https://github.com/SpeckledDarth/master-saas-muse.git
+   07d4251..9ecb08b  main -> main
+PS C:\Users\Chris\master-saas-muse> git log --oneline -3
+9ecb08b (HEAD -> main, origin/main) Add auth layout file
+07d4251 Add admin link to user menu
+c4df9f0 Module 2: Authentication complete - signup, login, email confirmation working
+PS C:\Users\Chris\master-saas-muse> cd C:\Users\Chris\master-saas-muse\src\app\(auth)
+auth : The term 'auth' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and
+try again.
+At line:1 char:45
++ cd C:\Users\Chris\master-saas-muse\src\app\(auth)
++                                             ~~~~
+    + CategoryInfo          : ObjectNotFound: (auth:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\Chris\master-saas-muse> ren "layout.tsx.txt" "layout.tsx"
+ren : Cannot rename because item at 'layout.tsx.txt' does not exist.
+At line:1 char:1
++ ren "layout.tsx.txt" "layout.tsx"
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [Rename-Item], PSInvalidOperationException
+    + FullyQualifiedErrorId : InvalidOperation,Microsoft.PowerShell.Commands.RenameItemCommand
+
+PS C:\Users\Chris\master-saas-muse> cd "C:\Users\Chris\master-saas-muse\src\app\(auth)"
+PS C:\Users\Chris\master-saas-muse\src\app\(auth)> ren "layout.tsx.txt" "layout.tsx"
+PS C:\Users\Chris\master-saas-muse\src\app\(auth)> cd C:\Users\Chris\master-saas-muse
+PS C:\Users\Chris\master-saas-muse> git add .
+PS C:\Users\Chris\master-saas-muse> git commit -m "Fix layout file extension"
+[main 560db37] Fix layout file extension
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ rename src/app/(auth)/{layout.tsx.txt => layout.tsx} (100%)
+PS C:\Users\Chris\master-saas-muse> git push
+Enumerating objects: 9, done.
+Counting objects: 100% (9/9), done.
+Delta compression using up to 24 threads
+Compressing objects: 100% (5/5), done.
+Writing objects: 100% (5/5), 505 bytes | 505.00 KiB/s, done.
+Total 5 (delta 3), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
+To https://github.com/SpeckledDarth/master-saas-muse.git
+   9ecb08b..560db37  main -> main
+PS C:\Users\Chris\master-saas-muse>
