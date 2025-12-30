@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast'
 import { Loader2, Camera, User, Mail, Key } from 'lucide-react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 
-export default function ProfilePage() {
+function ProfileContent() {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -26,7 +26,6 @@ export default function ProfilePage() {
   const { toast } = useToast()
   const supabase = createClient()
 
-  // Check if coming from password reset
   const isPasswordReset = searchParams.get('reset') === 'true'
 
   useEffect(() => {
@@ -66,7 +65,6 @@ export default function ProfilePage() {
     const fileName = `${user.id}-${Date.now()}.${fileExt}`
     const filePath = `avatars/${fileName}`
 
-    // Upload to Supabase Storage
     const { error: uploadError } = await supabase.storage
       .from('avatars')
       .upload(filePath, file, { upsert: true })
@@ -81,12 +79,10 @@ export default function ProfilePage() {
       return
     }
 
-    // Get public URL
     const { data: { publicUrl } } = supabase.storage
       .from('avatars')
       .getPublicUrl(filePath)
 
-    // Update user metadata
     const { error: updateError } = await supabase.auth.updateUser({
       data: { avatar_url: publicUrl },
     })
@@ -174,142 +170,145 @@ export default function ProfilePage() {
   const userInitials = user.email?.substring(0, 2).toUpperCase() || 'U'
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold">Profile</h1>
+    <div className="max-w-2xl mx-auto space-y-6">
+      <h1 className="text-3xl font-bold">Profile</h1>
 
-        {/* Profile Info Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Profile Information
-            </CardTitle>
-            <CardDescription>Your account details and avatar</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Avatar */}
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <Avatar className="h-20 w-20 cursor-pointer" onClick={handleAvatarClick}>
-                  <AvatarImage src={avatarUrl || undefined} />
-                  <AvatarFallback className="text-xl">{userInitials}</AvatarFallback>
-                </Avatar>
-                <button
-                  onClick={handleAvatarClick}
-                  className="absolute bottom-0 right-0 p-1.5 rounded-full bg-primary text-primary-foreground"
-                  disabled={isUploadingAvatar}
-                  data-testid="button-change-avatar"
-                >
-                  {isUploadingAvatar ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <Camera className="h-3 w-3" />
-                  )}
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleAvatarUpload}
-                  data-testid="input-avatar"
-                />
-              </div>
-              <div>
-                <p className="font-medium">{user.user_metadata?.full_name || 'User'}</p>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
-              </div>
-            </div>
-
-            {/* Email Display */}
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Mail className="h-4 w-4" />
-                Email
-              </Label>
-              <Input
-                value={user.email || ''}
-                disabled
-                className="bg-muted"
-                data-testid="input-email-display"
-              />
-              <p className="text-xs text-muted-foreground">
-                Email cannot be changed
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Password Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Key className="h-5 w-5" />
-              {isPasswordReset ? 'Set New Password' : 'Change Password'}
-            </CardTitle>
-            <CardDescription>
-              {isPasswordReset 
-                ? 'Create a new password for your account' 
-                : 'Update your password to keep your account secure'
-              }
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordUpdate} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">New Password</Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  placeholder="Enter new password (min 6 characters)"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                  disabled={isUpdating}
-                  data-testid="input-new-password"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmNewPassword">Confirm New Password</Label>
-                <Input
-                  id="confirmNewPassword"
-                  type="password"
-                  placeholder="Confirm new password"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  required
-                  disabled={isUpdating}
-                  data-testid="input-confirm-new-password"
-                />
-              </div>
-              <Button type="submit" disabled={isUpdating} data-testid="button-update-password">
-                {isUpdating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Updating...
-                  </>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Profile Information
+          </CardTitle>
+          <CardDescription>Your account details and avatar</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Avatar className="h-20 w-20 cursor-pointer" onClick={handleAvatarClick}>
+                <AvatarImage src={avatarUrl || undefined} />
+                <AvatarFallback className="text-xl">{userInitials}</AvatarFallback>
+              </Avatar>
+              <button
+                onClick={handleAvatarClick}
+                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-primary text-primary-foreground"
+                disabled={isUploadingAvatar}
+                data-testid="button-change-avatar"
+              >
+                {isUploadingAvatar ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
                 ) : (
-                  'Update Password'
+                  <Camera className="h-3 w-3" />
                 )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+                data-testid="input-avatar"
+              />
+            </div>
+            <div>
+              <p className="font-medium">{user.user_metadata?.full_name || 'User'}</p>
+              <p className="text-sm text-muted-foreground">{user.email}</p>
+            </div>
+          </div>
 
-        {/* Sign Out */}
-        <Card>
-          <CardContent className="pt-6">
-            <Button 
-              variant="destructive" 
-              onClick={handleSignOut}
-              data-testid="button-sign-out"
-            >
-              Sign Out
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Email
+            </Label>
+            <Input
+              value={user.email || ''}
+              disabled
+              className="bg-muted"
+              data-testid="input-email-display"
+            />
+            <p className="text-xs text-muted-foreground">
+              Email cannot be changed
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Key className="h-5 w-5" />
+            {isPasswordReset ? 'Set New Password' : 'Change Password'}
+          </CardTitle>
+          <CardDescription>
+            {isPasswordReset
+              ? 'Create a new password for your account'
+              : 'Update your password to keep your account secure'
+            }
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handlePasswordUpdate} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New Password</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                placeholder="Enter new password (min 6 characters)"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                disabled={isUpdating}
+                data-testid="input-new-password"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmNewPassword">Confirm New Password</Label>
+              <Input
+                id="confirmNewPassword"
+                type="password"
+                placeholder="Confirm new password"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                required
+                disabled={isUpdating}
+                data-testid="input-confirm-new-password"
+              />
+            </div>
+            <Button type="submit" disabled={isUpdating} data-testid="button-update-password">
+              {isUpdating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Update Password'
+              )}
             </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6">
+          <Button
+            variant="destructive"
+            onClick={handleSignOut}
+            data-testid="button-sign-out"
+          >
+            Sign Out
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <div className="min-h-screen p-4 md:p-8">
+      <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+        <ProfileContent />
+      </Suspense>
     </div>
   )
 }
