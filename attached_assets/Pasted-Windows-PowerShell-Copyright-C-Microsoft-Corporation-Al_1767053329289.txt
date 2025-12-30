@@ -1,0 +1,51 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Users\Chris> cd C:\Users\Chris\master-saas-muse
+PS C:\Users\Chris\master-saas-muse> git ls-files "src/app/(auth)"
+src/app/(auth)/auth/callback/route.ts
+src/app/(auth)/login/page.tsx
+src/app/(auth)/reset-password/page.tsx
+src/app/(auth)/signup/page.tsx
+PS C:\Users\Chris\master-saas-muse> git log --oneline -1
+07d4251 (HEAD -> main, origin/main) Add admin link to user menu
+PS C:\Users\Chris\master-saas-muse> cd C:\Users\Chris\master-saas-muse
+PS C:\Users\Chris\master-saas-muse> git add .
+PS C:\Users\Chris\master-saas-muse> git commit -m "Add auth layout file"
+[main 9ecb08b] Add auth layout file
+ 1 file changed, 7 insertions(+)
+ create mode 100644 src/app/(auth)/layout.tsx.txt
+PS C:\Users\Chris\master-saas-muse> git push
+Enumerating objects: 10, done.
+Counting objects: 100% (10/10), done.
+Delta compression using up to 24 threads
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (6/6), 641 bytes | 641.00 KiB/s, done.
+Total 6 (delta 3), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
+To https://github.com/SpeckledDarth/master-saas-muse.git
+   07d4251..9ecb08b  main -> main
+PS C:\Users\Chris\master-saas-muse> git log --oneline -3
+9ecb08b (HEAD -> main, origin/main) Add auth layout file
+07d4251 Add admin link to user menu
+c4df9f0 Module 2: Authentication complete - signup, login, email confirmation working
+PS C:\Users\Chris\master-saas-muse> cd C:\Users\Chris\master-saas-muse\src\app\(auth)
+auth : The term 'auth' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and
+try again.
+At line:1 char:45
++ cd C:\Users\Chris\master-saas-muse\src\app\(auth)
++                                             ~~~~
+    + CategoryInfo          : ObjectNotFound: (auth:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\Chris\master-saas-muse> ren "layout.tsx.txt" "layout.tsx"
+ren : Cannot rename because item at 'layout.tsx.txt' does not exist.
+At line:1 char:1
++ ren "layout.tsx.txt" "layout.tsx"
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [Rename-Item], PSInvalidOperationException
+    + FullyQualifiedErrorId : InvalidOperation,Microsoft.PowerShell.Commands.RenameItemCommand
+
+PS C:\Users\Chris\master-saas-muse>
