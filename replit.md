@@ -215,7 +215,7 @@ Vercel Source still shows old commit `31f21d9` instead of `560db37`.
 4. Try manual deploy via Vercel CLI
 
 **User's GitHub:** https://github.com/SpeckledDarth/master-saas-muse
-**Vercel Domain:** master-saas-muse.vercel.app
+**Vercel Domain:** master-saas-muse-u7ga.vercel.app (new project created Dec 30, 2025)
 
 ### Configuration Files
 - `.env.template` - Template for all secrets and environment variables
