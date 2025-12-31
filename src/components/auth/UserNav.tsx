@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -24,34 +24,40 @@ export function UserNav() {
   const router = useRouter()
   const supabase = createClient()
 
-    useEffect(() => {
+  const checkAdminRole = useCallback(async (userId: string) => {
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .single()
+    
+    setIsAdmin(roleData?.role === 'admin')
+  }, [supabase])
+
+  useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
 
       if (user) {
-        const { data: roleData } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .single()
-
-        setIsAdmin(roleData?.role === 'admin')
+        await checkAdminRole(user.id)
       }
 
       setIsLoading(false)
     }
     getUser()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
-      if (!session?.user) {
+      if (session?.user) {
+        await checkAdminRole(session.user.id)
+      } else {
         setIsAdmin(false)
       }
     })
 
     return () => subscription.unsubscribe()
-  }, [supabase])
+  }, [supabase, checkAdminRole])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
