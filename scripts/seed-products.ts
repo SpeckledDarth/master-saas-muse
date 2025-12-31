@@ -2,7 +2,6 @@
  * Seed Script: Create Stripe Products and Prices
  * 
  * Run this script to create the Free/Pro/Team plans in Stripe.
- * The products will be automatically synced to your database via webhooks.
  * 
  * Usage: npx tsx scripts/seed-products.ts
  */
@@ -13,11 +12,12 @@ const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 
 if (!STRIPE_SECRET_KEY) {
   console.error('STRIPE_SECRET_KEY environment variable is required');
+  console.error('Run with: STRIPE_SECRET_KEY=sk_test_xxx npx tsx scripts/seed-products.ts');
   process.exit(1);
 }
 
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2025-11-17.clover',
+  apiVersion: '2024-12-18.acacia',
 });
 
 interface PlanConfig {
@@ -30,18 +30,6 @@ interface PlanConfig {
 }
 
 const PLANS: PlanConfig[] = [
-  {
-    name: 'Free',
-    description: 'Perfect for getting started',
-    features: ['Basic features', 'Community support', '1 project'],
-    monthlyPrice: 0,
-    yearlyPrice: 0,
-    metadata: {
-      tier: 'free',
-      projectLimit: '1',
-      features: 'basic',
-    },
-  },
   {
     name: 'Pro',
     description: 'For professionals and growing teams',
@@ -121,7 +109,7 @@ async function seedProducts() {
   }
 
   console.log('Done! Products created successfully.');
-  console.log('\nNote: Free tier has no prices (it\'s free by default).');
+  console.log('\nNote: Free tier does not need a Stripe product (handled in app).');
 }
 
 seedProducts().catch(console.error);

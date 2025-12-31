@@ -172,7 +172,7 @@ export default function PricingPage() {
               data-testid={`card-plan-${product.metadata?.tier || product.id}`}
             >
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <CardTitle>{product.name}</CardTitle>
                   {isPro && <Badge>Popular</Badge>}
                 </div>

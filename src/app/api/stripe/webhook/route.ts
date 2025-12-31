@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { WebhookHandlers } from '@/lib/stripe/webhook-handlers';
+import { getUncachableStripeClient } from '@/lib/stripe/client';
 
 export const runtime = 'nodejs';
 
@@ -11,10 +11,30 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const rawBody = await request.arrayBuffer();
-    const payload = Buffer.from(rawBody);
+    const stripe = await getUncachableStripeClient();
+    const rawBody = await request.text();
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-    await WebhookHandlers.processWebhook(payload, signature);
+    if (!webhookSecret) {
+      console.error('STRIPE_WEBHOOK_SECRET not configured');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+    }
+
+    const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+
+    switch (event.type) {
+      case 'checkout.session.completed':
+        console.log('Checkout completed:', event.data.object);
+        break;
+      case 'customer.subscription.updated':
+        console.log('Subscription updated:', event.data.object);
+        break;
+      case 'customer.subscription.deleted':
+        console.log('Subscription deleted:', event.data.object);
+        break;
+      default:
+        console.log('Unhandled event type:', event.type);
+    }
 
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (error: any) {
