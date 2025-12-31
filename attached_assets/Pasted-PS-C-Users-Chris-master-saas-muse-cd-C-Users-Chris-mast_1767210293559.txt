@@ -1,0 +1,87 @@
+PS C:\Users\Chris\master-saas-muse> cd C:\Users\Chris\master-saas-muse
+PS C:\Users\Chris\master-saas-muse>
+PS C:\Users\Chris\master-saas-muse> # Set your Stripe key (replace with your actual key)
+PS C:\Users\Chris\master-saas-muse> $env:STRIPE_SECRET_KEY = sk_test_XXXX
+sk_test_XXXX : The term
+'sk_test_XXXX' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:26
++ ... ECRET_KEY = sk_test_XXXX ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (sk_test_51SkTb2...qcAcw00q0jndX7t:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\Chris\master-saas-muse>
+PS C:\Users\Chris\master-saas-muse> # Run the seed script
+PS C:\Users\Chris\master-saas-muse> npx tsx scripts/seed-products.ts
+Need to install the following packages:
+tsx@4.21.0
+Ok to proceed? (y) y
+
+Seeding Stripe products...
+
+StripeAuthenticationError: Invalid API Key provided: sk_test_*********HERE
+    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\Users\Chris\master-saas-muse\node_modules\stripe\cjs\RequestSender.js:102:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  type: 'StripeAuthenticationError',
+  raw: {
+    message: 'Invalid API Key provided: sk_test_*********HERE',
+    type: 'invalid_request_error',
+    headers: {
+      server: 'nginx',
+      date: 'Wed, 31 Dec 2025 19:40:38 GMT',
+      'content-type': 'application/json',
+      'content-length': '123',
+      connection: 'keep-alive',
+      'access-control-allow-credentials': 'true',
+      'access-control-allow-methods': 'GET, HEAD, PUT, PATCH, POST, DELETE',
+      'access-control-allow-origin': '*',
+      'access-control-expose-headers': 'Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required, X-Stripe-Privileged-Session-Required',
+      'access-control-max-age': '300',
+      'cache-control': 'no-cache, no-store',
+      'content-security-policy': "base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src 'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=E8H_D-hN8OQ-Q7zlILFQw3SdU3Qi6heUF5wpr8zZTKozxLvL4iVb_S6fMfNxgO2auSqt3FVYxwlgxq7o",
+      vary: 'Origin',
+      'www-authenticate': 'Bearer realm="Stripe"',
+      'x-robots-tag': 'none',
+      'x-wc': 'ABHIJ',
+      'strict-transport-security': 'max-age=63072000; includeSubDomains; preload'
+    },
+    statusCode: 401,
+    requestId: undefined
+  },
+  rawType: 'invalid_request_error',
+  code: undefined,
+  doc_url: undefined,
+  param: undefined,
+  detail: undefined,
+  headers: {
+    server: 'nginx',
+    date: 'Wed, 31 Dec 2025 19:40:38 GMT',
+    'content-type': 'application/json',
+    'content-length': '123',
+    connection: 'keep-alive',
+    'access-control-allow-credentials': 'true',
+    'access-control-allow-methods': 'GET, HEAD, PUT, PATCH, POST, DELETE',
+    'access-control-allow-origin': '*',
+    'access-control-expose-headers': 'Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required, X-Stripe-Privileged-Session-Required',
+    'access-control-max-age': '300',
+    'cache-control': 'no-cache, no-store',
+    'content-security-policy': "base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src 'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=E8H_D-hN8OQ-Q7zlILFQw3SdU3Qi6heUF5wpr8zZTKozxLvL4iVb_S6fMfNxgO2auSqt3FVYxwlgxq7o",
+    vary: 'Origin',
+    'www-authenticate': 'Bearer realm="Stripe"',
+    'x-robots-tag': 'none',
+    'x-wc': 'ABHIJ',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains; preload'
+  },
+  requestId: undefined,
+  statusCode: 401,
+  userMessage: undefined,
+  charge: undefined,
+  decline_code: undefined,
+  payment_intent: undefined,
+  payment_method: undefined,
+  payment_method_type: undefined,
+  setup_intent: undefined,
+  source: undefined
+}
+PS C:\Users\Chris\master-saas-muse>
