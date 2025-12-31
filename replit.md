@@ -10,6 +10,12 @@ This is a full-stack SaaS starter template designed for building production-read
 
 Preferred communication style: Simple, everyday language.
 
+### Workflow Commitments
+- **Secrets**: When I need a secret key, I immediately show the input form. No explanation first, no asking user to request it.
+- **Consistency**: Workflows stay the same between sessions. If something changes, I explain why clearly.
+- **Roles**: User sets goals and supplies keys when asked. Agent handles all technical execution.
+- **Cognitive load**: Minimize decisions. Ask simple yes/no questions. Avoid jargon unless it affects a decision.
+
 ## Session Context (Updated Dec 31, 2025)
 
 ### Development Workflow
