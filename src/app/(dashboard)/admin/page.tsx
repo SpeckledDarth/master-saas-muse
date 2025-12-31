@@ -20,57 +20,78 @@ export default function AdminDashboard() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function checkAdminAndLoadData() {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        router.push('/login');
-        return;
+      try {
+        const supabase = createClient();
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError) {
+          console.error('Auth error:', userError);
+          setError('Authentication error');
+          setLoading(false);
+          return;
+        }
+
+        if (!user) {
+          router.push('/login');
+          return;
+        }
+
+        setUserEmail(user.email || '');
+
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single();
+
+        if (roleError) {
+          console.error('Role fetch error:', roleError);
+          setError('Could not verify admin status');
+          setLoading(false);
+          return;
+        }
+
+        if (roleData?.role !== 'admin') {
+          router.push('/profile');
+          return;
+        }
+
+        setIsAdmin(true);
+
+        const { count: totalUsers } = await supabase
+          .from('user_roles')
+          .select('*', { count: 'exact', head: true });
+
+        const { count: totalAdmins } = await supabase
+          .from('user_roles')
+          .select('*', { count: 'exact', head: true })
+          .eq('role', 'admin');
+
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const { count: recentSignups } = await supabase
+          .from('user_roles')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', sevenDaysAgo.toISOString());
+
+        setMetrics({
+          totalUsers: totalUsers || 0,
+          totalAdmins: totalAdmins || 0,
+          totalMembers: (totalUsers || 0) - (totalAdmins || 0),
+          recentSignups: recentSignups || 0,
+        });
+
+        setLoading(false);
+      } catch (err) {
+        console.error('Admin page error:', err);
+        setError('An unexpected error occurred');
+        setLoading(false);
       }
-
-      setUserEmail(user.email || '');
-
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single();
-
-      if (roleData?.role !== 'admin') {
-        router.push('/profile');
-        return;
-      }
-
-      setIsAdmin(true);
-
-      const { count: totalUsers } = await supabase
-        .from('user_roles')
-        .select('*', { count: 'exact', head: true });
-
-      const { count: totalAdmins } = await supabase
-        .from('user_roles')
-        .select('*', { count: 'exact', head: true })
-        .eq('role', 'admin');
-
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-      const { count: recentSignups } = await supabase
-        .from('user_roles')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', sevenDaysAgo.toISOString());
-
-      setMetrics({
-        totalUsers: totalUsers || 0,
-        totalAdmins: totalAdmins || 0,
-        totalMembers: (totalUsers || 0) - (totalAdmins || 0),
-        recentSignups: recentSignups || 0,
-      });
-
-      setLoading(false);
     }
 
     checkAdminAndLoadData();
@@ -80,6 +101,14 @@ export default function AdminDashboard() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-destructive">{error}</div>
       </div>
     );
   }
