@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Camera, Loader2, LogOut, User } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { queryClient } from '@/lib/queryClient';
+import { SubscriptionCard } from '@/components/subscription/SubscriptionCard';
 
 export default function ProfilePage() {
   const { user, signOut } = useAuth();
@@ -138,6 +139,8 @@ export default function ProfilePage() {
             <h1 className="text-3xl font-display font-bold text-foreground">Profile</h1>
             <p className="text-muted-foreground mt-1">Manage your account settings</p>
           </div>
+
+          <SubscriptionCard />
 
           <Card className="border-border/50 shadow-lg">
             <CardHeader>

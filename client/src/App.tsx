@@ -13,6 +13,8 @@ import Home from "@/pages/home";
 import Login from "@/pages/auth/login";
 import Signup from "@/pages/auth/signup";
 import Profile from "@/pages/dashboard/profile";
+import Pricing from "@/pages/pricing";
+import Billing from "@/pages/billing";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminUsers from "@/pages/admin/users";
 import AdminSettings from "@/pages/admin/settings";
@@ -42,6 +44,14 @@ function Router() {
       
       <Route path="/auth/login" component={Login} />
       <Route path="/auth/signup" component={Signup} />
+      
+      <Route path="/pricing" component={Pricing} />
+      
+      <Route path="/billing">
+        <ProtectedRoute>
+          <Billing />
+        </ProtectedRoute>
+      </Route>
       
       <Route path="/dashboard">
         <ProtectedRoute>
@@ -80,10 +90,14 @@ function AppContent() {
   const isAuthPage = location.startsWith('/auth/');
   const isDashboardPage = location.startsWith('/dashboard');
   const isAdminPage = location.startsWith('/admin');
+  const isPricingPage = location === '/pricing';
+  const isBillingPage = location === '/billing';
+
+  const hideHeader = isAuthPage || isDashboardPage || isAdminPage || isPricingPage || isBillingPage;
 
   return (
     <>
-      {!isAuthPage && !isDashboardPage && !isAdminPage && <Header />}
+      {!hideHeader && <Header />}
       <Router />
       <Toaster />
     </>

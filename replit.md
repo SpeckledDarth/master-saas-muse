@@ -112,18 +112,40 @@ Same three variables above, added via Vercel Project → Settings → Environmen
 - Database migration for stripe_customer_id and stripe_subscription_id fields
 - Environment variables: STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET
 
-## Current Module: Module 5 - Subscription Management
+### Module 5: Subscription Management (Complete - Dec 31, 2025)
+- Subscription status displayed on user profile page
+- SubscriptionCard component showing current plan and status
+- Feature gating utility (`feature-gate.ts`) with tier limits (Free/Pro/Team)
+- UpgradeBanner component for prompting upgrades
+- Pricing page with plan comparison and upgrade flow
+- Billing page with usage display (projects, team members)
+- useSubscription hook for client-side subscription state
+- Trialing status correctly treated as active subscription
+- Both Vite/Express (client/) and Next.js (src/app/) implementations
 
-### Goals
-- Display subscription status on user profile
-- Feature gating based on subscription tier (Free/Pro/Team)
-- Usage tracking and limits
-- Subscription upgrade/downgrade flows
+### Development vs Production Architecture
+**Replit (Vite/Express)**: Development environment shows "Free" tier for all users. Stripe is not configured here.
+**Vercel (Next.js)**: Production environment has real Stripe integration with subscription data from Stripe API.
+
+### Key Files by Environment
+**Vite/Express (client/):**
+- `client/src/hooks/use-subscription.ts` - Hook fetching from `/api/subscription`
+- `client/src/components/subscription/SubscriptionCard.tsx` - UI component
+- `client/src/pages/pricing.tsx`, `billing.tsx` - Subscription pages
+- `server/storage.ts` - Returns free tier (no Stripe key in dev)
+
+**Next.js (src/):**
+- `src/lib/stripe/service.ts` - Full Stripe API integration
+- `src/lib/stripe/feature-gate.ts` - Feature gating with tier limits
+- `src/app/api/stripe/subscription/route.ts` - API endpoint with Stripe
+- `src/app/(dashboard)/billing/page.tsx` - Production billing page
 
 ### Architecture Notes
 - Check subscription status server-side for security
 - Cache subscription data to reduce Stripe API calls
 - Use middleware for feature gating on protected routes
+
+## Next Module: Module 6 - Email System
 
 ## Configuration Files
 - `.env.template` - Template for all secrets and environment variables

@@ -239,6 +239,23 @@ export async function registerRoutes(
     }
   });
 
+  // ==================== SUBSCRIPTION ENDPOINTS ====================
+  
+  // Get current user's subscription status
+  app.get("/api/subscription", async (req: AuthenticatedRequest, res) => {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    try {
+      const subscription = await storage.getSubscription(req.userId);
+      res.json(subscription);
+    } catch (error) {
+      console.error('[Subscription] Error fetching subscription:', error);
+      res.status(500).json({ error: 'Failed to fetch subscription' });
+    }
+  });
+
   // Bootstrap: Make first user admin (one-time setup endpoint)
   app.post("/api/admin/bootstrap", async (req: AuthenticatedRequest, res) => {
     try {

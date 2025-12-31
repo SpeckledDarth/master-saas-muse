@@ -14,6 +14,14 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, count } from "drizzle-orm";
+import { getProfileSubscriptionData } from "./supabase";
+
+export interface SubscriptionInfo {
+  status: 'free' | 'active' | 'canceled' | 'past_due' | 'trialing';
+  tier: 'free' | 'pro' | 'team';
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+}
 
 export interface IStorage {
   getStatus(): Promise<string>;
@@ -34,6 +42,9 @@ export interface IStorage {
   
   // Admin metrics
   getAdminMetrics(): Promise<{ totalUsers: number; adminCount: number; memberCount: number }>;
+  
+  // Subscriptions
+  getSubscription(userId: string): Promise<SubscriptionInfo>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -122,6 +133,42 @@ export class DatabaseStorage implements IStorage {
       adminCount,
       memberCount
     };
+  }
+
+  // Subscriptions - returns subscription info based on Supabase profile data
+  async getSubscription(userId: string): Promise<SubscriptionInfo> {
+    const defaultFree: SubscriptionInfo = {
+      status: 'free',
+      tier: 'free',
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+    };
+
+    if (!userId) {
+      return defaultFree;
+    }
+
+    try {
+      // Query Supabase profiles table for subscription info
+      const profileData = await getProfileSubscriptionData(userId);
+      
+      if (!profileData || !profileData.stripeSubscriptionId) {
+        return defaultFree;
+      }
+
+      // User has a Stripe subscription ID - treat as active subscriber
+      // In production (Next.js/Vercel), we query Stripe API for exact status
+      // In development, we check if subscription exists in profiles
+      return {
+        status: 'active',
+        tier: 'pro', // Default to pro; Team tier would require additional metadata
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+      };
+    } catch (error) {
+      console.error('Error fetching subscription:', error);
+      return defaultFree;
+    }
   }
 }
 
