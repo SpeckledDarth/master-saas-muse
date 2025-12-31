@@ -102,18 +102,28 @@ Same three variables above, added via Vercel Project → Settings → Environmen
 - Fixed sign-out: Session clears correctly and navigation works
 - Fixed auth state change handlers: Properly clear user state on SIGNED_OUT
 
-## Current Module: Module 4 - Stripe Integration
+### Module 4: Stripe Integration (Complete - Tested Dec 31, 2025)
+- Stripe Checkout for subscription payments (Pro $29/mo, Team $99/mo)
+- Webhook endpoint at `/api/stripe/webhook` receiving `checkout.session.completed`
+- Customer portal API route for subscription management
+- Products/prices API routes
+- Pricing page UI with plan selection
+- Seed script for products (`scripts/seed-products.ts`)
+- Database migration for stripe_customer_id and stripe_subscription_id fields
+- Environment variables: STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET
+
+## Current Module: Module 5 - Subscription Management
 
 ### Goals
-- Stripe Checkout for one-time and subscription payments
-- Webhook handling for payment events
-- Customer portal for subscription management
-- Database tables for subscriptions and payment history
+- Display subscription status on user profile
+- Feature gating based on subscription tier (Free/Pro/Team)
+- Usage tracking and limits
+- Subscription upgrade/downgrade flows
 
 ### Architecture Notes
-- Stripe secret keys must NEVER be client-side (no NEXT_PUBLIC_ prefix)
-- Webhooks need signature verification
-- Use Stripe Customer Portal for self-service
+- Check subscription status server-side for security
+- Cache subscription data to reduce Stripe API calls
+- Use middleware for feature gating on protected routes
 
 ## Configuration Files
 - `.env.template` - Template for all secrets and environment variables
