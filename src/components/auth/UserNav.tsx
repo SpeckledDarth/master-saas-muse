@@ -25,30 +25,65 @@ export function UserNav() {
   const supabase = createClient()
 
   const checkAdminRole = useCallback(async (userId: string) => {
-    const { data: roleData } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .single()
-    
-    setIsAdmin(roleData?.role === 'admin')
+    try {
+      const { data: roleData, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single()
+      
+      if (error) {
+        console.error('Error checking admin role:', error)
+        setIsAdmin(false)
+        return
+      }
+      
+      setIsAdmin(roleData?.role === 'admin')
+    } catch (err) {
+      console.error('Admin role check failed:', err)
+      setIsAdmin(false)
+    }
   }, [supabase])
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser()
+        
+        if (error) {
+          console.error('Error getting user:', error)
+          setUser(null)
+          setIsLoading(false)
+          return
+        }
+        
+        setUser(user)
 
-      if (user) {
-        await checkAdminRole(user.id)
+        if (user) {
+          await checkAdminRole(user.id)
+        }
+      } catch (err) {
+        console.error('getUser failed:', err)
+        setUser(null)
+      } finally {
+        setIsLoading(false)
       }
-
-      setIsLoading(false)
     }
+    
     getUser()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event)
+      
+      if (event === 'SIGNED_OUT') {
+        setUser(null)
+        setIsAdmin(false)
+        setIsLoading(false)
+        return
+      }
+      
       setUser(session?.user ?? null)
+      
       if (session?.user) {
         await checkAdminRole(session.user.id)
       } else {
@@ -60,9 +95,20 @@ export function UserNav() {
   }, [supabase, checkAdminRole])
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
-    router.refresh()
+    try {
+      // Clear local state first for immediate UI feedback
+      setUser(null)
+      setIsAdmin(false)
+      
+      // Then sign out from Supabase
+      await supabase.auth.signOut()
+      
+      // Navigate to home
+      router.push('/')
+      router.refresh()
+    } catch (err) {
+      console.error('Sign out error:', err)
+    }
   }
 
   if (isLoading) {
