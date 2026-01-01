@@ -1,314 +1,117 @@
+@'
 'use client'
 
-import { useState, useEffect, useRef, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { User, Mail, Lock, CreditCard, Loader2, Crown, Users, Sparkles, LogOut } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
-import { Loader2, Camera, User, Mail, Key } from 'lucide-react'
-import type { User as SupabaseUser } from '@supabase/supabase-js'
 
-function ProfileContent() {
-  const [user, setUser] = useState<SupabaseUser | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isUpdating, setIsUpdating] = useState(false)
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmNewPassword, setConfirmNewPassword] = useState('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { toast } = useToast()
-  const supabase = createClient()
+interface SubscriptionInfo {
+  status: 'free' | 'active' | 'canceled' | 'past_due' | 'trialing'
+  tier: 'free' | 'pro' | 'team'
+  currentPeriodEnd: string | null
+  cancelAtPeriodEnd: boolean
+}
 
-  const isPasswordReset = searchParams.get('reset') === 'true'
-
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUser(user)
-        setAvatarUrl(user.user_metadata?.avatar_url || null)
-      } else {
-        router.push('/login')
-      }
-      setIsLoading(false)
-    }
-    getUser()
-  }, [supabase, router])
-
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || !user) return
-
-    if (file.size > 2 * 1024 * 1024) {
-      toast({
-        title: 'File too large',
-        description: 'Please upload an image smaller than 2MB.',
-        variant: 'destructive',
-      })
-      return
-    }
-
-    setIsUploadingAvatar(true)
-
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${user.id}-${Date.now()}.${fileExt}`
-    const filePath = `avatars/${fileName}`
-
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file, { upsert: true })
-
-    if (uploadError) {
-      toast({
-        title: 'Upload failed',
-        description: uploadError.message,
-        variant: 'destructive',
-      })
-      setIsUploadingAvatar(false)
-      return
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath)
-
-    const { error: updateError } = await supabase.auth.updateUser({
-      data: { avatar_url: publicUrl },
-    })
-
-    if (updateError) {
-      toast({
-        title: 'Update failed',
-        description: updateError.message,
-        variant: 'destructive',
-      })
-      setIsUploadingAvatar(false)
-      return
-    }
-
-    setAvatarUrl(publicUrl)
-    toast({
-      title: 'Avatar updated',
-      description: 'Your profile picture has been updated.',
-    })
-    setIsUploadingAvatar(false)
-  }
-
-  const handlePasswordUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (newPassword !== confirmNewPassword) {
-      toast({
-        title: 'Passwords do not match',
-        description: 'Please make sure your passwords match.',
-        variant: 'destructive',
-      })
-      return
-    }
-
-    if (newPassword.length < 6) {
-      toast({
-        title: 'Password too short',
-        description: 'Password must be at least 6 characters.',
-        variant: 'destructive',
-      })
-      return
-    }
-
-    setIsUpdating(true)
-
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
-    })
-
-    if (error) {
-      toast({
-        title: 'Update failed',
-        description: error.message,
-        variant: 'destructive',
-      })
-      setIsUpdating(false)
-      return
-    }
-
-    toast({
-      title: 'Password updated',
-      description: 'Your password has been changed successfully.',
-    })
-    setNewPassword('')
-    setConfirmNewPassword('')
-    setIsUpdating(false)
-  }
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
-    router.refresh()
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    )
-  }
-
-  if (!user) return null
-
-  const userInitials = user.email?.substring(0, 2).toUpperCase() || 'U'
-
-  return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold">Profile</h1>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Profile Information
-          </CardTitle>
-          <CardDescription>Your account details and avatar</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Avatar className="h-20 w-20 cursor-pointer" onClick={handleAvatarClick}>
-                <AvatarImage src={avatarUrl || undefined} />
-                <AvatarFallback className="text-xl">{userInitials}</AvatarFallback>
-              </Avatar>
-              <button
-                onClick={handleAvatarClick}
-                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-primary text-primary-foreground"
-                disabled={isUploadingAvatar}
-                data-testid="button-change-avatar"
-              >
-                {isUploadingAvatar ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  <Camera className="h-3 w-3" />
-                )}
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleAvatarUpload}
-                data-testid="input-avatar"
-              />
-            </div>
-            <div>
-              <p className="font-medium">{user.user_metadata?.full_name || 'User'}</p>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Mail className="h-4 w-4" />
-              Email
-            </Label>
-            <Input
-              value={user.email || ''}
-              disabled
-              className="bg-muted"
-              data-testid="input-email-display"
-            />
-            <p className="text-xs text-muted-foreground">
-              Email cannot be changed
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Key className="h-5 w-5" />
-            {isPasswordReset ? 'Set New Password' : 'Change Password'}
-          </CardTitle>
-          <CardDescription>
-            {isPasswordReset
-              ? 'Create a new password for your account'
-              : 'Update your password to keep your account secure'
-            }
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handlePasswordUpdate} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                placeholder="Enter new password (min 6 characters)"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                disabled={isUpdating}
-                data-testid="input-new-password"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmNewPassword">Confirm New Password</Label>
-              <Input
-                id="confirmNewPassword"
-                type="password"
-                placeholder="Confirm new password"
-                value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
-                required
-                disabled={isUpdating}
-                data-testid="input-confirm-new-password"
-              />
-            </div>
-            <Button type="submit" disabled={isUpdating} data-testid="button-update-password">
-              {isUpdating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
-                </>
-              ) : (
-                'Update Password'
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="pt-6">
-          <Button
-            variant="destructive"
-            onClick={handleSignOut}
-            data-testid="button-sign-out"
-          >
-            Sign Out
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
-  )
+const tierConfig = {
+  free: { name: 'Free', icon: Sparkles, color: 'bg-gray-100 dark:bg-gray-800' },
+  pro: { name: 'Pro', icon: Crown, color: 'bg-blue-100 dark:bg-blue-900' },
+  team: { name: 'Team', icon: Users, color: 'bg-purple-100 dark:bg-purple-900' },
 }
 
 export default function ProfilePage() {
+  const [user, setUser] = useState<any>(null)
+  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
+  const [isSigningOut, setIsSigningOut] = useState(false)
+  const router = useRouter()
+  const { toast } = useToast()
+  const supabase = useMemo(() => createClient(), [])
+
+  useEffect(() => {
+    let mounted = true
+    async function loadData() {
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      if (!mounted) return
+      if (!currentUser) { router.push('/login?redirect=/profile'); return }
+      setUser(currentUser)
+      try {
+        const response = await fetch('/api/stripe/subscription')
+        if (response.ok && mounted) { setSubscription(await response.json()) }
+      } catch (error) { console.error('Failed to fetch subscription:', error) }
+      if (mounted) { setIsLoading(false) }
+    }
+    loadData()
+    return () => { mounted = false }
+  }, [router, supabase])
+
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (newPassword !== confirmPassword) { toast({ title: 'Passwords do not match', variant: 'destructive' }); return }
+    if (newPassword.length < 6) { toast({ title: 'Password too short', variant: 'destructive' }); return }
+    setIsUpdatingPassword(true)
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    if (error) { toast({ title: 'Failed to update password', description: error.message, variant: 'destructive' }) }
+    else { toast({ title: 'Password updated' }); setNewPassword(''); setConfirmPassword('') }
+    setIsUpdatingPassword(false)
+  }
+
+  const handleSignOut = async () => { setIsSigningOut(true); await supabase.auth.signOut(); router.push('/') }
+
+  if (isLoading) {
+    return (<div className="container mx-auto px-4 py-8 max-w-2xl"><div className="flex items-center justify-center min-h-[400px]"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div></div>)
+  }
+
+  const initials = user?.email?.slice(0, 2).toUpperCase() || 'U'
+  const tierInfo = subscription ? tierConfig[subscription.tier] : tierConfig.free
+  const TierIcon = tierInfo.icon
+
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
-        <ProfileContent />
-      </Suspense>
+    <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <h1 className="text-3xl font-bold mb-8">Profile</h1>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader><div className="flex items-center gap-2"><User className="h-5 w-5" /><CardTitle>Profile Information</CardTitle></div><CardDescription>Your account details and avatar</CardDescription></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-16 w-16"><AvatarImage src={user?.user_metadata?.avatar_url} /><AvatarFallback className="text-lg">{initials}</AvatarFallback></Avatar>
+              <div><p className="font-medium">{user?.user_metadata?.full_name || user?.email?.split('@')[0]}</p><p className="text-sm text-muted-foreground">{user?.email}</p></div>
+            </div>
+            <div className="pt-4 border-t"><div className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /><Label className="text-sm">Email</Label></div><Input value={user?.email || ''} disabled className="mt-2" /><p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p></div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader><div className="flex items-center gap-2"><CreditCard className="h-5 w-5" /><CardTitle>Subscription</CardTitle></div><CardDescription>Your current plan and billing</CardDescription></CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3"><div className={`p-2 rounded-lg ${tierInfo.color}`}><TierIcon className="h-5 w-5" /></div><div><p className="font-medium">{tierInfo.name} Plan</p>{subscription?.status && subscription.status !== 'free' && (<Badge variant="outline" className="mt-1">{subscription.status === 'active' ? 'Active' : subscription.status === 'trialing' ? 'Trial' : subscription.status === 'canceled' ? 'Canceled' : 'Past Due'}</Badge>)}</div></div>
+              <Button variant="outline" onClick={() => router.push('/billing')}>Manage Subscription</Button>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader><div className="flex items-center gap-2"><Lock className="h-5 w-5" /><CardTitle>Change Password</CardTitle></div><CardDescription>Update your password to keep your account secure</CardDescription></CardHeader>
+          <CardContent>
+            <form onSubmit={handlePasswordUpdate} className="space-y-4">
+              <div><Label htmlFor="new-password">New Password</Label><Input id="new-password" type="password" placeholder="Enter new password (min 6 characters)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></div>
+              <div><Label htmlFor="confirm-password">Confirm New Password</Label><Input id="confirm-password" type="password" placeholder="Confirm new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} /></div>
+              <Button type="submit" disabled={isUpdatingPassword || !newPassword}>{isUpdatingPassword && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Update Password</Button>
+            </form>
+          </CardContent>
+        </Card>
+        <Card><CardContent className="py-6"><Button variant="destructive" onClick={handleSignOut} disabled={isSigningOut}>{isSigningOut ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <LogOut className="h-4 w-4 mr-2" />}Sign Out</Button></CardContent></Card>
+      </div>
     </div>
   )
 }
+'@ | Out-File -FilePath "C:\Users\Chris\master-saas-muse\src\app\(dashboard)\profile\page.tsx" -Encoding utf8
