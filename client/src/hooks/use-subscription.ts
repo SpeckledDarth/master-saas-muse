@@ -23,13 +23,17 @@ export function useSubscription() {
 
   useEffect(() => {
     async function fetchSubscription() {
+      console.log('[useSubscription] Fetching subscription, user:', user?.id);
+      
       if (!user) {
+        console.log('[useSubscription] No user, returning default free subscription');
         setSubscription(DEFAULT_SUBSCRIPTION);
         setIsLoading(false);
         return;
       }
 
       try {
+        console.log('[useSubscription] Calling /api/subscription for user:', user.id);
         const response = await fetch('/api/subscription', {
           headers: {
             'x-user-id': user.id,
@@ -41,9 +45,10 @@ export function useSubscription() {
         }
 
         const data: SubscriptionInfo = await response.json();
+        console.log('[useSubscription] Received subscription data:', data);
         setSubscription(data);
       } catch (err) {
-        console.error('Error fetching subscription:', err);
+        console.error('[useSubscription] Error fetching subscription:', err);
         setError(err instanceof Error ? err : new Error('Unknown error'));
         setSubscription(DEFAULT_SUBSCRIPTION);
       } finally {
