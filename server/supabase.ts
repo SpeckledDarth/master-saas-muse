@@ -3,6 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+console.log('[Supabase] URL configured:', !!supabaseUrl);
+console.log('[Supabase] Service key configured:', !!supabaseServiceKey);
+
 if (!supabaseUrl) {
   console.warn('VITE_SUPABASE_URL not configured');
 }

@@ -15,6 +15,7 @@ import {
 import { db } from "./db";
 import { eq, desc, count } from "drizzle-orm";
 import { getProfileSubscriptionData } from "./supabase";
+import { getStripeSubscription } from "./stripe";
 
 export interface SubscriptionInfo {
   status: 'free' | 'active' | 'canceled' | 'past_due' | 'trialing';
@@ -135,7 +136,7 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  // Subscriptions - returns subscription info based on Supabase profile data
+  // Subscriptions - returns subscription info from Stripe via Supabase profile data
   async getSubscription(userId: string): Promise<SubscriptionInfo> {
     const defaultFree: SubscriptionInfo = {
       status: 'free',
@@ -149,22 +150,16 @@ export class DatabaseStorage implements IStorage {
     }
 
     try {
-      // Query Supabase profiles table for subscription info
+      // Query Supabase profiles table for Stripe subscription ID
       const profileData = await getProfileSubscriptionData(userId);
       
       if (!profileData || !profileData.stripeSubscriptionId) {
         return defaultFree;
       }
 
-      // User has a Stripe subscription ID - treat as active subscriber
-      // In production (Next.js/Vercel), we query Stripe API for exact status
-      // In development, we check if subscription exists in profiles
-      return {
-        status: 'active',
-        tier: 'pro', // Default to pro; Team tier would require additional metadata
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-      };
+      // Fetch real subscription data from Stripe
+      const stripeData = await getStripeSubscription(profileData.stripeSubscriptionId);
+      return stripeData;
     } catch (error) {
       console.error('Error fetching subscription:', error);
       return defaultFree;
