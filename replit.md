@@ -20,6 +20,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Development Workflow
 - **Local Environment**: Windows with PowerShell
+- **Local Project Path**: `C:\Users\Chris\master-saas-muse`
 - **Git Experience**: Beginner - step-by-step guidance needed
 - **Workflow**: Replit for code development → Git push → Vercel auto-deploys
 - **Styling**: User prefers original gradient font styling (deferred until after functional modules)
