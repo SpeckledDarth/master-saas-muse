@@ -1,7 +1,6 @@
-@'
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -81,37 +80,95 @@ export default function ProfilePage() {
       <h1 className="text-3xl font-bold mb-8">Profile</h1>
       <div className="space-y-6">
         <Card>
-          <CardHeader><div className="flex items-center gap-2"><User className="h-5 w-5" /><CardTitle>Profile Information</CardTitle></div><CardDescription>Your account details and avatar</CardDescription></CardHeader>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              <CardTitle>Profile Information</CardTitle>
+            </div>
+            <CardDescription>Your account details and avatar</CardDescription>
+          </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16"><AvatarImage src={user?.user_metadata?.avatar_url} /><AvatarFallback className="text-lg">{initials}</AvatarFallback></Avatar>
-              <div><p className="font-medium">{user?.user_metadata?.full_name || user?.email?.split('@')[0]}</p><p className="text-sm text-muted-foreground">{user?.email}</p></div>
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={user?.user_metadata?.avatar_url} />
+                <AvatarFallback className="text-lg">{initials}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium">{user?.user_metadata?.full_name || user?.email?.split('@')[0]}</p>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
+              </div>
             </div>
-            <div className="pt-4 border-t"><div className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /><Label className="text-sm">Email</Label></div><Input value={user?.email || ''} disabled className="mt-2" /><p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p></div>
+            <div className="pt-4 border-t">
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <Label className="text-sm">Email</Label>
+              </div>
+              <Input value={user?.email || ''} disabled className="mt-2" />
+              <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
+            </div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><div className="flex items-center gap-2"><CreditCard className="h-5 w-5" /><CardTitle>Subscription</CardTitle></div><CardDescription>Your current plan and billing</CardDescription></CardHeader>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              <CardTitle>Subscription</CardTitle>
+            </div>
+            <CardDescription>Your current plan and billing</CardDescription>
+          </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-3"><div className={`p-2 rounded-lg ${tierInfo.color}`}><TierIcon className="h-5 w-5" /></div><div><p className="font-medium">{tierInfo.name} Plan</p>{subscription?.status && subscription.status !== 'free' && (<Badge variant="outline" className="mt-1">{subscription.status === 'active' ? 'Active' : subscription.status === 'trialing' ? 'Trial' : subscription.status === 'canceled' ? 'Canceled' : 'Past Due'}</Badge>)}</div></div>
+              <div className="flex items-center gap-3">
+                <div className={`}>
+                  <TierIcon className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-medium">{tierInfo.name} Plan</p>
+                  {subscription?.status && subscription.status !== 'free' && (
+                    <Badge variant="outline" className="mt-1">
+                      {subscription.status === 'active' ? 'Active' : subscription.status === 'trialing' ? 'Trial' : subscription.status === 'canceled' ? 'Canceled' : 'Past Due'}
+                    </Badge>
+                  )}
+                </div>
+              </div>
               <Button variant="outline" onClick={() => router.push('/billing')}>Manage Subscription</Button>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><div className="flex items-center gap-2"><Lock className="h-5 w-5" /><CardTitle>Change Password</CardTitle></div><CardDescription>Update your password to keep your account secure</CardDescription></CardHeader>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              <CardTitle>Change Password</CardTitle>
+            </div>
+            <CardDescription>Update your password to keep your account secure</CardDescription>
+          </CardHeader>
           <CardContent>
             <form onSubmit={handlePasswordUpdate} className="space-y-4">
-              <div><Label htmlFor="new-password">New Password</Label><Input id="new-password" type="password" placeholder="Enter new password (min 6 characters)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></div>
-              <div><Label htmlFor="confirm-password">Confirm New Password</Label><Input id="confirm-password" type="password" placeholder="Confirm new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} /></div>
-              <Button type="submit" disabled={isUpdatingPassword || !newPassword}>{isUpdatingPassword && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Update Password</Button>
+              <div>
+                <Label htmlFor="new-password">New Password</Label>
+                <Input id="new-password" type="password" placeholder="Enter new password (min 6 characters)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+              </div>
+              <div>
+                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <Input id="confirm-password" type="password" placeholder="Confirm new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+              </div>
+              <Button type="submit" disabled={isUpdatingPassword || !newPassword}>
+                {isUpdatingPassword && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Update Password
+              </Button>
             </form>
           </CardContent>
         </Card>
-        <Card><CardContent className="py-6"><Button variant="destructive" onClick={handleSignOut} disabled={isSigningOut}>{isSigningOut ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <LogOut className="h-4 w-4 mr-2" />}Sign Out</Button></CardContent></Card>
+        <Card>
+          <CardContent className="py-6">
+            <Button variant="destructive" onClick={handleSignOut} disabled={isSigningOut}>
+              {isSigningOut ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <LogOut className="h-4 w-4 mr-2" />}
+              Sign Out
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
 }
-'@ | Out-File -FilePath "C:\Users\Chris\master-saas-muse\src\app\(dashboard)\profile\page.tsx" -Encoding utf8
