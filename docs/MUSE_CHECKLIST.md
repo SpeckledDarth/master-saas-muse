@@ -140,21 +140,48 @@ After setup, update `config/muse.config.json`:
 
 ---
 
-## Future Modules Checklist
+## Step 9: Configure Monitoring (5 min)
 
-As you add modules, check their specific requirements:
+### Sentry Error Tracking (Recommended)
+- [ ] Create account at [sentry.io](https://sentry.io)
+- [ ] Create a new Next.js project
+- [ ] Copy the DSN from Project Settings > Client Keys
+- [ ] Add to Vercel environment variables:
+  - `NEXT_PUBLIC_SENTRY_DSN` = your DSN
+  - `SENTRY_ORG` = your organization slug
+  - `SENTRY_PROJECT` = your project slug
 
-### Payments (Stripe)
-- [ ] Create Stripe account
-- [ ] Get API keys (test mode first)
-- [ ] Add webhook endpoint
-- [ ] Add secrets: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
+### Plausible Analytics (Recommended)
+- [ ] Create account at [plausible.io](https://plausible.io)
+- [ ] Add your domain
+- [ ] Add to Vercel environment variables:
+  - `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` = your domain (e.g., `myapp.com`)
 
-### Email
-- [ ] Choose provider (SendGrid, Resend, etc.)
-- [ ] Get API key
-- [ ] Configure sender domain
-- [ ] Add secrets: `EMAIL_API_KEY`, `EMAIL_FROM_ADDRESS`
+---
+
+## Step 10: Configure Stripe (10 min)
+
+- [ ] Create Stripe account at [stripe.com](https://stripe.com)
+- [ ] Get API keys from Dashboard > Developers > API keys
+- [ ] Add to Vercel environment variables:
+  - `STRIPE_SECRET_KEY` = sk_live_xxx or sk_test_xxx
+  - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` = pk_live_xxx or pk_test_xxx
+- [ ] Create webhook endpoint: Dashboard > Developers > Webhooks
+  - Endpoint URL: `https://yourdomain.com/api/stripe/webhook`
+  - Events: `checkout.session.completed`, `customer.subscription.*`
+- [ ] Add webhook secret to Vercel:
+  - `STRIPE_WEBHOOK_SECRET` = whsec_xxx
+
+---
+
+## Step 11: Configure Email (5 min)
+
+- [ ] Create Resend account at [resend.com](https://resend.com)
+- [ ] Create API key
+- [ ] Add to Vercel environment variables:
+  - `RESEND_API_KEY` = re_xxx
+  - `RESEND_FROM_EMAIL` = noreply@yourdomain.com
+- [ ] (Optional) Verify your domain for better deliverability
 
 ---
 
@@ -171,4 +198,4 @@ As you add modules, check their specific requirements:
 
 ---
 
-*Last updated: December 29, 2024*
+*Last updated: January 25, 2026*
