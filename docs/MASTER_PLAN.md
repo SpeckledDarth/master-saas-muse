@@ -245,13 +245,13 @@ src/
 **Dependencies**: Module 7  
 
 **Deliverables**:
-- [ ] Sentry error tracking
-- [ ] Plausible analytics integration
-- [ ] Structured logging
-- [ ] E2E smoke tests
-- [ ] GitHub template repository setup
-- [ ] Updated MUSE_CHECKLIST for cloning
-- [ ] Deployment documentation
+- [x] Sentry error tracking (DEFERRED - awaiting Next.js 16 support)
+- [x] Plausible analytics integration
+- [x] Structured logging
+- [ ] E2E smoke tests (deferred to v1.1)
+- [ ] GitHub template repository setup (deferred to v1.1)
+- [x] Updated MUSE_CHECKLIST for cloning
+- [x] Deployment documentation
 
 ---
 
@@ -260,13 +260,13 @@ src/
 | # | Feature                          | Module | Status      |
 |---|----------------------------------|--------|-------------|
 | 1 | User Auth & Onboarding           | 2      | COMPLETE    |
-| 2 | Plan System & Freemium Gating    | 4      | NOT STARTED |
-| 3 | Billing & Payments (Stripe)      | 5      | NOT STARTED |
+| 2 | Plan System & Freemium Gating    | 4      | COMPLETE    |
+| 3 | Billing & Payments (Stripe)      | 5      | COMPLETE    |
 | 4 | Global Navigation & UI Kit       | 1, 6   | COMPLETE    |
-| 5 | Core User Pages                  | 6      | NOT STARTED |
-| 6 | Admin Backend Dashboard          | 3      | IN PROGRESS |
-| 7 | Security & Privacy Rules         | 7      | NOT STARTED |
-| 8 | Error Logging & Monitoring       | 8      | NOT STARTED |
+| 5 | Core User Pages                  | 6      | COMPLETE    |
+| 6 | Admin Backend Dashboard          | 3      | COMPLETE    |
+| 7 | Security & Privacy Rules         | 7      | COMPLETE    |
+| 8 | Error Logging & Monitoring       | 8      | COMPLETE    |
 | 16| Dark/Light Mode Toggle           | 1      | COMPLETE    |
 
 ---

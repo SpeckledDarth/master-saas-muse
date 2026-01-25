@@ -177,10 +177,12 @@ Same three variables above, added via Vercel Project → Settings → Environmen
   - Permissions-Policy
 
 ### Module 8: Monitoring & Docs (Complete - Jan 25, 2026)
-- Sentry error tracking integration (`@sentry/nextjs`)
-  - Client, server, and edge runtime configs
-  - Automatic error capture with source maps
-- Plausible analytics component (privacy-friendly)
+- Sentry error tracking: **Deferred** - `@sentry/nextjs` doesn't support Next.js 16 yet
+  - Will be added when Sentry releases Next.js 16 support
+  - Environment variables ready in Vercel (NEXT_PUBLIC_SENTRY_DSN, SENTRY_ORG, SENTRY_PROJECT)
+- Plausible analytics: **Working** (privacy-friendly page view tracking)
+  - Component at `src/components/analytics/plausible.tsx`
+  - Integrated in layout.tsx
 - Structured logging utility (`src/lib/logging/`)
   - JSON format for easy parsing
   - Helper functions for API, auth, and subscription events

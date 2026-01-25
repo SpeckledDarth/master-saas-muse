@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import { withSentryConfig } from "@sentry/nextjs";
 
 const securityHeaders = [
   {
@@ -43,17 +42,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-const sentryConfig = {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  silent: !process.env.CI,
-  widenClientFileUpload: true,
-  disableLogger: true,
-  automaticVercelMonitors: true,
-};
-
-const hasSentryConfig = process.env.SENTRY_ORG && process.env.SENTRY_PROJECT;
-
-export default hasSentryConfig 
-  ? withSentryConfig(nextConfig, sentryConfig)
-  : nextConfig;
+export default nextConfig;
