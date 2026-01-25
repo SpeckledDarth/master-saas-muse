@@ -109,6 +109,12 @@ Same three variables above, added via Vercel Project → Settings → Environmen
 - Fixed sign-out: Session clears correctly and navigation works
 - Fixed auth state change handlers: Properly clear user state on SIGNED_OUT
 
+### Bug Fixes (Jan 25, 2026)
+- Fixed middleware timeout: Middleware was calling Supabase auth on every request, causing 504 MIDDLEWARE_INVOCATION_TIMEOUT errors
+- Solution: Updated middleware.ts to only run auth checks on protected routes (/profile, /dashboard, /admin, /billing, /settings)
+- Fixed Stripe type errors: Added type assertions for subscription.current_period_end and cancel_at_period_end
+- Fixed font import: Replaced unavailable Geist fonts with Inter in layout.tsx
+
 ### Module 4: Stripe Integration (Complete - Tested Dec 31, 2025)
 - Stripe Checkout for subscription payments (Pro $29/mo, Team $99/mo)
 - Webhook endpoint at `/api/stripe/webhook` receiving `checkout.session.completed`
