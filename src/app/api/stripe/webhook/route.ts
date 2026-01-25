@@ -1,9 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUncachableStripeClient } from '@/lib/stripe/client';
 import { stripeService } from '@/lib/stripe/service';
+import { sendSubscriptionConfirmationEmail, sendSubscriptionCancelledEmail } from '@/lib/email';
 import Stripe from 'stripe';
 
 export const runtime = 'nodejs';
+
+async function getCustomerEmail(stripe: Stripe, customerId: string): Promise<{ email: string; name: string } | null> {
+  try {
+    const customer = await stripe.customers.retrieve(customerId);
+    if (customer.deleted) return null;
+    return {
+      email: customer.email || '',
+      name: customer.name || customer.email?.split('@')[0] || 'there',
+    };
+  } catch {
+    return null;
+  }
+}
 
 export async function POST(request: NextRequest) {
   const signature = request.headers.get('stripe-signature');
@@ -35,6 +49,33 @@ export async function POST(request: NextRequest) {
           );
           await stripeService.syncSubscriptionToDatabase(subscription);
           console.log('Subscription synced to database:', subscription.id);
+
+          if (session.customer && session.mode === 'subscription') {
+            const customerData = await getCustomerEmail(stripe, session.customer as string);
+            if (customerData?.email) {
+              const product = subscription.items.data[0]?.price.product;
+              
+              let planName = 'Pro';
+              let amount = 2900;
+              
+              if (typeof product === 'string') {
+                const productData = await stripe.products.retrieve(product);
+                planName = productData.name;
+              }
+              
+              if (subscription.items.data[0]?.price.unit_amount) {
+                amount = subscription.items.data[0].price.unit_amount;
+              }
+
+              await sendSubscriptionConfirmationEmail(
+                customerData.email,
+                customerData.name,
+                planName,
+                amount
+              );
+              console.log('Subscription confirmation email sent to:', customerData.email);
+            }
+          }
         }
         break;
       }
@@ -42,6 +83,29 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         console.log('Subscription updated:', subscription.id);
         await stripeService.syncSubscriptionToDatabase(subscription);
+
+        if ((subscription as any).cancel_at_period_end && subscription.customer) {
+          const customerData = await getCustomerEmail(stripe, subscription.customer as string);
+          if (customerData?.email) {
+            const product = subscription.items.data[0]?.price.product;
+            let planName = 'Pro';
+            
+            if (typeof product === 'string') {
+              const productData = await stripe.products.retrieve(product);
+              planName = productData.name;
+            }
+
+            const endDate = new Date((subscription as any).current_period_end * 1000);
+            
+            await sendSubscriptionCancelledEmail(
+              customerData.email,
+              customerData.name,
+              planName,
+              endDate
+            );
+            console.log('Subscription cancellation email sent to:', customerData.email);
+          }
+        }
         break;
       }
       case 'customer.subscription.deleted': {
