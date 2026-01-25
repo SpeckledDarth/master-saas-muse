@@ -166,7 +166,8 @@ Same three variables above, added via Vercel Project → Settings → Environmen
   - audit_logs: Only admins can view, users can insert own logs
 - Zod validation schemas (`src/lib/validation/`) for all API inputs
 - Rate limiting middleware (`src/lib/rate-limit/`) with preset configs
-  - Note: In-memory limiter works for development; upgrade to Upstash Redis for production scale
+  - **MVP Status**: In-memory limiter is acceptable for development and initial launch
+  - **Production Upgrade**: Before first production SaaS with live customer data, upgrade to Upstash Redis for distributed rate limiting across serverless instances
 - Security headers in `next.config.ts`:
   - Strict-Transport-Security (HSTS)
   - X-Frame-Options (clickjacking protection)
@@ -174,6 +175,12 @@ Same three variables above, added via Vercel Project → Settings → Environmen
   - X-XSS-Protection
   - Referrer-Policy
   - Permissions-Policy
+
+### Pre-Production Checklist
+When launching first production SaaS with live customer/user data:
+1. **Rate Limiting**: Upgrade from in-memory to Upstash Redis (`src/lib/rate-limit/index.ts`)
+2. **CSP Headers**: Consider adding Content-Security-Policy header if needed
+3. **Monitoring**: Add error tracking (Sentry) and uptime monitoring
 
 ## Next Module: Module 8 - Monitoring & Docs
 
