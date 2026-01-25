@@ -158,7 +158,24 @@ Same three variables above, added via Vercel Project → Settings → Environmen
 - Webhook integration: emails sent on subscription events
 - Environment variables: RESEND_API_KEY, RESEND_FROM_EMAIL
 
-## Next Module: Module 7 - Security & RLS
+### Module 7: Security & RLS (Complete - Jan 25, 2026)
+- Supabase Row Level Security (RLS) enabled on all 4 tables
+  - profiles: Users can only view/update own profile, admins can view all
+  - user_roles: Users can view own role, admins can manage all
+  - organization_settings: Anyone can read, only admins can update
+  - audit_logs: Only admins can view, users can insert own logs
+- Zod validation schemas (`src/lib/validation/`) for all API inputs
+- Rate limiting middleware (`src/lib/rate-limit/`) with preset configs
+  - Note: In-memory limiter works for development; upgrade to Upstash Redis for production scale
+- Security headers in `next.config.ts`:
+  - Strict-Transport-Security (HSTS)
+  - X-Frame-Options (clickjacking protection)
+  - X-Content-Type-Options (MIME sniffing protection)
+  - X-XSS-Protection
+  - Referrer-Policy
+  - Permissions-Policy
+
+## Next Module: Module 8 - Monitoring & Docs
 
 ## Configuration Files
 - `.env.template` - Template for all secrets and environment variables
