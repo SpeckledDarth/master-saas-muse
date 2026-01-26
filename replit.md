@@ -16,7 +16,19 @@ Preferred communication style: Simple, everyday language.
 - **Roles**: User sets goals and supplies keys when asked. Agent handles all technical execution.
 - **Cognitive load**: Minimize decisions. Ask simple yes/no questions. Avoid jargon unless it affects a decision.
 
-## Session Context (Updated Dec 31, 2025)
+## Session Context (Updated Jan 26, 2026)
+
+### Vercel Deployment Fixed (Jan 26, 2026)
+- **Issue**: Replit-to-GitHub sync only syncs changed files, not full directories
+- **Root Cause**: GitHub package.json was missing ~20 Radix UI dependencies that UI components need
+- **Additional Fixes**:
+  - Updated react-day-picker from v8 to v9 for React 19 compatibility
+  - Fixed tsconfig.json syntax error (malformed JSON)
+  - Added missing UI components (switch, tabs, textarea, calendar)
+  - Added missing Stripe files (feature-gate.ts, webhook-handlers.ts)
+  - Removed duplicate `src/src/` folder that was created by accident
+- **Solution Method**: Local Git clone + manual file sync for bulk uploads
+- **Lesson**: When syncing many files, use local Git clone method rather than GitHub web UI
 
 ### Development Workflow
 - **Local Environment**: Windows with PowerShell
