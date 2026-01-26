@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { defaultSettings, SiteSettings } from '@/types/settings'
 
@@ -6,6 +8,38 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
+
+async function getAuthenticatedUser(request: NextRequest) {
+  const cookieStore = await cookies()
+  
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+          }
+        },
+      },
+    }
+  )
+  
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  if (error || !user) {
+    return null
+  }
+  
+  return user
+}
 
 async function isAdmin(userId: string): Promise<boolean> {
   const { data } = await supabaseAdmin
@@ -18,14 +52,13 @@ async function isAdmin(userId: string): Promise<boolean> {
 }
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  const userId = request.headers.get('x-user-id')
+  const user = await getAuthenticatedUser(request)
   
-  if (!userId) {
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   
-  const isAdminUser = await isAdmin(userId)
+  const isAdminUser = await isAdmin(user.id)
   if (!isAdminUser) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
@@ -58,13 +91,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const userId = request.headers.get('x-user-id')
+  const user = await getAuthenticatedUser(request)
   
-  if (!userId) {
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   
-  const isAdminUser = await isAdmin(userId)
+  const isAdminUser = await isAdmin(user.id)
   if (!isAdminUser) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
@@ -102,7 +135,7 @@ export async function POST(request: NextRequest) {
   await supabaseAdmin
     .from('audit_logs')
     .insert({
-      user_id: userId,
+      user_id: user.id,
       action: 'settings_updated',
       details: { section: Object.keys(settings).join(', ') }
     })

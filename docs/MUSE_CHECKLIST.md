@@ -168,17 +168,53 @@ Skip this if you only need email/password authentication.
 
 ---
 
-## Step 12: Verify Everything Works
+## Step 12: Configure Your SaaS (Setup Dashboard)
 
-- [ ] Landing page loads with dark/light mode toggle
+This is the key step that makes each clone unique! Go to `/admin/setup` and configure:
+
+### Branding Tab
+- [ ] **App Name** - Your SaaS product name (e.g., "ExtrusionCalc Pro")
+- [ ] **Tagline** - Short description (e.g., "Professional extrusion calculations")
+- [ ] **Company Name** - Your business name
+- [ ] **Support Email** - Where users contact you
+- [ ] **Primary Color** - Main brand color (use color picker)
+- [ ] **Accent Color** - Secondary brand color
+
+### Pricing Tab
+- [ ] Update plan names if needed
+- [ ] Set your prices (Pro: $29/mo default, Team: $99/mo default)
+- [ ] Add Stripe Price IDs from your Stripe Dashboard
+- [ ] Customize feature lists for each plan
+
+### Social Tab
+- [ ] Add your Twitter/X link
+- [ ] Add your LinkedIn link
+- [ ] Add your GitHub link (optional)
+- [ ] Add your company website
+
+### Features Tab
+- [ ] Toggle Email Authentication (on/off)
+- [ ] Toggle Google OAuth (on/off)
+- [ ] Toggle Avatar Upload (on/off)
+- [ ] Set Allow New Signups (on for launch)
+- [ ] Maintenance Mode (off for launch)
+
+**Click "Save Changes" when done!**
+
+---
+
+## Step 13: Verify Everything Works
+
+- [ ] Landing page loads with your branding
+- [ ] App name displays correctly in header
 - [ ] Sign up works (email confirmation sent)
 - [ ] Login works
 - [ ] Google OAuth works (if configured)
 - [ ] Profile page loads with avatar upload
 - [ ] Admin panel accessible at `/admin`
-- [ ] Admin can view/manage users at `/admin/users`
-- [ ] Admin can change settings at `/admin/settings`
-- [ ] Pricing page shows plans at `/pricing`
+- [ ] Setup Dashboard works at `/admin/setup`
+- [ ] Settings save successfully
+- [ ] Pricing page shows your customized plans at `/pricing`
 - [ ] Stripe checkout works (test mode)
 - [ ] Billing page shows subscription at `/billing`
 
@@ -223,6 +259,7 @@ Skip this if you only need email/password authentication.
 
 ### Admin Features
 - Admin dashboard with metrics
+- **Setup Dashboard** (configure branding, pricing, features)
 - User management (view, edit roles)
 - Organization settings
 - Audit logging

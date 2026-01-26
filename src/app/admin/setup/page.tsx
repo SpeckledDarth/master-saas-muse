@@ -35,7 +35,7 @@ export default function SetupPage() {
       setUserId(user.id)
       
       const response = await fetch('/api/admin/setup', {
-        headers: { 'x-user-id': user.id }
+        credentials: 'include'
       })
       
       if (response.ok) {
@@ -59,8 +59,8 @@ export default function SetupPage() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': userId,
       },
+      credentials: 'include',
       body: JSON.stringify({ settings }),
     })
     

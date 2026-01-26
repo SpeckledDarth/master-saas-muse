@@ -176,6 +176,17 @@ Same three variables above, added via Vercel Project → Settings → Environmen
   - Referrer-Policy
   - Permissions-Policy
 
+### Module 9: Setup Dashboard (Complete - Jan 26, 2026)
+- Admin-only Setup Dashboard at `/admin/setup`
+- Tabbed interface with: Branding, Pricing, Social, Features
+- Branding: App name, tagline, company name, support email, color picker
+- Pricing: Plan names, prices, features list, Stripe Price IDs
+- Social: Twitter, LinkedIn, GitHub, website links
+- Features: Toggle email auth, Google OAuth, avatar upload, maintenance mode
+- Settings stored in database (organization_settings table)
+- Dynamic branding components for use across the app
+- Secure API with cookie-based authentication (not header trust)
+
 ### Module 8: Monitoring & Docs (Complete - Jan 25, 2026)
 - Sentry error tracking: **Deferred** - `@sentry/nextjs` doesn't support Next.js 16 yet
   - Will be added when Sentry releases Next.js 16 support
