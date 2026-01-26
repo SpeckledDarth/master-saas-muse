@@ -1,0 +1,111 @@
+import { createClient } from '@supabase/supabase-js'
+import { NextRequest, NextResponse } from 'next/server'
+import { defaultSettings, SiteSettings } from '@/types/settings'
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
+async function isAdmin(userId: string): Promise<boolean> {
+  const { data } = await supabaseAdmin
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .single()
+  
+  return data?.role === 'admin'
+}
+
+export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get('authorization')
+  const userId = request.headers.get('x-user-id')
+  
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  
+  const isAdminUser = await isAdmin(userId)
+  if (!isAdminUser) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+  
+  const { data, error } = await supabaseAdmin
+    .from('organization_settings')
+    .select('settings')
+    .eq('app_id', 'default')
+    .single()
+  
+  if (error) {
+    if (error.code === 'PGRST116') {
+      await supabaseAdmin
+        .from('organization_settings')
+        .insert({ app_id: 'default', settings: defaultSettings })
+      
+      return NextResponse.json({ settings: defaultSettings })
+    }
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+  
+  const mergedSettings: SiteSettings = {
+    branding: { ...defaultSettings.branding, ...data?.settings?.branding },
+    pricing: { ...defaultSettings.pricing, ...data?.settings?.pricing },
+    social: { ...defaultSettings.social, ...data?.settings?.social },
+    features: { ...defaultSettings.features, ...data?.settings?.features },
+  }
+  
+  return NextResponse.json({ settings: mergedSettings })
+}
+
+export async function POST(request: NextRequest) {
+  const userId = request.headers.get('x-user-id')
+  
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  
+  const isAdminUser = await isAdmin(userId)
+  if (!isAdminUser) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+  
+  const body = await request.json()
+  const { settings } = body as { settings: Partial<SiteSettings> }
+  
+  const { data: current } = await supabaseAdmin
+    .from('organization_settings')
+    .select('settings')
+    .eq('app_id', 'default')
+    .single()
+  
+  const currentSettings = current?.settings || defaultSettings
+  
+  const newSettings: SiteSettings = {
+    branding: { ...defaultSettings.branding, ...currentSettings.branding, ...settings.branding },
+    pricing: { ...defaultSettings.pricing, ...currentSettings.pricing, ...settings.pricing },
+    social: { ...defaultSettings.social, ...currentSettings.social, ...settings.social },
+    features: { ...defaultSettings.features, ...currentSettings.features, ...settings.features },
+  }
+  
+  const { error } = await supabaseAdmin
+    .from('organization_settings')
+    .upsert({ 
+      app_id: 'default',
+      settings: newSettings,
+      updated_at: new Date().toISOString()
+    })
+  
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+  
+  await supabaseAdmin
+    .from('audit_logs')
+    .insert({
+      user_id: userId,
+      action: 'settings_updated',
+      details: { section: Object.keys(settings).join(', ') }
+    })
+  
+  return NextResponse.json({ success: true, settings: newSettings })
+}
