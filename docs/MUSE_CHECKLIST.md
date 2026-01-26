@@ -89,10 +89,10 @@ Run the SQL from `docs/SETUP_GUIDE.md` in Supabase SQL Editor:
 - USING: `bucket_id = 'avatars' OR bucket_id = 'branding'`
 - WITH CHECK: `bucket_id = 'avatars' OR bucket_id = 'branding'`
 
-**Policy 3: SELECT (public)**
+**Policy 3: SELECT (anon/public)**
 - Name: `Allow public reads`
 - Operation: SELECT
-- Target roles: public
+- Target roles: anon
 - USING: `bucket_id = 'avatars' OR bucket_id = 'branding'`
 
 > Note: The `branding` bucket stores logos and hero images uploaded via Setup Dashboard
