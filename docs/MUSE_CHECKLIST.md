@@ -69,30 +69,33 @@ Run the SQL from `docs/SETUP_GUIDE.md` in Supabase SQL Editor:
 
 ---
 
-## Step 5: Create Storage Bucket (3 min)
+## Step 5: Create Storage Buckets (5 min)
 
 - [ ] In Supabase, go to **Storage**
 - [ ] Click **New bucket**, name it `avatars`, make it **Public**
-- [ ] Go to **Policies** tab and add these 3 policies:
+- [ ] Click **New bucket**, name it `branding`, make it **Public**
+- [ ] Go to **Policies** tab and add these policies for **both buckets**:
 
 **Policy 1: INSERT (authenticated)**
 - Name: `Allow authenticated uploads`
 - Operation: INSERT
 - Target roles: authenticated
-- WITH CHECK: `bucket_id = 'avatars'`
+- WITH CHECK: `bucket_id = 'avatars' OR bucket_id = 'branding'`
 
 **Policy 2: UPDATE (authenticated)**
 - Name: `Allow authenticated updates`
 - Operation: UPDATE
 - Target roles: authenticated
-- USING: `bucket_id = 'avatars'`
-- WITH CHECK: `bucket_id = 'avatars'`
+- USING: `bucket_id = 'avatars' OR bucket_id = 'branding'`
+- WITH CHECK: `bucket_id = 'avatars' OR bucket_id = 'branding'`
 
 **Policy 3: SELECT (public)**
 - Name: `Allow public reads`
 - Operation: SELECT
 - Target roles: public
-- USING: `bucket_id = 'avatars'`
+- USING: `bucket_id = 'avatars' OR bucket_id = 'branding'`
+
+> Note: The `branding` bucket stores logos and hero images uploaded via Setup Dashboard
 
 ---
 
@@ -177,6 +180,8 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] **Tagline** - Short description (e.g., "Professional extrusion calculations")
 - [ ] **Company Name** - Your business name
 - [ ] **Support Email** - Where users contact you
+- [ ] **Logo** - Upload or paste URL for your logo (square recommended)
+- [ ] **Hero Image** - Upload or paste URL for landing page hero
 - [ ] **Primary Color** - Main brand color (use color picker)
 - [ ] **Accent Color** - Secondary brand color
 

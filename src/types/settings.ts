@@ -2,6 +2,8 @@ export interface BrandingSettings {
   appName: string
   tagline: string
   logoUrl: string | null
+  faviconUrl: string | null
+  heroImageUrl: string | null
   primaryColor: string
   accentColor: string
   companyName: string
@@ -52,6 +54,8 @@ export const defaultSettings: SiteSettings = {
     appName: 'My SaaS',
     tagline: 'Build something amazing',
     logoUrl: null,
+    faviconUrl: null,
+    heroImageUrl: null,
     primaryColor: '#6366f1',
     accentColor: '#8b5cf6',
     companyName: 'Your Company',

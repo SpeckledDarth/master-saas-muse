@@ -179,11 +179,12 @@ Same three variables above, added via Vercel Project → Settings → Environmen
 ### Module 9: Setup Dashboard (Complete - Jan 26, 2026)
 - Admin-only Setup Dashboard at `/admin/setup`
 - Tabbed interface with: Branding, Pricing, Social, Features
-- Branding: App name, tagline, company name, support email, color picker
+- Branding: App name, tagline, company name, support email, **logo upload**, **hero image upload**, color picker
 - Pricing: Plan names, prices, features list, Stripe Price IDs
 - Social: Twitter, LinkedIn, GitHub, website links
 - Features: Toggle email auth, Google OAuth, avatar upload, maintenance mode
 - Settings stored in database (organization_settings table)
+- Image uploads via Supabase Storage (`branding` bucket)
 - Dynamic branding components for use across the app
 - Secure API with cookie-based authentication (not header trust)
 

@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Palette, DollarSign, Globe, Settings, Loader2, Save, Check } from 'lucide-react'
+import { ImageUpload } from '@/components/admin/image-upload'
 
 export default function SetupPage() {
   const router = useRouter()
@@ -219,6 +220,25 @@ export default function SetupPage() {
                   onChange={e => updateBranding('supportEmail', e.target.value)}
                   placeholder="support@example.com"
                   data-testid="input-support-email"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <ImageUpload
+                  label="Logo"
+                  value={settings.branding.logoUrl}
+                  onChange={url => updateBranding('logoUrl', url)}
+                  folder="logos"
+                  aspectRatio="1/1"
+                  testId="logo-upload"
+                />
+                <ImageUpload
+                  label="Hero Image"
+                  value={settings.branding.heroImageUrl}
+                  onChange={url => updateBranding('heroImageUrl', url)}
+                  folder="heroes"
+                  aspectRatio="16/9"
+                  testId="hero-upload"
                 />
               </div>
 
