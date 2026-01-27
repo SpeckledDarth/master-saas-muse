@@ -26,8 +26,9 @@ Preferred communication style: Simple, everyday language.
 - **Solution**: Simplified RLS policy to allow all authenticated users to read roles
   - Created single policy: `"Allow authenticated read" FOR SELECT TO authenticated USING (true)`
   - Admin-only restrictions handled by application layout code, not database RLS
-- **Pending Task**: Add admin-only policies for INSERT, UPDATE, DELETE on user_roles
-- **Testing Needed**: Full test of Setup Dashboard (branding, pricing, social, features tabs)
+- **Completed**: Added admin-only policies for INSERT, UPDATE, DELETE on user_roles
+- **Database Fix**: Added `app_id` and `settings` JSONB columns to organization_settings table
+- **Setup Dashboard**: Tested and working - settings now persist correctly
 
 ### GitHub Sync Fix (Jan 27, 2026)
 - **Issue**: `src/app/admin/page.tsx` on GitHub had wrong content (Setup page code instead of Admin Dashboard)
