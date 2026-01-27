@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -21,93 +21,84 @@ export function UserNav() {
   const [user, setUser] = useState<User | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [debugInfo, setDebugInfo] = useState<string>('')
+  const [debugInfo, setDebugInfo] = useState<string>('Init')
   const router = useRouter()
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
+  
+  // Create supabase client once
+  if (typeof window !== 'undefined' && !supabaseRef.current) {
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      supabaseRef.current = createClient()
+    }
+  }
+  
+  const supabase = supabaseRef.current
 
-  const supabase = useMemo(() => {
-    if (typeof window === 'undefined') return null
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return null
-    return createClient()
-  }, [])
-
+  // Effect 1: Get initial session and subscribe to auth changes
   useEffect(() => {
     if (!supabase) {
       setLoading(false)
-      setDebugInfo('No Supabase client')
+      setDebugInfo('No client')
       return
     }
     
-    // Safety timeout - ensure loading stops after 5 seconds max
-    const timeoutId = setTimeout(() => {
-      setLoading(false)
-      setDebugInfo('Timeout - auth check took too long')
-    }, 5000)
+    setDebugInfo('Getting session...')
     
-    // Use getSession first (faster, uses cached session)
-    const getUser = async () => {
-      try {
-        // getSession is faster than getUser for initial load
-        const { data: { session } } = await supabase.auth.getSession()
-        const currentUser = session?.user ?? null
-        setUser(currentUser)
-        
-        if (currentUser) {
-          setDebugInfo(`User: ${currentUser.id.slice(0,8)}...`)
-          
-          const { data: role, error: roleError } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', currentUser.id)
-            .single()
-          
-          if (roleError) {
-            setDebugInfo(`Role error: ${roleError.message}`)
-          } else {
-            setDebugInfo(`Role: ${role?.role || 'none'}`)
-            setIsAdmin(role?.role === 'admin')
-          }
-        } else {
-          setDebugInfo('No user session')
-        }
-      } catch (error) {
-        setDebugInfo(`Error: ${error}`)
-      } finally {
-        clearTimeout(timeoutId)
-        setLoading(false)
-      }
-    }
-    
-    getUser()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setDebugInfo(session ? `Got user: ${session.user.id.slice(0,8)}` : 'No session')
       setUser(session?.user ?? null)
-      
-      if (session?.user) {
-        setDebugInfo(`Checking role for ${session.user.id.slice(0,8)}...`)
-        const { data: role, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .single()
-        
-        if (error) {
-          setDebugInfo(`Role error: ${error.message}`)
-          setIsAdmin(false)
-        } else {
-          setDebugInfo(`Role: ${role?.role || 'none'}`)
-          setIsAdmin(role?.role === 'admin')
-        }
-      } else {
-        setDebugInfo('No session')
+      setLoading(false)
+    }).catch((err) => {
+      setDebugInfo(`Session error: ${err.message}`)
+      setLoading(false)
+    })
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+      if (!session) {
         setIsAdmin(false)
       }
     })
 
     return () => {
-      clearTimeout(timeoutId)
       subscription.unsubscribe()
     }
   }, [supabase])
+  
+  // Effect 2: Check role whenever user changes
+  useEffect(() => {
+    if (!supabase || !user) {
+      setIsAdmin(false)
+      return
+    }
+    
+    const checkRole = async () => {
+      try {
+        setDebugInfo(`Checking role...`)
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single()
+        
+        if (error) {
+          setDebugInfo(`Role err: ${error.code} - ${error.message}`)
+          setIsAdmin(false)
+        } else {
+          setDebugInfo(`Role: ${data?.role || 'none'}`)
+          setIsAdmin(data?.role === 'admin')
+        }
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+        setDebugInfo(`Catch: ${errorMessage}`)
+        setIsAdmin(false)
+      }
+    }
+    
+    checkRole()
+  }, [supabase, user])
 
   const handleSignOut = useCallback(async () => {
     if (!supabase) return
