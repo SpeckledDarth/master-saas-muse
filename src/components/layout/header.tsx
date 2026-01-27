@@ -24,7 +24,7 @@ export function Header() {
             />
           ) : null}
           <span className="font-bold text-xl" data-testid="text-app-name">
-            {loading ? 'Loading...' : branding.appName}
+            {branding.appName}
           </span>
         </Link>
 

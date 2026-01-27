@@ -15,9 +15,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { User } from '@supabase/supabase-js'
+import { Shield } from 'lucide-react'
 
 export function UserNav() {
   const [user, setUser] = useState<User | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
@@ -34,14 +36,37 @@ export function UserNav() {
     }
     
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      setUser(currentUser)
+      
+      if (currentUser) {
+        const { data: role } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', currentUser.id)
+          .single()
+        
+        setIsAdmin(role?.role === 'admin')
+      }
+      
       setLoading(false)
     }
     getUser()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
+      
+      if (session?.user) {
+        const { data: role } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .single()
+        
+        setIsAdmin(role?.role === 'admin')
+      } else {
+        setIsAdmin(false)
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -50,6 +75,7 @@ export function UserNav() {
   const handleSignOut = useCallback(async () => {
     if (!supabase) return
     await supabase.auth.signOut()
+    setIsAdmin(false)
     router.push('/')
     router.refresh()
   }, [supabase, router])
@@ -91,6 +117,14 @@ export function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin" data-testid="link-admin" className="flex items-center">
+              <Shield className="mr-2 h-4 w-4" />
+              Admin Dashboard
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
           <Link href="/profile" data-testid="link-profile">Profile</Link>
         </DropdownMenuItem>
