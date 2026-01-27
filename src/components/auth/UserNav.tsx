@@ -21,6 +21,7 @@ export function UserNav() {
   const [user, setUser] = useState<User | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [debugInfo, setDebugInfo] = useState<string>('')
   const router = useRouter()
 
   const supabase = useMemo(() => {
@@ -32,36 +33,39 @@ export function UserNav() {
   useEffect(() => {
     if (!supabase) {
       setLoading(false)
+      setDebugInfo('No Supabase client')
       return
     }
     
-    let timeoutId: NodeJS.Timeout | null = setTimeout(() => {
-      setLoading(false)
-    }, 3000)
-    
+    // Use getSession first (faster, uses cached session)
     const getUser = async () => {
       try {
-        const { data: { user: currentUser } } = await supabase.auth.getUser()
+        // getSession is faster than getUser for initial load
+        const { data: { session } } = await supabase.auth.getSession()
+        const currentUser = session?.user ?? null
         setUser(currentUser)
         
         if (currentUser) {
-          console.log('Checking admin for user:', currentUser.id)
+          setDebugInfo(`User: ${currentUser.id.slice(0,8)}...`)
+          
           const { data: role, error: roleError } = await supabase
             .from('user_roles')
             .select('role')
             .eq('user_id', currentUser.id)
             .single()
           
-          console.log('Role query result:', { role, error: roleError })
-          setIsAdmin(role?.role === 'admin')
+          if (roleError) {
+            setDebugInfo(`Role error: ${roleError.message}`)
+          } else {
+            setDebugInfo(`Role: ${role?.role || 'none'}`)
+            setIsAdmin(role?.role === 'admin')
+          }
+        } else {
+          setDebugInfo('No user session')
         }
       } catch (error) {
-        console.error('Error fetching user:', error)
+        setDebugInfo(`Error: ${error}`)
       } finally {
-        if (timeoutId) {
-          clearTimeout(timeoutId)
-          timeoutId = null
-        }
         setLoading(false)
       }
     }
@@ -72,16 +76,17 @@ export function UserNav() {
       setUser(session?.user ?? null)
       
       if (session?.user) {
-        try {
-          const { data: role } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', session.user.id)
-            .single()
-          
-          setIsAdmin(role?.role === 'admin')
-        } catch {
+        const { data: role, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .single()
+        
+        if (error) {
+          setDebugInfo(`Auth change role error: ${error.message}`)
           setIsAdmin(false)
+        } else {
+          setIsAdmin(role?.role === 'admin')
         }
       } else {
         setIsAdmin(false)
@@ -89,7 +94,6 @@ export function UserNav() {
     })
 
     return () => {
-      if (timeoutId) clearTimeout(timeoutId)
       subscription.unsubscribe()
     }
   }, [supabase])
@@ -105,6 +109,9 @@ export function UserNav() {
   if (loading) {
     return <Button variant="ghost" size="sm" disabled>Loading...</Button>
   }
+
+  // Temporary debug display - remove after fixing
+  const showDebug = process.env.NODE_ENV === 'development' || debugInfo.includes('error') || debugInfo.includes('Error')
 
   if (!user) {
     return (
@@ -136,6 +143,9 @@ export function UserNav() {
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || 'User'}</p>
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+            {debugInfo && (
+              <p className="text-xs leading-none text-yellow-500 mt-1">[Debug: {debugInfo}]</p>
+            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
