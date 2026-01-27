@@ -35,41 +35,61 @@ export function UserNav() {
       return
     }
     
-    const getUser = async () => {
-      const { data: { user: currentUser } } = await supabase.auth.getUser()
-      setUser(currentUser)
-      
-      if (currentUser) {
-        const { data: role } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', currentUser.id)
-          .single()
-        
-        setIsAdmin(role?.role === 'admin')
-      }
-      
+    let timeoutId: NodeJS.Timeout | null = setTimeout(() => {
       setLoading(false)
+    }, 3000)
+    
+    const getUser = async () => {
+      try {
+        const { data: { user: currentUser } } = await supabase.auth.getUser()
+        setUser(currentUser)
+        
+        if (currentUser) {
+          const { data: role } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', currentUser.id)
+            .single()
+          
+          setIsAdmin(role?.role === 'admin')
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error)
+      } finally {
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+          timeoutId = null
+        }
+        setLoading(false)
+      }
     }
+    
     getUser()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
       
       if (session?.user) {
-        const { data: role } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .single()
-        
-        setIsAdmin(role?.role === 'admin')
+        try {
+          const { data: role } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .single()
+          
+          setIsAdmin(role?.role === 'admin')
+        } catch {
+          setIsAdmin(false)
+        }
       } else {
         setIsAdmin(false)
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+      subscription.unsubscribe()
+    }
   }, [supabase])
 
   const handleSignOut = useCallback(async () => {
