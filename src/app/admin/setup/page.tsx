@@ -311,68 +311,39 @@ export default function SetupPage() {
             <CardHeader>
               <CardTitle>Pricing Plans</CardTitle>
               <CardDescription>
-                Configure your subscription tiers and features
+                Manage your subscription tiers in Stripe Dashboard
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {settings.pricing.plans.map((plan, index) => (
-                <div key={plan.id} className="p-4 border rounded-lg space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-lg">{plan.name} Plan</h3>
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor={`highlighted-${plan.id}`} className="text-sm">
-                        Highlight
-                      </Label>
-                      <Switch
-                        id={`highlighted-${plan.id}`}
-                        checked={plan.highlighted}
-                        onCheckedChange={checked => updatePlan(plan.id, 'highlighted', checked)}
-                        data-testid={`switch-highlight-${plan.id}`}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label>Plan Name</Label>
-                      <Input
-                        value={plan.name}
-                        onChange={e => updatePlan(plan.id, 'name', e.target.value)}
-                        data-testid={`input-plan-name-${plan.id}`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Price ($/month)</Label>
-                      <Input
-                        type="number"
-                        value={plan.price}
-                        onChange={e => updatePlan(plan.id, 'price', parseInt(e.target.value) || 0)}
-                        data-testid={`input-plan-price-${plan.id}`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Stripe Price ID</Label>
-                      <Input
-                        value={plan.stripePriceId}
-                        onChange={e => updatePlan(plan.id, 'stripePriceId', e.target.value)}
-                        placeholder="price_xxx"
-                        data-testid={`input-stripe-price-${plan.id}`}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>Features (one per line)</Label>
-                    <Textarea
-                      value={plan.features.join('\n')}
-                      onChange={e => updatePlan(plan.id, 'features', e.target.value.split('\n').filter(f => f.trim()))}
-                      rows={4}
-                      placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
-                      data-testid={`textarea-features-${plan.id}`}
-                    />
-                  </div>
+              <div className="p-6 border rounded-lg bg-muted/50 text-center space-y-4">
+                <DollarSign className="h-12 w-12 mx-auto text-muted-foreground" />
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">Pricing is managed in Stripe</h3>
+                  <p className="text-muted-foreground text-sm max-w-md mx-auto">
+                    To keep invoices, emails, and your pricing page consistent, 
+                    all pricing is managed directly in Stripe. Changes you make there 
+                    will automatically appear on your site.
+                  </p>
                 </div>
-              ))}
+                <Button
+                  onClick={() => window.open('https://dashboard.stripe.com/products', '_blank')}
+                  className="mt-4"
+                  data-testid="button-open-stripe"
+                >
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  Manage Products in Stripe
+                </Button>
+              </div>
+              
+              <div className="text-sm text-muted-foreground space-y-2">
+                <p className="font-medium">How it works:</p>
+                <ol className="list-decimal list-inside space-y-1">
+                  <li>Create or edit products in Stripe Dashboard</li>
+                  <li>Set product names, prices, and descriptions</li>
+                  <li>Add features in the product metadata (key: features, value: JSON array)</li>
+                  <li>Your pricing page will automatically display the updates</li>
+                </ol>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
