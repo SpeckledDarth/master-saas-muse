@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeSettingsProvider } from "@/components/theme-settings-provider"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { PlausibleAnalytics } from "@/components/analytics/plausible"
@@ -32,11 +33,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+          <ThemeSettingsProvider>
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+          </ThemeSettingsProvider>
         </ThemeProvider>
       </body>
     </html>
