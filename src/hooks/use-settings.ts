@@ -10,9 +10,14 @@ export function useSettings() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => {
+      controller.abort()
+      setLoading(false)
+    }, 5000)
+    
     async function loadSettings() {
       try {
-        // Check if Supabase is configured before creating client
         if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
           setLoading(false)
           return
@@ -27,9 +32,8 @@ export function useSettings() {
         
         if (error) {
           if (error.code !== 'PGRST116') {
-            setError(error.message)
+            console.error('Settings error:', error.message)
           }
-          setLoading(false)
           return
         }
         
@@ -42,15 +46,20 @@ export function useSettings() {
             content: { ...defaultSettings.content, ...data.settings.content },
           })
         }
-        
-        setLoading(false)
       } catch (err) {
-        setError('Failed to load settings')
+        console.error('Failed to load settings:', err)
+      } finally {
+        clearTimeout(timeoutId)
         setLoading(false)
       }
     }
     
     loadSettings()
+    
+    return () => {
+      clearTimeout(timeoutId)
+      controller.abort()
+    }
   }, [])
 
   return { settings, loading, error }
