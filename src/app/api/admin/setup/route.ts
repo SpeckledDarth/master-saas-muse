@@ -122,11 +122,11 @@ export async function POST(request: NextRequest) {
   
   const { error } = await supabaseAdmin
     .from('organization_settings')
-    .upsert({ 
-      app_id: 'default',
+    .update({ 
       settings: newSettings,
       updated_at: new Date().toISOString()
     })
+    .eq('app_id', 'default')
   
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
