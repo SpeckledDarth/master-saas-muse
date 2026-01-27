@@ -4,7 +4,7 @@
 
 This is a full-stack SaaS starter template designed for building production-ready SaaS applications ("muses") with SEO-optimized pages, authentication via Supabase, multi-tenancy support, and Stripe billing. The template enables rapid cloning and customization for new SaaS products.
 
-**IMPORTANT**: We are migrating from Vite + Express to **Next.js 14 + Vercel** for proper SSR/SEO capabilities. See `docs/MASTER_PLAN.md` for the complete development roadmap.
+**ARCHITECTURE**: This is a **pure Next.js 16+ project** deployed to Vercel for SEO capabilities. All Vite/Express artifacts were removed on Jan 27, 2026.
 
 ## User Preferences
 
@@ -17,6 +17,16 @@ Preferred communication style: Simple, everyday language.
 - **Cognitive load**: Minimize decisions. Ask simple yes/no questions. Avoid jargon unless it affects a decision.
 
 ## Session Context (Updated Jan 27, 2026)
+
+### Vite Cleanup - Pure Next.js Architecture (Jan 27, 2026)
+- **Root Cause of Issues**: Project had dual architectures (Vite/Express + Next.js) causing constant conflicts
+- **Solution**: Removed all Vite/Express artifacts, now pure Next.js
+- **Removed Folders**: `client/`, `server/`, `nextjs-module2/`, `shared/`, `script/`
+- **Removed Files**: `vite.config.ts`, `drizzle.config.ts`, debug scripts
+- **Updated Scripts**: package.json now uses `next dev`, `next build`, `next start`
+- **Uninstalled Packages**: vite, @vitejs/plugin-react, express, tsx, drizzle-kit, etc.
+- **Added Package**: @supabase/ssr (was missing)
+- **Result**: Replit now runs Next.js directly, Vercel builds correctly
 
 ### RLS Fix & Admin Dashboard Working (Jan 27, 2026)
 - **Issue**: Admin page redirecting to home page instead of loading
