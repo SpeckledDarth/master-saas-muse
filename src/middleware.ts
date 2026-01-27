@@ -8,6 +8,16 @@ export async function middleware(request: NextRequest) {
     },
   })
 
+  const protectedPaths = ['/profile', '/dashboard', '/admin', '/billing', '/settings']
+  const isProtectedPath = protectedPaths.some(path => 
+    request.nextUrl.pathname.startsWith(path)
+  )
+
+  // Only check auth for protected paths - this is the expensive operation
+  if (!isProtectedPath) {
+    return response
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -25,16 +35,9 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh session on all pages (important for client-side auth)
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Only redirect to login for protected paths
-  const protectedPaths = ['/profile', '/dashboard', '/admin', '/billing', '/settings']
-  const isProtectedPath = protectedPaths.some(path => 
-    request.nextUrl.pathname.startsWith(path)
-  )
-
-  if (!user && isProtectedPath) {
+  if (!user) {
     const redirectUrl = new URL('/login', request.url)
     redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)
