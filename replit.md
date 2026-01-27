@@ -16,7 +16,22 @@ Preferred communication style: Simple, everyday language.
 - **Roles**: User sets goals and supplies keys when asked. Agent handles all technical execution.
 - **Cognitive load**: Minimize decisions. Ask simple yes/no questions. Avoid jargon unless it affects a decision.
 
-## Session Context (Updated Jan 26, 2026)
+## Session Context (Updated Jan 27, 2026)
+
+### RLS Fix & Admin Dashboard Working (Jan 27, 2026)
+- **Issue**: Admin page redirecting to home page instead of loading
+- **Root Cause**: Complex RLS policies on `user_roles` table had circular dependency
+  - "Admins can view all roles" policy checked if user was admin by querying user_roles
+  - But to query user_roles, user needed to be verified as admin first → infinite loop
+- **Solution**: Simplified RLS policy to allow all authenticated users to read roles
+  - Created single policy: `"Allow authenticated read" FOR SELECT TO authenticated USING (true)`
+  - Admin-only restrictions handled by application layout code, not database RLS
+- **Pending Task**: Add admin-only policies for INSERT, UPDATE, DELETE on user_roles
+- **Testing Needed**: Full test of Setup Dashboard (branding, pricing, social, features tabs)
+
+### GitHub Sync Fix (Jan 27, 2026)
+- **Issue**: `src/app/admin/page.tsx` on GitHub had wrong content (Setup page code instead of Admin Dashboard)
+- **Solution**: Replaced via GitHub web UI with correct AdminDashboard component
 
 ### Vercel Deployment Fixed (Jan 26, 2026)
 - **Issue**: Replit-to-GitHub sync only syncs changed files, not full directories
