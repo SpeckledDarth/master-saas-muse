@@ -37,6 +37,12 @@ export function UserNav() {
       return
     }
     
+    // Safety timeout - ensure loading stops after 5 seconds max
+    const timeoutId = setTimeout(() => {
+      setLoading(false)
+      setDebugInfo('Timeout - auth check took too long')
+    }, 5000)
+    
     // Use getSession first (faster, uses cached session)
     const getUser = async () => {
       try {
@@ -66,6 +72,7 @@ export function UserNav() {
       } catch (error) {
         setDebugInfo(`Error: ${error}`)
       } finally {
+        clearTimeout(timeoutId)
         setLoading(false)
       }
     }
@@ -94,6 +101,7 @@ export function UserNav() {
     })
 
     return () => {
+      clearTimeout(timeoutId)
       subscription.unsubscribe()
     }
   }, [supabase])
