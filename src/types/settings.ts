@@ -4,6 +4,8 @@ export interface BrandingSettings {
   logoUrl: string | null
   faviconUrl: string | null
   heroImageUrl: string | null
+  heroImagePosition: string
+  heroImageSize: string
   primaryColor: string
   accentColor: string
   companyName: string
@@ -56,6 +58,8 @@ export const defaultSettings: SiteSettings = {
     logoUrl: null,
     faviconUrl: null,
     heroImageUrl: null,
+    heroImagePosition: 'center',
+    heroImageSize: 'cover',
     primaryColor: '#6366f1',
     accentColor: '#8b5cf6',
     companyName: 'Your Company',

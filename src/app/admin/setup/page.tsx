@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Palette, DollarSign, Globe, Settings, Loader2, Save, Check } from 'lucide-react'
 import { ImageUpload } from '@/components/admin/image-upload'
 
@@ -240,6 +241,49 @@ export default function SetupPage() {
                   aspectRatio="16/9"
                   testId="hero-upload"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="heroPosition">Hero Image Position</Label>
+                  <Select
+                    value={settings.branding.heroImagePosition || 'center'}
+                    onValueChange={value => updateBranding('heroImagePosition', value)}
+                  >
+                    <SelectTrigger id="heroPosition" data-testid="select-hero-position">
+                      <SelectValue placeholder="Select position" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="center">Center</SelectItem>
+                      <SelectItem value="top">Top</SelectItem>
+                      <SelectItem value="bottom">Bottom</SelectItem>
+                      <SelectItem value="left">Left</SelectItem>
+                      <SelectItem value="right">Right</SelectItem>
+                      <SelectItem value="top left">Top Left</SelectItem>
+                      <SelectItem value="top right">Top Right</SelectItem>
+                      <SelectItem value="bottom left">Bottom Left</SelectItem>
+                      <SelectItem value="bottom right">Bottom Right</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Where the image focal point is positioned</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="heroSize">Hero Image Size</Label>
+                  <Select
+                    value={settings.branding.heroImageSize || 'cover'}
+                    onValueChange={value => updateBranding('heroImageSize', value)}
+                  >
+                    <SelectTrigger id="heroSize" data-testid="select-hero-size">
+                      <SelectValue placeholder="Select size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cover">Cover (fills area, may crop)</SelectItem>
+                      <SelectItem value="contain">Contain (shows full image)</SelectItem>
+                      <SelectItem value="auto">Auto (original size)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">How the image scales to fit</p>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
