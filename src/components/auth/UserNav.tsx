@@ -83,6 +83,7 @@ export function UserNav() {
       setUser(session?.user ?? null)
       
       if (session?.user) {
+        setDebugInfo(`Checking role for ${session.user.id.slice(0,8)}...`)
         const { data: role, error } = await supabase
           .from('user_roles')
           .select('role')
@@ -90,12 +91,14 @@ export function UserNav() {
           .single()
         
         if (error) {
-          setDebugInfo(`Auth change role error: ${error.message}`)
+          setDebugInfo(`Role error: ${error.message}`)
           setIsAdmin(false)
         } else {
+          setDebugInfo(`Role: ${role?.role || 'none'}`)
           setIsAdmin(role?.role === 'admin')
         }
       } else {
+        setDebugInfo('No session')
         setIsAdmin(false)
       }
     })
