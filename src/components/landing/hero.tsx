@@ -1,6 +1,7 @@
 'use client'
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import { AppName, AppTagline } from "@/components/branding/dynamic-branding"
@@ -20,10 +21,13 @@ export function Hero() {
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
       {heroImageUrl && (
         <>
-          <img
+          <Image
             src={heroImageUrl}
             alt="Hero background"
-            className="absolute inset-0 w-full h-full"
+            fill
+            priority
+            unoptimized
+            className="absolute inset-0"
             style={{
               objectFit: heroImageSize as 'cover' | 'contain',
               objectPosition: heroImagePosition,
