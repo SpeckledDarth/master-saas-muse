@@ -108,6 +108,8 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const { settings } = body as { settings: Partial<SiteSettings> }
   
+  console.log('[Setup API] Received settings to save:', JSON.stringify(settings, null, 2))
+  
   const { data: current } = await getSupabaseAdmin()
     .from('organization_settings')
     .select('settings')
@@ -116,6 +118,9 @@ export async function POST(request: NextRequest) {
   
   const currentSettings = current?.settings || defaultSettings
   
+  console.log('[Setup API] Current branding in DB:', JSON.stringify(currentSettings.branding, null, 2))
+  console.log('[Setup API] Incoming branding:', JSON.stringify(settings.branding, null, 2))
+  
   const newSettings: SiteSettings = {
     branding: { ...defaultSettings.branding, ...currentSettings.branding, ...settings.branding },
     pricing: { ...defaultSettings.pricing, ...currentSettings.pricing, ...settings.pricing },
@@ -123,6 +128,8 @@ export async function POST(request: NextRequest) {
     features: { ...defaultSettings.features, ...currentSettings.features, ...settings.features },
     content: { ...defaultSettings.content, ...currentSettings.content, ...settings.content },
   }
+  
+  console.log('[Setup API] Merged branding to save:', JSON.stringify(newSettings.branding, null, 2))
   
   const { error } = await getSupabaseAdmin()
     .from('organization_settings')
