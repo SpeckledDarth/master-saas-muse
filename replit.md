@@ -47,6 +47,20 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 - **Plausible Analytics**: Privacy-friendly website analytics.
 - **Sentry**: (Planned) Error tracking, pending Next.js 16 support.
 
+## IMPORTANT: Stack Reminder
+**This project uses Vercel + Next.js (App Router), NOT Vite.**
+- Deployment: Vercel (push to GitHub triggers deployment)
+- Framework: Next.js 16+ with App Router
+- No Vite config files - ignore any Vite-related suggestions
+
+## Next Session Priority (Jan 28, 2026)
+Continue MVP testing of the Setup Dashboard tabs:
+1. **Pricing tab** - Test configuration and persistence
+2. **Social tab** - Test social links editing
+3. **Features tab** - Test feature toggles
+
+All core functionality (theme customization, branding, content editing) is complete and working.
+
 ## Recent Session Progress (Jan 27, 2026)
 
 ### Completed This Session
