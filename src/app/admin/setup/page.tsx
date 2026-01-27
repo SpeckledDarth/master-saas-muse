@@ -561,6 +561,162 @@ export default function SetupPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Light Mode Theme
+              </CardTitle>
+              <CardDescription>Customize colors for light mode</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Background</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={settings.branding.lightTheme?.background || '#ffffff'}
+                      onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, background: e.target.value })}
+                      className="w-16 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={settings.branding.lightTheme?.background || '#ffffff'}
+                      onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, background: e.target.value })}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Text Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={settings.branding.lightTheme?.foreground || '#0a0a0a'}
+                      onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, foreground: e.target.value })}
+                      className="w-16 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={settings.branding.lightTheme?.foreground || '#0a0a0a'}
+                      onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, foreground: e.target.value })}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Card Background</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={settings.branding.lightTheme?.card || '#ffffff'}
+                      onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, card: e.target.value })}
+                      className="w-16 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={settings.branding.lightTheme?.card || '#ffffff'}
+                      onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, card: e.target.value })}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Border Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={settings.branding.lightTheme?.border || '#e5e5e5'}
+                      onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, border: e.target.value })}
+                      className="w-16 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={settings.branding.lightTheme?.border || '#e5e5e5'}
+                      onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, border: e.target.value })}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Dark Mode Theme
+              </CardTitle>
+              <CardDescription>Customize colors for dark mode</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Background</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={settings.branding.darkTheme?.background || '#0a0a1a'}
+                      onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, background: e.target.value })}
+                      className="w-16 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={settings.branding.darkTheme?.background || '#0a0a1a'}
+                      onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, background: e.target.value })}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Text Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={settings.branding.darkTheme?.foreground || '#fafafa'}
+                      onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, foreground: e.target.value })}
+                      className="w-16 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={settings.branding.darkTheme?.foreground || '#fafafa'}
+                      onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, foreground: e.target.value })}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Card Background</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={settings.branding.darkTheme?.card || '#0a0a1a'}
+                      onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, card: e.target.value })}
+                      className="w-16 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={settings.branding.darkTheme?.card || '#0a0a1a'}
+                      onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, card: e.target.value })}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Border Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={settings.branding.darkTheme?.border || '#2a2a3e'}
+                      onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, border: e.target.value })}
+                      className="w-16 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={settings.branding.darkTheme?.border || '#2a2a3e'}
+                      onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, border: e.target.value })}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="content">

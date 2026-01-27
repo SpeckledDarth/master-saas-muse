@@ -1,3 +1,13 @@
+export interface ThemeColors {
+  background: string
+  foreground: string
+  card: string
+  cardForeground: string
+  muted: string
+  mutedForeground: string
+  border: string
+}
+
 export interface BrandingSettings {
   appName: string
   tagline: string
@@ -12,6 +22,8 @@ export interface BrandingSettings {
   accentColor: string
   companyName: string
   supportEmail: string
+  lightTheme: ThemeColors
+  darkTheme: ThemeColors
 }
 
 export interface PricingPlan {
@@ -97,6 +109,26 @@ export interface SiteSettings {
   content: ContentSettings
 }
 
+export const defaultLightTheme: ThemeColors = {
+  background: '#ffffff',
+  foreground: '#0a0a0a',
+  card: '#ffffff',
+  cardForeground: '#0a0a0a',
+  muted: '#f5f5f5',
+  mutedForeground: '#737373',
+  border: '#e5e5e5',
+}
+
+export const defaultDarkTheme: ThemeColors = {
+  background: '#0a0a1a',
+  foreground: '#fafafa',
+  card: '#0a0a1a',
+  cardForeground: '#fafafa',
+  muted: '#1a1a2e',
+  mutedForeground: '#a3a3a3',
+  border: '#2a2a3e',
+}
+
 export const defaultSettings: SiteSettings = {
   branding: {
     appName: 'My SaaS',
@@ -112,6 +144,8 @@ export const defaultSettings: SiteSettings = {
     accentColor: '#8b5cf6',
     companyName: 'Your Company',
     supportEmail: 'support@example.com',
+    lightTheme: defaultLightTheme,
+    darkTheme: defaultDarkTheme,
   },
   pricing: {
     currency: 'USD',
