@@ -111,6 +111,37 @@ Run the SQL from `docs/SETUP_GUIDE.md` in Supabase SQL Editor:
   - Events: `checkout.session.completed`, `customer.subscription.*`, `invoice.*`
 - [ ] Copy webhook signing secret to `STRIPE_WEBHOOK_SECRET`
 
+### Configure Product Metadata (Important!)
+
+Stripe is the **single source of truth** for pricing. Your website automatically displays whatever you configure in Stripe - no code changes needed!
+
+**For each product (Pro, Team), add metadata:**
+
+1. Click on a product in Stripe Dashboard
+2. Scroll to the **Metadata** section
+3. Click **"+ Add metadata"**
+4. Add these key-value pairs:
+
+| Key | Value | Purpose |
+|-----|-------|---------|
+| `features` | `["Feature 1", "Feature 2", "Feature 3"]` | Shows as bullet points on pricing page |
+| `tier` | `pro` | Adds "Popular" badge (use on one plan only) |
+
+**Example for Pro plan:**
+- Key: `features`
+- Value: `["All Free features", "Priority support", "Advanced analytics", "Unlimited projects"]`
+- Key: `tier`
+- Value: `pro`
+
+**Example for Team plan:**
+- Key: `features`
+- Value: `["All Pro features", "Team collaboration", "Admin dashboard", "API access", "Custom integrations"]`
+
+5. Click **Save**
+6. Refresh your pricing page - changes appear instantly!
+
+> **Note:** The Free tier is hardcoded (no Stripe product needed) since free users don't go through checkout.
+
 ---
 
 ## Step 7: Configure Email (Resend) (3 min)
@@ -186,10 +217,9 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] **Accent Color** - Secondary brand color
 
 ### Pricing Tab
-- [ ] Update plan names if needed
-- [ ] Set your prices (Pro: $29/mo default, Team: $99/mo default)
-- [ ] Add Stripe Price IDs from your Stripe Dashboard
-- [ ] Customize feature lists for each plan
+- [ ] Click "Manage Products in Stripe" button to open Stripe Dashboard
+- [ ] Pricing is managed directly in Stripe (see Step 6 for metadata setup)
+- [ ] Changes in Stripe automatically appear on your pricing page
 
 ### Social Tab
 - [ ] Add your Twitter/X link
