@@ -9,8 +9,12 @@ import { useSettings } from "@/hooks/use-settings"
 export function Hero() {
   const { settings, loading } = useSettings()
   const heroImageUrl = settings?.branding?.heroImageUrl
-  const heroImagePosition = settings?.branding?.heroImagePosition || 'center'
+  const heroImagePositionX = settings?.branding?.heroImagePositionX ?? 50
+  const heroImagePositionY = settings?.branding?.heroImagePositionY ?? 50
   const heroImageSize = settings?.branding?.heroImageSize || 'cover'
+  
+  // Use percentage-based positioning for precise control
+  const heroImagePosition = `${heroImagePositionX}% ${heroImagePositionY}%`
 
   return (
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">

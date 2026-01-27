@@ -243,30 +243,17 @@ export default function SetupPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="heroPosition">Hero Image Position</Label>
-                  <Select
-                    value={settings.branding.heroImagePosition || 'center'}
-                    onValueChange={value => updateBranding('heroImagePosition', value)}
-                  >
-                    <SelectTrigger id="heroPosition" data-testid="select-hero-position">
-                      <SelectValue placeholder="Select position" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="center">Center</SelectItem>
-                      <SelectItem value="top">Top</SelectItem>
-                      <SelectItem value="bottom">Bottom</SelectItem>
-                      <SelectItem value="left">Left</SelectItem>
-                      <SelectItem value="right">Right</SelectItem>
-                      <SelectItem value="top left">Top Left</SelectItem>
-                      <SelectItem value="top right">Top Right</SelectItem>
-                      <SelectItem value="bottom left">Bottom Left</SelectItem>
-                      <SelectItem value="bottom right">Bottom Right</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">Where the image focal point is positioned</p>
-                </div>
+              <div className="p-4 rounded-lg border bg-muted/30 space-y-2">
+                <p className="text-sm font-medium">Recommended Hero Image Specs</p>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>Dimensions: <span className="font-medium text-foreground">1920 x 1080 pixels</span> (16:9 ratio)</li>
+                  <li>Minimum width: <span className="font-medium text-foreground">1280 pixels</span> for sharp display</li>
+                  <li>File size: Under <span className="font-medium text-foreground">500 KB</span> for fast loading</li>
+                  <li>Format: <span className="font-medium text-foreground">JPG</span> for photos, <span className="font-medium text-foreground">PNG</span> for graphics</li>
+                </ul>
+              </div>
+
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="heroSize">Hero Image Size</Label>
                   <Select
@@ -284,6 +271,46 @@ export default function SetupPage() {
                   </Select>
                   <p className="text-xs text-muted-foreground">How the image scales to fit</p>
                 </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="heroPositionX">Horizontal Position: {settings.branding.heroImagePositionX ?? 50}%</Label>
+                    <Input
+                      id="heroPositionX"
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={settings.branding.heroImagePositionX ?? 50}
+                      onChange={e => updateBranding('heroImagePositionX', parseInt(e.target.value))}
+                      className="w-full cursor-pointer"
+                      data-testid="input-hero-position-x"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>Left</span>
+                      <span>Center</span>
+                      <span>Right</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="heroPositionY">Vertical Position: {settings.branding.heroImagePositionY ?? 50}%</Label>
+                    <Input
+                      id="heroPositionY"
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={settings.branding.heroImagePositionY ?? 50}
+                      onChange={e => updateBranding('heroImagePositionY', parseInt(e.target.value))}
+                      className="w-full cursor-pointer"
+                      data-testid="input-hero-position-y"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>Top</span>
+                      <span>Center</span>
+                      <span>Bottom</span>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">Adjust where the focal point of your image is positioned (0% = left/top, 100% = right/bottom)</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
