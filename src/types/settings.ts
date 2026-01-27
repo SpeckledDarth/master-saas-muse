@@ -2,9 +2,6 @@ export interface ThemeColors {
   background: string
   foreground: string
   card: string
-  cardForeground: string
-  muted: string
-  mutedForeground: string
   border: string
 }
 
@@ -113,9 +110,6 @@ export const defaultLightTheme: ThemeColors = {
   background: '#ffffff',
   foreground: '#0a0a0a',
   card: '#ffffff',
-  cardForeground: '#0a0a0a',
-  muted: '#f5f5f5',
-  mutedForeground: '#737373',
   border: '#e5e5e5',
 }
 
@@ -123,9 +117,6 @@ export const defaultDarkTheme: ThemeColors = {
   background: '#0a0a1a',
   foreground: '#fafafa',
   card: '#0a0a1a',
-  cardForeground: '#fafafa',
-  muted: '#1a1a2e',
-  mutedForeground: '#a3a3a3',
   border: '#2a2a3e',
 }
 

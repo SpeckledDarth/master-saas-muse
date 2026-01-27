@@ -92,39 +92,36 @@ function hexToHSL(hex: string): string {
   return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`
 }
 
-function applyThemeColors(theme: { background: string; foreground: string; card: string; cardForeground: string; muted: string; mutedForeground: string; border: string } | undefined, prefix: string) {
+function applyTheme(theme: { background: string; foreground: string; card: string; border: string } | undefined) {
   if (!theme) return
   
   const root = document.documentElement
-  const style = prefix === 'dark' ? document.querySelector('.dark') as HTMLElement : root
   
   if (theme.background) {
     const hsl = hexToHSL(theme.background)
-    if (hsl) root.style.setProperty(`--${prefix}-background`, hsl)
+    if (hsl) {
+      root.style.setProperty('--background', hsl)
+      root.style.setProperty('--popover', hsl)
+    }
   }
   if (theme.foreground) {
     const hsl = hexToHSL(theme.foreground)
-    if (hsl) root.style.setProperty(`--${prefix}-foreground`, hsl)
+    if (hsl) {
+      root.style.setProperty('--foreground', hsl)
+      root.style.setProperty('--popover-foreground', hsl)
+      root.style.setProperty('--card-foreground', hsl)
+    }
   }
   if (theme.card) {
     const hsl = hexToHSL(theme.card)
-    if (hsl) root.style.setProperty(`--${prefix}-card`, hsl)
-  }
-  if (theme.cardForeground) {
-    const hsl = hexToHSL(theme.cardForeground)
-    if (hsl) root.style.setProperty(`--${prefix}-card-foreground`, hsl)
-  }
-  if (theme.muted) {
-    const hsl = hexToHSL(theme.muted)
-    if (hsl) root.style.setProperty(`--${prefix}-muted`, hsl)
-  }
-  if (theme.mutedForeground) {
-    const hsl = hexToHSL(theme.mutedForeground)
-    if (hsl) root.style.setProperty(`--${prefix}-muted-foreground`, hsl)
+    if (hsl) root.style.setProperty('--card', hsl)
   }
   if (theme.border) {
     const hsl = hexToHSL(theme.border)
-    if (hsl) root.style.setProperty(`--${prefix}-border`, hsl)
+    if (hsl) {
+      root.style.setProperty('--border', hsl)
+      root.style.setProperty('--input', hsl)
+    }
   }
 }
 
@@ -147,45 +144,7 @@ export function useThemeFromSettings(settings: SiteSettings) {
     }
     
     const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
-    if (theme) {
-      if (theme.background) {
-        const hsl = hexToHSL(theme.background)
-        if (hsl) root.style.setProperty('--background', hsl)
-      }
-      if (theme.foreground) {
-        const hsl = hexToHSL(theme.foreground)
-        if (hsl) root.style.setProperty('--foreground', hsl)
-      }
-      if (theme.card) {
-        const hsl = hexToHSL(theme.card)
-        if (hsl) root.style.setProperty('--card', hsl)
-      }
-      if (theme.cardForeground) {
-        const hsl = hexToHSL(theme.cardForeground)
-        if (hsl) root.style.setProperty('--card-foreground', hsl)
-      }
-      if (theme.muted) {
-        const hsl = hexToHSL(theme.muted)
-        if (hsl) {
-          root.style.setProperty('--muted', hsl)
-          root.style.setProperty('--secondary', hsl)
-        }
-      }
-      if (theme.mutedForeground) {
-        const hsl = hexToHSL(theme.mutedForeground)
-        if (hsl) {
-          root.style.setProperty('--muted-foreground', hsl)
-          root.style.setProperty('--secondary-foreground', hsl)
-        }
-      }
-      if (theme.border) {
-        const hsl = hexToHSL(theme.border)
-        if (hsl) {
-          root.style.setProperty('--border', hsl)
-          root.style.setProperty('--input', hsl)
-        }
-      }
-    }
+    applyTheme(theme)
   }, [settings.branding])
   
   useEffect(() => {
@@ -196,45 +155,16 @@ export function useThemeFromSettings(settings: SiteSettings) {
           const isDark = root.classList.contains('dark')
           const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
           
-          if (theme) {
-            if (theme.background) {
-              const hsl = hexToHSL(theme.background)
-              if (hsl) root.style.setProperty('--background', hsl)
-            }
-            if (theme.foreground) {
-              const hsl = hexToHSL(theme.foreground)
-              if (hsl) root.style.setProperty('--foreground', hsl)
-            }
-            if (theme.card) {
-              const hsl = hexToHSL(theme.card)
-              if (hsl) root.style.setProperty('--card', hsl)
-            }
-            if (theme.cardForeground) {
-              const hsl = hexToHSL(theme.cardForeground)
-              if (hsl) root.style.setProperty('--card-foreground', hsl)
-            }
-            if (theme.muted) {
-              const hsl = hexToHSL(theme.muted)
-              if (hsl) {
-                root.style.setProperty('--muted', hsl)
-                root.style.setProperty('--secondary', hsl)
-              }
-            }
-            if (theme.mutedForeground) {
-              const hsl = hexToHSL(theme.mutedForeground)
-              if (hsl) {
-                root.style.setProperty('--muted-foreground', hsl)
-                root.style.setProperty('--secondary-foreground', hsl)
-              }
-            }
-            if (theme.border) {
-              const hsl = hexToHSL(theme.border)
-              if (hsl) {
-                root.style.setProperty('--border', hsl)
-                root.style.setProperty('--input', hsl)
-              }
-            }
+          if (settings.branding.primaryColor) {
+            const hsl = hexToHSL(settings.branding.primaryColor)
+            if (hsl) root.style.setProperty('--primary', hsl)
           }
+          if (settings.branding.accentColor) {
+            const hsl = hexToHSL(settings.branding.accentColor)
+            if (hsl) root.style.setProperty('--accent', hsl)
+          }
+          
+          applyTheme(theme)
         }
       })
     })
