@@ -4,10 +4,12 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { defaultSettings, SiteSettings } from '@/types/settings'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 async function getAuthenticatedUser(request: NextRequest) {
   const cookieStore = await cookies()
@@ -42,7 +44,7 @@ async function getAuthenticatedUser(request: NextRequest) {
 }
 
 async function isAdmin(userId: string): Promise<boolean> {
-  const { data } = await supabaseAdmin
+  const { data } = await getSupabaseAdmin()
     .from('user_roles')
     .select('role')
     .eq('user_id', userId)
@@ -63,7 +65,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
   
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('organization_settings')
     .select('settings')
     .eq('app_id', 'default')
@@ -71,7 +73,7 @@ export async function GET(request: NextRequest) {
   
   if (error) {
     if (error.code === 'PGRST116') {
-      await supabaseAdmin
+      await getSupabaseAdmin()
         .from('organization_settings')
         .insert({ app_id: 'default', settings: defaultSettings })
       
@@ -85,6 +87,7 @@ export async function GET(request: NextRequest) {
     pricing: { ...defaultSettings.pricing, ...data?.settings?.pricing },
     social: { ...defaultSettings.social, ...data?.settings?.social },
     features: { ...defaultSettings.features, ...data?.settings?.features },
+    content: { ...defaultSettings.content, ...data?.settings?.content },
   }
   
   return NextResponse.json({ settings: mergedSettings })
@@ -105,7 +108,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const { settings } = body as { settings: Partial<SiteSettings> }
   
-  const { data: current } = await supabaseAdmin
+  const { data: current } = await getSupabaseAdmin()
     .from('organization_settings')
     .select('settings')
     .eq('app_id', 'default')
@@ -118,9 +121,10 @@ export async function POST(request: NextRequest) {
     pricing: { ...defaultSettings.pricing, ...currentSettings.pricing, ...settings.pricing },
     social: { ...defaultSettings.social, ...currentSettings.social, ...settings.social },
     features: { ...defaultSettings.features, ...currentSettings.features, ...settings.features },
+    content: { ...defaultSettings.content, ...currentSettings.content, ...settings.content },
   }
   
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from('organization_settings')
     .update({ 
       settings: newSettings,
@@ -132,7 +136,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
   
-  await supabaseAdmin
+  await getSupabaseAdmin()
     .from('audit_logs')
     .insert({
       user_id: user.id,

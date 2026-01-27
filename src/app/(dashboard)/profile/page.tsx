@@ -35,12 +35,20 @@ export default function ProfilePage() {
   const [isSigningOut, setIsSigningOut] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = useMemo(() => createClient(), [])
+  const supabase = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return null
+    return createClient()
+  }, [])
 
   useEffect(() => {
     let mounted = true
 
     async function loadData() {
+      if (!supabase) {
+        setIsLoading(false)
+        return
+      }
       const { data: { user: currentUser } } = await supabase.auth.getUser()
       
       if (!mounted) return
@@ -97,6 +105,7 @@ export default function ProfilePage() {
 
     setIsUpdatingPassword(true)
     
+    if (!supabase) return
     const { error } = await supabase.auth.updateUser({ password: newPassword })
     
     if (error) {
@@ -118,6 +127,7 @@ export default function ProfilePage() {
   }
 
   const handleSignOut = async () => {
+    if (!supabase) return
     setIsSigningOut(true)
     await supabase.auth.signOut()
     router.push('/')

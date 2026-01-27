@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -20,9 +20,19 @@ export function UserNav() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const supabase = createClient()
+
+  const supabase = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return null
+    return createClient()
+  }, [])
 
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false)
+      return
+    }
+    
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
@@ -35,13 +45,14 @@ export function UserNav() {
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [supabase])
 
-  const handleSignOut = async () => {
+  const handleSignOut = useCallback(async () => {
+    if (!supabase) return
     await supabase.auth.signOut()
     router.push('/')
     router.refresh()
-  }
+  }, [supabase, router])
 
   if (loading) {
     return <Button variant="ghost" size="sm" disabled>Loading...</Button>

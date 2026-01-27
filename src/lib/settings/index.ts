@@ -20,6 +20,7 @@ export async function getSettings(): Promise<SiteSettings> {
     pricing: { ...defaultSettings.pricing, ...dbSettings?.pricing },
     social: { ...defaultSettings.social, ...dbSettings?.social },
     features: { ...defaultSettings.features, ...dbSettings?.features },
+    content: { ...defaultSettings.content, ...dbSettings?.content },
   }
 }
 
@@ -32,6 +33,7 @@ export async function updateSettings(settings: Partial<SiteSettings>): Promise<{
     pricing: { ...currentSettings.pricing, ...settings.pricing },
     social: { ...currentSettings.social, ...settings.social },
     features: { ...currentSettings.features, ...settings.features },
+    content: { ...currentSettings.content, ...settings.content },
   }
   
   const { error } = await supabase

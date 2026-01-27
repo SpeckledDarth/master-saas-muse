@@ -12,6 +12,12 @@ export function useSettings() {
   useEffect(() => {
     async function loadSettings() {
       try {
+        // Check if Supabase is configured before creating client
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+          setLoading(false)
+          return
+        }
+        
         const supabase = createClient()
         const { data, error } = await supabase
           .from('organization_settings')
@@ -33,6 +39,7 @@ export function useSettings() {
             pricing: { ...defaultSettings.pricing, ...data.settings.pricing },
             social: { ...defaultSettings.social, ...data.settings.social },
             features: { ...defaultSettings.features, ...data.settings.features },
+            content: { ...defaultSettings.content, ...data.settings.content },
           })
         }
         

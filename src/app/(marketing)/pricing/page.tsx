@@ -46,7 +46,7 @@ export default function PricingPage() {
   const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: pricing.currency || 'USD',
       minimumFractionDigits: 0,
     }).format(price)
   }
@@ -61,36 +61,6 @@ export default function PricingPage() {
       </div>
     )
   }
-
-  const plans = [
-    {
-      id: 'free',
-      name: 'Free',
-      description: 'Perfect for getting started',
-      price: 0,
-      features: ['Basic features', 'Community support', '1 project'],
-      priceId: null,
-      popular: false,
-    },
-    {
-      id: 'pro',
-      name: pricing.proName,
-      description: 'For growing businesses',
-      price: pricing.proPrice,
-      features: pricing.proFeatures,
-      priceId: pricing.proPriceId,
-      popular: true,
-    },
-    {
-      id: 'team',
-      name: pricing.teamName,
-      description: 'For larger teams',
-      price: pricing.teamPrice,
-      features: pricing.teamFeatures,
-      priceId: pricing.teamPriceId,
-      popular: false,
-    },
-  ]
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -122,7 +92,7 @@ export default function PricingPage() {
       </div>
 
       <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        {plans.map((plan) => {
+        {pricing.plans.map((plan) => {
           const displayPrice = billingInterval === 'year' 
             ? Math.round(plan.price * 12 * 0.8) 
             : plan.price
@@ -130,15 +100,18 @@ export default function PricingPage() {
           return (
             <Card 
               key={plan.id} 
-              className={plan.popular ? 'border-primary shadow-lg' : ''}
+              className={plan.highlighted ? 'border-primary shadow-lg' : ''}
               data-testid={`card-plan-${plan.id}`}
             >
               <CardHeader>
                 <div className="flex items-center justify-between gap-2">
                   <CardTitle>{plan.name}</CardTitle>
-                  {plan.popular && <Badge>Popular</Badge>}
+                  {plan.highlighted && <Badge>Popular</Badge>}
                 </div>
-                <CardDescription>{plan.description}</CardDescription>
+                <CardDescription>
+                  {plan.price === 0 ? 'Perfect for getting started' : 
+                   plan.id === 'pro' ? 'For growing businesses' : 'For larger teams'}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
@@ -157,8 +130,8 @@ export default function PricingPage() {
               <CardFooter>
                 <Button 
                   className="w-full" 
-                  variant={plan.popular ? 'default' : 'outline'}
-                  onClick={() => handleSubscribe(plan.priceId, plan.id)}
+                  variant={plan.highlighted ? 'default' : 'outline'}
+                  onClick={() => handleSubscribe(plan.stripePriceId || null, plan.id)}
                   disabled={isSubscribing === plan.id}
                   data-testid={`button-subscribe-${plan.id}`}
                 >

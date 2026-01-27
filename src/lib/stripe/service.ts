@@ -116,8 +116,8 @@ export class StripeService {
       return {
         status: this.mapStripeStatus(subscription.status),
         tier,
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        currentPeriodEnd: new Date((subscription as unknown as { current_period_end: number }).current_period_end * 1000).toISOString(),
+        cancelAtPeriodEnd: (subscription as unknown as { cancel_at_period_end: boolean }).cancel_at_period_end,
         subscriptionId: subscription.id,
         priceId,
       };
