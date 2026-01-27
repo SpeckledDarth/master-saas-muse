@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { useSettings } from "@/hooks/use-settings"
-import { SiTwitter, SiLinkedin, SiGithub } from "react-icons/si"
+import { SiX, SiLinkedin, SiGithub } from "react-icons/si"
 import { Globe } from "lucide-react"
 
 export function Footer() {
@@ -45,7 +45,7 @@ export function Footer() {
                     className="text-muted-foreground hover:text-foreground transition-colors"
                     data-testid="link-social-twitter"
                   >
-                    <SiTwitter className="h-5 w-5" />
+                    <SiX className="h-5 w-5" />
                   </a>
                 )}
                 {social.linkedin && (
