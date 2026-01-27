@@ -46,3 +46,25 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 - **Resend**: Transactional email service.
 - **Plausible Analytics**: Privacy-friendly website analytics.
 - **Sentry**: (Planned) Error tracking, pending Next.js 16 support.
+
+## Recent Session Progress (Jan 27, 2026)
+
+### Completed This Session
+- **Content Tab fully functional**: All toggles, editing, and persistence working
+  - Features section: toggle, headline/subheadline editing, add/edit/delete cards, icon dropdown
+  - Testimonials: add/edit/delete with full profile info
+  - FAQ: add/edit/delete question/answer pairs
+  - All changes persist after save and page refresh
+
+### Fixed Issues
+- **Content settings persistence**: Initial database was missing `content` JSONB section; added it directly via SQL which enabled the save functionality to work correctly
+
+### Known Issues to Fix Next Session
+- **Primary/Secondary colors in Setup Dashboard**: Colors do not apply to the homepage when changed in Branding tab. This is the next priority.
+
+### Testing Status
+- Content tab: FULLY TESTED AND WORKING
+- Branding tab: Partially working (app name, tagline work; colors do NOT work)
+- Pricing tab: Not yet tested
+- Social tab: Not yet tested
+- Features tab: Not yet tested
