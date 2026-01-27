@@ -11,6 +11,7 @@ Preferred communication style: Simple, everyday language.
 - **Consistency**: Workflows stay the same between sessions. If something changes, I explain why clearly.
 - **Roles**: User sets goals and supplies keys when asked. Agent handles all technical execution.
 - **Cognitive load**: Minimize decisions. Ask simple yes/no questions. Avoid jargon unless it affects a decision.
+- **Git Sync Responsibility**: Agent ensures Replit and GitHub repo stay in sync. Before ending sessions or after significant changes, agent verifies sync status and asks user to run push commands if needed. User executes git commands when requested.
 
 ## System Architecture
 The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ and TypeScript for both frontend and backend. Styling is handled by Tailwind CSS, shadcn/ui, and next-themes, with server state managed by TanStack Query. Supabase provides the database (PostgreSQL), authentication, Row Level Security (RLS), and storage, supporting multi-tenancy through domain-based middleware and `app_id` context. Deployment and hosting are exclusively on Vercel, leveraging its features like preview deploys, custom domains, and edge functions.
