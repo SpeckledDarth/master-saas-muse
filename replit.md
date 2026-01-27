@@ -50,6 +50,11 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 ## Recent Session Progress (Jan 27, 2026)
 
 ### Completed This Session
+- **Full Theme Customization System**: Light and dark mode theme colors now work across all pages
+  - Simplified ThemeColors interface to 4 fields per mode (background, foreground, card, border)
+  - Created ThemeSettingsProvider component for global theme application
+  - Added to root layout so all pages (including dashboards) follow light/dark toggle
+  - MutationObserver watches for theme class changes and reapplies custom colors
 - **Content Tab fully functional**: All toggles, editing, and persistence working
   - Features section: toggle, headline/subheadline editing, add/edit/delete cards, icon dropdown
   - Testimonials: add/edit/delete with full profile info
@@ -57,14 +62,13 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
   - All changes persist after save and page refresh
 
 ### Fixed Issues
-- **Content settings persistence**: Initial database was missing `content` JSONB section; added it directly via SQL which enabled the save functionality to work correctly
-
-### Known Issues to Fix Next Session
-- **Primary/Secondary colors in Setup Dashboard**: Colors do not apply to the homepage when changed in Branding tab. This is the next priority.
+- **Theme colors on dashboards**: Previously only homepage had custom theme colors; now all pages have them
+- **Content settings persistence**: Initial database was missing `content` JSONB section; added directly via SQL
 
 ### Testing Status
+- Theme customization: FULLY TESTED AND WORKING (light/dark modes across all pages)
 - Content tab: FULLY TESTED AND WORKING
-- Branding tab: Partially working (app name, tagline work; colors do NOT work)
+- Branding tab: FULLY TESTED AND WORKING (app name, tagline, theme colors all work)
 - Pricing tab: Not yet tested
 - Social tab: Not yet tested
 - Features tab: Not yet tested
