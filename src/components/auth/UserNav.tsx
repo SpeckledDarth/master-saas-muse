@@ -45,12 +45,14 @@ export function UserNav() {
         setUser(currentUser)
         
         if (currentUser) {
-          const { data: role } = await supabase
+          console.log('Checking admin for user:', currentUser.id)
+          const { data: role, error: roleError } = await supabase
             .from('user_roles')
             .select('role')
             .eq('user_id', currentUser.id)
             .single()
           
+          console.log('Role query result:', { role, error: roleError })
           setIsAdmin(role?.role === 'admin')
         }
       } catch (error) {
