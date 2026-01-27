@@ -1,0 +1,96 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { User } from '@supabase/supabase-js'
+
+export function UserNav() {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  const supabase = createClient()
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      setLoading(false)
+    }
+    getUser()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.push('/')
+    router.refresh()
+  }
+
+  if (loading) {
+    return <Button variant="ghost" size="sm" disabled>Loading...</Button>
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" asChild data-testid="button-login">
+          <Link href="/login">Log in</Link>
+        </Button>
+        <Button size="sm" asChild data-testid="button-signup">
+          <Link href="/signup">Sign up</Link>
+        </Button>
+      </div>
+    )
+  }
+
+  const initials = user.email?.slice(0, 2).toUpperCase() || 'U'
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full" data-testid="button-user-menu">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={user.user_metadata?.avatar_url} alt={user.email || ''} />
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || 'User'}</p>
+            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/profile" data-testid="link-profile">Profile</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/billing" data-testid="link-billing">Billing</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleSignOut} data-testid="button-signout">
+          Log out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
