@@ -12,7 +12,8 @@ import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Palette, DollarSign, Globe, Settings, Loader2, Save, Check } from 'lucide-react'
+import { Palette, DollarSign, Globe, Settings, Loader2, Save, Check, FileText, Plus, Trash2, Zap, Shield, Sparkles, Users, BarChart, Lock, Rocket, Heart, Star, Target, Award, Lightbulb } from 'lucide-react'
+import type { FeatureCard, Testimonial, FAQItem, CTAContent } from '@/types/settings'
 import { ImageUpload } from '@/components/admin/image-upload'
 
 export default function SetupPage() {
@@ -104,6 +105,187 @@ export default function SetupPage() {
     }))
   }
 
+  function updateContent<K extends keyof SiteSettings['content']>(
+    key: K,
+    value: SiteSettings['content'][K]
+  ) {
+    setSettings(prev => ({
+      ...prev,
+      content: { ...defaultSettings.content, ...prev.content, [key]: value }
+    }))
+  }
+
+  function addFeatureCard() {
+    const newCard: FeatureCard = {
+      id: Date.now().toString(),
+      icon: 'Zap',
+      title: 'New Feature',
+      description: 'Description of this feature',
+    }
+    setSettings(prev => ({
+      ...prev,
+      content: {
+        ...defaultSettings.content,
+        ...prev.content,
+        featureCards: [...(prev.content?.featureCards ?? []), newCard],
+      }
+    }))
+  }
+
+  function updateFeatureCard(id: string, field: keyof FeatureCard, value: string) {
+    setSettings(prev => ({
+      ...prev,
+      content: {
+        ...defaultSettings.content,
+        ...prev.content,
+        featureCards: (prev.content?.featureCards ?? []).map(card =>
+          card.id === id ? { ...card, [field]: value } : card
+        ),
+      }
+    }))
+  }
+
+  function removeFeatureCard(id: string) {
+    setSettings(prev => ({
+      ...prev,
+      content: {
+        ...defaultSettings.content,
+        ...prev.content,
+        featureCards: (prev.content?.featureCards ?? []).filter(card => card.id !== id),
+      }
+    }))
+  }
+
+  function addTestimonial() {
+    const newTestimonial: Testimonial = {
+      id: Date.now().toString(),
+      name: 'Customer Name',
+      role: 'Job Title',
+      company: 'Company',
+      quote: 'Their testimonial quote goes here.',
+    }
+    setSettings(prev => ({
+      ...prev,
+      content: {
+        ...defaultSettings.content,
+        ...prev.content,
+        testimonials: [...(prev.content?.testimonials ?? []), newTestimonial],
+      }
+    }))
+  }
+
+  function updateTestimonial(id: string, field: keyof Testimonial, value: string) {
+    setSettings(prev => ({
+      ...prev,
+      content: {
+        ...defaultSettings.content,
+        ...prev.content,
+        testimonials: (prev.content?.testimonials ?? []).map(t =>
+          t.id === id ? { ...t, [field]: value } : t
+        ),
+      }
+    }))
+  }
+
+  function removeTestimonial(id: string) {
+    setSettings(prev => ({
+      ...prev,
+      content: {
+        ...defaultSettings.content,
+        ...prev.content,
+        testimonials: (prev.content?.testimonials ?? []).filter(t => t.id !== id),
+      }
+    }))
+  }
+
+  function addFAQItem() {
+    const newFAQ: FAQItem = {
+      id: Date.now().toString(),
+      question: 'New question?',
+      answer: 'Answer to the question.',
+    }
+    setSettings(prev => ({
+      ...prev,
+      content: {
+        ...defaultSettings.content,
+        ...prev.content,
+        faqItems: [...(prev.content?.faqItems ?? []), newFAQ],
+      }
+    }))
+  }
+
+  function updateFAQItem(id: string, field: keyof FAQItem, value: string) {
+    setSettings(prev => ({
+      ...prev,
+      content: {
+        ...defaultSettings.content,
+        ...prev.content,
+        faqItems: (prev.content?.faqItems ?? []).map(item =>
+          item.id === id ? { ...item, [field]: value } : item
+        ),
+      }
+    }))
+  }
+
+  function removeFAQItem(id: string) {
+    setSettings(prev => ({
+      ...prev,
+      content: {
+        ...defaultSettings.content,
+        ...prev.content,
+        faqItems: (prev.content?.faqItems ?? []).filter(item => item.id !== id),
+      }
+    }))
+  }
+
+  function updateCTA<K extends keyof CTAContent>(key: K, value: CTAContent[K]) {
+    setSettings(prev => ({
+      ...prev,
+      content: {
+        ...defaultSettings.content,
+        ...prev.content,
+        cta: {
+          ...defaultSettings.content.cta,
+          ...prev.content?.cta,
+          [key]: value,
+        },
+      }
+    }))
+  }
+
+  const iconOptions = [
+    { value: 'Zap', label: 'Lightning' },
+    { value: 'Shield', label: 'Shield' },
+    { value: 'Sparkles', label: 'Sparkles' },
+    { value: 'Users', label: 'Users' },
+    { value: 'BarChart', label: 'Chart' },
+    { value: 'Lock', label: 'Lock' },
+    { value: 'Rocket', label: 'Rocket' },
+    { value: 'Heart', label: 'Heart' },
+    { value: 'Star', label: 'Star' },
+    { value: 'Target', label: 'Target' },
+    { value: 'Award', label: 'Award' },
+    { value: 'Lightbulb', label: 'Lightbulb' },
+  ]
+
+  const IconComponent = ({ name }: { name: string }) => {
+    const icons: Record<string, React.ReactNode> = {
+      Zap: <Zap className="h-4 w-4" />,
+      Shield: <Shield className="h-4 w-4" />,
+      Sparkles: <Sparkles className="h-4 w-4" />,
+      Users: <Users className="h-4 w-4" />,
+      BarChart: <BarChart className="h-4 w-4" />,
+      Lock: <Lock className="h-4 w-4" />,
+      Rocket: <Rocket className="h-4 w-4" />,
+      Heart: <Heart className="h-4 w-4" />,
+      Star: <Star className="h-4 w-4" />,
+      Target: <Target className="h-4 w-4" />,
+      Award: <Award className="h-4 w-4" />,
+      Lightbulb: <Lightbulb className="h-4 w-4" />,
+    }
+    return <>{icons[name] || <Zap className="h-4 w-4" />}</>
+  }
+
   function updatePlan(planId: string, field: string, value: string | number | boolean | string[]) {
     setSettings(prev => ({
       ...prev,
@@ -150,10 +332,14 @@ export default function SetupPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 mb-8">
+        <TabsList className="grid w-full grid-cols-5 mb-8">
           <TabsTrigger value="branding" data-testid="tab-branding">
             <Palette className="h-4 w-4 mr-2" />
             Branding
+          </TabsTrigger>
+          <TabsTrigger value="content" data-testid="tab-content">
+            <FileText className="h-4 w-4 mr-2" />
+            Content
           </TabsTrigger>
           <TabsTrigger value="pricing" data-testid="tab-pricing">
             <DollarSign className="h-4 w-4 mr-2" />
@@ -375,6 +561,342 @@ export default function SetupPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="content">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Features Section</CardTitle>
+                    <CardDescription>Highlight what makes your product special</CardDescription>
+                  </div>
+                  <Switch
+                    checked={settings.content?.featuresEnabled ?? true}
+                    onCheckedChange={checked => updateContent('featuresEnabled', checked)}
+                    data-testid="switch-features-enabled"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Section Headline</Label>
+                    <Input
+                      value={settings.content?.featuresHeadline ?? ''}
+                      onChange={e => updateContent('featuresHeadline', e.target.value)}
+                      placeholder="Everything you need"
+                      data-testid="input-features-headline"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Section Subheadline</Label>
+                    <Input
+                      value={settings.content?.featuresSubheadline ?? ''}
+                      onChange={e => updateContent('featuresSubheadline', e.target.value)}
+                      placeholder="Powerful features to help you build faster"
+                      data-testid="input-features-subheadline"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Feature Cards</Label>
+                    <Button size="sm" variant="outline" onClick={addFeatureCard} data-testid="button-add-feature">
+                      <Plus className="h-4 w-4 mr-1" /> Add Feature
+                    </Button>
+                  </div>
+                  
+                  {(settings.content?.featureCards ?? []).map((card, index) => (
+                    <div key={card.id} className="p-4 border rounded-lg space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Feature {index + 1}</span>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          onClick={() => removeFeatureCard(card.id)}
+                          aria-label="Remove feature"
+                          data-testid={`button-remove-feature-${card.id}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-xs">Icon</Label>
+                          <Select
+                            value={card.icon}
+                            onValueChange={value => updateFeatureCard(card.id, 'icon', value)}
+                          >
+                            <SelectTrigger data-testid={`select-feature-icon-${card.id}`}>
+                              <div className="flex items-center gap-2">
+                                <IconComponent name={card.icon} />
+                                <SelectValue />
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent>
+                              {iconOptions.map(opt => (
+                                <SelectItem key={opt.value} value={opt.value}>
+                                  <div className="flex items-center gap-2">
+                                    <IconComponent name={opt.value} />
+                                    {opt.label}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Title</Label>
+                          <Input
+                            value={card.title}
+                            onChange={e => updateFeatureCard(card.id, 'title', e.target.value)}
+                            placeholder="Feature title"
+                            data-testid={`input-feature-title-${card.id}`}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Description</Label>
+                          <Input
+                            value={card.description}
+                            onChange={e => updateFeatureCard(card.id, 'description', e.target.value)}
+                            placeholder="Feature description"
+                            data-testid={`input-feature-desc-${card.id}`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Testimonials</CardTitle>
+                    <CardDescription>Show what customers say about your product</CardDescription>
+                  </div>
+                  <Switch
+                    checked={settings.content?.testimonialsEnabled ?? true}
+                    onCheckedChange={checked => updateContent('testimonialsEnabled', checked)}
+                    data-testid="switch-testimonials-enabled"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Section Headline</Label>
+                  <Input
+                    value={settings.content?.testimonialsHeadline ?? ''}
+                    onChange={e => updateContent('testimonialsHeadline', e.target.value)}
+                    placeholder="What our customers say"
+                    data-testid="input-testimonials-headline"
+                  />
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Customer Testimonials</Label>
+                    <Button size="sm" variant="outline" onClick={addTestimonial} data-testid="button-add-testimonial">
+                      <Plus className="h-4 w-4 mr-1" /> Add Testimonial
+                    </Button>
+                  </div>
+                  
+                  {(settings.content?.testimonials ?? []).map((t, index) => (
+                    <div key={t.id} className="p-4 border rounded-lg space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Testimonial {index + 1}</span>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          onClick={() => removeTestimonial(t.id)}
+                          aria-label="Remove testimonial"
+                          data-testid={`button-remove-testimonial-${t.id}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-xs">Name</Label>
+                          <Input
+                            value={t.name}
+                            onChange={e => updateTestimonial(t.id, 'name', e.target.value)}
+                            placeholder="Customer name"
+                            data-testid={`input-testimonial-name-${t.id}`}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Role</Label>
+                          <Input
+                            value={t.role}
+                            onChange={e => updateTestimonial(t.id, 'role', e.target.value)}
+                            placeholder="CEO, Developer, etc."
+                            data-testid={`input-testimonial-role-${t.id}`}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Company</Label>
+                          <Input
+                            value={t.company}
+                            onChange={e => updateTestimonial(t.id, 'company', e.target.value)}
+                            placeholder="Company name"
+                            data-testid={`input-testimonial-company-${t.id}`}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Quote</Label>
+                        <Textarea
+                          value={t.quote}
+                          onChange={e => updateTestimonial(t.id, 'quote', e.target.value)}
+                          placeholder="Their testimonial..."
+                          rows={2}
+                          data-testid={`input-testimonial-quote-${t.id}`}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>FAQ Section</CardTitle>
+                    <CardDescription>Answer common questions</CardDescription>
+                  </div>
+                  <Switch
+                    checked={settings.content?.faqEnabled ?? true}
+                    onCheckedChange={checked => updateContent('faqEnabled', checked)}
+                    data-testid="switch-faq-enabled"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Section Headline</Label>
+                  <Input
+                    value={settings.content?.faqHeadline ?? ''}
+                    onChange={e => updateContent('faqHeadline', e.target.value)}
+                    placeholder="Frequently asked questions"
+                    data-testid="input-faq-headline"
+                  />
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>FAQ Items</Label>
+                    <Button size="sm" variant="outline" onClick={addFAQItem} data-testid="button-add-faq">
+                      <Plus className="h-4 w-4 mr-1" /> Add FAQ
+                    </Button>
+                  </div>
+                  
+                  {(settings.content?.faqItems ?? []).map((faq, index) => (
+                    <div key={faq.id} className="p-4 border rounded-lg space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">FAQ {index + 1}</span>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          onClick={() => removeFAQItem(faq.id)}
+                          aria-label="Remove FAQ"
+                          data-testid={`button-remove-faq-${faq.id}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="space-y-1">
+                          <Label className="text-xs">Question</Label>
+                          <Input
+                            value={faq.question}
+                            onChange={e => updateFAQItem(faq.id, 'question', e.target.value)}
+                            placeholder="How do I...?"
+                            data-testid={`input-faq-question-${faq.id}`}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Answer</Label>
+                          <Textarea
+                            value={faq.answer}
+                            onChange={e => updateFAQItem(faq.id, 'answer', e.target.value)}
+                            placeholder="The answer is..."
+                            rows={2}
+                            data-testid={`input-faq-answer-${faq.id}`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Call to Action</CardTitle>
+                    <CardDescription>Final prompt to get users to sign up</CardDescription>
+                  </div>
+                  <Switch
+                    checked={settings.content?.ctaEnabled ?? true}
+                    onCheckedChange={checked => updateContent('ctaEnabled', checked)}
+                    data-testid="switch-cta-enabled"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Headline</Label>
+                    <Input
+                      value={settings.content?.cta?.headline ?? ''}
+                      onChange={e => updateCTA('headline', e.target.value)}
+                      placeholder="Ready to get started?"
+                      data-testid="input-cta-headline"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Description</Label>
+                    <Input
+                      value={settings.content?.cta?.description ?? ''}
+                      onChange={e => updateCTA('description', e.target.value)}
+                      placeholder="Join thousands of satisfied customers"
+                      data-testid="input-cta-description"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Button Text</Label>
+                    <Input
+                      value={settings.content?.cta?.buttonText ?? ''}
+                      onChange={e => updateCTA('buttonText', e.target.value)}
+                      placeholder="Start Free Trial"
+                      data-testid="input-cta-button-text"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Button Link</Label>
+                    <Input
+                      value={settings.content?.cta?.buttonLink ?? ''}
+                      onChange={e => updateCTA('buttonLink', e.target.value)}
+                      placeholder="/signup"
+                      data-testid="input-cta-button-link"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="pricing">
