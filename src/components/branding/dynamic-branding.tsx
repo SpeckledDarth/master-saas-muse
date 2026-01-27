@@ -48,3 +48,23 @@ export function SupportEmail() {
     </a>
   )
 }
+
+export function HeroImage({ className }: { className?: string }) {
+  const { settings, loading } = useSettings()
+  
+  if (loading || !settings.branding.heroImageUrl) return null
+  
+  return (
+    <img 
+      src={settings.branding.heroImageUrl}
+      alt="Hero"
+      className={className}
+      data-testid="img-hero"
+    />
+  )
+}
+
+export function useHeroImageUrl() {
+  const { settings, loading } = useSettings()
+  return { url: settings.branding.heroImageUrl, loading }
+}
