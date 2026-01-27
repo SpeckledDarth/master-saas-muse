@@ -1,9 +1,10 @@
 'use client'
 
 import { useSettings, useThemeFromSettings } from '@/hooks/use-settings'
+import { defaultSettings } from '@/types/settings'
 
 export function DynamicBranding({ children }: { children: React.ReactNode }) {
-  const { settings, loading } = useSettings()
+  const { settings } = useSettings()
   
   useThemeFromSettings(settings)
   
@@ -11,40 +12,33 @@ export function DynamicBranding({ children }: { children: React.ReactNode }) {
 }
 
 export function AppName() {
-  const { settings, loading } = useSettings()
+  const { settings } = useSettings()
   
-  if (loading) return <span>Loading...</span>
-  
-  return <span data-testid="text-app-name">{settings.branding.appName}</span>
+  return <span data-testid="text-app-name">{settings.branding.appName || defaultSettings.branding.appName}</span>
 }
 
 export function AppTagline() {
-  const { settings, loading } = useSettings()
+  const { settings } = useSettings()
   
-  if (loading) return null
-  
-  return <span data-testid="text-app-tagline">{settings.branding.tagline}</span>
+  return <span data-testid="text-app-tagline">{settings.branding.tagline || defaultSettings.branding.tagline}</span>
 }
 
 export function CompanyName() {
-  const { settings, loading } = useSettings()
+  const { settings } = useSettings()
   
-  if (loading) return null
-  
-  return <span data-testid="text-company-name">{settings.branding.companyName}</span>
+  return <span data-testid="text-company-name">{settings.branding.companyName || defaultSettings.branding.companyName}</span>
 }
 
 export function SupportEmail() {
-  const { settings, loading } = useSettings()
-  
-  if (loading) return null
+  const { settings } = useSettings()
+  const email = settings.branding.supportEmail || defaultSettings.branding.supportEmail
   
   return (
     <a 
-      href={`mailto:${settings.branding.supportEmail}`}
+      href={`mailto:${email}`}
       data-testid="link-support-email"
     >
-      {settings.branding.supportEmail}
+      {email}
     </a>
   )
 }
