@@ -14,6 +14,8 @@ export function DynamicBranding({ children }: { children: React.ReactNode }) {
 export function AppName() {
   const { settings } = useSettings()
   
+  useThemeFromSettings(settings)
+  
   return <span data-testid="text-app-name">{settings.branding.appName || defaultSettings.branding.appName}</span>
 }
 
