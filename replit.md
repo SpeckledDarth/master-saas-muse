@@ -68,6 +68,15 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 ## Recent Session Progress (Jan 28, 2026)
 
 ### Completed This Session
+- **Tier 1 Essential Pages**: All core marketing pages now complete with SEO metadata
+  - About page: Company story, mission, values, optional team section
+  - Contact page: Contact info + working form (uses Resend API with fallback logging)
+  - FAQ page: Expandable Q&A from settings
+  - Terms of Service: Markdown-rendered with last updated date
+  - Privacy Policy: Markdown-rendered with last updated date
+- **Pages Tab in Setup Dashboard**: Admins can edit About, Contact, and Legal page content
+- **Branded 404/Error Pages**: Custom error pages with helpful navigation links
+- **Footer Updated**: Links to all new pages (About, Contact, FAQ, Terms, Privacy)
 - **Homepage Flash Fix**: Added loading skeleton that displays while settings load, preventing flash of default content
 - **Admin Menu Styling**: Fixed "Admin" button to use same Button component styling as other nav items
 - **Pricing Page Free Plan**: Free plan now shows alongside Stripe products
