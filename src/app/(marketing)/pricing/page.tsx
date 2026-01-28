@@ -85,7 +85,7 @@ export default function PricingPage() {
   const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: pricing.currency || 'USD',
+      currency: pricing?.currency || 'USD',
       minimumFractionDigits: 0,
     }).format(price)
   }
@@ -244,7 +244,7 @@ export default function PricingPage() {
         </div>
       ) : (
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {pricing.plans.map((plan) => {
+          {(pricing?.plans || []).map((plan) => {
             const displayPrice = billingInterval === 'year' 
               ? Math.round(plan.price * 12 * 0.8) 
               : plan.price
