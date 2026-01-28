@@ -50,6 +50,7 @@ export function useSettings() {
             social: { ...defaultSettings.social, ...data.settings.social },
             features: { ...defaultSettings.features, ...data.settings.features },
             content: { ...defaultSettings.content, ...data.settings.content },
+            pages: { ...defaultSettings.pages, ...data.settings.pages },
           })
         } else {
           setSettings(defaultSettings)
