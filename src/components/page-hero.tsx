@@ -4,10 +4,12 @@ interface PageHeroProps {
   headline: string
   subheadline?: string
   imageUrl?: string | null
+  positionX?: number
+  positionY?: number
   testId?: string
 }
 
-export function PageHero({ headline, subheadline, imageUrl, testId }: PageHeroProps) {
+export function PageHero({ headline, subheadline, imageUrl, positionX = 50, positionY = 50, testId }: PageHeroProps) {
   if (!imageUrl) {
     return (
       <div className="text-center mb-12">
@@ -23,6 +25,8 @@ export function PageHero({ headline, subheadline, imageUrl, testId }: PageHeroPr
     )
   }
 
+  const objectPosition = `${positionX}% ${positionY}%`
+
   return (
     <div className="relative -mx-4 mb-12 overflow-hidden">
       <div className="relative h-[300px] md:h-[400px]">
@@ -30,6 +34,7 @@ export function PageHero({ headline, subheadline, imageUrl, testId }: PageHeroPr
           src={imageUrl}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition }}
           data-testid={testId ? `${testId}-image` : undefined}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />

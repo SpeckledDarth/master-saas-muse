@@ -68,6 +68,8 @@ export default function ContactPage() {
         headline={contact?.headline || 'Contact Us'}
         subheadline={contact?.subheadline || "We'd love to hear from you"}
         imageUrl={contact?.heroImageUrl}
+        positionX={contact?.heroImagePositionX ?? 50}
+        positionY={contact?.heroImagePositionY ?? 50}
         testId="contact"
       />
 

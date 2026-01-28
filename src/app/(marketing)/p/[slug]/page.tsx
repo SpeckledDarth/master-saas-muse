@@ -46,6 +46,8 @@ export default function CustomPage() {
         headline={page.headline}
         subheadline={page.subheadline}
         imageUrl={page.heroImageUrl}
+        positionX={page.heroImagePositionX ?? 50}
+        positionY={page.heroImagePositionY ?? 50}
         testId={`custom-${page.slug}`}
       />
 

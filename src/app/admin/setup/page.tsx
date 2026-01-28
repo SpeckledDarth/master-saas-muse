@@ -1248,6 +1248,34 @@ export default function SetupPage() {
                   aspectRatio="21/9"
                   testId="about-hero-image"
                 />
+                {settings.pages?.about?.heroImageUrl && (
+                  <div className="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Horizontal: {settings.pages?.about?.heroImagePositionX ?? 50}%</Label>
+                      <Input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.pages?.about?.heroImagePositionX ?? 50}
+                        onChange={e => updateAbout('heroImagePositionX', parseInt(e.target.value))}
+                        className="w-full cursor-pointer"
+                        data-testid="input-about-hero-position-x"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Vertical: {settings.pages?.about?.heroImagePositionY ?? 50}%</Label>
+                      <Input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.pages?.about?.heroImagePositionY ?? 50}
+                        onChange={e => updateAbout('heroImagePositionY', parseInt(e.target.value))}
+                        className="w-full cursor-pointer"
+                        data-testid="input-about-hero-position-y"
+                      />
+                    </div>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Headline</Label>
@@ -1392,6 +1420,34 @@ export default function SetupPage() {
                   aspectRatio="21/9"
                   testId="contact-hero-image"
                 />
+                {settings.pages?.contact?.heroImageUrl && (
+                  <div className="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Horizontal: {settings.pages?.contact?.heroImagePositionX ?? 50}%</Label>
+                      <Input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.pages?.contact?.heroImagePositionX ?? 50}
+                        onChange={e => updateContact('heroImagePositionX', parseInt(e.target.value))}
+                        className="w-full cursor-pointer"
+                        data-testid="input-contact-hero-position-x"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Vertical: {settings.pages?.contact?.heroImagePositionY ?? 50}%</Label>
+                      <Input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.pages?.contact?.heroImagePositionY ?? 50}
+                        onChange={e => updateContact('heroImagePositionY', parseInt(e.target.value))}
+                        className="w-full cursor-pointer"
+                        data-testid="input-contact-hero-position-y"
+                      />
+                    </div>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Headline</Label>
@@ -1545,6 +1601,34 @@ export default function SetupPage() {
                   aspectRatio="21/9"
                   testId="pricing-hero-image"
                 />
+                {settings.pages?.pricing?.heroImageUrl && (
+                  <div className="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Horizontal: {settings.pages?.pricing?.heroImagePositionX ?? 50}%</Label>
+                      <Input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.pages?.pricing?.heroImagePositionX ?? 50}
+                        onChange={e => updatePricingPage('heroImagePositionX', parseInt(e.target.value))}
+                        className="w-full cursor-pointer"
+                        data-testid="input-pricing-hero-position-x"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Vertical: {settings.pages?.pricing?.heroImagePositionY ?? 50}%</Label>
+                      <Input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.pages?.pricing?.heroImagePositionY ?? 50}
+                        onChange={e => updatePricingPage('heroImagePositionY', parseInt(e.target.value))}
+                        className="w-full cursor-pointer"
+                        data-testid="input-pricing-hero-position-y"
+                      />
+                    </div>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Headline</Label>
@@ -1585,6 +1669,34 @@ export default function SetupPage() {
                   aspectRatio="21/9"
                   testId="faq-hero-image"
                 />
+                {settings.pages?.faq?.heroImageUrl && (
+                  <div className="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Horizontal: {settings.pages?.faq?.heroImagePositionX ?? 50}%</Label>
+                      <Input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.pages?.faq?.heroImagePositionX ?? 50}
+                        onChange={e => updateFAQPage('heroImagePositionX', parseInt(e.target.value))}
+                        className="w-full cursor-pointer"
+                        data-testid="input-faq-hero-position-x"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Vertical: {settings.pages?.faq?.heroImagePositionY ?? 50}%</Label>
+                      <Input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.pages?.faq?.heroImagePositionY ?? 50}
+                        onChange={e => updateFAQPage('heroImagePositionY', parseInt(e.target.value))}
+                        className="w-full cursor-pointer"
+                        data-testid="input-faq-hero-position-y"
+                      />
+                    </div>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Headline</Label>
@@ -1657,6 +1769,34 @@ export default function SetupPage() {
                           aspectRatio="21/9"
                           testId={`custom-page-hero-${page.id}`}
                         />
+                        {page.heroImageUrl && (
+                          <div className="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+                            <div className="space-y-2">
+                              <Label className="text-xs">Horizontal: {page.heroImagePositionX ?? 50}%</Label>
+                              <Input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={page.heroImagePositionX ?? 50}
+                                onChange={e => updateCustomPage(page.id, 'heroImagePositionX', parseInt(e.target.value))}
+                                className="w-full cursor-pointer"
+                                data-testid={`input-custom-page-hero-position-x-${page.id}`}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-xs">Vertical: {page.heroImagePositionY ?? 50}%</Label>
+                              <Input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={page.heroImagePositionY ?? 50}
+                                onChange={e => updateCustomPage(page.id, 'heroImagePositionY', parseInt(e.target.value))}
+                                className="w-full cursor-pointer"
+                                data-testid={`input-custom-page-hero-position-y-${page.id}`}
+                              />
+                            </div>
+                          </div>
+                        )}
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label className="text-xs">Headline</Label>

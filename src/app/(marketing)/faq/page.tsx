@@ -42,6 +42,8 @@ export default function FAQPage() {
         headline={faqPageSettings?.headline || content?.faqHeadline || 'Frequently Asked Questions'}
         subheadline={faqPageSettings?.subheadline || 'Find answers to common questions about our product'}
         imageUrl={faqPageSettings?.heroImageUrl}
+        positionX={faqPageSettings?.heroImagePositionX ?? 50}
+        positionY={faqPageSettings?.heroImagePositionY ?? 50}
         testId="faq"
       />
 

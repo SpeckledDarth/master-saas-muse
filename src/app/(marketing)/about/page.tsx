@@ -25,6 +25,8 @@ export default function AboutPage() {
         headline={about?.headline || 'About Us'}
         subheadline={about?.subheadline || 'Learn more about our mission and team'}
         imageUrl={about?.heroImageUrl}
+        positionX={about?.heroImagePositionX ?? 50}
+        positionY={about?.heroImagePositionY ?? 50}
         testId="about"
       />
 

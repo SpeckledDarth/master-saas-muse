@@ -114,6 +114,8 @@ export interface AboutPageSettings {
   headline: string
   subheadline: string
   heroImageUrl: string | null
+  heroImagePositionX: number
+  heroImagePositionY: number
   story: string
   mission: string
   values: string[]
@@ -126,6 +128,8 @@ export interface ContactPageSettings {
   headline: string
   subheadline: string
   heroImageUrl: string | null
+  heroImagePositionX: number
+  heroImagePositionY: number
   email: string
   phone: string
   address: string
@@ -144,12 +148,16 @@ export interface PricingPageSettings {
   headline: string
   subheadline: string
   heroImageUrl: string | null
+  heroImagePositionX: number
+  heroImagePositionY: number
 }
 
 export interface FAQPageSettings {
   headline: string
   subheadline: string
   heroImageUrl: string | null
+  heroImagePositionX: number
+  heroImagePositionY: number
 }
 
 export interface CustomPageSection {
@@ -169,6 +177,8 @@ export interface CustomPage {
   headline: string
   subheadline: string
   heroImageUrl: string | null
+  heroImagePositionX: number
+  heroImagePositionY: number
   sections: CustomPageSection[]
 }
 
@@ -347,6 +357,8 @@ export const defaultSettings: SiteSettings = {
       headline: 'About Us',
       subheadline: 'Learn more about our mission and team',
       heroImageUrl: null,
+      heroImagePositionX: 50,
+      heroImagePositionY: 50,
       story: 'We started with a simple idea: make powerful tools accessible to everyone. What began as a small project has grown into a platform trusted by thousands of users worldwide.',
       mission: 'Our mission is to empower businesses and individuals with intuitive, powerful software that helps them achieve their goals faster.',
       values: ['Innovation', 'Simplicity', 'Customer Focus', 'Integrity'],
@@ -358,6 +370,8 @@ export const defaultSettings: SiteSettings = {
       headline: 'Contact Us',
       subheadline: 'We\'d love to hear from you',
       heroImageUrl: null,
+      heroImagePositionX: 50,
+      heroImagePositionY: 50,
       email: 'support@example.com',
       phone: '',
       address: '',
@@ -419,11 +433,15 @@ If you have any questions about this Privacy Policy, please contact us.`,
       headline: 'Simple, Transparent Pricing',
       subheadline: 'Choose the plan that works for you',
       heroImageUrl: null,
+      heroImagePositionX: 50,
+      heroImagePositionY: 50,
     },
     faq: {
       headline: 'Frequently Asked Questions',
       subheadline: 'Find answers to common questions about our product',
       heroImageUrl: null,
+      heroImagePositionX: 50,
+      heroImagePositionY: 50,
     },
     customPages: [
       {
@@ -434,6 +452,8 @@ If you have any questions about this Privacy Policy, please contact us.`,
         headline: 'Our Features',
         subheadline: 'Discover what makes us different',
         heroImageUrl: null,
+        heroImagePositionX: 50,
+        heroImagePositionY: 50,
         sections: [],
       },
       {
@@ -444,6 +464,8 @@ If you have any questions about this Privacy Policy, please contact us.`,
         headline: 'Our Products',
         subheadline: 'Explore our product lineup',
         heroImageUrl: null,
+        heroImagePositionX: 50,
+        heroImagePositionY: 50,
         sections: [],
       },
       {
@@ -454,6 +476,8 @@ If you have any questions about this Privacy Policy, please contact us.`,
         headline: 'Our Solutions',
         subheadline: 'Solutions tailored to your needs',
         heroImageUrl: null,
+        heroImagePositionX: 50,
+        heroImagePositionY: 50,
         sections: [],
       },
       {
@@ -464,6 +488,8 @@ If you have any questions about this Privacy Policy, please contact us.`,
         headline: 'Resources',
         subheadline: 'Helpful resources and guides',
         heroImageUrl: null,
+        heroImagePositionX: 50,
+        heroImagePositionY: 50,
         sections: [],
       },
     ],

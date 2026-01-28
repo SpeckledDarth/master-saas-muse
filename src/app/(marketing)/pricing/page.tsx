@@ -128,6 +128,8 @@ export default function PricingPage() {
         headline={pricingPage?.headline || 'Simple, Transparent Pricing'}
         subheadline={pricingPage?.subheadline || 'Choose the plan that works best for you'}
         imageUrl={pricingPage?.heroImageUrl}
+        positionX={pricingPage?.heroImagePositionX ?? 50}
+        positionY={pricingPage?.heroImagePositionY ?? 50}
         testId="pricing"
       />
         
