@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
@@ -13,6 +13,7 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const [loading, setLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
 
@@ -61,21 +62,37 @@ export default function AdminLayout({
       <nav className="border-b bg-card">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-6 h-14">
-            <Link href="/admin" className="font-semibold" data-testid="link-admin-home">
+            <Link 
+              href="/admin" 
+              className={`font-semibold ${pathname === '/admin' ? 'text-primary' : ''}`}
+              data-testid="link-admin-home"
+            >
               Admin
             </Link>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild>
+              <Button 
+                variant={pathname === '/admin/setup' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
                 <Link href="/admin/setup" data-testid="link-admin-setup">
                   Setup
                 </Link>
               </Button>
-              <Button variant="ghost" size="sm" asChild>
+              <Button 
+                variant={pathname === '/admin/users' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
                 <Link href="/admin/users" data-testid="link-admin-users">
                   Users
                 </Link>
               </Button>
-              <Button variant="ghost" size="sm" asChild>
+              <Button 
+                variant={pathname === '/admin/settings' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
                 <Link href="/admin/settings" data-testid="link-admin-settings">
                   Settings
                 </Link>

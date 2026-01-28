@@ -1,0 +1,38 @@
+1. Authentication - CONFIRMED WORKING
+Goal: Verify users can sign up and log in - CONFIRMED WORKING
+
+1.0.0 Login Page
+- ERROR: I would like to add the process of forgot email, or forgot password workflow.  Currently, that does not exist.
+
+
+2.1.0 Admin Dashboard 
+- ERROR: For all Dashboard menu Options (Admin, Setup, Users, Settings, etc....  The menu does not reflect the dashboard in focus.  FOr example, when on the Setup Dashbaord, the "Admin" button remains highlighted as if active.    
+
+- In general, I see the Admin Dashboard and the metric cars; however, I am not certain the data inside the cards are accurate.  We need to test this.  
+
+2.1.1 Setup Dashboard
+- For all dashboards... After clicking the "Save Changes" button, the page should conduct a hard refresh so the changes are visible on the current page as additional feedback, the changes have been applied.  Right now, you must open an entire new window to see the changes take affect, like button color changes, or site name changes, etc.) 
+
+- For all Dashboard menu Options...  The active dashboard is not highlighted in the menu.  Regardless of dashboard in focus, the "Admi" options remains bold.  
+
+2.2.0 Users Dashboard - Does not work yet.  Returns a 404 page.
+
+2.3.0 Settings Dashboard - Does not work yet.  Returns a 404 page.
+
+
+
+3. User Profile 
+- ERROR: There is no way to edit or modify user details on the user profile page.  It only shows initial signup details.  We need to add that.
+
+
+4. Pricing Page
+- ERROR: The current prices shown do not match what is in Stripe for some reason.
+
+
+5. Homepage
+
+- ERROR: When clicking on the Logo (i.e. homepage redirect, the redirect works; however, the site flashes old naming data.  For example, the site used to be called "My Saas".  I changed it in the setup dashboard to "Extrusion Calculator".  "Extrusion Calculator is visible and is persistent; however, the is a flash showing the "My Saas" before it changes to the "Extrusion Calculator name".  Can you fix that?
+
+- ERROR: Features button in the menu bar works, but goes to a 404 page.  I would like to discuss how we can make these pages dynamic in the setup dashboard.  Same with the "Doc" page.  NOTE:  These have been added for development purpose only.  I don't think we have focused on this yet.  Not necessarily a bug, but something we need to do. 
+ 
+- ERROR: When clicking on the User Icon, a dropdown box appears with user details.  There is an error code that was added yesterday for troubleshooting purposes.  We need to remove that now.  

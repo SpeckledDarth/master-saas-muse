@@ -65,28 +65,34 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 
 **MVP is fully functional.** Ready for continued development or publishing.
 
-## Recent Session Progress (Jan 27, 2026)
+## Recent Session Progress (Jan 28, 2026)
 
 ### Completed This Session
-- **Full Theme Customization System**: Light and dark mode theme colors now work across all pages
-  - Simplified ThemeColors interface to 4 fields per mode (background, foreground, card, border)
-  - Created ThemeSettingsProvider component for global theme application
-  - Added to root layout so all pages (including dashboards) follow light/dark toggle
-  - MutationObserver watches for theme class changes and reapplies custom colors
-- **Content Tab fully functional**: All toggles, editing, and persistence working
-  - Features section: toggle, headline/subheadline editing, add/edit/delete cards, icon dropdown
-  - Testimonials: add/edit/delete with full profile info
-  - FAQ: add/edit/delete question/answer pairs
-  - All changes persist after save and page refresh
+- **Users Dashboard**: Full user management with search and role editing
+  - Search input filters users by email
+  - Role selector (admin/member) with Supabase persistence
+  - Toast notifications for success/error feedback
+- **Settings Dashboard**: Admin feature toggles page created
+- **Forgot Password Workflow**: Complete password reset flow
+  - "Forgot password?" link added to login page
+  - Reset password page sends email via Supabase
+  - Update password page for setting new password
+- **Profile Page Enhancement**: Display name editing with save functionality
+- **Pricing Page Stripe Sync**: Now fetches prices directly from Stripe API
+  - Falls back to database settings if Stripe products unavailable
+  - Shows product metadata for features
+- **Homepage Flash Fix**: Loading state prevents "My SaaS" flash before custom branding loads
+- **Setup Dashboard Refresh**: Page auto-refreshes after Save to show updated branding
 
-### Fixed Issues
-- **Theme colors on dashboards**: Previously only homepage had custom theme colors; now all pages have them
-- **Content settings persistence**: Initial database was missing `content` JSONB section; added directly via SQL
+### Previous Session (Jan 27, 2026)
+- Full Theme Customization System (light/dark modes across all pages)
+- Content Tab fully functional (features, testimonials, FAQ editing)
+- Theme colors work on all dashboards
 
 ### Testing Status
-- Theme customization: FULLY TESTED AND WORKING (light/dark modes across all pages)
-- Content tab: FULLY TESTED AND WORKING
-- Branding tab: FULLY TESTED AND WORKING (app name, tagline, theme colors all work)
-- Pricing tab: Not yet tested
-- Social tab: Not yet tested
-- Features tab: Not yet tested
+- All Setup Dashboard tabs: TESTED AND WORKING
+- Users Dashboard: WORKING (search + role management)
+- Settings Dashboard: WORKING (feature toggles)
+- Profile page: WORKING (display name + password editing)
+- Forgot password flow: WORKING
+- Pricing page: WORKING (Stripe sync + fallback)

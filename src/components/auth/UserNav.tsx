@@ -21,7 +21,6 @@ export function UserNav() {
   const [user, setUser] = useState<User | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [debugInfo, setDebugInfo] = useState<string>('Init')
   const router = useRouter()
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
   
@@ -38,19 +37,14 @@ export function UserNav() {
   useEffect(() => {
     if (!supabase) {
       setLoading(false)
-      setDebugInfo('No client')
       return
     }
     
-    setDebugInfo('Getting session...')
-    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setDebugInfo(session ? `Got user: ${session.user.id.slice(0,8)}` : 'No session')
       setUser(session?.user ?? null)
       setLoading(false)
-    }).catch((err) => {
-      setDebugInfo(`Session error: ${err.message}`)
+    }).catch(() => {
       setLoading(false)
     })
 
@@ -76,7 +70,6 @@ export function UserNav() {
     
     const checkRole = async () => {
       try {
-        setDebugInfo(`Checking role...`)
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
@@ -84,15 +77,11 @@ export function UserNav() {
           .single()
         
         if (error) {
-          setDebugInfo(`Role err: ${error.code} - ${error.message}`)
           setIsAdmin(false)
         } else {
-          setDebugInfo(`Role: ${data?.role || 'none'}`)
           setIsAdmin(data?.role === 'admin')
         }
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error'
-        setDebugInfo(`Catch: ${errorMessage}`)
+      } catch {
         setIsAdmin(false)
       }
     }
@@ -111,9 +100,6 @@ export function UserNav() {
   if (loading) {
     return <Button variant="ghost" size="sm" disabled>Loading...</Button>
   }
-
-  // Temporary debug display - remove after fixing
-  const showDebug = process.env.NODE_ENV === 'development' || debugInfo.includes('error') || debugInfo.includes('Error')
 
   if (!user) {
     return (
@@ -145,9 +131,6 @@ export function UserNav() {
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || 'User'}</p>
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-            {debugInfo && (
-              <p className="text-xs leading-none text-yellow-500 mt-1">[Debug: {debugInfo}]</p>
-            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

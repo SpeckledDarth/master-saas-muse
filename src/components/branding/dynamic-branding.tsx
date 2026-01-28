@@ -12,15 +12,23 @@ export function DynamicBranding({ children }: { children: React.ReactNode }) {
 }
 
 export function AppName() {
-  const { settings } = useSettings()
+  const { settings, loading } = useSettings()
   
   useThemeFromSettings(settings)
+  
+  if (loading) {
+    return <span data-testid="text-app-name" className="opacity-0">Loading</span>
+  }
   
   return <span data-testid="text-app-name">{settings.branding.appName || defaultSettings.branding.appName}</span>
 }
 
 export function AppTagline() {
-  const { settings } = useSettings()
+  const { settings, loading } = useSettings()
+  
+  if (loading) {
+    return <span data-testid="text-app-tagline" className="opacity-0">Loading</span>
+  }
   
   return <span data-testid="text-app-tagline">{settings.branding.tagline || defaultSettings.branding.tagline}</span>
 }

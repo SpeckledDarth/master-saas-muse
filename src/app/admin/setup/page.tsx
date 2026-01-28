@@ -69,7 +69,10 @@ export default function SetupPage() {
     
     if (response.ok) {
       setSaved(true)
-      setTimeout(() => setSaved(false), 3000)
+      setTimeout(() => {
+        setSaved(false)
+        window.location.reload()
+      }, 1000)
     }
     
     setSaving(false)

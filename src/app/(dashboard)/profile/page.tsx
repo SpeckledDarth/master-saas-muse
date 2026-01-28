@@ -29,6 +29,8 @@ export default function ProfilePage() {
   const [user, setUser] = useState<any>(null)
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [displayName, setDisplayName] = useState('')
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
@@ -59,6 +61,7 @@ export default function ProfilePage() {
       }
       
       setUser(currentUser)
+      setDisplayName(currentUser.user_metadata?.full_name || '')
 
       try {
         const response = await fetch('/api/stripe/subscription')
@@ -81,6 +84,40 @@ export default function ProfilePage() {
       mounted = false
     }
   }, [router, supabase])
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!supabase || !displayName.trim()) return
+    
+    setIsUpdatingProfile(true)
+    
+    const { error } = await supabase.auth.updateUser({
+      data: { full_name: displayName.trim() }
+    })
+    
+    if (error) {
+      toast({
+        title: 'Failed to update profile',
+        description: error.message,
+        variant: 'destructive',
+      })
+    } else {
+      toast({
+        title: 'Profile updated',
+        description: 'Your display name has been updated.',
+      })
+      setUser((prev: any) => ({
+        ...prev,
+        user_metadata: {
+          ...prev?.user_metadata,
+          full_name: displayName.trim()
+        }
+      }))
+    }
+    
+    setIsUpdatingProfile(false)
+  }
 
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -176,19 +213,45 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="pt-4 border-t">
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <Label className="text-sm">Email</Label>
+            <form onSubmit={handleProfileUpdate} className="pt-4 border-t space-y-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="displayName" className="text-sm">Display Name</Label>
+                </div>
+                <Input 
+                  id="displayName"
+                  value={displayName} 
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Enter your display name"
+                  className="mt-2"
+                  data-testid="input-display-name"
+                />
               </div>
-              <Input 
-                value={user?.email || ''} 
-                disabled 
-                className="mt-2"
-                data-testid="input-email"
-              />
-              <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
-            </div>
+              
+              <div>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <Label className="text-sm">Email</Label>
+                </div>
+                <Input 
+                  value={user?.email || ''} 
+                  disabled 
+                  className="mt-2"
+                  data-testid="input-email"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
+              </div>
+              
+              <Button 
+                type="submit" 
+                disabled={isUpdatingProfile || !displayName.trim()}
+                data-testid="button-update-profile"
+              >
+                {isUpdatingProfile && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Save Profile
+              </Button>
+            </form>
           </CardContent>
         </Card>
 
