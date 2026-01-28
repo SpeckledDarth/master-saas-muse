@@ -26,19 +26,21 @@ export default function AdminDashboard() {
       if (user) {
         setUserId(user.id)
         
-        const { data: roles } = await supabase
-          .from('user_roles')
-          .select('user_id, role')
-        
-        if (roles) {
-          const uniqueUsers = new Set(roles.map(r => r.user_id))
-          const adminUsers = new Set(roles.filter(r => r.role === 'admin').map(r => r.user_id))
-          const memberUsers = new Set(roles.filter(r => r.role === 'member').map(r => r.user_id))
-          setStats({
-            totalUsers: uniqueUsers.size,
-            admins: adminUsers.size,
-            members: memberUsers.size,
+        // Fetch stats from API endpoint (uses service role to bypass RLS)
+        try {
+          const response = await fetch('/api/admin/stats', {
+            credentials: 'include',
           })
+          if (response.ok) {
+            const data = await response.json()
+            setStats({
+              totalUsers: data.totalUsers || 0,
+              admins: data.admins || 0,
+              members: data.members || 0,
+            })
+          }
+        } catch (error) {
+          console.error('Failed to fetch admin stats:', error)
         }
       }
       
