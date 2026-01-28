@@ -47,11 +47,13 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 - **Plausible Analytics**: Privacy-friendly website analytics.
 - **Sentry**: (Planned) Error tracking, pending Next.js 16 support.
 
-## IMPORTANT: Stack Reminder
-**This project uses Vercel + Next.js (App Router), NOT Vite.**
+## CRITICAL: Stack & Environment
+**THIS PROJECT USES VERCEL + NEXT.JS. NEVER MENTION OR USE VITE.**
 - Deployment: Vercel (push to GitHub triggers deployment)
 - Framework: Next.js 16+ with App Router
-- No Vite config files - ignore any Vite-related suggestions
+- Environment variables use `NEXT_PUBLIC_` prefix (NOT `VITE_`)
+- Required secrets: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- Any `VITE_` prefixed variables are legacy and must be renamed to `NEXT_PUBLIC_`
 
 ## Next Session Priority (Jan 28, 2026)
 Continue MVP testing of the Setup Dashboard tabs:
