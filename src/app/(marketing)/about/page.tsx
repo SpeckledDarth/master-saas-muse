@@ -1,0 +1,133 @@
+'use client'
+
+import { useSettings } from '@/hooks/use-settings'
+import { Card, CardContent } from '@/components/ui/card'
+import { Loader2, Users, Target, Heart } from 'lucide-react'
+
+export default function AboutPage() {
+  const { settings, loading } = useSettings()
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin" data-testid="loader-about" />
+      </div>
+    )
+  }
+
+  const about = settings?.pages?.about
+  const branding = settings?.branding
+
+  return (
+    <div className="container mx-auto px-4 py-16">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold mb-4" data-testid="text-about-headline">
+          {about?.headline || 'About Us'}
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto" data-testid="text-about-subheadline">
+          {about?.subheadline || 'Learn more about our mission and team'}
+        </p>
+      </div>
+
+      <div className="max-w-4xl mx-auto space-y-12">
+        <section>
+          <Card>
+            <CardContent className="p-8">
+              <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2" data-testid="text-our-story">
+                <Heart className="h-6 w-6 text-primary" />
+                Our Story
+              </h2>
+              <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap" data-testid="text-about-story">
+                {about?.story || 'We started with a simple idea: make powerful tools accessible to everyone.'}
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section>
+          <Card>
+            <CardContent className="p-8">
+              <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2" data-testid="text-our-mission">
+                <Target className="h-6 w-6 text-primary" />
+                Our Mission
+              </h2>
+              <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap" data-testid="text-about-mission">
+                {about?.mission || 'Our mission is to empower businesses and individuals with intuitive, powerful software.'}
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+
+        {about?.values && about.values.length > 0 && (
+          <section>
+            <h2 className="text-2xl font-semibold mb-6 text-center" data-testid="text-our-values">
+              Our Values
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {about.values.map((value, index) => (
+                <Card key={index} className="text-center hover-elevate">
+                  <CardContent className="p-6">
+                    <p className="font-medium" data-testid={`text-value-${index}`}>{value}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {about?.showTeam && about.team && about.team.length > 0 && (
+          <section>
+            <h2 className="text-2xl font-semibold mb-6 text-center" data-testid="text-team-headline">
+              {about.teamHeadline || 'Meet Our Team'}
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {about.team.map((member) => (
+                <Card key={member.id} className="text-center hover-elevate">
+                  <CardContent className="p-6">
+                    {member.imageUrl && (
+                      <img
+                        src={member.imageUrl}
+                        alt={member.name}
+                        className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
+                        data-testid={`img-team-${member.id}`}
+                      />
+                    )}
+                    <h3 className="font-semibold" data-testid={`text-team-name-${member.id}`}>
+                      {member.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-2" data-testid={`text-team-role-${member.id}`}>
+                      {member.role}
+                    </p>
+                    <p className="text-sm text-muted-foreground" data-testid={`text-team-bio-${member.id}`}>
+                      {member.bio}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="text-center">
+          <Card>
+            <CardContent className="p-8">
+              <h2 className="text-2xl font-semibold mb-4" data-testid="text-contact-cta">
+                Want to learn more?
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                Get in touch with our team at{' '}
+                <a 
+                  href={`mailto:${branding?.supportEmail || 'support@example.com'}`}
+                  className="text-primary hover:underline"
+                  data-testid="link-contact-email"
+                >
+                  {branding?.supportEmail || 'support@example.com'}
+                </a>
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+      </div>
+    </div>
+  )
+}

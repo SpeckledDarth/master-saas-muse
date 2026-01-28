@@ -12,8 +12,8 @@ import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Palette, DollarSign, Globe, Settings, Loader2, Save, Check, FileText, Plus, Trash2, Zap, Shield, Sparkles, Users, BarChart, Lock, Rocket, Heart, Star, Target, Award, Lightbulb } from 'lucide-react'
-import type { FeatureCard, Testimonial, FAQItem, CTAContent } from '@/types/settings'
+import { Palette, DollarSign, Globe, Settings, Loader2, Save, Check, FileText, Plus, Trash2, Zap, Shield, Sparkles, Users, BarChart, Lock, Rocket, Heart, Star, Target, Award, Lightbulb, BookOpen } from 'lucide-react'
+import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember } from '@/types/settings'
 import { ImageUpload } from '@/components/admin/image-upload'
 
 export default function SetupPage() {
@@ -266,6 +266,114 @@ export default function SetupPage() {
     }))
   }
 
+  function updateAbout<K extends keyof SiteSettings['pages']['about']>(
+    key: K,
+    value: SiteSettings['pages']['about'][K]
+  ) {
+    setSettings(prev => ({
+      ...prev,
+      pages: {
+        ...defaultSettings.pages,
+        ...prev.pages,
+        about: {
+          ...defaultSettings.pages.about,
+          ...prev.pages?.about,
+          [key]: value,
+        },
+      }
+    }))
+  }
+
+  function updateContact<K extends keyof SiteSettings['pages']['contact']>(
+    key: K,
+    value: SiteSettings['pages']['contact'][K]
+  ) {
+    setSettings(prev => ({
+      ...prev,
+      pages: {
+        ...defaultSettings.pages,
+        ...prev.pages,
+        contact: {
+          ...defaultSettings.pages.contact,
+          ...prev.pages?.contact,
+          [key]: value,
+        },
+      }
+    }))
+  }
+
+  function updateLegal<K extends keyof SiteSettings['pages']['legal']>(
+    key: K,
+    value: SiteSettings['pages']['legal'][K]
+  ) {
+    setSettings(prev => ({
+      ...prev,
+      pages: {
+        ...defaultSettings.pages,
+        ...prev.pages,
+        legal: {
+          ...defaultSettings.pages.legal,
+          ...prev.pages?.legal,
+          [key]: value,
+        },
+      }
+    }))
+  }
+
+  function addTeamMember() {
+    const newMember: TeamMember = {
+      id: Date.now().toString(),
+      name: 'Team Member',
+      role: 'Role',
+      bio: 'Short bio about this team member.',
+      imageUrl: null,
+    }
+    setSettings(prev => ({
+      ...prev,
+      pages: {
+        ...defaultSettings.pages,
+        ...prev.pages,
+        about: {
+          ...defaultSettings.pages.about,
+          ...prev.pages?.about,
+          team: [...(prev.pages?.about?.team ?? []), newMember],
+        },
+      }
+    }))
+  }
+
+  function updateTeamMember(id: string, field: keyof TeamMember, value: string | null) {
+    setSettings(prev => ({
+      ...prev,
+      pages: {
+        ...defaultSettings.pages,
+        ...prev.pages,
+        about: {
+          ...defaultSettings.pages.about,
+          ...prev.pages?.about,
+          team: (prev.pages?.about?.team ?? []).map(member =>
+            member.id === id ? { ...member, [field]: value } : member
+          ),
+        },
+      }
+    }))
+  }
+
+  function removeTeamMember(id: string) {
+    setSettings(prev => ({
+      ...prev,
+      pages: {
+        ...defaultSettings.pages,
+        ...prev.pages,
+        about: {
+          ...defaultSettings.pages.about,
+          ...prev.pages?.about,
+          team: (prev.pages?.about?.team ?? []).filter(member => member.id !== id),
+        },
+      }
+    }))
+  }
+
   const iconOptions = [
     { value: 'Zap', label: 'Lightning' },
     { value: 'Shield', label: 'Shield' },
@@ -345,7 +453,7 @@ export default function SetupPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5 mb-8">
+        <TabsList className="grid w-full grid-cols-6 mb-8">
           <TabsTrigger value="branding" data-testid="tab-branding">
             <Palette className="h-4 w-4 mr-2" />
             Branding
@@ -353,6 +461,10 @@ export default function SetupPage() {
           <TabsTrigger value="content" data-testid="tab-content">
             <FileText className="h-4 w-4 mr-2" />
             Content
+          </TabsTrigger>
+          <TabsTrigger value="pages" data-testid="tab-pages">
+            <BookOpen className="h-4 w-4 mr-2" />
+            Pages
           </TabsTrigger>
           <TabsTrigger value="pricing" data-testid="tab-pricing">
             <DollarSign className="h-4 w-4 mr-2" />
@@ -1062,6 +1174,278 @@ export default function SetupPage() {
                       data-testid="input-cta-button-link"
                     />
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="pages">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>About Page</CardTitle>
+                <CardDescription>
+                  Configure the content for your About Us page
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Headline</Label>
+                    <Input
+                      value={settings.pages?.about?.headline ?? ''}
+                      onChange={e => updateAbout('headline', e.target.value)}
+                      placeholder="About Us"
+                      data-testid="input-about-headline"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subheadline</Label>
+                    <Input
+                      value={settings.pages?.about?.subheadline ?? ''}
+                      onChange={e => updateAbout('subheadline', e.target.value)}
+                      placeholder="Learn more about our mission"
+                      data-testid="input-about-subheadline"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Our Story</Label>
+                  <Textarea
+                    value={settings.pages?.about?.story ?? ''}
+                    onChange={e => updateAbout('story', e.target.value)}
+                    placeholder="Tell your company's story..."
+                    rows={4}
+                    data-testid="input-about-story"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Mission Statement</Label>
+                  <Textarea
+                    value={settings.pages?.about?.mission ?? ''}
+                    onChange={e => updateAbout('mission', e.target.value)}
+                    placeholder="Your company's mission..."
+                    rows={3}
+                    data-testid="input-about-mission"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Values (one per line)</Label>
+                  <Textarea
+                    value={(settings.pages?.about?.values ?? []).join('\n')}
+                    onChange={e => updateAbout('values', e.target.value.split('\n').filter(v => v.trim()))}
+                    onBlur={e => updateAbout('values', e.target.value.split('\n').filter(v => v.trim()))}
+                    placeholder="Innovation&#10;Customer Focus&#10;Integrity"
+                    rows={4}
+                    data-testid="input-about-values"
+                  />
+                </div>
+                <div className="flex items-center justify-between py-3 border-t">
+                  <div>
+                    <p className="font-medium">Show Team Section</p>
+                    <p className="text-sm text-muted-foreground">Display team members on the About page</p>
+                  </div>
+                  <Switch
+                    checked={settings.pages?.about?.showTeam ?? false}
+                    onCheckedChange={checked => updateAbout('showTeam', checked)}
+                    data-testid="switch-show-team"
+                  />
+                </div>
+                {settings.pages?.about?.showTeam && (
+                  <div className="space-y-4 pt-4">
+                    <div className="flex items-center justify-between">
+                      <Label>Team Members</Label>
+                      <Button size="sm" variant="outline" onClick={addTeamMember} data-testid="button-add-team-member">
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add Member
+                      </Button>
+                    </div>
+                    {(settings.pages?.about?.team ?? []).map(member => (
+                      <div key={member.id} className="p-4 border rounded-lg space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">{member.name || 'New Member'}</span>
+                          <Button size="icon" variant="ghost" onClick={() => removeTeamMember(member.id)} data-testid={`button-remove-member-${member.id}`}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <Label className="text-xs">Name</Label>
+                            <Input
+                              value={member.name}
+                              onChange={e => updateTeamMember(member.id, 'name', e.target.value)}
+                              placeholder="John Doe"
+                              data-testid={`input-member-name-${member.id}`}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">Role</Label>
+                            <Input
+                              value={member.role}
+                              onChange={e => updateTeamMember(member.id, 'role', e.target.value)}
+                              placeholder="CEO"
+                              data-testid={`input-member-role-${member.id}`}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Bio</Label>
+                          <Textarea
+                            value={member.bio}
+                            onChange={e => updateTeamMember(member.id, 'bio', e.target.value)}
+                            placeholder="Short bio..."
+                            rows={2}
+                            data-testid={`input-member-bio-${member.id}`}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Contact Page</CardTitle>
+                <CardDescription>
+                  Configure contact information and form settings
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Headline</Label>
+                    <Input
+                      value={settings.pages?.contact?.headline ?? ''}
+                      onChange={e => updateContact('headline', e.target.value)}
+                      placeholder="Contact Us"
+                      data-testid="input-contact-headline"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subheadline</Label>
+                    <Input
+                      value={settings.pages?.contact?.subheadline ?? ''}
+                      onChange={e => updateContact('subheadline', e.target.value)}
+                      placeholder="We'd love to hear from you"
+                      data-testid="input-contact-subheadline"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Contact Email</Label>
+                    <Input
+                      type="email"
+                      value={settings.pages?.contact?.email ?? ''}
+                      onChange={e => updateContact('email', e.target.value)}
+                      placeholder="support@example.com"
+                      data-testid="input-contact-email"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Phone Number</Label>
+                    <Input
+                      value={settings.pages?.contact?.phone ?? ''}
+                      onChange={e => updateContact('phone', e.target.value)}
+                      placeholder="+1 (555) 123-4567"
+                      data-testid="input-contact-phone"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Address</Label>
+                  <Textarea
+                    value={settings.pages?.contact?.address ?? ''}
+                    onChange={e => updateContact('address', e.target.value)}
+                    placeholder="123 Main Street&#10;City, State 12345"
+                    rows={2}
+                    data-testid="input-contact-address"
+                  />
+                </div>
+                <div className="flex items-center justify-between py-3 border-t">
+                  <div>
+                    <p className="font-medium">Show Contact Form</p>
+                    <p className="text-sm text-muted-foreground">Display a contact form for visitors</p>
+                  </div>
+                  <Switch
+                    checked={settings.pages?.contact?.showContactForm ?? true}
+                    onCheckedChange={checked => updateContact('showContactForm', checked)}
+                    data-testid="switch-show-contact-form"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Form Success Message</Label>
+                  <Input
+                    value={settings.pages?.contact?.formSuccessMessage ?? ''}
+                    onChange={e => updateContact('formSuccessMessage', e.target.value)}
+                    placeholder="Thank you! We'll get back to you soon."
+                    data-testid="input-contact-success-message"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Terms of Service</CardTitle>
+                <CardDescription>
+                  Edit your Terms of Service content (supports Markdown)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Last Updated Date</Label>
+                  <Input
+                    type="date"
+                    value={settings.pages?.legal?.termsLastUpdated ?? ''}
+                    onChange={e => updateLegal('termsLastUpdated', e.target.value)}
+                    data-testid="input-terms-date"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Terms of Service Content (Markdown)</Label>
+                  <Textarea
+                    value={settings.pages?.legal?.termsOfService ?? ''}
+                    onChange={e => updateLegal('termsOfService', e.target.value)}
+                    placeholder="# Terms of Service&#10;&#10;## 1. Introduction..."
+                    rows={12}
+                    className="font-mono text-sm"
+                    data-testid="input-terms-content"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Privacy Policy</CardTitle>
+                <CardDescription>
+                  Edit your Privacy Policy content (supports Markdown)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Last Updated Date</Label>
+                  <Input
+                    type="date"
+                    value={settings.pages?.legal?.privacyLastUpdated ?? ''}
+                    onChange={e => updateLegal('privacyLastUpdated', e.target.value)}
+                    data-testid="input-privacy-date"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Privacy Policy Content (Markdown)</Label>
+                  <Textarea
+                    value={settings.pages?.legal?.privacyPolicy ?? ''}
+                    onChange={e => updateLegal('privacyPolicy', e.target.value)}
+                    placeholder="# Privacy Policy&#10;&#10;## 1. Information We Collect..."
+                    rows={12}
+                    className="font-mono text-sm"
+                    data-testid="input-privacy-content"
+                  />
                 </div>
               </CardContent>
             </Card>

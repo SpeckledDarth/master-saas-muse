@@ -102,12 +102,55 @@ export interface ContentSettings {
   cta: CTAContent
 }
 
+export interface TeamMember {
+  id: string
+  name: string
+  role: string
+  bio: string
+  imageUrl: string | null
+}
+
+export interface AboutPageSettings {
+  headline: string
+  subheadline: string
+  story: string
+  mission: string
+  values: string[]
+  showTeam: boolean
+  teamHeadline: string
+  team: TeamMember[]
+}
+
+export interface ContactPageSettings {
+  headline: string
+  subheadline: string
+  email: string
+  phone: string
+  address: string
+  showContactForm: boolean
+  formSuccessMessage: string
+}
+
+export interface LegalPageSettings {
+  termsOfService: string
+  termsLastUpdated: string
+  privacyPolicy: string
+  privacyLastUpdated: string
+}
+
+export interface PagesSettings {
+  about: AboutPageSettings
+  contact: ContactPageSettings
+  legal: LegalPageSettings
+}
+
 export interface SiteSettings {
   branding: BrandingSettings
   pricing: PricingSettings
   social: SocialLinks
   features: FeatureToggles
   content: ContentSettings
+  pages: PagesSettings
 }
 
 export const defaultLightTheme: ThemeColors = {
@@ -260,6 +303,78 @@ export const defaultSettings: SiteSettings = {
       description: 'Join thousands of satisfied customers today.',
       buttonText: 'Start Free Trial',
       buttonLink: '/signup',
+    },
+  },
+  pages: {
+    about: {
+      headline: 'About Us',
+      subheadline: 'Learn more about our mission and team',
+      story: 'We started with a simple idea: make powerful tools accessible to everyone. What began as a small project has grown into a platform trusted by thousands of users worldwide.',
+      mission: 'Our mission is to empower businesses and individuals with intuitive, powerful software that helps them achieve their goals faster.',
+      values: ['Innovation', 'Simplicity', 'Customer Focus', 'Integrity'],
+      showTeam: false,
+      teamHeadline: 'Meet Our Team',
+      team: [],
+    },
+    contact: {
+      headline: 'Contact Us',
+      subheadline: 'We\'d love to hear from you',
+      email: 'support@example.com',
+      phone: '',
+      address: '',
+      showContactForm: true,
+      formSuccessMessage: 'Thank you for your message! We\'ll get back to you within 24 hours.',
+    },
+    legal: {
+      termsOfService: `# Terms of Service
+
+## 1. Acceptance of Terms
+By accessing and using this service, you accept and agree to be bound by the terms and conditions of this agreement.
+
+## 2. Use of Service
+You agree to use this service only for lawful purposes and in accordance with these Terms.
+
+## 3. User Accounts
+You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
+
+## 4. Intellectual Property
+All content, features, and functionality of this service are owned by us and are protected by copyright, trademark, and other intellectual property laws.
+
+## 5. Limitation of Liability
+In no event shall we be liable for any indirect, incidental, special, consequential, or punitive damages.
+
+## 6. Changes to Terms
+We reserve the right to modify these terms at any time. We will notify users of any material changes.
+
+## 7. Contact
+If you have any questions about these Terms, please contact us.`,
+      termsLastUpdated: new Date().toISOString().split('T')[0],
+      privacyPolicy: `# Privacy Policy
+
+## 1. Information We Collect
+We collect information you provide directly to us, such as when you create an account, make a purchase, or contact us for support.
+
+## 2. How We Use Your Information
+We use the information we collect to provide, maintain, and improve our services, process transactions, and communicate with you.
+
+## 3. Information Sharing
+We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy.
+
+## 4. Data Security
+We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.
+
+## 5. Cookies
+We use cookies and similar tracking technologies to track activity on our service and hold certain information.
+
+## 6. Your Rights
+You have the right to access, update, or delete your personal information at any time.
+
+## 7. Changes to This Policy
+We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy on this page.
+
+## 8. Contact Us
+If you have any questions about this Privacy Policy, please contact us.`,
+      privacyLastUpdated: new Date().toISOString().split('T')[0],
     },
   },
 }
