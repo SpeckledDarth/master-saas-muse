@@ -29,8 +29,21 @@ export async function GET(request: Request) {
       }
     )
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
+    const { error, data } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error && data.user) {
+      // Add user to user_roles if they don't exist yet (default: member)
+      const { data: existingRole } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('user_id', data.user.id)
+        .single()
+      
+      if (!existingRole) {
+        await supabase
+          .from('user_roles')
+          .insert({ user_id: data.user.id, role: 'member' })
+      }
+      
       return NextResponse.redirect(`${origin}${next}`)
     }
   }
