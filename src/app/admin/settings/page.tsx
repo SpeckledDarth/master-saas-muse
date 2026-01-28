@@ -15,7 +15,9 @@ export default function SettingsPage() {
   const [localSettings, setLocalSettings] = useState(settings)
 
   useEffect(() => {
-    setLocalSettings(settings)
+    if (settings) {
+      setLocalSettings(settings)
+    }
   }, [settings])
 
   async function handleSave() {
@@ -37,14 +39,17 @@ export default function SettingsPage() {
     setSaving(false)
   }
 
-  function updateFeature(key: keyof typeof localSettings.features, value: boolean) {
-    setLocalSettings(prev => ({
-      ...prev,
-      features: { ...prev.features, [key]: value }
-    }))
+  function updateFeature(key: keyof NonNullable<typeof localSettings>['features'], value: boolean) {
+    setLocalSettings(prev => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        features: { ...prev.features, [key]: value }
+      }
+    })
   }
 
-  if (isLoading) {
+  if (isLoading || !localSettings) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin" />
