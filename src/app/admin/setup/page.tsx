@@ -1119,7 +1119,8 @@ export default function SetupPage() {
                       <Label>Features (one per line)</Label>
                       <Textarea
                         value={(settings.pricing?.freePlanFeatures ?? []).join('\n')}
-                        onChange={e => updatePricing('freePlanFeatures', e.target.value.split('\n').filter(f => f.trim()))}
+                        onChange={e => updatePricing('freePlanFeatures', e.target.value.split('\n'))}
+                        onBlur={e => updatePricing('freePlanFeatures', e.target.value.split('\n').filter(f => f.trim()))}
                         placeholder="Basic features&#10;Up to 100 items&#10;Community support"
                         rows={4}
                         data-testid="textarea-free-plan-features"
