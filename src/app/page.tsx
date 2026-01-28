@@ -37,6 +37,24 @@ export default function HomePage() {
   const faqEnabled = content?.faqEnabled ?? true
   const ctaEnabled = content?.ctaEnabled ?? true
 
+  // Show loading skeleton to prevent flash of default content
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden bg-muted/50">
+          <div className="relative z-10 container mx-auto px-4 text-center">
+            <div className="h-16 w-64 mx-auto mb-6 bg-muted animate-pulse rounded" />
+            <div className="h-8 w-96 mx-auto mb-8 bg-muted animate-pulse rounded" />
+            <div className="flex gap-4 justify-center">
+              <div className="h-12 w-36 bg-muted animate-pulse rounded" />
+              <div className="h-12 w-36 bg-muted animate-pulse rounded" />
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col">
       <section 

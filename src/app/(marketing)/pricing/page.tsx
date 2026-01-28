@@ -149,10 +149,46 @@ export default function PricingPage() {
       </div>
 
       {hasStripeProducts ? (
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className={`grid gap-8 max-w-5xl mx-auto ${stripeProducts.length >= 2 ? 'md:grid-cols-3' : stripeProducts.length === 1 ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
+          {pricing?.showFreePlan !== false && (
+            <Card data-testid="card-plan-free">
+              <CardHeader>
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle>{pricing?.freePlanName || 'Free'}</CardTitle>
+                </div>
+                <CardDescription>
+                  {pricing?.freePlanDescription || 'Perfect for getting started'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold">$0</span>
+                  <span className="text-muted-foreground">/forever</span>
+                </div>
+                <ul className="space-y-3">
+                  {(pricing?.freePlanFeatures || ['Basic features', 'Up to 100 items', 'Community support']).map((feature: string, i: number) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  className="w-full" 
+                  variant="outline"
+                  onClick={() => router.push('/signup')}
+                  data-testid="button-subscribe-free"
+                >
+                  Get Started Free
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
           {stripeProducts.map((product, index) => {
             const price = getStripePrice(product, billingInterval)
-            const isPopular = product.metadata.popular === 'true' || index === 1
+            const isPopular = product.metadata.popular === 'true' || (pricing?.showFreePlan !== false ? index === 0 : index === 1)
 
             return (
               <Card 

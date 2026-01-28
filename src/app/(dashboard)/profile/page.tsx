@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { User, Mail, Lock, CreditCard, Loader2, Crown, Users, Sparkles, LogOut } from 'lucide-react'
+import { User, Mail, Lock, CreditCard, Loader2, Crown, Users, Sparkles, LogOut, Camera, MapPin, Phone, Building } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface SubscriptionInfo {
@@ -30,11 +31,23 @@ export default function ProfilePage() {
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [displayName, setDisplayName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [company, setCompany] = useState('')
+  const [address, setAddress] = useState('')
+  const [city, setCity] = useState('')
+  const [state, setState] = useState('')
+  const [zipCode, setZipCode] = useState('')
+  const [country, setCountry] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState('')
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false)
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const { toast } = useToast()
   const supabase = useMemo(() => {
@@ -62,6 +75,15 @@ export default function ProfilePage() {
       
       setUser(currentUser)
       setDisplayName(currentUser.user_metadata?.full_name || '')
+      setEmail(currentUser.email || '')
+      setPhone(currentUser.user_metadata?.phone || '')
+      setCompany(currentUser.user_metadata?.company || '')
+      setAddress(currentUser.user_metadata?.address || '')
+      setCity(currentUser.user_metadata?.city || '')
+      setState(currentUser.user_metadata?.state || '')
+      setZipCode(currentUser.user_metadata?.zip_code || '')
+      setCountry(currentUser.user_metadata?.country || '')
+      setAvatarUrl(currentUser.user_metadata?.avatar_url || '')
 
       try {
         const response = await fetch('/api/stripe/subscription')
@@ -88,12 +110,21 @@ export default function ProfilePage() {
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!supabase || !displayName.trim()) return
+    if (!supabase) return
     
     setIsUpdatingProfile(true)
     
     const { error } = await supabase.auth.updateUser({
-      data: { full_name: displayName.trim() }
+      data: { 
+        full_name: displayName.trim(),
+        phone: phone.trim(),
+        company: company.trim(),
+        address: address.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        zip_code: zipCode.trim(),
+        country: country.trim(),
+      }
     })
     
     if (error) {
@@ -105,18 +136,128 @@ export default function ProfilePage() {
     } else {
       toast({
         title: 'Profile updated',
-        description: 'Your display name has been updated.',
+        description: 'Your profile has been updated.',
       })
       setUser((prev: any) => ({
         ...prev,
         user_metadata: {
           ...prev?.user_metadata,
-          full_name: displayName.trim()
+          full_name: displayName.trim(),
+          phone: phone.trim(),
+          company: company.trim(),
+          address: address.trim(),
+          city: city.trim(),
+          state: state.trim(),
+          zip_code: zipCode.trim(),
+          country: country.trim(),
         }
       }))
     }
     
     setIsUpdatingProfile(false)
+  }
+
+  const handleEmailUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!supabase || !email.trim() || email === user?.email) return
+    
+    setIsUpdatingEmail(true)
+    
+    const { error } = await supabase.auth.updateUser({
+      email: email.trim()
+    })
+    
+    if (error) {
+      toast({
+        title: 'Failed to update email',
+        description: error.message,
+        variant: 'destructive',
+      })
+    } else {
+      toast({
+        title: 'Confirmation email sent',
+        description: 'Please check your new email address to confirm the change.',
+      })
+    }
+    
+    setIsUpdatingEmail(false)
+  }
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !supabase) return
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Please upload an image file.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: 'File too large',
+        description: 'Please upload an image smaller than 2MB.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setIsUploadingAvatar(true)
+
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`
+      const filePath = `avatars/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true })
+
+      if (uploadError) {
+        if (uploadError.message?.includes('bucket') || uploadError.message?.includes('not found')) {
+          throw new Error('Avatar storage is not configured. Please contact your administrator to set up the avatars storage bucket in Supabase.')
+        }
+        throw uploadError
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl }
+      })
+
+      if (updateError) {
+        throw updateError
+      }
+
+      setAvatarUrl(publicUrl)
+      setUser((prev: any) => ({
+        ...prev,
+        user_metadata: {
+          ...prev?.user_metadata,
+          avatar_url: publicUrl
+        }
+      }))
+
+      toast({
+        title: 'Avatar updated',
+        description: 'Your profile picture has been updated.',
+      })
+    } catch (error: any) {
+      toast({
+        title: 'Failed to upload avatar',
+        description: error.message || 'An error occurred while uploading.',
+        variant: 'destructive',
+      })
+    }
+
+    setIsUploadingAvatar(false)
   }
 
   const handlePasswordUpdate = async (e: React.FormEvent) => {
@@ -199,10 +340,35 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
-                <AvatarFallback className="text-lg">{initials}</AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={avatarUrl || user?.user_metadata?.avatar_url} alt={user?.email} />
+                  <AvatarFallback className="text-xl">{initials}</AvatarFallback>
+                </Avatar>
+                <input 
+                  ref={fileInputRef}
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  data-testid="input-avatar"
+                />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  className="absolute -bottom-1 -right-1 rounded-full"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploadingAvatar}
+                  data-testid="button-upload-avatar"
+                >
+                  {isUploadingAvatar ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Camera className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
               <div>
                 <p className="font-medium" data-testid="text-user-name">
                   {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
@@ -214,42 +380,140 @@ export default function ProfilePage() {
             </div>
 
             <form onSubmit={handleProfileUpdate} className="pt-4 border-t space-y-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  <Label htmlFor="displayName" className="text-sm">Display Name</Label>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <Label htmlFor="displayName" className="text-sm">Display Name</Label>
+                  </div>
+                  <Input 
+                    id="displayName"
+                    value={displayName} 
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Enter your display name"
+                    className="mt-2"
+                    data-testid="input-display-name"
+                  />
                 </div>
-                <Input 
-                  id="displayName"
-                  value={displayName} 
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Enter your display name"
-                  className="mt-2"
-                  data-testid="input-display-name"
-                />
+                
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <Label htmlFor="phone" className="text-sm">Phone Number</Label>
+                  </div>
+                  <Input 
+                    id="phone"
+                    value={phone} 
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+1 (555) 123-4567"
+                    className="mt-2"
+                    data-testid="input-phone"
+                  />
+                </div>
               </div>
               
               <div>
                 <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  <Label className="text-sm">Email</Label>
+                  <Building className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="company" className="text-sm">Company</Label>
                 </div>
                 <Input 
-                  value={user?.email || ''} 
-                  disabled 
+                  id="company"
+                  value={company} 
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="Your company name"
                   className="mt-2"
-                  data-testid="input-email"
+                  data-testid="input-company"
                 />
-                <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
+              </div>
+              
+              <div className="pt-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <Label className="text-sm">Address</Label>
+                </div>
+                <div className="space-y-3">
+                  <Input 
+                    value={address} 
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Street address"
+                    data-testid="input-address"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input 
+                      value={city} 
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="City"
+                      data-testid="input-city"
+                    />
+                    <Input 
+                      value={state} 
+                      onChange={(e) => setState(e.target.value)}
+                      placeholder="State/Province"
+                      data-testid="input-state"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input 
+                      value={zipCode} 
+                      onChange={(e) => setZipCode(e.target.value)}
+                      placeholder="ZIP/Postal code"
+                      data-testid="input-zip"
+                    />
+                    <Input 
+                      value={country} 
+                      onChange={(e) => setCountry(e.target.value)}
+                      placeholder="Country"
+                      data-testid="input-country"
+                    />
+                  </div>
+                </div>
               </div>
               
               <Button 
                 type="submit" 
-                disabled={isUpdatingProfile || !displayName.trim()}
+                disabled={isUpdatingProfile}
                 data-testid="button-update-profile"
               >
                 {isUpdatingProfile && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Save Profile
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-email">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              <CardTitle>Email Address</CardTitle>
+            </div>
+            <CardDescription>Change your email address</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleEmailUpdate} className="space-y-4">
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="mt-2"
+                  data-testid="input-change-email"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  A confirmation email will be sent to verify the new address.
+                </p>
+              </div>
+              <Button 
+                type="submit" 
+                disabled={isUpdatingEmail || !email.trim() || email === user?.email}
+                data-testid="button-update-email"
+              >
+                {isUpdatingEmail && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Update Email
               </Button>
             </form>
           </CardContent>

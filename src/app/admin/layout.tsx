@@ -62,13 +62,15 @@ export default function AdminLayout({
       <nav className="border-b bg-card">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-6 h-14">
-            <Link 
-              href="/admin" 
-              className={`font-semibold ${pathname === '/admin' ? 'text-primary' : ''}`}
-              data-testid="link-admin-home"
+            <Button 
+              variant={pathname === '/admin' ? 'secondary' : 'ghost'} 
+              size="sm" 
+              asChild
             >
-              Admin
-            </Link>
+              <Link href="/admin" data-testid="link-admin-home">
+                Admin
+              </Link>
+            </Button>
             <div className="flex items-center gap-2">
               <Button 
                 variant={pathname === '/admin/setup' ? 'secondary' : 'ghost'} 
