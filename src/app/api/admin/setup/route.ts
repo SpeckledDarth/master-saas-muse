@@ -88,6 +88,7 @@ export async function GET(request: NextRequest) {
     social: { ...defaultSettings.social, ...data?.settings?.social },
     features: { ...defaultSettings.features, ...data?.settings?.features },
     content: { ...defaultSettings.content, ...data?.settings?.content },
+    pages: { ...defaultSettings.pages, ...data?.settings?.pages },
   }
   
   return NextResponse.json({ settings: mergedSettings })
@@ -127,6 +128,7 @@ export async function POST(request: NextRequest) {
     social: { ...defaultSettings.social, ...currentSettings.social, ...settings.social },
     features: { ...defaultSettings.features, ...currentSettings.features, ...settings.features },
     content: { ...defaultSettings.content, ...currentSettings.content, ...settings.content },
+    pages: { ...defaultSettings.pages, ...currentSettings.pages, ...settings.pages },
   }
   
   console.log('[Setup API] Merged branding to save:', JSON.stringify(newSettings.branding, null, 2))
