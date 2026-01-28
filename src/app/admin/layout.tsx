@@ -90,15 +90,6 @@ export default function AdminLayout({
                   Users
                 </Link>
               </Button>
-              <Button 
-                variant={pathname === '/admin/settings' ? 'secondary' : 'ghost'} 
-                size="sm" 
-                asChild
-              >
-                <Link href="/admin/settings" data-testid="link-admin-settings">
-                  Settings
-                </Link>
-              </Button>
             </div>
           </div>
         </div>

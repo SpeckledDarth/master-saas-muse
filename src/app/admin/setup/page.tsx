@@ -1299,6 +1299,17 @@ export default function SetupPage() {
                             data-testid={`input-member-bio-${member.id}`}
                           />
                         </div>
+                        <div className="space-y-1">
+                          <ImageUpload
+                            label="Photo"
+                            value={member.imageUrl}
+                            onChange={(url) => updateTeamMember(member.id, 'imageUrl', url)}
+                            bucket="branding"
+                            folder="team"
+                            aspectRatio="1/1"
+                            testId={`member-photo-${member.id}`}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>

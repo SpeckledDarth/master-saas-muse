@@ -84,13 +84,20 @@ export default function AboutPage() {
               {about.team.map((member) => (
                 <Card key={member.id} className="text-center hover-elevate">
                   <CardContent className="p-6">
-                    {member.imageUrl && (
+                    {member.imageUrl ? (
                       <img
                         src={member.imageUrl}
                         alt={member.name}
                         className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
                         data-testid={`img-team-${member.id}`}
                       />
+                    ) : (
+                      <div 
+                        className="w-24 h-24 rounded-full mx-auto mb-4 bg-muted flex items-center justify-center"
+                        data-testid={`img-team-placeholder-${member.id}`}
+                      >
+                        <Users className="h-10 w-10 text-muted-foreground" />
+                      </div>
                     )}
                     <h3 className="font-semibold" data-testid={`text-team-name-${member.id}`}>
                       {member.name}

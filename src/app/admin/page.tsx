@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Loader2, Users, Settings, Palette, TrendingUp } from 'lucide-react'
+import { Loader2, Users, Palette, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 
 interface Stats {
@@ -138,24 +138,6 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              System Settings
-            </CardTitle>
-            <CardDescription>
-              Configure system-wide settings
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/admin/settings" data-testid="link-goto-settings">
-                Open Settings
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )
