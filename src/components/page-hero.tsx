@@ -14,7 +14,7 @@ interface PageHeroProps {
 export function PageHero({ headline, subheadline, imageUrl, positionX = 50, positionY = 50, testId }: PageHeroProps) {
   if (!imageUrl) {
     return (
-      <div className="text-center mb-12 py-16">
+      <div className="text-center py-16 px-4">
         <h1 className="text-4xl md:text-5xl font-bold mb-4" data-testid={testId ? `${testId}-headline` : undefined}>
           {headline}
         </h1>
@@ -30,7 +30,7 @@ export function PageHero({ headline, subheadline, imageUrl, positionX = 50, posi
   const objectPosition = `${positionX}% ${positionY}%`
 
   return (
-    <section className="relative min-h-[400px] md:min-h-[500px] flex items-center justify-center overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 mb-12">
+    <section className="relative min-h-[400px] md:min-h-[500px] flex items-center justify-center overflow-hidden">
       <Image
         src={imageUrl}
         alt=""
