@@ -36,6 +36,10 @@ export interface PricingPlan {
 export interface PricingSettings {
   currency: string
   plans: PricingPlan[]
+  showFreePlan?: boolean
+  freePlanName?: string
+  freePlanDescription?: string
+  freePlanFeatures?: string[]
 }
 
 export interface SocialLinks {
@@ -140,6 +144,10 @@ export const defaultSettings: SiteSettings = {
   },
   pricing: {
     currency: 'USD',
+    showFreePlan: true,
+    freePlanName: 'Free',
+    freePlanDescription: 'Perfect for getting started',
+    freePlanFeatures: ['Basic features', 'Up to 100 items', 'Community support'],
     plans: [
       {
         id: 'free',
