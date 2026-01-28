@@ -1817,6 +1817,17 @@ export default function SetupPage() {
                             />
                           </div>
                         </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs">Page Content (Markdown supported)</Label>
+                          <Textarea
+                            value={page.content ?? ''}
+                            onChange={e => updateCustomPage(page.id, 'content', e.target.value)}
+                            placeholder="Write your page content here. You can use Markdown for formatting..."
+                            rows={8}
+                            className="font-mono text-sm"
+                            data-testid={`input-custom-page-content-${page.id}`}
+                          />
+                        </div>
                       </>
                     )}
                   </div>

@@ -20,7 +20,7 @@ export default function AboutPage() {
   const branding = settings?.branding
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="flex flex-col">
       <PageHero
         headline={about?.headline || 'About Us'}
         subheadline={about?.subheadline || 'Learn more about our mission and team'}
@@ -30,7 +30,8 @@ export default function AboutPage() {
         testId="about"
       />
 
-      <div className="max-w-4xl mx-auto space-y-12">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto space-y-12">
         <section>
           <Card>
             <CardContent className="p-8">
@@ -135,6 +136,7 @@ export default function AboutPage() {
             </CardContent>
           </Card>
         </section>
+        </div>
       </div>
     </div>
   )

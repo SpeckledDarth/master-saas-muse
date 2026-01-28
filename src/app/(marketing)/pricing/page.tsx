@@ -123,7 +123,7 @@ export default function PricingPage() {
   const pricingPage = settings?.pages?.pricing
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="flex flex-col">
       <PageHero
         headline={pricingPage?.headline || 'Simple, Transparent Pricing'}
         subheadline={pricingPage?.subheadline || 'Choose the plan that works best for you'}
@@ -132,8 +132,9 @@ export default function PricingPage() {
         positionY={pricingPage?.heroImagePositionY ?? 50}
         testId="pricing"
       />
-        
-      <div className="text-center mb-12">
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center mb-12">
         <div className="inline-flex items-center gap-2 p-1 bg-muted rounded-lg">
           <Button
             variant={billingInterval === 'month' ? 'default' : 'ghost'}
@@ -302,6 +303,7 @@ export default function PricingPage() {
         })}
       </div>
       )}
+      </div>
     </div>
   )
 }

@@ -179,6 +179,7 @@ export interface CustomPage {
   heroImageUrl: string | null
   heroImagePositionX: number
   heroImagePositionY: number
+  content: string
   sections: CustomPageSection[]
 }
 
@@ -454,6 +455,7 @@ If you have any questions about this Privacy Policy, please contact us.`,
         heroImageUrl: null,
         heroImagePositionX: 50,
         heroImagePositionY: 50,
+        content: '',
         sections: [],
       },
       {
@@ -466,6 +468,7 @@ If you have any questions about this Privacy Policy, please contact us.`,
         heroImageUrl: null,
         heroImagePositionX: 50,
         heroImagePositionY: 50,
+        content: '',
         sections: [],
       },
       {
@@ -478,6 +481,7 @@ If you have any questions about this Privacy Policy, please contact us.`,
         heroImageUrl: null,
         heroImagePositionX: 50,
         heroImagePositionY: 50,
+        content: '',
         sections: [],
       },
       {
@@ -490,6 +494,7 @@ If you have any questions about this Privacy Policy, please contact us.`,
         heroImageUrl: null,
         heroImagePositionX: 50,
         heroImagePositionY: 50,
+        content: '',
         sections: [],
       },
     ],

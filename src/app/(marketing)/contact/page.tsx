@@ -63,7 +63,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="flex flex-col">
       <PageHero
         headline={contact?.headline || 'Contact Us'}
         subheadline={contact?.subheadline || "We'd love to hear from you"}
@@ -73,7 +73,8 @@ export default function ContactPage() {
         testId="contact"
       />
 
-      <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -217,6 +218,7 @@ export default function ContactPage() {
             </CardContent>
           </Card>
         )}
+        </div>
       </div>
     </div>
   )

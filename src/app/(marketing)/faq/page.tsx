@@ -37,7 +37,7 @@ export default function FAQPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="flex flex-col">
       <PageHero
         headline={faqPageSettings?.headline || content?.faqHeadline || 'Frequently Asked Questions'}
         subheadline={faqPageSettings?.subheadline || 'Find answers to common questions about our product'}
@@ -47,7 +47,8 @@ export default function FAQPage() {
         testId="faq"
       />
 
-      <div className="max-w-3xl mx-auto space-y-4">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-3xl mx-auto space-y-4">
         {faqItems.length > 0 ? (
           faqItems.map((item) => (
             <Card key={item.id} className="overflow-hidden">
@@ -98,6 +99,7 @@ export default function FAQPage() {
             Contact Us
           </Button>
         </Link>
+      </div>
       </div>
     </div>
   )
