@@ -44,13 +44,21 @@ export function useSettings() {
         }
         
         if (data?.settings) {
+          const dbPages = data.settings.pages || {}
           setSettings({
             branding: { ...defaultSettings.branding, ...data.settings.branding },
             pricing: { ...defaultSettings.pricing, ...data.settings.pricing },
             social: { ...defaultSettings.social, ...data.settings.social },
             features: { ...defaultSettings.features, ...data.settings.features },
             content: { ...defaultSettings.content, ...data.settings.content },
-            pages: { ...defaultSettings.pages, ...data.settings.pages },
+            pages: {
+              about: { ...defaultSettings.pages.about, ...dbPages.about },
+              contact: { ...defaultSettings.pages.contact, ...dbPages.contact },
+              legal: { ...defaultSettings.pages.legal, ...dbPages.legal },
+              pricing: { ...defaultSettings.pages.pricing, ...dbPages.pricing },
+              faq: { ...defaultSettings.pages.faq, ...dbPages.faq },
+              customPages: dbPages.customPages || defaultSettings.pages.customPages,
+            },
           })
         } else {
           setSettings(defaultSettings)

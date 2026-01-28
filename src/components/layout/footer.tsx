@@ -98,9 +98,19 @@ export function Footer() {
           <div>
             <h4 className="font-medium mb-3">Product</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/features" className="hover:text-foreground transition-colors" data-testid="link-footer-features">Features</Link></li>
               <li><Link href="/pricing" className="hover:text-foreground transition-colors" data-testid="link-footer-pricing">Pricing</Link></li>
               <li><Link href="/faq" className="hover:text-foreground transition-colors" data-testid="link-footer-faq">FAQ</Link></li>
+              {settings?.pages?.customPages?.filter(p => p.enabled && p.name && p.slug).map(page => (
+                <li key={page.id}>
+                  <Link 
+                    href={`/p/${page.slug}`} 
+                    className="hover:text-foreground transition-colors" 
+                    data-testid={`link-footer-custom-${page.slug}`}
+                  >
+                    {page.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

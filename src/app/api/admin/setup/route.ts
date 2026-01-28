@@ -82,13 +82,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
   
+  const dbPages = data?.settings?.pages || {}
   const mergedSettings: SiteSettings = {
     branding: { ...defaultSettings.branding, ...data?.settings?.branding },
     pricing: { ...defaultSettings.pricing, ...data?.settings?.pricing },
     social: { ...defaultSettings.social, ...data?.settings?.social },
     features: { ...defaultSettings.features, ...data?.settings?.features },
     content: { ...defaultSettings.content, ...data?.settings?.content },
-    pages: { ...defaultSettings.pages, ...data?.settings?.pages },
+    pages: {
+      about: { ...defaultSettings.pages.about, ...dbPages.about },
+      contact: { ...defaultSettings.pages.contact, ...dbPages.contact },
+      legal: { ...defaultSettings.pages.legal, ...dbPages.legal },
+      pricing: { ...defaultSettings.pages.pricing, ...dbPages.pricing },
+      faq: { ...defaultSettings.pages.faq, ...dbPages.faq },
+      customPages: dbPages.customPages || defaultSettings.pages.customPages,
+    },
   }
   
   return NextResponse.json({ settings: mergedSettings })
@@ -122,13 +130,22 @@ export async function POST(request: NextRequest) {
   console.log('[Setup API] Current branding in DB:', JSON.stringify(currentSettings.branding, null, 2))
   console.log('[Setup API] Incoming branding:', JSON.stringify(settings.branding, null, 2))
   
+  const currentPages = (currentSettings.pages || {}) as any
+  const incomingPages = (settings.pages || {}) as any
   const newSettings: SiteSettings = {
     branding: { ...defaultSettings.branding, ...currentSettings.branding, ...settings.branding },
     pricing: { ...defaultSettings.pricing, ...currentSettings.pricing, ...settings.pricing },
     social: { ...defaultSettings.social, ...currentSettings.social, ...settings.social },
     features: { ...defaultSettings.features, ...currentSettings.features, ...settings.features },
     content: { ...defaultSettings.content, ...currentSettings.content, ...settings.content },
-    pages: { ...defaultSettings.pages, ...currentSettings.pages, ...settings.pages },
+    pages: {
+      about: { ...defaultSettings.pages.about, ...currentPages.about, ...incomingPages.about },
+      contact: { ...defaultSettings.pages.contact, ...currentPages.contact, ...incomingPages.contact },
+      legal: { ...defaultSettings.pages.legal, ...currentPages.legal, ...incomingPages.legal },
+      pricing: { ...defaultSettings.pages.pricing, ...currentPages.pricing, ...incomingPages.pricing },
+      faq: { ...defaultSettings.pages.faq, ...currentPages.faq, ...incomingPages.faq },
+      customPages: incomingPages.customPages || currentPages.customPages || defaultSettings.pages.customPages,
+    },
   }
   
   console.log('[Setup API] Merged branding to save:', JSON.stringify(newSettings.branding, null, 2))

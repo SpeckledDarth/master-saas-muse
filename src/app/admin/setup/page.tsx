@@ -320,6 +320,55 @@ export default function SetupPage() {
     }))
   }
 
+  function updatePricingPage<K extends keyof SiteSettings['pages']['pricing']>(
+    key: K,
+    value: SiteSettings['pages']['pricing'][K]
+  ) {
+    setSettings(prev => ({
+      ...prev,
+      pages: {
+        ...defaultSettings.pages,
+        ...prev.pages,
+        pricing: {
+          ...defaultSettings.pages.pricing,
+          ...prev.pages?.pricing,
+          [key]: value,
+        },
+      }
+    }))
+  }
+
+  function updateFAQPage<K extends keyof SiteSettings['pages']['faq']>(
+    key: K,
+    value: SiteSettings['pages']['faq'][K]
+  ) {
+    setSettings(prev => ({
+      ...prev,
+      pages: {
+        ...defaultSettings.pages,
+        ...prev.pages,
+        faq: {
+          ...defaultSettings.pages.faq,
+          ...prev.pages?.faq,
+          [key]: value,
+        },
+      }
+    }))
+  }
+
+  function updateCustomPage(pageId: string, field: string, value: any) {
+    setSettings(prev => ({
+      ...prev,
+      pages: {
+        ...defaultSettings.pages,
+        ...prev.pages,
+        customPages: (prev.pages?.customPages ?? defaultSettings.pages.customPages).map(page =>
+          page.id === pageId ? { ...page, [field]: value } : page
+        ),
+      }
+    }))
+  }
+
   function addTeamMember() {
     const newMember: TeamMember = {
       id: Date.now().toString(),
@@ -1190,6 +1239,15 @@ export default function SetupPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <ImageUpload
+                  label="Hero Image"
+                  value={settings.pages?.about?.heroImageUrl}
+                  onChange={(url) => updateAbout('heroImageUrl', url)}
+                  bucket="branding"
+                  folder="heroes"
+                  aspectRatio="21/9"
+                  testId="about-hero-image"
+                />
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Headline</Label>
@@ -1325,6 +1383,15 @@ export default function SetupPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <ImageUpload
+                  label="Hero Image"
+                  value={settings.pages?.contact?.heroImageUrl}
+                  onChange={(url) => updateContact('heroImageUrl', url)}
+                  bucket="branding"
+                  folder="heroes"
+                  aspectRatio="21/9"
+                  testId="contact-hero-image"
+                />
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Headline</Label>
@@ -1458,6 +1525,162 @@ export default function SetupPage() {
                     data-testid="input-privacy-content"
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Pricing Page</CardTitle>
+                <CardDescription>
+                  Configure the appearance of your pricing page
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ImageUpload
+                  label="Hero Image"
+                  value={settings.pages?.pricing?.heroImageUrl}
+                  onChange={(url) => updatePricingPage('heroImageUrl', url)}
+                  bucket="branding"
+                  folder="heroes"
+                  aspectRatio="21/9"
+                  testId="pricing-hero-image"
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Headline</Label>
+                    <Input
+                      value={settings.pages?.pricing?.headline ?? ''}
+                      onChange={e => updatePricingPage('headline', e.target.value)}
+                      placeholder="Simple, Transparent Pricing"
+                      data-testid="input-pricing-headline"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subheadline</Label>
+                    <Input
+                      value={settings.pages?.pricing?.subheadline ?? ''}
+                      onChange={e => updatePricingPage('subheadline', e.target.value)}
+                      placeholder="Choose the plan that works for you"
+                      data-testid="input-pricing-subheadline"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>FAQ Page</CardTitle>
+                <CardDescription>
+                  Configure the appearance of your FAQ page
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ImageUpload
+                  label="Hero Image"
+                  value={settings.pages?.faq?.heroImageUrl}
+                  onChange={(url) => updateFAQPage('heroImageUrl', url)}
+                  bucket="branding"
+                  folder="heroes"
+                  aspectRatio="21/9"
+                  testId="faq-hero-image"
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Headline</Label>
+                    <Input
+                      value={settings.pages?.faq?.headline ?? ''}
+                      onChange={e => updateFAQPage('headline', e.target.value)}
+                      placeholder="Frequently Asked Questions"
+                      data-testid="input-faq-headline"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subheadline</Label>
+                    <Input
+                      value={settings.pages?.faq?.subheadline ?? ''}
+                      onChange={e => updateFAQPage('subheadline', e.target.value)}
+                      placeholder="Find answers to common questions"
+                      data-testid="input-faq-subheadline"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Custom Pages</CardTitle>
+                <CardDescription>
+                  Configure up to 4 additional marketing pages with custom names
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {(settings.pages?.customPages ?? defaultSettings.pages.customPages).map((page, index) => (
+                  <div key={page.id} className="p-4 border rounded-lg space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">Page {index + 1}: {page.name || 'Untitled'}</span>
+                      <Switch
+                        checked={page.enabled}
+                        onCheckedChange={checked => updateCustomPage(page.id, 'enabled', checked)}
+                        data-testid={`switch-custom-page-${page.id}`}
+                      />
+                    </div>
+                    {page.enabled && (
+                      <>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label className="text-xs">Page Name (appears in menu)</Label>
+                            <Input
+                              value={page.name}
+                              onChange={e => updateCustomPage(page.id, 'name', e.target.value)}
+                              placeholder="Features"
+                              data-testid={`input-custom-page-name-${page.id}`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">URL Slug</Label>
+                            <Input
+                              value={page.slug}
+                              onChange={e => updateCustomPage(page.id, 'slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                              placeholder="features"
+                              data-testid={`input-custom-page-slug-${page.id}`}
+                            />
+                          </div>
+                        </div>
+                        <ImageUpload
+                          label="Hero Image"
+                          value={page.heroImageUrl}
+                          onChange={(url) => updateCustomPage(page.id, 'heroImageUrl', url)}
+                          bucket="branding"
+                          folder="heroes"
+                          aspectRatio="21/9"
+                          testId={`custom-page-hero-${page.id}`}
+                        />
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label className="text-xs">Headline</Label>
+                            <Input
+                              value={page.headline}
+                              onChange={e => updateCustomPage(page.id, 'headline', e.target.value)}
+                              placeholder="Our Features"
+                              data-testid={`input-custom-page-headline-${page.id}`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Subheadline</Label>
+                            <Input
+                              value={page.subheadline}
+                              onChange={e => updateCustomPage(page.id, 'subheadline', e.target.value)}
+                              placeholder="Discover what makes us different"
+                              data-testid={`input-custom-page-subheadline-${page.id}`}
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </div>

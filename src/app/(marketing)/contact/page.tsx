@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Loader2, Mail, Phone, MapPin, Send, Check } from 'lucide-react'
+import { PageHero } from '@/components/page-hero'
 
 export default function ContactPage() {
   const { settings, loading } = useSettings()
@@ -63,14 +64,12 @@ export default function ContactPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4" data-testid="text-contact-headline">
-          {contact?.headline || 'Contact Us'}
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto" data-testid="text-contact-subheadline">
-          {contact?.subheadline || "We'd love to hear from you"}
-        </p>
-      </div>
+      <PageHero
+        headline={contact?.headline || 'Contact Us'}
+        subheadline={contact?.subheadline || "We'd love to hear from you"}
+        imageUrl={contact?.heroImageUrl}
+        testId="contact"
+      />
 
       <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
         <div className="space-y-6">

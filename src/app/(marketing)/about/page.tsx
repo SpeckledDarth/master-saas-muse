@@ -3,6 +3,7 @@
 import { useSettings } from '@/hooks/use-settings'
 import { Card, CardContent } from '@/components/ui/card'
 import { Loader2, Users, Target, Heart } from 'lucide-react'
+import { PageHero } from '@/components/page-hero'
 
 export default function AboutPage() {
   const { settings, loading } = useSettings()
@@ -20,14 +21,12 @@ export default function AboutPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4" data-testid="text-about-headline">
-          {about?.headline || 'About Us'}
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto" data-testid="text-about-subheadline">
-          {about?.subheadline || 'Learn more about our mission and team'}
-        </p>
-      </div>
+      <PageHero
+        headline={about?.headline || 'About Us'}
+        subheadline={about?.subheadline || 'Learn more about our mission and team'}
+        imageUrl={about?.heroImageUrl}
+        testId="about"
+      />
 
       <div className="max-w-4xl mx-auto space-y-12">
         <section>

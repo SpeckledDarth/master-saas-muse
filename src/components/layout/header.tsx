@@ -43,13 +43,6 @@ export function Header() {
 
         <nav className="hidden md:flex items-center gap-6">
           <Link
-            href="/features"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            data-testid="link-features"
-          >
-            Features
-          </Link>
-          <Link
             href="/pricing"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             data-testid="link-pricing"
@@ -57,12 +50,22 @@ export function Header() {
             Pricing
           </Link>
           <Link
-            href="/docs"
+            href="/about"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            data-testid="link-docs"
+            data-testid="link-about"
           >
-            Docs
+            About
           </Link>
+          {settings?.pages?.customPages?.filter(p => p.enabled && p.name && p.slug).map(page => (
+            <Link
+              key={page.id}
+              href={`/p/${page.slug}`}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              data-testid={`link-custom-${page.slug}`}
+            >
+              {page.name}
+            </Link>
+          ))}
         </nav>
 
         <div className="flex items-center gap-2">

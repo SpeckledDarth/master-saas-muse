@@ -15,13 +15,21 @@ export async function getSettings(): Promise<SiteSettings> {
   }
   
   const dbSettings = data.settings as Partial<SiteSettings>
+  const dbPages = dbSettings?.pages || {}
   return {
     branding: { ...defaultSettings.branding, ...dbSettings?.branding },
     pricing: { ...defaultSettings.pricing, ...dbSettings?.pricing },
     social: { ...defaultSettings.social, ...dbSettings?.social },
     features: { ...defaultSettings.features, ...dbSettings?.features },
     content: { ...defaultSettings.content, ...dbSettings?.content },
-    pages: { ...defaultSettings.pages, ...dbSettings?.pages },
+    pages: {
+      about: { ...defaultSettings.pages.about, ...(dbPages as any).about },
+      contact: { ...defaultSettings.pages.contact, ...(dbPages as any).contact },
+      legal: { ...defaultSettings.pages.legal, ...(dbPages as any).legal },
+      pricing: { ...defaultSettings.pages.pricing, ...(dbPages as any).pricing },
+      faq: { ...defaultSettings.pages.faq, ...(dbPages as any).faq },
+      customPages: (dbPages as any).customPages || defaultSettings.pages.customPages,
+    },
   }
 }
 

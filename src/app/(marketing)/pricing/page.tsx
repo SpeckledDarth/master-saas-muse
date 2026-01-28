@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge'
 import { Check, Loader2 } from 'lucide-react'
 import { useSettings } from '@/hooks/use-settings'
+import { PageHero } from '@/components/page-hero'
 
 interface StripePrice {
   id: string
@@ -119,14 +120,18 @@ export default function PricingPage() {
     }).format(amount / 100)
   }
 
+  const pricingPage = settings?.pages?.pricing
+
   return (
     <div className="container mx-auto px-4 py-16">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4" data-testid="text-pricing-title">Simple, Transparent Pricing</h1>
-        <p className="text-muted-foreground mb-8" data-testid="text-pricing-subtitle">
-          Choose the plan that works best for you
-        </p>
+      <PageHero
+        headline={pricingPage?.headline || 'Simple, Transparent Pricing'}
+        subheadline={pricingPage?.subheadline || 'Choose the plan that works best for you'}
+        imageUrl={pricingPage?.heroImageUrl}
+        testId="pricing"
+      />
         
+      <div className="text-center mb-12">
         <div className="inline-flex items-center gap-2 p-1 bg-muted rounded-lg">
           <Button
             variant={billingInterval === 'month' ? 'default' : 'ghost'}

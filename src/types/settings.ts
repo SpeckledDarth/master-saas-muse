@@ -113,6 +113,7 @@ export interface TeamMember {
 export interface AboutPageSettings {
   headline: string
   subheadline: string
+  heroImageUrl: string | null
   story: string
   mission: string
   values: string[]
@@ -124,6 +125,7 @@ export interface AboutPageSettings {
 export interface ContactPageSettings {
   headline: string
   subheadline: string
+  heroImageUrl: string | null
   email: string
   phone: string
   address: string
@@ -138,10 +140,45 @@ export interface LegalPageSettings {
   privacyLastUpdated: string
 }
 
+export interface PricingPageSettings {
+  headline: string
+  subheadline: string
+  heroImageUrl: string | null
+}
+
+export interface FAQPageSettings {
+  headline: string
+  subheadline: string
+  heroImageUrl: string | null
+}
+
+export interface CustomPageSection {
+  id: string
+  type: 'text' | 'image-left' | 'image-right' | 'cards'
+  headline: string
+  content: string
+  imageUrl: string | null
+  cards: { id: string; title: string; description: string; icon: string }[]
+}
+
+export interface CustomPage {
+  id: string
+  enabled: boolean
+  name: string
+  slug: string
+  headline: string
+  subheadline: string
+  heroImageUrl: string | null
+  sections: CustomPageSection[]
+}
+
 export interface PagesSettings {
   about: AboutPageSettings
   contact: ContactPageSettings
   legal: LegalPageSettings
+  pricing: PricingPageSettings
+  faq: FAQPageSettings
+  customPages: CustomPage[]
 }
 
 export interface SiteSettings {
@@ -309,6 +346,7 @@ export const defaultSettings: SiteSettings = {
     about: {
       headline: 'About Us',
       subheadline: 'Learn more about our mission and team',
+      heroImageUrl: null,
       story: 'We started with a simple idea: make powerful tools accessible to everyone. What began as a small project has grown into a platform trusted by thousands of users worldwide.',
       mission: 'Our mission is to empower businesses and individuals with intuitive, powerful software that helps them achieve their goals faster.',
       values: ['Innovation', 'Simplicity', 'Customer Focus', 'Integrity'],
@@ -319,6 +357,7 @@ export const defaultSettings: SiteSettings = {
     contact: {
       headline: 'Contact Us',
       subheadline: 'We\'d love to hear from you',
+      heroImageUrl: null,
       email: 'support@example.com',
       phone: '',
       address: '',
@@ -376,5 +415,57 @@ We may update this privacy policy from time to time. We will notify you of any c
 If you have any questions about this Privacy Policy, please contact us.`,
       privacyLastUpdated: new Date().toISOString().split('T')[0],
     },
+    pricing: {
+      headline: 'Simple, Transparent Pricing',
+      subheadline: 'Choose the plan that works for you',
+      heroImageUrl: null,
+    },
+    faq: {
+      headline: 'Frequently Asked Questions',
+      subheadline: 'Find answers to common questions about our product',
+      heroImageUrl: null,
+    },
+    customPages: [
+      {
+        id: 'page-1',
+        enabled: false,
+        name: 'Features',
+        slug: 'features',
+        headline: 'Our Features',
+        subheadline: 'Discover what makes us different',
+        heroImageUrl: null,
+        sections: [],
+      },
+      {
+        id: 'page-2',
+        enabled: false,
+        name: 'Products',
+        slug: 'products',
+        headline: 'Our Products',
+        subheadline: 'Explore our product lineup',
+        heroImageUrl: null,
+        sections: [],
+      },
+      {
+        id: 'page-3',
+        enabled: false,
+        name: 'Solutions',
+        slug: 'solutions',
+        headline: 'Our Solutions',
+        subheadline: 'Solutions tailored to your needs',
+        heroImageUrl: null,
+        sections: [],
+      },
+      {
+        id: 'page-4',
+        enabled: false,
+        name: 'Resources',
+        slug: 'resources',
+        headline: 'Resources',
+        subheadline: 'Helpful resources and guides',
+        heroImageUrl: null,
+        sections: [],
+      },
+    ],
   },
 }

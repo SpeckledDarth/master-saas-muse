@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Loader2, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
+import { PageHero } from '@/components/page-hero'
 
 export default function FAQPage() {
   const { settings, loading } = useSettings()
@@ -20,6 +21,7 @@ export default function FAQPage() {
   }
 
   const content = settings?.content
+  const faqPageSettings = settings?.pages?.faq
   const faqItems = content?.faqItems || []
 
   function toggleItem(id: string) {
@@ -36,14 +38,12 @@ export default function FAQPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4" data-testid="text-faq-title">
-          {content?.faqHeadline || 'Frequently Asked Questions'}
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto" data-testid="text-faq-subtitle">
-          Find answers to common questions about our product
-        </p>
-      </div>
+      <PageHero
+        headline={faqPageSettings?.headline || content?.faqHeadline || 'Frequently Asked Questions'}
+        subheadline={faqPageSettings?.subheadline || 'Find answers to common questions about our product'}
+        imageUrl={faqPageSettings?.heroImageUrl}
+        testId="faq"
+      />
 
       <div className="max-w-3xl mx-auto space-y-4">
         {faqItems.length > 0 ? (
