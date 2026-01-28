@@ -1,0 +1,25 @@
+Here's a clear, concise summary of the vision and purpose for ExtrusionCalculator.com (the SaaS business we've been building together):
+Core Vision
+To become the go-to, one-click starting point for anyone designing modular aluminum extrusion projects—whether it's a hobbyist building a van conversion cabinet, a homelab enthusiast making a server rack, an aquarium keeper creating a custom stand, or a Lean manufacturing engineer designing a kaizen workstation or assembly fixture.
+The tool removes the pain of manual calculations, material waste, sourcing confusion, and CAD friction, letting users go from idea → accurate BOM + shopping list in minutes.
+Purpose & Mission
+
+Solve real friction
+Eliminate hours of edge-counting, scrap math, supplier cross-referencing, and inconsistent load ratings.
+Deliver precise BOMs (extrusion lengths rounded to whole sticks, panels rounded to sheets, hardware auto-suggested).
+Provide one-click affiliate shopping lists (prioritizing 80/20 Inc., Amazon, Misumi, etc.).
+
+Serve two audiences
+B2C (high volume): RV/van life builders, homelabbers, 3D printer enclosure makers, aquarium keepers, workshop organizers — emphasize ~50% savings vs IKEA/traditional cabinets, aesthetics (black anodized industrial look), and ease.
+B2B (higher ARPU, stickier): Lean/5S/Kaizen engineers, manufacturing teams, small fab shops — emphasize no-CAD-required design, ergonomic/load-rated options, .STP export for layout integration, and reshoring-friendly modularity.
+
+Business model & outcome
+Freemium SaaS: Free basic single-cabinet BOMs → Pro ($12/mo) for multi-cabinet, renders, PDF → Team ($119/mo) for CAD exports, load/compliance notes, sharing.
+Passive revenue layers: 25% lifetime recurring affiliate commissions on subs + material affiliate commissions from BOM links.
+Goal: Profitable passive muse (~$60K+ Year 1 profit target) with <2 hrs/week maintenance after launch.
+Long-term: Become the "Canva of T-slot extrusion design" — default tool for any modular frame worldwide.
+
+
+In short:
+"Empower anyone to design better extrusion projects faster, cheaper, and with zero waste — so they can spend less time calculating and more time building."
+Does that capture the heart of it correctly? Any part you'd like to refine or emphasize before we push forward? 🚀
