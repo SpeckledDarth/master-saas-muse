@@ -5,7 +5,7 @@ import { SiteSettings, defaultSettings } from '@/types/settings'
 import { createClient } from '@/lib/supabase/client'
 
 export function useSettings() {
-  const [settings, setSettings] = useState<SiteSettings>(defaultSettings)
+  const [settings, setSettings] = useState<SiteSettings | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -13,12 +13,16 @@ export function useSettings() {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => {
       controller.abort()
+      if (!settings) {
+        setSettings(defaultSettings)
+      }
       setLoading(false)
     }, 5000)
     
     async function loadSettings() {
       try {
         if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+          setSettings(defaultSettings)
           setLoading(false)
           return
         }
@@ -34,6 +38,8 @@ export function useSettings() {
           if (error.code !== 'PGRST116') {
             console.error('Settings error:', error.message)
           }
+          setSettings(defaultSettings)
+          setLoading(false)
           return
         }
         
@@ -45,9 +51,12 @@ export function useSettings() {
             features: { ...defaultSettings.features, ...data.settings.features },
             content: { ...defaultSettings.content, ...data.settings.content },
           })
+        } else {
+          setSettings(defaultSettings)
         }
       } catch (err) {
         console.error('Failed to load settings:', err)
+        setSettings(defaultSettings)
       } finally {
         clearTimeout(timeoutId)
         setLoading(false)
@@ -62,7 +71,8 @@ export function useSettings() {
     }
   }, [])
 
-  return { settings, loading, error }
+  const isLoading = loading || settings === null
+  return { settings: isLoading ? null : settings, loading: isLoading, error }
 }
 
 function hexToHSL(hex: string): string {
@@ -125,8 +135,10 @@ function applyTheme(theme: { background: string; foreground: string; card: strin
   }
 }
 
-export function useThemeFromSettings(settings: SiteSettings) {
+export function useThemeFromSettings(settings: SiteSettings | null) {
   useEffect(() => {
+    if (!settings) return
+    
     const root = document.documentElement
     const isDark = root.classList.contains('dark')
     
@@ -145,9 +157,11 @@ export function useThemeFromSettings(settings: SiteSettings) {
     
     const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
     applyTheme(theme)
-  }, [settings.branding])
+  }, [settings?.branding])
   
   useEffect(() => {
+    if (!settings) return
+    
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'class') {
@@ -171,5 +185,5 @@ export function useThemeFromSettings(settings: SiteSettings) {
     
     observer.observe(document.documentElement, { attributes: true })
     return () => observer.disconnect()
-  }, [settings.branding])
+  }, [settings?.branding])
 }

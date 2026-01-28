@@ -28,13 +28,16 @@ export default function AdminDashboard() {
         
         const { data: roles } = await supabase
           .from('user_roles')
-          .select('role')
+          .select('user_id, role')
         
         if (roles) {
+          const uniqueUsers = new Set(roles.map(r => r.user_id))
+          const adminUsers = new Set(roles.filter(r => r.role === 'admin').map(r => r.user_id))
+          const memberUsers = new Set(roles.filter(r => r.role === 'member').map(r => r.user_id))
           setStats({
-            totalUsers: roles.length,
-            admins: roles.filter(r => r.role === 'admin').length,
-            members: roles.filter(r => r.role === 'member').length,
+            totalUsers: uniqueUsers.size,
+            admins: adminUsers.size,
+            members: memberUsers.size,
           })
         }
       }

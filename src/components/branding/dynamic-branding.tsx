@@ -1,12 +1,12 @@
 'use client'
 
 import { useSettings, useThemeFromSettings } from '@/hooks/use-settings'
-import { defaultSettings } from '@/types/settings'
+import { defaultSettings, SiteSettings } from '@/types/settings'
 
 export function DynamicBranding({ children }: { children: React.ReactNode }) {
-  const { settings } = useSettings()
+  const { settings, loading } = useSettings()
   
-  useThemeFromSettings(settings)
+  useThemeFromSettings(loading ? null : settings)
   
   return <>{children}</>
 }
@@ -14,10 +14,10 @@ export function DynamicBranding({ children }: { children: React.ReactNode }) {
 export function AppName() {
   const { settings, loading } = useSettings()
   
-  useThemeFromSettings(settings)
+  useThemeFromSettings(loading ? null : settings)
   
-  if (loading) {
-    return <span data-testid="text-app-name" className="opacity-0">Loading</span>
+  if (loading || !settings) {
+    return <span data-testid="text-app-name" className="invisible">.</span>
   }
   
   return <span data-testid="text-app-name">{settings.branding.appName || defaultSettings.branding.appName}</span>
@@ -26,21 +26,30 @@ export function AppName() {
 export function AppTagline() {
   const { settings, loading } = useSettings()
   
-  if (loading) {
-    return <span data-testid="text-app-tagline" className="opacity-0">Loading</span>
+  if (loading || !settings) {
+    return <span data-testid="text-app-tagline" className="invisible">.</span>
   }
   
   return <span data-testid="text-app-tagline">{settings.branding.tagline || defaultSettings.branding.tagline}</span>
 }
 
 export function CompanyName() {
-  const { settings } = useSettings()
+  const { settings, loading } = useSettings()
+  
+  if (loading || !settings) {
+    return <span data-testid="text-company-name" className="invisible">.</span>
+  }
   
   return <span data-testid="text-company-name">{settings.branding.companyName || defaultSettings.branding.companyName}</span>
 }
 
 export function SupportEmail() {
-  const { settings } = useSettings()
+  const { settings, loading } = useSettings()
+  
+  if (loading || !settings) {
+    return <span data-testid="link-support-email" className="invisible">.</span>
+  }
+  
   const email = settings.branding.supportEmail || defaultSettings.branding.supportEmail
   
   return (
@@ -56,7 +65,7 @@ export function SupportEmail() {
 export function HeroImage({ className }: { className?: string }) {
   const { settings, loading } = useSettings()
   
-  if (loading || !settings.branding.heroImageUrl) return null
+  if (loading || !settings || !settings.branding.heroImageUrl) return null
   
   return (
     <img 
@@ -70,5 +79,5 @@ export function HeroImage({ className }: { className?: string }) {
 
 export function useHeroImageUrl() {
   const { settings, loading } = useSettings()
-  return { url: settings.branding.heroImageUrl, loading }
+  return { url: settings?.branding.heroImageUrl ?? null, loading }
 }
