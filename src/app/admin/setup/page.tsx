@@ -1226,6 +1226,107 @@ export default function SetupPage() {
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Trusted By / Logo Marquee</CardTitle>
+                    <CardDescription>Show scrolling logos of companies that trust you</CardDescription>
+                  </div>
+                  <Switch
+                    checked={settings.content?.trustedByEnabled ?? false}
+                    onCheckedChange={checked => updateContent('trustedByEnabled', checked)}
+                    data-testid="switch-trusted-by-enabled"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Section Headline</Label>
+                  <Input
+                    value={settings.content?.trustedByHeadline ?? ''}
+                    onChange={e => updateContent('trustedByHeadline', e.target.value)}
+                    placeholder="Trusted by industry leaders"
+                    data-testid="input-trusted-by-headline"
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Logo management coming soon. For now, enable to show placeholder logos.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Metrics / Counters</CardTitle>
+                    <CardDescription>Show animated metric counters (e.g., "10,000+ Customers")</CardDescription>
+                  </div>
+                  <Switch
+                    checked={settings.content?.metricsEnabled ?? false}
+                    onCheckedChange={checked => updateContent('metricsEnabled', checked)}
+                    data-testid="switch-metrics-enabled"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Section Headline (optional)</Label>
+                  <Input
+                    value={settings.content?.metricsHeadline ?? ''}
+                    onChange={e => updateContent('metricsHeadline', e.target.value)}
+                    placeholder="Results that speak for themselves"
+                    data-testid="input-metrics-headline"
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Metric editing coming soon. Default metrics will be shown when enabled.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>How It Works / Process Steps</CardTitle>
+                    <CardDescription>Show step-by-step process visualization</CardDescription>
+                  </div>
+                  <Switch
+                    checked={settings.content?.processEnabled ?? false}
+                    onCheckedChange={checked => updateContent('processEnabled', checked)}
+                    data-testid="switch-process-enabled"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Section Headline</Label>
+                    <Input
+                      value={settings.content?.processHeadline ?? ''}
+                      onChange={e => updateContent('processHeadline', e.target.value)}
+                      placeholder="How it works"
+                      data-testid="input-process-headline"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Section Subheadline</Label>
+                    <Input
+                      value={settings.content?.processSubheadline ?? ''}
+                      onChange={e => updateContent('processSubheadline', e.target.value)}
+                      placeholder="Get started in just a few simple steps"
+                      data-testid="input-process-subheadline"
+                    />
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Step editing coming soon. Default steps will be shown when enabled.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
 

@@ -5,8 +5,13 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { AppName, AppTagline } from '@/components/branding/dynamic-branding'
 import { useSettings } from '@/hooks/use-settings'
-import { ArrowRight, Zap, Shield, Sparkles, Users, BarChart, Lock, Rocket, Heart, Star, Target, Award, Lightbulb, ChevronDown } from 'lucide-react'
+import { ArrowRight, Zap, Shield, Sparkles, Users, BarChart, Lock, Rocket, Heart, Star, Target, Award, Lightbulb, ChevronDown, Quote } from 'lucide-react'
 import { useState } from 'react'
+import { LogoMarquee } from '@/components/landing/logo-marquee'
+import { AnimatedCounterSection } from '@/components/landing/animated-counter'
+import { ProcessSteps } from '@/components/landing/process-steps'
+import { GradientText } from '@/components/landing/gradient-text'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const iconMap: Record<string, React.ReactNode> = {
   Zap: <Zap className="h-5 w-5 text-primary" />,
@@ -36,6 +41,9 @@ export default function HomePage() {
   const testimonialsEnabled = content?.testimonialsEnabled ?? true
   const faqEnabled = content?.faqEnabled ?? true
   const ctaEnabled = content?.ctaEnabled ?? true
+  const trustedByEnabled = content?.trustedByEnabled ?? false
+  const metricsEnabled = content?.metricsEnabled ?? false
+  const processEnabled = content?.processEnabled ?? false
 
   // Show loading skeleton to prevent flash of default content
   if (loading) {
@@ -107,6 +115,15 @@ export default function HomePage() {
         </div>
       </section>
 
+      {trustedByEnabled && <LogoMarquee />}
+
+      {metricsEnabled && (content?.metrics?.length ?? 0) > 0 && (
+        <AnimatedCounterSection 
+          metrics={content?.metrics || []}
+          headline={content?.metricsHeadline}
+        />
+      )}
+
       {featuresEnabled && (content?.featureCards?.length ?? 0) > 0 && (
         <section className="py-20 bg-muted/50" data-testid="section-features">
           <div className="container mx-auto px-4">
@@ -146,12 +163,16 @@ export default function HomePage() {
                   role={testimonial.role}
                   company={testimonial.company}
                   quote={testimonial.quote}
+                  avatarUrl={testimonial.avatarUrl}
+                  companyLogoUrl={testimonial.companyLogoUrl}
                 />
               ))}
             </div>
           </div>
         </section>
       )}
+
+      {processEnabled && <ProcessSteps />}
 
       {faqEnabled && (content?.faqItems?.length ?? 0) > 0 && (
         <section className="py-20 bg-muted/50" data-testid="section-faq">
@@ -206,13 +227,25 @@ function FeatureCard({ icon, title, description }: { icon: string; title: string
   )
 }
 
-function TestimonialCard({ name, role, company, quote }: { name: string; role: string; company: string; quote: string }) {
+function TestimonialCard({ name, role, company, quote, avatarUrl, companyLogoUrl }: { name: string; role: string; company: string; quote: string; avatarUrl?: string; companyLogoUrl?: string }) {
+  const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+  
   return (
-    <div className="p-6 rounded-lg border bg-card" data-testid={`card-testimonial-${name.toLowerCase().replace(/\s+/g, '-')}`}>
-      <p className="text-muted-foreground mb-4 italic">&quot;{quote}&quot;</p>
-      <div>
-        <p className="font-semibold">{name}</p>
-        <p className="text-sm text-muted-foreground">{role}, {company}</p>
+    <div className="p-6 rounded-lg border bg-card relative" data-testid={`card-testimonial-${name.toLowerCase().replace(/\s+/g, '-')}`}>
+      <Quote className="absolute top-4 right-4 h-8 w-8 text-primary/10" />
+      <p className="text-muted-foreground mb-6 italic leading-relaxed">&quot;{quote}&quot;</p>
+      <div className="flex items-center gap-4">
+        <Avatar className="h-12 w-12">
+          {avatarUrl && <AvatarImage src={avatarUrl} alt={name} />}
+          <AvatarFallback className="bg-primary/10 text-primary font-medium">{initials}</AvatarFallback>
+        </Avatar>
+        <div className="flex-1">
+          <p className="font-semibold">{name}</p>
+          <p className="text-sm text-muted-foreground">{role}, {company}</p>
+        </div>
+        {companyLogoUrl && (
+          <img src={companyLogoUrl} alt={company} className="h-6 w-auto opacity-60" />
+        )}
       </div>
     </div>
   )

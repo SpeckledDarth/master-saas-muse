@@ -98,6 +98,17 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 - **Homepage Flash Fix**: Loading state prevents "My SaaS" flash before custom branding loads
 - **Setup Dashboard Refresh**: Page auto-refreshes after Save to show updated branding
 
+### Benchmark Visual Enhancements (Jan 28, 2026)
+Inspired by world-class sites (GitBook, TitanIntake, TheWone, Musicfy, Zazu, Eleveight):
+- **Logo Marquee**: Auto-scrolling trusted-by logos (`src/components/landing/logo-marquee.tsx`)
+- **Animated Counters**: Scroll-triggered number animations for metrics (`src/components/landing/animated-counter.tsx`)
+- **Gradient Text**: Stylized gradient headlines (`src/components/landing/gradient-text.tsx`)
+- **Process Steps**: Numbered step visualization (`src/components/landing/process-steps.tsx`)
+- **Enhanced Testimonials**: Avatar photos, company logos, decorative quote icon
+- **Admin Toggles**: Enable/disable each section in Setup Dashboard Content tab
+
+All sections disabled by default to maintain backward compatibility. Admins enable via toggles.
+
 ### Previous Session (Jan 27, 2026)
 - Full Theme Customization System (light/dark modes across all pages)
 - Content Tab fully functional (features, testimonials, FAQ editing)
@@ -110,3 +121,4 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 - Profile page: WORKING (display name + password editing)
 - Forgot password flow: WORKING
 - Pricing page: WORKING (Stripe sync + fallback)
+- Benchmark visual enhancements: IMPLEMENTED (Logo Marquee, Counters, Process Steps, Testimonials)

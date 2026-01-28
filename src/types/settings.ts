@@ -72,6 +72,8 @@ export interface Testimonial {
   role: string
   company: string
   quote: string
+  avatarUrl?: string
+  companyLogoUrl?: string
 }
 
 export interface FAQItem {
@@ -87,6 +89,27 @@ export interface CTAContent {
   buttonLink: string
 }
 
+export interface TrustedLogo {
+  id: string
+  name: string
+  imageUrl?: string
+}
+
+export interface ProcessStep {
+  id: string
+  number: number
+  title: string
+  description: string
+}
+
+export interface Metric {
+  id: string
+  value: number
+  suffix?: string
+  prefix?: string
+  label: string
+}
+
 export interface ContentSettings {
   featuresEnabled: boolean
   featuresHeadline: string
@@ -100,6 +123,16 @@ export interface ContentSettings {
   faqItems: FAQItem[]
   ctaEnabled: boolean
   cta: CTAContent
+  trustedByEnabled?: boolean
+  trustedByHeadline?: string
+  trustedLogos?: TrustedLogo[]
+  metricsEnabled?: boolean
+  metricsHeadline?: string
+  metrics?: Metric[]
+  processEnabled?: boolean
+  processHeadline?: string
+  processSubheadline?: string
+  processSteps?: ProcessStep[]
 }
 
 export interface TeamMember {
@@ -352,6 +385,30 @@ export const defaultSettings: SiteSettings = {
       buttonText: 'Start Free Trial',
       buttonLink: '/signup',
     },
+    trustedByEnabled: false,
+    trustedByHeadline: 'Trusted by industry leaders',
+    trustedLogos: [
+      { id: '1', name: 'Acme Corp' },
+      { id: '2', name: 'TechStart' },
+      { id: '3', name: 'GlobalTech' },
+      { id: '4', name: 'InnovateCo' },
+      { id: '5', name: 'FutureLabs' },
+    ],
+    metricsEnabled: false,
+    metricsHeadline: 'Results that speak for themselves',
+    metrics: [
+      { id: '1', value: 10000, suffix: '+', label: 'Happy Customers' },
+      { id: '2', value: 99, suffix: '%', label: 'Uptime' },
+      { id: '3', value: 24, suffix: '/7', label: 'Support' },
+    ],
+    processEnabled: false,
+    processHeadline: 'How it works',
+    processSubheadline: 'Get started in just a few simple steps',
+    processSteps: [
+      { id: '1', number: 1, title: 'Sign Up', description: 'Create your free account in seconds' },
+      { id: '2', number: 2, title: 'Configure', description: 'Set up your preferences and connect your tools' },
+      { id: '3', number: 3, title: 'Launch', description: 'Start using the platform and see results' },
+    ],
   },
   pages: {
     about: {
