@@ -68,16 +68,21 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 ## Recent Session Progress (Jan 28, 2026)
 
 ### Completed This Session
+- **Homepage Flash Fix**: Added loading skeleton that displays while settings load, preventing flash of default content
+- **Admin Menu Styling**: Fixed "Admin" button to use same Button component styling as other nav items
+- **Pricing Page Free Plan**: Free plan now shows alongside Stripe products
+  - Configurable via settings (showFreePlan, freePlanName, freePlanDescription, freePlanFeatures)
+  - Dynamic grid layout based on number of plans
+- **Enhanced User Profile Page**:
+  - Avatar upload with camera button (requires Supabase "avatars" storage bucket)
+  - Email change capability with confirmation email
+  - Phone number, company name
+  - Full address fields (street, city, state, zip, country)
+  - All fields persist to Supabase user_metadata
 - **Users Dashboard**: Full user management with search and role editing
-  - Search input filters users by email
-  - Role selector (admin/member) with Supabase persistence
-  - Toast notifications for success/error feedback
 - **Settings Dashboard**: Admin feature toggles page created
 - **Forgot Password Workflow**: Complete password reset flow
-  - "Forgot password?" link added to login page
-  - Reset password page sends email via Supabase
-  - Update password page for setting new password
-- **Profile Page Enhancement**: Display name editing with save functionality
+  - NOTE: Password reset emails require Supabase email settings to be configured in Supabase Dashboard > Authentication > Email Templates
 - **Pricing Page Stripe Sync**: Now fetches prices directly from Stripe API
   - Falls back to database settings if Stripe products unavailable
   - Shows product metadata for features
