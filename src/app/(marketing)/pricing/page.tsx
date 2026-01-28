@@ -33,7 +33,7 @@ export default function PricingPage() {
   const [stripeError, setStripeError] = useState<string | null>(null)
   const router = useRouter()
   const { settings, loading } = useSettings()
-  const { pricing } = settings
+  const pricing = settings?.pricing
   
   useEffect(() => {
     async function fetchStripeProducts() {

@@ -8,8 +8,18 @@ import { Globe } from "lucide-react"
 
 export function Footer() {
   const { settings, loading } = useSettings()
+  
+  if (loading || !settings) {
+    return (
+      <footer className="border-t bg-muted/40">
+        <div className="container py-8 md:py-12">
+          <div className="h-8 w-32 bg-muted animate-pulse rounded" />
+        </div>
+      </footer>
+    )
+  }
+  
   const { branding, social } = settings
-
   const hasSocialLinks = social.twitter || social.linkedin || social.github || social.website
 
   return (

@@ -8,23 +8,36 @@ import { useSettings } from '@/hooks/use-settings'
 
 export function Header() {
   const { settings, loading } = useSettings()
-  const { branding } = settings
+  const branding = settings?.branding
+
+  if (loading || !settings) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center justify-between gap-4">
+          <div className="h-8 w-32 bg-muted animate-pulse rounded" />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+    )
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between gap-4">
         <Link href="/" className="flex items-center space-x-2" data-testid="link-home">
-          {branding.logoUrl ? (
+          {branding?.logoUrl ? (
             <Image 
               src={branding.logoUrl} 
-              alt={branding.appName}
+              alt={branding.appName || 'Logo'}
               width={32}
               height={32}
               className="h-8 w-8 object-contain"
             />
           ) : null}
           <span className="font-bold text-xl" data-testid="text-app-name">
-            {branding.appName}
+            {branding?.appName || 'App'}
           </span>
         </Link>
 
