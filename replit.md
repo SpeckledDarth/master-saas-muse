@@ -100,6 +100,8 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 
 ### Benchmark Visual Enhancements (Jan 28-29, 2026)
 Inspired by world-class sites (GitBook, TitanIntake, TheWone, Musicfy, Zazu, Eleveight):
+
+**Visual Components:**
 - **Logo Marquee**: Auto-scrolling trusted-by logos (`src/components/landing/logo-marquee.tsx`)
 - **Animated Counters**: Scroll-triggered number animations for metrics (`src/components/landing/animated-counter.tsx`)
 - **Gradient Text**: Stylized gradient headlines (`src/components/landing/gradient-text.tsx`)
@@ -107,9 +109,21 @@ Inspired by world-class sites (GitBook, TitanIntake, TheWone, Musicfy, Zazu, Ele
 - **Enhanced Testimonials**: Avatar photos, company logos, decorative quote icon + carousel option
 - **Testimonial Carousel**: Full carousel mode with auto-play and navigation (`src/components/landing/testimonial-carousel.tsx`)
 - **Image + Text Blocks**: Alternating left/right layout sections (`src/components/landing/image-text-section.tsx`)
-- **Split Hero Option**: Image left/right layout alternative to full-bleed (`src/components/landing/split-hero.tsx`)
-- **Section Background Controls**: Per-section background style options (default/muted/gradient)
-- **Admin Toggles**: Enable/disable each section + style options in Setup Dashboard Content tab
+
+**5 Hero Styles (Admin Configurable):**
+1. **Full Width Background** (default): Classic hero with background image
+2. **Split Layout**: Image + text side by side (configurable left/right position)
+3. **Video Background**: YouTube, Vimeo, or direct video URL with autoplay/loop
+4. **Pattern/Texture**: Gradient background with pattern overlay (adjustable opacity)
+5. **Floating Mockup**: Gradient background with animated floating product image
+
+**Full Admin CRUD UI:**
+- Logo Marquee: Add/edit/delete trusted-by logos (name + image URL)
+- Metrics: Add/edit/delete animated counters (value, prefix, suffix, label)
+- Process Steps: Add/edit/delete steps (number, title, description)
+- Image+Text Blocks: Add/edit/delete sections (headline, description, image, button, position)
+- Section Backgrounds: Dropdown per section (features, testimonials, FAQ, CTA) with default/muted/gradient options
+- Hero Style: Dropdown selector with conditional config fields per style
 
 All new sections disabled by default to maintain backward compatibility. Admins enable via toggles.
 
