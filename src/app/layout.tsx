@@ -43,11 +43,6 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className} style={{ visibility: 'hidden' }}>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `document.body.style.visibility = 'visible';`,
-          }}
-        />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
