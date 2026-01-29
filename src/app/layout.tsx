@@ -43,7 +43,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={inter.className} style={{ visibility: 'hidden' }}>
+      <body className={inter.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
