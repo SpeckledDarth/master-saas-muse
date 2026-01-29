@@ -12,6 +12,9 @@ import { AnimatedCounterSection } from '@/components/landing/animated-counter'
 import { ProcessSteps } from '@/components/landing/process-steps'
 import { GradientText } from '@/components/landing/gradient-text'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { TestimonialCarousel } from '@/components/landing/testimonial-carousel'
+import { ImageTextSection } from '@/components/landing/image-text-section'
+import { SplitHero } from '@/components/landing/split-hero'
 
 const iconMap: Record<string, React.ReactNode> = {
   Zap: <Zap className="h-5 w-5 text-primary" />,
@@ -44,6 +47,9 @@ export default function HomePage() {
   const trustedByEnabled = content?.trustedByEnabled ?? false
   const metricsEnabled = content?.metricsEnabled ?? false
   const processEnabled = content?.processEnabled ?? false
+  const testimonialStyle = content?.testimonialStyle ?? 'cards'
+  const imageTextEnabled = content?.imageTextEnabled ?? false
+  const heroStyle = content?.heroStyle ?? 'fullWidth'
 
   // Show loading skeleton to prevent flash of default content
   if (loading) {
@@ -63,57 +69,82 @@ export default function HomePage() {
     )
   }
 
+  const splitHeroImageUrl = content?.splitHeroImageUrl
+  const splitHeroImagePosition = content?.splitHeroImagePosition ?? 'right'
+  const appName = settings?.branding?.appName || 'My SaaS'
+  const appTagline = settings?.branding?.tagline || 'Build something amazing'
+
+  const getSectionBg = (section: 'features' | 'testimonials' | 'faq' | 'cta') => {
+    const style = content?.sectionBackgrounds?.[section] ?? 'default'
+    if (style === 'muted') return 'bg-muted/50'
+    if (style === 'gradient') return 'bg-gradient-to-br from-primary/5 via-background to-accent/5'
+    return ''
+  }
+
   return (
     <div className="flex flex-col">
-      <section 
-        className="relative min-h-[600px] flex items-center justify-center overflow-hidden"
-        data-testid="section-hero"
-      >
-        {heroImageUrl && (
-          <>
-            <Image
-              src={heroImageUrl}
-              alt="Hero background"
-              fill
-              priority
-              unoptimized
-              className="absolute inset-0"
-              style={{
-                objectFit: heroImageSize as 'cover' | 'contain',
-                objectPosition: heroImagePosition,
-              }}
-              data-testid="img-hero"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
-          </>
-        )}
-        
-        {!heroImageUrl && !loading && (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20" />
-        )}
+      {heroStyle === 'split' && splitHeroImageUrl ? (
+        <SplitHero
+          headline={appName}
+          subheadline={appTagline}
+          imageUrl={splitHeroImageUrl}
+          imagePosition={splitHeroImagePosition}
+          primaryButtonText="Get Started Free"
+          primaryButtonLink="/signup"
+          secondaryButtonText="View Pricing"
+          secondaryButtonLink="/pricing"
+        />
+      ) : (
+        <section 
+          className="relative min-h-[600px] flex items-center justify-center overflow-hidden"
+          data-testid="section-hero"
+        >
+          {heroImageUrl && (
+            <>
+              <Image
+                src={heroImageUrl}
+                alt="Hero background"
+                fill
+                priority
+                unoptimized
+                className="absolute inset-0"
+                style={{
+                  objectFit: heroImageSize as 'cover' | 'contain',
+                  objectPosition: heroImagePosition,
+                }}
+                data-testid="img-hero"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+            </>
+          )}
+          
+          {!heroImageUrl && !loading && (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20" />
+          )}
 
-        <div className="relative z-10 container mx-auto px-4 text-center">
-          <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${heroImageUrl ? 'text-white' : ''}`}>
-            <AppName />
-          </h1>
-          <p className={`text-xl md:text-2xl mb-8 max-w-2xl mx-auto ${heroImageUrl ? 'text-white/90' : 'text-muted-foreground'}`}>
-            <AppTagline />
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" asChild data-testid="button-get-started">
-              <Link href="/signup">
-                Get Started Free
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild className={heroImageUrl ? 'bg-white/10 backdrop-blur-sm border-white/30 text-white' : ''} data-testid="button-view-pricing">
-              <Link href="/pricing">
-                View Pricing
-              </Link>
-            </Button>
+          <div className="relative z-10 container mx-auto px-4 text-center">
+            <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${heroImageUrl ? 'text-white' : ''}`}>
+              <AppName />
+            </h1>
+            <p className={`text-xl md:text-2xl mb-8 max-w-2xl mx-auto ${heroImageUrl ? 'text-white/90' : 'text-muted-foreground'}`}>
+              <AppTagline />
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" asChild data-testid="button-get-started">
+                <Link href="/signup">
+                  Get Started Free
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild className={heroImageUrl ? 'bg-white/10 backdrop-blur-sm border-white/30 text-white' : ''} data-testid="button-view-pricing">
+                <Link href="/pricing">
+                  View Pricing
+                </Link>
+              </Button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {trustedByEnabled && <LogoMarquee />}
 
@@ -125,7 +156,7 @@ export default function HomePage() {
       )}
 
       {featuresEnabled && (content?.featureCards?.length ?? 0) > 0 && (
-        <section className="py-20 bg-muted/50" data-testid="section-features">
+        <section className={`py-20 ${getSectionBg('features') || 'bg-muted/50'}`} data-testid="section-features">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-4">
               {content?.featuresHeadline || 'Everything you need'}
@@ -150,32 +181,43 @@ export default function HomePage() {
       )}
 
       {testimonialsEnabled && (content?.testimonials?.length ?? 0) > 0 && (
-        <section className="py-20" data-testid="section-testimonials">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">
-              {content?.testimonialsHeadline || 'What our customers say'}
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {content?.testimonials?.map((testimonial) => (
-                <TestimonialCard
-                  key={testimonial.id}
-                  name={testimonial.name}
-                  role={testimonial.role}
-                  company={testimonial.company}
-                  quote={testimonial.quote}
-                  avatarUrl={testimonial.avatarUrl}
-                  companyLogoUrl={testimonial.companyLogoUrl}
-                />
-              ))}
+        testimonialStyle === 'carousel' ? (
+          <TestimonialCarousel 
+            testimonials={content?.testimonials || []}
+            headline={content?.testimonialsHeadline}
+          />
+        ) : (
+          <section className={`py-20 ${getSectionBg('testimonials')}`} data-testid="section-testimonials">
+            <div className="container mx-auto px-4">
+              <h2 className="text-3xl font-bold text-center mb-12">
+                {content?.testimonialsHeadline || 'What our customers say'}
+              </h2>
+              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                {content?.testimonials?.map((testimonial) => (
+                  <TestimonialCard
+                    key={testimonial.id}
+                    name={testimonial.name}
+                    role={testimonial.role}
+                    company={testimonial.company}
+                    quote={testimonial.quote}
+                    avatarUrl={testimonial.avatarUrl}
+                    companyLogoUrl={testimonial.companyLogoUrl}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )
+      )}
+
+      {imageTextEnabled && (content?.imageTextBlocks?.length ?? 0) > 0 && (
+        <ImageTextSection blocks={content?.imageTextBlocks || []} />
       )}
 
       {processEnabled && <ProcessSteps />}
 
       {faqEnabled && (content?.faqItems?.length ?? 0) > 0 && (
-        <section className="py-20 bg-muted/50" data-testid="section-faq">
+        <section className={`py-20 ${getSectionBg('faq') || 'bg-muted/50'}`} data-testid="section-faq">
           <div className="container mx-auto px-4 max-w-3xl">
             <h2 className="text-3xl font-bold text-center mb-12">
               {content?.faqHeadline || 'Frequently asked questions'}
@@ -194,7 +236,7 @@ export default function HomePage() {
       )}
 
       {ctaEnabled && (
-        <section className="py-20" data-testid="section-cta">
+        <section className={`py-20 ${getSectionBg('cta')}`} data-testid="section-cta">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-6">
               {content?.cta?.headline || 'Ready to get started?'}

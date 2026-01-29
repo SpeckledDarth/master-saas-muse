@@ -98,16 +98,20 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 - **Homepage Flash Fix**: Loading state prevents "My SaaS" flash before custom branding loads
 - **Setup Dashboard Refresh**: Page auto-refreshes after Save to show updated branding
 
-### Benchmark Visual Enhancements (Jan 28, 2026)
+### Benchmark Visual Enhancements (Jan 28-29, 2026)
 Inspired by world-class sites (GitBook, TitanIntake, TheWone, Musicfy, Zazu, Eleveight):
 - **Logo Marquee**: Auto-scrolling trusted-by logos (`src/components/landing/logo-marquee.tsx`)
 - **Animated Counters**: Scroll-triggered number animations for metrics (`src/components/landing/animated-counter.tsx`)
 - **Gradient Text**: Stylized gradient headlines (`src/components/landing/gradient-text.tsx`)
 - **Process Steps**: Numbered step visualization (`src/components/landing/process-steps.tsx`)
-- **Enhanced Testimonials**: Avatar photos, company logos, decorative quote icon
-- **Admin Toggles**: Enable/disable each section in Setup Dashboard Content tab
+- **Enhanced Testimonials**: Avatar photos, company logos, decorative quote icon + carousel option
+- **Testimonial Carousel**: Full carousel mode with auto-play and navigation (`src/components/landing/testimonial-carousel.tsx`)
+- **Image + Text Blocks**: Alternating left/right layout sections (`src/components/landing/image-text-section.tsx`)
+- **Split Hero Option**: Image left/right layout alternative to full-bleed (`src/components/landing/split-hero.tsx`)
+- **Section Background Controls**: Per-section background style options (default/muted/gradient)
+- **Admin Toggles**: Enable/disable each section + style options in Setup Dashboard Content tab
 
-All sections disabled by default to maintain backward compatibility. Admins enable via toggles.
+All new sections disabled by default to maintain backward compatibility. Admins enable via toggles.
 
 ### Previous Session (Jan 27, 2026)
 - Full Theme Customization System (light/dark modes across all pages)

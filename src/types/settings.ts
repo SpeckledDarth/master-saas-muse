@@ -110,6 +110,17 @@ export interface Metric {
   label: string
 }
 
+export interface ImageTextBlock {
+  id: string
+  headline: string
+  description: string
+  imageUrl: string
+  imageAlt?: string
+  buttonText?: string
+  buttonLink?: string
+  imagePosition: 'left' | 'right'
+}
+
 export interface ContentSettings {
   featuresEnabled: boolean
   featuresHeadline: string
@@ -133,6 +144,18 @@ export interface ContentSettings {
   processHeadline?: string
   processSubheadline?: string
   processSteps?: ProcessStep[]
+  testimonialStyle?: 'cards' | 'carousel'
+  imageTextEnabled?: boolean
+  imageTextBlocks?: ImageTextBlock[]
+  heroStyle?: 'fullWidth' | 'split'
+  splitHeroImagePosition?: 'left' | 'right'
+  splitHeroImageUrl?: string
+  sectionBackgrounds?: {
+    features?: 'default' | 'muted' | 'gradient'
+    testimonials?: 'default' | 'muted' | 'gradient'
+    faq?: 'default' | 'muted' | 'gradient'
+    cta?: 'default' | 'muted' | 'gradient'
+  }
 }
 
 export interface TeamMember {
@@ -409,6 +432,15 @@ export const defaultSettings: SiteSettings = {
       { id: '2', number: 2, title: 'Configure', description: 'Set up your preferences and connect your tools' },
       { id: '3', number: 3, title: 'Launch', description: 'Start using the platform and see results' },
     ],
+    testimonialStyle: 'cards',
+    imageTextEnabled: false,
+    imageTextBlocks: [
+      { id: '1', headline: 'Built for scale', description: 'Our platform grows with your business, handling everything from small projects to enterprise workloads.', imageUrl: '', imagePosition: 'left' },
+      { id: '2', headline: 'Security first', description: 'Enterprise-grade security with encryption at rest and in transit, plus SOC 2 compliance.', imageUrl: '', imagePosition: 'right' },
+    ],
+    heroStyle: 'fullWidth',
+    splitHeroImagePosition: 'right',
+    splitHeroImageUrl: '',
   },
   pages: {
     about: {

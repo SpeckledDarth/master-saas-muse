@@ -603,6 +603,53 @@ export default function SetupPage() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label>Hero Layout Style</Label>
+                <Select
+                  value={settings.content?.heroStyle ?? 'fullWidth'}
+                  onValueChange={value => updateContent('heroStyle', value as 'fullWidth' | 'split')}
+                >
+                  <SelectTrigger data-testid="select-hero-style">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fullWidth">Full Width Background</SelectItem>
+                    <SelectItem value="split">Split Layout (Image + Text)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Choose how the hero section is displayed</p>
+              </div>
+
+              {settings.content?.heroStyle === 'split' && (
+                <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+                  <div className="space-y-2">
+                    <Label>Split Hero Image</Label>
+                    <Input
+                      value={settings.content?.splitHeroImageUrl ?? ''}
+                      onChange={e => updateContent('splitHeroImageUrl', e.target.value)}
+                      placeholder="https://example.com/image.jpg"
+                      data-testid="input-split-hero-image-url"
+                    />
+                    <p className="text-xs text-muted-foreground">URL for the image in split hero layout</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Image Position</Label>
+                    <Select
+                      value={settings.content?.splitHeroImagePosition ?? 'right'}
+                      onValueChange={value => updateContent('splitHeroImagePosition', value as 'left' | 'right')}
+                    >
+                      <SelectTrigger data-testid="select-split-hero-position">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="right">Image on Right</SelectItem>
+                        <SelectItem value="left">Image on Left</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+
               <div className="p-4 rounded-lg border bg-muted/30 space-y-2">
                 <p className="text-sm font-medium">Recommended Hero Image Specs</p>
                 <ul className="text-xs text-muted-foreground space-y-1">
@@ -1018,14 +1065,31 @@ export default function SetupPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Section Headline</Label>
-                  <Input
-                    value={settings.content?.testimonialsHeadline ?? ''}
-                    onChange={e => updateContent('testimonialsHeadline', e.target.value)}
-                    placeholder="What our customers say"
-                    data-testid="input-testimonials-headline"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Section Headline</Label>
+                    <Input
+                      value={settings.content?.testimonialsHeadline ?? ''}
+                      onChange={e => updateContent('testimonialsHeadline', e.target.value)}
+                      placeholder="What our customers say"
+                      data-testid="input-testimonials-headline"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Display Style</Label>
+                    <Select
+                      value={settings.content?.testimonialStyle ?? 'cards'}
+                      onValueChange={value => updateContent('testimonialStyle', value as 'cards' | 'carousel')}
+                    >
+                      <SelectTrigger data-testid="select-testimonial-style">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cards">Grid Cards</SelectItem>
+                        <SelectItem value="carousel">Carousel</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 
                 <div className="space-y-3">
@@ -1324,6 +1388,27 @@ export default function SetupPage() {
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Step editing coming soon. Default steps will be shown when enabled.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Image + Text Blocks</CardTitle>
+                    <CardDescription>Alternating image and text sections (like GitBook/TheWone)</CardDescription>
+                  </div>
+                  <Switch
+                    checked={settings.content?.imageTextEnabled ?? false}
+                    onCheckedChange={checked => updateContent('imageTextEnabled', checked)}
+                    data-testid="switch-image-text-enabled"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Image + text block editing coming soon. Default blocks will be shown when enabled.
                 </p>
               </CardContent>
             </Card>
