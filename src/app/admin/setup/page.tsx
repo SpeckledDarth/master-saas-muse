@@ -565,6 +565,18 @@ export default function SetupPage() {
         </TabsList>
 
         <TabsContent value="branding">
+          <Card className="bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800 mb-6">
+            <CardHeader>
+              <CardTitle className="text-blue-800 dark:text-blue-300">Branding & Hero Tips</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm text-blue-700 dark:text-blue-400 space-y-2">
+              <p><strong>Hero Styles:</strong> Choose from 5 styles - Full Width Background (default), Split Layout, Video Background, Pattern/Texture, or Floating Mockup.</p>
+              <p><strong>Animated Words:</strong> Add 2+ comma-separated words (e.g., "fast, secure, reliable") to create a cycling animation after your app name. Click outside the field to save.</p>
+              <p><strong>Video Hero:</strong> Paste a YouTube embed URL, Vimeo URL, or direct .mp4 link. The video replaces the static image and plays automatically (muted, looping).</p>
+              <p><strong>Announcement Bar:</strong> Scroll down to enable a top banner for promotions, product launches, or important updates.</p>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Branding Settings</CardTitle>
@@ -661,15 +673,18 @@ export default function SetupPage() {
               <div className="space-y-2">
                 <Label>Hero Animated Words (optional)</Label>
                 <Input
-                  value={(settings.content?.heroAnimatedWords || []).join(', ')}
-                  onChange={e => {
+                  defaultValue={(settings.content?.heroAnimatedWords || []).join(', ')}
+                  onBlur={e => {
                     const words = e.target.value.split(',').map(w => w.trim()).filter(w => w)
                     updateContent('heroAnimatedWords', words)
                   }}
                   placeholder="innovative, powerful, seamless"
                   data-testid="input-hero-animated-words"
                 />
-                <p className="text-xs text-muted-foreground">Comma-separated words that cycle after your app name in the hero</p>
+                <p className="text-xs text-muted-foreground">
+                  Enter 2 or more comma-separated words to create cycling animation (e.g., "fast, secure, reliable"). 
+                  With only 1 word, it displays as static text. Click outside the field to save.
+                </p>
               </div>
 
               {settings.content?.heroStyle === 'split' && (
@@ -706,16 +721,21 @@ export default function SetupPage() {
               {settings.content?.heroStyle === 'video' && (
                 <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
                   <p className="text-sm font-medium">Video Hero Settings</p>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    The video replaces the static hero image and plays automatically in the background (muted, looping).
+                  </p>
                   <div className="space-y-2">
                     <Label>Video URL</Label>
                     <Input
                       value={settings.branding?.heroVideoUrl ?? ''}
                       onChange={e => updateBranding('heroVideoUrl', e.target.value)}
-                      placeholder="https://www.youtube.com/embed/... or direct .mp4 URL"
+                      placeholder="https://www.youtube.com/embed/VIDEO_ID"
                       data-testid="input-hero-video-url"
                     />
                     <p className="text-xs text-muted-foreground">
-                      YouTube embed URL, Vimeo URL, or direct video file URL (.mp4, .webm)
+                      <strong>YouTube:</strong> Use embed URL format: https://www.youtube.com/embed/VIDEO_ID<br/>
+                      <strong>Vimeo:</strong> Use player URL: https://player.vimeo.com/video/VIDEO_ID<br/>
+                      <strong>Direct file:</strong> Paste a direct .mp4 or .webm URL from any hosting service
                     </p>
                   </div>
                 </div>
@@ -1256,6 +1276,17 @@ export default function SetupPage() {
 
         <TabsContent value="content">
           <div className="space-y-6">
+            <Card className="bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
+              <CardHeader>
+                <CardTitle className="text-blue-800 dark:text-blue-300">Quick Tips for Homepage Sections</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-blue-700 dark:text-blue-400 space-y-2">
+                <p><strong>Enable/Disable:</strong> Use the toggle switch on each section card to show or hide it on your homepage.</p>
+                <p><strong>Section Order:</strong> Sections appear on the homepage in this order: Hero → Logo Marquee → Metrics → Features → Testimonials → Process Steps → Customer Stories → Image+Text Blocks → FAQ → CTA.</p>
+                <p><strong>Backgrounds:</strong> Scroll down to "Section Backgrounds" to customize each section's look (transparent, muted, gradient, or mesh).</p>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
