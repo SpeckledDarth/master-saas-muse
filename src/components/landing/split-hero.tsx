@@ -46,12 +46,16 @@ export function SplitHero({
     accent: 'bg-accent/20'
   }
 
+  // Convert gap number to rem for better responsiveness
+  const gapRem = gap * 0.25 // 0 = 0rem, 12 = 3rem, 24 = 6rem
+  
   return (
     <section className={`py-16 md:py-24 ${bgClasses[background]} ${className}`} data-testid="section-split-hero">
       <div className="container mx-auto px-4">
         <div 
           className={`grid grid-cols-1 md:grid-cols-2 items-center ${isImageLeft ? '[&>*:first-child]:md:order-2' : ''}`}
-          style={{ gap: `${gap * 4}px` }}
+          style={{ gap: `${gapRem}rem` }}
+          data-gap={gap}
         >
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
