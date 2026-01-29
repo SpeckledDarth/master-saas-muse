@@ -30,8 +30,7 @@ export function Header() {
     return () => clearTimeout(timer)
   }, [])
 
-  const logoWidth = branding?.logoWidth ?? 32
-  const logoHeight = branding?.logoHeight ?? 32
+  const logoHeight = branding?.logoHeight ?? 40
   const logoHoverEffect = branding?.logoHoverEffect ?? true
   const brandNameGradient = branding?.brandNameGradient ?? false
   const brandNameAnimated = branding?.brandNameAnimated ?? false
@@ -86,16 +85,16 @@ export function Header() {
                 logoHoverEffect && "group-hover:scale-110"
               )}
               style={{ 
-                width: logoWidth, 
                 height: effectiveLogoHeight,
               }}
             >
               <Image 
                 src={branding.logoUrl} 
                 alt={branding.appName || 'Logo'}
-                fill
+                width={effectiveLogoHeight * 4}
+                height={effectiveLogoHeight}
                 className={cn(
-                  "object-contain object-left transition-all duration-200",
+                  "h-full w-auto object-contain transition-all duration-200",
                   logoHoverEffect && "group-hover:drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]"
                 )}
                 unoptimized

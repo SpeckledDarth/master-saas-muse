@@ -673,32 +673,18 @@ export default function SetupPage() {
               {settings.branding.logoUrl && (
                 <div className="p-4 rounded-lg border bg-muted/30 space-y-4">
                   <p className="text-sm font-medium">Logo Size & Effects</p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Logo Width: {settings.branding.logoWidth ?? 32}px</Label>
-                      <Input
-                        type="range"
-                        min="16"
-                        max="400"
-                        value={settings.branding.logoWidth ?? 32}
-                        onChange={e => updateBranding('logoWidth', parseInt(e.target.value))}
-                        className="w-full cursor-pointer"
-                        data-testid="input-logo-width"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Logo Height: {settings.branding.logoHeight ?? 32}px</Label>
-                      <Input
-                        type="range"
-                        min="16"
-                        max="200"
-                        value={settings.branding.logoHeight ?? 32}
-                        onChange={e => updateBranding('logoHeight', parseInt(e.target.value))}
-                        className="w-full cursor-pointer"
-                        data-testid="input-logo-height"
-                      />
-                      <p className="text-xs text-muted-foreground">Header grows with logo (visual max ~120px in header)</p>
-                    </div>
+                  <div className="space-y-2">
+                    <Label>Logo Height: {settings.branding.logoHeight ?? 40}px</Label>
+                    <Input
+                      type="range"
+                      min="20"
+                      max="120"
+                      value={settings.branding.logoHeight ?? 40}
+                      onChange={e => updateBranding('logoHeight', parseInt(e.target.value))}
+                      className="w-full cursor-pointer"
+                      data-testid="input-logo-height"
+                    />
+                    <p className="text-xs text-muted-foreground">Aspect ratio is preserved automatically. Header adjusts to fit.</p>
                   </div>
                   <div className="flex items-center gap-2 pt-2">
                     <Switch
