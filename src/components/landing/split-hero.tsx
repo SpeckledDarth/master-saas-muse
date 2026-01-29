@@ -58,7 +58,7 @@ export function SplitHero({
           style={{ gap: `${gapPx}px` }}
           data-gap={gap}
         >
-          <div className="space-y-6">
+          <div className="space-y-6" style={{ outline: '2px solid red' }}>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
               {animatedWords.length > 0 ? (
                 <AnimatedWords words={animatedWords} className="text-primary" />
@@ -94,7 +94,7 @@ export function SplitHero({
             )}
           </div>
           
-          <div>
+          <div style={{ outline: '2px solid blue' }}>
             <div className="relative aspect-square md:aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
               {imageUrl ? (
                 <Image
