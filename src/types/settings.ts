@@ -197,6 +197,7 @@ export interface ContentSettings {
   splitHeroImagePosition?: 'left' | 'right'
   splitHeroImageUrl?: string
   splitHeroBackground?: 'transparent' | 'muted' | 'gradient' | 'accent'
+  splitHeroGap?: number
   floatingHeroGap?: number
   sectionBackgrounds?: {
     features?: 'default' | 'muted' | 'gradient' | 'mesh'
@@ -497,6 +498,7 @@ export const defaultSettings: SiteSettings = {
     splitHeroImagePosition: 'right',
     splitHeroImageUrl: '',
     splitHeroBackground: 'transparent',
+    splitHeroGap: 12,
     floatingHeroGap: 8,
   },
   pages: {

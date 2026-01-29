@@ -733,6 +733,21 @@ export default function SetupPage() {
                     </Select>
                     <p className="text-xs text-muted-foreground">Choose a background to make the hero section stand out</p>
                   </div>
+                  <div className="space-y-2">
+                    <Label>Spacing Between Text and Image: {settings.content?.splitHeroGap ?? 12}</Label>
+                    <Input
+                      type="range"
+                      min="0"
+                      max="24"
+                      value={settings.content?.splitHeroGap ?? 12}
+                      onChange={e => updateContent('splitHeroGap', parseInt(e.target.value))}
+                      className="w-full cursor-pointer"
+                      data-testid="input-split-hero-gap"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Adjust the gap between text and image (0 = tight, 24 = very spaced out)
+                    </p>
+                  </div>
                 </div>
               )}
 
@@ -1314,6 +1329,23 @@ export default function SetupPage() {
               </div>
             </CardContent>
           </Card>
+
+          <div className="flex justify-end pt-6">
+            <Button 
+              onClick={handleSave} 
+              disabled={saving}
+              data-testid="button-save-branding"
+            >
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : saved ? (
+                <Check className="h-4 w-4 mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              {saved ? 'Saved!' : 'Save Changes'}
+            </Button>
+          </div>
         </TabsContent>
 
         <TabsContent value="content">
@@ -2608,6 +2640,23 @@ export default function SetupPage() {
                 </div>
               </CardContent>
             </Card>
+
+            <div className="flex justify-end pt-6">
+              <Button 
+                onClick={handleSave} 
+                disabled={saving}
+                data-testid="button-save-content"
+              >
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : saved ? (
+                  <Check className="h-4 w-4 mr-2" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                {saved ? 'Saved!' : 'Save Changes'}
+              </Button>
+            </div>
           </div>
         </TabsContent>
 
@@ -3216,6 +3265,23 @@ export default function SetupPage() {
                 ))}
               </CardContent>
             </Card>
+
+            <div className="flex justify-end pt-6">
+              <Button 
+                onClick={handleSave} 
+                disabled={saving}
+                data-testid="button-save-pages"
+              >
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : saved ? (
+                  <Check className="h-4 w-4 mr-2" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                {saved ? 'Saved!' : 'Save Changes'}
+              </Button>
+            </div>
           </div>
         </TabsContent>
 
@@ -3322,6 +3388,23 @@ export default function SetupPage() {
                 </div>
               </CardContent>
             </Card>
+
+            <div className="flex justify-end pt-6">
+              <Button 
+                onClick={handleSave} 
+                disabled={saving}
+                data-testid="button-save-pricing"
+              >
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : saved ? (
+                  <Check className="h-4 w-4 mr-2" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                {saved ? 'Saved!' : 'Save Changes'}
+              </Button>
+            </div>
           </div>
         </TabsContent>
 
@@ -3376,6 +3459,23 @@ export default function SetupPage() {
               </div>
             </CardContent>
           </Card>
+
+          <div className="flex justify-end pt-6">
+            <Button 
+              onClick={handleSave} 
+              disabled={saving}
+              data-testid="button-save-social"
+            >
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : saved ? (
+                <Check className="h-4 w-4 mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              {saved ? 'Saved!' : 'Save Changes'}
+            </Button>
+          </div>
         </TabsContent>
 
         <TabsContent value="features">
@@ -3472,6 +3572,23 @@ export default function SetupPage() {
               </div>
             </CardContent>
           </Card>
+
+          <div className="flex justify-end pt-6">
+            <Button 
+              onClick={handleSave} 
+              disabled={saving}
+              data-testid="button-save-features"
+            >
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : saved ? (
+                <Check className="h-4 w-4 mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              {saved ? 'Saved!' : 'Save Changes'}
+            </Button>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
