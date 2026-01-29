@@ -93,10 +93,23 @@ export interface CTAContent {
   buttonLink: string
 }
 
+export interface NavItem {
+  id: string
+  label: string
+  href: string
+  enabled: boolean
+}
+
+export interface NavigationSettings {
+  items: NavItem[]
+}
+
 export interface TrustedLogo {
   id: string
   name: string
   imageUrl?: string
+  imagePositionX?: number
+  imagePositionY?: number
 }
 
 export interface ProcessStep {
@@ -112,6 +125,9 @@ export interface Metric {
   suffix?: string
   prefix?: string
   label: string
+  iconUrl?: string
+  iconPositionX?: number
+  iconPositionY?: number
 }
 
 export interface ImageTextBlock {
@@ -123,6 +139,8 @@ export interface ImageTextBlock {
   buttonText?: string
   buttonLink?: string
   imagePosition: 'left' | 'right'
+  imagePositionX?: number
+  imagePositionY?: number
 }
 
 export interface ContentSettings {
@@ -259,6 +277,7 @@ export interface SiteSettings {
   features: FeatureToggles
   content: ContentSettings
   pages: PagesSettings
+  navigation?: NavigationSettings
 }
 
 export const defaultLightTheme: ThemeColors = {
@@ -590,6 +609,14 @@ If you have any questions about this Privacy Policy, please contact us.`,
         content: '',
         sections: [],
       },
+    ],
+  },
+  navigation: {
+    items: [
+      { id: 'nav-1', label: 'Pricing', href: '/pricing', enabled: true },
+      { id: 'nav-2', label: 'About', href: '/about', enabled: true },
+      { id: 'nav-3', label: 'Contact', href: '/contact', enabled: true },
+      { id: 'nav-4', label: 'FAQ', href: '/faq', enabled: false },
     ],
   },
 }

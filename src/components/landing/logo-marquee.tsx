@@ -6,6 +6,8 @@ interface Logo {
   id: string
   name: string
   imageUrl?: string
+  imagePositionX?: number
+  imagePositionY?: number
 }
 
 export function LogoMarquee() {
@@ -40,7 +42,8 @@ export function LogoMarquee() {
                 <img
                   src={logo.imageUrl}
                   alt={logo.name}
-                  className="h-8 w-auto object-contain opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
+                  className="h-8 w-auto object-cover opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
+                  style={{ objectPosition: `${logo.imagePositionX ?? 50}% ${logo.imagePositionY ?? 50}%` }}
                 />
               ) : (
                 <span className="text-lg font-semibold text-muted-foreground/60 hover:text-muted-foreground transition-colors whitespace-nowrap">

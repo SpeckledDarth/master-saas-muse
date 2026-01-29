@@ -13,6 +13,8 @@ export interface ImageTextBlock {
   buttonText?: string
   buttonLink?: string
   imagePosition: 'left' | 'right'
+  imagePositionX?: number
+  imagePositionY?: number
 }
 
 interface ImageTextSectionProps {
@@ -36,6 +38,7 @@ function SingleBlock({ block, index }: { block: ImageTextBlock; index: number })
               alt={block.imageAlt || block.headline}
               fill
               className="object-cover"
+              style={{ objectPosition: `${block.imagePositionX ?? 50}% ${block.imagePositionY ?? 50}%` }}
             />
           ) : (
             <div className="w-full h-full bg-muted flex items-center justify-center">

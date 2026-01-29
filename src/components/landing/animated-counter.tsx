@@ -8,6 +8,9 @@ interface Metric {
   suffix?: string
   prefix?: string
   label: string
+  iconUrl?: string
+  iconPositionX?: number
+  iconPositionY?: number
 }
 
 interface AnimatedCounterProps {
@@ -78,6 +81,16 @@ export function AnimatedCounterSection({ metrics, headline }: AnimatedCounterPro
         <div className={`grid gap-8 ${metrics.length === 2 ? 'md:grid-cols-2' : metrics.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'} max-w-4xl mx-auto`}>
           {metrics.map((metric) => (
             <div key={metric.id} className="text-center" data-testid={`metric-${metric.id}`}>
+              {metric.iconUrl && (
+                <div className="flex justify-center mb-3">
+                  <img
+                    src={metric.iconUrl}
+                    alt={metric.label}
+                    className="h-12 w-12 object-cover rounded"
+                    style={{ objectPosition: `${metric.iconPositionX ?? 50}% ${metric.iconPositionY ?? 50}%` }}
+                  />
+                </div>
+              )}
               <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
                 <Counter value={metric.value} suffix={metric.suffix} prefix={metric.prefix} />
               </div>

@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Palette, DollarSign, Globe, Settings, Loader2, Save, Check, FileText, Plus, Trash2, Zap, Shield, Sparkles, Users, BarChart, Lock, Rocket, Heart, Star, Target, Award, Lightbulb, BookOpen } from 'lucide-react'
-import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember } from '@/types/settings'
+import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem } from '@/types/settings'
 import { ImageUpload } from '@/components/admin/image-upload'
 
 export default function SetupPage() {
@@ -116,6 +116,41 @@ export default function SetupPage() {
       ...prev,
       pricing: { ...prev.pricing, [key]: value }
     }))
+  }
+
+  function updateNavigation(items: NavItem[]) {
+    setSettings(prev => ({
+      ...prev,
+      navigation: {
+        ...prev.navigation,
+        items,
+      }
+    }))
+  }
+
+  function addNavItem() {
+    const newItem: NavItem = {
+      id: `nav-${Date.now()}`,
+      label: 'New Link',
+      href: '/',
+      enabled: true,
+    }
+    const currentItems = settings.navigation?.items ?? []
+    updateNavigation([...currentItems, newItem])
+  }
+
+  function updateNavItem(id: string, field: keyof NavItem, value: string | boolean) {
+    const currentItems = settings.navigation?.items ?? []
+    updateNavigation(
+      currentItems.map(item =>
+        item.id === id ? { ...item, [field]: value } : item
+      )
+    )
+  }
+
+  function removeNavItem(id: string) {
+    const currentItems = settings.navigation?.items ?? []
+    updateNavigation(currentItems.filter(item => item.id !== id))
   }
 
   function updateContent<K extends keyof SiteSettings['content']>(
@@ -1008,6 +1043,65 @@ export default function SetupPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card className="mt-6">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Navigation Menu</CardTitle>
+                  <CardDescription>
+                    Configure which links appear in the top navigation
+                  </CardDescription>
+                </div>
+                <Button onClick={addNavItem} size="sm" data-testid="button-add-nav-item">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Link
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {(settings.navigation?.items ?? []).map((item, index) => (
+                  <div key={item.id} className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={item.enabled}
+                        onCheckedChange={checked => updateNavItem(item.id, 'enabled', checked)}
+                        data-testid={`switch-nav-${index}`}
+                      />
+                    </div>
+                    <Input
+                      value={item.label}
+                      onChange={e => updateNavItem(item.id, 'label', e.target.value)}
+                      placeholder="Link Label"
+                      className="flex-1"
+                      data-testid={`input-nav-label-${index}`}
+                    />
+                    <Input
+                      value={item.href}
+                      onChange={e => updateNavItem(item.id, 'href', e.target.value)}
+                      placeholder="/path"
+                      className="flex-1"
+                      data-testid={`input-nav-href-${index}`}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeNavItem(item.id)}
+                      data-testid={`button-remove-nav-${index}`}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+                {(settings.navigation?.items ?? []).length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No navigation links configured. Click "Add Link" to get started.
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="content">
@@ -1408,41 +1502,79 @@ export default function SetupPage() {
                   
                   <div className="space-y-3">
                     {(settings.content?.trustedLogos || []).map((logo, index) => (
-                      <div key={logo.id} className="flex gap-3 items-start p-3 border rounded-lg bg-muted/30">
-                        <div className="flex-1 space-y-2">
-                          <Input
-                            value={logo.name}
-                            onChange={e => {
-                              const logos = [...(settings.content?.trustedLogos || [])]
-                              logos[index] = { ...logos[index], name: e.target.value }
+                      <div key={logo.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Logo {index + 1}</span>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              const logos = (settings.content?.trustedLogos || []).filter((_, i) => i !== index)
                               updateContent('trustedLogos', logos)
                             }}
-                            placeholder="Company name"
-                            data-testid={`input-logo-name-${index}`}
-                          />
-                          <Input
-                            value={logo.imageUrl || ''}
-                            onChange={e => {
-                              const logos = [...(settings.content?.trustedLogos || [])]
-                              logos[index] = { ...logos[index], imageUrl: e.target.value }
-                              updateContent('trustedLogos', logos)
-                            }}
-                            placeholder="Logo image URL (optional - text shown if empty)"
-                            data-testid={`input-logo-url-${index}`}
-                          />
+                            data-testid={`button-delete-logo-${index}`}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
                         </div>
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => {
-                            const logos = (settings.content?.trustedLogos || []).filter((_, i) => i !== index)
+                        <Input
+                          value={logo.name}
+                          onChange={e => {
+                            const logos = [...(settings.content?.trustedLogos || [])]
+                            logos[index] = { ...logos[index], name: e.target.value }
                             updateContent('trustedLogos', logos)
                           }}
-                          data-testid={`button-delete-logo-${index}`}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                          placeholder="Company name"
+                          data-testid={`input-logo-name-${index}`}
+                        />
+                        <ImageUpload
+                          label="Logo Image"
+                          value={logo.imageUrl || null}
+                          onChange={url => {
+                            const logos = [...(settings.content?.trustedLogos || [])]
+                            logos[index] = { ...logos[index], imageUrl: url || undefined }
+                            updateContent('trustedLogos', logos)
+                          }}
+                          bucket="branding"
+                          folder="logos"
+                          aspectRatio="3/1"
+                          testId={`logo-image-${index}`}
+                        />
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-2">
+                            <Label className="text-xs">Horizontal Position: {logo.imagePositionX ?? 50}%</Label>
+                            <Input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={logo.imagePositionX ?? 50}
+                              onChange={e => {
+                                const logos = [...(settings.content?.trustedLogos || [])]
+                                logos[index] = { ...logos[index], imagePositionX: parseInt(e.target.value) }
+                                updateContent('trustedLogos', logos)
+                              }}
+                              className="cursor-pointer"
+                              data-testid={`input-logo-positionx-${index}`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Vertical Position: {logo.imagePositionY ?? 50}%</Label>
+                            <Input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={logo.imagePositionY ?? 50}
+                              onChange={e => {
+                                const logos = [...(settings.content?.trustedLogos || [])]
+                                logos[index] = { ...logos[index], imagePositionY: parseInt(e.target.value) }
+                                updateContent('trustedLogos', logos)
+                              }}
+                              className="cursor-pointer"
+                              data-testid={`input-logo-positiony-${index}`}
+                            />
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1500,10 +1632,25 @@ export default function SetupPage() {
                     </Button>
                   </div>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {(settings.content?.metrics || []).map((metric, index) => (
-                      <div key={metric.id} className="flex gap-3 items-start p-3 border rounded-lg bg-muted/30">
-                        <div className="flex-1 grid grid-cols-4 gap-2">
+                      <div key={metric.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Metric {index + 1}</span>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              const metrics = (settings.content?.metrics || []).filter((_, i) => i !== index)
+                              updateContent('metrics', metrics)
+                            }}
+                            data-testid={`button-delete-metric-${index}`}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-4 gap-2">
                           <Input
                             value={metric.prefix || ''}
                             onChange={e => {
@@ -1548,18 +1695,57 @@ export default function SetupPage() {
                             data-testid={`input-metric-label-${index}`}
                           />
                         </div>
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => {
-                            const metrics = (settings.content?.metrics || []).filter((_, i) => i !== index)
-                            updateContent('metrics', metrics)
-                          }}
-                          data-testid={`button-delete-metric-${index}`}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                        <div className="pt-2 border-t">
+                          <ImageUpload
+                            label="Icon Image (optional)"
+                            value={metric.iconUrl || null}
+                            onChange={url => {
+                              const metrics = [...(settings.content?.metrics || [])]
+                              metrics[index] = { ...metrics[index], iconUrl: url || undefined }
+                              updateContent('metrics', metrics)
+                            }}
+                            bucket="branding"
+                            folder="icons"
+                            aspectRatio="1/1"
+                            testId={`metric-icon-${index}`}
+                          />
+                          {metric.iconUrl && (
+                            <div className="grid grid-cols-2 gap-3 mt-2">
+                              <div className="space-y-2">
+                                <Label className="text-xs">Horizontal: {metric.iconPositionX ?? 50}%</Label>
+                                <Input
+                                  type="range"
+                                  min="0"
+                                  max="100"
+                                  value={metric.iconPositionX ?? 50}
+                                  onChange={e => {
+                                    const metrics = [...(settings.content?.metrics || [])]
+                                    metrics[index] = { ...metrics[index], iconPositionX: parseInt(e.target.value) }
+                                    updateContent('metrics', metrics)
+                                  }}
+                                  className="cursor-pointer"
+                                  data-testid={`input-metric-iconx-${index}`}
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="text-xs">Vertical: {metric.iconPositionY ?? 50}%</Label>
+                                <Input
+                                  type="range"
+                                  min="0"
+                                  max="100"
+                                  value={metric.iconPositionY ?? 50}
+                                  onChange={e => {
+                                    const metrics = [...(settings.content?.metrics || [])]
+                                    metrics[index] = { ...metrics[index], iconPositionY: parseInt(e.target.value) }
+                                    updateContent('metrics', metrics)
+                                  }}
+                                  className="cursor-pointer"
+                                  data-testid={`input-metric-icony-${index}`}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1809,17 +1995,53 @@ export default function SetupPage() {
                         </div>
                         
                         <div className="space-y-2">
-                          <Label className="text-xs">Image URL</Label>
-                          <Input
-                            value={block.imageUrl || ''}
-                            onChange={e => {
+                          <ImageUpload
+                            label="Section Image"
+                            value={block.imageUrl || null}
+                            onChange={url => {
                               const blocks = [...(settings.content?.imageTextBlocks || [])]
-                              blocks[index] = { ...blocks[index], imageUrl: e.target.value }
+                              blocks[index] = { ...blocks[index], imageUrl: url || '' }
                               updateContent('imageTextBlocks', blocks)
                             }}
-                            placeholder="https://example.com/image.jpg"
-                            data-testid={`input-block-image-url-${index}`}
+                            bucket="branding"
+                            folder="content"
+                            aspectRatio="4/3"
+                            testId={`block-image-${index}`}
                           />
+                          <div className="grid grid-cols-2 gap-3 mt-2">
+                            <div className="space-y-2">
+                              <Label className="text-xs">Horizontal: {block.imagePositionX ?? 50}%</Label>
+                              <Input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={block.imagePositionX ?? 50}
+                                onChange={e => {
+                                  const blocks = [...(settings.content?.imageTextBlocks || [])]
+                                  blocks[index] = { ...blocks[index], imagePositionX: parseInt(e.target.value) }
+                                  updateContent('imageTextBlocks', blocks)
+                                }}
+                                className="cursor-pointer"
+                                data-testid={`input-block-positionx-${index}`}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-xs">Vertical: {block.imagePositionY ?? 50}%</Label>
+                              <Input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={block.imagePositionY ?? 50}
+                                onChange={e => {
+                                  const blocks = [...(settings.content?.imageTextBlocks || [])]
+                                  blocks[index] = { ...blocks[index], imagePositionY: parseInt(e.target.value) }
+                                  updateContent('imageTextBlocks', blocks)
+                                }}
+                                className="cursor-pointer"
+                                data-testid={`input-block-positiony-${index}`}
+                              />
+                            </div>
+                          </div>
                         </div>
                         
                         <div className="grid grid-cols-2 gap-3">

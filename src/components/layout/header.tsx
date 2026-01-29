@@ -42,20 +42,16 @@ export function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          <Link
-            href="/pricing"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            data-testid="link-pricing"
-          >
-            Pricing
-          </Link>
-          <Link
-            href="/about"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            data-testid="link-about"
-          >
-            About
-          </Link>
+          {settings?.navigation?.items?.filter(item => item.enabled).map(item => (
+            <Link
+              key={item.id}
+              href={item.href}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              data-testid={`link-nav-${item.id}`}
+            >
+              {item.label}
+            </Link>
+          ))}
           {settings?.pages?.customPages?.filter(p => p.enabled && p.name && p.slug).map(page => (
             <Link
               key={page.id}
