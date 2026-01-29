@@ -41,12 +41,10 @@ export function SplitHero({
         <div className={`flex flex-col ${isImageLeft ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-12 lg:gap-16`}>
           <div className="w-full md:w-1/2 space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-              {headline}
-              {animatedWords.length > 0 && (
-                <>
-                  {' '}
-                  <AnimatedWords words={animatedWords} className="text-primary" />
-                </>
+              {animatedWords.length > 0 ? (
+                <AnimatedWords words={animatedWords} className="text-primary" />
+              ) : (
+                headline
               )}
             </h1>
             
@@ -86,6 +84,7 @@ export function SplitHero({
                   fill
                   className="object-cover"
                   priority
+                  unoptimized
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">

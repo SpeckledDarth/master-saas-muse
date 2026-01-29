@@ -96,10 +96,7 @@ export default function HomePage() {
     <div className="relative z-10 container mx-auto px-4 text-center">
       <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${isDark ? 'text-white' : ''}`}>
         {heroAnimatedWords.length > 0 ? (
-          <>
-            <AppName />{' '}
-            <AnimatedWords words={heroAnimatedWords} className="text-primary" />
-          </>
+          <AnimatedWords words={heroAnimatedWords} className="text-primary" />
         ) : (
           <AppName />
         )}
@@ -146,10 +143,25 @@ export default function HomePage() {
       
       const getVideoSrc = () => {
         if (isYoutube) {
-          return `${heroVideoUrl}${heroVideoUrl.includes('?') ? '&' : '?'}autoplay=1&mute=1&loop=1&controls=0&showinfo=0&playlist=${heroVideoUrl.split('/').pop()?.split('?')[0] || ''}`
+          let videoId = ''
+          if (heroVideoUrl.includes('youtu.be/')) {
+            videoId = heroVideoUrl.split('youtu.be/')[1]?.split('?')[0] || ''
+          } else if (heroVideoUrl.includes('watch?v=')) {
+            videoId = heroVideoUrl.split('watch?v=')[1]?.split('&')[0] || ''
+          } else if (heroVideoUrl.includes('/embed/')) {
+            videoId = heroVideoUrl.split('/embed/')[1]?.split('?')[0] || ''
+          }
+          if (videoId) {
+            return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&playlist=${videoId}`
+          }
+          return heroVideoUrl
         }
         if (isVimeo) {
-          return `${heroVideoUrl}${heroVideoUrl.includes('?') ? '&' : '?'}background=1&autoplay=1&muted=1&loop=1`
+          const vimeoId = heroVideoUrl.split('/').pop()?.split('?')[0] || ''
+          if (vimeoId) {
+            return `https://player.vimeo.com/video/${vimeoId}?background=1&autoplay=1&muted=1&loop=1`
+          }
+          return heroVideoUrl
         }
         return heroVideoUrl
       }
@@ -205,16 +217,14 @@ export default function HomePage() {
       return (
         <section className="relative min-h-[600px] flex items-center overflow-hidden" data-testid="section-hero-floating">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/30" />
-          <div className="container mx-auto px-4">
+          <div className="relative z-10 container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="text-left space-y-6">
                 <h1 className="text-4xl md:text-6xl font-bold">
-                  <AppName />
-                  {heroAnimatedWords.length > 0 && (
-                    <>
-                      {' '}
-                      <AnimatedWords words={heroAnimatedWords} className="text-primary" />
-                    </>
+                  {heroAnimatedWords.length > 0 ? (
+                    <AnimatedWords words={heroAnimatedWords} className="text-primary" />
+                  ) : (
+                    <AppName />
                   )}
                 </h1>
                 <p className="text-xl md:text-2xl text-muted-foreground">

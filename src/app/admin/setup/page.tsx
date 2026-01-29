@@ -744,18 +744,17 @@ export default function SetupPage() {
               {settings.content?.heroStyle === 'pattern' && (
                 <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
                   <p className="text-sm font-medium">Pattern/Texture Settings</p>
-                  <div className="space-y-2">
-                    <Label>Pattern Image URL</Label>
-                    <Input
-                      value={settings.branding?.heroPatternUrl ?? ''}
-                      onChange={e => updateBranding('heroPatternUrl', e.target.value)}
-                      placeholder="https://example.com/pattern.png"
-                      data-testid="input-hero-pattern-url"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      URL for seamless pattern/texture image (PNG with transparency works best)
-                    </p>
-                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Upload a seamless pattern or texture that tiles over the gradient background. PNG with transparency works best.
+                  </p>
+                  <ImageUpload
+                    label="Pattern Image"
+                    value={settings.branding?.heroPatternUrl ?? null}
+                    onChange={url => updateBranding('heroPatternUrl', url)}
+                    folder="patterns"
+                    aspectRatio="1/1"
+                    testId="pattern-upload"
+                  />
                   <div className="space-y-2">
                     <Label>Pattern Opacity: {settings.branding?.heroPatternOpacity ?? 20}%</Label>
                     <Input
@@ -767,6 +766,9 @@ export default function SetupPage() {
                       className="w-full cursor-pointer"
                       data-testid="input-hero-pattern-opacity"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Lower values create a subtle texture, higher values make the pattern more visible.
+                    </p>
                   </div>
                 </div>
               )}
@@ -1206,7 +1208,7 @@ export default function SetupPage() {
                 <div>
                   <CardTitle>Navigation Menu</CardTitle>
                   <CardDescription>
-                    Configure which links appear in the top navigation
+                    Configure which links appear in the top navigation bar of your website
                   </CardDescription>
                 </div>
                 <Button onClick={addNavItem} size="sm" data-testid="button-add-nav-item">
@@ -1215,7 +1217,14 @@ export default function SetupPage() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+                <p className="text-sm text-blue-700 dark:text-blue-400">
+                  <strong>How it works:</strong> Each link you add here will appear in the header navigation bar. 
+                  Use the toggle to show/hide links. Add badges like "New" or "Beta" to highlight new features. 
+                  Common links include: Pricing, About, Contact, Blog, Features.
+                </p>
+              </div>
               <div className="space-y-3">
                 {(settings.navigation?.items ?? []).map((item, index) => (
                   <div key={item.id} className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">

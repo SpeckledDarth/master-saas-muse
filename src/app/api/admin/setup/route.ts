@@ -89,6 +89,10 @@ export async function GET(request: NextRequest) {
     social: { ...defaultSettings.social, ...data?.settings?.social },
     features: { ...defaultSettings.features, ...data?.settings?.features },
     content: { ...defaultSettings.content, ...data?.settings?.content },
+    announcement: { ...defaultSettings.announcement, ...data?.settings?.announcement },
+    navigation: { 
+      items: data?.settings?.navigation?.items || defaultSettings.navigation?.items || []
+    },
     pages: {
       about: { ...defaultSettings.pages.about, ...dbPages.about },
       contact: { ...defaultSettings.pages.contact, ...dbPages.contact },
@@ -138,6 +142,10 @@ export async function POST(request: NextRequest) {
     social: { ...defaultSettings.social, ...currentSettings.social, ...settings.social },
     features: { ...defaultSettings.features, ...currentSettings.features, ...settings.features },
     content: { ...defaultSettings.content, ...currentSettings.content, ...settings.content },
+    announcement: { ...defaultSettings.announcement, ...currentSettings.announcement, ...settings.announcement },
+    navigation: { 
+      items: settings.navigation?.items || currentSettings.navigation?.items || defaultSettings.navigation?.items || []
+    },
     pages: {
       about: { ...defaultSettings.pages.about, ...currentPages.about, ...incomingPages.about },
       contact: { ...defaultSettings.pages.contact, ...currentPages.contact, ...incomingPages.contact },
