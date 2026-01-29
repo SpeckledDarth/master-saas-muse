@@ -98,6 +98,25 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 - **Homepage Flash Fix**: Loading state prevents "My SaaS" flash before custom branding loads
 - **Setup Dashboard Refresh**: Page auto-refreshes after Save to show updated branding
 
+### Session Progress (Jan 29, 2026)
+
+**Dynamic Navigation Menu:**
+- Navigation items now fully configurable via Admin → Setup → Branding tab
+- Add/edit/delete navigation links with label, URL, and enabled toggle
+- Defaults: Pricing, About, Contact (enabled), FAQ (disabled)
+- Header dynamically renders enabled navigation items
+
+**Button Hover Animation:**
+- All button variants transition to accent color on hover
+- Text color transitions to accent-foreground for proper contrast
+- Smooth 300ms fade transition for polished feel
+
+**Enhanced Image Uploads:**
+- Logo Marquee: ImageUpload component with horizontal/vertical alignment sliders (0-100%)
+- Metrics Section: Optional icon upload with alignment controls, rendered above counter values
+- Image+Text Blocks: ImageUpload with alignment sliders for precise image positioning
+- All alignment controls use CSS object-position for live preview
+
 ### Benchmark Visual Enhancements (Jan 28-29, 2026)
 Inspired by world-class sites (GitBook, TitanIntake, TheWone, Musicfy, Zazu, Eleveight):
 
