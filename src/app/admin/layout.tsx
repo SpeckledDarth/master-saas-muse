@@ -90,6 +90,60 @@ export default function AdminLayout({
                   Users
                 </Link>
               </Button>
+              <Button 
+                variant={pathname === '/admin/team' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
+                <Link href="/admin/team" data-testid="link-admin-team">
+                  Team
+                </Link>
+              </Button>
+              <Button 
+                variant={pathname === '/admin/content' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
+                <Link href="/admin/content" data-testid="link-admin-content">
+                  Content
+                </Link>
+              </Button>
+              <Button 
+                variant={pathname === '/admin/analytics' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
+                <Link href="/admin/analytics" data-testid="link-admin-analytics">
+                  Analytics
+                </Link>
+              </Button>
+              <Button 
+                variant={pathname === '/admin/feedback' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
+                <Link href="/admin/feedback" data-testid="link-admin-feedback">
+                  Feedback
+                </Link>
+              </Button>
+              <Button 
+                variant={pathname === '/admin/waitlist' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
+                <Link href="/admin/waitlist" data-testid="link-admin-waitlist">
+                  Waitlist
+                </Link>
+              </Button>
+              <Button 
+                variant={pathname === '/admin/email-templates' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
+                <Link href="/admin/email-templates" data-testid="link-admin-emails">
+                  Emails
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

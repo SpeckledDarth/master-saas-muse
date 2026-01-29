@@ -66,6 +66,8 @@ export interface FeatureToggles {
   auditLogs: boolean
   maintenanceMode: boolean
   allowNewSignups: boolean
+  waitlistMode: boolean
+  feedbackWidget: boolean
 }
 
 export interface FeatureCard {
@@ -407,6 +409,8 @@ export const defaultSettings: SiteSettings = {
     auditLogs: true,
     maintenanceMode: false,
     allowNewSignups: true,
+    waitlistMode: false,
+    feedbackWidget: true,
   },
   content: {
     featuresEnabled: true,

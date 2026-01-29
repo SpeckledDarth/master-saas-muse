@@ -6,6 +6,7 @@ import { ThemeSettingsProvider } from "@/components/theme-settings-provider"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { PlausibleAnalytics } from "@/components/analytics/plausible"
+import { ConditionalFeedbackWidget } from "@/components/conditional-feedback-widget"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -54,6 +55,7 @@ export default function RootLayout({
               <Header />
               <main className="flex-1">{children}</main>
               <Footer />
+              <ConditionalFeedbackWidget />
             </div>
           </ThemeSettingsProvider>
         </ThemeProvider>

@@ -1,0 +1,142 @@
+'use client'
+
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useToast } from '@/hooks/use-toast'
+import { MessageSquare, X, Send } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+
+export function FeedbackWidget() {
+  const [open, setOpen] = useState(false)
+  const [message, setMessage] = useState('')
+  const [email, setEmail] = useState('')
+  const [sending, setSending] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const { toast } = useToast()
+
+  async function checkUser() {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    setUser(user)
+  }
+
+  function handleOpen() {
+    checkUser()
+    setOpen(true)
+  }
+
+  async function handleSubmit() {
+    if (!message.trim()) {
+      toast({ title: 'Please enter your feedback', variant: 'destructive' })
+      return
+    }
+
+    if (!user && !email) {
+      toast({ title: 'Please enter your email', variant: 'destructive' })
+      return
+    }
+
+    setSending(true)
+
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          email: email || user?.email,
+          pageUrl: window.location.pathname,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        toast({ title: 'Thank you!', description: 'Your feedback has been submitted.' })
+        setMessage('')
+        setEmail('')
+        setOpen(false)
+      } else {
+        toast({ title: 'Error', description: data.error, variant: 'destructive' })
+      }
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to submit feedback', variant: 'destructive' })
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <>
+      <Button
+        onClick={handleOpen}
+        className="fixed bottom-4 right-4 rounded-full w-14 h-14 shadow-lg z-50"
+        size="icon"
+        data-testid="button-feedback"
+      >
+        <MessageSquare className="h-6 w-6" />
+      </Button>
+
+      {open && (
+        <div className="fixed bottom-20 right-4 w-80 bg-card border rounded-lg shadow-xl z-50 p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold">Send Feedback</h3>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => setOpen(false)}
+              data-testid="button-close-feedback"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            {!user && (
+              <div className="space-y-2">
+                <Label htmlFor="feedback-email">Your Email</Label>
+                <Input
+                  id="feedback-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  data-testid="input-feedback-email"
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="feedback-message">Message</Label>
+              <Textarea
+                id="feedback-message"
+                placeholder="Tell us what's on your mind..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={4}
+                data-testid="input-feedback-message"
+              />
+            </div>
+
+            <Button
+              onClick={handleSubmit}
+              disabled={sending}
+              className="w-full"
+              data-testid="button-submit-feedback"
+            >
+              {sending ? 'Sending...' : (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  Send Feedback
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}

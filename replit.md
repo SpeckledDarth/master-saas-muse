@@ -100,6 +100,62 @@ The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ an
 
 ### Session Progress (Jan 29, 2026)
 
+**New Features Added (8 Major Additions):**
+
+1. **Team/Organization System** (`/admin/team`)
+   - Multi-user accounts with owner/admin/member roles
+   - Invite team members via email
+   - Role management and member removal
+   - Database tables: `organizations`, `organization_members`, `invitations`
+
+2. **Onboarding Wizard** (`/admin/onboarding`)
+   - Guided 4-step first-run setup for new admins
+   - Steps: Branding → Stripe → Content → Launch
+   - Progress tracking in `onboarding_state` table
+   - Skip option for each step
+
+3. **Blog/Changelog System** (`/blog`, `/changelog`, `/admin/content`)
+   - Markdown-based blog posts and changelog entries
+   - Public pages with SEO metadata
+   - Admin CRUD interface with publish/draft toggle
+   - Database table: `posts` (type: blog|changelog)
+
+4. **Waitlist Mode** (`/admin/waitlist`)
+   - Pre-launch email collection
+   - Feature toggle in settings (`waitlistMode`)
+   - Waitlist form component for landing pages
+   - CSV export for collected emails
+   - Database table: `waitlist_entries`
+
+5. **Feedback Widget** (floating button on all pages)
+   - In-app feedback submission
+   - Works for both logged-in and anonymous users
+   - Admin feedback management with status tracking
+   - Feature toggle in settings (`feedbackWidget`)
+   - Database table: `feedback`
+
+6. **Email Templates Editor** (`/admin/email-templates`)
+   - 5 default templates: welcome, subscription_confirmed, subscription_cancelled, password_reset, team_invitation
+   - Variable placeholders ({{appName}}, {{name}}, etc.)
+   - Admin-editable subject and body
+   - Database table: `email_templates`
+
+7. **Analytics Dashboard** (`/admin/analytics`)
+   - Key SaaS metrics: total users, new this month, active subscriptions
+   - Waitlist count and feedback count
+   - Recent signups list
+   - Database table: `analytics_events`
+
+8. **Sitemap & SEO** (`/sitemap.xml`, `/robots.txt`)
+   - Auto-generated sitemap including all static pages and blog posts
+   - robots.txt with appropriate allow/disallow rules
+   - Proper metadata on all new pages
+
+**Theme Flash Prevention:**
+- Inline script sets dark/light class immediately before render
+- Body stays hidden until custom theme colors are applied from settings
+- 2-second fallback prevents infinite loading
+
 **Dynamic Navigation Menu:**
 - Navigation items now fully configurable via Admin → Setup → Branding tab
 - Add/edit/delete navigation links with label, URL, and enabled toggle

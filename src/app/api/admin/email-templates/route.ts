@@ -1,0 +1,86 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+
+export async function GET() {
+  try {
+    const supabase = await createClient()
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { data: templates, error } = await supabase
+      .from('email_templates')
+      .select('*')
+      .order('name')
+
+    if (error) {
+      console.error('Error fetching templates:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ templates: templates || [] })
+  } catch (error) {
+    console.error('Templates fetch error:', error)
+    return NextResponse.json({ error: 'Failed to fetch templates' }, { status: 500 })
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { data: userRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+
+    if (userRole?.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    }
+
+    const body = await request.json()
+    const { id, name, subject, body: templateBody, description } = body
+
+    if (id) {
+      const { error } = await supabase
+        .from('email_templates')
+        .update({
+          subject,
+          body: templateBody,
+          description,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+    } else {
+      const { error } = await supabase
+        .from('email_templates')
+        .insert({
+          name,
+          subject,
+          body: templateBody,
+          description,
+        })
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Template save error:', error)
+    return NextResponse.json({ error: 'Failed to save template' }, { status: 500 })
+  }
+}
