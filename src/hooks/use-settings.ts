@@ -47,8 +47,15 @@ export function useSettings() {
           const dbPages = data.settings.pages || {}
           const dbNavigation = data.settings.navigation || {}
           const dbAnnouncement = data.settings.announcement || {}
+          const dbBranding = data.settings.branding || {}
           setSettings({
-            branding: { ...defaultSettings.branding, ...data.settings.branding },
+            branding: { 
+              ...defaultSettings.branding, 
+              ...dbBranding,
+              // Deep merge nested theme objects
+              lightTheme: { ...defaultSettings.branding.lightTheme, ...(dbBranding.lightTheme || {}) },
+              darkTheme: { ...defaultSettings.branding.darkTheme, ...(dbBranding.darkTheme || {}) },
+            },
             pricing: { ...defaultSettings.pricing, ...data.settings.pricing },
             social: { ...defaultSettings.social, ...data.settings.social },
             features: { ...defaultSettings.features, ...data.settings.features },
