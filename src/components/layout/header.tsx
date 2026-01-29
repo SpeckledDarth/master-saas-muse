@@ -85,19 +85,20 @@ export function Header() {
                 unoptimized
               />
             </div>
-          ) : null}
-          <span 
-            className={cn(
-              "font-bold text-xl transition-all duration-200",
-              brandNameGradient 
-                ? "bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent"
-                : "",
-              scrolled && "text-lg"
-            )}
-            data-testid="text-app-name"
-          >
-            {branding?.appName || 'App'}
-          </span>
+          ) : (
+            <span 
+              className={cn(
+                "font-bold text-xl transition-all duration-200",
+                brandNameGradient 
+                  ? "bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent"
+                  : "",
+                scrolled && "text-lg"
+              )}
+              data-testid="text-app-name"
+            >
+              {branding?.appName || 'App'}
+            </span>
+          )}
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">

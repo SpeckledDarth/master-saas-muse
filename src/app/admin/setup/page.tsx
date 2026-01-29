@@ -678,8 +678,8 @@ export default function SetupPage() {
                       <Label>Logo Width: {settings.branding.logoWidth ?? 32}px</Label>
                       <Input
                         type="range"
-                        min="20"
-                        max="80"
+                        min="16"
+                        max="200"
                         value={settings.branding.logoWidth ?? 32}
                         onChange={e => updateBranding('logoWidth', parseInt(e.target.value))}
                         className="w-full cursor-pointer"
@@ -690,8 +690,8 @@ export default function SetupPage() {
                       <Label>Logo Height: {settings.branding.logoHeight ?? 32}px</Label>
                       <Input
                         type="range"
-                        min="20"
-                        max="80"
+                        min="16"
+                        max="200"
                         value={settings.branding.logoHeight ?? 32}
                         onChange={e => updateBranding('logoHeight', parseInt(e.target.value))}
                         className="w-full cursor-pointer"
