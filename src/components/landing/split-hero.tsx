@@ -18,6 +18,7 @@ interface SplitHeroProps {
   secondaryButtonLink?: string
   className?: string
   animatedWords?: string[]
+  background?: 'transparent' | 'muted' | 'gradient' | 'accent'
 }
 
 export function SplitHero({
@@ -31,12 +32,20 @@ export function SplitHero({
   secondaryButtonText,
   secondaryButtonLink,
   className = '',
-  animatedWords = []
+  animatedWords = [],
+  background = 'transparent'
 }: SplitHeroProps) {
   const isImageLeft = imagePosition === 'left'
 
+  const bgClasses = {
+    transparent: '',
+    muted: 'bg-muted/50',
+    gradient: 'bg-gradient-to-br from-primary/10 via-background to-accent/20',
+    accent: 'bg-accent/20'
+  }
+
   return (
-    <section className={`py-16 md:py-24 ${className}`} data-testid="section-split-hero">
+    <section className={`py-16 md:py-24 ${bgClasses[background]} ${className}`} data-testid="section-split-hero">
       <div className="container mx-auto px-4">
         <div className={`flex flex-col ${isImageLeft ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-12 lg:gap-16`}>
           <div className="w-full md:w-1/2 space-y-6">

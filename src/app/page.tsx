@@ -122,6 +122,7 @@ export default function HomePage() {
 
   const renderHero = () => {
     if (heroStyle === 'split' && splitHeroImageUrl) {
+      const splitHeroBackground = settings?.content?.splitHeroBackground || 'transparent'
       return (
         <SplitHero
           headline={appName}
@@ -133,6 +134,7 @@ export default function HomePage() {
           secondaryButtonText="View Pricing"
           secondaryButtonLink="/pricing"
           animatedWords={heroAnimatedWords}
+          background={splitHeroBackground}
         />
       )
     }
@@ -214,11 +216,12 @@ export default function HomePage() {
     }
 
     if (heroStyle === 'floating' && heroFloatingImageUrl) {
+      const floatingGap = settings?.content?.floatingHeroGap ?? 8
       return (
         <section className="relative min-h-[600px] flex items-center overflow-hidden" data-testid="section-hero-floating">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/30" />
           <div className="relative z-10 container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className={`grid md:grid-cols-2 items-center`} style={{ gap: `${floatingGap * 4}px` }}>
               <div className="text-left space-y-6">
                 <h1 className="text-4xl md:text-6xl font-bold">
                   {heroAnimatedWords.length > 0 ? (

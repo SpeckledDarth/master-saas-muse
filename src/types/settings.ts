@@ -196,6 +196,8 @@ export interface ContentSettings {
   heroStyle?: 'fullWidth' | 'split' | 'video' | 'pattern' | 'floating'
   splitHeroImagePosition?: 'left' | 'right'
   splitHeroImageUrl?: string
+  splitHeroBackground?: 'transparent' | 'muted' | 'gradient' | 'accent'
+  floatingHeroGap?: number
   sectionBackgrounds?: {
     features?: 'default' | 'muted' | 'gradient' | 'mesh'
     testimonials?: 'default' | 'muted' | 'gradient' | 'mesh'
@@ -494,6 +496,8 @@ export const defaultSettings: SiteSettings = {
     heroStyle: 'fullWidth',
     splitHeroImagePosition: 'right',
     splitHeroImageUrl: '',
+    splitHeroBackground: 'transparent',
+    floatingHeroGap: 8,
   },
   pages: {
     about: {

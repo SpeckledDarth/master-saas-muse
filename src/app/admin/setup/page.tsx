@@ -715,6 +715,24 @@ export default function SetupPage() {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="space-y-2">
+                    <Label>Background Style</Label>
+                    <Select
+                      value={settings.content?.splitHeroBackground ?? 'transparent'}
+                      onValueChange={value => updateContent('splitHeroBackground', value as 'transparent' | 'muted' | 'gradient' | 'accent')}
+                    >
+                      <SelectTrigger data-testid="select-split-hero-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="transparent">Transparent (inherits page background)</SelectItem>
+                        <SelectItem value="muted">Muted (subtle gray)</SelectItem>
+                        <SelectItem value="gradient">Gradient (primary to accent)</SelectItem>
+                        <SelectItem value="accent">Accent (subtle accent color)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">Choose a background to make the hero section stand out</p>
+                  </div>
                 </div>
               )}
 
@@ -786,6 +804,21 @@ export default function SetupPage() {
                     />
                     <p className="text-xs text-muted-foreground">
                       PNG with transparent background works best for the floating effect
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Spacing Between Text and Image: {settings.content?.floatingHeroGap ?? 8}</Label>
+                    <Input
+                      type="range"
+                      min="0"
+                      max="24"
+                      value={settings.content?.floatingHeroGap ?? 8}
+                      onChange={e => updateContent('floatingHeroGap', parseInt(e.target.value))}
+                      className="w-full cursor-pointer"
+                      data-testid="input-floating-hero-gap"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Adjust the gap between the text content and the floating image (0 = tight, 24 = very spaced out)
                     </p>
                   </div>
                 </div>
