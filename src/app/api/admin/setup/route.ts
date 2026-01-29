@@ -83,8 +83,15 @@ export async function GET(request: NextRequest) {
   }
   
   const dbPages = data?.settings?.pages || {}
+  const dbBranding = data?.settings?.branding || {}
   const mergedSettings: SiteSettings = {
-    branding: { ...defaultSettings.branding, ...data?.settings?.branding },
+    branding: { 
+      ...defaultSettings.branding, 
+      ...dbBranding,
+      // Deep merge nested theme objects
+      lightTheme: { ...defaultSettings.branding.lightTheme, ...(dbBranding.lightTheme || {}) },
+      darkTheme: { ...defaultSettings.branding.darkTheme, ...(dbBranding.darkTheme || {}) },
+    },
     pricing: { ...defaultSettings.pricing, ...data?.settings?.pricing },
     social: { ...defaultSettings.social, ...data?.settings?.social },
     features: { ...defaultSettings.features, ...data?.settings?.features },
@@ -136,8 +143,25 @@ export async function POST(request: NextRequest) {
   
   const currentPages = (currentSettings.pages || {}) as any
   const incomingPages = (settings.pages || {}) as any
+  const currentBranding = (currentSettings.branding || {}) as any
+  const incomingBranding = (settings.branding || {}) as any
   const newSettings: SiteSettings = {
-    branding: { ...defaultSettings.branding, ...currentSettings.branding, ...settings.branding },
+    branding: { 
+      ...defaultSettings.branding, 
+      ...currentBranding, 
+      ...incomingBranding,
+      // Deep merge nested theme objects
+      lightTheme: { 
+        ...defaultSettings.branding.lightTheme, 
+        ...(currentBranding.lightTheme || {}), 
+        ...(incomingBranding.lightTheme || {}) 
+      },
+      darkTheme: { 
+        ...defaultSettings.branding.darkTheme, 
+        ...(currentBranding.darkTheme || {}), 
+        ...(incomingBranding.darkTheme || {}) 
+      },
+    },
     pricing: { ...defaultSettings.pricing, ...currentSettings.pricing, ...settings.pricing },
     social: { ...defaultSettings.social, ...currentSettings.social, ...settings.social },
     features: { ...defaultSettings.features, ...currentSettings.features, ...settings.features },

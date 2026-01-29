@@ -171,12 +171,14 @@ function applyTheme(theme: { background: string; foreground: string; card: strin
 }
 
 export function useThemeFromSettings(settings: SiteSettings | null) {
-  // Only apply primary and accent brand colors - let CSS handle light/dark mode
+  // Apply all theme colors - both brand colors and theme-specific colors
   useEffect(() => {
     if (!settings) return
     
     const root = document.documentElement
+    const isDark = root.classList.contains('dark')
     
+    // Apply brand colors (primary/accent)
     if (settings.branding.primaryColor) {
       const hsl = hexToHSL(settings.branding.primaryColor)
       if (hsl) {
@@ -191,7 +193,32 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
         root.style.setProperty('--accent-foreground', getContrastForeground(settings.branding.accentColor))
       }
     }
-    // Note: We no longer apply background/foreground/card/border via inline styles
-    // This allows the CSS .dark class to properly control light/dark mode switching
-  }, [settings?.branding.primaryColor, settings?.branding.accentColor])
+    
+    // Apply theme colors (background/foreground/card/border) based on current mode
+    const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
+    applyTheme(theme)
+  }, [settings?.branding])
+  
+  // Watch for light/dark mode changes and re-apply the correct theme
+  useEffect(() => {
+    if (!settings) return
+    
+    const applyCurrentTheme = () => {
+      const root = document.documentElement
+      const isDark = root.classList.contains('dark')
+      const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
+      applyTheme(theme)
+    }
+    
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          applyCurrentTheme()
+        }
+      })
+    })
+    
+    observer.observe(document.documentElement, { attributes: true })
+    return () => observer.disconnect()
+  }, [settings?.branding.lightTheme, settings?.branding.darkTheme])
 }
