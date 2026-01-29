@@ -15,6 +15,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { TestimonialCarousel } from '@/components/landing/testimonial-carousel'
 import { ImageTextSection } from '@/components/landing/image-text-section'
 import { SplitHero } from '@/components/landing/split-hero'
+import { AnnouncementBar } from '@/components/landing/announcement-bar'
+import { AnimatedWords } from '@/components/landing/animated-words'
+import { CustomerStories } from '@/components/landing/customer-stories'
 
 const iconMap: Record<string, React.ReactNode> = {
   Zap: <Zap className="h-5 w-5 text-primary" />,
@@ -78,17 +81,28 @@ export default function HomePage() {
   const heroPatternOpacity = settings?.branding?.heroPatternOpacity ?? 20
   const heroFloatingImageUrl = settings?.branding?.heroFloatingImageUrl
 
-  const getSectionBg = (section: 'features' | 'testimonials' | 'faq' | 'cta') => {
+  const customerStoriesEnabled = content?.customerStoriesEnabled ?? false
+  const heroAnimatedWords = content?.heroAnimatedWords || []
+
+  const getSectionBg = (section: 'features' | 'testimonials' | 'faq' | 'cta' | 'customerStories') => {
     const style = content?.sectionBackgrounds?.[section] ?? 'default'
     if (style === 'muted') return 'bg-muted/50'
     if (style === 'gradient') return 'bg-gradient-to-br from-primary/5 via-background to-accent/5'
+    if (style === 'mesh') return 'bg-mesh'
     return ''
   }
 
   const renderHeroContent = (isDark: boolean) => (
     <div className="relative z-10 container mx-auto px-4 text-center">
       <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${isDark ? 'text-white' : ''}`}>
-        <AppName />
+        {heroAnimatedWords.length > 0 ? (
+          <>
+            <AppName />{' '}
+            <AnimatedWords words={heroAnimatedWords} className="text-primary" />
+          </>
+        ) : (
+          <AppName />
+        )}
       </h1>
       <p className={`text-xl md:text-2xl mb-8 max-w-2xl mx-auto ${isDark ? 'text-white/90' : 'text-muted-foreground'}`}>
         <AppTagline />
@@ -121,6 +135,7 @@ export default function HomePage() {
           primaryButtonLink="/signup"
           secondaryButtonText="View Pricing"
           secondaryButtonLink="/pricing"
+          animatedWords={heroAnimatedWords}
         />
       )
     }
@@ -195,6 +210,12 @@ export default function HomePage() {
               <div className="text-left space-y-6">
                 <h1 className="text-4xl md:text-6xl font-bold">
                   <AppName />
+                  {heroAnimatedWords.length > 0 && (
+                    <>
+                      {' '}
+                      <AnimatedWords words={heroAnimatedWords} className="text-primary" />
+                    </>
+                  )}
                 </h1>
                 <p className="text-xl md:text-2xl text-muted-foreground">
                   <AppTagline />
@@ -267,6 +288,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
+      <AnnouncementBar />
       {renderHero()}
 
       {trustedByEnabled && <LogoMarquee />}
@@ -338,6 +360,14 @@ export default function HomePage() {
       )}
 
       {processEnabled && <ProcessSteps />}
+
+      {customerStoriesEnabled && (content?.customerStories?.length ?? 0) > 0 && (
+        <CustomerStories 
+          stories={content?.customerStories}
+          headline={content?.customerStoriesHeadline}
+          className={getSectionBg('customerStories')}
+        />
+      )}
 
       {faqEnabled && (content?.faqItems?.length ?? 0) > 0 && (
         <section className={`py-20 ${getSectionBg('faq') || 'bg-muted/50'}`} data-testid="section-faq">

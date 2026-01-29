@@ -46,10 +46,19 @@ export function Header() {
             <Link
               key={item.id}
               href={item.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
               data-testid={`link-nav-${item.id}`}
             >
               {item.label}
+              {item.badge && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                  item.badge === 'new' ? 'bg-green-500/20 text-green-600 dark:text-green-400' :
+                  item.badge === 'beta' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' :
+                  'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                }`}>
+                  {item.badge === 'new' ? 'New' : item.badge === 'beta' ? 'Beta' : 'Soon'}
+                </span>
+              )}
             </Link>
           ))}
           {settings?.pages?.customPages?.filter(p => p.enabled && p.name && p.slug).map(page => (

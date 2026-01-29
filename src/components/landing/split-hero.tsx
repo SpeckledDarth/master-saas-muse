@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
+import { AnimatedWords } from './animated-words'
 
 interface SplitHeroProps {
   headline: string
@@ -16,6 +17,7 @@ interface SplitHeroProps {
   secondaryButtonText?: string
   secondaryButtonLink?: string
   className?: string
+  animatedWords?: string[]
 }
 
 export function SplitHero({
@@ -28,7 +30,8 @@ export function SplitHero({
   primaryButtonLink,
   secondaryButtonText,
   secondaryButtonLink,
-  className = ''
+  className = '',
+  animatedWords = []
 }: SplitHeroProps) {
   const isImageLeft = imagePosition === 'left'
 
@@ -39,6 +42,12 @@ export function SplitHero({
           <div className="w-full md:w-1/2 space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
               {headline}
+              {animatedWords.length > 0 && (
+                <>
+                  {' '}
+                  <AnimatedWords words={animatedWords} className="text-primary" />
+                </>
+              )}
             </h1>
             
             {subheadline && (

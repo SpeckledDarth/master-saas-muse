@@ -98,10 +98,34 @@ export interface NavItem {
   label: string
   href: string
   enabled: boolean
+  badge?: 'new' | 'beta' | 'coming-soon' | null
+  children?: NavItem[]
 }
 
 export interface NavigationSettings {
   items: NavItem[]
+}
+
+export interface AnnouncementBar {
+  enabled: boolean
+  text: string
+  linkText?: string
+  linkUrl?: string
+  backgroundColor?: string
+  textColor?: string
+  dismissible?: boolean
+}
+
+export interface CustomerStory {
+  id: string
+  companyName: string
+  companyLogoUrl?: string
+  personName?: string
+  personRole?: string
+  personPhotoUrl?: string
+  quote?: string
+  storyUrl?: string
+  backgroundImageUrl?: string
 }
 
 export interface TrustedLogo {
@@ -173,11 +197,16 @@ export interface ContentSettings {
   splitHeroImagePosition?: 'left' | 'right'
   splitHeroImageUrl?: string
   sectionBackgrounds?: {
-    features?: 'default' | 'muted' | 'gradient'
-    testimonials?: 'default' | 'muted' | 'gradient'
-    faq?: 'default' | 'muted' | 'gradient'
-    cta?: 'default' | 'muted' | 'gradient'
+    features?: 'default' | 'muted' | 'gradient' | 'mesh'
+    testimonials?: 'default' | 'muted' | 'gradient' | 'mesh'
+    faq?: 'default' | 'muted' | 'gradient' | 'mesh'
+    cta?: 'default' | 'muted' | 'gradient' | 'mesh'
+    customerStories?: 'default' | 'muted' | 'gradient' | 'mesh'
   }
+  heroAnimatedWords?: string[]
+  customerStoriesEnabled?: boolean
+  customerStoriesHeadline?: string
+  customerStories?: CustomerStory[]
 }
 
 export interface TeamMember {
@@ -278,6 +307,7 @@ export interface SiteSettings {
   content: ContentSettings
   pages: PagesSettings
   navigation?: NavigationSettings
+  announcement?: AnnouncementBar
 }
 
 export const defaultLightTheme: ThemeColors = {
@@ -610,6 +640,15 @@ If you have any questions about this Privacy Policy, please contact us.`,
         sections: [],
       },
     ],
+  },
+  announcement: {
+    enabled: false,
+    text: 'Introducing our new feature!',
+    linkText: 'Learn more',
+    linkUrl: '/features',
+    backgroundColor: '#7c3aed',
+    textColor: '#ffffff',
+    dismissible: true,
   },
   navigation: {
     items: [

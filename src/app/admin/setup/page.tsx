@@ -139,7 +139,7 @@ export default function SetupPage() {
     updateNavigation([...currentItems, newItem])
   }
 
-  function updateNavItem(id: string, field: keyof NavItem, value: string | boolean) {
+  function updateNavItem(id: string, field: keyof NavItem, value: string | boolean | null) {
     const currentItems = settings.navigation?.items ?? []
     updateNavigation(
       currentItems.map(item =>
@@ -658,6 +658,20 @@ export default function SetupPage() {
                 <p className="text-xs text-muted-foreground">Choose how the hero section is displayed</p>
               </div>
 
+              <div className="space-y-2">
+                <Label>Hero Animated Words (optional)</Label>
+                <Input
+                  value={(settings.content?.heroAnimatedWords || []).join(', ')}
+                  onChange={e => {
+                    const words = e.target.value.split(',').map(w => w.trim()).filter(w => w)
+                    updateContent('heroAnimatedWords', words)
+                  }}
+                  placeholder="innovative, powerful, seamless"
+                  data-testid="input-hero-animated-words"
+                />
+                <p className="text-xs text-muted-foreground">Comma-separated words that cycle after your app name in the hero</p>
+              </div>
+
               {settings.content?.heroStyle === 'split' && (
                 <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
                   <p className="text-sm font-medium">Split Hero Settings</p>
@@ -1048,6 +1062,128 @@ export default function SetupPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
+                  <CardTitle>Announcement Bar</CardTitle>
+                  <CardDescription>
+                    Display a top banner for promotions or announcements
+                  </CardDescription>
+                </div>
+                <Switch
+                  checked={settings.announcement?.enabled ?? false}
+                  onCheckedChange={checked => setSettings(prev => ({
+                    ...prev,
+                    announcement: { ...prev.announcement!, enabled: checked }
+                  }))}
+                  data-testid="switch-announcement-enabled"
+                />
+              </div>
+            </CardHeader>
+            {settings.announcement?.enabled && (
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Announcement Text</Label>
+                  <Input
+                    value={settings.announcement?.text ?? ''}
+                    onChange={e => setSettings(prev => ({
+                      ...prev,
+                      announcement: { ...prev.announcement!, text: e.target.value }
+                    }))}
+                    placeholder="Introducing our new feature!"
+                    data-testid="input-announcement-text"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Link Text (optional)</Label>
+                    <Input
+                      value={settings.announcement?.linkText ?? ''}
+                      onChange={e => setSettings(prev => ({
+                        ...prev,
+                        announcement: { ...prev.announcement!, linkText: e.target.value }
+                      }))}
+                      placeholder="Learn more"
+                      data-testid="input-announcement-link-text"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Link URL (optional)</Label>
+                    <Input
+                      value={settings.announcement?.linkUrl ?? ''}
+                      onChange={e => setSettings(prev => ({
+                        ...prev,
+                        announcement: { ...prev.announcement!, linkUrl: e.target.value }
+                      }))}
+                      placeholder="/features"
+                      data-testid="input-announcement-link-url"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Background Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="color"
+                        value={settings.announcement?.backgroundColor ?? '#7c3aed'}
+                        onChange={e => setSettings(prev => ({
+                          ...prev,
+                          announcement: { ...prev.announcement!, backgroundColor: e.target.value }
+                        }))}
+                        className="w-12 h-9 p-1"
+                        data-testid="input-announcement-bg-color"
+                      />
+                      <Input
+                        value={settings.announcement?.backgroundColor ?? '#7c3aed'}
+                        onChange={e => setSettings(prev => ({
+                          ...prev,
+                          announcement: { ...prev.announcement!, backgroundColor: e.target.value }
+                        }))}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Text Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="color"
+                        value={settings.announcement?.textColor ?? '#ffffff'}
+                        onChange={e => setSettings(prev => ({
+                          ...prev,
+                          announcement: { ...prev.announcement!, textColor: e.target.value }
+                        }))}
+                        className="w-12 h-9 p-1"
+                        data-testid="input-announcement-text-color"
+                      />
+                      <Input
+                        value={settings.announcement?.textColor ?? '#ffffff'}
+                        onChange={e => setSettings(prev => ({
+                          ...prev,
+                          announcement: { ...prev.announcement!, textColor: e.target.value }
+                        }))}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={settings.announcement?.dismissible ?? true}
+                    onCheckedChange={checked => setSettings(prev => ({
+                      ...prev,
+                      announcement: { ...prev.announcement!, dismissible: checked }
+                    }))}
+                    data-testid="switch-announcement-dismissible"
+                  />
+                  <Label>Allow users to dismiss</Label>
+                </div>
+              </CardContent>
+            )}
+          </Card>
+
+          <Card className="mt-6">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
                   <CardTitle>Navigation Menu</CardTitle>
                   <CardDescription>
                     Configure which links appear in the top navigation
@@ -1084,6 +1220,20 @@ export default function SetupPage() {
                       className="flex-1"
                       data-testid={`input-nav-href-${index}`}
                     />
+                    <Select
+                      value={item.badge || 'none'}
+                      onValueChange={value => updateNavItem(item.id, 'badge', value === 'none' ? null : value)}
+                    >
+                      <SelectTrigger className="w-28" data-testid={`select-nav-badge-${index}`}>
+                        <SelectValue placeholder="Badge" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No Badge</SelectItem>
+                        <SelectItem value="new">New</SelectItem>
+                        <SelectItem value="beta">Beta</SelectItem>
+                        <SelectItem value="coming-soon">Soon</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -2086,6 +2236,192 @@ export default function SetupPage() {
 
             <Card>
               <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Customer Stories</CardTitle>
+                    <CardDescription>Showcase customer success stories with photos and quotes</CardDescription>
+                  </div>
+                  <Switch
+                    checked={settings.content?.customerStoriesEnabled ?? false}
+                    onCheckedChange={checked => updateContent('customerStoriesEnabled', checked)}
+                    data-testid="switch-customer-stories-enabled"
+                  />
+                </div>
+              </CardHeader>
+              {(settings.content?.customerStoriesEnabled ?? false) && (
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Section Headline</Label>
+                    <Input
+                      value={settings.content?.customerStoriesHeadline ?? ''}
+                      onChange={e => updateContent('customerStoriesHeadline', e.target.value)}
+                      placeholder="Customer Stories"
+                      data-testid="input-customer-stories-headline"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <Label>Stories</Label>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => {
+                        const stories = [...(settings.content?.customerStories || [])]
+                        stories.push({
+                          id: `story-${Date.now()}`,
+                          companyName: '',
+                          companyLogoUrl: '',
+                          personName: '',
+                          personRole: '',
+                          personPhotoUrl: '',
+                          quote: '',
+                          storyUrl: '',
+                          backgroundImageUrl: '',
+                        })
+                        updateContent('customerStories', stories)
+                      }}
+                      data-testid="button-add-customer-story"
+                    >
+                      <Plus className="h-4 w-4 mr-1" /> Add Story
+                    </Button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {(settings.content?.customerStories || []).map((story, index) => (
+                      <div key={story.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Story {index + 1}</span>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              const stories = (settings.content?.customerStories || []).filter((_, i) => i !== index)
+                              updateContent('customerStories', stories)
+                            }}
+                            data-testid={`button-delete-story-${index}`}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-2">
+                            <Label className="text-xs">Company Name</Label>
+                            <Input
+                              value={story.companyName}
+                              onChange={e => {
+                                const stories = [...(settings.content?.customerStories || [])]
+                                stories[index] = { ...stories[index], companyName: e.target.value }
+                                updateContent('customerStories', stories)
+                              }}
+                              placeholder="Acme Inc"
+                              data-testid={`input-story-company-${index}`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Company Logo URL</Label>
+                            <Input
+                              value={story.companyLogoUrl || ''}
+                              onChange={e => {
+                                const stories = [...(settings.content?.customerStories || [])]
+                                stories[index] = { ...stories[index], companyLogoUrl: e.target.value }
+                                updateContent('customerStories', stories)
+                              }}
+                              placeholder="https://..."
+                              data-testid={`input-story-logo-${index}`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Person Name</Label>
+                            <Input
+                              value={story.personName || ''}
+                              onChange={e => {
+                                const stories = [...(settings.content?.customerStories || [])]
+                                stories[index] = { ...stories[index], personName: e.target.value }
+                                updateContent('customerStories', stories)
+                              }}
+                              placeholder="John Doe"
+                              data-testid={`input-story-person-${index}`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Person Role</Label>
+                            <Input
+                              value={story.personRole || ''}
+                              onChange={e => {
+                                const stories = [...(settings.content?.customerStories || [])]
+                                stories[index] = { ...stories[index], personRole: e.target.value }
+                                updateContent('customerStories', stories)
+                              }}
+                              placeholder="CTO, Acme Inc"
+                              data-testid={`input-story-role-${index}`}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs">Quote</Label>
+                          <Textarea
+                            value={story.quote || ''}
+                            onChange={e => {
+                              const stories = [...(settings.content?.customerStories || [])]
+                              stories[index] = { ...stories[index], quote: e.target.value }
+                              updateContent('customerStories', stories)
+                            }}
+                            placeholder="This product changed everything..."
+                            rows={2}
+                            data-testid={`input-story-quote-${index}`}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-2">
+                            <Label className="text-xs">Person Photo URL</Label>
+                            <Input
+                              value={story.personPhotoUrl || ''}
+                              onChange={e => {
+                                const stories = [...(settings.content?.customerStories || [])]
+                                stories[index] = { ...stories[index], personPhotoUrl: e.target.value }
+                                updateContent('customerStories', stories)
+                              }}
+                              placeholder="https://..."
+                              data-testid={`input-story-photo-${index}`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Background Image URL</Label>
+                            <Input
+                              value={story.backgroundImageUrl || ''}
+                              onChange={e => {
+                                const stories = [...(settings.content?.customerStories || [])]
+                                stories[index] = { ...stories[index], backgroundImageUrl: e.target.value }
+                                updateContent('customerStories', stories)
+                              }}
+                              placeholder="https://..."
+                              data-testid={`input-story-bg-${index}`}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs">Story Link (optional)</Label>
+                          <Input
+                            value={story.storyUrl || ''}
+                            onChange={e => {
+                              const stories = [...(settings.content?.customerStories || [])]
+                              stories[index] = { ...stories[index], storyUrl: e.target.value }
+                              updateContent('customerStories', stories)
+                            }}
+                            placeholder="/customers/acme"
+                            data-testid={`input-story-url-${index}`}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+
+            <Card>
+              <CardHeader>
                 <CardTitle>Section Backgrounds</CardTitle>
                 <CardDescription>Customize background styles for each section</CardDescription>
               </CardHeader>
@@ -2108,6 +2444,7 @@ export default function SetupPage() {
                         <SelectItem value="default">Default (transparent)</SelectItem>
                         <SelectItem value="muted">Muted (subtle gray)</SelectItem>
                         <SelectItem value="gradient">Gradient (primary/accent)</SelectItem>
+                        <SelectItem value="mesh">Mesh Gradient (modern blur)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -2117,7 +2454,7 @@ export default function SetupPage() {
                       value={settings.content?.sectionBackgrounds?.testimonials ?? 'default'}
                       onValueChange={value => {
                         const sectionBackgrounds = { ...(settings.content?.sectionBackgrounds || {}) }
-                        sectionBackgrounds.testimonials = value as 'default' | 'muted' | 'gradient'
+                        sectionBackgrounds.testimonials = value as 'default' | 'muted' | 'gradient' | 'mesh'
                         updateContent('sectionBackgrounds', sectionBackgrounds)
                       }}
                     >
@@ -2128,6 +2465,7 @@ export default function SetupPage() {
                         <SelectItem value="default">Default (transparent)</SelectItem>
                         <SelectItem value="muted">Muted (subtle gray)</SelectItem>
                         <SelectItem value="gradient">Gradient (primary/accent)</SelectItem>
+                        <SelectItem value="mesh">Mesh Gradient (modern blur)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -2137,7 +2475,7 @@ export default function SetupPage() {
                       value={settings.content?.sectionBackgrounds?.faq ?? 'muted'}
                       onValueChange={value => {
                         const sectionBackgrounds = { ...(settings.content?.sectionBackgrounds || {}) }
-                        sectionBackgrounds.faq = value as 'default' | 'muted' | 'gradient'
+                        sectionBackgrounds.faq = value as 'default' | 'muted' | 'gradient' | 'mesh'
                         updateContent('sectionBackgrounds', sectionBackgrounds)
                       }}
                     >
@@ -2148,6 +2486,7 @@ export default function SetupPage() {
                         <SelectItem value="default">Default (transparent)</SelectItem>
                         <SelectItem value="muted">Muted (subtle gray)</SelectItem>
                         <SelectItem value="gradient">Gradient (primary/accent)</SelectItem>
+                        <SelectItem value="mesh">Mesh Gradient (modern blur)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -2157,7 +2496,7 @@ export default function SetupPage() {
                       value={settings.content?.sectionBackgrounds?.cta ?? 'default'}
                       onValueChange={value => {
                         const sectionBackgrounds = { ...(settings.content?.sectionBackgrounds || {}) }
-                        sectionBackgrounds.cta = value as 'default' | 'muted' | 'gradient'
+                        sectionBackgrounds.cta = value as 'default' | 'muted' | 'gradient' | 'mesh'
                         updateContent('sectionBackgrounds', sectionBackgrounds)
                       }}
                     >
@@ -2168,6 +2507,28 @@ export default function SetupPage() {
                         <SelectItem value="default">Default (transparent)</SelectItem>
                         <SelectItem value="muted">Muted (subtle gray)</SelectItem>
                         <SelectItem value="gradient">Gradient (primary/accent)</SelectItem>
+                        <SelectItem value="mesh">Mesh Gradient (modern blur)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Customer Stories Section</Label>
+                    <Select
+                      value={settings.content?.sectionBackgrounds?.customerStories ?? 'default'}
+                      onValueChange={value => {
+                        const sectionBackgrounds = { ...(settings.content?.sectionBackgrounds || {}) }
+                        sectionBackgrounds.customerStories = value as 'default' | 'muted' | 'gradient' | 'mesh'
+                        updateContent('sectionBackgrounds', sectionBackgrounds)
+                      }}
+                    >
+                      <SelectTrigger data-testid="select-bg-customer-stories">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Default (transparent)</SelectItem>
+                        <SelectItem value="muted">Muted (subtle gray)</SelectItem>
+                        <SelectItem value="gradient">Gradient (primary/accent)</SelectItem>
+                        <SelectItem value="mesh">Mesh Gradient (modern blur)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

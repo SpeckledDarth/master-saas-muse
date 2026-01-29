@@ -46,6 +46,7 @@ export function useSettings() {
         if (data?.settings) {
           const dbPages = data.settings.pages || {}
           const dbNavigation = data.settings.navigation || {}
+          const dbAnnouncement = data.settings.announcement || {}
           setSettings({
             branding: { ...defaultSettings.branding, ...data.settings.branding },
             pricing: { ...defaultSettings.pricing, ...data.settings.pricing },
@@ -55,6 +56,7 @@ export function useSettings() {
             navigation: {
               items: dbNavigation.items || defaultSettings.navigation?.items || [],
             },
+            announcement: { ...defaultSettings.announcement, ...dbAnnouncement },
             pages: {
               about: { ...defaultSettings.pages.about, ...dbPages.about },
               contact: { ...defaultSettings.pages.contact, ...dbPages.contact },
