@@ -672,7 +672,7 @@ export default function SetupPage() {
 
               {settings.branding.logoUrl && (
                 <div className="p-4 rounded-lg border bg-muted/30 space-y-4">
-                  <p className="text-sm font-medium">Logo Size</p>
+                  <p className="text-sm font-medium">Logo Size & Effects</p>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Logo Width: {settings.branding.logoWidth ?? 32}px</Label>
@@ -699,32 +699,41 @@ export default function SetupPage() {
                       />
                     </div>
                   </div>
+                  <div className="flex items-center gap-2 pt-2">
+                    <Switch
+                      checked={settings.branding.logoHoverEffect ?? true}
+                      onCheckedChange={checked => updateBranding('logoHoverEffect', checked)}
+                      data-testid="switch-logo-hover"
+                    />
+                    <Label>Logo Hover Effect (scale + glow on mouse over)</Label>
+                  </div>
                 </div>
               )}
 
               <div className="p-4 rounded-lg border bg-muted/30 space-y-4">
-                <p className="text-sm font-medium">Brand Name Style</p>
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2">
+                <p className="text-sm font-medium">Header Animation</p>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={settings.branding.brandNameAnimated ?? false}
+                    onCheckedChange={checked => updateBranding('brandNameAnimated', checked)}
+                    data-testid="switch-brand-animated"
+                  />
+                  <Label>Animated Header Reveal</Label>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Adds a fade-in + slide-up effect to your logo/brand when the page loads.
+                </p>
+                {!settings.branding.logoUrl && (
+                  <div className="flex items-center gap-2 pt-2">
                     <Switch
                       checked={settings.branding.brandNameGradient ?? false}
                       onCheckedChange={checked => updateBranding('brandNameGradient', checked)}
                       data-testid="switch-brand-gradient"
                     />
                     <Label>Gradient Brand Name</Label>
+                    <span className="text-xs text-muted-foreground">(applies when no logo is uploaded)</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={settings.branding.brandNameAnimated ?? false}
-                      onCheckedChange={checked => updateBranding('brandNameAnimated', checked)}
-                      data-testid="switch-brand-animated"
-                    />
-                    <Label>Animated Header Reveal</Label>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Gradient applies your primary/accent colors to the brand name. Animation adds a fade-in effect on page load.
-                </p>
+                )}
               </div>
 
               <div className="space-y-2">

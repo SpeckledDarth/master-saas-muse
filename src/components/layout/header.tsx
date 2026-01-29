@@ -32,6 +32,7 @@ export function Header() {
 
   const logoWidth = branding?.logoWidth ?? 32
   const logoHeight = branding?.logoHeight ?? 32
+  const logoHoverEffect = branding?.logoHoverEffect ?? true
   const brandNameGradient = branding?.brandNameGradient ?? false
   const brandNameAnimated = branding?.brandNameAnimated ?? false
 
@@ -68,20 +69,27 @@ export function Header() {
           className={cn(
             "flex items-center space-x-2 group",
             brandNameAnimated && !mounted && "opacity-0 translate-y-2",
-            brandNameAnimated && mounted && "opacity-100 translate-y-0 transition-all duration-500 ease-out"
+            brandNameAnimated && mounted && "opacity-100 translate-y-0 transition-all duration-500 ease-out",
+            !brandNameAnimated && "opacity-100"
           )}
           data-testid="link-home"
         >
           {branding?.logoUrl ? (
             <div 
-              className="relative transition-transform duration-200 group-hover:scale-110"
+              className={cn(
+                "relative transition-all duration-200",
+                logoHoverEffect && "group-hover:scale-110"
+              )}
               style={{ width: logoWidth, height: logoHeight }}
             >
               <Image 
                 src={branding.logoUrl} 
                 alt={branding.appName || 'Logo'}
                 fill
-                className="object-contain transition-all duration-200 group-hover:drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]"
+                className={cn(
+                  "object-contain transition-all duration-200",
+                  logoHoverEffect && "group-hover:drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]"
+                )}
                 unoptimized
               />
             </div>

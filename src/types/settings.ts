@@ -11,6 +11,7 @@ export interface BrandingSettings {
   logoUrl: string | null
   logoWidth?: number
   logoHeight?: number
+  logoHoverEffect?: boolean
   brandNameGradient?: boolean
   brandNameAnimated?: boolean
   faviconUrl: string | null
@@ -340,6 +341,7 @@ export const defaultSettings: SiteSettings = {
     logoUrl: null,
     logoWidth: 32,
     logoHeight: 32,
+    logoHoverEffect: true,
     brandNameGradient: false,
     brandNameAnimated: false,
     faviconUrl: null,
