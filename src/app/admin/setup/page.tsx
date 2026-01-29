@@ -670,6 +670,59 @@ export default function SetupPage() {
                 />
               </div>
 
+              {settings.branding.logoUrl && (
+                <div className="p-4 rounded-lg border bg-muted/30 space-y-4">
+                  <p className="text-sm font-medium">Logo Size & Brand Name Style</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Logo Width: {settings.branding.logoWidth ?? 32}px</Label>
+                      <Input
+                        type="range"
+                        min="20"
+                        max="80"
+                        value={settings.branding.logoWidth ?? 32}
+                        onChange={e => updateBranding('logoWidth', parseInt(e.target.value))}
+                        className="w-full cursor-pointer"
+                        data-testid="input-logo-width"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Logo Height: {settings.branding.logoHeight ?? 32}px</Label>
+                      <Input
+                        type="range"
+                        min="20"
+                        max="80"
+                        value={settings.branding.logoHeight ?? 32}
+                        onChange={e => updateBranding('logoHeight', parseInt(e.target.value))}
+                        className="w-full cursor-pointer"
+                        data-testid="input-logo-height"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={settings.branding.brandNameGradient ?? false}
+                        onCheckedChange={checked => updateBranding('brandNameGradient', checked)}
+                        data-testid="switch-brand-gradient"
+                      />
+                      <Label>Gradient Brand Name</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={settings.branding.brandNameAnimated ?? false}
+                        onCheckedChange={checked => updateBranding('brandNameAnimated', checked)}
+                        data-testid="switch-brand-animated"
+                      />
+                      <Label>Animated Logo Reveal</Label>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Gradient applies your primary/accent colors to the brand name. Animation adds a fade-in effect on page load.
+                  </p>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label>Hero Layout Style</Label>
                 <Select

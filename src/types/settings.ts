@@ -9,6 +9,10 @@ export interface BrandingSettings {
   appName: string
   tagline: string
   logoUrl: string | null
+  logoWidth?: number
+  logoHeight?: number
+  brandNameGradient?: boolean
+  brandNameAnimated?: boolean
   faviconUrl: string | null
   heroImageUrl: string | null
   heroImagePosition: string
