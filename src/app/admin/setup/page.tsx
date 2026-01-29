@@ -607,14 +607,17 @@ export default function SetupPage() {
                 <Label>Hero Layout Style</Label>
                 <Select
                   value={settings.content?.heroStyle ?? 'fullWidth'}
-                  onValueChange={value => updateContent('heroStyle', value as 'fullWidth' | 'split')}
+                  onValueChange={value => updateContent('heroStyle', value as 'fullWidth' | 'split' | 'video' | 'pattern' | 'floating')}
                 >
                   <SelectTrigger data-testid="select-hero-style">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="fullWidth">Full Width Background</SelectItem>
-                    <SelectItem value="split">Split Layout (Image + Text)</SelectItem>
+                    <SelectItem value="fullWidth">Full Width Background Image</SelectItem>
+                    <SelectItem value="split">Split Layout (Image + Text Side by Side)</SelectItem>
+                    <SelectItem value="video">Video Background</SelectItem>
+                    <SelectItem value="pattern">Pattern/Texture Overlay</SelectItem>
+                    <SelectItem value="floating">Gradient + Floating Mockup</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">Choose how the hero section is displayed</p>
@@ -622,6 +625,7 @@ export default function SetupPage() {
 
               {settings.content?.heroStyle === 'split' && (
                 <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+                  <p className="text-sm font-medium">Split Hero Settings</p>
                   <div className="space-y-2">
                     <Label>Split Hero Image</Label>
                     <Input
@@ -646,6 +650,72 @@ export default function SetupPage() {
                         <SelectItem value="left">Image on Left</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                </div>
+              )}
+
+              {settings.content?.heroStyle === 'video' && (
+                <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+                  <p className="text-sm font-medium">Video Hero Settings</p>
+                  <div className="space-y-2">
+                    <Label>Video URL</Label>
+                    <Input
+                      value={settings.branding?.heroVideoUrl ?? ''}
+                      onChange={e => updateBranding('heroVideoUrl', e.target.value)}
+                      placeholder="https://www.youtube.com/embed/... or direct .mp4 URL"
+                      data-testid="input-hero-video-url"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      YouTube embed URL, Vimeo URL, or direct video file URL (.mp4, .webm)
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {settings.content?.heroStyle === 'pattern' && (
+                <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+                  <p className="text-sm font-medium">Pattern/Texture Settings</p>
+                  <div className="space-y-2">
+                    <Label>Pattern Image URL</Label>
+                    <Input
+                      value={settings.branding?.heroPatternUrl ?? ''}
+                      onChange={e => updateBranding('heroPatternUrl', e.target.value)}
+                      placeholder="https://example.com/pattern.png"
+                      data-testid="input-hero-pattern-url"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      URL for seamless pattern/texture image (PNG with transparency works best)
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Pattern Opacity: {settings.branding?.heroPatternOpacity ?? 20}%</Label>
+                    <Input
+                      type="range"
+                      min="5"
+                      max="50"
+                      value={settings.branding?.heroPatternOpacity ?? 20}
+                      onChange={e => updateBranding('heroPatternOpacity', parseInt(e.target.value))}
+                      className="w-full cursor-pointer"
+                      data-testid="input-hero-pattern-opacity"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {settings.content?.heroStyle === 'floating' && (
+                <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+                  <p className="text-sm font-medium">Floating Mockup Settings</p>
+                  <div className="space-y-2">
+                    <Label>Product/Mockup Image URL</Label>
+                    <Input
+                      value={settings.branding?.heroFloatingImageUrl ?? ''}
+                      onChange={e => updateBranding('heroFloatingImageUrl', e.target.value)}
+                      placeholder="https://example.com/product-mockup.png"
+                      data-testid="input-hero-floating-image-url"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      PNG with transparent background works best for the floating effect
+                    </p>
                   </div>
                 </div>
               )}
@@ -1315,9 +1385,73 @@ export default function SetupPage() {
                     data-testid="input-trusted-by-headline"
                   />
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Logo management coming soon. For now, enable to show placeholder logos.
-                </p>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Trusted Logos</Label>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const logos = settings.content?.trustedLogos || []
+                        updateContent('trustedLogos', [
+                          ...logos,
+                          { id: `logo-${Date.now()}`, name: 'New Company', imageUrl: '' }
+                        ])
+                      }}
+                      data-testid="button-add-logo"
+                    >
+                      <Plus className="h-4 w-4 mr-1" /> Add Logo
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {(settings.content?.trustedLogos || []).map((logo, index) => (
+                      <div key={logo.id} className="flex gap-3 items-start p-3 border rounded-lg bg-muted/30">
+                        <div className="flex-1 space-y-2">
+                          <Input
+                            value={logo.name}
+                            onChange={e => {
+                              const logos = [...(settings.content?.trustedLogos || [])]
+                              logos[index] = { ...logos[index], name: e.target.value }
+                              updateContent('trustedLogos', logos)
+                            }}
+                            placeholder="Company name"
+                            data-testid={`input-logo-name-${index}`}
+                          />
+                          <Input
+                            value={logo.imageUrl || ''}
+                            onChange={e => {
+                              const logos = [...(settings.content?.trustedLogos || [])]
+                              logos[index] = { ...logos[index], imageUrl: e.target.value }
+                              updateContent('trustedLogos', logos)
+                            }}
+                            placeholder="Logo image URL (optional - text shown if empty)"
+                            data-testid={`input-logo-url-${index}`}
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => {
+                            const logos = (settings.content?.trustedLogos || []).filter((_, i) => i !== index)
+                            updateContent('trustedLogos', logos)
+                          }}
+                          data-testid={`button-delete-logo-${index}`}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  {(settings.content?.trustedLogos?.length ?? 0) === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No logos added yet. Click "Add Logo" to get started.
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -1345,9 +1479,99 @@ export default function SetupPage() {
                     data-testid="input-metrics-headline"
                   />
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Metric editing coming soon. Default metrics will be shown when enabled.
-                </p>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Metrics</Label>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const metrics = settings.content?.metrics || []
+                        updateContent('metrics', [
+                          ...metrics,
+                          { id: `metric-${Date.now()}`, value: 100, suffix: '+', label: 'New Metric' }
+                        ])
+                      }}
+                      data-testid="button-add-metric"
+                    >
+                      <Plus className="h-4 w-4 mr-1" /> Add Metric
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {(settings.content?.metrics || []).map((metric, index) => (
+                      <div key={metric.id} className="flex gap-3 items-start p-3 border rounded-lg bg-muted/30">
+                        <div className="flex-1 grid grid-cols-4 gap-2">
+                          <Input
+                            value={metric.prefix || ''}
+                            onChange={e => {
+                              const metrics = [...(settings.content?.metrics || [])]
+                              metrics[index] = { ...metrics[index], prefix: e.target.value }
+                              updateContent('metrics', metrics)
+                            }}
+                            placeholder="Prefix ($)"
+                            className="text-center"
+                            data-testid={`input-metric-prefix-${index}`}
+                          />
+                          <Input
+                            type="number"
+                            value={metric.value}
+                            onChange={e => {
+                              const metrics = [...(settings.content?.metrics || [])]
+                              metrics[index] = { ...metrics[index], value: parseInt(e.target.value) || 0 }
+                              updateContent('metrics', metrics)
+                            }}
+                            placeholder="Value"
+                            data-testid={`input-metric-value-${index}`}
+                          />
+                          <Input
+                            value={metric.suffix || ''}
+                            onChange={e => {
+                              const metrics = [...(settings.content?.metrics || [])]
+                              metrics[index] = { ...metrics[index], suffix: e.target.value }
+                              updateContent('metrics', metrics)
+                            }}
+                            placeholder="Suffix (+, %, K)"
+                            className="text-center"
+                            data-testid={`input-metric-suffix-${index}`}
+                          />
+                          <Input
+                            value={metric.label}
+                            onChange={e => {
+                              const metrics = [...(settings.content?.metrics || [])]
+                              metrics[index] = { ...metrics[index], label: e.target.value }
+                              updateContent('metrics', metrics)
+                            }}
+                            placeholder="Label"
+                            data-testid={`input-metric-label-${index}`}
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => {
+                            const metrics = (settings.content?.metrics || []).filter((_, i) => i !== index)
+                            updateContent('metrics', metrics)
+                          }}
+                          data-testid={`button-delete-metric-${index}`}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  {(settings.content?.metrics?.length ?? 0) === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No metrics added yet. Click "Add Metric" to get started.
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Example: Prefix "$", Value "10", Suffix "M+", Label "Revenue" → displays as "$10M+ Revenue"
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
@@ -1386,9 +1610,91 @@ export default function SetupPage() {
                     />
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Step editing coming soon. Default steps will be shown when enabled.
-                </p>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Process Steps</Label>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const steps = settings.content?.processSteps || []
+                        updateContent('processSteps', [
+                          ...steps,
+                          { id: `step-${Date.now()}`, number: steps.length + 1, title: 'New Step', description: 'Step description' }
+                        ])
+                      }}
+                      data-testid="button-add-step"
+                    >
+                      <Plus className="h-4 w-4 mr-1" /> Add Step
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {(settings.content?.processSteps || []).map((step, index) => (
+                      <div key={step.id} className="flex gap-3 items-start p-3 border rounded-lg bg-muted/30">
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm shrink-0">
+                          {step.number}
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="grid grid-cols-4 gap-2">
+                            <Input
+                              type="number"
+                              value={step.number}
+                              onChange={e => {
+                                const steps = [...(settings.content?.processSteps || [])]
+                                steps[index] = { ...steps[index], number: parseInt(e.target.value) || 1 }
+                                updateContent('processSteps', steps)
+                              }}
+                              placeholder="#"
+                              className="w-16"
+                              data-testid={`input-step-number-${index}`}
+                            />
+                            <Input
+                              value={step.title}
+                              onChange={e => {
+                                const steps = [...(settings.content?.processSteps || [])]
+                                steps[index] = { ...steps[index], title: e.target.value }
+                                updateContent('processSteps', steps)
+                              }}
+                              placeholder="Step title"
+                              className="col-span-3"
+                              data-testid={`input-step-title-${index}`}
+                            />
+                          </div>
+                          <Input
+                            value={step.description}
+                            onChange={e => {
+                              const steps = [...(settings.content?.processSteps || [])]
+                              steps[index] = { ...steps[index], description: e.target.value }
+                              updateContent('processSteps', steps)
+                            }}
+                            placeholder="Step description"
+                            data-testid={`input-step-description-${index}`}
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => {
+                            const steps = (settings.content?.processSteps || []).filter((_, i) => i !== index)
+                            updateContent('processSteps', steps)
+                          }}
+                          data-testid={`button-delete-step-${index}`}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  {(settings.content?.processSteps?.length ?? 0) === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No steps added yet. Click "Add Step" to get started.
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -1407,9 +1713,243 @@ export default function SetupPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Image + text block editing coming soon. Default blocks will be shown when enabled.
-                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Content Blocks</Label>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const blocks = settings.content?.imageTextBlocks || []
+                        updateContent('imageTextBlocks', [
+                          ...blocks,
+                          { 
+                            id: `block-${Date.now()}`, 
+                            headline: 'New Section', 
+                            description: 'Add your description here', 
+                            imageUrl: '', 
+                            imagePosition: blocks.length % 2 === 0 ? 'left' : 'right'
+                          }
+                        ])
+                      }}
+                      data-testid="button-add-image-text-block"
+                    >
+                      <Plus className="h-4 w-4 mr-1" /> Add Block
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {(settings.content?.imageTextBlocks || []).map((block, index) => (
+                      <div key={block.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Block {index + 1}</span>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              const blocks = (settings.content?.imageTextBlocks || []).filter((_, i) => i !== index)
+                              updateContent('imageTextBlocks', blocks)
+                            }}
+                            data-testid={`button-delete-image-text-block-${index}`}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-2">
+                            <Label className="text-xs">Headline</Label>
+                            <Input
+                              value={block.headline}
+                              onChange={e => {
+                                const blocks = [...(settings.content?.imageTextBlocks || [])]
+                                blocks[index] = { ...blocks[index], headline: e.target.value }
+                                updateContent('imageTextBlocks', blocks)
+                              }}
+                              placeholder="Section headline"
+                              data-testid={`input-block-headline-${index}`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Image Position</Label>
+                            <Select
+                              value={block.imagePosition}
+                              onValueChange={value => {
+                                const blocks = [...(settings.content?.imageTextBlocks || [])]
+                                blocks[index] = { ...blocks[index], imagePosition: value as 'left' | 'right' }
+                                updateContent('imageTextBlocks', blocks)
+                              }}
+                            >
+                              <SelectTrigger data-testid={`select-block-position-${index}`}>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="left">Image on Left</SelectItem>
+                                <SelectItem value="right">Image on Right</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-xs">Description</Label>
+                          <Textarea
+                            value={block.description}
+                            onChange={e => {
+                              const blocks = [...(settings.content?.imageTextBlocks || [])]
+                              blocks[index] = { ...blocks[index], description: e.target.value }
+                              updateContent('imageTextBlocks', blocks)
+                            }}
+                            placeholder="Section description"
+                            rows={2}
+                            data-testid={`input-block-description-${index}`}
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-xs">Image URL</Label>
+                          <Input
+                            value={block.imageUrl || ''}
+                            onChange={e => {
+                              const blocks = [...(settings.content?.imageTextBlocks || [])]
+                              blocks[index] = { ...blocks[index], imageUrl: e.target.value }
+                              updateContent('imageTextBlocks', blocks)
+                            }}
+                            placeholder="https://example.com/image.jpg"
+                            data-testid={`input-block-image-url-${index}`}
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-2">
+                            <Label className="text-xs">Button Text (optional)</Label>
+                            <Input
+                              value={block.buttonText || ''}
+                              onChange={e => {
+                                const blocks = [...(settings.content?.imageTextBlocks || [])]
+                                blocks[index] = { ...blocks[index], buttonText: e.target.value }
+                                updateContent('imageTextBlocks', blocks)
+                              }}
+                              placeholder="Learn More"
+                              data-testid={`input-block-button-text-${index}`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Button Link (optional)</Label>
+                            <Input
+                              value={block.buttonLink || ''}
+                              onChange={e => {
+                                const blocks = [...(settings.content?.imageTextBlocks || [])]
+                                blocks[index] = { ...blocks[index], buttonLink: e.target.value }
+                                updateContent('imageTextBlocks', blocks)
+                              }}
+                              placeholder="/features"
+                              data-testid={`input-block-button-link-${index}`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {(settings.content?.imageTextBlocks?.length ?? 0) === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No blocks added yet. Click "Add Block" to create alternating image/text sections.
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Section Backgrounds</CardTitle>
+                <CardDescription>Customize background styles for each section</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Features Section</Label>
+                    <Select
+                      value={settings.content?.sectionBackgrounds?.features ?? 'muted'}
+                      onValueChange={value => {
+                        const sectionBackgrounds = { ...(settings.content?.sectionBackgrounds || {}) }
+                        sectionBackgrounds.features = value as 'default' | 'muted' | 'gradient'
+                        updateContent('sectionBackgrounds', sectionBackgrounds)
+                      }}
+                    >
+                      <SelectTrigger data-testid="select-bg-features">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Default (transparent)</SelectItem>
+                        <SelectItem value="muted">Muted (subtle gray)</SelectItem>
+                        <SelectItem value="gradient">Gradient (primary/accent)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Testimonials Section</Label>
+                    <Select
+                      value={settings.content?.sectionBackgrounds?.testimonials ?? 'default'}
+                      onValueChange={value => {
+                        const sectionBackgrounds = { ...(settings.content?.sectionBackgrounds || {}) }
+                        sectionBackgrounds.testimonials = value as 'default' | 'muted' | 'gradient'
+                        updateContent('sectionBackgrounds', sectionBackgrounds)
+                      }}
+                    >
+                      <SelectTrigger data-testid="select-bg-testimonials">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Default (transparent)</SelectItem>
+                        <SelectItem value="muted">Muted (subtle gray)</SelectItem>
+                        <SelectItem value="gradient">Gradient (primary/accent)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>FAQ Section</Label>
+                    <Select
+                      value={settings.content?.sectionBackgrounds?.faq ?? 'muted'}
+                      onValueChange={value => {
+                        const sectionBackgrounds = { ...(settings.content?.sectionBackgrounds || {}) }
+                        sectionBackgrounds.faq = value as 'default' | 'muted' | 'gradient'
+                        updateContent('sectionBackgrounds', sectionBackgrounds)
+                      }}
+                    >
+                      <SelectTrigger data-testid="select-bg-faq">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Default (transparent)</SelectItem>
+                        <SelectItem value="muted">Muted (subtle gray)</SelectItem>
+                        <SelectItem value="gradient">Gradient (primary/accent)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>CTA Section</Label>
+                    <Select
+                      value={settings.content?.sectionBackgrounds?.cta ?? 'default'}
+                      onValueChange={value => {
+                        const sectionBackgrounds = { ...(settings.content?.sectionBackgrounds || {}) }
+                        sectionBackgrounds.cta = value as 'default' | 'muted' | 'gradient'
+                        updateContent('sectionBackgrounds', sectionBackgrounds)
+                      }}
+                    >
+                      <SelectTrigger data-testid="select-bg-cta">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Default (transparent)</SelectItem>
+                        <SelectItem value="muted">Muted (subtle gray)</SelectItem>
+                        <SelectItem value="gradient">Gradient (primary/accent)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>

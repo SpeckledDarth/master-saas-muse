@@ -21,6 +21,10 @@ export interface BrandingSettings {
   supportEmail: string
   lightTheme: ThemeColors
   darkTheme: ThemeColors
+  heroVideoUrl?: string | null
+  heroPatternUrl?: string | null
+  heroPatternOpacity?: number
+  heroFloatingImageUrl?: string | null
 }
 
 export interface PricingPlan {
@@ -147,7 +151,7 @@ export interface ContentSettings {
   testimonialStyle?: 'cards' | 'carousel'
   imageTextEnabled?: boolean
   imageTextBlocks?: ImageTextBlock[]
-  heroStyle?: 'fullWidth' | 'split'
+  heroStyle?: 'fullWidth' | 'split' | 'video' | 'pattern' | 'floating'
   splitHeroImagePosition?: 'left' | 'right'
   splitHeroImageUrl?: string
   sectionBackgrounds?: {

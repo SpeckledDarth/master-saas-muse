@@ -73,6 +73,10 @@ export default function HomePage() {
   const splitHeroImagePosition = content?.splitHeroImagePosition ?? 'right'
   const appName = settings?.branding?.appName || 'My SaaS'
   const appTagline = settings?.branding?.tagline || 'Build something amazing'
+  const heroVideoUrl = settings?.branding?.heroVideoUrl
+  const heroPatternUrl = settings?.branding?.heroPatternUrl
+  const heroPatternOpacity = settings?.branding?.heroPatternOpacity ?? 20
+  const heroFloatingImageUrl = settings?.branding?.heroFloatingImageUrl
 
   const getSectionBg = (section: 'features' | 'testimonials' | 'faq' | 'cta') => {
     const style = content?.sectionBackgrounds?.[section] ?? 'default'
@@ -81,9 +85,33 @@ export default function HomePage() {
     return ''
   }
 
-  return (
-    <div className="flex flex-col">
-      {heroStyle === 'split' && splitHeroImageUrl ? (
+  const renderHeroContent = (isDark: boolean) => (
+    <div className="relative z-10 container mx-auto px-4 text-center">
+      <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${isDark ? 'text-white' : ''}`}>
+        <AppName />
+      </h1>
+      <p className={`text-xl md:text-2xl mb-8 max-w-2xl mx-auto ${isDark ? 'text-white/90' : 'text-muted-foreground'}`}>
+        <AppTagline />
+      </p>
+      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <Button size="lg" asChild data-testid="button-get-started">
+          <Link href="/signup">
+            Get Started Free
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
+        </Button>
+        <Button size="lg" variant="outline" asChild className={isDark ? 'bg-white/10 backdrop-blur-sm border-white/30 text-white' : ''} data-testid="button-view-pricing">
+          <Link href="/pricing">
+            View Pricing
+          </Link>
+        </Button>
+      </div>
+    </div>
+  )
+
+  const renderHero = () => {
+    if (heroStyle === 'split' && splitHeroImageUrl) {
+      return (
         <SplitHero
           headline={appName}
           subheadline={appTagline}
@@ -94,57 +122,152 @@ export default function HomePage() {
           secondaryButtonText="View Pricing"
           secondaryButtonLink="/pricing"
         />
-      ) : (
-        <section 
-          className="relative min-h-[600px] flex items-center justify-center overflow-hidden"
-          data-testid="section-hero"
-        >
-          {heroImageUrl && (
-            <>
-              <Image
-                src={heroImageUrl}
-                alt="Hero background"
-                fill
-                priority
-                unoptimized
-                className="absolute inset-0"
-                style={{
-                  objectFit: heroImageSize as 'cover' | 'contain',
-                  objectPosition: heroImagePosition,
-                }}
-                data-testid="img-hero"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
-            </>
-          )}
-          
-          {!heroImageUrl && !loading && (
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20" />
-          )}
+      )
+    }
 
-          <div className="relative z-10 container mx-auto px-4 text-center">
-            <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${heroImageUrl ? 'text-white' : ''}`}>
-              <AppName />
-            </h1>
-            <p className={`text-xl md:text-2xl mb-8 max-w-2xl mx-auto ${heroImageUrl ? 'text-white/90' : 'text-muted-foreground'}`}>
-              <AppTagline />
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild data-testid="button-get-started">
-                <Link href="/signup">
-                  Get Started Free
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild className={heroImageUrl ? 'bg-white/10 backdrop-blur-sm border-white/30 text-white' : ''} data-testid="button-view-pricing">
-                <Link href="/pricing">
-                  View Pricing
-                </Link>
-              </Button>
+    if (heroStyle === 'video' && heroVideoUrl) {
+      const isYoutube = heroVideoUrl.includes('youtube.com') || heroVideoUrl.includes('youtu.be')
+      const isVimeo = heroVideoUrl.includes('vimeo.com')
+      
+      const getVideoSrc = () => {
+        if (isYoutube) {
+          return `${heroVideoUrl}${heroVideoUrl.includes('?') ? '&' : '?'}autoplay=1&mute=1&loop=1&controls=0&showinfo=0&playlist=${heroVideoUrl.split('/').pop()?.split('?')[0] || ''}`
+        }
+        if (isVimeo) {
+          return `${heroVideoUrl}${heroVideoUrl.includes('?') ? '&' : '?'}background=1&autoplay=1&muted=1&loop=1`
+        }
+        return heroVideoUrl
+      }
+      
+      return (
+        <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden" data-testid="section-hero-video">
+          <div className="absolute inset-0">
+            {isYoutube || isVimeo ? (
+              <iframe
+                src={getVideoSrc()}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ transform: 'scale(1.5)' }}
+                allow="autoplay; fullscreen"
+                frameBorder="0"
+              />
+            ) : (
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+              >
+                <source src={heroVideoUrl} type="video/mp4" />
+              </video>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
+          </div>
+          {renderHeroContent(true)}
+        </section>
+      )
+    }
+
+    if (heroStyle === 'pattern') {
+      return (
+        <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden" data-testid="section-hero-pattern">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background to-accent/30" />
+          {heroPatternUrl && (
+            <div 
+              className="absolute inset-0 bg-repeat"
+              style={{ 
+                backgroundImage: `url(${heroPatternUrl})`,
+                opacity: heroPatternOpacity / 100 
+              }}
+            />
+          )}
+          {renderHeroContent(false)}
+        </section>
+      )
+    }
+
+    if (heroStyle === 'floating' && heroFloatingImageUrl) {
+      return (
+        <section className="relative min-h-[600px] flex items-center overflow-hidden" data-testid="section-hero-floating">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/30" />
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div className="text-left space-y-6">
+                <h1 className="text-4xl md:text-6xl font-bold">
+                  <AppName />
+                </h1>
+                <p className="text-xl md:text-2xl text-muted-foreground">
+                  <AppTagline />
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Button size="lg" asChild data-testid="button-get-started">
+                    <Link href="/signup">
+                      Get Started Free
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                  <Button size="lg" variant="outline" asChild data-testid="button-view-pricing">
+                    <Link href="/pricing">
+                      View Pricing
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+              <div className="relative">
+                <div className="relative animate-float">
+                  <Image
+                    src={heroFloatingImageUrl}
+                    alt="Product mockup"
+                    width={600}
+                    height={400}
+                    className="w-full h-auto drop-shadow-2xl"
+                    unoptimized
+                    data-testid="img-hero-floating"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </section>
-      )}
+      )
+    }
+
+    return (
+      <section 
+        className="relative min-h-[600px] flex items-center justify-center overflow-hidden"
+        data-testid="section-hero"
+      >
+        {heroImageUrl && (
+          <>
+            <Image
+              src={heroImageUrl}
+              alt="Hero background"
+              fill
+              priority
+              unoptimized
+              className="absolute inset-0"
+              style={{
+                objectFit: heroImageSize as 'cover' | 'contain',
+                objectPosition: heroImagePosition,
+              }}
+              data-testid="img-hero"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+          </>
+        )}
+        
+        {!heroImageUrl && !loading && (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20" />
+        )}
+
+        {renderHeroContent(!!heroImageUrl)}
+      </section>
+    )
+  }
+
+  return (
+    <div className="flex flex-col">
+      {renderHero()}
 
       {trustedByEnabled && <LogoMarquee />}
 
