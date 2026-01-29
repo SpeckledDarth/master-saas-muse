@@ -45,12 +45,16 @@ export function useSettings() {
         
         if (data?.settings) {
           const dbPages = data.settings.pages || {}
+          const dbNavigation = data.settings.navigation || {}
           setSettings({
             branding: { ...defaultSettings.branding, ...data.settings.branding },
             pricing: { ...defaultSettings.pricing, ...data.settings.pricing },
             social: { ...defaultSettings.social, ...data.settings.social },
             features: { ...defaultSettings.features, ...data.settings.features },
             content: { ...defaultSettings.content, ...data.settings.content },
+            navigation: {
+              items: dbNavigation.items || defaultSettings.navigation?.items || [],
+            },
             pages: {
               about: { ...defaultSettings.pages.about, ...dbPages.about },
               contact: { ...defaultSettings.pages.contact, ...dbPages.contact },
@@ -111,6 +115,19 @@ function hexToHSL(hex: string): string {
   return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`
 }
 
+function getContrastForeground(hex: string): string {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  if (!result) return '0 0% 100%'
+  
+  const r = parseInt(result[1], 16)
+  const g = parseInt(result[2], 16)
+  const b = parseInt(result[3], 16)
+  
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  
+  return luminance > 0.5 ? '0 0% 0%' : '0 0% 100%'
+}
+
 function applyTheme(theme: { background: string; foreground: string; card: string; border: string } | undefined) {
   if (!theme) return
   
@@ -155,12 +172,14 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
       const hsl = hexToHSL(settings.branding.primaryColor)
       if (hsl) {
         root.style.setProperty('--primary', hsl)
+        root.style.setProperty('--primary-foreground', getContrastForeground(settings.branding.primaryColor))
       }
     }
     if (settings.branding.accentColor) {
       const hsl = hexToHSL(settings.branding.accentColor)
       if (hsl) {
         root.style.setProperty('--accent', hsl)
+        root.style.setProperty('--accent-foreground', getContrastForeground(settings.branding.accentColor))
       }
     }
     
@@ -180,11 +199,17 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
           
           if (settings.branding.primaryColor) {
             const hsl = hexToHSL(settings.branding.primaryColor)
-            if (hsl) root.style.setProperty('--primary', hsl)
+            if (hsl) {
+              root.style.setProperty('--primary', hsl)
+              root.style.setProperty('--primary-foreground', getContrastForeground(settings.branding.primaryColor))
+            }
           }
           if (settings.branding.accentColor) {
             const hsl = hexToHSL(settings.branding.accentColor)
-            if (hsl) root.style.setProperty('--accent', hsl)
+            if (hsl) {
+              root.style.setProperty('--accent', hsl)
+              root.style.setProperty('--accent-foreground', getContrastForeground(settings.branding.accentColor))
+            }
           }
           
           applyTheme(theme)
