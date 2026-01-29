@@ -768,6 +768,22 @@ export default function SetupPage() {
                       Adjust the gap between text and image (0 = tight, 24 = very spaced out)
                     </p>
                   </div>
+                  <div className="space-y-2">
+                    <Label>Image Height: {settings.content?.splitHeroImageHeight ?? 400}px</Label>
+                    <Input
+                      type="range"
+                      min="200"
+                      max="700"
+                      step="25"
+                      value={settings.content?.splitHeroImageHeight ?? 400}
+                      onChange={e => updateContent('splitHeroImageHeight', parseInt(e.target.value))}
+                      className="w-full cursor-pointer"
+                      data-testid="input-split-hero-image-height"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Adjust the image height (200px = small, 700px = large)
+                    </p>
+                  </div>
                 </div>
               )}
 

@@ -198,6 +198,7 @@ export interface ContentSettings {
   splitHeroImageUrl?: string
   splitHeroBackground?: 'transparent' | 'muted' | 'gradient' | 'accent'
   splitHeroGap?: number
+  splitHeroImageHeight?: number
   floatingHeroGap?: number
   sectionBackgrounds?: {
     features?: 'default' | 'muted' | 'gradient' | 'mesh'

@@ -124,6 +124,7 @@ export default function HomePage() {
     if (heroStyle === 'split' && splitHeroImageUrl) {
       const splitHeroBackground = settings?.content?.splitHeroBackground || 'transparent'
       const splitHeroGap = settings?.content?.splitHeroGap ?? 12
+      const splitHeroImageHeight = settings?.content?.splitHeroImageHeight ?? 400
       return (
         <SplitHero
           headline={appName}
@@ -137,6 +138,7 @@ export default function HomePage() {
           animatedWords={heroAnimatedWords}
           background={splitHeroBackground}
           gap={splitHeroGap}
+          imageHeight={splitHeroImageHeight}
         />
       )
     }

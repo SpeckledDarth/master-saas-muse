@@ -20,6 +20,7 @@ interface SplitHeroProps {
   animatedWords?: string[]
   background?: 'transparent' | 'muted' | 'gradient' | 'accent'
   gap?: number
+  imageHeight?: number
 }
 
 export function SplitHero({
@@ -35,7 +36,8 @@ export function SplitHero({
   className = '',
   animatedWords = [],
   background = 'transparent',
-  gap = 12
+  gap = 12,
+  imageHeight = 400
 }: SplitHeroProps) {
   const isImageLeft = imagePosition === 'left'
 
@@ -95,7 +97,10 @@ export function SplitHero({
           </div>
           
           <div>
-            <div className="relative aspect-square md:aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
+            <div 
+              className="relative rounded-xl overflow-hidden shadow-2xl"
+              style={{ height: `${imageHeight}px`, width: 'auto', aspectRatio: '4/3' }}
+            >
               {imageUrl ? (
                 <Image
                   src={imageUrl}
