@@ -171,11 +171,11 @@ function applyTheme(theme: { background: string; foreground: string; card: strin
 }
 
 export function useThemeFromSettings(settings: SiteSettings | null) {
+  // Only apply primary and accent brand colors - let CSS handle light/dark mode
   useEffect(() => {
     if (!settings) return
     
     const root = document.documentElement
-    const isDark = root.classList.contains('dark')
     
     if (settings.branding.primaryColor) {
       const hsl = hexToHSL(settings.branding.primaryColor)
@@ -191,42 +191,7 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
         root.style.setProperty('--accent-foreground', getContrastForeground(settings.branding.accentColor))
       }
     }
-    
-    const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
-    applyTheme(theme)
-  }, [settings?.branding])
-  
-  useEffect(() => {
-    if (!settings) return
-    
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          const root = document.documentElement
-          const isDark = root.classList.contains('dark')
-          const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
-          
-          if (settings.branding.primaryColor) {
-            const hsl = hexToHSL(settings.branding.primaryColor)
-            if (hsl) {
-              root.style.setProperty('--primary', hsl)
-              root.style.setProperty('--primary-foreground', getContrastForeground(settings.branding.primaryColor))
-            }
-          }
-          if (settings.branding.accentColor) {
-            const hsl = hexToHSL(settings.branding.accentColor)
-            if (hsl) {
-              root.style.setProperty('--accent', hsl)
-              root.style.setProperty('--accent-foreground', getContrastForeground(settings.branding.accentColor))
-            }
-          }
-          
-          applyTheme(theme)
-        }
-      })
-    })
-    
-    observer.observe(document.documentElement, { attributes: true })
-    return () => observer.disconnect()
-  }, [settings?.branding])
+    // Note: We no longer apply background/foreground/card/border via inline styles
+    // This allows the CSS .dark class to properly control light/dark mode switching
+  }, [settings?.branding.primaryColor, settings?.branding.accentColor])
 }
