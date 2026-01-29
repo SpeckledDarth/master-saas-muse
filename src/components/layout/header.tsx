@@ -35,15 +35,11 @@ export function Header() {
   const brandNameGradient = branding?.brandNameGradient ?? false
   const brandNameAnimated = branding?.brandNameAnimated ?? false
 
+  // Don't show anything while loading to prevent flash
   if (loading || !settings) {
     return (
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center justify-between gap-4">
-          <div className="h-8 w-32 bg-muted animate-pulse rounded" />
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-          </div>
-        </div>
+      <header className="sticky top-0 z-50 w-full border-b bg-transparent h-14">
+        <div className="container flex h-14 items-center justify-between gap-4" />
       </header>
     )
   }
@@ -55,18 +51,23 @@ export function Header() {
   const scrolledHeaderHeight = Math.max(48, effectiveLogoHeight + 12) // Shrinks padding when scrolled
   const currentHeaderHeight = scrolled ? scrolledHeaderHeight : baseHeaderHeight
 
+  // When animation is enabled but not yet triggered, hide everything including border
+  const isAnimating = brandNameAnimated && !mounted
+
   return (
     <header 
       className={cn(
-        "sticky top-0 z-50 w-full border-b transition-all duration-300",
-        scrolled 
-          ? "bg-background/80 backdrop-blur-lg shadow-sm" 
-          : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        "sticky top-0 z-50 w-full transition-all duration-300",
+        isAnimating 
+          ? "border-transparent bg-transparent" 
+          : scrolled 
+            ? "border-b bg-background/80 backdrop-blur-lg shadow-sm" 
+            : "border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
       )}
       style={{
-        opacity: brandNameAnimated && !mounted ? 0 : 1,
-        transform: brandNameAnimated && !mounted ? 'translateY(-10px)' : 'translateY(0)',
-        transition: 'all 0.3s ease, opacity 0.8s ease-out, transform 0.8s ease-out'
+        opacity: isAnimating ? 0 : 1,
+        transform: isAnimating ? 'translateY(-100%)' : 'translateY(0)',
+        transition: 'opacity 0.6s ease-out, transform 0.6s ease-out, background-color 0.3s ease, border-color 0.3s ease'
       }}
     >
       <div 
