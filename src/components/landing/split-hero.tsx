@@ -50,10 +50,10 @@ export function SplitHero({
     <section className={`py-16 md:py-24 ${bgClasses[background]} ${className}`} data-testid="section-split-hero">
       <div className="container mx-auto px-4">
         <div 
-          className={`flex flex-col ${isImageLeft ? 'md:flex-row-reverse' : 'md:flex-row'} items-center`}
+          className={`grid grid-cols-1 md:grid-cols-2 items-center ${isImageLeft ? '[&>*:first-child]:md:order-2' : ''}`}
           style={{ gap: `${gap * 4}px` }}
         >
-          <div className="w-full md:w-1/2 space-y-6">
+          <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
               {animatedWords.length > 0 ? (
                 <AnimatedWords words={animatedWords} className="text-primary" />
@@ -89,7 +89,7 @@ export function SplitHero({
             )}
           </div>
           
-          <div className="w-full md:w-1/2">
+          <div>
             <div className="relative aspect-square md:aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
               {imageUrl ? (
                 <Image

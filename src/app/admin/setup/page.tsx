@@ -16,6 +16,26 @@ import { Palette, DollarSign, Globe, Settings, Loader2, Save, Check, FileText, P
 import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem } from '@/types/settings'
 import { ImageUpload } from '@/components/admin/image-upload'
 
+function MiniSaveButton({ saving, saved, onClick, testId }: { saving: boolean; saved: boolean; onClick: () => void; testId: string }) {
+  return (
+    <Button 
+      size="sm" 
+      variant="outline"
+      onClick={onClick} 
+      disabled={saving}
+      data-testid={testId}
+    >
+      {saving ? (
+        <Loader2 className="h-3 w-3 animate-spin" />
+      ) : saved ? (
+        <Check className="h-3 w-3" />
+      ) : (
+        <Save className="h-3 w-3" />
+      )}
+    </Button>
+  )
+}
+
 export default function SetupPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
@@ -1137,14 +1157,17 @@ export default function SetupPage() {
                     Display a top banner for promotions or announcements
                   </CardDescription>
                 </div>
-                <Switch
-                  checked={settings.announcement?.enabled ?? false}
-                  onCheckedChange={checked => setSettings(prev => ({
-                    ...prev,
-                    announcement: { ...prev.announcement!, enabled: checked }
-                  }))}
-                  data-testid="switch-announcement-enabled"
-                />
+                <div className="flex items-center gap-2">
+                  <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-announcement" />
+                  <Switch
+                    checked={settings.announcement?.enabled ?? false}
+                    onCheckedChange={checked => setSettings(prev => ({
+                      ...prev,
+                      announcement: { ...prev.announcement!, enabled: checked }
+                    }))}
+                    data-testid="switch-announcement-enabled"
+                  />
+                </div>
               </div>
             </CardHeader>
             {settings.announcement?.enabled && (
@@ -1368,11 +1391,14 @@ export default function SetupPage() {
                     <CardTitle>Features Section</CardTitle>
                     <CardDescription>Highlight what makes your product special</CardDescription>
                   </div>
-                  <Switch
-                    checked={settings.content?.featuresEnabled ?? true}
-                    onCheckedChange={checked => updateContent('featuresEnabled', checked)}
-                    data-testid="switch-features-enabled"
-                  />
+                  <div className="flex items-center gap-2">
+                    <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-features" />
+                    <Switch
+                      checked={settings.content?.featuresEnabled ?? true}
+                      onCheckedChange={checked => updateContent('featuresEnabled', checked)}
+                      data-testid="switch-features-enabled"
+                    />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1476,11 +1502,14 @@ export default function SetupPage() {
                     <CardTitle>Testimonials</CardTitle>
                     <CardDescription>Show what customers say about your product</CardDescription>
                   </div>
-                  <Switch
-                    checked={settings.content?.testimonialsEnabled ?? true}
-                    onCheckedChange={checked => updateContent('testimonialsEnabled', checked)}
-                    data-testid="switch-testimonials-enabled"
-                  />
+                  <div className="flex items-center gap-2">
+                    <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-testimonials" />
+                    <Switch
+                      checked={settings.content?.testimonialsEnabled ?? true}
+                      onCheckedChange={checked => updateContent('testimonialsEnabled', checked)}
+                      data-testid="switch-testimonials-enabled"
+                    />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1585,11 +1614,14 @@ export default function SetupPage() {
                     <CardTitle>FAQ Section</CardTitle>
                     <CardDescription>Answer common questions</CardDescription>
                   </div>
-                  <Switch
-                    checked={settings.content?.faqEnabled ?? true}
-                    onCheckedChange={checked => updateContent('faqEnabled', checked)}
-                    data-testid="switch-faq-enabled"
-                  />
+                  <div className="flex items-center gap-2">
+                    <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-faq" />
+                    <Switch
+                      checked={settings.content?.faqEnabled ?? true}
+                      onCheckedChange={checked => updateContent('faqEnabled', checked)}
+                      data-testid="switch-faq-enabled"
+                    />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1717,11 +1749,14 @@ export default function SetupPage() {
                     <CardTitle>Trusted By / Logo Marquee</CardTitle>
                     <CardDescription>Show scrolling logos of companies that trust you</CardDescription>
                   </div>
-                  <Switch
-                    checked={settings.content?.trustedByEnabled ?? false}
-                    onCheckedChange={checked => updateContent('trustedByEnabled', checked)}
-                    data-testid="switch-trusted-by-enabled"
-                  />
+                  <div className="flex items-center gap-2">
+                    <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-logo-marquee" />
+                    <Switch
+                      checked={settings.content?.trustedByEnabled ?? false}
+                      onCheckedChange={checked => updateContent('trustedByEnabled', checked)}
+                      data-testid="switch-trusted-by-enabled"
+                    />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1849,11 +1884,14 @@ export default function SetupPage() {
                     <CardTitle>Metrics / Counters</CardTitle>
                     <CardDescription>Show animated metric counters (e.g., "10,000+ Customers")</CardDescription>
                   </div>
-                  <Switch
-                    checked={settings.content?.metricsEnabled ?? false}
-                    onCheckedChange={checked => updateContent('metricsEnabled', checked)}
-                    data-testid="switch-metrics-enabled"
-                  />
+                  <div className="flex items-center gap-2">
+                    <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-metrics" />
+                    <Switch
+                      checked={settings.content?.metricsEnabled ?? false}
+                      onCheckedChange={checked => updateContent('metricsEnabled', checked)}
+                      data-testid="switch-metrics-enabled"
+                    />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -2023,11 +2061,14 @@ export default function SetupPage() {
                     <CardTitle>How It Works / Process Steps</CardTitle>
                     <CardDescription>Show step-by-step process visualization</CardDescription>
                   </div>
-                  <Switch
-                    checked={settings.content?.processEnabled ?? false}
-                    onCheckedChange={checked => updateContent('processEnabled', checked)}
-                    data-testid="switch-process-enabled"
-                  />
+                  <div className="flex items-center gap-2">
+                    <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-process" />
+                    <Switch
+                      checked={settings.content?.processEnabled ?? false}
+                      onCheckedChange={checked => updateContent('processEnabled', checked)}
+                      data-testid="switch-process-enabled"
+                    />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -2146,11 +2187,14 @@ export default function SetupPage() {
                     <CardTitle>Image + Text Blocks</CardTitle>
                     <CardDescription>Alternating image and text sections (like GitBook/TheWone)</CardDescription>
                   </div>
-                  <Switch
-                    checked={settings.content?.imageTextEnabled ?? false}
-                    onCheckedChange={checked => updateContent('imageTextEnabled', checked)}
-                    data-testid="switch-image-text-enabled"
-                  />
+                  <div className="flex items-center gap-2">
+                    <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-image-text" />
+                    <Switch
+                      checked={settings.content?.imageTextEnabled ?? false}
+                      onCheckedChange={checked => updateContent('imageTextEnabled', checked)}
+                      data-testid="switch-image-text-enabled"
+                    />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -2346,11 +2390,14 @@ export default function SetupPage() {
                     <CardTitle>Customer Stories</CardTitle>
                     <CardDescription>Showcase customer success stories with photos and quotes</CardDescription>
                   </div>
-                  <Switch
-                    checked={settings.content?.customerStoriesEnabled ?? false}
-                    onCheckedChange={checked => updateContent('customerStoriesEnabled', checked)}
-                    data-testid="switch-customer-stories-enabled"
-                  />
+                  <div className="flex items-center gap-2">
+                    <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-customer-stories" />
+                    <Switch
+                      checked={settings.content?.customerStoriesEnabled ?? false}
+                      onCheckedChange={checked => updateContent('customerStoriesEnabled', checked)}
+                      data-testid="switch-customer-stories-enabled"
+                    />
+                  </div>
                 </div>
               </CardHeader>
               {(settings.content?.customerStoriesEnabled ?? false) && (
@@ -2527,8 +2574,13 @@ export default function SetupPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Section Backgrounds</CardTitle>
-                <CardDescription>Customize background styles for each section</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Section Backgrounds</CardTitle>
+                    <CardDescription>Customize background styles for each section</CardDescription>
+                  </div>
+                  <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-backgrounds" />
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
