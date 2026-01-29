@@ -54,9 +54,9 @@ export function SplitHero({
   
   return (
     <section className={`py-16 md:py-24 ${bgClasses[background]} ${className}`} data-testid="section-split-hero">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 flex justify-center">
         <div 
-          className={`grid grid-cols-1 md:grid-cols-[auto_1fr] items-center ${isImageLeft ? 'md:grid-cols-[1fr_auto] [&>*:first-child]:md:order-2' : ''}`}
+          className={`grid grid-cols-1 md:grid-cols-[auto_auto] items-center ${isImageLeft ? '[&>*:first-child]:md:order-2' : ''}`}
           style={{ gap: `${gapPx}px` }}
           data-gap={gap}
         >
