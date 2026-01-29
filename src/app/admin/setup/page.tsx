@@ -872,6 +872,22 @@ export default function SetupPage() {
                       Adjust the gap between the text content and the floating image (0 = tight, 24 = very spaced out)
                     </p>
                   </div>
+                  <div className="space-y-2">
+                    <Label>Image Height: {settings.content?.floatingHeroImageHeight ?? 400}px</Label>
+                    <Input
+                      type="range"
+                      min="200"
+                      max="700"
+                      step="25"
+                      value={settings.content?.floatingHeroImageHeight ?? 400}
+                      onChange={e => updateContent('floatingHeroImageHeight', parseInt(e.target.value))}
+                      className="w-full cursor-pointer"
+                      data-testid="input-floating-hero-image-height"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Adjust the floating image height (200px = small, 700px = large)
+                    </p>
+                  </div>
                 </div>
               )}
 

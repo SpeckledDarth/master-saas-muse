@@ -200,6 +200,7 @@ export interface ContentSettings {
   splitHeroGap?: number
   splitHeroImageHeight?: number
   floatingHeroGap?: number
+  floatingHeroImageHeight?: number
   sectionBackgrounds?: {
     features?: 'default' | 'muted' | 'gradient' | 'mesh'
     testimonials?: 'default' | 'muted' | 'gradient' | 'mesh'

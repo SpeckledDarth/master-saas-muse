@@ -221,12 +221,13 @@ export default function HomePage() {
 
     if (heroStyle === 'floating' && heroFloatingImageUrl) {
       const floatingGap = settings?.content?.floatingHeroGap ?? 8
+      const floatingImageHeight = settings?.content?.floatingHeroImageHeight ?? 400
       return (
         <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden" data-testid="section-hero-floating">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/30" />
           <div className="relative z-10 container mx-auto px-4 flex justify-center">
-            <div className="grid md:grid-cols-2 items-center max-w-6xl w-full" style={{ gap: `${floatingGap * 4}px` }}>
-              <div className="text-left space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-[auto_auto] items-center" style={{ gap: `${floatingGap * 4}px` }}>
+              <div className="text-left space-y-6 max-w-lg">
                 <h1 className="text-4xl md:text-6xl font-bold">
                   {heroAnimatedWords.length > 0 ? (
                     <AnimatedWords words={heroAnimatedWords} className="text-primary" />
@@ -252,13 +253,12 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="relative">
-                <div className="relative animate-float">
+                <div className="relative animate-float" style={{ height: `${floatingImageHeight}px`, aspectRatio: '4/3' }}>
                   <Image
                     src={heroFloatingImageUrl}
                     alt="Product mockup"
-                    width={600}
-                    height={400}
-                    className="w-full h-auto drop-shadow-2xl"
+                    fill
+                    className="object-contain drop-shadow-2xl"
                     unoptimized
                     data-testid="img-hero-floating"
                   />
