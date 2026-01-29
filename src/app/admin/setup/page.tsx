@@ -679,7 +679,7 @@ export default function SetupPage() {
                       <Input
                         type="range"
                         min="16"
-                        max="200"
+                        max="400"
                         value={settings.branding.logoWidth ?? 32}
                         onChange={e => updateBranding('logoWidth', parseInt(e.target.value))}
                         className="w-full cursor-pointer"
@@ -697,6 +697,7 @@ export default function SetupPage() {
                         className="w-full cursor-pointer"
                         data-testid="input-logo-height"
                       />
+                      <p className="text-xs text-muted-foreground">Header grows with logo (visual max ~120px in header)</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 pt-2">
@@ -721,7 +722,7 @@ export default function SetupPage() {
                   <Label>Animated Header Reveal</Label>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Adds a fade-in + slide-up effect to your logo/brand when the page loads.
+                  Adds a fade-in + slide-down effect to the header when visitors first load the page. Refresh to see the effect.
                 </p>
                 {!settings.branding.logoUrl && (
                   <div className="flex items-center gap-2 pt-2">

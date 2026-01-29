@@ -49,6 +49,13 @@ export function Header() {
     )
   }
 
+  // Calculate dynamic header height based on logo size (with min/max bounds)
+  // Allow up to 120px logo height, header will grow to accommodate
+  const effectiveLogoHeight = Math.min(logoHeight, 120)
+  const baseHeaderHeight = Math.max(56, effectiveLogoHeight + 24) // Logo + 24px padding
+  const scrolledHeaderHeight = Math.max(48, effectiveLogoHeight + 12) // Shrinks padding when scrolled
+  const currentHeaderHeight = scrolled ? scrolledHeaderHeight : baseHeaderHeight
+
   return (
     <header 
       className={cn(
@@ -57,37 +64,38 @@ export function Header() {
           ? "bg-background/80 backdrop-blur-lg shadow-sm" 
           : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
       )}
+      style={{
+        opacity: brandNameAnimated && !mounted ? 0 : 1,
+        transform: brandNameAnimated && !mounted ? 'translateY(-10px)' : 'translateY(0)',
+        transition: 'all 0.3s ease, opacity 0.8s ease-out, transform 0.8s ease-out'
+      }}
     >
       <div 
-        className={cn(
-          "container flex items-center justify-between gap-4 transition-all duration-300",
-          scrolled ? "h-12" : "h-14"
-        )}
+        className="container flex items-center justify-between gap-4 transition-all duration-300"
+        style={{ height: currentHeaderHeight }}
       >
         <Link 
           href="/" 
-          className={cn(
-            "flex items-center space-x-2 group",
-            brandNameAnimated && !mounted && "opacity-0 translate-y-2",
-            brandNameAnimated && mounted && "opacity-100 translate-y-0 transition-all duration-500 ease-out",
-            !brandNameAnimated && "opacity-100"
-          )}
+          className="flex items-center space-x-2 group flex-shrink-0"
           data-testid="link-home"
         >
           {branding?.logoUrl ? (
             <div 
               className={cn(
-                "relative transition-all duration-200",
+                "relative transition-all duration-200 flex-shrink-0",
                 logoHoverEffect && "group-hover:scale-110"
               )}
-              style={{ width: logoWidth, height: logoHeight }}
+              style={{ 
+                width: logoWidth, 
+                height: effectiveLogoHeight,
+              }}
             >
               <Image 
                 src={branding.logoUrl} 
                 alt={branding.appName || 'Logo'}
                 fill
                 className={cn(
-                  "object-contain transition-all duration-200",
+                  "object-contain object-left transition-all duration-200",
                   logoHoverEffect && "group-hover:drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]"
                 )}
                 unoptimized
