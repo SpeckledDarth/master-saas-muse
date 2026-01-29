@@ -51,23 +51,20 @@ export function Header() {
   const scrolledHeaderHeight = Math.max(48, effectiveLogoHeight + 12) // Shrinks padding when scrolled
   const currentHeaderHeight = scrolled ? scrolledHeaderHeight : baseHeaderHeight
 
-  // When animation is enabled but not yet triggered, hide everything including border
+  // When animation is enabled but not yet triggered, use clip-path to hide content
   const isAnimating = brandNameAnimated && !mounted
 
   return (
     <header 
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
-        isAnimating 
-          ? "border-transparent bg-transparent" 
-          : scrolled 
-            ? "border-b bg-background/80 backdrop-blur-lg shadow-sm" 
-            : "border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        scrolled 
+          ? "border-b bg-background/80 backdrop-blur-lg shadow-sm" 
+          : "border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
       )}
       style={{
-        opacity: isAnimating ? 0 : 1,
-        transform: isAnimating ? 'translateY(-100%)' : 'translateY(0)',
-        transition: 'opacity 0.6s ease-out, transform 0.6s ease-out, background-color 0.3s ease, border-color 0.3s ease'
+        clipPath: isAnimating ? 'inset(0 0 100% 0)' : 'inset(0 0 0 0)',
+        transition: 'clip-path 0.7s ease-out, background-color 0.3s ease'
       }}
     >
       <div 
