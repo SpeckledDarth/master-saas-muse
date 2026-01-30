@@ -27,6 +27,7 @@ export async function GET() {
     const { data: invitations, error } = await adminClient
       .from('invitations')
       .select('*')
+      .is('accepted_at', null)
       .order('created_at', { ascending: false })
 
     if (error) {
