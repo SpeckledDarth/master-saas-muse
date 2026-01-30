@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET() {
   try {
@@ -10,7 +11,20 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: onboarding, error } = await supabase
+    // Check admin role
+    const { data: userRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+
+    if (userRole?.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    }
+
+    // Use admin client to bypass RLS
+    const adminClient = createAdminClient()
+    const { data: onboarding, error } = await adminClient
       .from('onboarding_state')
       .select('*')
       .eq('user_id', user.id)
@@ -45,17 +59,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Check admin role
+    const { data: userRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+
+    if (userRole?.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    }
+
     const body = await request.json()
     const { current_step, completed_steps, completed } = body
 
-    const { data: existing } = await supabase
+    // Use admin client to bypass RLS
+    const adminClient = createAdminClient()
+
+    const { data: existing } = await adminClient
       .from('onboarding_state')
       .select('id')
       .eq('user_id', user.id)
       .single()
 
     if (existing) {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('onboarding_state')
         .update({
           current_step,
@@ -69,7 +97,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     } else {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('onboarding_state')
         .insert({
           user_id: user.id,

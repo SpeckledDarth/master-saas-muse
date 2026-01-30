@@ -22,7 +22,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const { data: members, error } = await supabase
+    // Use admin client for all operations to bypass RLS
+    const adminClient = createAdminClient()
+    
+    const { data: members, error } = await adminClient
       .from('organization_members')
       .select('*')
       .order('joined_at', { ascending: false })
@@ -37,7 +40,6 @@ export async function GET() {
     let users: any[] = []
     if (memberIds.length > 0) {
       try {
-        const adminClient = createAdminClient()
         const { data: authUsers } = await adminClient.auth.admin.listUsers()
         users = authUsers?.users?.filter(u => memberIds.includes(u.id)) || []
       } catch (adminError) {
@@ -84,12 +86,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { action, email, role, memberId } = body
 
+    // Use admin client for all operations
+    const adminClient = createAdminClient()
+
     if (action === 'invite') {
       const token = crypto.randomUUID()
       const expiresAt = new Date()
       expiresAt.setDate(expiresAt.getDate() + 7)
 
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('invitations')
         .insert({
           organization_id: 1,
@@ -101,11 +106,12 @@ export async function POST(request: NextRequest) {
         })
 
       if (error) {
+        console.error('Invitation insert error:', error)
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
 
       // Get settings for app name
-      const { data: settingsData } = await supabase
+      const { data: settingsData } = await adminClient
         .from('organization_settings')
         .select('settings')
         .eq('app_id', 'default')
@@ -138,7 +144,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'update_role') {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('organization_members')
         .update({ role })
         .eq('id', memberId)
@@ -151,7 +157,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'remove') {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('organization_members')
         .delete()
         .eq('id', memberId)

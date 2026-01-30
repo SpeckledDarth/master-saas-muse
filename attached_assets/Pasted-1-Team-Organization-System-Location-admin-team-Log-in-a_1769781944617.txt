@@ -1,0 +1,63 @@
+1. Team/Organization System
+Location: /admin/team
+•	Log in as admin - Done
+•	Click "Invite Member" button - Done
+•	Enter an email address and select a role (Admin, Member) – Done
+ERROR REMAINS:  After clicking “Send Invite”, The button changes to temporarily to say “sending…”, but then nothing else happens.  Window stays open, not email sent. 
+•	Check that invitations appear in the list - TBD
+•	Test changing member roles with the dropdown - TBD
+________________________________________
+2. Onboarding Wizard
+Location: /admin/onboarding
+ERROR REMAINS:  on the page, the “Continue button” on the wizard does not work. 
+•	Visit the onboarding page as a new admin - TBD
+•	Walk through 4 steps: Branding → Stripe → Content → Launch - TBD
+•	Test "Skip" buttons on each step - TBD
+•	Try "Complete" to mark steps done - TBD
+•	Progress saves to database - TBD
+________________________________________
+3. Blog/Changelog System
+Public pages: /blog and /changelog
+Admin: /admin/content
+•	Go to Admin → Content - Done
+•	Create a new blog post (title, slug, content in markdown) - 
+ERROR REMAINS: After clicking “+ New Blog Post” button opens a popup with fields.  After completely the fields and Saving, the button does not work.  Popup remains, no information saved.
+•	Toggle between "Draft" and "Published" - TBD
+•	Visit /blog to see published posts - TBD
+•	Click a post to see /blog/[slug] detail page - TBD
+•	Create changelog entries and view at /changelog - TBD
+________________________________________
+4. Waitlist Mode
+Admin: /admin/waitlist
+ERROR REMAINS:  No /admin/waitlist page exists.  I do see a menu button on the Admin dashboard with an empty placeholder for a table; however, no data, no interactions available, no unique page as described.
+•	Enable "Waitlist Mode" in Admin → Settings → Features - TBD
+•	Add the waitlist form to your landing page (or test at /admin/waitlist) - TBD
+•	Submit test emails - TBD
+•	View collected emails in the admin panel - TBD
+•	Test CSV export button - TBD
+________________________________________
+5. Feedback Widget
+Visible on all pages (floating button, bottom-right)
+Admin: /admin/feedback
+ERROR REMAINS: I do see a menu button on the Admin dashboard with an empty placeholder for a table; however, no data, no interactions available, no unique page as described.
+•	Enable "Feedback Widget" in Admin → Settings → Features - TBD
+•	Click the floating feedback button on any page - TBD
+•	Submit feedback (works for logged-in and anonymous users) - TBD
+•	Go to Admin → Feedback to see submissions - TBD
+•	Change status (New, In Progress, Resolved, Closed) - TBD
+________________________________________
+6. Email Templates Editor
+Location: /admin/email-templates
+ERROR REMAINS: I do see a menu button on the Admin dashboard with an empty placeholder for a table; however, no data, no interactions available, no unique page as described.
+•	View 5 default templates: Welcome, Subscription Confirmed, Subscription Cancelled, Password Reset, Team Invitation - TBD
+•	Edit subject line and body - TBD
+•	Use placeholders like {{appName}}, {{name}}, {{email}} - TBD
+•	Save changes - TBD
+________________________________________
+7. Analytics Dashboard
+Location: /admin/analytics – DONE.  I see the data.  
+
+ERROR: However, how is this different than the metrics at /admin?  Imho, these are duplicate pages (with some extra data).  Regardless, if duplicate, I prefer this page and not the one at /admin.  Its possible we do not need content on that page anymore other than dashboard navigation.  Lets discuss.
+•	View key metrics: Total Users, New This Month, Active Subscriptions - Done
+•	See Waitlist Count and Feedback Count - Done
+•	View Recent Signups list - Done

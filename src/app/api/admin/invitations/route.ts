@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET() {
   try {
@@ -10,7 +11,20 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: invitations, error } = await supabase
+    // Check admin role
+    const { data: userRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+
+    if (userRole?.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    }
+
+    // Use admin client to bypass RLS
+    const adminClient = createAdminClient()
+    const { data: invitations, error } = await adminClient
       .from('invitations')
       .select('*')
       .order('created_at', { ascending: false })
@@ -53,7 +67,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Invitation ID required' }, { status: 400 })
     }
 
-    const { error } = await supabase
+    // Use admin client to bypass RLS
+    const adminClient = createAdminClient()
+    const { error } = await adminClient
       .from('invitations')
       .delete()
       .eq('id', invitationId)
