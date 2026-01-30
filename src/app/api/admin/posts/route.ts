@@ -10,8 +10,26 @@ export async function GET(request: NextRequest) {
     const published = searchParams.get('published')
     const adminOnly = searchParams.get('admin') === 'true'
     
-    // For admin requests, use the admin client to bypass RLS
-    const client = adminOnly ? createAdminClient() : supabase
+    // For admin requests, verify user is actually an admin before using admin client
+    let client = supabase
+    if (adminOnly) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      
+      const { data: userRole } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single()
+      
+      if (userRole?.role !== 'admin') {
+        return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+      }
+      
+      client = createAdminClient()
+    }
     
     let query = client.from('posts').select('*').order('created_at', { ascending: false })
     
@@ -117,6 +135,17 @@ export async function DELETE(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Check admin role before deleting
+    const { data: userRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+
+    if (userRole?.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
