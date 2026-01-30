@@ -58,7 +58,7 @@ export default function InvitePage() {
   const handleAccept = async () => {
     if (!user) {
       localStorage.setItem('pendingInviteToken', token)
-      router.push(`/auth?redirect=/invite/${token}`)
+      router.push(`/login?redirectTo=/invite/${token}`)
       return
     }
 
