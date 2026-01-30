@@ -64,7 +64,11 @@ export default function TeamPage() {
   }
 
   async function handleInvite() {
-    if (!inviteEmail) return
+    console.log('[Team Invite] handleInvite called')
+    if (!inviteEmail) {
+      console.log('[Team Invite] No email, returning')
+      return
+    }
     setSending(true)
     console.log('[Team Invite] Starting invite for:', inviteEmail, 'role:', inviteRole)
     
@@ -225,10 +229,10 @@ export default function TeamPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setInviteDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleInvite} disabled={sending || !inviteEmail} data-testid="button-send-invite">
+              <Button type="button" onClick={handleInvite} disabled={sending || !inviteEmail} data-testid="button-send-invite">
                 {sending ? 'Sending...' : 'Send Invitation'}
               </Button>
             </DialogFooter>
