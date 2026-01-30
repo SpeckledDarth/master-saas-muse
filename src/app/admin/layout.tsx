@@ -73,6 +73,15 @@ export default function AdminLayout({
             </Button>
             <div className="flex items-center gap-2">
               <Button 
+                variant={pathname === '/admin/onboarding' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
+                <Link href="/admin/onboarding" data-testid="link-admin-onboarding">
+                  Onboarding
+                </Link>
+              </Button>
+              <Button 
                 variant={pathname === '/admin/setup' ? 'secondary' : 'ghost'} 
                 size="sm" 
                 asChild
@@ -88,6 +97,15 @@ export default function AdminLayout({
               >
                 <Link href="/admin/users" data-testid="link-admin-users">
                   Users
+                </Link>
+              </Button>
+              <Button 
+                variant={pathname === '/admin/settings' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
+                <Link href="/admin/settings" data-testid="link-admin-settings">
+                  Settings
                 </Link>
               </Button>
               <Button 

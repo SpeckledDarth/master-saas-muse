@@ -1,8 +1,23 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { headers } from 'next/headers'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
+  // Try to get the actual host from request headers
+  let baseUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
+  
+  if (!baseUrl) {
+    try {
+      const headersList = await headers()
+      const host = headersList.get('host')
+      const protocol = headersList.get('x-forwarded-proto') || 'https'
+      if (host) {
+        baseUrl = `${protocol}://${host}`
+      }
+    } catch {
+      baseUrl = 'https://example.com'
+    }
+  }
   
   const staticPages = [
     {
