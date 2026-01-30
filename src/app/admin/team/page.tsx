@@ -15,7 +15,7 @@ import { Users, Mail, UserPlus, Trash2, Shield, User, Crown } from 'lucide-react
 interface TeamMember {
   id: number
   user_id: string
-  role: 'owner' | 'admin' | 'member'
+  role: 'owner' | 'manager' | 'member' | 'viewer'
   joined_at: string
   email: string
   name: string
@@ -156,7 +156,8 @@ export default function TeamPage() {
   function getRoleIcon(role: string) {
     switch (role) {
       case 'owner': return <Crown className="h-4 w-4" />
-      case 'admin': return <Shield className="h-4 w-4" />
+      case 'manager': return <Shield className="h-4 w-4" />
+      case 'viewer': return <User className="h-4 w-4" />
       default: return <User className="h-4 w-4" />
     }
   }
@@ -164,7 +165,7 @@ export default function TeamPage() {
   function getRoleBadgeVariant(role: string) {
     switch (role) {
       case 'owner': return 'default'
-      case 'admin': return 'secondary'
+      case 'manager': return 'secondary'
       default: return 'outline'
     }
   }
@@ -224,8 +225,9 @@ export default function TeamPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="manager">Manager</SelectItem>
                     <SelectItem value="member">Member</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="viewer">Viewer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -287,8 +289,9 @@ export default function TeamPage() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
+                            <SelectItem value="manager">Manager</SelectItem>
                             <SelectItem value="member">Member</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="viewer">Viewer</SelectItem>
                           </SelectContent>
                         </Select>
                         <Button

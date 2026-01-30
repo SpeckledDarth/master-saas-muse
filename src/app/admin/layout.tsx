@@ -27,24 +27,14 @@ export default function AdminLayout({
         return
       }
       
-      // Check user_roles table first
+      // Check user_roles table for app admin access
       const { data: role } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
         .single()
       
-      // Also check organization_members for team admin role
-      const { data: teamRole } = await supabase
-        .from('organization_members')
-        .select('role')
-        .eq('user_id', user.id)
-        .single()
-      
-      const isAppAdmin = role?.role === 'admin'
-      const isTeamAdmin = teamRole?.role === 'admin' || teamRole?.role === 'owner'
-      
-      if (!isAppAdmin && !isTeamAdmin) {
+      if (role?.role !== 'admin') {
         router.push('/')
         return
       }
