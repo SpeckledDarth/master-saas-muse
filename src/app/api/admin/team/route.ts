@@ -113,12 +113,14 @@ export async function POST(request: NextRequest) {
       const expiresAt = new Date()
       expiresAt.setDate(expiresAt.getDate() + 7)
 
-      console.log('[Team API] Inserting invitation for:', email)
+      // Normalize email to lowercase for consistency
+      const normalizedEmail = email.toLowerCase().trim()
+      console.log('[Team API] Inserting invitation for:', normalizedEmail)
       const { data: insertData, error } = await adminClient
         .from('invitations')
         .insert({
           organization_id: 1,
-          email,
+          email: normalizedEmail,
           role: role || 'member',
           token,
           invited_by: user.id,
@@ -148,7 +150,7 @@ export async function POST(request: NextRequest) {
       // Try to send email
       try {
         await sendEmail({
-          to: email,
+          to: normalizedEmail,
           subject: `You've been invited to join ${appName}`,
           html: `
             <h2>You've been invited!</h2>
