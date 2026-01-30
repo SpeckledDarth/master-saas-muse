@@ -68,13 +68,21 @@ export default function SignupPage() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Check your email</CardTitle>
             <CardDescription>
-              We've sent you a confirmation link at <strong>{email}</strong>
+              We've sent a confirmation link to <strong>{email}</strong>
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground text-center">
               Click the link in your email to activate your account.
             </p>
+            <div className="rounded-md bg-muted p-3">
+              <p className="text-sm text-muted-foreground text-center">
+                <strong>No email?</strong> Check your spam folder, or if you already have an account,{' '}
+                <Link href="/login" className="text-primary hover:underline" data-testid="link-login-from-success">
+                  try logging in instead
+                </Link>.
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
