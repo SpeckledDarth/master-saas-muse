@@ -12,7 +12,11 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: userRole } = await supabase
+    // Use admin client for all operations to bypass RLS
+    const adminClient = createAdminClient()
+
+    // Check admin role using admin client to bypass RLS
+    const { data: userRole } = await adminClient
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
@@ -21,9 +25,6 @@ export async function GET() {
     if (userRole?.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
-
-    // Use admin client for all operations to bypass RLS
-    const adminClient = createAdminClient()
     
     const { data: members, error } = await adminClient
       .from('organization_members')
@@ -73,7 +74,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: userRole } = await supabase
+    // Use admin client for all operations to bypass RLS
+    const adminClient = createAdminClient()
+
+    // Check admin role using admin client to bypass RLS
+    const { data: userRole } = await adminClient
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
@@ -85,9 +90,6 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const { action, email, role, memberId } = body
-
-    // Use admin client for all operations
-    const adminClient = createAdminClient()
 
     if (action === 'invite') {
       const token = crypto.randomUUID()
