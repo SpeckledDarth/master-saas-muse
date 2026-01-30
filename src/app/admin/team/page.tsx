@@ -66,6 +66,7 @@ export default function TeamPage() {
   async function handleInvite() {
     if (!inviteEmail) return
     setSending(true)
+    console.log('[Team Invite] Starting invite for:', inviteEmail, 'role:', inviteRole)
     
     try {
       const res = await fetch('/api/admin/team', {
@@ -74,19 +75,24 @@ export default function TeamPage() {
         body: JSON.stringify({ action: 'invite', email: inviteEmail, role: inviteRole })
       })
       
+      console.log('[Team Invite] Response status:', res.status)
+      const data = await res.json()
+      console.log('[Team Invite] Response data:', data)
+      
       if (res.ok) {
         toast({ title: 'Invitation sent', description: `Invitation sent to ${inviteEmail}` })
         setInviteEmail('')
         setInviteDialogOpen(false)
         fetchData()
       } else {
-        const errorData = await res.json()
-        toast({ title: 'Error', description: errorData.error || 'Failed to send invitation', variant: 'destructive' })
+        toast({ title: 'Error', description: data.error || 'Failed to send invitation', variant: 'destructive' })
       }
     } catch (error) {
+      console.error('[Team Invite] Error:', error)
       toast({ title: 'Error', description: 'Failed to send invitation', variant: 'destructive' })
     } finally {
       setSending(false)
+      console.log('[Team Invite] Complete')
     }
   }
 
