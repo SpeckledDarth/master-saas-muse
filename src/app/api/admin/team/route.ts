@@ -67,36 +67,54 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('[Team API] POST request received')
+    
     const supabase = await createClient()
     
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
+      console.log('[Team API] No user found - unauthorized')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    console.log('[Team API] User authenticated:', user.id)
 
     // Use admin client for all operations to bypass RLS
-    const adminClient = createAdminClient()
+    let adminClient
+    try {
+      adminClient = createAdminClient()
+      console.log('[Team API] Admin client created successfully')
+    } catch (adminError) {
+      console.error('[Team API] Failed to create admin client:', adminError)
+      return NextResponse.json({ error: 'Admin client configuration error' }, { status: 500 })
+    }
 
     // Check admin role using admin client to bypass RLS
-    const { data: userRole } = await adminClient
+    const { data: userRole, error: roleError } = await adminClient
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .single()
 
+    console.log('[Team API] Role check result:', userRole, 'Error:', roleError)
+
     if (userRole?.role !== 'admin') {
+      console.log('[Team API] User is not admin, access denied')
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
+    console.log('[Team API] User is admin, proceeding')
 
     const body = await request.json()
     const { action, email, role, memberId } = body
+    console.log('[Team API] Action:', action, 'Email:', email, 'Role:', role)
 
     if (action === 'invite') {
+      console.log('[Team API] Processing invite action')
       const token = crypto.randomUUID()
       const expiresAt = new Date()
       expiresAt.setDate(expiresAt.getDate() + 7)
 
-      const { error } = await adminClient
+      console.log('[Team API] Inserting invitation for:', email)
+      const { data: insertData, error } = await adminClient
         .from('invitations')
         .insert({
           organization_id: 1,
@@ -106,11 +124,15 @@ export async function POST(request: NextRequest) {
           invited_by: user.id,
           expires_at: expiresAt.toISOString()
         })
+        .select()
+
+      console.log('[Team API] Insert result:', insertData, 'Error:', error)
 
       if (error) {
-        console.error('Invitation insert error:', error)
+        console.error('[Team API] Invitation insert error:', error)
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
+      console.log('[Team API] Invitation inserted successfully')
 
       // Get settings for app name
       const { data: settingsData } = await adminClient
