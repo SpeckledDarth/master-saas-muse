@@ -1,7 +1,7 @@
 # Master SaaS Muse Template
 
 ## Overview
-This project is a full-stack SaaS starter template designed for building production-ready applications with SEO-optimized pages, authentication via Supabase, multi-tenancy support, and Stripe billing. The template aims to enable rapid cloning and customization for new SaaS products, targeting a pure Next.js architecture deployed to Vercel for optimal SEO and development efficiency. The vision is to provide a robust foundation for various SaaS ventures.
+This project is a full-stack SaaS starter template built with Next.js 14+ (App Router), React 18+, and TypeScript. It provides a robust foundation for new SaaS products, featuring SEO-optimized pages, Supabase authentication, multi-tenancy support, and Stripe billing. The template enables rapid cloning and customization, aiming for a pure Next.js architecture deployed to Vercel for optimal performance and development efficiency. Key capabilities include a comprehensive admin dashboard, multi-user organization system, a markdown-based blog/changelog, and a waitlist mode. The vision is to offer a scalable and production-ready solution for various SaaS ventures.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -14,204 +14,44 @@ Preferred communication style: Simple, everyday language.
 - **Git Sync Responsibility**: Agent ensures Replit and GitHub repo stay in sync. Before ending sessions or after significant changes, agent verifies sync status and asks user to run push commands if needed. User executes git commands when requested.
 
 ## System Architecture
-The project utilizes a pure Next.js 14+ (App Router) framework with React 18+ and TypeScript for both frontend and backend. Styling is handled by Tailwind CSS, shadcn/ui, and next-themes, with server state managed by TanStack Query. Supabase provides the database (PostgreSQL), authentication, Row Level Security (RLS), and storage, supporting multi-tenancy through domain-based middleware and `app_id` context. Deployment and hosting are exclusively on Vercel, leveraging its features like preview deploys, custom domains, and edge functions.
+The project uses Next.js 14+ (App Router) with React 18+ and TypeScript. Styling is managed with Tailwind CSS, shadcn/ui, and next-themes, while TanStack Query handles server state. Supabase provides PostgreSQL, authentication, Row Level Security (RLS), and storage, supporting multi-tenancy via domain-based middleware and `app_id` context. Deployment is exclusively on Vercel.
 
 **UI/UX Decisions:**
 - Dark/light mode toggle.
 - Admin dashboard for metrics, user management, and settings.
-- Tabbed interface for the Setup Dashboard (Branding, Pricing, Social, Features).
-- Dynamic branding components.
-- Original gradient font styling is a deferred preference.
+- Setup Dashboard with Branding, Pricing, Social, and Features tabs.
+- Dynamic branding components and configurable navigation.
+- Customizable hero sections with various styles (full-width background, split layout, video background, pattern/texture, floating mockup).
+- Enhanced visual components like Logo Marquee, Animated Counters, Gradient Text, Process Steps, and Testimonial Carousels.
 
 **Technical Implementations & Feature Specifications:**
-- **Authentication**: Email/password, Google OAuth, protected routes, session persistence, profile management with avatar uploads, multi-tenancy middleware.
-- **Admin Features**: Dashboard with user/admin/member counts, recent signups, user management with role editing, settings page with feature toggles, role-based access control, audit logging, auto-registration for new users.
-- **Stripe Integration**: Checkout for subscriptions, webhook handling for `checkout.session.completed`, customer portal API, products/prices API, pricing page UI, feature gating.
-- **Subscription Management**: Profile and billing pages showing subscription status, pricing page for plan upgrades, `feature-gate.ts` for tier limits.
-- **Email System**: Resend integration for transactional emails (welcome, subscription confirmation/cancellation), API route for custom emails.
-- **Security & RLS**: Supabase RLS enabled on `profiles`, `user_roles`, `organization_settings`, and `audit_logs` tables. Zod validation schemas for API inputs, rate limiting middleware (in-memory for MVP, Upstash Redis for production). Security headers configured in `next.config.ts`.
-- **Setup Dashboard**: Admin-only interface for branding (app name, tagline, logo/hero image upload, colors), pricing configuration, social links, and feature toggles. Settings are stored in the `organization_settings` table using a JSONB column.
-- **Monitoring**: Plausible analytics for privacy-friendly page view tracking. Structured logging utility for API, auth, and subscription events. Sentry error tracking is planned for Next.js 16 support.
+- **Authentication**: Email/password, Google OAuth, protected routes, session persistence, profile management, multi-tenancy middleware.
+- **Admin Features**: Dashboard with user analytics, user management with role editing, feature toggles, role-based access control, audit logging, auto-registration.
+- **Stripe Integration**: Checkout for subscriptions, webhook handling, customer portal API, products/prices API, pricing page UI, feature gating.
+- **Subscription Management**: Profile and billing pages, pricing page for plan upgrades, `feature-gate.ts` for tier limits.
+- **Email System**: Resend integration for transactional emails (welcome, subscription confirmations, team invitations), with an admin-editable template editor.
+- **Security & RLS**: Supabase RLS on key tables, Zod validation for API inputs, rate limiting, and security headers.
+- **Setup Dashboard**: Admin interface for branding (app name, tagline, logo, colors), pricing, social links, and feature toggles, stored in `organization_settings`.
+- **Monitoring**: Plausible analytics for page view tracking, structured logging, and planned Sentry error tracking.
+- **Team/Organization System**: Multi-user accounts with owner/admin/member roles, invitations, and role management.
+- **Onboarding Wizard**: Guided 4-step setup for new administrators.
+- **Blog/Changelog System**: Markdown-based content with public pages and admin CRUD interface.
+- **Waitlist Mode**: Pre-launch email collection with CSV export.
+- **Feedback Widget**: In-app feedback submission for logged-in and anonymous users.
+- **Sitemap & SEO**: Auto-generated sitemap and `robots.txt`, comprehensive metadata.
+- **Theme Flash Prevention**: Inline script for immediate dark/light mode application and loading skeletons.
 
 **System Design Choices:**
 - Unified frontend and backend using Next.js.
-- Modular component-based development (e.g., shadcn/ui).
+- Modular component-based development.
 - RLS and application-level logic for access control.
 - Clear separation of concerns for Stripe and Supabase services.
+- `NEXT_PUBLIC_` prefix for environment variables.
 
 ## External Dependencies
 - **Supabase**: PostgreSQL database, Authentication, Row Level Security (RLS), Storage.
-- **Stripe**: Subscription payments, webhooks for `checkout.session.completed`, customer portal.
+- **Stripe**: Subscription payments, webhooks, customer portal.
 - **Vercel**: Deployment and hosting platform.
 - **Resend**: Transactional email service.
 - **Plausible Analytics**: Privacy-friendly website analytics.
-- **Sentry**: (Planned) Error tracking, pending Next.js 16 support.
-
-## CRITICAL: Stack & Environment
-**THIS PROJECT USES VERCEL + NEXT.JS. NEVER MENTION OR USE VITE.**
-- Deployment: Vercel (push to GitHub triggers deployment)
-- Framework: Next.js 16+ with App Router
-- Environment variables use `NEXT_PUBLIC_` prefix (NOT `VITE_`)
-- Required secrets: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- Any `VITE_` prefixed variables are legacy and must be renamed to `NEXT_PUBLIC_`
-
-## Current Status (Jan 28, 2026)
-**All Setup Dashboard tabs tested and working:**
-- Branding tab: App name, tagline, theme colors - WORKING
-- Content tab: Features, testimonials, FAQ sections - WORKING  
-- Pricing tab: Links to Stripe Dashboard - WORKING
-- Social tab: Social links editing - WORKING
-- Features tab: Feature toggles - WORKING
-
-**MVP is fully functional.** Ready for continued development or publishing.
-
-## Recent Session Progress (Jan 28, 2026)
-
-### Completed This Session
-- **Tier 1 Essential Pages**: All core marketing pages now complete with SEO metadata
-  - About page: Company story, mission, values, optional team section
-  - Contact page: Contact info + working form (uses Resend API with fallback logging)
-  - FAQ page: Expandable Q&A from settings
-  - Terms of Service: Markdown-rendered with last updated date
-  - Privacy Policy: Markdown-rendered with last updated date
-- **Pages Tab in Setup Dashboard**: Admins can edit About, Contact, and Legal page content
-- **Branded 404/Error Pages**: Custom error pages with helpful navigation links
-- **Footer Updated**: Links to all new pages (About, Contact, FAQ, Terms, Privacy)
-- **Homepage Flash Fix**: Added loading skeleton that displays while settings load, preventing flash of default content
-- **Admin Menu Styling**: Fixed "Admin" button to use same Button component styling as other nav items
-- **Pricing Page Free Plan**: Free plan now shows alongside Stripe products
-  - Configurable via settings (showFreePlan, freePlanName, freePlanDescription, freePlanFeatures)
-  - Dynamic grid layout based on number of plans
-- **Enhanced User Profile Page**:
-  - Avatar upload with camera button (requires Supabase "avatars" storage bucket)
-  - Email change capability with confirmation email
-  - Phone number, company name
-  - Full address fields (street, city, state, zip, country)
-  - All fields persist to Supabase user_metadata
-- **Users Dashboard**: Full user management with search and role editing
-- **Settings Dashboard**: Admin feature toggles page created
-- **Forgot Password Workflow**: Complete password reset flow
-  - NOTE: Password reset emails require Supabase email settings to be configured in Supabase Dashboard > Authentication > Email Templates
-- **Pricing Page Stripe Sync**: Now fetches prices directly from Stripe API
-  - Falls back to database settings if Stripe products unavailable
-  - Shows product metadata for features
-- **Homepage Flash Fix**: Loading state prevents "My SaaS" flash before custom branding loads
-- **Setup Dashboard Refresh**: Page auto-refreshes after Save to show updated branding
-
-### Session Progress (Jan 29, 2026)
-
-**New Features Added (8 Major Additions):**
-
-1. **Team/Organization System** (`/admin/team`)
-   - Multi-user accounts with owner/admin/member roles
-   - Invite team members via email
-   - Role management and member removal
-   - Database tables: `organizations`, `organization_members`, `invitations`
-
-2. **Onboarding Wizard** (`/admin/onboarding`)
-   - Guided 4-step first-run setup for new admins
-   - Steps: Branding → Stripe → Content → Launch
-   - Progress tracking in `onboarding_state` table
-   - Skip option for each step
-
-3. **Blog/Changelog System** (`/blog`, `/changelog`, `/admin/content`)
-   - Markdown-based blog posts and changelog entries
-   - Public pages with SEO metadata
-   - Admin CRUD interface with publish/draft toggle
-   - Database table: `posts` (type: blog|changelog)
-
-4. **Waitlist Mode** (`/admin/waitlist`)
-   - Pre-launch email collection
-   - Feature toggle in settings (`waitlistMode`)
-   - Waitlist form component for landing pages
-   - CSV export for collected emails
-   - Database table: `waitlist_entries`
-
-5. **Feedback Widget** (floating button on all pages)
-   - In-app feedback submission
-   - Works for both logged-in and anonymous users
-   - Admin feedback management with status tracking
-   - Feature toggle in settings (`feedbackWidget`)
-   - Database table: `feedback`
-
-6. **Email Templates Editor** (`/admin/email-templates`)
-   - 5 default templates: welcome, subscription_confirmed, subscription_cancelled, password_reset, team_invitation
-   - Variable placeholders ({{appName}}, {{name}}, etc.)
-   - Admin-editable subject and body
-   - Database table: `email_templates`
-
-7. **Analytics Dashboard** (`/admin/analytics`)
-   - Key SaaS metrics: total users, new this month, active subscriptions
-   - Waitlist count and feedback count
-   - Recent signups list
-   - Database table: `analytics_events`
-
-8. **Sitemap & SEO** (`/sitemap.xml`, `/robots.txt`)
-   - Auto-generated sitemap including all static pages and blog posts
-   - robots.txt with appropriate allow/disallow rules
-   - Proper metadata on all new pages
-
-**Theme Flash Prevention:**
-- Inline script sets dark/light class immediately before render
-- Body stays hidden until custom theme colors are applied from settings
-- 2-second fallback prevents infinite loading
-
-**Dynamic Navigation Menu:**
-- Navigation items now fully configurable via Admin → Setup → Branding tab
-- Add/edit/delete navigation links with label, URL, and enabled toggle
-- Defaults: Pricing, About, Contact (enabled), FAQ (disabled)
-- Header dynamically renders enabled navigation items
-
-**Button Hover Animation:**
-- All button variants transition to accent color on hover
-- Text color transitions to accent-foreground for proper contrast
-- Smooth 300ms fade transition for polished feel
-
-**Enhanced Image Uploads:**
-- Logo Marquee: ImageUpload component with horizontal/vertical alignment sliders (0-100%)
-- Metrics Section: Optional icon upload with alignment controls, rendered above counter values
-- Image+Text Blocks: ImageUpload with alignment sliders for precise image positioning
-- All alignment controls use CSS object-position for live preview
-
-### Benchmark Visual Enhancements (Jan 28-29, 2026)
-Inspired by world-class sites (GitBook, TitanIntake, TheWone, Musicfy, Zazu, Eleveight):
-
-**Visual Components:**
-- **Logo Marquee**: Auto-scrolling trusted-by logos (`src/components/landing/logo-marquee.tsx`)
-- **Animated Counters**: Scroll-triggered number animations for metrics (`src/components/landing/animated-counter.tsx`)
-- **Gradient Text**: Stylized gradient headlines (`src/components/landing/gradient-text.tsx`)
-- **Process Steps**: Numbered step visualization (`src/components/landing/process-steps.tsx`)
-- **Enhanced Testimonials**: Avatar photos, company logos, decorative quote icon + carousel option
-- **Testimonial Carousel**: Full carousel mode with auto-play and navigation (`src/components/landing/testimonial-carousel.tsx`)
-- **Image + Text Blocks**: Alternating left/right layout sections (`src/components/landing/image-text-section.tsx`)
-
-**5 Hero Styles (Admin Configurable):**
-1. **Full Width Background** (default): Classic hero with background image
-2. **Split Layout**: Image + text side by side (configurable left/right position)
-3. **Video Background**: YouTube, Vimeo, or direct video URL with autoplay/loop
-4. **Pattern/Texture**: Gradient background with pattern overlay (adjustable opacity)
-5. **Floating Mockup**: Gradient background with animated floating product image
-
-**Full Admin CRUD UI:**
-- Logo Marquee: Add/edit/delete trusted-by logos (name + image URL)
-- Metrics: Add/edit/delete animated counters (value, prefix, suffix, label)
-- Process Steps: Add/edit/delete steps (number, title, description)
-- Image+Text Blocks: Add/edit/delete sections (headline, description, image, button, position)
-- Section Backgrounds: Dropdown per section (features, testimonials, FAQ, CTA) with default/muted/gradient options
-- Hero Style: Dropdown selector with conditional config fields per style
-
-All new sections disabled by default to maintain backward compatibility. Admins enable via toggles.
-
-### Previous Session (Jan 27, 2026)
-- Full Theme Customization System (light/dark modes across all pages)
-- Content Tab fully functional (features, testimonials, FAQ editing)
-- Theme colors work on all dashboards
-
-### Testing Status
-- All Setup Dashboard tabs: TESTED AND WORKING
-- Users Dashboard: WORKING (search + role management)
-- Settings Dashboard: WORKING (feature toggles)
-- Profile page: WORKING (display name + password editing)
-- Forgot password flow: WORKING
-- Pricing page: WORKING (Stripe sync + fallback)
-- Benchmark visual enhancements: IMPLEMENTED (Logo Marquee, Counters, Process Steps, Testimonials)
+- **Sentry**: (Planned) Error tracking.
