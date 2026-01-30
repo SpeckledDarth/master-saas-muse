@@ -80,8 +80,8 @@ export default function TeamPage() {
         setInviteDialogOpen(false)
         fetchData()
       } else {
-        const error = await res.json()
-        toast({ title: 'Error', description: error.message, variant: 'destructive' })
+        const errorData = await res.json()
+        toast({ title: 'Error', description: errorData.error || 'Failed to send invitation', variant: 'destructive' })
       }
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to send invitation', variant: 'destructive' })
