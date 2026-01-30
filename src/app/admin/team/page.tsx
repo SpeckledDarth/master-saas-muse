@@ -81,7 +81,7 @@ export default function TeamPage() {
       
       console.log('[Team Invite] Response status:', res.status)
       const data = await res.json()
-      console.log('[Team Invite] Response data:', data)
+      console.log('[Team Invite] Response data:', JSON.stringify(data, null, 2))
       
       if (res.ok) {
         toast({ title: 'Invitation sent', description: `Invitation sent to ${inviteEmail}` })
@@ -89,7 +89,9 @@ export default function TeamPage() {
         setInviteDialogOpen(false)
         fetchData()
       } else {
-        toast({ title: 'Error', description: data.error || 'Failed to send invitation', variant: 'destructive' })
+        const errorMsg = data.error || 'Failed to send invitation'
+        console.error('[Team Invite] Error details:', data.details)
+        toast({ title: 'Error', description: errorMsg, variant: 'destructive' })
       }
     } catch (error) {
       console.error('[Team Invite] Error:', error)

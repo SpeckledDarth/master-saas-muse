@@ -194,8 +194,11 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Team action error:', error)
-    return NextResponse.json({ error: 'Failed to perform action' }, { status: 500 })
+    return NextResponse.json({ 
+      error: error?.message || 'Failed to perform action',
+      details: String(error)
+    }, { status: 500 })
   }
 }
