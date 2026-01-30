@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET() {
   try {
@@ -10,7 +11,20 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: templates, error } = await supabase
+    // Check admin role
+    const { data: userRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+
+    if (userRole?.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    }
+
+    // Use admin client for service role access
+    const adminClient = createAdminClient()
+    const { data: templates, error } = await adminClient
       .from('email_templates')
       .select('*')
       .order('name')
@@ -49,8 +63,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { id, name, subject, body: templateBody, description } = body
 
+    // Use admin client for service role access
+    const adminClient = createAdminClient()
+
     if (id) {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('email_templates')
         .update({
           subject,
@@ -64,7 +81,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     } else {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('email_templates')
         .insert({
           name,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,8 +8,12 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type')
     const published = searchParams.get('published')
+    const adminOnly = searchParams.get('admin') === 'true'
     
-    let query = supabase.from('posts').select('*').order('created_at', { ascending: false })
+    // For admin requests, use the admin client to bypass RLS
+    const client = adminOnly ? createAdminClient() : supabase
+    
+    let query = client.from('posts').select('*').order('created_at', { ascending: false })
     
     if (type) {
       query = query.eq('type', type)
@@ -53,6 +58,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { id, title, slug, excerpt, content, type, published } = body
 
+    // Use admin client for write operations
+    const adminClient = createAdminClient()
+
     if (id) {
       const updateData: any = {
         title,
@@ -68,7 +76,7 @@ export async function POST(request: NextRequest) {
         updateData.published_at = new Date().toISOString()
       }
 
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('posts')
         .update(updateData)
         .eq('id', id)
@@ -77,7 +85,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     } else {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('posts')
         .insert({
           title,
@@ -118,7 +126,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Post ID required' }, { status: 400 })
     }
 
-    const { error } = await supabase
+    const adminClient = createAdminClient()
+    const { error } = await adminClient
       .from('posts')
       .delete()
       .eq('id', postId)

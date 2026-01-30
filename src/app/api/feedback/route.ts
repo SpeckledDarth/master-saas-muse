@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,7 +54,9 @@ export async function GET() {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const { data: feedback, error } = await supabase
+    // Use admin client for service role access
+    const adminClient = createAdminClient()
+    const { data: feedback, error } = await adminClient
       .from('feedback')
       .select('*')
       .order('created_at', { ascending: false })
@@ -81,7 +84,8 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json()
     const { id, status } = body
 
-    const { error } = await supabase
+    const adminClient = createAdminClient()
+    const { error } = await adminClient
       .from('feedback')
       .update({ status })
       .eq('id', id)

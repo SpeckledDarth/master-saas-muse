@@ -49,7 +49,7 @@ export default function ContentPage() {
 
   async function fetchPosts() {
     try {
-      const res = await fetch('/api/admin/posts')
+      const res = await fetch('/api/admin/posts?admin=true')
       const data = await res.json()
       setPosts(data.posts || [])
     } catch (error) {
