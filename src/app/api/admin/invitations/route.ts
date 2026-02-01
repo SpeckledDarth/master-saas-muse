@@ -1,6 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getTeamPermissions, type TeamRole } from '@/lib/team-permissions'
+
+async function checkUserPermissions(userId: string, adminClient: any) {
+  const { data: userRole } = await adminClient
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .single()
+
+  if (userRole?.role === 'admin') {
+    return { isAppAdmin: true, permissions: getTeamPermissions('owner') }
+  }
+
+  const { data: teamMember } = await adminClient
+    .from('organization_members')
+    .select('role')
+    .eq('user_id', userId)
+    .single()
+
+  if (teamMember?.role) {
+    return { 
+      isAppAdmin: false, 
+      permissions: getTeamPermissions(teamMember.role as TeamRole)
+    }
+  }
+
+  return { isAppAdmin: false, permissions: null }
+}
 
 export async function GET() {
   try {
@@ -11,19 +39,13 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Use admin client to bypass RLS
     const adminClient = createAdminClient()
-
-    // Check admin role using admin client
-    const { data: userRole } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
-
-    if (userRole?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    const { permissions } = await checkUserPermissions(user.id, adminClient)
+    
+    if (!permissions || !permissions.canViewTeamList) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
+
     const { data: invitations, error } = await adminClient
       .from('invitations')
       .select('*')
@@ -51,18 +73,12 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Use admin client to bypass RLS
     const adminClient = createAdminClient()
-
-    // Check admin role using admin client
-    const { data: userRole } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
-
-    if (userRole?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    const { permissions } = await checkUserPermissions(user.id, adminClient)
+    
+    // Only app admins, owners, and managers can cancel invitations
+    if (!permissions || !permissions.canInviteMembers) {
+      return NextResponse.json({ error: 'You do not have permission to cancel invitations' }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)

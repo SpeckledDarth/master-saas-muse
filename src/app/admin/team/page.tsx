@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useToast } from '@/hooks/use-toast'
-import { Users, Mail, UserPlus, Trash2, Shield, User, Crown } from 'lucide-react'
+import { Users, Mail, UserPlus, Trash2, Shield, User, Crown, Info, ChevronDown, ChevronUp } from 'lucide-react'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 interface TeamMember {
   id: number
@@ -38,6 +39,7 @@ export default function TeamPage() {
   const [inviteRole, setInviteRole] = useState('member')
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
   const [sending, setSending] = useState(false)
+  const [rolesInfoOpen, setRolesInfoOpen] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -243,6 +245,80 @@ export default function TeamPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      <Collapsible open={rolesInfoOpen} onOpenChange={setRolesInfoOpen}>
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover-elevate">
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  Role Permissions Reference
+                </span>
+                {rolesInfoOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </CardTitle>
+              <CardDescription>Click to see what each team role can do</CardDescription>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent className="pt-0">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="p-4 border rounded-lg space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Crown className="h-4 w-4 text-yellow-500" />
+                    <span className="font-semibold">Owner</span>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
+                    <li>Full access to all features</li>
+                    <li>Manage team members and roles</li>
+                    <li>Access billing and subscription settings</li>
+                    <li>Edit all app settings and branding</li>
+                    <li>Cannot be removed from the team</li>
+                  </ul>
+                </div>
+                <div className="p-4 border rounded-lg space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-blue-500" />
+                    <span className="font-semibold">Manager</span>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
+                    <li>Create, edit, and publish content</li>
+                    <li>View dashboard analytics</li>
+                    <li>Invite new team members</li>
+                    <li>Manage user accounts</li>
+                    <li>Cannot access billing or app settings</li>
+                  </ul>
+                </div>
+                <div className="p-4 border rounded-lg space-y-2">
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-green-500" />
+                    <span className="font-semibold">Member</span>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
+                    <li>View dashboard and analytics</li>
+                    <li>Create and edit content</li>
+                    <li>View team member list</li>
+                    <li>Cannot manage users or invite members</li>
+                    <li>Cannot access billing or app settings</li>
+                  </ul>
+                </div>
+                <div className="p-4 border rounded-lg space-y-2">
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-gray-500" />
+                    <span className="font-semibold">Viewer</span>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
+                    <li>No admin dashboard access</li>
+                    <li>Can view public content only</li>
+                    <li>Team member without operational access</li>
+                    <li>Useful for stakeholders who need visibility</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       <Card>
         <CardHeader>

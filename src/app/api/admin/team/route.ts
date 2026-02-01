@@ -2,6 +2,37 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendEmail } from '@/lib/email'
+import { getTeamPermissions, type TeamRole } from '@/lib/team-permissions'
+
+async function checkUserPermissions(userId: string, adminClient: any) {
+  // Check if user is app admin (full access)
+  const { data: userRole } = await adminClient
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .single()
+
+  if (userRole?.role === 'admin') {
+    return { isAppAdmin: true, permissions: getTeamPermissions('owner') }
+  }
+
+  // Check team membership
+  const { data: teamMember } = await adminClient
+    .from('organization_members')
+    .select('role')
+    .eq('user_id', userId)
+    .single()
+
+  if (teamMember?.role) {
+    return { 
+      isAppAdmin: false, 
+      permissions: getTeamPermissions(teamMember.role as TeamRole),
+      teamRole: teamMember.role as TeamRole
+    }
+  }
+
+  return { isAppAdmin: false, permissions: null }
+}
 
 export async function GET() {
   try {
@@ -15,15 +46,11 @@ export async function GET() {
     // Use admin client for all operations to bypass RLS
     const adminClient = createAdminClient()
 
-    // Check admin role using admin client to bypass RLS
-    const { data: userRole } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
-
-    if (userRole?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    // Check permissions
+    const { permissions } = await checkUserPermissions(user.id, adminClient)
+    
+    if (!permissions || !permissions.canViewTeamList) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
     
     const { data: members, error } = await adminClient
@@ -88,26 +115,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Admin client configuration error' }, { status: 500 })
     }
 
-    // Check admin role using admin client to bypass RLS
-    const { data: userRole, error: roleError } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
+    // Check permissions
+    const { isAppAdmin, permissions } = await checkUserPermissions(user.id, adminClient)
+    console.log('[Team API] Permission check result:', { isAppAdmin, permissions })
 
-    console.log('[Team API] Role check result:', userRole, 'Error:', roleError)
-
-    if (userRole?.role !== 'admin') {
-      console.log('[Team API] User is not admin, access denied')
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    if (!permissions) {
+      console.log('[Team API] No permissions, access denied')
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
-    console.log('[Team API] User is admin, proceeding')
 
     const body = await request.json()
     const { action, email, role, memberId } = body
     console.log('[Team API] Action:', action, 'Email:', email, 'Role:', role)
 
     if (action === 'invite') {
+      // Only app admins, owners, and managers can invite
+      if (!permissions.canInviteMembers) {
+        return NextResponse.json({ error: 'You do not have permission to invite members' }, { status: 403 })
+      }
       console.log('[Team API] Processing invite action')
       const token = crypto.randomUUID()
       const expiresAt = new Date()
@@ -170,6 +195,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'update_role') {
+      // Only app admins and owners can change roles
+      if (!permissions.canManageTeam) {
+        return NextResponse.json({ error: 'You do not have permission to change roles' }, { status: 403 })
+      }
+      
       const { error } = await adminClient
         .from('organization_members')
         .update({ role })
@@ -183,6 +213,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'remove') {
+      // Only app admins and owners can remove members
+      if (!permissions.canManageTeam) {
+        return NextResponse.json({ error: 'You do not have permission to remove members' }, { status: 403 })
+      }
+      
       const { error } = await adminClient
         .from('organization_members')
         .delete()
