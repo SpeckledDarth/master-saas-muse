@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -11,8 +11,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2 } from 'lucide-react'
 import { SiGoogle } from 'react-icons/si'
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirectTo') || '/'
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -20,6 +22,13 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+
+  useEffect(() => {
+    const pendingToken = localStorage.getItem('pendingInviteToken')
+    if (pendingToken && !searchParams.get('redirectTo')) {
+      router.replace(`/signup?redirectTo=/invite/${pendingToken}`)
+    }
+  }, [searchParams, router])
 
   async function handleEmailSignup(e: React.FormEvent) {
     e.preventDefault()
@@ -37,7 +46,7 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
       },
     })
 
@@ -56,7 +65,7 @@ export default function SignupPage() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
       },
     })
   }
@@ -176,5 +185,15 @@ export default function SignupPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+import { Suspense } from 'react'
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+      <SignupForm />
+    </Suspense>
   )
 }
