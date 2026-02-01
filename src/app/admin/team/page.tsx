@@ -141,6 +141,8 @@ export default function TeamPage() {
   }
 
   async function handleCancelInvitation(invitationId: number) {
+    if (!confirm('Are you sure you want to cancel this invitation?')) return
+    
     try {
       const res = await fetch(`/api/admin/invitations?id=${invitationId}`, {
         method: 'DELETE'

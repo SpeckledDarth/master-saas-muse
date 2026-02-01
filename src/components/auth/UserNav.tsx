@@ -20,6 +20,7 @@ import { Shield } from 'lucide-react'
 export function UserNav() {
   const [user, setUser] = useState<User | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [hasAdminAccess, setHasAdminAccess] = useState(false)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
@@ -53,6 +54,7 @@ export function UserNav() {
       setUser(session?.user ?? null)
       if (!session) {
         setIsAdmin(false)
+        setHasAdminAccess(false)
       }
     })
 
@@ -65,24 +67,38 @@ export function UserNav() {
   useEffect(() => {
     if (!supabase || !user) {
       setIsAdmin(false)
+      setHasAdminAccess(false)
       return
     }
     
     const checkRole = async () => {
       try {
-        const { data, error } = await supabase
+        // Check if app admin
+        const { data: roleData } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
           .single()
         
-        if (error) {
-          setIsAdmin(false)
-        } else {
-          setIsAdmin(data?.role === 'admin')
-        }
+        const isAppAdmin = roleData?.role === 'admin'
+        setIsAdmin(isAppAdmin)
+        
+        // Check if team member with admin access (owner, manager, or member - not viewer)
+        // Use maybeSingle() to handle case where user is not in any org
+        const { data: memberData } = await supabase
+          .from('organization_members')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('organization_id', 1) // Currently single-org, scoped for safety
+          .maybeSingle()
+        
+        const teamRole = memberData?.role
+        const hasTeamAccess = teamRole === 'owner' || teamRole === 'manager' || teamRole === 'member'
+        
+        setHasAdminAccess(isAppAdmin || hasTeamAccess)
       } catch {
         setIsAdmin(false)
+        setHasAdminAccess(false)
       }
     }
     
@@ -134,7 +150,7 @@ export function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {isAdmin && (
+        {hasAdminAccess && (
           <DropdownMenuItem asChild>
             <Link href="/admin" data-testid="link-admin" className="flex items-center">
               <Shield className="mr-2 h-4 w-4" />
