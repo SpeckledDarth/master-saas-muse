@@ -63,9 +63,9 @@ export function UserNav() {
     }
   }, [supabase])
   
-  // Effect 2: Check role whenever user changes
+  // Effect 2: Check role whenever user changes (via API to bypass RLS)
   useEffect(() => {
-    if (!supabase || !user) {
+    if (!user) {
       setIsAdmin(false)
       setHasAdminAccess(false)
       return
@@ -73,29 +73,15 @@ export function UserNav() {
     
     const checkRole = async () => {
       try {
-        // Check if app admin
-        const { data: roleData } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .single()
-        
-        const isAppAdmin = roleData?.role === 'admin'
-        setIsAdmin(isAppAdmin)
-        
-        // Check if team member with admin access (owner, manager, or member - not viewer)
-        // Use maybeSingle() to handle case where user is not in any org
-        const { data: memberData } = await supabase
-          .from('organization_members')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('organization_id', 1) // Currently single-org, scoped for safety
-          .maybeSingle()
-        
-        const teamRole = memberData?.role
-        const hasTeamAccess = teamRole === 'owner' || teamRole === 'manager' || teamRole === 'member'
-        
-        setHasAdminAccess(isAppAdmin || hasTeamAccess)
+        const response = await fetch('/api/user/membership')
+        if (response.ok) {
+          const data = await response.json()
+          setIsAdmin(data.isAppAdmin)
+          setHasAdminAccess(data.hasAdminAccess)
+        } else {
+          setIsAdmin(false)
+          setHasAdminAccess(false)
+        }
       } catch {
         setIsAdmin(false)
         setHasAdminAccess(false)
@@ -103,7 +89,7 @@ export function UserNav() {
     }
     
     checkRole()
-  }, [supabase, user])
+  }, [user])
 
   const handleSignOut = useCallback(async () => {
     if (!supabase) return

@@ -42,7 +42,7 @@ function SignupForm() {
     setError(null)
 
     const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -56,6 +56,14 @@ function SignupForm() {
       return
     }
 
+    // If user is immediately logged in (email confirmation disabled), redirect
+    if (data?.session) {
+      localStorage.removeItem('pendingInviteToken')
+      router.push(redirectTo)
+      return
+    }
+
+    // Otherwise show confirmation email message
     setSuccess(true)
     setLoading(false)
   }
