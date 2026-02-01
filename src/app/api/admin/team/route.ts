@@ -47,10 +47,38 @@ export async function GET() {
     const adminClient = createAdminClient()
 
     // Check permissions
-    const { permissions } = await checkUserPermissions(user.id, adminClient)
+    const { isAppAdmin, permissions } = await checkUserPermissions(user.id, adminClient)
     
     if (!permissions || !permissions.canViewTeamList) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
+    }
+    
+    // Auto-add app admin to organization_members as owner if not present (single-org setup)
+    if (isAppAdmin) {
+      const { data: existingMember } = await adminClient
+        .from('organization_members')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('organization_id', 1)
+        .maybeSingle()
+      
+      if (!existingMember) {
+        const { error: insertError } = await adminClient
+          .from('organization_members')
+          .insert({
+            organization_id: 1,
+            user_id: user.id,
+            role: 'owner',
+            joined_at: new Date().toISOString()
+          })
+        
+        if (insertError) {
+          // Handle race condition or constraint violation gracefully
+          console.log('[Team API] Could not auto-add owner (may already exist):', insertError.message)
+        } else {
+          console.log('[Team API] Auto-added app admin as owner to organization_members')
+        }
+      }
     }
     
     const { data: members, error } = await adminClient
