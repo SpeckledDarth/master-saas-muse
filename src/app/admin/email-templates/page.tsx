@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useToast } from '@/hooks/use-toast'
-import { Mail, Edit2, Info } from 'lucide-react'
+import { Mail, Edit2, Info, Plus } from 'lucide-react'
 
 interface EmailTemplate {
   id: number
@@ -35,9 +35,12 @@ export default function EmailTemplatesPage() {
   const { toast } = useToast()
   
   const [form, setForm] = useState({
+    name: '',
     subject: '',
     body: '',
+    description: '',
   })
+  const [isCreateMode, setIsCreateMode] = useState(false)
 
   useEffect(() => {
     fetchTemplates()
@@ -57,31 +60,59 @@ export default function EmailTemplatesPage() {
 
   function openEditTemplate(template: EmailTemplate) {
     setEditingTemplate(template)
+    setIsCreateMode(false)
     setForm({
+      name: template.name,
       subject: template.subject,
       body: template.body,
+      description: template.description,
+    })
+    setDialogOpen(true)
+  }
+
+  function openCreateTemplate() {
+    setEditingTemplate(null)
+    setIsCreateMode(true)
+    setForm({
+      name: '',
+      subject: '',
+      body: '',
+      description: '',
     })
     setDialogOpen(true)
   }
 
   async function handleSave() {
-    if (!editingTemplate) return
+    if (isCreateMode && !form.name.trim()) {
+      toast({ title: 'Error', description: 'Template name is required', variant: 'destructive' })
+      return
+    }
     
     setSaving(true)
     
     try {
+      const payload = isCreateMode 
+        ? {
+            name: form.name.toLowerCase().replace(/\s+/g, '_'),
+            subject: form.subject,
+            body: form.body,
+            description: form.description,
+          }
+        : {
+            id: editingTemplate?.id,
+            subject: form.subject,
+            body: form.body,
+            description: form.description,
+          }
+
       const res = await fetch('/api/admin/email-templates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: editingTemplate.id,
-          subject: form.subject,
-          body: form.body,
-        }),
+        body: JSON.stringify(payload),
       })
       
       if (res.ok) {
-        toast({ title: 'Template updated' })
+        toast({ title: isCreateMode ? 'Template created' : 'Template updated' })
         setDialogOpen(false)
         fetchTemplates()
       } else {
@@ -108,12 +139,18 @@ export default function EmailTemplatesPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Mail className="h-6 w-6" />
-          Email Templates
-        </h1>
-        <p className="text-muted-foreground">Customize the emails sent to your users</p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Mail className="h-6 w-6" />
+            Email Templates
+          </h1>
+          <p className="text-muted-foreground">Customize the emails sent to your users</p>
+        </div>
+        <Button onClick={openCreateTemplate} data-testid="button-create-template">
+          <Plus className="h-4 w-4 mr-2" />
+          New Template
+        </Button>
       </div>
 
       <Card className="bg-blue-500/10 border-blue-500/20">
@@ -177,14 +214,43 @@ export default function EmailTemplatesPage() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="capitalize">
-              Edit {editingTemplate?.name.replace(/_/g, ' ')} Template
+              {isCreateMode ? 'Create New Template' : `Edit ${editingTemplate?.name.replace(/_/g, ' ')} Template`}
             </DialogTitle>
             <DialogDescription>
-              {editingTemplate?.description}
+              {isCreateMode ? 'Create a custom email template for your application' : editingTemplate?.description}
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
+            {isCreateMode && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="name">Template Name</Label>
+                  <Input
+                    id="name"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="e.g., payment_reminder"
+                    data-testid="input-template-name"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Use lowercase with underscores (spaces will be converted)
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Input
+                    id="description"
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    placeholder="When this email is sent..."
+                    data-testid="input-template-description"
+                  />
+                </div>
+              </>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="subject">Subject Line</Label>
               <Input
@@ -208,7 +274,10 @@ export default function EmailTemplatesPage() {
                 data-testid="input-template-body"
               />
               <p className="text-xs text-muted-foreground">
-                Available variables: {(TEMPLATE_VARIABLES[editingTemplate?.name as keyof typeof TEMPLATE_VARIABLES] || []).join(', ')}
+                {isCreateMode 
+                  ? 'Use variables like {{appName}}, {{name}}, etc. that will be replaced when sending'
+                  : `Available variables: ${(TEMPLATE_VARIABLES[editingTemplate?.name as keyof typeof TEMPLATE_VARIABLES] || []).join(', ') || 'Custom template - use any variables'}`
+                }
               </p>
             </div>
           </div>
@@ -218,7 +287,7 @@ export default function EmailTemplatesPage() {
               Cancel
             </Button>
             <Button onClick={handleSave} disabled={saving} data-testid="button-save-template">
-              {saving ? 'Saving...' : 'Save Template'}
+              {saving ? 'Saving...' : (isCreateMode ? 'Create Template' : 'Save Template')}
             </Button>
           </DialogFooter>
         </DialogContent>
