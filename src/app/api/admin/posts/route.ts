@@ -82,46 +82,80 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { id, title, slug, excerpt, content, type, published } = body
 
-    // Reuse admin client for write operations (already created above)
+    // Use raw SQL to bypass schema cache issues
+    const finalSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    const now = new Date().toISOString()
+    
     if (id) {
-      const updateData: any = {
-        title,
-        slug,
-        excerpt,
-        content,
-        type,
-        published,
-        updated_at: new Date().toISOString(),
-      }
+      // Update existing post
+      const { error } = await adminClient.rpc('exec_sql', {
+        query: `UPDATE posts SET title = $1, slug = $2, excerpt = $3, content = $4, type = $5, published = $6, published_at = $7, updated_at = $8 WHERE id = $9`,
+        params: [title, finalSlug, excerpt || '', content, type || 'blog', published || false, published ? now : null, now, id]
+      })
       
-      if (published && !body.published_at) {
-        updateData.published_at = new Date().toISOString()
-      }
-
-      const { error } = await adminClient
-        .from('posts')
-        .update(updateData)
-        .eq('id', id)
-
-      if (error) {
+      // If RPC doesn't exist, fall back to direct query via fetch
+      if (error?.message?.includes('function') || error?.message?.includes('does not exist')) {
+        // Use direct SQL via Supabase REST API
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+        
+        const response = await fetch(`${supabaseUrl}/rest/v1/posts?id=eq.${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': serviceKey!,
+            'Authorization': `Bearer ${serviceKey}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            title,
+            slug: finalSlug,
+            excerpt: excerpt || '',
+            content,
+            type: type || 'blog',
+            published: published || false,
+            published_at: published ? now : null,
+            updated_at: now
+          })
+        })
+        
+        if (!response.ok) {
+          const errText = await response.text()
+          console.error('Update error:', errText)
+          return NextResponse.json({ error: errText }, { status: 500 })
+        }
+      } else if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     } else {
-      const { error } = await adminClient
-        .from('posts')
-        .insert({
+      // Insert new post - use direct REST API
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+      
+      const response = await fetch(`${supabaseUrl}/rest/v1/posts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': serviceKey!,
+          'Authorization': `Bearer ${serviceKey}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
           title,
-          slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-          excerpt,
+          slug: finalSlug,
+          excerpt: excerpt || '',
           content,
           type: type || 'blog',
           published: published || false,
-          published_at: published ? new Date().toISOString() : null,
-          author_id: user.id,
+          published_at: published ? now : null,
+          author_id: user.id
         })
-
-      if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+      })
+      
+      if (!response.ok) {
+        const errText = await response.text()
+        console.error('Insert error:', errText)
+        return NextResponse.json({ error: errText }, { status: 500 })
       }
     }
 
