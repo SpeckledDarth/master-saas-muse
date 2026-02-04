@@ -62,6 +62,32 @@ The project uses Next.js 14+ (App Router) with React 18+ and TypeScript. Styling
 - **Plausible Analytics**: Privacy-friendly website analytics.
 - **Sentry**: (Planned) Error tracking.
 
+## Supabase Database Tables (Already Created)
+The following tables exist in the production Supabase database:
+- `analytics_events` - Page view and event tracking
+- `audit_logs` - Admin action logging
+- `email_templates` - Customizable email templates
+- `feedback` - User feedback submissions
+- `invitations` - Team invitation records
+- `onboarding_state` - Admin onboarding wizard progress
+- `organization_members` - Team membership records
+- `organization_settings` - Branding, pricing, feature toggles (JSON values)
+- `organizations` - Multi-tenant organization records
+- `posts` - Blog/changelog content (markdown)
+- `settings` - Legacy settings table
+- `user_roles` - User role assignments (admin, member, etc.)
+- `waitlist_entries` - Pre-launch email collection
+
+**Important:** Tables are created in Supabase, NOT in Replit's local Postgres. Schema changes must be applied to Supabase.
+
+## Key File Locations
+- `src/lib/supabase/` - Supabase client setup (server.ts, admin.ts, client.ts)
+- `src/lib/email/` - Resend email client and templates
+- `src/lib/stripe/` - Stripe integration
+- `src/app/api/` - All API routes (admin/, stripe/, user/, etc.)
+- `src/app/admin/` - Admin dashboard pages
+- `src/components/ui/` - shadcn/ui components
+
 ## CRITICAL: Testing & Deployment Context
 **All testing happens on Vercel deployment, NOT locally in Replit.**
 - User pushes code to GitHub with `git push origin main`
@@ -73,7 +99,14 @@ The following secrets are already set in Vercel - DO NOT ask user to reconfigure
 - `RESEND_API_KEY` - Resend API key (set)
 - `RESEND_FROM_EMAIL` - Currently `onboarding@resend.dev` (Resend test domain)
 - `STRIPE_SECRET_KEY` - Stripe API key (set)
-- Supabase keys - All configured
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key  
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase admin key (for server-side operations)
+- `SESSION_SECRET` - Session encryption key
+
+### Replit Secrets (Also Configured)
+- `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` - Legacy Vite prefixes (may not be needed)
+- `GIT_URL` - GitHub repository URL
 
 ### Resend Email Limitations
 - `onboarding@resend.dev` can ONLY send emails to the Resend account owner: `kitt2002@proton.me`
