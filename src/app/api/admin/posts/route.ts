@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { query } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,41 +11,43 @@ export async function GET(request: NextRequest) {
     const published = searchParams.get('published')
     const adminOnly = searchParams.get('admin') === 'true'
     
-    // For admin requests, verify user is actually an admin before using admin client
-    let client = supabase
+    // For admin requests, verify user is actually an admin
     if (adminOnly) {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
       
-      const { data: userRole } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single()
+      const { data: roles } = await query('SELECT role FROM user_roles WHERE user_id = $1', [user.id])
       
-      if (userRole?.role !== 'admin') {
+      if (!roles || roles.length === 0 || roles[0].role !== 'admin') {
         return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
       }
-      
-      client = createAdminClient()
     }
     
-    let query = client.from('posts').select('*').order('created_at', { ascending: false })
+    // Build query with filters
+    let sql = 'SELECT * FROM posts'
+    const params: any[] = []
+    const conditions: string[] = []
     
     if (type) {
-      query = query.eq('type', type)
+      params.push(type)
+      conditions.push(`type = $${params.length}`)
     }
     if (published === 'true') {
-      query = query.eq('published', true)
+      conditions.push('published = true')
     }
+    
+    if (conditions.length > 0) {
+      sql += ' WHERE ' + conditions.join(' AND ')
+    }
+    sql += ' ORDER BY created_at DESC'
 
-    const { data: posts, error } = await query
+    const { data: posts, error } = await query(sql, params)
 
     if (error) {
       console.error('Error fetching posts:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json({ error }, { status: 500 })
     }
 
     return NextResponse.json({ posts: posts || [] })
@@ -65,17 +68,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized - Please log in' }, { status: 401 })
     }
 
-    // Use admin client to check roles (bypasses RLS)
-    const adminClient = createAdminClient()
-    const { data: userRole, error: roleError } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
+    // Check admin role using direct pg
+    const { data: roles, error: roleError } = await query('SELECT role FROM user_roles WHERE user_id = $1', [user.id])
+    console.log('Posts API - Roles:', roles, 'Role error:', roleError)
 
-    console.log('Posts API - Role:', userRole?.role, 'Role error:', roleError?.message)
-
-    if (userRole?.role !== 'admin') {
+    if (!roles || roles.length === 0 || roles[0].role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
@@ -86,41 +83,26 @@ export async function POST(request: NextRequest) {
     const now = new Date().toISOString()
 
     if (id) {
-      const { error } = await adminClient
-        .from('posts')
-        .update({
-          title,
-          slug: finalSlug,
-          excerpt: excerpt || '',
-          content,
-          type: type || 'blog',
-          published: published || false,
-          published_at: published ? now : null,
-          updated_at: now
-        })
-        .eq('id', id)
+      // Update existing post using direct pg
+      const { error } = await query(
+        `UPDATE posts SET title = $1, slug = $2, excerpt = $3, content = $4, type = $5, published = $6, published_at = $7, updated_at = $8 WHERE id = $9`,
+        [title, finalSlug, excerpt || '', content, type || 'blog', published || false, published ? now : null, now, id]
+      )
 
       if (error) {
         console.error('Update error:', error)
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        return NextResponse.json({ error }, { status: 500 })
       }
     } else {
-      const { error } = await adminClient
-        .from('posts')
-        .insert({
-          title,
-          slug: finalSlug,
-          excerpt: excerpt || '',
-          content,
-          type: type || 'blog',
-          published: published || false,
-          published_at: published ? now : null,
-          author_id: user.id
-        })
+      // Insert new post using direct pg
+      const { error } = await query(
+        `INSERT INTO posts (title, slug, excerpt, content, type, published, published_at, author_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [title, finalSlug, excerpt || '', content, type || 'blog', published || false, published ? now : null, user.id]
+      )
 
       if (error) {
         console.error('Insert error:', error)
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        return NextResponse.json({ error }, { status: 500 })
       }
     }
 
@@ -140,14 +122,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check admin role before deleting
-    const { data: userRole } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
+    // Check admin role using direct pg
+    const { data: roles } = await query('SELECT role FROM user_roles WHERE user_id = $1', [user.id])
 
-    if (userRole?.role !== 'admin') {
+    if (!roles || roles.length === 0 || roles[0].role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
@@ -158,14 +136,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Post ID required' }, { status: 400 })
     }
 
-    const adminClient = createAdminClient()
-    const { error } = await adminClient
-      .from('posts')
-      .delete()
-      .eq('id', postId)
+    const { error } = await query('DELETE FROM posts WHERE id = $1', [postId])
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json({ error }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
