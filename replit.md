@@ -1,7 +1,13 @@
 # Master SaaS Muse Template
 
+## CRITICAL: Stack Reminder
+**This project uses Vercel + Next.js 16+ (App Router). NOT Vite.**
+- Deployment: Vercel only
+- Framework: Next.js 16+ with App Router
+- Do NOT use Vite patterns, imports, or configurations
+
 ## Overview
-This project is a full-stack SaaS starter template built with Next.js 14+ (App Router), React 18+, and TypeScript. It provides a robust foundation for new SaaS products, featuring SEO-optimized pages, Supabase authentication, multi-tenancy support, and Stripe billing. The template enables rapid cloning and customization, aiming for a pure Next.js architecture deployed to Vercel for optimal performance and development efficiency. Key capabilities include a comprehensive admin dashboard, multi-user organization system, a markdown-based blog/changelog, and a waitlist mode. The vision is to offer a scalable and production-ready solution for various SaaS ventures.
+This project is a full-stack SaaS starter template built with Next.js 16+ (App Router), React 18+, and TypeScript. It provides a robust foundation for new SaaS products, featuring SEO-optimized pages, Supabase authentication, multi-tenancy support, and Stripe billing. The template enables rapid cloning and customization, aiming for a pure Next.js architecture deployed to Vercel for optimal performance and development efficiency. Key capabilities include a comprehensive admin dashboard, multi-user organization system, a markdown-based blog/changelog, and a waitlist mode. The vision is to offer a scalable and production-ready solution for various SaaS ventures.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
