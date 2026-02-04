@@ -1,7 +1,7 @@
 # Master SaaS Muse Template - Development Master Plan
 
-**Version**: 2.0  
-**Date**: December 29, 2025  
+**Version**: 2.1  
+**Date**: February 4, 2026  
 **Status**: Active Development  
 
 ---
@@ -51,30 +51,31 @@ This document is the single source of truth for the Master SaaS Muse Template de
 | 6      | Core Pages & Navigation  | COMPLETE    | MVP      |
 | 7      | Security & RLS           | COMPLETE    | MVP      |
 | 8      | Monitoring & Docs        | COMPLETE    | MVP      |
-| 9      | Analytics & Tracking     | NOT STARTED | v1.1     |
-| 10     | Affiliate System         | NOT STARTED | v1.1     |
-| 11     | n8n Automation           | NOT STARTED | v1.1     |
-| 12     | Notifications            | NOT STARTED | v1.1     |
-| 13     | Referral Program         | NOT STARTED | v1.1     |
-| 14     | Feedback System          | NOT STARTED | v1.1     |
-| 15     | AI Integration           | NOT STARTED | v1.1     |
-| 16     | PWA Support              | NOT STARTED | v1.1     |
-| 17     | Internationalization     | NOT STARTED | v1.1     |
-| 18     | A/B Testing              | NOT STARTED | v1.1     |
-| 19     | User Impersonation       | NOT STARTED | v1.1     |
-| 20     | Social Media Management  | NOT STARTED | v1.1     |
-| 21     | Launch Plan Tools        | NOT STARTED | v1.1     |
-| 22     | Operations & Support     | NOT STARTED | v1.1     |
-| 23     | Multi-Role Dashboards    | NOT STARTED | v1.1     |
-| 24     | Branding Manager         | NOT STARTED | v1.1     |
-| 25     | Email/SMS Campaigns      | NOT STARTED | v1.2     |
-| 26     | Lead & CRM               | NOT STARTED | v1.2     |
-| 27     | Product Catalog          | NOT STARTED | v1.2     |
-| 28     | Usage-Based Billing      | NOT STARTED | v1.2     |
-| 29     | White-Label              | NOT STARTED | v1.3     |
-| 30     | Onboarding Checklist     | NOT STARTED | v1.3     |
-| 31     | Data Export              | NOT STARTED | v1.3     |
-| 32     | Health Monitor           | NOT STARTED | v1.3     |
+| 9      | **Team Collaboration**   | **COMPLETE**| **MVP**  |
+| 10     | Analytics & Tracking     | NOT STARTED | v1.1     |
+| 11     | Affiliate System         | NOT STARTED | v1.1     |
+| 12     | n8n Automation           | NOT STARTED | v1.1     |
+| 13     | Notifications            | NOT STARTED | v1.1     |
+| 14     | Referral Program         | NOT STARTED | v1.1     |
+| 15     | Feedback System          | NOT STARTED | v1.1     |
+| 16     | AI Integration           | NOT STARTED | v1.1     |
+| 17     | PWA Support              | NOT STARTED | v1.1     |
+| 18     | Internationalization     | NOT STARTED | v1.1     |
+| 19     | A/B Testing              | NOT STARTED | v1.1     |
+| 20     | User Impersonation       | NOT STARTED | v1.1     |
+| 21     | Social Media Management  | NOT STARTED | v1.1     |
+| 22     | Launch Plan Tools        | NOT STARTED | v1.1     |
+| 23     | Operations & Support     | NOT STARTED | v1.1     |
+| 24     | Multi-Role Dashboards    | NOT STARTED | v1.1     |
+| 25     | Branding Manager         | NOT STARTED | v1.1     |
+| 26     | Email/SMS Campaigns      | NOT STARTED | v1.2     |
+| 27     | Lead & CRM               | NOT STARTED | v1.2     |
+| 28     | Product Catalog          | NOT STARTED | v1.2     |
+| 29     | Usage-Based Billing      | NOT STARTED | v1.2     |
+| 30     | White-Label              | NOT STARTED | v1.3     |
+| 31     | Onboarding Checklist     | NOT STARTED | v1.3     |
+| 32     | Data Export              | NOT STARTED | v1.3     |
+| 33     | Health Monitor           | NOT STARTED | v1.3     |
 
 ---
 
@@ -255,6 +256,56 @@ src/
 
 ---
 
+### Module 9: Team Collaboration
+**Estimated Time**: 3-4 days  
+**Dependencies**: Module 3  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Organizations table with multi-tenant support
+- [x] Organization members with role-based access
+- [x] Role hierarchy: Owner > Manager > Member > Viewer
+- [x] Email-based invitation system with token validation
+- [x] Invitation acceptance flow (signup/login → accept)
+- [x] Team management UI in admin dashboard
+- [x] Cancel/resend invitation functionality
+- [x] Confirmation dialogs for destructive actions
+- [x] Auto-add app admin as organization owner
+- [x] RLS policies for team tables (via admin client)
+
+**Database Tables**:
+- `organizations` (id, name, created_at)
+- `organization_members` (id, organization_id, user_id, role, joined_at)
+- `invitations` (id, organization_id, email, role, token, invited_by, expires_at, accepted_at, created_at)
+
+**Role Permissions** (from `src/lib/team-permissions.ts`):
+| Role    | Manage Team | Manage Users | Edit Settings | Invite Members | Billing | View Analytics | View Team List |
+|---------|-------------|--------------|---------------|----------------|---------|----------------|----------------|
+| Owner   | Yes         | Yes          | Yes           | Yes            | Yes     | Yes            | Yes            |
+| Manager | No          | Yes          | No            | Yes            | No      | Yes            | Yes            |
+| Member  | No          | No           | No            | No             | No      | Yes            | Yes            |
+| Viewer  | No          | No           | No            | No             | No      | No             | No             |
+
+**Key Files**:
+```
+src/
+├── app/
+│   ├── admin/team/page.tsx          # Team management UI
+│   ├── invite/[token]/page.tsx      # Invitation acceptance page
+│   └── api/
+│       ├── admin/team/route.ts      # Team CRUD operations
+│       ├── admin/invitations/route.ts
+│       ├── invite/[token]/route.ts  # Validate invitation
+│       ├── invite/[token]/accept/route.ts
+│       └── user/membership/route.ts # Check user's org membership
+├── lib/
+│   └── team-permissions.ts          # Permission checking utilities
+└── components/
+    └── admin/TeamManagement.tsx
+```
+
+---
+
 ## MVP Feature Checklist (from 33-Feature List)
 
 | # | Feature                          | Module | Status      |
@@ -267,6 +318,7 @@ src/
 | 6 | Admin Backend Dashboard          | 3      | COMPLETE    |
 | 7 | Security & Privacy Rules         | 7      | COMPLETE    |
 | 8 | Error Logging & Monitoring       | 8      | COMPLETE    |
+| 9 | **Team Collaboration & Roles**   | 9      | **COMPLETE**|
 | 16| Dark/Light Mode Toggle           | 1      | COMPLETE    |
 
 ---
@@ -311,9 +363,10 @@ When creating a new muse from this template:
 
 ## Progress Tracking
 
-### Current Phase: MVP COMPLETE
+### Current Phase: MVP COMPLETE + Team Collaboration
 **Start Date**: December 29, 2025  
 **MVP Completion**: January 25, 2026  
+**Team Collaboration Added**: February 4, 2026
 
 ### Completed Work (Next.js + Vercel):
 - [x] Module 1: Foundation - Landing page, dark/light mode, header/footer, Vercel deployment
@@ -324,9 +377,11 @@ When creating a new muse from this template:
 - [x] Module 6: Core Pages & Navigation - Profile, billing, pricing pages
 - [x] Module 7: Security & RLS - Supabase RLS policies, Zod validation, rate limiting, security headers
 - [x] Module 8: Monitoring & Docs - Sentry error tracking, Plausible analytics, structured logging, updated documentation
+- [x] Module 9: Team Collaboration - Organizations, team members, invitations, role-based permissions (Owner/Manager/Member/Viewer)
 
 ### Next Steps:
 - [ ] Clone template for first production muse (ExtrusionCalculator.com)
+- [ ] Add RLS policies for organization_members table in Supabase (currently bypassed via admin client)
 - [ ] v1.1 features as needed
 
 ---
@@ -369,4 +424,4 @@ When creating a new muse from this template:
 
 ---
 
-*Last Updated: January 25, 2026*
+*Last Updated: February 4, 2026*

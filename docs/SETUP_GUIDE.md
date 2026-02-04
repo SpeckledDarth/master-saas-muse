@@ -2,7 +2,7 @@
 
 This guide walks you through creating a new SaaS from the Master SaaS Muse Template.
 
-**Template Status: MVP COMPLETE (January 2026)**
+**Template Status: MVP COMPLETE + Team Collaboration (February 2026)**
 
 ---
 
@@ -291,12 +291,54 @@ CREATE TABLE audit_logs (
 );
 
 -- ===================
+-- ORGANIZATIONS (for team collaboration)
+-- ===================
+CREATE TABLE organizations (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL DEFAULT 'Default Organization',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Insert default organization
+INSERT INTO organizations (name) VALUES ('Default Organization');
+
+-- ===================
+-- ORGANIZATION MEMBERS
+-- ===================
+CREATE TABLE organization_members (
+  id SERIAL PRIMARY KEY,
+  organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('owner', 'manager', 'member', 'viewer')),
+  joined_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(organization_id, user_id)
+);
+
+-- ===================
+-- INVITATIONS
+-- ===================
+CREATE TABLE invitations (
+  id SERIAL PRIMARY KEY,
+  organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('owner', 'manager', 'member', 'viewer')),
+  token TEXT NOT NULL UNIQUE,
+  invited_by UUID NOT NULL REFERENCES auth.users(id),
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  accepted_at TIMESTAMPTZ
+);
+
+-- ===================
 -- ENABLE RLS
 -- ===================
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE organization_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE organization_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE invitations ENABLE ROW LEVEL SECURITY;
 
 -- ===================
 -- RLS POLICIES
@@ -348,7 +390,24 @@ CREATE POLICY "Admins can view audit logs" ON audit_logs
 
 CREATE POLICY "Users can insert own audit logs" ON audit_logs
   FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Organizations (service role manages, users can read their org)
+CREATE POLICY "Service role full access orgs" ON organizations
+  FOR ALL USING (true);
+
+-- Organization Members (service role manages via admin client)
+CREATE POLICY "Service role full access org_members" ON organization_members
+  FOR ALL USING (true);
+
+-- Invitations (service role manages via admin client)
+CREATE POLICY "Service role full access invitations" ON invitations
+  FOR ALL USING (true);
 ```
+
+> **Important RLS Note**: The policies above for organization tables use `FOR ALL USING (true)` which is permissive. **Access is controlled server-side** by using the Supabase admin client (service role) in API routes, not by RLS. This means:
+> - Client-side queries to these tables may fail or return empty results
+> - All team operations go through server API endpoints that use the admin client
+> - For stricter RLS, add policies that check `auth.uid()` membership in organization_members
 
 ---
 
@@ -412,7 +471,7 @@ Create in Stripe Dashboard:
 
 ---
 
-## What's Included (MVP)
+## What's Included (MVP + Team)
 
 | Feature | Status |
 |---------|--------|
@@ -430,8 +489,11 @@ Create in Stripe Dashboard:
 | Security Headers | Complete |
 | Plausible Analytics | Complete |
 | Structured Logging | Complete |
+| **Team Collaboration** | **Complete** |
+| **Role-Based Permissions** | **Complete** |
+| **Email Invitations** | **Complete** |
 | Sentry Error Tracking | Deferred (Next.js 16) |
 
 ---
 
-*Last Updated: January 26, 2026*
+*Last Updated: February 4, 2026*

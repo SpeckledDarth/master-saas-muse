@@ -4,7 +4,7 @@ This checklist guides you through setting up a new project from the Master SaaS 
 
 **Estimated time: 15-30 minutes**
 
-**Template Status: MVP COMPLETE (January 2026)**
+**Template Status: MVP COMPLETE + Team Collaboration (February 2026)**
 
 ---
 
@@ -60,10 +60,13 @@ This checklist guides you through setting up a new project from the Master SaaS 
 ## Step 4: Create Database Tables (5 min)
 
 Run the SQL from `docs/SETUP_GUIDE.md` in Supabase SQL Editor:
+- [ ] Create `profiles` table (with stripe fields)
 - [ ] Create `user_roles` table
 - [ ] Create `organization_settings` table
 - [ ] Create `audit_logs` table
-- [ ] Create `profiles` table (with stripe fields)
+- [ ] Create `organizations` table
+- [ ] Create `organization_members` table
+- [ ] Create `invitations` table
 - [ ] Enable Row Level Security on all tables
 - [ ] Create RLS policies
 
@@ -238,7 +241,34 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 
 ---
 
-## Step 13: Verify Everything Works
+## Step 13: Set Up Your Team (Optional)
+
+If you want to invite team members to help manage the SaaS:
+
+- [ ] Go to `/admin/team` in your Admin Dashboard
+- [ ] Click **"Invite Team Member"**
+- [ ] Enter their email address
+- [ ] Select a role:
+  - **Owner**: Full access including billing and settings (only one per organization)
+  - **Manager**: Can manage users and send invitations (no settings or billing)
+  - **Member**: Can view dashboard and analytics
+  - **Viewer**: Read-only access (no analytics or team list)
+- [ ] Click **"Send Invitation"**
+- [ ] Invited user receives email with acceptance link
+
+### Invitation Flow for Invitees
+1. Click the link in the invitation email
+2. Sign up or log in with the invited email address
+3. Click "Accept Invitation" on the invite page
+4. Access Admin Dashboard via avatar dropdown menu
+
+> **Note**: The app admin who bootstrapped the system is automatically added as the organization Owner.
+
+> **Email Confirmation**: If Supabase email confirmation is enabled, new users must verify their email before they can accept invitations. If disabled, users can accept immediately after signup.
+
+---
+
+## Step 14: Verify Everything Works
 
 - [ ] Landing page loads with your branding
 - [ ] App name displays correctly in header
@@ -298,6 +328,8 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - User management (view, edit roles)
 - Organization settings
 - Audit logging
+- **Team Management** (invite members, assign roles)
+- Role-based permissions (Owner/Manager/Member/Viewer)
 
 ### Billing (Stripe)
 - Subscription checkout (Pro $29/mo, Team $99/mo)
@@ -336,4 +368,4 @@ Before launching with live customer data:
 
 ---
 
-*Last Updated: January 26, 2026*
+*Last Updated: February 4, 2026*
