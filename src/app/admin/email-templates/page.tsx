@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useToast } from '@/hooks/use-toast'
-import { Mail, Edit2, Info, Plus, Trash2 } from 'lucide-react'
+import { Mail, Edit2, Info, Plus, Trash2, Send } from 'lucide-react'
 
 interface EmailTemplate {
   id: number
@@ -42,6 +42,7 @@ export default function EmailTemplatesPage() {
   })
   const [isCreateMode, setIsCreateMode] = useState(false)
   const [deleting, setDeleting] = useState<number | null>(null)
+  const [sendingTest, setSendingTest] = useState<number | null>(null)
 
   useEffect(() => {
     fetchTemplates()
@@ -124,6 +125,30 @@ export default function EmailTemplatesPage() {
       toast({ title: 'Error', description: 'Failed to save template', variant: 'destructive' })
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleSendTest(templateId: number) {
+    setSendingTest(templateId)
+    
+    try {
+      const res = await fetch('/api/admin/email-templates/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId }),
+      })
+      
+      const data = await res.json()
+      
+      if (res.ok) {
+        toast({ title: 'Test email sent!', description: data.message })
+      } else {
+        toast({ title: 'Error', description: data.error, variant: 'destructive' })
+      }
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to send test email', variant: 'destructive' })
+    } finally {
+      setSendingTest(null)
     }
   }
 
@@ -213,6 +238,15 @@ export default function EmailTemplatesPage() {
                   <CardDescription>{template.description}</CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSendTest(template.id)}
+                    disabled={sendingTest === template.id}
+                    data-testid={`button-test-${template.name}`}
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    {sendingTest === template.id ? 'Sending...' : 'Send Test'}
+                  </Button>
                   <Button
                     variant="outline"
                     onClick={() => openEditTemplate(template)}
