@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useToast } from '@/hooks/use-toast'
-import { Mail, Edit2, Info, Plus } from 'lucide-react'
+import { Mail, Edit2, Info, Plus, Trash2 } from 'lucide-react'
 
 interface EmailTemplate {
   id: number
@@ -41,6 +41,7 @@ export default function EmailTemplatesPage() {
     description: '',
   })
   const [isCreateMode, setIsCreateMode] = useState(false)
+  const [deleting, setDeleting] = useState<number | null>(null)
 
   useEffect(() => {
     fetchTemplates()
@@ -126,6 +127,32 @@ export default function EmailTemplatesPage() {
     }
   }
 
+  async function handleDelete(templateId: number, templateName: string) {
+    if (!confirm(`Are you sure you want to delete the "${templateName.replace(/_/g, ' ')}" template?`)) {
+      return
+    }
+    
+    setDeleting(templateId)
+    
+    try {
+      const res = await fetch(`/api/admin/email-templates?id=${templateId}`, {
+        method: 'DELETE',
+      })
+      
+      if (res.ok) {
+        toast({ title: 'Template deleted' })
+        fetchTemplates()
+      } else {
+        const error = await res.json()
+        toast({ title: 'Error', description: error.message, variant: 'destructive' })
+      }
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to delete template', variant: 'destructive' })
+    } finally {
+      setDeleting(null)
+    }
+  }
+
   if (loading) {
     return (
       <div className="p-6">
@@ -185,14 +212,26 @@ export default function EmailTemplatesPage() {
                   </CardTitle>
                   <CardDescription>{template.description}</CardDescription>
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={() => openEditTemplate(template)}
-                  data-testid={`button-edit-${template.name}`}
-                >
-                  <Edit2 className="h-4 w-4 mr-2" />
-                  Edit
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => openEditTemplate(template)}
+                    data-testid={`button-edit-${template.name}`}
+                  >
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleDelete(template.id, template.name)}
+                    disabled={deleting === template.id}
+                    data-testid={`button-delete-${template.name}`}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">

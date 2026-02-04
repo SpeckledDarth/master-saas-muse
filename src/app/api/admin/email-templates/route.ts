@@ -101,3 +101,46 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to save template' }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { data: userRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+
+    if (userRole?.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    }
+
+    const { searchParams } = new URL(request.url)
+    const templateId = searchParams.get('id')
+
+    if (!templateId) {
+      return NextResponse.json({ error: 'Template ID required' }, { status: 400 })
+    }
+
+    const adminClient = createAdminClient()
+    const { error } = await adminClient
+      .from('email_templates')
+      .delete()
+      .eq('id', templateId)
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Delete template error:', error)
+    return NextResponse.json({ error: 'Failed to delete template' }, { status: 500 })
+  }
+}
