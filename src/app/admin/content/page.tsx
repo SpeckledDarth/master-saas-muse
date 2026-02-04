@@ -97,6 +97,7 @@ export default function ContentPage() {
       const res = await fetch('/api/admin/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           id: editingPost?.id,
           ...form,
@@ -104,15 +105,17 @@ export default function ContentPage() {
         }),
       })
       
+      const data = await res.json()
+      
       if (res.ok) {
         toast({ title: editingPost ? 'Post updated' : 'Post created' })
         setDialogOpen(false)
         fetchPosts()
       } else {
-        const error = await res.json()
-        toast({ title: 'Error', description: error.message, variant: 'destructive' })
+        toast({ title: 'Error', description: data.error || data.message || 'Failed to save', variant: 'destructive' })
       }
     } catch (error) {
+      console.error('Save error:', error)
       toast({ title: 'Error', description: 'Failed to save post', variant: 'destructive' })
     } finally {
       setSaving(false)

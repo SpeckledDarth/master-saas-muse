@@ -58,16 +58,22 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
     
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    console.log('Posts API - User:', user?.id, 'Auth error:', authError?.message)
+    
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized - Please log in' }, { status: 401 })
     }
 
-    const { data: userRole } = await supabase
+    // Use admin client to check roles (bypasses RLS)
+    const adminClient = createAdminClient()
+    const { data: userRole, error: roleError } = await adminClient
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .single()
+
+    console.log('Posts API - Role:', userRole?.role, 'Role error:', roleError?.message)
 
     if (userRole?.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
@@ -76,9 +82,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { id, title, slug, excerpt, content, type, published } = body
 
-    // Use admin client for write operations
-    const adminClient = createAdminClient()
-
+    // Reuse admin client for write operations (already created above)
     if (id) {
       const updateData: any = {
         title,
