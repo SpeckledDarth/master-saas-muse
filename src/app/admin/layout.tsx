@@ -30,46 +30,46 @@ export default function AdminLayout({
         return
       }
       
-      // Check user_roles table for app admin access (full access)
-      const { data: role } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single()
-      
-      if (role?.role === 'admin') {
-        setIsAppAdmin(true)
-        setHasAccess(true)
-        setPermissions(getTeamPermissions('owner'))
-        setLoading(false)
-        return
-      }
-      
-      // If not app admin, check if user is a team member
-      const { data: teamMember } = await supabase
-        .from('organization_members')
-        .select('role')
-        .eq('user_id', user.id)
-        .single()
-      
-      if (teamMember?.role) {
-        const teamRole = teamMember.role as TeamRole
-        const teamPermissions = getTeamPermissions(teamRole)
-        
-        // Viewers cannot access admin dashboard at all
-        if (teamRole === 'viewer') {
+      // Use API endpoint to check membership (bypasses RLS issues)
+      try {
+        const response = await fetch('/api/user/membership')
+        if (!response.ok) {
           router.push('/')
           return
         }
         
-        setPermissions(teamPermissions)
-        setHasAccess(true)
-        setLoading(false)
-        return
+        const data = await response.json()
+        
+        if (data.isAppAdmin) {
+          setIsAppAdmin(true)
+          setHasAccess(true)
+          setPermissions(getTeamPermissions('owner'))
+          setLoading(false)
+          return
+        }
+        
+        if (data.teamRole) {
+          const teamRole = data.teamRole as TeamRole
+          const teamPermissions = getTeamPermissions(teamRole)
+          
+          // Viewers cannot access admin dashboard at all
+          if (teamRole === 'viewer') {
+            router.push('/')
+            return
+          }
+          
+          setPermissions(teamPermissions)
+          setHasAccess(true)
+          setLoading(false)
+          return
+        }
+        
+        // No access
+        router.push('/')
+      } catch (error) {
+        console.error('Error checking access:', error)
+        router.push('/')
       }
-      
-      // No access
-      router.push('/')
     }
     
     checkAccess()

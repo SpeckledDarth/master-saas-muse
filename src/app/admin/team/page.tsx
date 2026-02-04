@@ -31,6 +31,13 @@ interface Invitation {
   created_at: string
 }
 
+interface UserPermissions {
+  isAppAdmin: boolean
+  teamRole: string | null
+  canManageTeam: boolean
+  canInviteMembers: boolean
+}
+
 export default function TeamPage() {
   const [members, setMembers] = useState<TeamMember[]>([])
   const [invitations, setInvitations] = useState<Invitation[]>([])
@@ -40,6 +47,7 @@ export default function TeamPage() {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
   const [sending, setSending] = useState(false)
   const [rolesInfoOpen, setRolesInfoOpen] = useState(false)
+  const [permissions, setPermissions] = useState<UserPermissions | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -48,16 +56,28 @@ export default function TeamPage() {
 
   async function fetchData() {
     try {
-      const [membersRes, invitationsRes] = await Promise.all([
+      const [membersRes, invitationsRes, permissionsRes] = await Promise.all([
         fetch('/api/admin/team'),
-        fetch('/api/admin/invitations')
+        fetch('/api/admin/invitations'),
+        fetch('/api/user/membership')
       ])
       
       const membersData = await membersRes.json()
       const invitationsData = await invitationsRes.json()
+      const permissionsData = await permissionsRes.json()
       
       setMembers(membersData.members || [])
       setInvitations(invitationsData.invitations || [])
+      
+      // Determine permissions based on role
+      const isOwner = permissionsData.isAppAdmin || permissionsData.teamRole === 'owner'
+      const isManager = permissionsData.teamRole === 'manager'
+      setPermissions({
+        isAppAdmin: permissionsData.isAppAdmin,
+        teamRole: permissionsData.teamRole,
+        canManageTeam: isOwner, // Only owners can change roles and remove members
+        canInviteMembers: isOwner || isManager // Owners and managers can invite
+      })
     } catch (error) {
       console.error('Error fetching team data:', error)
     } finally {
@@ -112,9 +132,17 @@ export default function TeamPage() {
         body: JSON.stringify({ action: 'update_role', memberId, role: newRole })
       })
       
+      const data = await res.json()
+      
       if (res.ok) {
         toast({ title: 'Role updated' })
         fetchData()
+      } else {
+        toast({ 
+          title: 'Error', 
+          description: data.error || 'Failed to update role', 
+          variant: 'destructive' 
+        })
       }
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to update role', variant: 'destructive' })
@@ -131,9 +159,17 @@ export default function TeamPage() {
         body: JSON.stringify({ action: 'remove', memberId })
       })
       
+      const data = await res.json()
+      
       if (res.ok) {
         toast({ title: 'Member removed' })
         fetchData()
+      } else {
+        toast({ 
+          title: 'Error', 
+          description: data.error || 'Failed to remove member', 
+          variant: 'destructive' 
+        })
       }
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to remove member', variant: 'destructive' })
@@ -196,13 +232,14 @@ export default function TeamPage() {
           <p className="text-muted-foreground">Manage your team members and invitations</p>
         </div>
         
-        <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-invite-member">
-              <UserPlus className="h-4 w-4 mr-2" />
-              Invite Member
-            </Button>
-          </DialogTrigger>
+        {permissions?.canInviteMembers && (
+          <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+            <DialogTrigger asChild>
+              <Button data-testid="button-invite-member">
+                <UserPlus className="h-4 w-4 mr-2" />
+                Invite Member
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Invite Team Member</DialogTitle>
@@ -246,6 +283,7 @@ export default function TeamPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        )}
       </div>
 
       <Collapsible open={rolesInfoOpen} onOpenChange={setRolesInfoOpen}>
@@ -357,7 +395,7 @@ export default function TeamPage() {
                       {getRoleIcon(member.role)}
                       {member.role}
                     </Badge>
-                    {member.role !== 'owner' && (
+                    {member.role !== 'owner' && permissions?.canManageTeam && (
                       <div className="flex items-center gap-2">
                         <Select
                           value={member.role}
