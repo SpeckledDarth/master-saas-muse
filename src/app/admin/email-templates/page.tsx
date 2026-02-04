@@ -129,13 +129,23 @@ export default function EmailTemplatesPage() {
   }
 
   async function handleSendTest(templateId: number) {
+    // Prompt for email address (important for onboarding@resend.dev which can only send to Resend account email)
+    const recipientEmail = prompt(
+      'Enter email address to send test to:\n\n' +
+      '(Note: If using onboarding@resend.dev, you can only send to the email you signed up with on Resend)'
+    )
+    
+    if (!recipientEmail) {
+      return
+    }
+    
     setSendingTest(templateId)
     
     try {
       const res = await fetch('/api/admin/email-templates/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateId }),
+        body: JSON.stringify({ templateId, recipientEmail }),
       })
       
       const data = await res.json()

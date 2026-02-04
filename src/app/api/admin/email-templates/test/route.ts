@@ -70,9 +70,13 @@ export async function POST(request: NextRequest) {
 
     const { client, fromEmail } = await getEmailClient()
     
+    // When using onboarding@resend.dev, it can only send to the Resend account email
+    // Allow override via request body for testing
+    const recipientEmail = body.recipientEmail || user.email!
+    
     const { error: sendError } = await client.emails.send({
       from: fromEmail,
-      to: user.email!,
+      to: recipientEmail,
       subject,
       text: emailBody,
       html: emailBody.replace(/\n/g, '<br>'),
@@ -87,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       success: true, 
-      message: `Test email sent to ${user.email}` 
+      message: `Test email sent to ${recipientEmail}` 
     })
   } catch (error) {
     console.error('Test email error:', error)
