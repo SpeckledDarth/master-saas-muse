@@ -61,3 +61,28 @@ The project uses Next.js 14+ (App Router) with React 18+ and TypeScript. Styling
 - **Resend**: Transactional email service.
 - **Plausible Analytics**: Privacy-friendly website analytics.
 - **Sentry**: (Planned) Error tracking.
+
+## CRITICAL: Testing & Deployment Context
+**All testing happens on Vercel deployment, NOT locally in Replit.**
+- User pushes code to GitHub with `git push origin main`
+- Vercel auto-deploys from GitHub
+- Production URL: `https://master-saas-muse-u7ga.vercel.app`
+
+## CRITICAL: Environment Variables (Already Configured in Vercel)
+The following secrets are already set in Vercel - DO NOT ask user to reconfigure:
+- `RESEND_API_KEY` - Resend API key (set)
+- `RESEND_FROM_EMAIL` - Currently `onboarding@resend.dev` (Resend test domain)
+- `STRIPE_SECRET_KEY` - Stripe API key (set)
+- Supabase keys - All configured
+
+### Resend Email Limitations
+- `onboarding@resend.dev` can ONLY send emails to the Resend account owner: `kitt2002@proton.me`
+- Admin user email is `speckledchris@gmail.com` (different from Resend account)
+- To send to any email, user must verify their own domain in Resend
+
+## Session Start Checklist for Agent
+Before debugging any issue:
+1. Read this file completely
+2. Check if environment variables are already configured (they usually are)
+3. ASK clarifying questions before making assumptions
+4. Remember: testing happens on Vercel, not locally
