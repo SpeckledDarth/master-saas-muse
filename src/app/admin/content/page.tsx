@@ -86,6 +86,8 @@ export default function ContentPage() {
   }
 
   async function handleSave() {
+    console.log('handleSave called with form:', form)
+    
     if (!form.title || !form.content) {
       toast({ title: 'Error', description: 'Title and content are required', variant: 'destructive' })
       return
@@ -360,10 +362,10 @@ export default function ContentPage() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={saving} data-testid="button-save-post">
+            <Button type="button" onClick={handleSave} disabled={saving} data-testid="button-save-post">
               {saving ? 'Saving...' : 'Save'}
             </Button>
           </DialogFooter>
