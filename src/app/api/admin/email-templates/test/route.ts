@@ -80,7 +80,9 @@ export async function POST(request: NextRequest) {
 
     if (sendError) {
       console.error('Email send error:', sendError)
-      return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+      return NextResponse.json({ 
+        error: `Failed to send email: ${sendError.message || JSON.stringify(sendError)}` 
+      }, { status: 500 })
     }
 
     return NextResponse.json({ 
@@ -89,6 +91,9 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Test email error:', error)
-    return NextResponse.json({ error: 'Failed to send test email' }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    return NextResponse.json({ 
+      error: `Failed to send test email: ${errorMessage}` 
+    }, { status: 500 })
   }
 }
