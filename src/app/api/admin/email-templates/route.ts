@@ -1,6 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getTeamPermissions, type TeamRole } from '@/lib/team-permissions'
+
+async function checkUserPermissions(userId: string, adminClient: any) {
+  const { data: userRole } = await adminClient
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (userRole?.role === 'admin') {
+    return { isAppAdmin: true, permissions: getTeamPermissions('owner') }
+  }
+
+  const { data: teamMember } = await adminClient
+    .from('organization_members')
+    .select('role')
+    .eq('user_id', userId)
+    .eq('organization_id', 1)
+    .maybeSingle()
+
+  if (teamMember?.role) {
+    return { 
+      isAppAdmin: false, 
+      permissions: getTeamPermissions(teamMember.role as TeamRole)
+    }
+  }
+
+  return { isAppAdmin: false, permissions: null }
+}
 
 export async function GET() {
   try {
@@ -11,19 +40,13 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check admin role
-    const { data: userRole } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
-
-    if (userRole?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    const adminClient = createAdminClient()
+    const { permissions } = await checkUserPermissions(user.id, adminClient)
+    
+    if (!permissions?.canEditContent) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
-    // Use admin client for service role access
-    const adminClient = createAdminClient()
     const { data: templates, error } = await adminClient
       .from('email_templates')
       .select('*')
@@ -50,21 +73,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: userRole } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
-
-    if (userRole?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    const adminClient = createAdminClient()
+    const { permissions } = await checkUserPermissions(user.id, adminClient)
+    
+    if (!permissions?.canEditContent) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
     const body = await request.json()
     const { id, name, subject, body: templateBody, description } = body
-
-    // Use admin client for service role access
-    const adminClient = createAdminClient()
 
     if (id) {
       const { error } = await adminClient
@@ -111,14 +128,11 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: userRole } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
-
-    if (userRole?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    const adminClient = createAdminClient()
+    const { permissions } = await checkUserPermissions(user.id, adminClient)
+    
+    if (!permissions?.canEditContent) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -127,8 +141,6 @@ export async function DELETE(request: NextRequest) {
     if (!templateId) {
       return NextResponse.json({ error: 'Template ID required' }, { status: 400 })
     }
-
-    const adminClient = createAdminClient()
     const { error } = await adminClient
       .from('email_templates')
       .delete()

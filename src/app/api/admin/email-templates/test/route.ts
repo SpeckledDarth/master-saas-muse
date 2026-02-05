@@ -2,6 +2,33 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getEmailClient } from '@/lib/email/client'
+import { wrapEmailInTemplate, replaceVariables } from '@/lib/email/template'
+import { getTeamPermissions, type TeamRole } from '@/lib/team-permissions'
+
+async function checkUserPermissions(userId: string, adminClient: any) {
+  const { data: userRole } = await adminClient
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (userRole?.role === 'admin') {
+    return { permissions: getTeamPermissions('owner') }
+  }
+
+  const { data: teamMember } = await adminClient
+    .from('organization_members')
+    .select('role')
+    .eq('user_id', userId)
+    .eq('organization_id', 1)
+    .maybeSingle()
+
+  if (teamMember?.role) {
+    return { permissions: getTeamPermissions(teamMember.role as TeamRole) }
+  }
+
+  return { permissions: null }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,14 +39,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: userRole } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
-
-    if (userRole?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    const adminClient = createAdminClient()
+    const { permissions } = await checkUserPermissions(user.id, adminClient)
+    
+    if (!permissions?.canEditContent) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
     const body = await request.json()
@@ -29,7 +53,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Template ID required' }, { status: 400 })
     }
 
-    const adminClient = createAdminClient()
     const { data: template, error: templateError } = await adminClient
       .from('email_templates')
       .select('*')
@@ -40,37 +63,50 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Template not found' }, { status: 404 })
     }
 
-    const { data: settings } = await adminClient
+    // Get branding settings
+    const { data: settingsData } = await adminClient
       .from('organization_settings')
-      .select('value')
-      .eq('key', 'branding')
+      .select('settings')
+      .eq('app_id', 'default')
       .single()
 
-    const appName = settings?.value?.appName || 'Your App'
+    const branding = settingsData?.settings?.branding || {}
+    const appName = branding.appName || 'Your App'
+    const appLogo = branding.logoUrl || ''
+    const primaryColor = branding.primaryColor || '#6366f1'
+    const supportEmail = branding.supportEmail || 'support@example.com'
+    const websiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
 
     const sampleData: Record<string, string> = {
       '{{appName}}': appName,
+      '{{appLogo}}': appLogo,
       '{{name}}': user.user_metadata?.full_name || 'Test User',
+      '{{firstName}}': (user.user_metadata?.full_name || 'Test').split(' ')[0],
+      '{{email}}': user.email || '',
       '{{planName}}': 'Pro Plan',
       '{{endDate}}': new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
       '{{orgName}}': 'Test Organization',
       '{{inviteLink}}': 'https://example.com/invite/test123',
       '{{resetLink}}': 'https://example.com/reset/test123',
+      '{{supportEmail}}': supportEmail,
+      '{{websiteUrl}}': websiteUrl,
+      '{{year}}': new Date().getFullYear().toString(),
     }
 
-    let subject = template.subject
-    let emailBody = template.body
+    const subject = `[TEST] ${replaceVariables(template.subject, sampleData)}`
+    const emailBody = replaceVariables(template.body, sampleData)
 
-    for (const [variable, value] of Object.entries(sampleData)) {
-      subject = subject.replace(new RegExp(variable.replace(/[{}]/g, '\\$&'), 'g'), value)
-      emailBody = emailBody.replace(new RegExp(variable.replace(/[{}]/g, '\\$&'), 'g'), value)
-    }
-
-    subject = `[TEST] ${subject}`
+    // Wrap in branded HTML template
+    const htmlEmail = wrapEmailInTemplate(emailBody, subject, {
+      appName,
+      appLogo: appLogo || undefined,
+      primaryColor,
+      supportEmail,
+      websiteUrl,
+    })
 
     const { client, fromEmail } = await getEmailClient()
     
-    // When using onboarding@resend.dev, it can only send to the Resend account email
     // Allow override via request body for testing
     const recipientEmail = body.recipientEmail || user.email!
     
@@ -79,7 +115,7 @@ export async function POST(request: NextRequest) {
       to: recipientEmail,
       subject,
       text: emailBody,
-      html: emailBody.replace(/\n/g, '<br>'),
+      html: htmlEmail,
     })
 
     if (sendError) {
