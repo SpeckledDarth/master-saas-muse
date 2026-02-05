@@ -42,18 +42,55 @@ export default function InvitePage() {
         if (!response.ok) {
           setError(data.error || 'Invalid invitation')
           setInvitation({ valid: false, error: data.error } as InvitationDetails)
-        } else {
-          setInvitation({ ...data, valid: true })
+          setLoading(false)
+          return
         }
+        
+        setInvitation({ ...data, valid: true })
+        
+        // Auto-accept if user is logged in and came from auth flow
+        const pendingToken = localStorage.getItem('pendingInviteToken')
+        if (currentUser && pendingToken === token) {
+          localStorage.removeItem('pendingInviteToken')
+          // Auto-accept the invitation
+          setLoading(false)
+          await autoAcceptInvitation()
+          return
+        }
+        
+        setLoading(false)
       } catch (err) {
         setError('Failed to verify invitation')
-      } finally {
         setLoading(false)
       }
     }
     
+    async function autoAcceptInvitation() {
+      setAccepting(true)
+      try {
+        const response = await fetch(`/api/invite/${token}/accept`, {
+          method: 'POST',
+        })
+        
+        const data = await response.json()
+        
+        if (!response.ok) {
+          setError(data.error || 'Failed to accept invitation')
+        } else {
+          setSuccess(true)
+          setTimeout(() => {
+            router.push('/admin')
+          }, 2000)
+        }
+      } catch (err) {
+        setError('Failed to accept invitation')
+      } finally {
+        setAccepting(false)
+      }
+    }
+    
     checkInvitation()
-  }, [token])
+  }, [token, router])
 
   const handleAccept = async () => {
     if (!user) {

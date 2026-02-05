@@ -38,6 +38,11 @@ function LoginForm() {
       return
     }
 
+    // Keep pendingInviteToken if redirecting to invite page (will be used for auto-accept)
+    if (!redirectTo.startsWith('/invite/')) {
+      localStorage.removeItem('pendingInviteToken')
+    }
+    
     router.push(redirectTo)
   }
 
