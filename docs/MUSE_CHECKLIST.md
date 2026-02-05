@@ -204,12 +204,14 @@ Skip this if you only need email/password authentication. Configure only the pro
 - [ ] Go to [Plausible](https://plausible.io) and add your domain
 - [ ] Add environment variable: `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` = your domain
 
-### Sentry Error Tracking (Deferred)
-- Sentry integration is deferred until `@sentry/nextjs` supports Next.js 16
-- Environment variables ready for when supported:
-  - `NEXT_PUBLIC_SENTRY_DSN`
-  - `SENTRY_ORG`
-  - `SENTRY_PROJECT`
+### Sentry Error Tracking (Now Available!)
+- [ ] Create a Sentry project at [sentry.io](https://sentry.io)
+- [ ] Add environment variables in Vercel:
+  - `NEXT_PUBLIC_SENTRY_DSN` = Your Sentry DSN
+  - `SENTRY_ORG` = Your organization slug
+  - `SENTRY_PROJECT` = Your project slug
+  - `SENTRY_AUTH_TOKEN` = Auth token for source maps (optional)
+- [ ] Deploy and verify errors appear in Sentry dashboard
 
 ---
 
@@ -344,7 +346,10 @@ If you want to invite team members to help manage the SaaS:
 | Variable | Description |
 |----------|-------------|
 | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Plausible analytics domain |
-| `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN (when supported) |
+| `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN |
+| `SENTRY_ORG` | Sentry organization slug |
+| `SENTRY_PROJECT` | Sentry project slug |
+| `SENTRY_AUTH_TOKEN` | Sentry auth token (for source maps) |
 
 ---
 
@@ -398,7 +403,7 @@ If you want to invite team members to help manage the SaaS:
 ### Analytics & Monitoring
 - Plausible analytics (privacy-friendly)
 - Structured logging utility
-- Sentry error tracking (deferred until Next.js 16 support)
+- Sentry error tracking (fully integrated)
 
 ---
 
@@ -407,7 +412,7 @@ If you want to invite team members to help manage the SaaS:
 Before launching with live customer data:
 
 - [ ] Upgrade rate limiting from in-memory to Upstash Redis
-- [ ] Enable Sentry when Next.js 16 support is available
+- [ ] Configure Sentry with your DSN and project details
 - [ ] Set up uptime monitoring
 - [ ] Configure custom domain
 - [ ] Switch Stripe to live mode

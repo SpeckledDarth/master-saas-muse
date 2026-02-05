@@ -60,7 +60,7 @@ The project uses Next.js 14+ (App Router) with React 18+ and TypeScript. Styling
 - **Email System**: Resend integration for transactional emails (welcome, subscription confirmations, team invitations), with an admin-editable template editor.
 - **Security & RLS**: Supabase RLS on key tables, Zod validation for API inputs, rate limiting, and security headers.
 - **Setup Dashboard**: Admin interface for branding (app name, tagline, logo, colors), pricing, social links, and feature toggles, stored in `organization_settings`.
-- **Monitoring**: Plausible analytics for page view tracking, structured logging, and planned Sentry error tracking.
+- **Monitoring**: Plausible analytics for page view tracking, structured logging, and Sentry error tracking.
 - **Team/Organization System**: Multi-user accounts with owner/admin/member roles, invitations, and role management.
 - **Onboarding Wizard**: Guided 4-step setup for new administrators.
 - **Blog/Changelog System**: Markdown-based content with public pages and admin CRUD interface.
@@ -82,7 +82,7 @@ The project uses Next.js 14+ (App Router) with React 18+ and TypeScript. Styling
 - **Vercel**: Deployment and hosting platform.
 - **Resend**: Transactional email service.
 - **Plausible Analytics**: Privacy-friendly website analytics.
-- **Sentry**: (Planned) Error tracking.
+- **Sentry**: Error tracking and monitoring (now available).
 
 ## Supabase Database Tables (Already Created)
 The following tables exist in the production Supabase database:

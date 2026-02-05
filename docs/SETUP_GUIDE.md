@@ -154,10 +154,11 @@ RESEND_FROM_EMAIL=noreply@yourdomain.com
 # ===================
 NEXT_PUBLIC_PLAUSIBLE_DOMAIN=yourdomain.com
 
-# Sentry (deferred until Next.js 16 support)
-# NEXT_PUBLIC_SENTRY_DSN=
-# SENTRY_ORG=
-# SENTRY_PROJECT=
+# Sentry Error Tracking
+NEXT_PUBLIC_SENTRY_DSN=https://...@o123.ingest.sentry.io/456
+SENTRY_ORG=your-org-slug
+SENTRY_PROJECT=your-project-slug
+SENTRY_AUTH_TOKEN=sntrys_...
 
 # ===================
 # APP
@@ -513,7 +514,7 @@ Create in Stripe Dashboard:
 | **Team Collaboration** | **Complete** |
 | **Role-Based Permissions** | **Complete** |
 | **Email Invitations** | **Complete** |
-| Sentry Error Tracking | Deferred (Next.js 16) |
+| **Sentry Error Tracking** | **Complete** |
 
 ---
 

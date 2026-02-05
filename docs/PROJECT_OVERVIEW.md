@@ -208,7 +208,7 @@ This section compares the planned technology stack against what is currently imp
 | **AI & Automation** | xAI Grok API | Not Started | Planned for v1.1 |
 | | n8n Workflows | Not Started | Planned for v1.1 |
 | **Operations** | Resend (Emails) | Implemented | Templates + test sending working |
-| | Sentry (Monitoring) | Not Started | Planned for v1.1 |
+| | Sentry (Monitoring) | Implemented | Error tracking + global error handler |
 | | Plausible (Analytics) | Implemented | Script integrated |
 | | Upstash/BullMQ (Queues) | Not Started | Planned for async jobs |
 | **Monetization** | Stripe Billing | Implemented | Subscriptions + portal working |
@@ -227,9 +227,9 @@ This section compares the planned technology stack against what is currently imp
 
 ### Priority Gaps for v1.1
 
-1. **Sentry** - Error monitoring for production stability
-2. **xAI Grok API** - AI features for enhanced user experience
-3. **n8n Integration** - Workflow automation for admin tasks
+1. **xAI Grok API** - AI features for enhanced user experience
+2. **n8n Integration** - Workflow automation for admin tasks
+3. **Upstash Redis** - Production-ready rate limiting
 4. **Upstash/BullMQ** - Background job processing for emails, reports
 
 ---
