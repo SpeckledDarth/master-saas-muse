@@ -1,0 +1,89 @@
+MVP Gap Analysis: Current State vs. World-Class SaaS
+1. TEAMS FEATURE
+Current State
+What Exists	Status
+Add/Edit/Delete team members	Working
+Role assignment (owner/manager/member/viewer)	Working
+Send invitations	Working (glitchy)
+Cancel invitations	Working
+Permission-based UI (who can see what)	Working
+Gaps to World-Class
+Missing	Impact	Priority
+Team members can't access dashboard	CRITICAL - Defeats purpose of teams	P0
+Invitation acceptance flow is glitchy	Poor UX	P1
+No invitation email branding	Unprofessional	P2
+No "resend invitation" button	Admin frustration	P3
+No team activity log	Audit trail missing	P3
+Root Cause (Likely)
+The /api/user/membership API checks organization_id = 1 which may not match how invitations create team records. Need to trace the full flow.
+
+2. USERS MANAGEMENT
+Current State
+What Exists	Status
+Page exists	Shows empty
+Queries profiles table with user_roles join	Code exists
+Role editing dropdown	Code exists
+Search functionality	Code exists
+Gaps to World-Class
+Missing	Impact	Priority
+No data displays	CRITICAL - Feature broken	P0
+No "profiles" table in database?	Root cause	P0
+No user deletion	Admin limitation	P2
+No user details modal	Limited visibility	P3
+No last login tracking	Missing analytics	P3
+Root Cause (Likely)
+The page queries a profiles table that may not exist or has no data. Need to verify database schema.
+
+3. EMAIL TEMPLATES
+Current State
+What Exists	Status
+CRUD (Create/Read/Update/Delete)	Working
+Test email sending	Working (with prompt)
+Variable placeholders documented	Partial
+Templates stored in database	Working
+Gaps to World-Class
+Missing	Impact	Priority
+No HTML rendering - text only	Unprofessional	P1
+No branding (logo, colors)	Not customer-ready	P1
+No email preview	Can't visualize	P2
+Limited personalization variables	Inflexible	P2
+No template categories	Organization	P3
+Standard Variables Needed
+{{firstName}}, {{lastName}}, {{email}}, {{appName}}, 
+{{appLogo}}, {{primaryColor}}, {{companyName}}, 
+{{unsubscribeLink}}, {{supportEmail}}
+4. BLOG/CONTENT
+Current State
+What Exists	Status
+CRUD for blog posts	Working
+CRUD for changelog	Working
+Markdown content	Working
+Publish/unpublish toggle	Working
+Public /blog page exists	Working
+Public /blog/[slug] page exists	Working
+Gaps to World-Class
+Missing	Impact	Priority
+No branding on public pages	Generic look	P1
+No featured image support	Visual appeal	P2
+No author attribution	Impersonal	P2
+No categories/tags	No organization	P2
+No SEO meta fields	Poor discoverability	P2
+No social share buttons	Limited reach	P3
+No related posts	Lower engagement	P3
+5. DASHBOARD MENU
+Current State
+Menu buttons exist in admin/layout.tsx
+Permission-based visibility
+Links to all admin pages
+Gaps/Bugs
+Issue	Impact	Priority
+"Some buttons don't work"	Navigation broken	P0
+Duplicate buttons	Confusing UI	P1
+Redirect to wrong page	User frustration	P1
+Need specific details from you on which buttons are broken
+
+6. UNTESTED FEATURES
+Feature	Admin Page	Public Page	API Route
+Onboarding	/admin/onboarding	N/A	/api/admin/onboarding
+Feedback	/admin/feedback	N/A	N/A
+Waitlist	/admin/waitlist	N/A	N/A
