@@ -157,10 +157,11 @@ Stripe is the **single source of truth** for pricing. Your website automatically
 
 ---
 
-## Step 8: Google OAuth (Optional, 10 min)
+## Step 8: OAuth Providers (Optional, 10-30 min)
 
-Skip this if you only need email/password authentication.
+Skip this if you only need email/password authentication. Configure only the providers you want to offer.
 
+### Google OAuth
 - [ ] Go to [Google Cloud Console](https://console.cloud.google.com)
 - [ ] Create a new project or select existing
 - [ ] Configure OAuth Consent Screen (External)
@@ -168,6 +169,32 @@ Skip this if you only need email/password authentication.
 - [ ] Add Authorized JavaScript origin: `https://your-app.vercel.app`
 - [ ] Add Authorized redirect URI: (get from Supabase > Auth > Providers > Google)
 - [ ] In Supabase, enable Google provider and paste Client ID + Secret
+
+### GitHub OAuth
+- [ ] Go to [GitHub Developer Settings](https://github.com/settings/developers)
+- [ ] Create new OAuth App
+- [ ] Set Homepage URL: `https://your-app.vercel.app`
+- [ ] Set Authorization callback URL: (get from Supabase > Auth > Providers > GitHub)
+- [ ] In Supabase, enable GitHub provider and paste Client ID + Secret
+
+### Apple OAuth
+- [ ] Go to [Apple Developer Portal](https://developer.apple.com)
+- [ ] Create a new App ID with Sign in with Apple capability
+- [ ] Create a Services ID for web authentication
+- [ ] Configure the callback URL from Supabase
+- [ ] In Supabase, enable Apple provider with your credentials
+
+### X (Twitter) OAuth
+- [ ] Go to [Twitter Developer Portal](https://developer.twitter.com)
+- [ ] Create a new project and app
+- [ ] Enable OAuth 2.0 with "Read users" scope
+- [ ] Set callback URL from Supabase
+- [ ] In Supabase, enable Twitter provider and paste Client ID + Secret
+
+### Magic Link (Passwordless)
+- [ ] Magic Link uses Supabase's built-in email system
+- [ ] No additional configuration needed if Resend is set up
+- [ ] Users receive a login link via email instead of entering a password
 
 ---
 
@@ -231,11 +258,22 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] Add your company website
 
 ### Features Tab
+
+**Authentication Controls:**
 - [ ] Toggle Email Authentication (on/off)
-- [ ] Toggle Google OAuth (on/off)
+- [ ] Toggle Google OAuth (on/off) - enabled by default
+- [ ] Toggle GitHub OAuth (on/off) - disabled by default
+- [ ] Toggle Apple OAuth (on/off) - disabled by default
+- [ ] Toggle X (Twitter) OAuth (on/off) - disabled by default
+- [ ] Toggle Magic Link (on/off) - enabled by default
+
+> **Note:** These toggles control which OAuth buttons appear on the login/signup pages. You must also configure the actual OAuth providers in Supabase Dashboard for them to work.
+
+**Other Features:**
 - [ ] Toggle Avatar Upload (on/off)
 - [ ] Set Allow New Signups (on for launch)
 - [ ] Maintenance Mode (off for launch)
+- [ ] Toggle Feedback Widget (on/off)
 
 **Click "Save Changes" when done!**
 
@@ -274,7 +312,10 @@ If you want to invite team members to help manage the SaaS:
 - [ ] App name displays correctly in header
 - [ ] Sign up works (email confirmation sent)
 - [ ] Login works
-- [ ] Google OAuth works (if configured)
+- [ ] Google OAuth works (if configured and enabled in Features)
+- [ ] Other OAuth providers work (GitHub, Apple, X - if configured)
+- [ ] Magic Link passwordless login works
+- [ ] OAuth toggles in Setup Dashboard control which buttons appear
 - [ ] Profile page loads with avatar upload
 - [ ] Admin panel accessible at `/admin`
 - [ ] Setup Dashboard works at `/admin/setup`
@@ -312,10 +353,16 @@ If you want to invite team members to help manage the SaaS:
 ### Authentication
 - Email/password signup with confirmation
 - Email/password login
-- Google OAuth (optional)
+- **5 OAuth Providers** (configurable via Admin Dashboard):
+  - Google OAuth (enabled by default)
+  - GitHub OAuth
+  - Apple OAuth
+  - X (Twitter) OAuth
+  - Magic Link passwordless login (enabled by default)
 - Password reset flow
 - Protected routes
 - Session persistence
+- **Admin-controlled OAuth toggles** (show/hide providers on login page)
 
 ### User Features
 - Profile page with avatar upload
@@ -368,4 +415,4 @@ Before launching with live customer data:
 
 ---
 
-*Last Updated: February 4, 2026*
+*Last Updated: February 5, 2026*

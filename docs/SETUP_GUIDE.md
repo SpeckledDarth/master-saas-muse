@@ -424,9 +424,28 @@ CREATE POLICY "Service role full access invitations" ON invitations
 1. Create bucket named `avatars` (public)
 2. Add policies for authenticated upload/update and public read
 
-### Google OAuth (Optional)
-1. Get credentials from Google Cloud Console
-2. Enable in **Authentication > Providers > Google**
+### OAuth Providers (Optional)
+
+The template supports 5 OAuth providers, all configurable via Admin Dashboard:
+
+| Provider | Default | Configuration |
+|----------|---------|---------------|
+| Google | Enabled | Google Cloud Console > OAuth Credentials |
+| GitHub | Disabled | GitHub Developer Settings > OAuth Apps |
+| Apple | Disabled | Apple Developer Portal > Sign in with Apple |
+| X (Twitter) | Disabled | Twitter Developer Portal > OAuth 2.0 |
+| Magic Link | Enabled | Uses Supabase email (no extra config) |
+
+**To configure a provider:**
+1. Get credentials from the provider's developer console
+2. Enable in Supabase **Authentication > Providers > [Provider]**
+3. Paste Client ID and Secret
+4. Enable the provider toggle in Admin Dashboard > Setup > Features tab
+
+**Admin Controls:**
+- Login/signup pages only show OAuth buttons that are enabled in Features settings
+- Toggle providers on/off without code changes
+- Changes take effect immediately
 
 ---
 
@@ -476,7 +495,9 @@ Create in Stripe Dashboard:
 | Feature | Status |
 |---------|--------|
 | Email/Password Auth | Complete |
-| Google OAuth | Complete |
+| **5 OAuth Providers** | **Complete** |
+| OAuth Admin Controls | Complete |
+| Magic Link Passwordless | Complete |
 | Profile with Avatar | Complete |
 | Admin Dashboard | Complete |
 | User Management | Complete |
@@ -496,4 +517,4 @@ Create in Stripe Dashboard:
 
 ---
 
-*Last Updated: February 4, 2026*
+*Last Updated: February 5, 2026*

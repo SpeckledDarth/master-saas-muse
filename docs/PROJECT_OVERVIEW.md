@@ -119,15 +119,17 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 
 MuseKit supports multiple authentication methods:
 
-| Method | Status | Description |
-|--------|--------|-------------|
-| Email/Password | Included | Traditional signup with email verification |
-| Google OAuth | Included | One-click sign-in with Google accounts |
-| GitHub OAuth | Included | One-click sign-in with GitHub accounts |
-| Apple OAuth | Included | One-click sign-in with Apple accounts |
-| Twitter/X OAuth | Included | One-click sign-in with X accounts |
-| Magic Links | Included | Passwordless email authentication |
-| SSO/SAML | Planned | Enterprise single sign-on (future) |
+| Method | Status | Default | Description |
+|--------|--------|---------|-------------|
+| Email/Password | Included | Enabled | Traditional signup with email verification |
+| Google OAuth | Included | Enabled | One-click sign-in with Google accounts |
+| GitHub OAuth | Included | Disabled | One-click sign-in with GitHub accounts |
+| Apple OAuth | Included | Disabled | One-click sign-in with Apple accounts |
+| Twitter/X OAuth | Included | Disabled | One-click sign-in with X accounts |
+| Magic Links | Included | Enabled | Passwordless email authentication |
+| SSO/SAML | Planned | - | Enterprise single sign-on (future) |
+
+**Admin Controls:** All OAuth providers can be enabled/disabled via the Setup Dashboard (Features tab). Changes take effect immediately on login/signup pages - no code changes required.
 
 ### The Workflow
 
