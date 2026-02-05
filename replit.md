@@ -183,10 +183,10 @@ npx playwright test --headed
 - [x] Twitter/X OAuth button
 - [x] Magic Link passwordless login
 
-### Phase 2: Profile Integration (Planned)
-- [ ] Show connected providers in Profile page
-- [ ] Allow linking/unlinking additional providers
-- [ ] Sync avatar from OAuth provider if available
+### Phase 2: Profile Integration (Complete)
+- [x] Show connected providers in Profile page
+- [x] Allow linking/unlinking additional providers
+- [x] Safety check: can't unlink if it's the only auth method
 
 ### Phase 3: Admin Controls (Planned)
 - [ ] Add OAuth provider toggles to Setup Wizard

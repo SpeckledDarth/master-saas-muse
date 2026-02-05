@@ -10,7 +10,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { User, Mail, Lock, CreditCard, Loader2, Crown, Users, Sparkles, LogOut, Camera, MapPin, Phone, Building } from 'lucide-react'
+import { User, Mail, Lock, CreditCard, Loader2, Crown, Users, Sparkles, LogOut, Camera, MapPin, Phone, Building, Link2, Unlink } from 'lucide-react'
+import { SiGoogle, SiGithub, SiApple, SiX } from 'react-icons/si'
 import { useToast } from '@/hooks/use-toast'
 
 interface SubscriptionInfo {
@@ -25,6 +26,13 @@ const tierConfig = {
   pro: { name: 'Pro', icon: Crown, color: 'bg-blue-100 dark:bg-blue-900' },
   team: { name: 'Team', icon: Users, color: 'bg-purple-100 dark:bg-purple-900' },
 }
+
+const oauthProviders = [
+  { id: 'google', name: 'Google', icon: SiGoogle },
+  { id: 'github', name: 'GitHub', icon: SiGithub },
+  { id: 'apple', name: 'Apple', icon: SiApple },
+  { id: 'twitter', name: 'X', icon: SiX },
+] as const
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null)
@@ -47,6 +55,8 @@ export default function ProfilePage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const [linkingProvider, setLinkingProvider] = useState<string | null>(null)
+  const [unlinkingProvider, setUnlinkingProvider] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const { toast } = useToast()
@@ -311,6 +321,119 @@ export default function ProfilePage() {
     router.push('/')
   }
 
+  const getConnectedProviders = useCallback(() => {
+    if (!user?.identities) return []
+    return user.identities.map((identity: any) => identity.provider)
+  }, [user])
+
+  const hasPasswordAuth = useCallback(() => {
+    if (!user?.identities) return false
+    return user.identities.some((identity: any) => identity.provider === 'email')
+  }, [user])
+
+  const canUnlinkProvider = useCallback((provider: string) => {
+    const connectedProviders = getConnectedProviders()
+    const hasPassword = hasPasswordAuth()
+    const totalMethods = connectedProviders.length
+    
+    // Can unlink if: after removing this provider, there's still at least 1 method left
+    // If they have email/password auth, they can unlink any OAuth provider
+    // If they only have OAuth, they need at least 2 providers to unlink one
+    if (hasPassword) {
+      // Email auth counts as a method, so can unlink any OAuth
+      return true
+    }
+    // No password auth - need at least 2 OAuth providers to unlink one
+    return totalMethods > 1
+  }, [getConnectedProviders, hasPasswordAuth])
+
+  const handleLinkProvider = async (provider: 'google' | 'github' | 'apple' | 'twitter') => {
+    if (!supabase) return
+    setLinkingProvider(provider)
+    
+    try {
+      const { error } = await supabase.auth.linkIdentity({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/profile`,
+        },
+      })
+      
+      if (error) {
+        toast({
+          title: 'Failed to link account',
+          description: error.message,
+          variant: 'destructive',
+        })
+        setLinkingProvider(null)
+      }
+      // Note: On success, the user is redirected to the OAuth provider,
+      // so we don't need to reset linkingProvider here
+    } catch (err: any) {
+      toast({
+        title: 'Failed to link account',
+        description: err?.message || 'An unexpected error occurred',
+        variant: 'destructive',
+      })
+      setLinkingProvider(null)
+    }
+  }
+
+  const handleUnlinkProvider = async (provider: string) => {
+    if (!supabase || !user?.identities) return
+    
+    // Double-check safety before attempting unlink
+    if (!canUnlinkProvider(provider)) {
+      toast({
+        title: 'Cannot unlink',
+        description: 'You need at least one sign-in method. Add another provider or set a password first.',
+        variant: 'destructive',
+      })
+      return
+    }
+    
+    const identity = user.identities.find((id: any) => id.provider === provider)
+    if (!identity) {
+      toast({
+        title: 'Provider not found',
+        description: 'This provider is not linked to your account.',
+        variant: 'destructive',
+      })
+      return
+    }
+    
+    setUnlinkingProvider(provider)
+    
+    try {
+      const { error } = await supabase.auth.unlinkIdentity(identity)
+      
+      if (error) {
+        toast({
+          title: 'Failed to unlink account',
+          description: error.message,
+          variant: 'destructive',
+        })
+      } else {
+        toast({
+          title: 'Account unlinked',
+          description: `${provider.charAt(0).toUpperCase() + provider.slice(1)} has been disconnected from your account.`,
+        })
+        setUser((prev: any) => ({
+          ...prev,
+          identities: prev.identities.filter((id: any) => id.provider !== provider)
+        }))
+      }
+    } catch (err: any) {
+      toast({
+        title: 'Failed to unlink account',
+        description: err?.message || 'An unexpected error occurred',
+        variant: 'destructive',
+      })
+    }
+    
+    setUnlinkingProvider(null)
+  }
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl">
@@ -516,6 +639,101 @@ export default function ProfilePage() {
                 Update Email
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-connected-accounts">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Link2 className="h-5 w-5" />
+              <CardTitle>Connected Accounts</CardTitle>
+            </div>
+            <CardDescription>Manage your sign-in methods and linked accounts</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {hasPasswordAuth() && (
+              <div className="flex items-center justify-between p-3 rounded-lg border" data-testid="provider-email">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-muted">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">Email & Password</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  </div>
+                </div>
+                <Badge variant="secondary" data-testid="badge-email-connected">Connected</Badge>
+              </div>
+            )}
+            
+            {oauthProviders.map((provider) => {
+              const isConnected = getConnectedProviders().includes(provider.id)
+              const ProviderIcon = provider.icon
+              const isLinking = linkingProvider === provider.id
+              const isUnlinking = unlinkingProvider === provider.id
+              const canUnlink = canUnlinkProvider(provider.id)
+              
+              return (
+                <div 
+                  key={provider.id}
+                  className="flex items-center justify-between p-3 rounded-lg border"
+                  data-testid={`provider-${provider.id}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-muted">
+                      <ProviderIcon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{provider.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {isConnected ? 'Connected to your account' : 'Not connected'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {isConnected ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleUnlinkProvider(provider.id)}
+                      disabled={isUnlinking || !canUnlink}
+                      title={!canUnlink ? 'You need at least one sign-in method' : undefined}
+                      data-testid={`button-unlink-${provider.id}`}
+                    >
+                      {isUnlinking ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Unlink className="h-4 w-4 mr-1" />
+                          Unlink
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleLinkProvider(provider.id)}
+                      disabled={isLinking}
+                      data-testid={`button-link-${provider.id}`}
+                    >
+                      {isLinking ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Link2 className="h-4 w-4 mr-1" />
+                          Link
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              )
+            })}
+            
+            <p className="text-xs text-muted-foreground pt-2" data-testid="text-connected-accounts-help">
+              Linking multiple accounts lets you sign in with any of them.
+            </p>
           </CardContent>
         </Card>
 
