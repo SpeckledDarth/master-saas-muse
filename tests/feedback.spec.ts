@@ -1,14 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { ensureAuthenticated } from './auth.setup';
 
 test.describe('Feedback Management', () => {
   test.beforeEach(async ({ page }) => {
+    const isAuthenticated = await ensureAuthenticated(page);
+    
+    if (!isAuthenticated) {
+      test.skip(true, 'User not authenticated - set TEST_USER_EMAIL and TEST_USER_PASSWORD');
+      return;
+    }
+    
     await page.goto('/admin/feedback');
     await page.waitForLoadState('networkidle');
-    
-    // Check if redirected to login - skip test if not authenticated
-    if (page.url().includes('/login') || page.url().includes('/auth')) {
-      test.skip(true, 'User not authenticated - skipping admin tests');
-    }
   });
 
   test('should display feedback page header', async ({ page }) => {

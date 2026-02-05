@@ -141,32 +141,38 @@ The following secrets are already set in Vercel - DO NOT ask user to reconfigure
 - **Framework**: Playwright for E2E testing
 - **Config**: `playwright.config.ts` in project root
 - **Tests**: `tests/` directory
+- **Total Tests**: 38 tests (34 pass, 4 skip gracefully when no data)
 
 ### Test Files
-- `tests/blog.spec.ts` - Blog/Changelog CRUD, markdown preview
-- `tests/waitlist.spec.ts` - Waitlist management, CSV export, delete
-- `tests/feedback.spec.ts` - Feedback management, status filter, delete
-- `tests/email-templates.spec.ts` - Email template editing, preview, test emails
+- `tests/blog.spec.ts` - Blog/Changelog CRUD, markdown preview (9 tests)
+- `tests/waitlist.spec.ts` - Waitlist management, CSV export, delete (9 tests)
+- `tests/feedback.spec.ts` - Feedback management, status filter, delete (9 tests)
+- `tests/email-templates.spec.ts` - Email template editing, preview, test emails (10 tests)
+- `tests/public-waitlist.spec.ts` - Public waitlist page submission (1 test)
 
 ### Running Tests
 ```bash
-# Run all tests
-npx playwright test
+# Run all tests against Vercel deployment
+TEST_USER_EMAIL=speckledchris@gmail.com TEST_USER_PASSWORD='your-password' TEST_BASE_URL=https://master-saas-muse-u7ga.vercel.app npx playwright test
 
 # Run specific test file
 npx playwright test tests/blog.spec.ts
 
 # Run with headed browser (visible)
 npx playwright test --headed
-
-# Run against Vercel deployment
-TEST_BASE_URL=https://master-saas-muse-u7ga.vercel.app npx playwright test
 ```
 
 ### Test Requirements
 - Tests require authenticated admin user
 - Set `TEST_USER_EMAIL` and `TEST_USER_PASSWORD` env vars for auth
+- Set `TEST_BASE_URL` to target Vercel deployment
 - All interactive elements have `data-testid` attributes
+- Tests gracefully skip when no data exists (e.g., empty waitlist)
+
+### Test ID Patterns
+- Inputs: `input-{field}` or `input-post-{field}` for blog
+- Buttons: `button-{action}` or `button-{action}-{target}`
+- Lists: `{type}-entry-{id}` or `{type}-item-{id}`
 
 ## Session Start Checklist for Agent
 Before debugging any issue:

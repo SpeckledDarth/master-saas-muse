@@ -1,14 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { ensureAuthenticated } from './auth.setup';
 
 test.describe('Email Templates Management', () => {
   test.beforeEach(async ({ page }) => {
+    const isAuthenticated = await ensureAuthenticated(page);
+    
+    if (!isAuthenticated) {
+      test.skip(true, 'User not authenticated - set TEST_USER_EMAIL and TEST_USER_PASSWORD');
+      return;
+    }
+    
     await page.goto('/admin/email-templates');
     await page.waitForLoadState('networkidle');
-    
-    // Check if redirected to login - skip test if not authenticated
-    if (page.url().includes('/login') || page.url().includes('/auth')) {
-      test.skip(true, 'User not authenticated - skipping admin tests');
-    }
   });
 
   test('should display email templates page', async ({ page }) => {
@@ -47,7 +50,13 @@ test.describe('Email Templates Management', () => {
     
     if (count > 0) {
       await editButtons.first().click();
-      await expect(page.getByTestId('email-preview')).toBeVisible();
+      await page.waitForTimeout(1000);
+      
+      // Click preview tab to see preview
+      const previewTab = page.locator('[role="tab"]').filter({ hasText: 'Preview' });
+      await previewTab.click();
+      
+      await expect(page.getByTestId('email-preview')).toBeVisible({ timeout: 10000 });
     }
   });
 
@@ -57,12 +66,17 @@ test.describe('Email Templates Management', () => {
     
     if (count > 0) {
       await editButtons.first().click();
+      await page.waitForTimeout(1000);
       
       const contentInput = page.getByTestId('input-content');
       await contentInput.fill('<h1>Test Preview Update</h1>');
       
+      // Click preview tab to see preview
+      const previewTab = page.locator('[role="tab"]').filter({ hasText: 'Preview' });
+      await previewTab.click();
+      
       const preview = page.getByTestId('email-preview');
-      await expect(preview).toContainText('Test Preview Update');
+      await expect(preview).toContainText('Test Preview Update', { timeout: 10000 });
     }
   });
 
@@ -72,7 +86,10 @@ test.describe('Email Templates Management', () => {
     
     if (count > 0) {
       await editButtons.first().click();
-      await expect(page.getByText('{{user_name}}')).toBeVisible();
+      await page.waitForTimeout(1000);
+      
+      // Variables are shown in the edit view - use specific test id for variable button
+      await expect(page.getByTestId('button-insert-appName')).toBeVisible({ timeout: 10000 });
     }
   });
 

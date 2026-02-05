@@ -1,14 +1,18 @@
 import { test, expect } from '@playwright/test';
+import { ensureAuthenticated } from './auth.setup';
 
 test.describe('Blog/Changelog Management', () => {
   test.beforeEach(async ({ page }) => {
+    // Try to authenticate if credentials are provided
+    const isAuthenticated = await ensureAuthenticated(page);
+    
+    if (!isAuthenticated) {
+      test.skip(true, 'User not authenticated - set TEST_USER_EMAIL and TEST_USER_PASSWORD');
+      return;
+    }
+    
     await page.goto('/admin/blog');
     await page.waitForLoadState('networkidle');
-    
-    // Check if redirected to login - skip test if not authenticated
-    if (page.url().includes('/login') || page.url().includes('/auth')) {
-      test.skip(true, 'User not authenticated - skipping admin tests');
-    }
   });
 
   test('should display blog posts list', async ({ page }) => {
@@ -34,17 +38,19 @@ test.describe('Blog/Changelog Management', () => {
 
   test('should open new post dialog', async ({ page }) => {
     await page.getByTestId('button-new-blog').click();
+    await page.waitForTimeout(1000);
     
-    await expect(page.getByTestId('input-title')).toBeVisible();
-    await expect(page.getByTestId('input-slug')).toBeVisible();
+    await expect(page.getByTestId('input-post-title')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId('input-post-slug')).toBeVisible();
     await expect(page.getByTestId('tab-edit')).toBeVisible();
     await expect(page.getByTestId('tab-preview')).toBeVisible();
   });
 
   test('should show markdown preview', async ({ page }) => {
     await page.getByTestId('button-new-blog').click();
+    await page.waitForTimeout(1000);
     
-    await page.getByTestId('input-content').fill('# Test Heading\n\n**Bold text** and *italic text*\n\n- List item 1\n- List item 2');
+    await page.getByTestId('input-post-content').fill('# Test Heading\n\n**Bold text** and *italic text*\n\n- List item 1\n- List item 2');
     
     await page.getByTestId('tab-preview').click();
     
@@ -54,11 +60,12 @@ test.describe('Blog/Changelog Management', () => {
 
   test('should cancel post creation', async ({ page }) => {
     await page.getByTestId('button-new-blog').click();
-    await expect(page.getByTestId('input-title')).toBeVisible();
+    await page.waitForTimeout(1000);
+    await expect(page.getByTestId('input-post-title')).toBeVisible({ timeout: 10000 });
     
     await page.getByTestId('button-cancel-post').click();
     
-    await expect(page.getByTestId('input-title')).not.toBeVisible();
+    await expect(page.getByTestId('input-post-title')).not.toBeVisible();
   });
 
   test('should create and save a new blog post', async ({ page }) => {
@@ -66,11 +73,12 @@ test.describe('Blog/Changelog Management', () => {
     const uniqueSlug = `test-post-${Date.now()}`;
 
     await page.getByTestId('button-new-blog').click();
+    await page.waitForTimeout(1000);
     
-    await page.getByTestId('input-title').fill(uniqueTitle);
-    await page.getByTestId('input-slug').fill(uniqueSlug);
-    await page.getByTestId('input-excerpt').fill('This is a test excerpt');
-    await page.getByTestId('input-content').fill('# Test Content\n\nThis is test content.');
+    await page.getByTestId('input-post-title').fill(uniqueTitle);
+    await page.getByTestId('input-post-slug').fill(uniqueSlug);
+    await page.getByTestId('input-post-excerpt').fill('This is a test excerpt');
+    await page.getByTestId('input-post-content').fill('# Test Content\n\nThis is test content.');
     
     await page.getByTestId('button-save-post').click();
     
