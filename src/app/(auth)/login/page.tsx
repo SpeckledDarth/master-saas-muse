@@ -4,6 +4,8 @@ import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { getSettings } from '@/lib/settings'
+import { FeatureToggles, defaultSettings } from '@/types/settings'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -23,13 +25,21 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [redirectTo, setRedirectTo] = useState(urlRedirectTo)
+  const [features, setFeatures] = useState<FeatureToggles>(defaultSettings.features)
 
-  // Check for pending invite token and update redirect if needed
+  // Load feature settings and check for pending invite token
   useEffect(() => {
     const pendingToken = localStorage.getItem('pendingInviteToken')
     if (pendingToken && !urlRedirectTo.startsWith('/invite/')) {
       setRedirectTo(`/invite/${pendingToken}`)
     }
+    
+    // Load feature settings (defaults already set, this updates with server values)
+    getSettings().then(settings => {
+      setFeatures(settings.features)
+    }).catch(() => {
+      // Keep defaults on error
+    })
   }, [urlRedirectTo])
 
   async function handleEmailLogin(e: React.FormEvent) {
@@ -132,55 +142,67 @@ function LoginForm() {
         <CardDescription>Sign in to your account</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-2">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => handleOAuthLogin('google')}
-            data-testid="button-google-login"
-          >
-            <SiGoogle className="mr-2 h-4 w-4" />
-            Google
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => handleOAuthLogin('github')}
-            data-testid="button-github-login"
-          >
-            <SiGithub className="mr-2 h-4 w-4" />
-            GitHub
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => handleOAuthLogin('apple')}
-            data-testid="button-apple-login"
-          >
-            <SiApple className="mr-2 h-4 w-4" />
-            Apple
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => handleOAuthLogin('twitter')}
-            data-testid="button-twitter-login"
-          >
-            <SiX className="mr-2 h-4 w-4" />
-            X
-          </Button>
-        </div>
+        {(features.googleOAuth || features.githubOAuth || features.appleOAuth || features.twitterOAuth) && (
+          <>
+            <div className="grid grid-cols-2 gap-2">
+              {features.googleOAuth && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleOAuthLogin('google')}
+                  data-testid="button-google-login"
+                >
+                  <SiGoogle className="mr-2 h-4 w-4" />
+                  Google
+                </Button>
+              )}
+              {features.githubOAuth && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleOAuthLogin('github')}
+                  data-testid="button-github-login"
+                >
+                  <SiGithub className="mr-2 h-4 w-4" />
+                  GitHub
+                </Button>
+              )}
+              {features.appleOAuth && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleOAuthLogin('apple')}
+                  data-testid="button-apple-login"
+                >
+                  <SiApple className="mr-2 h-4 w-4" />
+                  Apple
+                </Button>
+              )}
+              {features.twitterOAuth && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleOAuthLogin('twitter')}
+                  data-testid="button-twitter-login"
+                >
+                  <SiX className="mr-2 h-4 w-4" />
+                  X
+                </Button>
+              )}
+            </div>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Or continue with email
-            </span>
-          </div>
-        </div>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with email
+                </span>
+              </div>
+            </div>
+          </>
+        )}
 
         <form onSubmit={handleEmailLogin} className="space-y-4">
           <div className="space-y-2">
@@ -227,21 +249,23 @@ function LoginForm() {
             Sign in
           </Button>
           
-          <Button 
-            type="button" 
-            variant="ghost" 
-            className="w-full" 
-            onClick={handleMagicLink}
-            disabled={magicLinkLoading}
-            data-testid="button-magic-link"
-          >
-            {magicLinkLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Mail className="mr-2 h-4 w-4" />
-            )}
-            Send magic link instead
-          </Button>
+          {features.magicLink && (
+            <Button 
+              type="button" 
+              variant="ghost" 
+              className="w-full" 
+              onClick={handleMagicLink}
+              disabled={magicLinkLoading}
+              data-testid="button-magic-link"
+            >
+              {magicLinkLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Mail className="mr-2 h-4 w-4" />
+              )}
+              Send magic link instead
+            </Button>
+          )}
         </form>
 
         <p className="text-center text-sm text-muted-foreground">

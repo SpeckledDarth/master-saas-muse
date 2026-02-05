@@ -60,6 +60,10 @@ export interface SocialLinks {
 
 export interface FeatureToggles {
   googleOAuth: boolean
+  githubOAuth: boolean
+  appleOAuth: boolean
+  twitterOAuth: boolean
+  magicLink: boolean
   emailAuth: boolean
   avatarUpload: boolean
   adminPanel: boolean
@@ -403,6 +407,10 @@ export const defaultSettings: SiteSettings = {
   },
   features: {
     googleOAuth: true,
+    githubOAuth: false,
+    appleOAuth: false,
+    twitterOAuth: false,
+    magicLink: true,
     emailAuth: true,
     avatarUpload: true,
     adminPanel: true,

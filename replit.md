@@ -174,7 +174,7 @@ npx playwright test --headed
 - Buttons: `button-{action}` or `button-{action}-{target}`
 - Lists: `{type}-entry-{id}` or `{type}-item-{id}`
 
-## OAuth Enhancement Plan (In Progress)
+## OAuth Enhancement Plan (Complete)
 
 ### Phase 1: Add More OAuth Providers (Complete)
 - [x] Google OAuth (already working)
@@ -188,11 +188,13 @@ npx playwright test --headed
 - [x] Allow linking/unlinking additional providers
 - [x] Safety check: can't unlink if it's the only auth method
 
-### Phase 3: Admin Controls (Planned)
-- [ ] Add OAuth provider toggles to Setup Wizard
-- [ ] Store enabled providers in organization settings
+### Phase 3: Admin Controls (Complete)
+- [x] Add OAuth provider toggles to Setup Dashboard (Features tab)
+- [x] Store enabled providers in organization_settings (features object)
+- [x] Login/signup pages conditionally render OAuth buttons based on settings
+- [x] Defaults: Google OAuth + Magic Link enabled; GitHub, Apple, Twitter disabled
 
-**Note:** OAuth providers are configured in Supabase Dashboard. Code changes are UI buttons + handlers.
+**Note:** OAuth providers are configured in Supabase Dashboard. Admin toggles control UI visibility only.
 
 ## Session Start Checklist for Agent
 Before debugging any issue:

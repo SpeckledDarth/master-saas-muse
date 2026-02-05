@@ -3650,6 +3650,54 @@ export default function SetupPage() {
               
               <div className="flex items-center justify-between py-3 border-b">
                 <div>
+                  <p className="font-medium">GitHub OAuth</p>
+                  <p className="text-sm text-muted-foreground">Allow users to sign in with GitHub</p>
+                </div>
+                <Switch
+                  checked={settings.features.githubOAuth}
+                  onCheckedChange={checked => updateFeatures('githubOAuth', checked)}
+                  data-testid="switch-github-oauth"
+                />
+              </div>
+              
+              <div className="flex items-center justify-between py-3 border-b">
+                <div>
+                  <p className="font-medium">Apple OAuth</p>
+                  <p className="text-sm text-muted-foreground">Allow users to sign in with Apple</p>
+                </div>
+                <Switch
+                  checked={settings.features.appleOAuth}
+                  onCheckedChange={checked => updateFeatures('appleOAuth', checked)}
+                  data-testid="switch-apple-oauth"
+                />
+              </div>
+              
+              <div className="flex items-center justify-between py-3 border-b">
+                <div>
+                  <p className="font-medium">X (Twitter) OAuth</p>
+                  <p className="text-sm text-muted-foreground">Allow users to sign in with X</p>
+                </div>
+                <Switch
+                  checked={settings.features.twitterOAuth}
+                  onCheckedChange={checked => updateFeatures('twitterOAuth', checked)}
+                  data-testid="switch-twitter-oauth"
+                />
+              </div>
+              
+              <div className="flex items-center justify-between py-3 border-b">
+                <div>
+                  <p className="font-medium">Magic Link</p>
+                  <p className="text-sm text-muted-foreground">Allow passwordless email sign-in</p>
+                </div>
+                <Switch
+                  checked={settings.features.magicLink}
+                  onCheckedChange={checked => updateFeatures('magicLink', checked)}
+                  data-testid="switch-magic-link"
+                />
+              </div>
+              
+              <div className="flex items-center justify-between py-3 border-b">
+                <div>
                   <p className="font-medium">Avatar Upload</p>
                   <p className="text-sm text-muted-foreground">Allow users to upload profile pictures</p>
                 </div>

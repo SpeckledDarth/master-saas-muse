@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { getSettings } from '@/lib/settings'
+import { FeatureToggles, defaultSettings } from '@/types/settings'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -22,12 +24,20 @@ function SignupForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [features, setFeatures] = useState<FeatureToggles>(defaultSettings.features)
 
   useEffect(() => {
     const pendingToken = localStorage.getItem('pendingInviteToken')
     if (pendingToken && !searchParams.get('redirectTo')) {
       router.replace(`/signup?redirectTo=/invite/${pendingToken}`)
     }
+    
+    // Load feature settings (defaults already set, this updates with server values)
+    getSettings().then(settings => {
+      setFeatures(settings.features)
+    }).catch(() => {
+      // Keep defaults on error
+    })
   }, [searchParams, router])
 
   async function handleEmailSignup(e: React.FormEvent) {
@@ -120,55 +130,67 @@ function SignupForm() {
           <CardDescription>Get started with your free account</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => handleOAuthSignup('google')}
-              data-testid="button-google-signup"
-            >
-              <SiGoogle className="mr-2 h-4 w-4" />
-              Google
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => handleOAuthSignup('github')}
-              data-testid="button-github-signup"
-            >
-              <SiGithub className="mr-2 h-4 w-4" />
-              GitHub
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => handleOAuthSignup('apple')}
-              data-testid="button-apple-signup"
-            >
-              <SiApple className="mr-2 h-4 w-4" />
-              Apple
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => handleOAuthSignup('twitter')}
-              data-testid="button-twitter-signup"
-            >
-              <SiX className="mr-2 h-4 w-4" />
-              X
-            </Button>
-          </div>
+          {(features.googleOAuth || features.githubOAuth || features.appleOAuth || features.twitterOAuth) && (
+            <>
+              <div className="grid grid-cols-2 gap-2">
+                {features.googleOAuth && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => handleOAuthSignup('google')}
+                    data-testid="button-google-signup"
+                  >
+                    <SiGoogle className="mr-2 h-4 w-4" />
+                    Google
+                  </Button>
+                )}
+                {features.githubOAuth && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => handleOAuthSignup('github')}
+                    data-testid="button-github-signup"
+                  >
+                    <SiGithub className="mr-2 h-4 w-4" />
+                    GitHub
+                  </Button>
+                )}
+                {features.appleOAuth && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => handleOAuthSignup('apple')}
+                    data-testid="button-apple-signup"
+                  >
+                    <SiApple className="mr-2 h-4 w-4" />
+                    Apple
+                  </Button>
+                )}
+                {features.twitterOAuth && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => handleOAuthSignup('twitter')}
+                    data-testid="button-twitter-signup"
+                  >
+                    <SiX className="mr-2 h-4 w-4" />
+                    X
+                  </Button>
+                )}
+              </div>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with email
-              </span>
-            </div>
-          </div>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or continue with email
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
 
           <form onSubmit={handleEmailSignup} className="space-y-4">
             <div className="space-y-2">
