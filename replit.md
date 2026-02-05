@@ -6,6 +6,28 @@
 - Framework: Next.js 16+ with App Router
 - Do NOT use Vite patterns, imports, or configurations
 
+## STOP: READ THIS BEFORE MAKING ANY CHANGES
+
+### This is NOT a standard Replit project
+- Code written here must be pushed to GitHub for Vercel to deploy
+- Local Replit testing is NOT the same as production
+- Changes in Replit are NOT automatically deployed
+- User tests on Vercel deployment, NOT locally
+
+### Git Sync is MANDATORY
+After every significant change:
+1. Ask user to run: `git push origin main`
+2. Wait for Vercel deployment (1-2 minutes)
+3. User tests on Vercel URL, not Replit preview
+
+### Common Mistakes to AVOID
+- Using `import.meta.env` (Vite) instead of `process.env` (Next.js server-side)
+- Creating `vite.config.ts` files
+- Using Vite-specific plugins or imports
+- Testing locally instead of on Vercel deployment
+- Assuming environment variables work the same as Replit
+- Forgetting to sync code to GitHub before user tests
+
 ## Overview
 This project is a full-stack SaaS starter template built with Next.js 16+ (App Router), React 18+, and TypeScript. It provides a robust foundation for new SaaS products, featuring SEO-optimized pages, Supabase authentication, multi-tenancy support, and Stripe billing. The template enables rapid cloning and customization, aiming for a pure Next.js architecture deployed to Vercel for optimal performance and development efficiency. Key capabilities include a comprehensive admin dashboard, multi-user organization system, a markdown-based blog/changelog, and a waitlist mode. The vision is to offer a scalable and production-ready solution for various SaaS ventures.
 
