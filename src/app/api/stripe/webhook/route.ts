@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUncachableStripeClient } from '@/lib/stripe/client';
 import { stripeService } from '@/lib/stripe/service';
 import { sendSubscriptionConfirmationEmail, sendSubscriptionCancelledEmail } from '@/lib/email';
+import { dispatchWebhook } from '@/lib/webhooks/dispatcher';
 import Stripe from 'stripe';
 
 export const runtime = 'nodejs';
@@ -76,6 +77,12 @@ export async function POST(request: NextRequest) {
               console.log('Subscription confirmation email sent to:', customerData.email);
             }
           }
+
+          dispatchWebhook('subscription.created', {
+            subscriptionId: subscription.id,
+            customerId: session.customer,
+            status: subscription.status,
+          });
         }
         break;
       }
@@ -106,6 +113,13 @@ export async function POST(request: NextRequest) {
             console.log('Subscription cancellation email sent to:', customerData.email);
           }
         }
+
+        dispatchWebhook('subscription.updated', {
+          subscriptionId: subscription.id,
+          customerId: subscription.customer,
+          status: subscription.status,
+          cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+        });
         break;
       }
       case 'customer.subscription.deleted': {
@@ -115,6 +129,11 @@ export async function POST(request: NextRequest) {
           ? subscription.customer 
           : subscription.customer.id;
         await stripeService.clearSubscriptionFromDatabase(customerId);
+
+        dispatchWebhook('subscription.cancelled', {
+          subscriptionId: subscription.id,
+          customerId,
+        });
         break;
       }
       default:

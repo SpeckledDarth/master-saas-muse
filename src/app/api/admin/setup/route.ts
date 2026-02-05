@@ -96,6 +96,11 @@ export async function GET(request: NextRequest) {
     social: { ...defaultSettings.social, ...data?.settings?.social },
     features: { ...defaultSettings.features, ...data?.settings?.features },
     ai: { ...defaultSettings.ai, ...(data?.settings?.ai || {}) },
+    webhooks: { 
+      ...defaultSettings.webhooks!, 
+      ...(data?.settings?.webhooks || {}),
+      events: { ...defaultSettings.webhooks!.events, ...(data?.settings?.webhooks?.events || {}) },
+    },
     content: { ...defaultSettings.content, ...data?.settings?.content },
     announcement: { ...defaultSettings.announcement, ...data?.settings?.announcement },
     navigation: { 
@@ -167,6 +172,16 @@ export async function POST(request: NextRequest) {
     social: { ...defaultSettings.social, ...currentSettings.social, ...settings.social },
     features: { ...defaultSettings.features, ...currentSettings.features, ...settings.features },
     ai: { ...defaultSettings.ai, ...(currentSettings.ai || {}), ...(settings.ai || {}) },
+    webhooks: { 
+      ...defaultSettings.webhooks!, 
+      ...(currentSettings.webhooks || {}), 
+      ...(settings.webhooks || {}),
+      events: { 
+        ...defaultSettings.webhooks!.events, 
+        ...(currentSettings.webhooks?.events || {}), 
+        ...(settings.webhooks?.events || {}) 
+      },
+    },
     content: { ...defaultSettings.content, ...currentSettings.content, ...settings.content },
     announcement: { ...defaultSettings.announcement, ...currentSettings.announcement, ...settings.announcement },
     navigation: { 

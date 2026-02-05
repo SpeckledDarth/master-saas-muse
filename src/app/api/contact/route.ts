@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { dispatchWebhook } from '@/lib/webhooks/dispatcher'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -42,6 +43,8 @@ export async function POST(request: Request) {
         <p>${message.replace(/\n/g, '<br>')}</p>
       `,
     })
+
+    dispatchWebhook('contact.submitted', { name, email, subject, message })
 
     return NextResponse.json({ success: true })
   } catch (error) {

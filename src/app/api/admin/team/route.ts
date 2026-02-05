@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendEmail } from '@/lib/email'
 import { getTeamPermissions, type TeamRole } from '@/lib/team-permissions'
+import { dispatchWebhook } from '@/lib/webhooks/dispatcher'
 
 async function checkUserPermissions(userId: string, adminClient: any) {
   // Check if user is app admin (full access)
@@ -256,6 +257,12 @@ export async function POST(request: NextRequest) {
         console.log('Email not sent (Resend may not be configured):', emailError)
         // Continue without email - invitation is still saved
       }
+
+      dispatchWebhook('team.invited', {
+        email: normalizedEmail,
+        role: role || 'member',
+        invitedBy: user.id,
+      })
 
       return NextResponse.json({ success: true, message: 'Invitation sent' })
     }

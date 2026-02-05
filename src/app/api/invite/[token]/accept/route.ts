@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { dispatchWebhook } from '@/lib/webhooks/dispatcher'
 
 export async function POST(
   request: NextRequest,
@@ -61,6 +62,13 @@ export async function POST(
       .from('invitations')
       .update({ accepted_at: new Date().toISOString() })
       .eq('id', invitation.id)
+
+    dispatchWebhook('team.member_joined', {
+      email: user.email,
+      userId: user.id,
+      role: invitation.role,
+      organizationId: invitation.organization_id,
+    })
 
     return NextResponse.json({ success: true, message: 'Invitation accepted successfully' })
   } catch (error) {

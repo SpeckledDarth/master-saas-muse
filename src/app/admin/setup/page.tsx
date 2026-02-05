@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Palette, DollarSign, Globe, Settings, Loader2, Save, Check, FileText, Plus, Trash2, Zap, Shield, Sparkles, Users, BarChart, Lock, Rocket, Heart, Star, Target, Award, Lightbulb, BookOpen, Bot } from 'lucide-react'
-import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem, AISettings, AIProvider } from '@/types/settings'
+import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem, AISettings, AIProvider, WebhookSettings } from '@/types/settings'
 import { ImageUpload } from '@/components/admin/image-upload'
 
 function MiniSaveButton({ saving, saved, onClick, testId }: { saving: boolean; saved: boolean; onClick: () => void; testId: string }) {
@@ -142,6 +142,49 @@ export default function SetupPage() {
       ...prev,
       ai: { ...(prev.ai || defaultSettings.ai!), [key]: value }
     }))
+  }
+
+  function updateWebhooks<K extends keyof WebhookSettings>(
+    key: K,
+    value: WebhookSettings[K]
+  ) {
+    setSettings(prev => ({
+      ...prev,
+      webhooks: { ...(prev.webhooks || defaultSettings.webhooks!), [key]: value }
+    }))
+  }
+
+  function updateWebhookEvent<K extends keyof WebhookSettings['events']>(
+    key: K,
+    value: boolean
+  ) {
+    setSettings(prev => ({
+      ...prev,
+      webhooks: {
+        ...(prev.webhooks || defaultSettings.webhooks!),
+        events: {
+          ...(prev.webhooks?.events || defaultSettings.webhooks!.events),
+          [key]: value,
+        },
+      }
+    }))
+  }
+
+  const [webhookTesting, setWebhookTesting] = useState(false)
+  const [webhookTestResult, setWebhookTestResult] = useState<{ success: boolean; status?: number; error?: string } | null>(null)
+
+  async function testWebhook() {
+    setWebhookTesting(true)
+    setWebhookTestResult(null)
+    try {
+      const res = await fetch('/api/admin/webhooks/test', { method: 'POST' })
+      const data = await res.json()
+      setWebhookTestResult(data)
+    } catch (err) {
+      setWebhookTestResult({ success: false, error: (err as Error).message })
+    } finally {
+      setWebhookTesting(false)
+    }
   }
 
   function updatePricing<K extends keyof SiteSettings['pricing']>(
@@ -3783,6 +3826,112 @@ export default function SetupPage() {
                   data-testid="switch-ai-enabled"
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                Webhook / n8n Integration
+              </CardTitle>
+              <CardDescription>
+                Send real-time events to n8n, Zapier, or any webhook URL when key actions happen in your app.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Enable Webhooks</p>
+                  <p className="text-sm text-muted-foreground">Fire HTTP POST events to an external URL</p>
+                </div>
+                <Switch
+                  checked={settings.webhooks?.enabled ?? false}
+                  onCheckedChange={checked => updateWebhooks('enabled', checked)}
+                  data-testid="switch-webhooks-enabled"
+                />
+              </div>
+
+              {settings.webhooks?.enabled && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Webhook URL</Label>
+                    <Input
+                      placeholder="https://your-n8n-instance.com/webhook/abc123"
+                      value={settings.webhooks?.url || ''}
+                      onChange={(e) => updateWebhooks('url', e.target.value)}
+                      data-testid="input-webhook-url"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      The URL that will receive POST requests with event data
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Webhook Secret (optional)</Label>
+                    <Input
+                      type="password"
+                      placeholder="A shared secret for HMAC signature verification"
+                      value={settings.webhooks?.secret || ''}
+                      onChange={(e) => updateWebhooks('secret', e.target.value)}
+                      data-testid="input-webhook-secret"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      If set, each request includes an <code className="bg-muted px-1 py-0.5 rounded text-xs">X-Webhook-Signature</code> header for verification
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label>Events to Send</Label>
+                    <div className="space-y-2">
+                      {[
+                        { key: 'feedbackSubmitted' as const, label: 'Feedback Submitted', desc: 'When a user submits feedback' },
+                        { key: 'waitlistEntry' as const, label: 'Waitlist Entry', desc: 'When someone joins the waitlist' },
+                        { key: 'subscriptionCreated' as const, label: 'Subscription Created', desc: 'When a new subscription is purchased' },
+                        { key: 'subscriptionUpdated' as const, label: 'Subscription Updated', desc: 'When a subscription is modified or set to cancel' },
+                        { key: 'subscriptionCancelled' as const, label: 'Subscription Cancelled', desc: 'When a subscription is fully cancelled' },
+                        { key: 'teamInvited' as const, label: 'Team Invitation Sent', desc: 'When a team member is invited' },
+                        { key: 'teamMemberJoined' as const, label: 'Team Member Joined', desc: 'When an invitation is accepted' },
+                        { key: 'contactSubmitted' as const, label: 'Contact Form Submitted', desc: 'When someone submits the contact form' },
+                      ].map(evt => (
+                        <div key={evt.key} className="flex items-center justify-between py-1">
+                          <div>
+                            <p className="text-sm font-medium">{evt.label}</p>
+                            <p className="text-xs text-muted-foreground">{evt.desc}</p>
+                          </div>
+                          <Switch
+                            checked={settings.webhooks?.events?.[evt.key] ?? true}
+                            onCheckedChange={checked => updateWebhookEvent(evt.key, checked)}
+                            data-testid={`switch-webhook-event-${evt.key}`}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={testWebhook}
+                      disabled={webhookTesting || !settings.webhooks?.url}
+                      data-testid="button-test-webhook"
+                    >
+                      {webhookTesting ? (
+                        <Loader2 className="h-3 w-3 animate-spin mr-2" />
+                      ) : null}
+                      Send Test Event
+                    </Button>
+                    {webhookTestResult && (
+                      <p className={`text-sm ${webhookTestResult.success ? 'text-green-600' : 'text-red-600'}`}>
+                        {webhookTestResult.success
+                          ? `Delivered (status ${webhookTestResult.status})`
+                          : `Failed: ${webhookTestResult.error || 'Unknown error'}`}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 

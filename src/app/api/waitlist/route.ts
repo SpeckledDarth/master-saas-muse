@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getTeamPermissions, type TeamRole } from '@/lib/team-permissions'
+import { dispatchWebhook } from '@/lib/webhooks/dispatcher'
 
 async function checkUserPermissions(userId: string, adminClient: any) {
   const { data: userRole } = await adminClient
@@ -63,6 +64,12 @@ export async function POST(request: NextRequest) {
       console.error('Waitlist error:', error)
       return NextResponse.json({ error: 'Failed to join waitlist' }, { status: 500 })
     }
+
+    dispatchWebhook('waitlist.entry', {
+      email: email.toLowerCase(),
+      name: name || null,
+      referralSource: referralSource || null,
+    })
 
     return NextResponse.json({ success: true, message: 'You\'re on the list!' })
   } catch (error) {

@@ -62,6 +62,7 @@ The project uses Next.js 14+ (App Router) with React 18+ and TypeScript. Styling
 - **Setup Dashboard**: Admin interface for branding (app name, tagline, logo, colors), pricing, social links, and feature toggles, stored in `organization_settings`.
 - **Monitoring**: Plausible analytics for page view tracking, structured logging, and Sentry error tracking.
 - **AI Integration**: Pluggable AI provider system supporting xAI (Grok), OpenAI, and Anthropic. Admin-configurable provider, model, temperature, max tokens, and system prompt. API route at `/api/ai/chat` with streaming support.
+- **Webhook/n8n Integration**: Event-driven webhook system for n8n, Zapier, or any automation tool. Fire-and-forget delivery with HMAC-SHA256 signing, retry logic (3 attempts), and per-event toggles. Events: feedback, waitlist, subscription lifecycle, team, contact form. Admin-configurable URL, secret, and event selection in Setup Dashboard.
 - **Team/Organization System**: Multi-user accounts with owner/admin/member roles, invitations, and role management.
 - **Onboarding Wizard**: Guided 4-step setup for new administrators.
 - **Blog/Changelog System**: Markdown-based content with public pages and admin CRUD interface.
@@ -118,6 +119,8 @@ The following tables exist in the production Supabase database:
 - `src/lib/ai/provider.ts` - AI provider abstraction (xAI, OpenAI, Anthropic)
 - `src/app/api/ai/chat/route.ts` - AI chat completion API (streaming + non-streaming)
 - `src/app/api/ai/providers/route.ts` - Available AI providers/models list
+- `src/lib/webhooks/dispatcher.ts` - Webhook dispatcher (HMAC signing, retry, fire-and-forget)
+- `src/app/api/admin/webhooks/test/route.ts` - Webhook test ping endpoint
 
 ## CRITICAL: Testing & Deployment Context
 **All testing happens on Vercel deployment, NOT locally in Replit.**

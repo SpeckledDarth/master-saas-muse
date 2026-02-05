@@ -326,6 +326,22 @@ export interface PagesSettings {
   customPages: CustomPage[]
 }
 
+export interface WebhookSettings {
+  enabled: boolean
+  url: string
+  secret: string
+  events: {
+    feedbackSubmitted: boolean
+    waitlistEntry: boolean
+    subscriptionCreated: boolean
+    subscriptionUpdated: boolean
+    subscriptionCancelled: boolean
+    teamInvited: boolean
+    teamMemberJoined: boolean
+    contactSubmitted: boolean
+  }
+}
+
 export interface SiteSettings {
   branding: BrandingSettings
   pricing: PricingSettings
@@ -336,6 +352,7 @@ export interface SiteSettings {
   navigation?: NavigationSettings
   announcement?: AnnouncementBar
   ai?: AISettings
+  webhooks?: WebhookSettings
 }
 
 export const defaultLightTheme: ThemeColors = {
@@ -690,6 +707,21 @@ If you have any questions about this Privacy Policy, please contact us.`,
         sections: [],
       },
     ],
+  },
+  webhooks: {
+    enabled: false,
+    url: '',
+    secret: '',
+    events: {
+      feedbackSubmitted: true,
+      waitlistEntry: true,
+      subscriptionCreated: true,
+      subscriptionUpdated: true,
+      subscriptionCancelled: true,
+      teamInvited: true,
+      teamMemberJoined: true,
+      contactSubmitted: true,
+    },
   },
   announcement: {
     enabled: false,
