@@ -105,13 +105,28 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 
 ### Technology Stack
 
-| What | Why |
-|------|-----|
-| **Next.js** | Modern web framework with built-in SEO support |
-| **Supabase** | Database, user authentication, and security |
-| **Stripe** | Payment processing and subscriptions |
-| **Vercel** | Hosting and automatic deployments |
-| **Resend** | Transactional emails |
+| Layer | Technologies | Purpose |
+|-------|--------------|---------|
+| **Frontend** | Vercel + Next.js 16+ + shadcn/ui + Tailwind CSS | Modern React framework with server-side rendering, beautiful UI components, and utility-first styling |
+| **Backend/API** | Next.js API Routes + OAuth SDKs | Serverless API endpoints with authentication provider integrations |
+| **Database/Storage** | Supabase (PostgreSQL + Storage + Auth) | Managed database, file storage, and built-in authentication with Row Level Security |
+| **Authentication** | Supabase Auth + OAuth Providers | Email/password, Google OAuth, and extensible to other providers (GitHub, Twitter, etc.) |
+| **AI & Automation** | xAI Grok API + n8n | AI capabilities and workflow automation |
+| **Operations** | Resend (Emails) + Sentry (Monitoring) + Plausible (Analytics) + Upstash/BullMQ (Queues) | Transactional emails, error tracking, privacy-friendly metrics, and background job processing |
+| **Monetization** | Stripe | Subscription billing, payment processing, and customer portal |
+
+### Authentication & OAuth
+
+MuseKit supports multiple authentication methods:
+
+| Method | Status | Description |
+|--------|--------|-------------|
+| Email/Password | Included | Traditional signup with email verification |
+| Google OAuth | Included | One-click sign-in with Google accounts |
+| GitHub OAuth | Extensible | Can be added via Supabase Auth settings |
+| Twitter/X OAuth | Extensible | Can be added via Supabase Auth settings |
+| Magic Links | Extensible | Passwordless email authentication |
+| SSO/SAML | Planned | Enterprise single sign-on (future) |
 
 ### The Workflow
 
@@ -159,6 +174,59 @@ This means you can run multiple SaaS products from one template, or allow custom
 - Internationalization (multiple languages)
 - A/B testing
 - White-label support
+
+---
+
+## Gap Analysis: Tech Stack vs. Current Implementation
+
+This section compares the planned technology stack against what is currently implemented in the MVP.
+
+### Implementation Status by Layer
+
+| Layer | Technology | Status | Notes |
+|-------|------------|--------|-------|
+| **Frontend** | Vercel | Implemented | Production deployment configured |
+| | Next.js 16+ | Implemented | App Router with TypeScript |
+| | shadcn/ui | Implemented | Full component library installed |
+| | Tailwind CSS | Implemented | With dark mode support |
+| **Backend/API** | Next.js API Routes | Implemented | All endpoints functional |
+| | OAuth SDKs | Partial | Google OAuth working; others extensible |
+| **Database** | Supabase PostgreSQL | Implemented | 13 tables in production |
+| | Supabase Storage | Available | Configured but not actively used |
+| | Supabase Auth | Implemented | Email + Google OAuth |
+| | Row Level Security | Implemented | Policies on key tables |
+| **Authentication** | Email/Password | Implemented | Full flow with verification |
+| | Google OAuth | Implemented | One-click sign-in working |
+| | GitHub/Twitter OAuth | Not Started | Can be enabled in Supabase |
+| | Magic Links | Not Started | Available in Supabase |
+| | SSO/SAML | Not Started | Enterprise feature for later |
+| **AI & Automation** | xAI Grok API | Not Started | Planned for v1.1 |
+| | n8n Workflows | Not Started | Planned for v1.1 |
+| **Operations** | Resend (Emails) | Implemented | Templates + test sending working |
+| | Sentry (Monitoring) | Not Started | Planned for v1.1 |
+| | Plausible (Analytics) | Implemented | Script integrated |
+| | Upstash/BullMQ (Queues) | Not Started | Planned for async jobs |
+| **Monetization** | Stripe Billing | Implemented | Subscriptions + portal working |
+
+### Summary
+
+| Category | Implemented | Partial | Not Started |
+|----------|-------------|---------|-------------|
+| Frontend | 4/4 | 0 | 0 |
+| Backend/API | 1/2 | 1/2 | 0 |
+| Database/Storage | 4/4 | 0 | 0 |
+| Authentication | 2/6 | 0 | 4/6 |
+| AI & Automation | 0/2 | 0 | 2/2 |
+| Operations | 2/4 | 0 | 2/4 |
+| Monetization | 1/1 | 0 | 0 |
+
+### Priority Gaps for v1.1
+
+1. **Sentry** - Error monitoring for production stability
+2. **xAI Grok API** - AI features for enhanced user experience
+3. **n8n Integration** - Workflow automation for admin tasks
+4. **Upstash/BullMQ** - Background job processing for emails, reports
+5. **Additional OAuth** - GitHub, Twitter for developer audiences
 
 ---
 
