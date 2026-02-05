@@ -1,6 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getTeamPermissions, type TeamRole } from '@/lib/team-permissions'
+
+async function checkUserPermissions(userId: string, adminClient: any) {
+  const { data: userRole } = await adminClient
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (userRole?.role === 'admin') {
+    return { isAppAdmin: true, permissions: getTeamPermissions('owner') }
+  }
+
+  const { data: teamMember } = await adminClient
+    .from('organization_members')
+    .select('role')
+    .eq('user_id', userId)
+    .eq('organization_id', 1)
+    .maybeSingle()
+
+  if (teamMember?.role) {
+    return { 
+      isAppAdmin: false, 
+      permissions: getTeamPermissions(teamMember.role as TeamRole)
+    }
+  }
+
+  return { isAppAdmin: false, permissions: null }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,27 +80,11 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Use admin client for service role access
     const adminClient = createAdminClient()
-
-    const { data: userRole } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .maybeSingle()
-
-    const { data: teamMember } = await adminClient
-      .from('organization_members')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('organization_id', 1)
-      .maybeSingle()
-
-    const isAdmin = userRole?.role === 'admin'
-    const canViewWaitlist = isAdmin || teamMember?.role === 'owner' || teamMember?.role === 'manager'
-
-    if (!canViewWaitlist) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    const { permissions } = await checkUserPermissions(user.id, adminClient)
+    
+    if (!permissions?.canViewAnalytics) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
     const { data: entries, error } = await adminClient
       .from('waitlist_entries')
@@ -86,5 +99,44 @@ export async function GET() {
   } catch (error) {
     console.error('Waitlist fetch error:', error)
     return NextResponse.json({ error: 'Failed to fetch waitlist' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const adminClient = createAdminClient()
+    const { permissions } = await checkUserPermissions(user.id, adminClient)
+    
+    if (!permissions?.canManageUsers) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
+    }
+
+    const { searchParams } = new URL(request.url)
+    const entryId = searchParams.get('id')
+
+    if (!entryId) {
+      return NextResponse.json({ error: 'Entry ID required' }, { status: 400 })
+    }
+
+    const { error } = await adminClient
+      .from('waitlist_entries')
+      .delete()
+      .eq('id', entryId)
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Waitlist delete error:', error)
+    return NextResponse.json({ error: 'Failed to delete entry' }, { status: 500 })
   }
 }

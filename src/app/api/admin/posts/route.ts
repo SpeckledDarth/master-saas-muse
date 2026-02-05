@@ -1,6 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getTeamPermissions, type TeamRole } from '@/lib/team-permissions'
+
+async function checkUserPermissions(userId: string, adminClient: any) {
+  const { data: userRole } = await adminClient
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (userRole?.role === 'admin') {
+    return { isAppAdmin: true, permissions: getTeamPermissions('owner') }
+  }
+
+  const { data: teamMember } = await adminClient
+    .from('organization_members')
+    .select('role')
+    .eq('user_id', userId)
+    .eq('organization_id', 1)
+    .maybeSingle()
+
+  if (teamMember?.role) {
+    return { 
+      isAppAdmin: false, 
+      permissions: getTeamPermissions(teamMember.role as TeamRole)
+    }
+  }
+
+  return { isAppAdmin: false, permissions: null }
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,21 +40,16 @@ export async function GET(request: NextRequest) {
     const published = searchParams.get('published')
     const adminOnly = searchParams.get('admin') === 'true'
     
-    // For admin requests, verify user is actually an admin
     if (adminOnly) {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
       
-      const { data: userRole } = await adminClient
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single()
+      const { permissions } = await checkUserPermissions(user.id, adminClient)
       
-      if (userRole?.role !== 'admin') {
-        return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+      if (!permissions?.canEditContent) {
+        return NextResponse.json({ error: 'Access denied' }, { status: 403 })
       }
     }
     
@@ -57,34 +81,28 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
     const adminClient = createAdminClient()
     
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    console.log('Posts API - User:', user?.id, 'Auth error:', authError?.message)
-    
+    const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized - Please log in' }, { status: 401 })
     }
 
-    // Check admin role using Supabase admin client
-    const { data: userRole, error: roleError } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
+    const { permissions } = await checkUserPermissions(user.id, adminClient)
     
-    console.log('Posts API - Role:', userRole?.role, 'Role error:', roleError?.message)
-
-    if (userRole?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    if (!permissions?.canEditContent) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
     const body = await request.json()
     const { id, title, slug, excerpt, content, type, published } = body
 
+    if (published && !permissions?.canPublishContent) {
+      return NextResponse.json({ error: 'You do not have permission to publish content' }, { status: 403 })
+    }
+
     const finalSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
     const now = new Date().toISOString()
 
     if (id) {
-      // Update existing post
       const { error } = await adminClient
         .from('posts')
         .update({
@@ -104,7 +122,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     } else {
-      // Insert new post
       const { error } = await adminClient
         .from('posts')
         .insert({
@@ -141,15 +158,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check admin role using Supabase admin client
-    const { data: userRole } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
-
-    if (userRole?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    const { permissions } = await checkUserPermissions(user.id, adminClient)
+    
+    if (!permissions?.canManageUsers) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
