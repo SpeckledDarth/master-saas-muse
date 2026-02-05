@@ -193,6 +193,27 @@ export default function TeamPage() {
     }
   }
 
+  async function handleResendInvitation(invitationId: number) {
+    try {
+      const res = await fetch('/api/admin/invitations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'resend', invitationId })
+      })
+      
+      const data = await res.json()
+      
+      if (res.ok) {
+        toast({ title: 'Invitation resent', description: 'A new invitation email has been sent' })
+        fetchData()
+      } else {
+        toast({ title: 'Error', description: data.error || 'Failed to resend invitation', variant: 'destructive' })
+      }
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to resend invitation', variant: 'destructive' })
+    }
+  }
+
   function getRoleIcon(role: string) {
     switch (role) {
       case 'owner': return <Crown className="h-4 w-4" />
@@ -451,16 +472,28 @@ export default function TeamPage() {
                       Expires {new Date(invitation.expires_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
                     <Badge variant="outline">{invitation.role}</Badge>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleCancelInvitation(invitation.id)}
-                      data-testid={`button-cancel-invite-${invitation.id}`}
-                    >
-                      Cancel
-                    </Button>
+                    {permissions?.canInviteMembers && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleResendInvitation(invitation.id)}
+                          data-testid={`button-resend-invite-${invitation.id}`}
+                        >
+                          Resend
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleCancelInvitation(invitation.id)}
+                          data-testid={`button-cancel-invite-${invitation.id}`}
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}

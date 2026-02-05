@@ -163,12 +163,49 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'You do not have permission to invite members' }, { status: 403 })
       }
       console.log('[Team API] Processing invite action')
+      
+      // Normalize email to lowercase for consistency
+      const normalizedEmail = email.toLowerCase().trim()
+      
+      // Check if there's already a pending invitation for this email
+      const { data: existingInvitation } = await adminClient
+        .from('invitations')
+        .select('id')
+        .eq('email', normalizedEmail)
+        .eq('organization_id', 1)
+        .is('accepted_at', null)
+        .gt('expires_at', new Date().toISOString())
+        .maybeSingle()
+      
+      if (existingInvitation) {
+        return NextResponse.json({ 
+          error: 'A pending invitation already exists for this email. Cancel it first or use resend.' 
+        }, { status: 400 })
+      }
+      
+      // Check if user is already a member
+      const { data: authUsers } = await adminClient.auth.admin.listUsers()
+      const existingUser = authUsers?.users?.find(u => u.email?.toLowerCase() === normalizedEmail)
+      
+      if (existingUser) {
+        const { data: existingMember } = await adminClient
+          .from('organization_members')
+          .select('id')
+          .eq('user_id', existingUser.id)
+          .eq('organization_id', 1)
+          .maybeSingle()
+        
+        if (existingMember) {
+          return NextResponse.json({ 
+            error: 'This user is already a team member.' 
+          }, { status: 400 })
+        }
+      }
+      
       const token = crypto.randomUUID()
       const expiresAt = new Date()
       expiresAt.setDate(expiresAt.getDate() + 7)
 
-      // Normalize email to lowercase for consistency
-      const normalizedEmail = email.toLowerCase().trim()
       console.log('[Team API] Inserting invitation for:', normalizedEmail)
       const { data: insertData, error } = await adminClient
         .from('invitations')
