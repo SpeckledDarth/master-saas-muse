@@ -63,39 +63,43 @@ export async function GET() {
       })
     }
 
-    // Combine users from both tables (using user_id as the key)
-    const userMap = new Map<string, { user_id: string; role: string; created_at: string; email: string }>()
+    // Create role maps for quick lookup
+    const appRoleMap = new Map<string, string>()
+    const teamRoleMap = new Map<string, string>()
 
-    // Add users from user_roles
     if (allRoles) {
       for (const role of allRoles) {
-        const authInfo = emailMap.get(role.user_id)
-        userMap.set(role.user_id, {
-          user_id: role.user_id,
-          role: role.role,
-          created_at: authInfo?.created_at || role.assigned_at,
-          email: authInfo?.email || 'Unknown'
-        })
+        appRoleMap.set(role.user_id, role.role)
       }
     }
 
-    // Add/update users from organization_members
     if (allMembers) {
       for (const member of allMembers) {
-        const existing = userMap.get(member.user_id)
-        const authInfo = emailMap.get(member.user_id)
-        if (existing) {
-          // Keep the higher role priority
-          existing.role = existing.role === 'admin' ? 'admin' : member.role
-        } else {
-          userMap.set(member.user_id, {
-            user_id: member.user_id,
-            role: member.role,
-            created_at: authInfo?.created_at || member.joined_at,
-            email: authInfo?.email || 'Unknown'
-          })
-        }
+        teamRoleMap.set(member.user_id, member.role)
       }
+    }
+
+    // Build user list from all auth users
+    const userMap = new Map<string, { user_id: string; role: string; created_at: string; email: string }>()
+
+    for (const authUser of authUsers) {
+      const appRole = appRoleMap.get(authUser.id)
+      const teamRole = teamRoleMap.get(authUser.id)
+      
+      // Priority: app admin > team role > empty
+      let displayRole = ''
+      if (appRole === 'admin') {
+        displayRole = 'owner' // Show admin as owner in the dropdown
+      } else if (teamRole) {
+        displayRole = teamRole
+      }
+
+      userMap.set(authUser.id, {
+        user_id: authUser.id,
+        role: displayRole,
+        created_at: authUser.created_at,
+        email: authUser.email || 'Unknown'
+      })
     }
 
     const users = Array.from(userMap.values()).map(u => ({
@@ -147,18 +151,48 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { userId, role } = body
 
-    // Update user role
-    const { error } = await adminClient
-      .from('user_roles')
-      .upsert({ 
-        user_id: userId, 
-        role: role 
-      }, { 
-        onConflict: 'user_id' 
-      })
+    // Check if user already has a team membership
+    const { data: existingMember } = await adminClient
+      .from('organization_members')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('organization_id', 1)
+      .maybeSingle()
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (existingMember) {
+      // Update existing membership
+      const { error } = await adminClient
+        .from('organization_members')
+        .update({ role })
+        .eq('user_id', userId)
+        .eq('organization_id', 1)
+
+      if (error) {
+        console.error('Error updating member role:', error)
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+    } else {
+      // Create new membership
+      const { error } = await adminClient
+        .from('organization_members')
+        .insert({
+          user_id: userId,
+          organization_id: 1,
+          role: role,
+          joined_at: new Date().toISOString()
+        })
+
+      if (error) {
+        console.error('Error creating member:', error)
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+    }
+
+    // Also update user_roles if setting to admin
+    if (role === 'admin') {
+      await adminClient
+        .from('user_roles')
+        .upsert({ user_id: userId, role: 'admin' }, { onConflict: 'user_id' })
     }
 
     return NextResponse.json({ success: true })
