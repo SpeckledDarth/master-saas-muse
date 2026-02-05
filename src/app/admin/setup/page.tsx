@@ -12,8 +12,8 @@ import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Palette, DollarSign, Globe, Settings, Loader2, Save, Check, FileText, Plus, Trash2, Zap, Shield, Sparkles, Users, BarChart, Lock, Rocket, Heart, Star, Target, Award, Lightbulb, BookOpen } from 'lucide-react'
-import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem } from '@/types/settings'
+import { Palette, DollarSign, Globe, Settings, Loader2, Save, Check, FileText, Plus, Trash2, Zap, Shield, Sparkles, Users, BarChart, Lock, Rocket, Heart, Star, Target, Award, Lightbulb, BookOpen, Bot } from 'lucide-react'
+import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem, AISettings, AIProvider } from '@/types/settings'
 import { ImageUpload } from '@/components/admin/image-upload'
 
 function MiniSaveButton({ saving, saved, onClick, testId }: { saving: boolean; saved: boolean; onClick: () => void; testId: string }) {
@@ -44,6 +44,7 @@ export default function SetupPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings)
   const [activeTab, setActiveTab] = useState('branding')
+  const [aiProviders, setAiProviders] = useState<{ id: string; name: string; envKey: string; models: { id: string; name: string }[] }[]>([])
 
   useEffect(() => {
     async function loadSettings() {
@@ -70,6 +71,11 @@ export default function SetupPage() {
     }
     
     loadSettings()
+
+    fetch('/api/ai/providers')
+      .then(res => res.json())
+      .then(data => setAiProviders(data.providers || []))
+      .catch(() => {})
   }, [router])
 
   async function handleSave() {
@@ -125,6 +131,16 @@ export default function SetupPage() {
     setSettings(prev => ({
       ...prev,
       features: { ...prev.features, [key]: value }
+    }))
+  }
+
+  function updateAI<K extends keyof AISettings>(
+    key: K,
+    value: AISettings[K]
+  ) {
+    setSettings(prev => ({
+      ...prev,
+      ai: { ...(prev.ai || defaultSettings.ai!), [key]: value }
     }))
   }
 
@@ -3744,7 +3760,7 @@ export default function SetupPage() {
                 />
               </div>
               
-              <div className="flex items-center justify-between py-3">
+              <div className="flex items-center justify-between py-3 border-b">
                 <div>
                   <p className="font-medium">Maintenance Mode</p>
                   <p className="text-sm text-muted-foreground">Show maintenance page to all users</p>
@@ -3755,8 +3771,121 @@ export default function SetupPage() {
                   data-testid="switch-maintenance-mode"
                 />
               </div>
+
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="font-medium">AI Features</p>
+                  <p className="text-sm text-muted-foreground">Enable AI-powered features using xAI Grok, OpenAI, or Anthropic</p>
+                </div>
+                <Switch
+                  checked={settings.features.aiEnabled}
+                  onCheckedChange={checked => updateFeatures('aiEnabled', checked)}
+                  data-testid="switch-ai-enabled"
+                />
+              </div>
             </CardContent>
           </Card>
+
+          {settings.features.aiEnabled && (
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bot className="h-5 w-5" />
+                  AI Provider Configuration
+                </CardTitle>
+                <CardDescription>
+                  Configure which AI provider and model to use. Set the API key as an environment variable in your deployment.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label>Provider</Label>
+                  <Select
+                    value={settings.ai?.provider || 'xai'}
+                    onValueChange={(value) => {
+                      updateAI('provider', value as AIProvider)
+                      const provider = aiProviders.find(p => p.id === value)
+                      if (provider && provider.models.length > 0) {
+                        updateAI('model', provider.models[0].id)
+                      }
+                    }}
+                  >
+                    <SelectTrigger data-testid="select-ai-provider">
+                      <SelectValue placeholder="Select provider" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {aiProviders.map(p => (
+                        <SelectItem key={p.id} value={p.id} data-testid={`option-ai-provider-${p.id}`}>
+                          {p.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Required env variable: <code className="bg-muted px-1 py-0.5 rounded text-xs">{aiProviders.find(p => p.id === (settings.ai?.provider || 'xai'))?.envKey || 'XAI_API_KEY'}</code>
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Model</Label>
+                  <Select
+                    value={settings.ai?.model || 'grok-3-mini-fast'}
+                    onValueChange={(value) => updateAI('model', value)}
+                  >
+                    <SelectTrigger data-testid="select-ai-model">
+                      <SelectValue placeholder="Select model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(aiProviders.find(p => p.id === (settings.ai?.provider || 'xai'))?.models || []).map(m => (
+                        <SelectItem key={m.id} value={m.id} data-testid={`option-ai-model-${m.id}`}>
+                          {m.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Max Tokens</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={32768}
+                      value={settings.ai?.maxTokens || 1024}
+                      onChange={(e) => updateAI('maxTokens', parseInt(e.target.value) || 1024)}
+                      data-testid="input-ai-max-tokens"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Temperature</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={2}
+                      step={0.1}
+                      value={settings.ai?.temperature || 0.7}
+                      onChange={(e) => updateAI('temperature', parseFloat(e.target.value) || 0.7)}
+                      data-testid="input-ai-temperature"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>System Prompt</Label>
+                  <Textarea
+                    value={settings.ai?.systemPrompt || ''}
+                    onChange={(e) => updateAI('systemPrompt', e.target.value)}
+                    rows={3}
+                    data-testid="input-ai-system-prompt"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Default instructions sent to the AI with every request
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="flex justify-end pt-6">
             <Button 

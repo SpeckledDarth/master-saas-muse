@@ -72,6 +72,17 @@ export interface FeatureToggles {
   allowNewSignups: boolean
   waitlistMode: boolean
   feedbackWidget: boolean
+  aiEnabled: boolean
+}
+
+export type AIProvider = 'xai' | 'openai' | 'anthropic'
+
+export interface AISettings {
+  provider: AIProvider
+  model: string
+  maxTokens: number
+  temperature: number
+  systemPrompt: string
 }
 
 export interface FeatureCard {
@@ -324,6 +335,7 @@ export interface SiteSettings {
   pages: PagesSettings
   navigation?: NavigationSettings
   announcement?: AnnouncementBar
+  ai?: AISettings
 }
 
 export const defaultLightTheme: ThemeColors = {
@@ -419,6 +431,14 @@ export const defaultSettings: SiteSettings = {
     allowNewSignups: true,
     waitlistMode: false,
     feedbackWidget: true,
+    aiEnabled: false,
+  },
+  ai: {
+    provider: 'xai',
+    model: 'grok-3-mini-fast',
+    maxTokens: 1024,
+    temperature: 0.7,
+    systemPrompt: 'You are a helpful AI assistant.',
   },
   content: {
     featuresEnabled: true,

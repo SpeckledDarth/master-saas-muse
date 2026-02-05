@@ -61,6 +61,7 @@ The project uses Next.js 14+ (App Router) with React 18+ and TypeScript. Styling
 - **Security & RLS**: Supabase RLS on key tables, Zod validation for API inputs, rate limiting, and security headers.
 - **Setup Dashboard**: Admin interface for branding (app name, tagline, logo, colors), pricing, social links, and feature toggles, stored in `organization_settings`.
 - **Monitoring**: Plausible analytics for page view tracking, structured logging, and Sentry error tracking.
+- **AI Integration**: Pluggable AI provider system supporting xAI (Grok), OpenAI, and Anthropic. Admin-configurable provider, model, temperature, max tokens, and system prompt. API route at `/api/ai/chat` with streaming support.
 - **Team/Organization System**: Multi-user accounts with owner/admin/member roles, invitations, and role management.
 - **Onboarding Wizard**: Guided 4-step setup for new administrators.
 - **Blog/Changelog System**: Markdown-based content with public pages and admin CRUD interface.
@@ -114,6 +115,9 @@ The following tables exist in the production Supabase database:
 - `src/instrumentation.ts` - Sentry server-side SDK init
 - `sentry.server.config.ts` - Sentry server config
 - `sentry.edge.config.ts` - Sentry edge config
+- `src/lib/ai/provider.ts` - AI provider abstraction (xAI, OpenAI, Anthropic)
+- `src/app/api/ai/chat/route.ts` - AI chat completion API (streaming + non-streaming)
+- `src/app/api/ai/providers/route.ts` - Available AI providers/models list
 
 ## CRITICAL: Testing & Deployment Context
 **All testing happens on Vercel deployment, NOT locally in Replit.**
@@ -130,6 +134,7 @@ The following secrets are already set in Vercel - DO NOT ask user to reconfigure
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key  
 - `SUPABASE_SERVICE_ROLE_KEY` - Supabase admin key (for server-side operations)
 - `SESSION_SECRET` - Session encryption key
+- `XAI_API_KEY` - xAI/Grok API key (optional, needed for AI features)
 
 ### Replit Secrets (Also Configured)
 - `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` - Legacy Vite prefixes (may not be needed)

@@ -95,6 +95,7 @@ export async function GET(request: NextRequest) {
     pricing: { ...defaultSettings.pricing, ...data?.settings?.pricing },
     social: { ...defaultSettings.social, ...data?.settings?.social },
     features: { ...defaultSettings.features, ...data?.settings?.features },
+    ai: { ...defaultSettings.ai, ...(data?.settings?.ai || {}) },
     content: { ...defaultSettings.content, ...data?.settings?.content },
     announcement: { ...defaultSettings.announcement, ...data?.settings?.announcement },
     navigation: { 
@@ -165,6 +166,7 @@ export async function POST(request: NextRequest) {
     pricing: { ...defaultSettings.pricing, ...currentSettings.pricing, ...settings.pricing },
     social: { ...defaultSettings.social, ...currentSettings.social, ...settings.social },
     features: { ...defaultSettings.features, ...currentSettings.features, ...settings.features },
+    ai: { ...defaultSettings.ai, ...(currentSettings.ai || {}), ...(settings.ai || {}) },
     content: { ...defaultSettings.content, ...currentSettings.content, ...settings.content },
     announcement: { ...defaultSettings.announcement, ...currentSettings.announcement, ...settings.announcement },
     navigation: { 
