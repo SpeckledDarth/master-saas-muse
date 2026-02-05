@@ -1,13 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Search } from 'lucide-react'
+import { Loader2, Search, Users } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface UserWithRole {
@@ -25,71 +24,77 @@ export default function UsersPage() {
   const { toast } = useToast()
 
   useEffect(() => {
-    async function loadUsers() {
-      const supabase = createClient()
-      
-      const { data: profiles, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          email,
-          created_at,
-          user_roles (role)
-        `)
-        .order('created_at', { ascending: false })
-      
-      if (!error && profiles) {
-        const usersWithRoles = profiles.map((profile: { id: string; email: string; created_at: string; user_roles: { role: string }[] | { role: string } | null }) => ({
-          id: profile.id,
-          email: profile.email || 'No email',
-          created_at: profile.created_at,
-          role: Array.isArray(profile.user_roles) 
-            ? profile.user_roles[0]?.role || 'member'
-            : profile.user_roles?.role || 'member'
-        }))
-        setUsers(usersWithRoles)
-      }
-      
-      setLoading(false)
-    }
-    
     loadUsers()
   }, [])
 
-  const handleRoleChange = async (userId: string, newRole: string) => {
-    setUpdatingRole(userId)
-    const supabase = createClient()
-    
-    const { error } = await supabase
-      .from('user_roles')
-      .upsert({ 
-        user_id: userId, 
-        role: newRole 
-      }, { 
-        onConflict: 'user_id' 
-      })
-    
-    if (error) {
+  async function loadUsers() {
+    try {
+      const response = await fetch('/api/admin/users')
+      const data = await response.json()
+      
+      if (response.ok && data.users) {
+        setUsers(data.users)
+      } else {
+        console.error('Failed to load users:', data.error)
+        toast({
+          title: 'Failed to load users',
+          description: data.error || 'Unknown error',
+          variant: 'destructive',
+        })
+      }
+    } catch (error) {
+      console.error('Error loading users:', error)
       toast({
-        title: 'Failed to update role',
-        description: error.message,
+        title: 'Failed to load users',
+        description: 'Please try again',
         variant: 'destructive',
       })
-    } else {
-      toast({
-        title: 'Role updated',
-        description: `User role changed to ${newRole}`,
-      })
-      setUsers(users.map(u => 
-        u.id === userId ? { ...u, role: newRole } : u
-      ))
+    } finally {
+      setLoading(false)
     }
+  }
+
+  async function handleRoleChange(userId: string, newRole: string) {
+    setUpdatingRole(userId)
     
-    setUpdatingRole(null)
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, role: newRole })
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        toast({
+          title: 'Role updated',
+          description: `User role changed to ${newRole}`,
+        })
+        setUsers(users.map(u => 
+          u.id === userId ? { ...u, role: newRole } : u
+        ))
+      } else {
+        toast({
+          title: 'Failed to update role',
+          description: data.error,
+          variant: 'destructive',
+        })
+      }
+    } catch (error) {
+      toast({
+        title: 'Failed to update role',
+        description: 'Please try again',
+        variant: 'destructive',
+      })
+    } finally {
+      setUpdatingRole(null)
+    }
   }
 
   const filteredUsers = users.filter(user => 
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.id.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   if (loading) {
@@ -104,16 +109,19 @@ export default function UsersPage() {
     <div className="container mx-auto py-8 px-4">
       <Card>
         <CardHeader>
-          <CardTitle>User Management</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            User Management
+          </CardTitle>
           <CardDescription>
-            View and manage all users in your application
+            View and manage all users in your application ({users.length} total)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search users by email..."
+              placeholder="Search users by email or ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -132,7 +140,9 @@ export default function UsersPage() {
             <TableBody>
               {filteredUsers.map((user) => (
                 <TableRow key={user.id} data-testid={`row-user-${user.id}`}>
-                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    {user.email}
+                  </TableCell>
                   <TableCell>
                     <Select
                       value={user.role}
@@ -148,6 +158,7 @@ export default function UsersPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="member">Member</SelectItem>
+                        <SelectItem value="manager">Manager</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
                     </Select>
@@ -159,7 +170,7 @@ export default function UsersPage() {
               ))}
               {filteredUsers.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center text-muted-foreground">
+                  <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
                     {searchQuery ? 'No users match your search' : 'No users found'}
                   </TableCell>
                 </TableRow>

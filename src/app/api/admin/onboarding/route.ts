@@ -11,19 +11,29 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check admin role
-    const { data: userRole } = await supabase
+    // Check admin role or team owner role
+    const adminClient = createAdminClient()
+    
+    const { data: userRole } = await adminClient
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
-    if (userRole?.role !== 'admin') {
+    const { data: teamMember } = await adminClient
+      .from('organization_members')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('organization_id', 1)
+      .maybeSingle()
+
+    const isAdmin = userRole?.role === 'admin'
+    const isTeamOwner = teamMember?.role === 'owner'
+    
+    if (!isAdmin && !isTeamOwner) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    // Use admin client to bypass RLS
-    const adminClient = createAdminClient()
     const { data: onboarding, error } = await adminClient
       .from('onboarding_state')
       .select('*')
@@ -59,22 +69,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check admin role
-    const { data: userRole } = await supabase
+    // Check admin role or team owner role
+    const adminClient = createAdminClient()
+    
+    const { data: userRole } = await adminClient
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
-    if (userRole?.role !== 'admin') {
+    const { data: teamMember } = await adminClient
+      .from('organization_members')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('organization_id', 1)
+      .maybeSingle()
+
+    const isAdmin = userRole?.role === 'admin'
+    const isTeamOwner = teamMember?.role === 'owner'
+    
+    if (!isAdmin && !isTeamOwner) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
     const body = await request.json()
     const { current_step, completed_steps, completed } = body
-
-    // Use admin client to bypass RLS
-    const adminClient = createAdminClient()
 
     const { data: existing } = await adminClient
       .from('onboarding_state')

@@ -51,18 +51,28 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: userRole } = await supabase
+    // Use admin client for service role access
+    const adminClient = createAdminClient()
+
+    const { data: userRole } = await adminClient
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
-    if (userRole?.role !== 'admin') {
+    const { data: teamMember } = await adminClient
+      .from('organization_members')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('organization_id', 1)
+      .maybeSingle()
+
+    const isAdmin = userRole?.role === 'admin'
+    const canViewWaitlist = isAdmin || teamMember?.role === 'owner' || teamMember?.role === 'manager'
+
+    if (!canViewWaitlist) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
-
-    // Use admin client for service role access
-    const adminClient = createAdminClient()
     const { data: entries, error } = await adminClient
       .from('waitlist_entries')
       .select('*')

@@ -10,18 +10,19 @@ async function checkUserPermissions(userId: string, adminClient: any) {
     .from('user_roles')
     .select('role')
     .eq('user_id', userId)
-    .single()
+    .maybeSingle()
 
   if (userRole?.role === 'admin') {
     return { isAppAdmin: true, permissions: getTeamPermissions('owner') }
   }
 
-  // Check team membership
+  // Check team membership (organization_id = 1 for single-org setup)
   const { data: teamMember } = await adminClient
     .from('organization_members')
     .select('role')
     .eq('user_id', userId)
-    .single()
+    .eq('organization_id', 1)
+    .maybeSingle()
 
   if (teamMember?.role) {
     return { 

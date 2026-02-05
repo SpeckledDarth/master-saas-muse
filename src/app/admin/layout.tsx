@@ -135,17 +135,6 @@ export default function AdminLayout({
                   </Link>
                 </Button>
               )}
-              {(isAppAdmin || permissions?.canEditSettings) && (
-                <Button 
-                  variant={pathname === '/admin/settings' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/settings" data-testid="link-admin-settings">
-                    Settings
-                  </Link>
-                </Button>
-              )}
               {(isAppAdmin || permissions?.canManageTeam || permissions?.canViewTeamList) && (
                 <Button 
                   variant={pathname === '/admin/team' ? 'secondary' : 'ghost'} 
@@ -164,7 +153,7 @@ export default function AdminLayout({
                   asChild
                 >
                   <Link href="/admin/content" data-testid="link-admin-content">
-                    Content
+                    Blog
                   </Link>
                 </Button>
               )}
