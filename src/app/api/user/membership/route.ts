@@ -21,15 +21,23 @@ export async function GET() {
     
     const isAppAdmin = roleData?.role === 'admin'
 
-    const { data: memberData } = await adminClient
+    // Use limit(1) instead of maybeSingle to handle duplicate entries gracefully
+    const { data: memberData, error: memberError } = await adminClient
       .from('organization_members')
       .select('role')
       .eq('user_id', user.id)
       .eq('organization_id', 1)
-      .maybeSingle()
+      .order('joined_at', { ascending: false })
+      .limit(1)
     
-    const teamRole = memberData?.role
+    if (memberError) {
+      console.error('[Membership API] Error fetching member:', memberError)
+    }
+    
+    const teamRole = memberData?.[0]?.role
     const hasTeamAccess = teamRole === 'owner' || teamRole === 'manager' || teamRole === 'member'
+    
+    console.log('[Membership API] User:', user.email, 'isAppAdmin:', isAppAdmin, 'teamRole:', teamRole, 'hasTeamAccess:', hasTeamAccess)
     
     return NextResponse.json({ 
       hasAdminAccess: isAppAdmin || hasTeamAccess,
