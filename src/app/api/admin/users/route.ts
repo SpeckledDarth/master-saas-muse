@@ -82,32 +82,33 @@ export async function GET() {
     // Build user list from all auth users
     const userMap = new Map<string, { user_id: string; role: string; created_at: string; email: string }>()
 
-    for (const authUser of authUsers) {
+    const usersData = authUsers.map(authUser => {
       const appRole = appRoleMap.get(authUser.id)
       const teamRole = teamRoleMap.get(authUser.id)
       
       // Priority: app admin > team role > empty
       let displayRole = ''
       if (appRole === 'admin') {
-        displayRole = 'owner' // Show admin as owner in the dropdown
+        displayRole = 'owner'
       } else if (teamRole) {
         displayRole = teamRole
       }
 
-      userMap.set(authUser.id, {
-        user_id: authUser.id,
+      return {
+        id: authUser.id,
+        email: authUser.email || 'Unknown',
         role: displayRole,
         created_at: authUser.created_at,
-        email: authUser.email || 'Unknown'
-      })
-    }
+        last_sign_in_at: authUser.last_sign_in_at || null,
+        email_confirmed_at: authUser.email_confirmed_at || null,
+        phone: authUser.phone || null,
+        name: authUser.user_metadata?.full_name || authUser.user_metadata?.display_name || null,
+        avatar_url: authUser.user_metadata?.avatar_url || null,
+        provider: authUser.app_metadata?.provider || 'email'
+      }
+    })
 
-    const users = Array.from(userMap.values()).map(u => ({
-      id: u.user_id,
-      email: u.email,
-      role: u.role,
-      created_at: u.created_at
-    }))
+    const users = usersData
 
     return NextResponse.json({ users })
   } catch (error) {
@@ -188,16 +189,80 @@ export async function POST(request: Request) {
       }
     }
 
-    // Also update user_roles if setting to admin
-    if (role === 'admin') {
-      await adminClient
-        .from('user_roles')
-        .upsert({ user_id: userId, role: 'admin' }, { onConflict: 'user_id' })
-    }
-
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error updating user role:', error)
     return NextResponse.json({ error: 'Failed to update role' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const adminClient = createAdminClient()
+
+    // Check if user has admin access
+    const { data: userRole } = await adminClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    const { data: teamMember } = await adminClient
+      .from('organization_members')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('organization_id', 1)
+      .maybeSingle()
+
+    const isAdmin = userRole?.role === 'admin'
+    const isOwner = teamMember?.role === 'owner'
+    
+    if (!isAdmin && !isOwner) {
+      return NextResponse.json({ error: 'Only admins or owners can delete users' }, { status: 403 })
+    }
+
+    const url = new URL(request.url)
+    const userId = url.searchParams.get('userId')
+
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID required' }, { status: 400 })
+    }
+
+    // Prevent self-deletion
+    if (userId === user.id) {
+      return NextResponse.json({ error: 'Cannot delete yourself' }, { status: 400 })
+    }
+
+    // Remove from organization_members first
+    await adminClient
+      .from('organization_members')
+      .delete()
+      .eq('user_id', userId)
+
+    // Remove from user_roles
+    await adminClient
+      .from('user_roles')
+      .delete()
+      .eq('user_id', userId)
+
+    // Delete the auth user
+    const { error: deleteError } = await adminClient.auth.admin.deleteUser(userId)
+
+    if (deleteError) {
+      console.error('Error deleting auth user:', deleteError)
+      return NextResponse.json({ error: deleteError.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error deleting user:', error)
+    return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 })
   }
 }
