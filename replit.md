@@ -176,12 +176,12 @@ npx playwright test --headed
 
 ## OAuth Enhancement Plan (In Progress)
 
-### Phase 1: Add More OAuth Providers (Current)
+### Phase 1: Add More OAuth Providers (Complete)
 - [x] Google OAuth (already working)
-- [ ] GitHub OAuth button
-- [ ] Apple OAuth button  
-- [ ] Twitter/X OAuth button
-- [ ] Magic Link passwordless login
+- [x] GitHub OAuth button
+- [x] Apple OAuth button  
+- [x] Twitter/X OAuth button
+- [x] Magic Link passwordless login
 
 ### Phase 2: Profile Integration (Planned)
 - [ ] Show connected providers in Profile page

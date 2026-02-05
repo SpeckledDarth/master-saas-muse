@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2 } from 'lucide-react'
-import { SiGoogle } from 'react-icons/si'
+import { Loader2, Mail } from 'lucide-react'
+import { SiGoogle, SiGithub, SiApple, SiX } from 'react-icons/si'
 
 function LoginForm() {
   const router = useRouter()
@@ -19,7 +19,9 @@ function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [magicLinkLoading, setMagicLinkLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [redirectTo, setRedirectTo] = useState(urlRedirectTo)
 
   // Check for pending invite token and update redirect if needed
@@ -54,18 +56,73 @@ function LoginForm() {
     router.push(finalRedirect)
   }
 
-  async function handleGoogleLogin() {
+  async function handleOAuthLogin(provider: 'google' | 'github' | 'apple' | 'twitter') {
     const supabase = createClient()
-    // Check for pending invite token
     const pendingToken = localStorage.getItem('pendingInviteToken')
     const finalRedirect = pendingToken ? `/invite/${pendingToken}` : redirectTo
     
     await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(finalRedirect)}`,
       },
     })
+  }
+
+  async function handleMagicLink() {
+    if (!email) {
+      setError('Please enter your email address')
+      return
+    }
+    
+    setMagicLinkLoading(true)
+    setError(null)
+    
+    const supabase = createClient()
+    const pendingToken = localStorage.getItem('pendingInviteToken')
+    const finalRedirect = pendingToken ? `/invite/${pendingToken}` : redirectTo
+    
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(finalRedirect)}`,
+      },
+    })
+    
+    if (error) {
+      setError(error.message)
+      setMagicLinkLoading(false)
+      return
+    }
+    
+    setMagicLinkSent(true)
+    setMagicLinkLoading(false)
+  }
+
+  if (magicLinkSent) {
+    return (
+      <Card className="w-full max-w-md" data-testid="card-magic-link-sent">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl" data-testid="text-magic-link-title">Check your email</CardTitle>
+          <CardDescription data-testid="text-magic-link-description">
+            We've sent a magic link to <strong data-testid="text-magic-link-email">{email}</strong>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground text-center" data-testid="text-magic-link-instructions">
+            Click the link in your email to sign in instantly.
+          </p>
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={() => setMagicLinkSent(false)}
+            data-testid="button-back-to-login"
+          >
+            Back to login
+          </Button>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -75,15 +132,44 @@ function LoginForm() {
         <CardDescription>Sign in to your account</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={handleGoogleLogin}
-          data-testid="button-google-login"
-        >
-          <SiGoogle className="mr-2 h-4 w-4" />
-          Continue with Google
-        </Button>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => handleOAuthLogin('google')}
+            data-testid="button-google-login"
+          >
+            <SiGoogle className="mr-2 h-4 w-4" />
+            Google
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => handleOAuthLogin('github')}
+            data-testid="button-github-login"
+          >
+            <SiGithub className="mr-2 h-4 w-4" />
+            GitHub
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => handleOAuthLogin('apple')}
+            data-testid="button-apple-login"
+          >
+            <SiApple className="mr-2 h-4 w-4" />
+            Apple
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => handleOAuthLogin('twitter')}
+            data-testid="button-twitter-login"
+          >
+            <SiX className="mr-2 h-4 w-4" />
+            X
+          </Button>
+        </div>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -139,6 +225,22 @@ function LoginForm() {
           <Button type="submit" className="w-full" disabled={loading} data-testid="button-login">
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign in
+          </Button>
+          
+          <Button 
+            type="button" 
+            variant="ghost" 
+            className="w-full" 
+            onClick={handleMagicLink}
+            disabled={magicLinkLoading}
+            data-testid="button-magic-link"
+          >
+            {magicLinkLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Mail className="mr-2 h-4 w-4" />
+            )}
+            Send magic link instead
           </Button>
         </form>
 

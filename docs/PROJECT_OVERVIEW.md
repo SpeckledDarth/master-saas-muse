@@ -123,9 +123,10 @@ MuseKit supports multiple authentication methods:
 |--------|--------|-------------|
 | Email/Password | Included | Traditional signup with email verification |
 | Google OAuth | Included | One-click sign-in with Google accounts |
-| GitHub OAuth | Extensible | Can be added via Supabase Auth settings |
-| Twitter/X OAuth | Extensible | Can be added via Supabase Auth settings |
-| Magic Links | Extensible | Passwordless email authentication |
+| GitHub OAuth | Included | One-click sign-in with GitHub accounts |
+| Apple OAuth | Included | One-click sign-in with Apple accounts |
+| Twitter/X OAuth | Included | One-click sign-in with X accounts |
+| Magic Links | Included | Passwordless email authentication |
 | SSO/SAML | Planned | Enterprise single sign-on (future) |
 
 ### The Workflow
@@ -190,15 +191,17 @@ This section compares the planned technology stack against what is currently imp
 | | shadcn/ui | Implemented | Full component library installed |
 | | Tailwind CSS | Implemented | With dark mode support |
 | **Backend/API** | Next.js API Routes | Implemented | All endpoints functional |
-| | OAuth SDKs | Partial | Google OAuth working; others extensible |
+| | OAuth SDKs | Implemented | All providers via Supabase Auth |
 | **Database** | Supabase PostgreSQL | Implemented | 13 tables in production |
-| | Supabase Storage | Available | Configured but not actively used |
-| | Supabase Auth | Implemented | Email + Google OAuth |
+| | Supabase Storage | Implemented | Used for avatars + branding images |
+| | Supabase Auth | Implemented | Email + all OAuth providers |
 | | Row Level Security | Implemented | Policies on key tables |
 | **Authentication** | Email/Password | Implemented | Full flow with verification |
 | | Google OAuth | Implemented | One-click sign-in working |
-| | GitHub/Twitter OAuth | Not Started | Can be enabled in Supabase |
-| | Magic Links | Not Started | Available in Supabase |
+| | GitHub OAuth | Implemented | UI ready, enable in Supabase Dashboard |
+| | Apple OAuth | Implemented | UI ready, enable in Supabase Dashboard |
+| | Twitter/X OAuth | Implemented | UI ready, enable in Supabase Dashboard |
+| | Magic Links | Implemented | Passwordless login via Supabase OTP |
 | | SSO/SAML | Not Started | Enterprise feature for later |
 | **AI & Automation** | xAI Grok API | Not Started | Planned for v1.1 |
 | | n8n Workflows | Not Started | Planned for v1.1 |
@@ -213,9 +216,9 @@ This section compares the planned technology stack against what is currently imp
 | Category | Implemented | Partial | Not Started |
 |----------|-------------|---------|-------------|
 | Frontend | 4/4 | 0 | 0 |
-| Backend/API | 1/2 | 1/2 | 0 |
+| Backend/API | 2/2 | 0 | 0 |
 | Database/Storage | 4/4 | 0 | 0 |
-| Authentication | 2/6 | 0 | 4/6 |
+| Authentication | 6/7 | 0 | 1/7 |
 | AI & Automation | 0/2 | 0 | 2/2 |
 | Operations | 2/4 | 0 | 2/4 |
 | Monetization | 1/1 | 0 | 0 |
@@ -226,7 +229,6 @@ This section compares the planned technology stack against what is currently imp
 2. **xAI Grok API** - AI features for enhanced user experience
 3. **n8n Integration** - Workflow automation for admin tasks
 4. **Upstash/BullMQ** - Background job processing for emails, reports
-5. **Additional OAuth** - GitHub, Twitter for developer audiences
 
 ---
 

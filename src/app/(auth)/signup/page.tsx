@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2 } from 'lucide-react'
-import { SiGoogle } from 'react-icons/si'
+import { SiGoogle, SiGithub, SiApple, SiX } from 'react-icons/si'
 
 function SignupForm() {
   const router = useRouter()
@@ -71,14 +71,13 @@ function SignupForm() {
     setLoading(false)
   }
 
-  async function handleGoogleSignup() {
+  async function handleOAuthSignup(provider: 'google' | 'github' | 'apple' | 'twitter') {
     const supabase = createClient()
-    // Check for pending invite token
     const pendingToken = localStorage.getItem('pendingInviteToken')
     const finalRedirect = pendingToken ? `/invite/${pendingToken}` : redirectTo
     
     await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(finalRedirect)}`,
       },
@@ -121,15 +120,44 @@ function SignupForm() {
           <CardDescription>Get started with your free account</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleSignup}
-            data-testid="button-google-signup"
-          >
-            <SiGoogle className="mr-2 h-4 w-4" />
-            Continue with Google
-          </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => handleOAuthSignup('google')}
+              data-testid="button-google-signup"
+            >
+              <SiGoogle className="mr-2 h-4 w-4" />
+              Google
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => handleOAuthSignup('github')}
+              data-testid="button-github-signup"
+            >
+              <SiGithub className="mr-2 h-4 w-4" />
+              GitHub
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => handleOAuthSignup('apple')}
+              data-testid="button-apple-signup"
+            >
+              <SiApple className="mr-2 h-4 w-4" />
+              Apple
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => handleOAuthSignup('twitter')}
+              data-testid="button-twitter-signup"
+            >
+              <SiX className="mr-2 h-4 w-4" />
+              X
+            </Button>
+          </div>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
