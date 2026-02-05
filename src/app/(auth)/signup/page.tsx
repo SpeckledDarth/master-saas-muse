@@ -58,7 +58,10 @@ function SignupForm() {
 
     // If user is immediately logged in (email confirmation disabled), redirect
     if (data?.session) {
-      localStorage.removeItem('pendingInviteToken')
+      // Keep pendingInviteToken if redirecting to invite page (will be used for auto-accept)
+      if (!redirectTo.startsWith('/invite/')) {
+        localStorage.removeItem('pendingInviteToken')
+      }
       router.push(redirectTo)
       return
     }
@@ -70,10 +73,14 @@ function SignupForm() {
 
   async function handleGoogleSignup() {
     const supabase = createClient()
+    // Check for pending invite token
+    const pendingToken = localStorage.getItem('pendingInviteToken')
+    const finalRedirect = pendingToken ? `/invite/${pendingToken}` : redirectTo
+    
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(finalRedirect)}`,
       },
     })
   }

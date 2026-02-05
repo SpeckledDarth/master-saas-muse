@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -14,12 +14,21 @@ import { SiGoogle } from 'react-icons/si'
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirectTo') || '/'
+  const urlRedirectTo = searchParams.get('redirectTo') || '/'
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [redirectTo, setRedirectTo] = useState(urlRedirectTo)
+
+  // Check for pending invite token and update redirect if needed
+  useEffect(() => {
+    const pendingToken = localStorage.getItem('pendingInviteToken')
+    if (pendingToken && !urlRedirectTo.startsWith('/invite/')) {
+      setRedirectTo(`/invite/${pendingToken}`)
+    }
+  }, [urlRedirectTo])
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -38,20 +47,23 @@ function LoginForm() {
       return
     }
 
-    // Keep pendingInviteToken if redirecting to invite page (will be used for auto-accept)
-    if (!redirectTo.startsWith('/invite/')) {
-      localStorage.removeItem('pendingInviteToken')
-    }
+    // Redirect - if going to invite page, keep the token for auto-accept
+    const pendingToken = localStorage.getItem('pendingInviteToken')
+    const finalRedirect = pendingToken ? `/invite/${pendingToken}` : redirectTo
     
-    router.push(redirectTo)
+    router.push(finalRedirect)
   }
 
   async function handleGoogleLogin() {
     const supabase = createClient()
+    // Check for pending invite token
+    const pendingToken = localStorage.getItem('pendingInviteToken')
+    const finalRedirect = pendingToken ? `/invite/${pendingToken}` : redirectTo
+    
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${redirectTo}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(finalRedirect)}`,
       },
     })
   }
