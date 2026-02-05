@@ -322,30 +322,37 @@ export default function ProfilePage() {
   }
 
   const getConnectedProviders = useCallback(() => {
-    if (!user?.identities) return []
+    if (!user?.identities || !Array.isArray(user.identities)) return []
     return user.identities.map((identity: any) => identity.provider)
   }, [user])
 
+  const hasIdentitiesData = useCallback(() => {
+    // Check if we have reliable identity data to make unlink decisions
+    return user?.identities && Array.isArray(user.identities) && user.identities.length > 0
+  }, [user])
+
   const hasPasswordAuth = useCallback(() => {
-    if (!user?.identities) return false
+    // In Supabase, email/password users have an identity with provider === 'email'
+    if (!user?.identities || !Array.isArray(user.identities)) return false
     return user.identities.some((identity: any) => identity.provider === 'email')
   }, [user])
 
   const canUnlinkProvider = useCallback((provider: string) => {
+    // If we don't have identity data, be conservative and don't allow unlink
+    if (!hasIdentitiesData()) return false
+    
     const connectedProviders = getConnectedProviders()
     const hasPassword = hasPasswordAuth()
+    
+    // Count all available auth methods from identities
+    // All providers in identities count as valid auth methods
     const totalMethods = connectedProviders.length
     
-    // Can unlink if: after removing this provider, there's still at least 1 method left
-    // If they have email/password auth, they can unlink any OAuth provider
-    // If they only have OAuth, they need at least 2 providers to unlink one
-    if (hasPassword) {
-      // Email auth counts as a method, so can unlink any OAuth
-      return true
-    }
-    // No password auth - need at least 2 OAuth providers to unlink one
+    // Can only unlink if there will be at least 1 method remaining
+    // Note: email identity also counts as a method, so this works for both
+    // OAuth-only users and email+OAuth users
     return totalMethods > 1
-  }, [getConnectedProviders, hasPasswordAuth])
+  }, [getConnectedProviders, hasPasswordAuth, hasIdentitiesData])
 
   const handleLinkProvider = async (provider: 'google' | 'github' | 'apple' | 'twitter') => {
     if (!supabase) return
