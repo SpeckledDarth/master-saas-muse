@@ -111,7 +111,7 @@ export default function FeedbackPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex items-center justify-between gap-4 flex-wrap" data-testid="feedback-header">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <MessageSquare className="h-6 w-6" />
@@ -201,7 +201,7 @@ export default function FeedbackPage() {
                     onClick={() => handleDelete(item.id)}
                     disabled={deleting === item.id}
                     className="text-destructive hover:text-destructive"
-                    data-testid={`button-delete-${item.id}`}
+                    data-testid={`button-delete-feedback-${item.id}`}
                   >
                     {deleting === item.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

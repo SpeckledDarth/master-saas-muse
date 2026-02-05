@@ -98,7 +98,7 @@ export default function WaitlistPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex items-center justify-between gap-4 flex-wrap" data-testid="waitlist-header">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Mail className="h-6 w-6" />
@@ -137,7 +137,7 @@ export default function WaitlistPage() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9"
-                  data-testid="input-search-waitlist"
+                  data-testid="input-search"
                 />
               </div>
             )}
@@ -183,7 +183,7 @@ export default function WaitlistPage() {
                         onClick={() => handleDelete(entry.id, entry.email)}
                         disabled={deleting === entry.id}
                         className="text-destructive hover:text-destructive"
-                        data-testid={`button-delete-${entry.id}`}
+                        data-testid={`button-delete-entry-${entry.id}`}
                       >
                         {deleting === entry.id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />

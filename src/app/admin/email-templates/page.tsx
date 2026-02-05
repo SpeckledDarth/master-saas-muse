@@ -253,7 +253,7 @@ export default function EmailTemplatesPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4" data-testid="email-templates-header">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Mail className="h-6 w-6" />
@@ -323,7 +323,7 @@ export default function EmailTemplatesPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => openEditTemplate(template)}
-                    data-testid={`button-edit-${template.name}`}
+                    data-testid={`button-edit-template-${template.name}`}
                   >
                     <Edit2 className="h-4 w-4 mr-2" />
                     Edit
@@ -418,7 +418,7 @@ export default function EmailTemplatesPage() {
                   value={form.subject}
                   onChange={(e) => setForm({ ...form, subject: e.target.value })}
                   placeholder="Email subject..."
-                  data-testid="input-template-subject"
+                  data-testid="input-subject"
                 />
               </div>
               
@@ -447,7 +447,7 @@ export default function EmailTemplatesPage() {
                   placeholder="Email content..."
                   rows={10}
                   className="font-mono text-sm"
-                  data-testid="input-template-body"
+                  data-testid="input-content"
                 />
               </div>
               
@@ -473,7 +473,7 @@ export default function EmailTemplatesPage() {
               </Card>
             </TabsContent>
             
-            <TabsContent value="preview" className="flex-1 overflow-auto mt-4">
+            <TabsContent value="preview" className="flex-1 overflow-auto mt-4" data-testid="email-preview">
               <Card>
                 <CardHeader className="border-b">
                   <div className="text-sm text-muted-foreground">Subject:</div>
@@ -494,7 +494,7 @@ export default function EmailTemplatesPage() {
           </Tabs>
           
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setDialogOpen(false)} data-testid="button-cancel-template">
               Cancel
             </Button>
             <Button onClick={handleSave} disabled={saving} data-testid="button-save-template">

@@ -272,7 +272,7 @@ export default function ContentPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
+      <div data-testid="blog-header">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <FileText className="h-6 w-6" />
           Content Management
@@ -429,7 +429,7 @@ export default function ContentPage() {
               </div>
             </TabsContent>
             
-            <TabsContent value="preview" className="flex-1 overflow-auto mt-4">
+            <TabsContent value="preview" className="flex-1 overflow-auto mt-4" data-testid="markdown-preview">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-2xl">{form.title || 'Untitled'}</CardTitle>
