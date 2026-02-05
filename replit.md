@@ -82,7 +82,7 @@ The project uses Next.js 14+ (App Router) with React 18+ and TypeScript. Styling
 - **Vercel**: Deployment and hosting platform.
 - **Resend**: Transactional email service.
 - **Plausible Analytics**: Privacy-friendly website analytics.
-- **Sentry**: Error tracking and monitoring (now available).
+- **Sentry**: Error tracking and monitoring (fully working - server + browser errors via `/monitoring` tunnel route).
 
 ## Supabase Database Tables (Already Created)
 The following tables exist in the production Supabase database:
@@ -109,6 +109,11 @@ The following tables exist in the production Supabase database:
 - `src/app/api/` - All API routes (admin/, stripe/, user/, etc.)
 - `src/app/admin/` - Admin dashboard pages
 - `src/components/ui/` - shadcn/ui components
+- `src/app/monitoring/route.ts` - Sentry tunnel route (proxies browser errors to Sentry)
+- `src/instrumentation-client.ts` - Sentry client-side SDK init (v10 format)
+- `src/instrumentation.ts` - Sentry server-side SDK init
+- `sentry.server.config.ts` - Sentry server config
+- `sentry.edge.config.ts` - Sentry edge config
 
 ## CRITICAL: Testing & Deployment Context
 **All testing happens on Vercel deployment, NOT locally in Replit.**
