@@ -148,11 +148,11 @@ export default function AdminLayout({
               )}
               {(isAppAdmin || permissions?.canEditContent) && (
                 <Button 
-                  variant={pathname === '/admin/content' ? 'secondary' : 'ghost'} 
+                  variant={pathname === '/admin/blog' ? 'secondary' : 'ghost'} 
                   size="sm" 
                   asChild
                 >
-                  <Link href="/admin/content" data-testid="link-admin-content">
+                  <Link href="/admin/blog" data-testid="link-admin-blog">
                     Blog
                   </Link>
                 </Button>

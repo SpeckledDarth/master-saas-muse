@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { useToast } from '@/hooks/use-toast'
-import { FileText, Plus, Edit2, Trash2, Eye, EyeOff, Megaphone } from 'lucide-react'
+import { FileText, Plus, Edit2, Trash2, Eye, EyeOff, Megaphone, ExternalLink } from 'lucide-react'
 
 interface Post {
   id: number
@@ -216,8 +216,14 @@ export default function ContentPage() {
               {blogPosts.map((post) => (
                 <Card key={post.id} data-testid={`post-${post.id}`}>
                   <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
-                    <div>
-                      <CardTitle className="text-lg">{post.title}</CardTitle>
+                    <div 
+                      className="cursor-pointer hover:opacity-80"
+                      onClick={() => window.open(`/blog/${post.slug}`, '_blank')}
+                    >
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        {post.title}
+                        <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                      </CardTitle>
                       <CardDescription>
                         /blog/{post.slug} • {new Date(post.created_at).toLocaleDateString()}
                       </CardDescription>
@@ -226,13 +232,22 @@ export default function ContentPage() {
                       <Badge variant={post.published ? 'default' : 'secondary'}>
                         {post.published ? 'Published' : 'Draft'}
                       </Badge>
-                      <Button size="icon" variant="ghost" onClick={() => togglePublish(post)}>
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => window.open(`/blog/${post.slug}`, '_blank')}
+                        title="View post"
+                        data-testid={`button-view-${post.id}`}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" variant="ghost" onClick={() => togglePublish(post)} title={post.published ? 'Unpublish' : 'Publish'}>
                         {post.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
-                      <Button size="icon" variant="ghost" onClick={() => openEditPost(post)}>
+                      <Button size="icon" variant="ghost" onClick={() => openEditPost(post)} title="Edit">
                         <Edit2 className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" onClick={() => handleDelete(post.id)}>
+                      <Button size="icon" variant="ghost" onClick={() => handleDelete(post.id)} title="Delete">
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
@@ -262,10 +277,14 @@ export default function ContentPage() {
               {changelogPosts.map((post) => (
                 <Card key={post.id} data-testid={`post-${post.id}`}>
                   <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
-                    <div>
+                    <div 
+                      className="cursor-pointer hover:opacity-80"
+                      onClick={() => window.open(`/blog/${post.slug}`, '_blank')}
+                    >
                       <CardTitle className="text-lg flex items-center gap-2">
                         <Megaphone className="h-4 w-4" />
                         {post.title}
+                        <ExternalLink className="h-3 w-3 text-muted-foreground" />
                       </CardTitle>
                       <CardDescription>
                         {new Date(post.created_at).toLocaleDateString()}
@@ -275,13 +294,21 @@ export default function ContentPage() {
                       <Badge variant={post.published ? 'default' : 'secondary'}>
                         {post.published ? 'Published' : 'Draft'}
                       </Badge>
-                      <Button size="icon" variant="ghost" onClick={() => togglePublish(post)}>
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => window.open(`/blog/${post.slug}`, '_blank')}
+                        title="View post"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" variant="ghost" onClick={() => togglePublish(post)} title={post.published ? 'Unpublish' : 'Publish'}>
                         {post.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
-                      <Button size="icon" variant="ghost" onClick={() => openEditPost(post)}>
+                      <Button size="icon" variant="ghost" onClick={() => openEditPost(post)} title="Edit">
                         <Edit2 className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" onClick={() => handleDelete(post.id)}>
+                      <Button size="icon" variant="ghost" onClick={() => handleDelete(post.id)} title="Delete">
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
