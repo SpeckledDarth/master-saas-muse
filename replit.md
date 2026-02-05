@@ -135,6 +135,39 @@ The following secrets are already set in Vercel - DO NOT ask user to reconfigure
 - Admin user email is `speckledchris@gmail.com` (different from Resend account)
 - To send to any email, user must verify their own domain in Resend
 
+## Automated Testing
+
+### Test Infrastructure
+- **Framework**: Playwright for E2E testing
+- **Config**: `playwright.config.ts` in project root
+- **Tests**: `tests/` directory
+
+### Test Files
+- `tests/blog.spec.ts` - Blog/Changelog CRUD, markdown preview
+- `tests/waitlist.spec.ts` - Waitlist management, CSV export, delete
+- `tests/feedback.spec.ts` - Feedback management, status filter, delete
+- `tests/email-templates.spec.ts` - Email template editing, preview, test emails
+
+### Running Tests
+```bash
+# Run all tests
+npx playwright test
+
+# Run specific test file
+npx playwright test tests/blog.spec.ts
+
+# Run with headed browser (visible)
+npx playwright test --headed
+
+# Run against Vercel deployment
+TEST_BASE_URL=https://master-saas-muse-u7ga.vercel.app npx playwright test
+```
+
+### Test Requirements
+- Tests require authenticated admin user
+- Set `TEST_USER_EMAIL` and `TEST_USER_PASSWORD` env vars for auth
+- All interactive elements have `data-testid` attributes
+
 ## Session Start Checklist for Agent
 Before debugging any issue:
 1. Read this file completely
