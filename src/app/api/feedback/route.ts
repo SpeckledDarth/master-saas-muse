@@ -44,15 +44,25 @@ export async function POST(request: NextRequest) {
 
     const { data: { user } } = await supabase.auth.getUser()
 
-    const { error } = await supabase
+    const npsValue = typeof npsScore === 'number' && npsScore >= 0 && npsScore <= 10 ? npsScore : null
+    const baseRecord: Record<string, any> = {
+      message: message.trim(),
+      email: email || user?.email,
+      user_id: user?.id,
+      page_url: pageUrl,
+    }
+
+    let { error } = await supabase
       .from('feedback')
-      .insert({
-        message: message.trim(),
-        email: email || user?.email,
-        user_id: user?.id,
-        page_url: pageUrl,
-        nps_score: typeof npsScore === 'number' && npsScore >= 0 && npsScore <= 10 ? npsScore : null,
-      })
+      .insert({ ...baseRecord, nps_score: npsValue })
+
+    if (error && error.message?.includes('nps_score')) {
+      console.warn('Feedback: nps_score column not found in database. Submitting without NPS. Run: ALTER TABLE feedback ADD COLUMN nps_score integer;')
+      const fallback = await supabase
+        .from('feedback')
+        .insert(baseRecord)
+      error = fallback.error
+    }
 
     if (error) {
       console.error('Feedback error:', error)

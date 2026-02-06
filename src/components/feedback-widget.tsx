@@ -143,27 +143,25 @@ export function FeedbackWidget() {
             </div>
 
             <div className="space-y-2">
-              <Label>How likely are you to recommend us? <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Label data-testid="label-nps-rating">How likely are you to recommend us? <span className="text-muted-foreground text-xs">(optional)</span></Label>
               <div className="flex items-center gap-1">
                 {Array.from({ length: 11 }, (_, i) => (
-                  <button
+                  <Button
                     key={i}
                     type="button"
+                    size="sm"
+                    variant={npsScore === i ? 'default' : 'ghost'}
                     onClick={() => setNpsScore(npsScore === i ? null : i)}
-                    className={`flex-1 text-xs py-1 rounded-md border transition-colors ${
-                      npsScore === i
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'bg-muted/50 text-muted-foreground border-transparent hover-elevate'
-                    }`}
+                    className="flex-1 min-w-0 px-0"
                     data-testid={`button-nps-${i}`}
                   >
                     {i}
-                  </button>
+                  </Button>
                 ))}
               </div>
-              <div className="flex justify-between text-[10px] text-muted-foreground">
-                <span>Not likely</span>
-                <span>Very likely</span>
+              <div className="flex justify-between gap-2 text-[10px] text-muted-foreground">
+                <span data-testid="text-nps-low">Not likely</span>
+                <span data-testid="text-nps-high">Very likely</span>
               </div>
             </div>
 
