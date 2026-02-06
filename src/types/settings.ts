@@ -277,6 +277,61 @@ export interface LegalPageSettings {
   termsLastUpdated: string
   privacyPolicy: string
   privacyLastUpdated: string
+  acceptableUse: string
+  acceptableUseLastUpdated: string
+  cookiePolicy: string
+  cookiePolicyLastUpdated: string
+  accessibilityStatement: string
+  accessibilityLastUpdated: string
+  dmcaPolicy: string
+  dmcaLastUpdated: string
+  dataHandling: string
+  dataHandlingLastUpdated: string
+  aiDataUsage: string
+  aiDataUsageLastUpdated: string
+  securityPolicy: string
+  securityPolicyLastUpdated: string
+}
+
+export interface ComplianceSettings {
+  acceptableUseEnabled: boolean
+  cookiePolicyEnabled: boolean
+  accessibilityEnabled: boolean
+  dmcaEnabled: boolean
+  dataHandlingEnabled: boolean
+  aiDataUsageEnabled: boolean
+  securityPolicyEnabled: boolean
+  cookieConsentEnabled: boolean
+  cookieConsentText: string
+  cookieConsentCategories: {
+    necessary: boolean
+    analytics: boolean
+    marketing: boolean
+  }
+}
+
+export interface SupportSettings {
+  enabled: boolean
+  widgetPosition: 'bottom-right' | 'bottom-left'
+  widgetColor: string
+  widgetIcon: string
+  systemPrompt: string
+  fallbackEmail: string
+  welcomeMessage: string
+  logChats: boolean
+}
+
+export interface SecuritySettings {
+  mfaEnabled: boolean
+  mfaRequired: boolean
+  passwordMinLength: number
+  passwordRequireUppercase: boolean
+  passwordRequireNumbers: boolean
+  passwordRequireSpecial: boolean
+  sessionTimeoutMinutes: number
+  dataExportEnabled: boolean
+  accountDeletionEnabled: boolean
+  captchaEnabled: boolean
 }
 
 export interface PricingPageSettings {
@@ -354,6 +409,9 @@ export interface SiteSettings {
   announcement?: AnnouncementBar
   ai?: AISettings
   webhooks?: WebhookSettings
+  compliance?: ComplianceSettings
+  support?: SupportSettings
+  security?: SecuritySettings
 }
 
 export const defaultLightTheme: ThemeColors = {
@@ -640,6 +698,255 @@ We may update this privacy policy from time to time. We will notify you of any c
 ## 8. Contact Us
 If you have any questions about this Privacy Policy, please contact us.`,
       privacyLastUpdated: new Date().toISOString().split('T')[0],
+      acceptableUse: `# Acceptable Use Policy
+
+## 1. Purpose
+This Acceptable Use Policy outlines the rules and guidelines for using {appName}. By using our service, you agree to comply with this policy.
+
+## 2. Prohibited Activities
+You may not use {appName} to:
+- Violate any applicable laws or regulations
+- Send spam, unsolicited messages, or bulk communications
+- Distribute malware, viruses, or other harmful software
+- Attempt to gain unauthorized access to other users' accounts or our systems
+- Engage in any activity that disrupts or interferes with our services
+- Scrape, mine, or collect data from our platform without permission
+- Impersonate another person or entity
+
+## 3. API and Integration Usage
+When using our APIs or third-party integrations:
+- Respect rate limits and usage quotas
+- Do not share API credentials with unauthorized parties
+- Use integrations only for their intended purposes
+- Comply with third-party service terms of use
+
+## 4. Content Guidelines
+Users are responsible for content they create or share through {appName}. Content must not be illegal, offensive, defamatory, or infringe on intellectual property rights.
+
+## 5. Enforcement
+We reserve the right to suspend or terminate accounts that violate this policy. Repeated violations may result in permanent account removal.
+
+## 6. Reporting Violations
+If you become aware of any violations of this policy, please report them to us immediately via our contact page.
+
+## 7. Changes
+We may update this policy at any time. Continued use of {appName} after changes constitutes acceptance of the updated policy.`,
+      acceptableUseLastUpdated: new Date().toISOString().split('T')[0],
+      cookiePolicy: `# Cookie Policy
+
+## 1. What Are Cookies
+Cookies are small text files stored on your device when you visit {appName}. They help us provide you with a better experience by remembering your preferences and understanding how you use our service.
+
+## 2. Types of Cookies We Use
+
+### Necessary Cookies
+These cookies are essential for {appName} to function properly. They enable core features like authentication, security, and session management. You cannot opt out of these cookies.
+
+### Analytics Cookies
+We use privacy-friendly analytics to understand how visitors interact with {appName}. These cookies help us improve our service by tracking anonymous usage patterns. No personal data is collected through analytics cookies.
+
+### Marketing Cookies
+If enabled, these cookies may be used to deliver relevant information about {appName} to you. We do not sell your data to third-party advertisers.
+
+## 3. Managing Cookies
+You can control cookie preferences through our cookie consent banner. You can also manage cookies through your browser settings. Note that disabling certain cookies may affect the functionality of {appName}.
+
+## 4. Third-Party Cookies
+Some features of {appName} may use third-party services that set their own cookies. These include authentication providers and analytics services. Please refer to their respective privacy policies for more information.
+
+## 5. Data Retention
+Cookies are retained for varying periods depending on their purpose. Session cookies are deleted when you close your browser. Persistent cookies may be retained for up to 12 months.
+
+## 6. Updates to This Policy
+We may update this Cookie Policy from time to time. We will notify you of any significant changes.
+
+## 7. Contact
+If you have questions about our use of cookies, please contact us.`,
+      cookiePolicyLastUpdated: new Date().toISOString().split('T')[0],
+      accessibilityStatement: `# Accessibility Statement
+
+## Our Commitment
+{appName} is committed to ensuring digital accessibility for people of all abilities. We strive to meet WCAG 2.2 Level AA standards to provide an inclusive experience for everyone.
+
+## Accessibility Features
+- **Keyboard Navigation**: All interactive elements are accessible via keyboard
+- **Screen Reader Support**: Content is structured with semantic HTML and ARIA labels
+- **Color Contrast**: We maintain sufficient color contrast ratios for readability
+- **Responsive Design**: Our interface adapts to different screen sizes and zoom levels
+- **Focus Indicators**: Clear visual indicators show which element has keyboard focus
+- **Alt Text**: Images include descriptive alternative text
+
+## Known Limitations
+While we strive for full accessibility, some areas may have limitations that we are actively working to address. We continuously test and improve our accessibility.
+
+## Feedback
+We welcome your feedback on the accessibility of {appName}. If you encounter any accessibility barriers or have suggestions for improvement, please contact us:
+- Email: {supportEmail}
+- Use our contact form on the website
+
+## Remediation
+We take accessibility reports seriously and will investigate and address issues promptly. Our goal is to respond to accessibility feedback within 5 business days.
+
+## Compliance
+This statement was last reviewed and updated on the date shown below. We regularly review our accessibility practices to ensure ongoing compliance.`,
+      accessibilityLastUpdated: new Date().toISOString().split('T')[0],
+      dmcaPolicy: `# DMCA Policy
+
+## 1. Overview
+{appName} respects the intellectual property rights of others and expects users to do the same. This policy outlines our procedures for handling copyright infringement claims under the Digital Millennium Copyright Act (DMCA).
+
+## 2. Reporting Copyright Infringement
+If you believe your copyrighted work has been used on {appName} in a way that constitutes infringement, please submit a DMCA takedown notice containing:
+
+1. Your physical or electronic signature
+2. Identification of the copyrighted work claimed to be infringed
+3. Identification of the material to be removed, with enough information for us to locate it
+4. Your contact information (address, phone number, email)
+5. A statement that you have a good faith belief the use is not authorized
+6. A statement, under penalty of perjury, that the information in your notice is accurate and that you are the copyright owner or authorized to act on their behalf
+
+## 3. Where to Send Notices
+Please send DMCA takedown notices to: {supportEmail}
+
+## 4. Counter-Notification
+If you believe your content was wrongly removed, you may file a counter-notification containing:
+1. Your physical or electronic signature
+2. Identification of the removed material and its former location
+3. A statement under penalty of perjury that you believe the material was removed by mistake
+4. Your name, address, phone number, and consent to jurisdiction
+
+## 5. Repeat Infringers
+{appName} may terminate accounts of users who are repeat copyright infringers.
+
+## 6. Good Faith
+We process all DMCA notices in good faith and will act promptly to remove infringing content upon receiving valid notices.`,
+      dmcaLastUpdated: new Date().toISOString().split('T')[0],
+      dataHandling: `# Data Handling Policy
+
+## 1. Overview
+This policy describes how {appName} handles, stores, and protects your data, including data from third-party integrations and APIs.
+
+## 2. Data Collection
+We collect data that you provide directly, including:
+- Account information (name, email, profile details)
+- Content you create within the platform
+- Payment information (processed securely via Stripe)
+- Communications with our support team
+
+## 3. Third-Party API Data
+When you connect third-party services (such as social media accounts or other integrations):
+- **OAuth Tokens**: Stored encrypted in our database with restricted access
+- **API Data**: Retrieved on-demand and not permanently stored unless you explicitly save it
+- **Consent**: You control which services are connected and can revoke access at any time from your profile settings
+- **Scope**: We only request the minimum permissions necessary for the features you use
+
+## 4. Data Storage and Security
+- All data is stored in secure, encrypted databases
+- API tokens and sensitive credentials are encrypted at rest
+- We use Row Level Security (RLS) to ensure users can only access their own data
+- Regular security audits and monitoring are performed
+
+## 5. Data Retention
+- Active account data is retained while your account is active
+- Deleted data is permanently removed within 30 days
+- Backups are retained for disaster recovery and automatically expire
+
+## 6. Your Data Rights
+You have the right to:
+- **Access**: Request a copy of all your personal data
+- **Correction**: Update or correct your information
+- **Deletion**: Request permanent deletion of your account and data
+- **Portability**: Export your data in a standard format
+- **Restriction**: Limit how we process your data
+
+## 7. Data Deletion
+To request data deletion, use the account deletion feature in your profile settings or contact us at {supportEmail}. We will process deletion requests within 30 days.
+
+## 8. Contact
+For questions about data handling, contact us at {supportEmail}.`,
+      dataHandlingLastUpdated: new Date().toISOString().split('T')[0],
+      aiDataUsage: `# AI Data Usage Policy
+
+## 1. Overview
+{appName} integrates AI capabilities to enhance your experience. This policy explains how your data interacts with AI systems and how we protect your privacy.
+
+## 2. AI Providers
+We use the following AI providers (configurable by administrators):
+- **xAI (Grok)**: For intelligent chat and content generation
+- **OpenAI**: For natural language processing
+- **Anthropic (Claude)**: For advanced reasoning and assistance
+
+## 3. How AI Uses Your Data
+- **Prompts**: Text you send to the AI assistant is forwarded to the configured AI provider for processing
+- **No Training**: Your conversations are NOT used to train AI models. We use API access only, which providers have confirmed does not use for training
+- **Context**: The AI may receive system-level context (configured by administrators) to provide relevant responses
+- **No Storage by Providers**: AI providers process requests in real-time and do not permanently store your conversations
+
+## 4. What Data is Shared
+- Only the text of your current conversation is sent to the AI provider
+- Personal account information is NOT sent to AI providers
+- Payment details are NEVER shared with AI systems
+
+## 5. Data Minimization
+- We send only the minimum data needed for AI responses
+- System prompts are configured by administrators to keep AI focused and relevant
+- Conversation history is session-based and not persisted beyond your current session
+
+## 6. Opt-Out
+AI features are optional. If you prefer not to use AI:
+- Simply don't interact with the AI assistant
+- Administrators can disable AI features entirely from the admin dashboard
+
+## 7. Changes
+We will update this policy if we change AI providers or significantly alter how AI processes data. You will be notified of material changes.
+
+## 8. Contact
+For questions about AI data usage, contact us at {supportEmail}.`,
+      aiDataUsageLastUpdated: new Date().toISOString().split('T')[0],
+      securityPolicy: `# Security Policy
+
+## 1. Our Commitment
+{appName} takes the security of your data seriously. This page outlines the security measures we implement to protect your information.
+
+## 2. Infrastructure Security
+- **Encryption in Transit**: All data transmitted to and from {appName} is encrypted using TLS/SSL
+- **Encryption at Rest**: Sensitive data is encrypted in our databases
+- **Hosting**: Our infrastructure is hosted on enterprise-grade platforms with SOC 2 compliance
+- **CDN**: Content is delivered via a global CDN with built-in DDoS protection
+
+## 3. Authentication Security
+- **Password Hashing**: Passwords are hashed using industry-standard algorithms
+- **Multi-Factor Authentication**: MFA is available for additional account security
+- **OAuth Integration**: We support secure OAuth 2.0 authentication with trusted providers
+- **Session Management**: Sessions have configurable timeouts and are securely managed
+
+## 4. Application Security
+- **Input Validation**: All user inputs are validated and sanitized to prevent injection attacks
+- **Rate Limiting**: API endpoints are protected against abuse with rate limiting
+- **CSRF Protection**: Cross-site request forgery protection is built into all forms
+- **Row Level Security**: Database-level access controls ensure users can only access their own data
+
+## 5. Monitoring and Logging
+- **Error Tracking**: We use real-time error monitoring to detect and respond to issues quickly
+- **Audit Logging**: Administrative actions are logged for accountability
+- **Anomaly Detection**: Unusual activity patterns trigger alerts for investigation
+
+## 6. Incident Response
+In the event of a security incident:
+1. We will investigate and contain the issue immediately
+2. Affected users will be notified within 72 hours as required by applicable regulations
+3. We will implement remediation measures to prevent recurrence
+4. A post-incident report will be made available to affected parties
+
+## 7. Responsible Disclosure
+If you discover a security vulnerability, please report it to {supportEmail}. We ask that you:
+- Do not exploit the vulnerability
+- Allow us reasonable time to address the issue
+- Do not disclose the vulnerability publicly until we have resolved it
+
+## 8. Updates
+We regularly review and update our security practices. This page reflects our current security posture.`,
+      securityPolicyLastUpdated: new Date().toISOString().split('T')[0],
     },
     pricing: {
       headline: 'Simple, Transparent Pricing',
@@ -741,5 +1048,43 @@ If you have any questions about this Privacy Policy, please contact us.`,
       { id: 'nav-3', label: 'Contact', href: '/contact', enabled: true },
       { id: 'nav-4', label: 'FAQ', href: '/faq', enabled: false },
     ],
+  },
+  compliance: {
+    acceptableUseEnabled: false,
+    cookiePolicyEnabled: false,
+    accessibilityEnabled: false,
+    dmcaEnabled: false,
+    dataHandlingEnabled: false,
+    aiDataUsageEnabled: false,
+    securityPolicyEnabled: false,
+    cookieConsentEnabled: false,
+    cookieConsentText: 'We use cookies to improve your experience. By continuing to use our site, you agree to our use of cookies.',
+    cookieConsentCategories: {
+      necessary: true,
+      analytics: false,
+      marketing: false,
+    },
+  },
+  support: {
+    enabled: false,
+    widgetPosition: 'bottom-right',
+    widgetColor: '#6366f1',
+    widgetIcon: 'MessageCircle',
+    systemPrompt: 'You are a helpful customer support assistant for {appName}. Answer questions about the product, help with common issues, and guide users. If you cannot help with something, suggest they email support. Be friendly, concise, and professional.',
+    fallbackEmail: '',
+    welcomeMessage: 'Hi there! How can I help you today?',
+    logChats: false,
+  },
+  security: {
+    mfaEnabled: false,
+    mfaRequired: false,
+    passwordMinLength: 8,
+    passwordRequireUppercase: false,
+    passwordRequireNumbers: false,
+    passwordRequireSpecial: false,
+    sessionTimeoutMinutes: 0,
+    dataExportEnabled: true,
+    accountDeletionEnabled: true,
+    captchaEnabled: false,
   },
 }

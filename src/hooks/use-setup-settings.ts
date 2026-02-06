@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { SiteSettings, defaultSettings } from '@/types/settings'
-import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem, AISettings, WebhookSettings } from '@/types/settings'
+import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem, AISettings, WebhookSettings, ComplianceSettings, SupportSettings, SecuritySettings } from '@/types/settings'
 
 interface UseSetupSettingsReturn {
   loading: boolean
@@ -56,6 +56,10 @@ interface UseSetupSettingsReturn {
   webhookTesting: boolean
   webhookTestResult: { success: boolean; status?: number; error?: string } | null
   testWebhook: () => Promise<void>
+
+  updateCompliance: <K extends keyof ComplianceSettings>(key: K, value: ComplianceSettings[K]) => void
+  updateSupport: <K extends keyof SupportSettings>(key: K, value: SupportSettings[K]) => void
+  updateSecurity: <K extends keyof SecuritySettings>(key: K, value: SecuritySettings[K]) => void
 }
 
 export function useSetupSettings(): UseSetupSettingsReturn {
@@ -290,6 +294,18 @@ export function useSetupSettings(): UseSetupSettingsReturn {
     setSettings(prev => ({ ...prev, pages: { ...defaultSettings.pages, ...prev.pages, about: { ...defaultSettings.pages.about, ...prev.pages?.about, team: (prev.pages?.about?.team ?? []).filter(member => member.id !== id) } } }))
   }
 
+  function updateCompliance<K extends keyof ComplianceSettings>(key: K, value: ComplianceSettings[K]) {
+    setSettings(prev => ({ ...prev, compliance: { ...(prev.compliance || defaultSettings.compliance!), [key]: value } }))
+  }
+
+  function updateSupport<K extends keyof SupportSettings>(key: K, value: SupportSettings[K]) {
+    setSettings(prev => ({ ...prev, support: { ...(prev.support || defaultSettings.support!), [key]: value } }))
+  }
+
+  function updateSecurity<K extends keyof SecuritySettings>(key: K, value: SecuritySettings[K]) {
+    setSettings(prev => ({ ...prev, security: { ...(prev.security || defaultSettings.security!), [key]: value } }))
+  }
+
   return {
     loading, saving, saved, settings, setSettings, handleSave, aiProviders,
     updateBranding, updateSocial, updateFeatures, updateAI, updateWebhooks, updateWebhookEvent,
@@ -301,5 +317,6 @@ export function useSetupSettings(): UseSetupSettingsReturn {
     addFAQItem, updateFAQItem, removeFAQItem,
     addTeamMember, updateTeamMember, removeTeamMember,
     webhookTesting, webhookTestResult, testWebhook,
+    updateCompliance, updateSupport, updateSecurity,
   }
 }

@@ -35,7 +35,9 @@ export default function PrivacyPage() {
           data-testid="content-privacy"
         >
           <ReactMarkdown>
-            {legal?.privacyPolicy?.replace(/\{appName\}/g, branding?.appName || 'Our Service') || 
+            {legal?.privacyPolicy
+              ?.replace(/\{appName\}/g, branding?.appName || 'Our Service')
+              ?.replace(/\{supportEmail\}/g, branding?.supportEmail || 'support@example.com') || 
              'Privacy Policy content has not been configured yet.'}
           </ReactMarkdown>
         </div>

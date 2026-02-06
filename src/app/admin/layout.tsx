@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Loader2 } from 'lucide-react'
+import { Loader2, BarChart3 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { getTeamPermissions, type TeamRole, type TeamPermissions } from '@/lib/team-permissions'
@@ -102,6 +102,18 @@ export default function AdminLayout({
               </Link>
             </Button>
             <div className="flex items-center gap-2 flex-wrap">
+              {(isAppAdmin || permissions?.canViewAnalytics) && (
+                <Button 
+                  variant={pathname === '/admin/metrics' ? 'secondary' : 'ghost'} 
+                  size="sm" 
+                  asChild
+                >
+                  <Link href="/admin/metrics" data-testid="link-admin-metrics">
+                    <BarChart3 className="h-4 w-4 mr-1" />
+                    Metrics
+                  </Link>
+                </Button>
+              )}
               {(isAppAdmin || permissions?.canEditSettings) && (
                 <Button 
                   variant={pathname === '/admin/onboarding' ? 'secondary' : 'ghost'} 

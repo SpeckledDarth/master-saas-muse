@@ -35,7 +35,9 @@ export default function TermsPage() {
           data-testid="content-terms"
         >
           <ReactMarkdown>
-            {legal?.termsOfService?.replace(/\{appName\}/g, branding?.appName || 'Our Service') || 
+            {legal?.termsOfService
+              ?.replace(/\{appName\}/g, branding?.appName || 'Our Service')
+              ?.replace(/\{supportEmail\}/g, branding?.supportEmail || 'support@example.com') || 
              'Terms of Service content has not been configured yet.'}
           </ReactMarkdown>
         </div>

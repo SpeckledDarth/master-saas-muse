@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Palette, FileText, BookOpen, DollarSign, Globe, Settings, Save, Check, Loader2 } from 'lucide-react'
+import { Palette, FileText, BookOpen, DollarSign, Globe, Settings, Save, Check, Loader2, Scale, MessageCircle, Shield } from 'lucide-react'
 import { SetupSettingsProvider, useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
 
 const sections = [
@@ -13,6 +13,9 @@ const sections = [
   { id: 'pricing', label: 'Pricing', icon: DollarSign, href: '/admin/setup/pricing' },
   { id: 'social', label: 'Social', icon: Globe, href: '/admin/setup/social' },
   { id: 'features', label: 'Features', icon: Settings, href: '/admin/setup/features' },
+  { id: 'compliance', label: 'Compliance', icon: Scale, href: '/admin/setup/compliance' },
+  { id: 'support', label: 'Support', icon: MessageCircle, href: '/admin/setup/support' },
+  { id: 'security', label: 'Security', icon: Shield, href: '/admin/setup/security' },
 ]
 
 function SetupLayoutInner({ children }: { children: React.ReactNode }) {
