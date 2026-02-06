@@ -120,6 +120,20 @@ The project is built with Next.js 16+ (App Router), React 18+, and TypeScript. S
 6. **Rate Limiting** - Upstash Redis sliding window:
    - `src/lib/rate-limit/index.ts` - Falls back to in-memory if Redis unavailable
 
+7. **Admin Setup UX Overhaul** - Split monolithic setup page into focused sub-pages:
+   - Original 4076-line `setup/page.tsx` replaced with redirect to `/admin/setup/branding`
+   - `src/hooks/use-setup-settings.ts` - Shared hook extracting all state management logic
+   - `src/hooks/use-setup-settings-context.tsx` - React context provider for cross-page state sharing
+   - `src/app/admin/setup/layout.tsx` - Layout with sidebar navigation for 6 sub-pages
+   - 6 focused sub-pages: branding, content, pages, pricing, social, features
+   - Each sub-page manages only its own section, improving maintainability and load times
+   - Sidebar navigation with active state highlighting and section descriptions
+
+8. **Comprehensive Admin Guide** - `ADMIN_GUIDE.md`:
+   - 18 sections covering all platform features in plain, non-technical language
+   - 500+ lines of documentation for team members managing the platform
+   - Covers: Dashboard, Onboarding, Setup (all 6 sections), Users, Teams, Blog, Analytics, Feedback, Waitlist, Email Templates, Queue, SSO, Billing, Webhooks, AI, Feature Toggles, Public Pages
+
 ### Next Session Priority
 - Run Playwright E2E test suites (38 tests across 5 suites)
 - Test AI chat through the UI (requires authenticated user)
