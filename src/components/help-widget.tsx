@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import { MessageCircle, X, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useToast } from '@/hooks/use-toast'
 
 interface HelpWidgetProps {
   position?: 'bottom-right' | 'bottom-left'
@@ -22,9 +24,13 @@ export function HelpWidget({
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([])
   const [inputValue, setInputValue] = useState('')
   const [loading, setLoading] = useState(false)
+  const [npsScore, setNpsScore] = useState<number | null>(null)
+  const [npsSubmitted, setNpsSubmitted] = useState(false)
+  const [npsSubmitting, setNpsSubmitting] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const { toast } = useToast()
 
   useEffect(() => {
     if (isOpen && messages.length === 0 && welcomeMessage) {
@@ -50,6 +56,32 @@ export function HelpWidget({
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isOpen])
+
+  const hasUserMessages = messages.some(m => m.role === 'user')
+
+  async function handleNpsSubmit() {
+    if (npsScore === null) return
+    setNpsSubmitting(true)
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'NPS rating from support chat',
+          pageUrl: typeof window !== 'undefined' ? window.location.pathname : '',
+          npsScore,
+        }),
+      })
+      if (res.ok) {
+        setNpsSubmitted(true)
+        toast({ title: 'Thank you!', description: 'Your rating has been recorded.' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to submit rating', variant: 'destructive' })
+    } finally {
+      setNpsSubmitting(false)
+    }
+  }
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault()
@@ -144,6 +176,48 @@ export function HelpWidget({
               <p className="text-xs text-muted-foreground">
                 Can&apos;t find what you need? Email <a href={`mailto:${fallbackEmail}`} className="underline" data-testid="link-fallback-email">{fallbackEmail}</a>
               </p>
+            </div>
+          )}
+
+          {hasUserMessages && !npsSubmitted && (
+            <div className="border-t px-4 py-3 space-y-2">
+              <Label className="text-xs" data-testid="label-help-nps">How likely are you to recommend us? <span className="text-muted-foreground">(optional)</span></Label>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 11 }, (_, i) => (
+                  <Button
+                    key={i}
+                    type="button"
+                    size="sm"
+                    variant={npsScore === i ? 'default' : 'ghost'}
+                    onClick={() => setNpsScore(npsScore === i ? null : i)}
+                    className="flex-1 min-w-0"
+                    data-testid={`button-help-nps-${i}`}
+                  >
+                    {i}
+                  </Button>
+                ))}
+              </div>
+              <div className="flex justify-between gap-2 text-[10px] text-muted-foreground">
+                <span>Not likely</span>
+                <span>Very likely</span>
+              </div>
+              {npsScore !== null && (
+                <Button
+                  size="sm"
+                  onClick={handleNpsSubmit}
+                  disabled={npsSubmitting}
+                  className="w-full"
+                  data-testid="button-submit-help-nps"
+                >
+                  {npsSubmitting ? 'Submitting...' : 'Submit Rating'}
+                </Button>
+              )}
+            </div>
+          )}
+
+          {npsSubmitted && (
+            <div className="border-t px-4 py-2">
+              <p className="text-xs text-muted-foreground text-center" data-testid="text-help-nps-thanks">Thanks for your rating!</p>
             </div>
           )}
 

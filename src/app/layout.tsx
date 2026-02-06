@@ -9,6 +9,7 @@ import { PlausibleAnalytics } from "@/components/analytics/plausible"
 import { ImpersonationBanner } from "@/components/impersonation-banner"
 import { CookieConsentWrapper } from "@/components/cookie-consent-wrapper"
 import { UnifiedSupportWidget } from "@/components/unified-support-widget"
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -61,6 +62,7 @@ export default function RootLayout({
               <CookieConsentWrapper />
               <UnifiedSupportWidget />
             </div>
+            <Toaster />
           </ThemeSettingsProvider>
         </ThemeProvider>
       </body>

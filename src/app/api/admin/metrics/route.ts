@@ -218,22 +218,23 @@ export async function GET() {
       npsResponses = 0
     }
 
+    const defaultThresholds = { alertChurnThreshold: 5, alertMinMonthlyUsers: 10 }
     let alertThresholds: { alertChurnThreshold?: number; alertMinMonthlyUsers?: number } = {}
     try {
       const { data: orgSettings } = await adminClient
         .from('organization_settings')
         .select('settings')
-        .eq('organization_id', 1)
+        .eq('app_id', 'default')
         .maybeSingle()
-      const security = orgSettings?.settings?.security || {}
-      if (typeof security.alertChurnThreshold === 'number') {
-        alertThresholds.alertChurnThreshold = security.alertChurnThreshold
-      }
-      if (typeof security.alertMinMonthlyUsers === 'number') {
-        alertThresholds.alertMinMonthlyUsers = security.alertMinMonthlyUsers
-      }
+      const security = (orgSettings?.settings as any)?.security || {}
+      alertThresholds.alertChurnThreshold = typeof security.alertChurnThreshold === 'number'
+        ? security.alertChurnThreshold
+        : defaultThresholds.alertChurnThreshold
+      alertThresholds.alertMinMonthlyUsers = typeof security.alertMinMonthlyUsers === 'number'
+        ? security.alertMinMonthlyUsers
+        : defaultThresholds.alertMinMonthlyUsers
     } catch {
-      // Thresholds are optional
+      alertThresholds = defaultThresholds
     }
 
     return NextResponse.json({

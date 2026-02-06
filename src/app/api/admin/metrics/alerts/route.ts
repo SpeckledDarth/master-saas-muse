@@ -27,7 +27,7 @@ export async function POST() {
     const { data: orgSettings } = await adminClient
       .from('organization_settings')
       .select('settings')
-      .eq('organization_id', 1)
+      .eq('app_id', 'default')
       .maybeSingle()
 
     const settings = orgSettings?.settings as any
