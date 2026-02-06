@@ -77,8 +77,17 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - User management with customer service tools
 - Subscription status visibility and Stripe integration
 - Feature toggles
-- Audit logging
+- Audit logging with dedicated audit log viewer
 - Admin notes system for customer service tracking
+- User impersonation for debugging
+
+### Metrics Dashboard
+- 10 KPI cards: Total Users, New Users, Active Subscriptions, MRR, ARPU, LTV, Churn Rate, Conversion Rate, Feedback Count, Waitlist Count
+- NPS Score card with color-coded Net Promoter Score
+- User Growth and Revenue Growth line charts
+- Configurable alert thresholds for churn rate and user growth
+- Email Report and Check Alerts action buttons
+- Scheduled weekly/monthly KPI summary emails
 
 ### Setup Dashboard
 - Split into 6 focused sub-pages with sidebar navigation
@@ -87,7 +96,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Pages configuration (about, contact, terms, privacy, custom pages)
 - Pricing configuration (Stripe integration)
 - Social links setup
-- Features & integrations (auth toggles, AI, webhooks)
+- Features & integrations (auth toggles, AI, webhooks, security, compliance, support)
 
 ### Content Management
 - Blog/changelog system with markdown and live preview
@@ -97,7 +106,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 ### Marketing Tools
 - Waitlist mode for pre-launch email collection with CSV export
 - SEO-optimized pages with auto-generated sitemap and robots.txt
-- Feedback collection widget (logged-in and anonymous users)
+- Feedback collection widget with NPS rating (0-10)
 - Announcement bar with admin controls
 - Custom pages system
 
@@ -106,6 +115,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Template preview and test email sending
 - Welcome emails, subscription confirmations, cancellation notifications
 - Team invitation emails
+- Scheduled KPI report emails
 - Powered by Resend
 
 ### AI Integration
@@ -114,24 +124,45 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Chat completion API with streaming support
 - Feature toggle to enable/disable AI features
 
+### Help Widget (Support Chatbot)
+- Floating AI-powered chat button for visitor support
+- Configurable system prompt and fallback email
+- NPS rating collection after AI responses
+- Separate from feedback widget, independently toggleable
+
+### In-App Notifications
+- Bell icon in header with unread count badge
+- Notification popover with type-specific icons
+- Auto-polling for new notifications
+- Mark all as read functionality
+- Server-side notification creation utility
+
 ### Webhook Automation
 - Event-driven webhook system for n8n, Zapier, Make, or any HTTP endpoint
 - 8 events: feedback, waitlist, subscriptions, team, contact form
 - HMAC-SHA256 payload signing for security
 - Fire-and-forget delivery with retry logic
 - Admin-configurable URL, secret, and per-event toggles
+- Automated API token rotation
 
 ### Enterprise Features
 - SSO/SAML single sign-on with domain-based detection
 - Admin-managed identity providers (Okta, Azure AD, Google Workspace)
-- Background job processing with BullMQ and Upstash Redis
+- Background job processing with BullMQ and Upstash Redis (4 job types: email, webhook-retry, report, token-rotation)
 - Production-grade rate limiting with Upstash Redis (in-memory fallback)
 - Customer service tools (subscription tracking, invoices, admin notes)
+- User impersonation with 30-minute sessions and audit logging
+- Database backup configuration
+
+### Legal & Compliance
+- 9 legal pages with dynamic variable replacement: Terms, Privacy, Cookie Policy, Acceptable Use, Accessibility, Data Handling, DMCA, AI Data Usage, Security Policy
+- Configurable cookie consent banner
+- MFA and password requirement settings
 
 ### Monitoring & Testing
 - Sentry error tracking (server + browser errors)
 - Plausible privacy-friendly analytics
-- 38 Playwright E2E tests across 5 test suites
+- 46 Playwright E2E tests across 7 test files
 - Structured logging utility
 
 ---
@@ -196,31 +227,40 @@ This means you can run multiple SaaS products from one template, or allow custom
 | User Authentication (Email + 5 OAuth) | Complete |
 | Stripe Billing & Feature Gating | Complete |
 | Admin Dashboard & User Management | Complete |
+| Metrics Dashboard (10 KPIs + NPS + Alerts) | Complete |
 | Team/Organization System | Complete |
 | Blog/Changelog System | Complete |
 | Email Template Editor | Complete |
 | Waitlist Mode | Complete |
-| Feedback Widget | Complete |
+| Feedback Widget + NPS Rating | Complete |
+| Help Widget (AI Support Chatbot) | Complete |
+| In-App Notifications | Complete |
+| User Impersonation | Complete |
+| Audit Log Viewer | Complete |
 | SEO/Sitemap | Complete |
-| Setup Dashboard (Branding Manager) | Complete |
+| Setup Dashboard (6 Sub-Pages) | Complete |
 | Onboarding Wizard | Complete |
 | AI Integration (xAI/OpenAI/Anthropic) | Complete |
 | Webhook/n8n Automation | Complete |
 | Sentry Error Tracking | Complete |
 | Plausible Analytics | Complete |
-| E2E Testing (38 Playwright tests) | Complete |
+| E2E Testing (46 Playwright tests, 7 files) | Complete |
 | Dark/Light Mode | Complete |
 | OAuth Admin Controls | Complete |
 | SSO/SAML Enterprise Auth | Complete |
-| Queue Infrastructure (BullMQ) | Complete |
+| Queue Infrastructure (BullMQ, 4 Job Types) | Complete |
 | Rate Limiting (Upstash Redis) | Complete |
 | Admin Setup UX (6 Sub-Pages) | Complete |
 | Customer Service Tools | Complete |
 | Admin Documentation Guide | Complete |
+| Legal & Compliance Pages (9 pages + cookie consent) | Complete |
+| Scheduled Metrics Reports | Complete |
+| Metrics Alerts (Churn + Growth) | Complete |
+| Database Backup Configuration | Complete |
+| API Token Rotation | Complete |
 
 ### Planned (Post-MVP)
 
-- Advanced analytics dashboards
 - Affiliate/referral system
 - Push notifications
 - Internationalization (multiple languages)
@@ -241,7 +281,7 @@ This section compares the planned technology stack against what is currently imp
 | | Next.js 16+ | Implemented | App Router with TypeScript |
 | | shadcn/ui | Implemented | Full component library installed (70+ components) |
 | | Tailwind CSS | Implemented | With dark mode support |
-| **Backend/API** | Next.js API Routes | Implemented | 25+ API routes functional |
+| **Backend/API** | Next.js API Routes | Implemented | 30+ API routes functional |
 | | OAuth SDKs | Implemented | All 5 providers via Supabase Auth |
 | **Database** | Supabase PostgreSQL | Implemented | 13 tables in production |
 | | Supabase Storage | Implemented | Used for avatars + branding images |
@@ -258,12 +298,12 @@ This section compares the planned technology stack against what is currently imp
 | | OpenAI | Implemented | Configurable via admin dashboard |
 | | Anthropic | Implemented | Configurable via admin dashboard |
 | | n8n/Webhook System | Implemented | 8 events, HMAC signing, fire-and-forget |
-| **Operations** | Resend (Emails) | Implemented | Templates + test sending + admin editor |
+| **Operations** | Resend (Emails) | Implemented | Templates + test sending + admin editor + scheduled reports |
 | | Sentry (Monitoring) | Implemented | Server + browser errors via tunnel route |
 | | Plausible (Analytics) | Implemented | Script integrated |
-| | Upstash/BullMQ (Queues) | Implemented | 3 job types, admin dashboard |
+| | Upstash/BullMQ (Queues) | Implemented | 4 job types, admin dashboard |
 | | Upstash Redis Rate Limiting | Implemented | Sliding window with in-memory fallback |
-| **Testing** | Playwright E2E | Implemented | 38 tests across 5 suites |
+| **Testing** | Playwright E2E | Implemented | 46 tests across 7 files |
 | **Monetization** | Stripe Billing | Implemented | Subscriptions + portal working |
 
 ### Summary
@@ -314,6 +354,7 @@ If you're interested in using MuseKit for your project:
 1. **Review the Setup Guide** - See `docs/SETUP_GUIDE.md` for step-by-step instructions
 2. **Check the Master Plan** - See `docs/MASTER_PLAN.md` for detailed technical specifications
 3. **Use the Checklist** - See `docs/MUSE_CHECKLIST.md` for launch readiness
+4. **Read the Admin Guide** - See `docs/ADMIN_GUIDE.md` for managing the platform
 
 ---
 

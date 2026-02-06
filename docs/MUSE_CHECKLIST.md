@@ -4,7 +4,7 @@ This checklist guides you through setting up a new project from the Master SaaS 
 
 **Estimated time: 15-30 minutes**
 
-**Template Status: MVP COMPLETE + SSO + Queue + Customer Service Tools (February 2026)**
+**Template Status: MVP COMPLETE + Full Feature Set (February 2026)**
 
 ---
 
@@ -210,7 +210,7 @@ Skip this if you only need email/password authentication. Configure only the pro
 - [ ] Go to [Plausible](https://plausible.io) and add your domain
 - [ ] Add environment variable: `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` = your domain
 
-### Sentry Error Tracking (Now Available!)
+### Sentry Error Tracking
 - [ ] Create a Sentry project at [sentry.io](https://sentry.io)
 - [ ] Add environment variables in Vercel:
   - `NEXT_PUBLIC_SENTRY_DSN` = Your Sentry DSN
@@ -223,7 +223,7 @@ Skip this if you only need email/password authentication. Configure only the pro
 
 ## Step 9b: Configure Upstash Redis (Optional, 3 min)
 
-Required for background job processing (email sending, webhook retries) and production-grade rate limiting.
+Required for background job processing (email sending, webhook retries, scheduled reports) and production-grade rate limiting.
 
 - [ ] Go to [Upstash Console](https://console.upstash.com)
 - [ ] Create a new Redis database
@@ -297,6 +297,8 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] Set Allow New Signups (on for launch)
 - [ ] Maintenance Mode (off for launch)
 - [ ] Toggle Feedback Widget (on/off)
+- [ ] Toggle Support Chatbot (on/off)
+- [ ] Toggle Enterprise SSO/SAML (on/off)
 
 **AI Settings (Optional):**
 - [ ] Toggle AI Enabled (on/off)
@@ -321,6 +323,19 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
   - Team Invited / Team Member Joined
   - Contact Submitted
 - [ ] Click "Test Webhook" to verify connectivity
+
+**Security Settings (Optional):**
+- [ ] Configure metrics alert thresholds (churn rate, minimum new users)
+- [ ] Configure API token rotation interval
+- [ ] Configure database backup preferences
+
+**Compliance Settings (Optional):**
+- [ ] Enable/disable legal pages (Cookie Policy, Acceptable Use, etc.)
+- [ ] Configure cookie consent banner
+
+**Support Settings (Optional):**
+- [ ] Configure chatbot fallback email
+- [ ] Customize chatbot system prompt
 
 **Click "Save Changes" when done!**
 
@@ -366,7 +381,9 @@ TEST_BASE_URL=https://your-app.vercel.app \
 npx playwright test
 ```
 
-Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
+Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with NPS), email templates, help widget, admin metrics, responsive design, and API endpoints.
+
+**Test suite: 46 tests across 7 test files**
 
 ---
 
@@ -383,20 +400,27 @@ Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
 - [ ] Profile page loads with avatar upload
 - [ ] Admin panel accessible at `/admin`
 - [ ] Setup Dashboard works at `/admin/setup`
-- [ ] Settings save successfully
+- [ ] Settings save successfully and take effect immediately
 - [ ] Pricing page shows your customized plans at `/pricing`
 - [ ] Stripe checkout works (test mode)
 - [ ] Billing page shows subscription at `/billing`
 - [ ] AI chat works (if AI enabled and API key configured)
+- [ ] Help widget appears and responds (if support chatbot enabled)
 - [ ] Webhook test delivers (if webhook URL configured)
 - [ ] Blog posts can be created and published at `/admin/blog`
 - [ ] Feedback widget appears on pages (if enabled)
+- [ ] NPS rating buttons appear in feedback widget
 - [ ] Waitlist mode works (if enabled)
 - [ ] Sentry captures errors (if configured)
 - [ ] Customer service tools work (click eye icon on user in Admin > Users)
 - [ ] Admin notes can be added and deleted on user profiles
 - [ ] Queue dashboard accessible at `/admin/queue` (if Upstash configured)
 - [ ] SSO admin page accessible at `/admin/sso`
+- [ ] Metrics dashboard loads at `/admin/metrics` with all 10 KPIs
+- [ ] Audit log viewer accessible at `/admin/audit-logs`
+- [ ] Notification bell appears in header
+- [ ] Legal pages load correctly (privacy, terms, cookie-policy, etc.)
+- [ ] Cookie consent banner appears (if enabled)
 
 ---
 
@@ -449,23 +473,30 @@ Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
 - Profile page with avatar upload
 - Billing management page
 - Subscription status display
+- In-app notification bell with unread count
 
 ### Admin Features
 - Admin dashboard with metrics
-- **Setup Dashboard** (configure branding, pricing, social, features)
+- **Metrics Dashboard** (10 KPIs: Total Users, New Users, Active Subscriptions, MRR, ARPU, LTV, Churn Rate, Conversion Rate, Feedback Count, Waitlist Count)
+- **NPS Score** card with color-coded Net Promoter Score
+- **Alert thresholds** for churn rate and user growth with email notifications
+- **Setup Dashboard** (configure branding, pricing, social, features, security, compliance, support)
 - User management (view, edit roles, search)
+- **User Impersonation** (view app as any user for debugging, 30-min sessions, audit logged)
 - Organization settings
-- Audit logging
+- Audit logging with **Audit Log Viewer** page
 - **Team Management** (invite members, assign roles)
 - Role-based permissions (Owner/Manager/Member/Viewer)
 - **Onboarding Wizard** (4-step guided setup)
 - **Blog/Changelog** management
 - **Email Template** editor with preview and test sending
 - **Waitlist** management with CSV export
-- **Feedback** management with status filters
+- **Feedback** management with status filters and NPS badges
 - **Customer Service Tools** (subscription status, user detail, invoices, admin notes)
-- **Queue Dashboard** (monitor background jobs)
+- **Queue Dashboard** (monitor background jobs, 4 job types: email, webhook-retry, report, token-rotation)
 - **SSO/SAML Management** (enterprise single sign-on)
+- **Scheduled Metrics Reports** (weekly/monthly KPI email summaries)
+- **Database Backup Configuration** (notification preferences, frequency, retention)
 
 ### Billing (Stripe)
 - Subscription checkout (Pro $29/mo, Team $99/mo)
@@ -479,6 +510,7 @@ Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
 - Cancellation notification email
 - Team invitation email
 - Admin-editable templates
+- Scheduled KPI report emails
 
 ### AI Integration
 - Pluggable provider system (xAI Grok, OpenAI, Anthropic)
@@ -486,20 +518,29 @@ Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
 - Chat completion API with streaming support
 - Feature toggle to enable/disable
 
+### Help Widget (Support Chatbot)
+- Floating AI-powered support chat button
+- Configurable system prompt and fallback email
+- NPS rating collection after responses
+- Separate from feedback widget
+
 ### Webhook/n8n Automation
 - Event-driven webhook system (8 events)
 - HMAC-SHA256 payload signing
 - Fire-and-forget delivery with retry
 - Admin-configurable URL, secret, per-event toggles
 - Compatible with n8n, Zapier, Make
+- Automated API token rotation
 
 ### Content & Marketing
 - Blog/changelog system (markdown with live preview)
 - Waitlist mode for pre-launch
-- Feedback widget (logged-in and anonymous)
+- Feedback widget with NPS rating (0-10)
 - SEO-optimized pages with sitemap
 - Custom pages system
 - Announcement bar
+- 9 legal/compliance pages with dynamic variable replacement
+- Cookie consent banner
 
 ### Security
 - Supabase Row Level Security (RLS)
@@ -512,7 +553,7 @@ Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
 - Plausible analytics (privacy-friendly)
 - Sentry error tracking (server + browser)
 - Structured logging utility
-- 38 Playwright E2E tests across 5 suites
+- 46 Playwright E2E tests across 7 test files
 
 ### Feature Completion Status
 
@@ -523,6 +564,14 @@ Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
 | Rate Limiting (Upstash Redis) | Complete |
 | Customer Service Tools | Complete |
 | Admin Setup UX (6 Sub-Pages) | Complete |
+| Metrics Dashboard (10 KPIs + NPS) | Complete |
+| Help Widget (Support Chatbot) | Complete |
+| NPS Score Tracking | Complete |
+| In-App Notifications | Complete |
+| User Impersonation | Complete |
+| Audit Log Viewer | Complete |
+| Legal & Compliance Pages | Complete |
+| Metrics Alerts & Reports | Complete |
 
 ---
 
@@ -539,6 +588,9 @@ Before launching with live customer data:
 - [ ] Run full E2E test suite against production
 - [ ] Verify AI API key is set (if using AI features)
 - [ ] Test webhook delivery to your n8n/Zapier endpoint (if using)
+- [ ] Configure alert thresholds for churn rate and user growth
+- [ ] Review and customize legal pages
+- [ ] Enable cookie consent banner if required
 
 ---
 

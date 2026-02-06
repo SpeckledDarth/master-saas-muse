@@ -2,7 +2,7 @@
 
 This guide walks you through creating a new SaaS from the Master SaaS Muse Template.
 
-**Template Status: MVP COMPLETE + SSO + Queue + Customer Service Tools (February 2026)**
+**Template Status: MVP COMPLETE + Full Feature Set (February 2026)**
 
 ---
 
@@ -205,15 +205,25 @@ master-saas-muse/
 │   │   │   ├── pricing/page.tsx
 │   │   │   ├── privacy/page.tsx
 │   │   │   ├── terms/page.tsx
+│   │   │   ├── cookie-policy/page.tsx
+│   │   │   ├── acceptable-use/page.tsx
+│   │   │   ├── accessibility/page.tsx
+│   │   │   ├── data-handling/page.tsx
+│   │   │   ├── dmca/page.tsx
+│   │   │   ├── ai-data-usage/page.tsx
+│   │   │   ├── security-policy/page.tsx
 │   │   │   └── p/[slug]/page.tsx
 │   │   ├── admin/
 │   │   │   ├── page.tsx (dashboard)
 │   │   │   ├── analytics/page.tsx
+│   │   │   ├── audit-logs/page.tsx
 │   │   │   ├── blog/page.tsx
 │   │   │   ├── email-templates/page.tsx
 │   │   │   ├── feedback/page.tsx
+│   │   │   ├── metrics/page.tsx
 │   │   │   ├── onboarding/page.tsx
 │   │   │   ├── queue/page.tsx
+│   │   │   ├── settings/page.tsx
 │   │   │   ├── sso/page.tsx
 │   │   │   ├── setup/
 │   │   │   │   ├── layout.tsx
@@ -227,7 +237,7 @@ master-saas-muse/
 │   │   │   ├── users/page.tsx
 │   │   │   └── waitlist/page.tsx
 │   │   ├── api/
-│   │   │   ├── admin/ (setup, stats, posts, users, users/[userId], notes, team, invitations, email-templates, webhooks, sso)
+│   │   │   ├── admin/ (setup, stats, metrics, posts, users, users/[userId], notes, team, invitations, email-templates, webhooks, sso, notifications, queue)
 │   │   │   ├── ai/ (chat, providers)
 │   │   │   ├── auth/sso/check/
 │   │   │   ├── stripe/ (checkout, portal, products, subscription, webhook)
@@ -235,6 +245,7 @@ master-saas-muse/
 │   │   │   ├── feedback/
 │   │   │   ├── invite/[token]/ (validate, accept)
 │   │   │   ├── contact/
+│   │   │   ├── public/settings/
 │   │   │   ├── user/membership/
 │   │   │   └── waitlist/
 │   │   ├── auth/callback/route.ts
@@ -255,6 +266,8 @@ master-saas-muse/
 │   │   ├── subscription/ (UpgradeBanner)
 │   │   ├── analytics/ (plausible)
 │   │   ├── feedback-widget.tsx
+│   │   ├── help-widget.tsx
+│   │   ├── notification-bell.tsx
 │   │   └── waitlist-form.tsx
 │   ├── lib/
 │   │   ├── supabase/ (client, server, admin)
@@ -263,10 +276,11 @@ master-saas-muse/
 │   │   ├── ai/ (provider - xAI, OpenAI, Anthropic)
 │   │   ├── webhooks/ (dispatcher - HMAC, retry, fire-and-forget)
 │   │   ├── sso/ (provider - SAML SSO management)
-│   │   ├── queue/ (index - BullMQ job queue)
+│   │   ├── queue/ (index - BullMQ job queue with 4 job types)
 │   │   ├── validation/ (schemas, index)
 │   │   ├── rate-limit/ (index - Upstash Redis sliding window)
 │   │   ├── logging/
+│   │   ├── notifications/ (server-side notification utility)
 │   │   ├── settings/
 │   │   └── team-permissions.ts
 │   ├── hooks/
@@ -275,15 +289,17 @@ master-saas-muse/
 │   ├── types/
 │   │   └── settings.ts (all settings interfaces)
 │   ├── instrumentation-client.ts (Sentry client)
-│   └── instrumentation.ts (Sentry server)
+│   └── instrumentation.ts (Sentry server + queue worker)
 ├── tests/
 │   ├── auth.setup.ts
 │   ├── blog.spec.ts
+│   ├── e2e-full.spec.ts
 │   ├── waitlist.spec.ts
 │   ├── feedback.spec.ts
 │   ├── email-templates.spec.ts
-│   └── public-waitlist.spec.ts
+│   └── run-tests.sh
 ├── docs/
+│   ├── ADMIN_GUIDE.md
 │   ├── MASTER_PLAN.md
 │   ├── MUSE_CHECKLIST.md
 │   ├── PROJECT_OVERVIEW.md
@@ -510,7 +526,8 @@ CREATE POLICY "Service role full access admin_notes" ON admin_notes
 
 ### Storage Bucket
 1. Create bucket named `avatars` (public)
-2. Add policies for authenticated upload/update and public read
+2. Create bucket named `branding` (public)
+3. Add policies for authenticated upload/update and public read
 
 ### OAuth Providers (Optional)
 
@@ -533,7 +550,7 @@ The template supports 5 OAuth providers, all configurable via Admin Dashboard:
 **Admin Controls:**
 - Login/signup pages only show OAuth buttons that are enabled in Features settings
 - Toggle providers on/off without code changes
-- Changes take effect immediately
+- Changes take effect immediately (no caching delay)
 
 ---
 
@@ -563,6 +580,7 @@ Create in Stripe Dashboard:
 | `npm run dev` | Start development server (localhost:3000) |
 | `npm run build` | Build for production |
 | `npm run start` | Start production server |
+| `npx playwright test` | Run E2E tests (46 tests across 7 files) |
 | `git push` | Deploy to Vercel (auto-deploy) |
 
 ---
@@ -575,6 +593,7 @@ Create in Stripe Dashboard:
 - [Google Cloud Console](https://console.cloud.google.com)
 - [Resend Dashboard](https://resend.com)
 - [Plausible Dashboard](https://plausible.io)
+- [Upstash Console](https://console.upstash.com)
 
 ---
 
@@ -587,7 +606,9 @@ Create in Stripe Dashboard:
 | OAuth Admin Controls (enable/disable from dashboard) | Complete |
 | Profile with Avatar + Connected Providers | Complete |
 | Admin Dashboard with Metrics | Complete |
+| Metrics Dashboard (10 KPIs + NPS + Alerts) | Complete |
 | User Management | Complete |
+| User Impersonation | Complete |
 | Setup Dashboard (6 Sub-Pages: Branding, Content, Pages, Pricing, Social, Features) | Complete |
 | Onboarding Wizard (4-step guided setup) | Complete |
 | Stripe Billing + Feature Gating | Complete |
@@ -597,12 +618,15 @@ Create in Stripe Dashboard:
 | Email Template Editor + Test Sending | Complete |
 | Blog/Changelog System (Markdown) | Complete |
 | Waitlist Mode + CSV Export | Complete |
-| Feedback Widget | Complete |
+| Feedback Widget + NPS Rating | Complete |
+| Help Widget (AI Support Chatbot) | Complete |
+| In-App Notifications | Complete |
+| Audit Log Viewer | Complete |
 | AI Integration (xAI Grok, OpenAI, Anthropic) | Complete |
 | Webhook/n8n Automation (8 events, HMAC signing) | Complete |
 | Sentry Error Tracking (Server + Browser) | Complete |
 | Plausible Analytics | Complete |
-| E2E Testing (38 Playwright Tests) | Complete |
+| E2E Testing (46 Playwright Tests, 7 Files) | Complete |
 | SEO/Sitemap | Complete |
 | Row Level Security (RLS) | Complete |
 | Rate Limiting + Security Headers | Complete |
@@ -611,10 +635,15 @@ Create in Stripe Dashboard:
 | Custom Pages System | Complete |
 | Announcement Bar | Complete |
 | SSO/SAML Enterprise Auth | Complete |
-| Queue Infrastructure (BullMQ + Upstash) | Complete |
+| Queue Infrastructure (BullMQ + Upstash, 4 Job Types) | Complete |
 | Rate Limiting (Upstash Redis) | Complete |
 | Customer Service Tools | Complete |
 | Admin Setup UX (6 Sub-Pages) | Complete |
+| Legal & Compliance Pages (9 pages + cookie consent) | Complete |
+| Scheduled Metrics Reports | Complete |
+| Metrics Alerts (Churn Rate + User Growth) | Complete |
+| Database Backup Configuration | Complete |
+| API Token Rotation | Complete |
 
 ---
 

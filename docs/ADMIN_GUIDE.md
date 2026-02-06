@@ -18,19 +18,30 @@ A complete guide for managing your MuseKit-powered application. Written for team
    - [Features & Integrations](#features--integrations)
 5. [User Management](#user-management)
    - [Customer Service Tools](#customer-service-tools)
+   - [User Impersonation](#user-impersonation)
 6. [Team Management](#team-management)
 7. [Blog & Changelog](#blog--changelog)
-8. [Analytics](#analytics)
-9. [Feedback](#feedback)
-10. [Waitlist](#waitlist)
-11. [Email Templates](#email-templates)
-12. [Job Queue](#job-queue)
-13. [SSO / SAML](#sso--saml)
-14. [Billing & Subscriptions](#billing--subscriptions)
-15. [Webhooks & Automation](#webhooks--automation)
-16. [AI Features](#ai-features)
-17. [Feature Toggles Reference](#feature-toggles-reference)
-18. [Public Pages Your Visitors See](#public-pages-your-visitors-see)
+8. [Metrics Dashboard](#metrics-dashboard)
+   - [KPI Cards](#kpi-cards)
+   - [NPS Score](#nps-score)
+   - [Alert Thresholds](#alert-thresholds)
+   - [Action Buttons](#action-buttons)
+9. [Analytics](#analytics)
+10. [Feedback](#feedback)
+    - [NPS Score Tracking](#nps-score-tracking)
+11. [Waitlist](#waitlist)
+12. [Email Templates](#email-templates)
+13. [Job Queue](#job-queue)
+14. [SSO / SAML](#sso--saml)
+15. [Billing & Subscriptions](#billing--subscriptions)
+16. [Webhooks & Automation](#webhooks--automation)
+17. [AI Features](#ai-features)
+18. [Help Widget (Support Chatbot)](#help-widget-support-chatbot)
+19. [In-App Notifications](#in-app-notifications)
+20. [Audit Log Viewer](#audit-log-viewer)
+21. [Legal & Compliance Pages](#legal--compliance-pages)
+22. [Feature Toggles Reference](#feature-toggles-reference)
+23. [Public Pages Your Visitors See](#public-pages-your-visitors-see)
 
 ---
 
@@ -68,7 +79,7 @@ The Dashboard is your home base. It shows at-a-glance numbers about your platfor
 - **Admins** — How many users have admin access
 - **Members** — How many regular members you have
 
-It also provides quick links to jump into Setup, User Management, and other areas.
+It also provides quick links to jump into Setup, User Management, Metrics, and other areas.
 
 ---
 
@@ -179,7 +190,13 @@ Add links to your social media profiles. These appear in your site's footer:
 
 **Where:** `/admin/setup/features`
 
-Toggle features on and off, and configure AI and webhook integrations. See [Feature Toggles Reference](#feature-toggles-reference) for details on each toggle.
+Toggle features on and off, and configure AI and webhook integrations. This page also includes:
+
+- **Security settings** — Configure metrics alert thresholds (churn rate, minimum new users), API token rotation intervals, and database backup preferences
+- **Compliance settings** — Enable/disable legal pages (Cookie Policy, Acceptable Use, etc.) and configure the cookie consent banner
+- **Support settings** — Configure the floating support chatbot widget, set the fallback email, and customize the chatbot's system prompt
+
+See [Feature Toggles Reference](#feature-toggles-reference) for details on each toggle.
 
 ---
 
@@ -216,6 +233,16 @@ Click the **eye icon** on any user row to open their detailed profile. The detai
 - Add notes about customer interactions, support tickets, or special arrangements
 - Delete notes you no longer need
 - Each note shows who wrote it and when
+
+### User Impersonation
+
+Admins can temporarily impersonate any user for debugging purposes. This lets you see exactly what the user sees without needing their password.
+
+- **How it works:** Click the impersonate button on a user's profile to view the app as that user
+- **Safety:** Impersonation sessions expire after 30 minutes automatically
+- **Visual indicator:** A yellow warning banner appears at the top of the screen while impersonating
+- **Stop anytime:** Click "Stop Impersonation" to return to your admin account
+- **Audit trail:** All impersonation sessions are logged in the audit log
 
 ---
 
@@ -257,6 +284,54 @@ Each post has: title, slug (URL path), content (Markdown), publish status, and d
 
 ---
 
+## Metrics Dashboard
+
+**Where:** `/admin/metrics`
+
+A comprehensive dashboard showing your key business performance indicators with charts and alert monitoring.
+
+### KPI Cards
+
+The dashboard displays 10 KPI cards in a responsive grid:
+
+| KPI | What It Shows |
+|-----|--------------|
+| **Total Users** | Overall signups |
+| **New Users This Month** | Recent growth (with alert threshold) |
+| **Active Subscriptions** | How many paying customers you have |
+| **MRR** | Monthly Recurring Revenue in dollars |
+| **ARPU** | Average Revenue Per User |
+| **LTV** | Customer Lifetime Value |
+| **Churn Rate** | Percentage of users leaving (with alert threshold) |
+| **Conversion Rate** | Free-to-paid conversion percentage |
+| **Feedback Count** | Total feedback submissions |
+| **Waitlist Count** | People waiting for access |
+
+### NPS Score
+
+A dedicated card shows your **Net Promoter Score** — a measure of how likely users are to recommend your product. The NPS is calculated from optional ratings (0-10) that users can submit through the feedback widget and help widget.
+
+- Color-coded display: green (good, 50+), yellow (average, 0-49), red (needs attention, below 0)
+- Score ranges from -100 to +100
+
+### Alert Thresholds
+
+Configurable alerts let you know when key metrics need attention:
+
+- **Churn Rate Alert** — Set a maximum churn rate threshold. When exceeded, you'll see a warning on the card and can receive email alerts.
+- **Minimum New Users Alert** — Set a minimum number of new users per month. If growth drops below this, you'll be notified.
+
+Configure alert thresholds in Admin > Setup > Features > Security section.
+
+### Action Buttons
+
+- **Email Report** — Send a KPI summary email to yourself or your team. Uses the scheduled report system to compile and deliver key metrics.
+- **Check Alerts** — Manually trigger an alert check against your configured thresholds. Shows a notification if any thresholds are exceeded.
+
+The dashboard also includes **User Growth** and **Revenue Growth** line charts showing trends over time.
+
+---
+
 ## Analytics
 
 **Where:** `/admin/analytics`
@@ -269,6 +344,8 @@ Your key business metrics at a glance:
 - **Feedback Count** — Total feedback submissions
 - **Waitlist Count** — People waiting for access (when waitlist mode is on)
 - **Recent Signups** — The latest users who signed up
+
+For more detailed metrics and KPIs, use the [Metrics Dashboard](#metrics-dashboard).
 
 ---
 
@@ -284,6 +361,17 @@ Read and manage feedback from your users:
 - **Delete feedback** — Remove entries you no longer need
 
 The feedback widget appears on your site when the "Feedback Widget" feature toggle is enabled. Users can submit feedback from any page.
+
+### NPS Score Tracking
+
+Each feedback submission can include an optional **NPS rating** (0-10). When users submit feedback:
+
+- They see 11 buttons (0 through 10) labeled "Not likely" to "Very likely"
+- The rating is stored alongside their feedback message
+- Feedback entries with NPS scores display a colored **NPS badge** in the admin feedback list
+- All NPS scores are aggregated into the Net Promoter Score displayed on the Metrics Dashboard
+
+NPS ratings can also be submitted through the [Help Widget](#help-widget-support-chatbot) after a support conversation.
 
 ---
 
@@ -329,7 +417,8 @@ Monitor the background job processing system. Jobs are tasks that run behind the
 **What gets queued:**
 - **Email jobs** — Sending emails (welcome, subscription, team invites)
 - **Webhook retry jobs** — Retrying failed webhook deliveries
-- **Report jobs** — Generating reports and analytics
+- **Report jobs** — Generating and emailing scheduled KPI summary reports
+- **Token rotation jobs** — Automated webhook secret rotation at configured intervals
 
 **Dashboard shows:**
 - **Redis status** — Whether the job queue is connected (green = connected)
@@ -431,6 +520,8 @@ Webhooks let you connect your platform to automation tools like n8n, Zapier, or 
 
 **Security:** Each webhook delivery is signed with HMAC-SHA256 using your webhook secret. This lets the receiving service verify the notification came from your platform. Failed deliveries are automatically retried up to 3 times with increasing delays.
 
+**API Token Rotation:** You can configure automated webhook secret rotation at a set interval (e.g., every 30 days) via Admin > Setup > Security. This is processed as a background job through the queue system.
+
 ---
 
 ## AI Features
@@ -456,6 +547,75 @@ When AI Features are enabled, your platform includes an AI chat assistant. The A
 
 ---
 
+## Help Widget (Support Chatbot)
+
+The Help Widget is a floating chat button that appears in the bottom corner of your site (separate from the Feedback Widget). When enabled, it provides AI-powered support to your visitors.
+
+**How it works:**
+1. Visitors click the help button to open a chat panel
+2. They type a question and receive an AI-generated response using your configured AI provider and system prompt
+3. After receiving a response, they're shown an optional NPS rating (0-10) to rate their experience
+4. A fallback email link is displayed in case the AI can't answer their question
+
+**Configuration (Admin > Setup > Features > Support):**
+- Toggle the support chatbot on/off
+- Set the fallback email address for unresolved questions
+- Customize the chatbot's system prompt (instructions that guide its responses)
+
+**NPS ratings** submitted through the help widget are included in the overall NPS score on the Metrics Dashboard.
+
+---
+
+## In-App Notifications
+
+MuseKit includes an in-app notification system for keeping users informed:
+
+- **Bell icon** in the header shows an unread notification count badge
+- **Notification popover** lists recent notifications with type-specific icons
+- **Auto-polling** checks for new notifications periodically
+- **Mark all as read** button clears the unread count
+- **Server-side utility** allows creating notifications programmatically from any API route
+
+---
+
+## Audit Log Viewer
+
+**Where:** `/admin/audit-logs`
+
+A dedicated page for reviewing all administrative actions taken on the platform:
+
+- **Paginated table** of audit log entries showing user, action, timestamp, and details
+- **Filterable** by action type and user
+- Captures all admin operations including settings changes, user role updates, impersonation sessions, and more
+
+This is essential for compliance and tracking who made what changes and when.
+
+---
+
+## Legal & Compliance Pages
+
+MuseKit includes a comprehensive set of legal pages that are automatically available at public URLs. These pages use dynamic variable replacement so your company name, support email, and other details are inserted automatically.
+
+**Available legal pages:**
+
+| Page | URL |
+|------|-----|
+| Terms of Service | `/terms` |
+| Privacy Policy | `/privacy` |
+| Cookie Policy | `/cookie-policy` |
+| Acceptable Use | `/acceptable-use` |
+| Accessibility | `/accessibility` |
+| Data Handling | `/data-handling` |
+| DMCA | `/dmca` |
+| AI Data Usage | `/ai-data-usage` |
+| Security Policy | `/security-policy` |
+
+**Cookie Consent Banner:** A configurable cookie consent banner can be enabled via Admin > Setup > Features > Compliance. When enabled, visitors see a banner at the bottom of the page asking them to accept or decline cookies.
+
+**Configuration:** Legal and compliance settings are managed in Admin > Setup > Features, including toggles for individual legal pages, cookie consent, MFA requirements, and password requirements.
+
+---
+
 ## Feature Toggles Reference
 
 Here's what each feature toggle does:
@@ -475,6 +635,7 @@ Here's what each feature toggle does:
 | **Maintenance Mode** | Shows a maintenance page to all visitors |
 | **Waitlist Mode** | Replace signup with a waitlist form (for pre-launch) |
 | **Feedback Widget** | Show a feedback button on all pages |
+| **Support Chatbot** | Show a floating AI-powered help chat widget |
 | **AI Features** | Enable the AI chat assistant |
 | **Enterprise SSO / SAML** | Enable SAML-based single sign-on for enterprise users |
 
@@ -497,6 +658,13 @@ These are the pages your customers and visitors can access:
 | **Docs** | `/docs` | Documentation hub |
 | **Privacy** | `/privacy` | Privacy policy |
 | **Terms** | `/terms` | Terms of service |
+| **Cookie Policy** | `/cookie-policy` | Cookie usage policy |
+| **Acceptable Use** | `/acceptable-use` | Acceptable use policy |
+| **Accessibility** | `/accessibility` | Accessibility statement |
+| **Data Handling** | `/data-handling` | Data handling practices |
+| **DMCA** | `/dmca` | DMCA takedown policy |
+| **AI Data Usage** | `/ai-data-usage` | AI data usage policy |
+| **Security Policy** | `/security-policy` | Security practices |
 | **Login** | `/login` | User login (email, OAuth, Magic Link, SSO) |
 | **Signup** | `/signup` | New account registration |
 | **Billing** | `/billing` | Subscription management (logged-in users) |
@@ -510,9 +678,16 @@ All pages automatically support dark/light mode and are responsive on mobile dev
 ## Tips & Best Practices
 
 - **Always click Save** — Changes in Setup Dashboard aren't applied until you click the "Save Changes" button
+- **Changes take effect immediately** — After saving, settings are applied on the next page load (no caching delay)
 - **Test after changes** — After saving, visit your public pages to verify changes look correct
 - **Use the onboarding wizard first** — If this is a new setup, complete the onboarding wizard before diving into the Setup Dashboard
 - **Keep your Stripe Dashboard in sync** — Pricing plans are managed in Stripe, not in MuseKit. If plans look wrong, check Stripe first.
 - **Monitor the Job Queue** — If emails aren't being sent, check the Queue dashboard for failed jobs
 - **Test webhooks** — Use the "Test Webhook" button before relying on webhook integrations
+- **Check the Metrics Dashboard regularly** — Monitor KPIs and set up alert thresholds to catch issues early
+- **Review the Audit Log** — Periodically check the audit log for unexpected admin actions
 - **Backup before major changes** — The platform supports checkpoints, but it's good practice to note your current settings before making sweeping changes
+
+---
+
+*Last Updated: February 6, 2026*

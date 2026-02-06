@@ -55,14 +55,14 @@ This document is the single source of truth for the Master SaaS Muse Template de
 | 10     | Analytics & Tracking     | PARTIAL     | v1.1     |
 | 11     | Affiliate System         | NOT STARTED | v1.1     |
 | 12     | **n8n Automation**       | **COMPLETE**| **v1.1** |
-| 13     | Notifications            | NOT STARTED | v1.1     |
+| 13     | **Notifications**        | **COMPLETE**| **v1.1** |
 | 14     | Referral Program         | NOT STARTED | v1.1     |
 | 15     | **Feedback System**      | **COMPLETE**| **v1.1** |
 | 16     | **AI Integration**       | **COMPLETE**| **v1.1** |
 | 17     | PWA Support              | NOT STARTED | v1.1     |
 | 18     | Internationalization     | NOT STARTED | v1.1     |
 | 19     | A/B Testing              | NOT STARTED | v1.1     |
-| 20     | User Impersonation       | NOT STARTED | v1.1     |
+| 20     | **User Impersonation**   | **COMPLETE**| **v1.1** |
 | 21     | Social Media Management  | NOT STARTED | v1.1     |
 | 22     | Launch Plan Tools        | NOT STARTED | v1.1     |
 | 23     | Operations & Support     | NOT STARTED | v1.1     |
@@ -86,6 +86,15 @@ This document is the single source of truth for the Master SaaS Muse Template de
 | 41     | **Admin Setup UX Overhaul**   | **COMPLETE** | **v1.1** |
 | 42     | **Customer Service Tools**    | **COMPLETE** | **v1.1** |
 | 43     | **Admin Documentation**       | **COMPLETE** | **v1.1** |
+| 44     | **Metrics Dashboard (10 KPIs)**| **COMPLETE** | **v1.1** |
+| 45     | **NPS Score Tracking**        | **COMPLETE** | **v1.1** |
+| 46     | **Help Widget (Support Chatbot)** | **COMPLETE** | **v1.1** |
+| 47     | **In-App Notifications**      | **COMPLETE** | **v1.1** |
+| 48     | **Audit Log Viewer**          | **COMPLETE** | **v1.1** |
+| 49     | **Legal & Compliance Pages**  | **COMPLETE** | **v1.1** |
+| 50     | **Metrics Alerts & Reports**  | **COMPLETE** | **v1.1** |
+| 51     | **Database Backup Config**    | **COMPLETE** | **v1.1** |
+| 52     | **API Token Rotation**        | **COMPLETE** | **v1.1** |
 
 ---
 
@@ -272,7 +281,7 @@ src/
 - [x] Sentry error tracking (fully working - server + browser via `/monitoring` tunnel route)
 - [x] Plausible analytics integration
 - [x] Structured logging
-- [x] E2E Playwright tests (38 tests across 5 suites)
+- [x] E2E Playwright tests (46 tests across 7 files)
 - [x] Updated MUSE_CHECKLIST for cloning
 - [x] Deployment documentation
 - [x] PROJECT_OVERVIEW.md
@@ -382,6 +391,8 @@ src/
 - [x] Status filters (all/new/reviewed/resolved)
 - [x] Delete individual feedback entries
 - [x] Webhook dispatch on new feedback
+- [x] NPS rating (0-10) on feedback submissions
+- [x] NPS badge display in admin feedback list
 
 **Key Files**:
 ```
@@ -463,25 +474,28 @@ src/
 
 **Deliverables**:
 - [x] Playwright test framework configuration
-- [x] 38 E2E tests across 5 test suites
+- [x] 46 E2E tests across 7 test files
+- [x] Comprehensive E2E suite (e2e-full.spec.ts): public pages, auth, feedback, help widget, metrics, admin, API endpoints, responsive design
 - [x] Blog/Changelog CRUD tests (9 tests)
 - [x] Waitlist management tests (9 tests)
 - [x] Feedback management tests (9 tests)
 - [x] Email template tests (10 tests)
-- [x] Public waitlist submission test (1 test)
 - [x] Auth setup for authenticated admin testing
 - [x] `data-testid` attributes on all interactive elements
 - [x] Graceful skipping when no test data exists
+- [x] Help widget tests (button visibility, panel open/close, NPS rating, fallback email)
+- [x] Metrics dashboard tests (KPI cards, alert buttons)
+- [x] 60-second timeouts for admin pages requiring authentication
 
 **Key Files**:
 ```
 tests/
 ├── auth.setup.ts               # Authentication setup
 ├── blog.spec.ts                 # Blog CRUD tests
+├── e2e-full.spec.ts             # Comprehensive E2E suite (46 tests)
 ├── waitlist.spec.ts             # Waitlist tests
 ├── feedback.spec.ts             # Feedback tests
 ├── email-templates.spec.ts      # Email template tests
-├── public-waitlist.spec.ts      # Public waitlist test
 └── run-tests.sh                 # Test runner script
 playwright.config.ts             # Playwright configuration
 ```
@@ -659,9 +673,142 @@ src/
 **Status**: COMPLETE (February 2026)
 
 **Deliverables**:
-- [x] Comprehensive Admin Guide (`docs/ADMIN_GUIDE.md`) - 18 sections, 500+ lines
+- [x] Comprehensive Admin Guide (`docs/ADMIN_GUIDE.md`) - 23 sections, 600+ lines
 - [x] Non-technical language for team members managing the platform
 - [x] Covers all admin features, setup, and best practices
+
+---
+
+### Module 44: Metrics Dashboard (10 KPIs)
+**Estimated Time**: 1 day  
+**Dependencies**: Module 3  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] 10 KPI cards: Total Users, New Users, Active Subscriptions, MRR, ARPU, LTV, Churn Rate, Conversion Rate, Feedback Count, Waitlist Count
+- [x] NPS Score card with color-coded Net Promoter Score
+- [x] User Growth and Revenue Growth line charts (Recharts)
+- [x] "Email Report" action button (triggers scheduled report via queue)
+- [x] "Check Alerts" action button (checks configured thresholds)
+- [x] Metrics aggregation API (`/api/admin/metrics`)
+
+---
+
+### Module 45: NPS Score Tracking
+**Estimated Time**: 0.5 days  
+**Dependencies**: Module 15, Module 46  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] NPS rating (0-10) in feedback widget submissions
+- [x] NPS rating (0-10) in help widget after AI responses
+- [x] NPS badge display in admin feedback list
+- [x] NPS aggregation into Net Promoter Score on metrics dashboard
+- [x] Color-coded NPS display (green/yellow/red)
+
+---
+
+### Module 46: Help Widget (Support Chatbot)
+**Estimated Time**: 1 day  
+**Dependencies**: Module 16  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Floating chat button in bottom corner of site
+- [x] AI-powered responses using configured provider/model
+- [x] Configurable system prompt and fallback email
+- [x] NPS rating collection after AI responses
+- [x] Admin toggle to enable/disable
+- [x] Independent from feedback widget
+
+**Key Files**:
+```
+src/components/help-widget.tsx
+```
+
+---
+
+### Module 47: In-App Notifications
+**Estimated Time**: 0.5 days  
+**Dependencies**: Module 3  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Bell icon in header with unread count badge
+- [x] Notification popover with type-specific icons
+- [x] Auto-polling for new notifications
+- [x] Mark all as read functionality
+- [x] Server-side notification creation utility
+
+**Key Files**:
+```
+src/components/notification-bell.tsx
+src/lib/notifications/
+```
+
+---
+
+### Module 48: Audit Log Viewer
+**Estimated Time**: 0.5 days  
+**Dependencies**: Module 3  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Dedicated admin page at `/admin/audit-logs`
+- [x] Paginated table of audit log entries
+- [x] Filterable by action type and user
+- [x] Shows user, action, timestamp, and details
+
+---
+
+### Module 49: Legal & Compliance Pages
+**Estimated Time**: 1 day  
+**Dependencies**: Module 6  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] 9 legal pages with dynamic variable replacement: Terms, Privacy, Cookie Policy, Acceptable Use, Accessibility, Data Handling, DMCA, AI Data Usage, Security Policy
+- [x] Cookie consent banner (configurable via admin)
+- [x] Compliance settings in Setup > Features
+- [x] MFA and password requirement configuration
+
+---
+
+### Module 50: Metrics Alerts & Scheduled Reports
+**Estimated Time**: 0.5 days  
+**Dependencies**: Module 44, Module 39  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Configurable alert thresholds for churn rate and user growth
+- [x] Email notifications when thresholds exceeded
+- [x] BullMQ job type for scheduled KPI summary emails
+- [x] Admin-triggered report sending
+- [x] Alert settings in Admin > Setup > Security
+
+---
+
+### Module 51: Database Backup Configuration
+**Estimated Time**: 0.5 days  
+**Dependencies**: Module 3  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Admin UI for backup notification preferences
+- [x] Configurable frequency and retention periods
+- [x] Managed by Supabase (configuration only)
+
+---
+
+### Module 52: API Token Rotation
+**Estimated Time**: 0.5 days  
+**Dependencies**: Module 39  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] BullMQ job type for automated webhook secret rotation
+- [x] Configurable rotation interval
+- [x] Managed via Admin > Setup > Security
 
 ---
 
@@ -696,6 +843,15 @@ src/
 | 25| Admin Setup UX Overhaul          | 41     | COMPLETE    |
 | 26| Customer Service Tools           | 42     | COMPLETE    |
 | 27| Admin Documentation              | 43     | COMPLETE    |
+| 28| Metrics Dashboard (10 KPIs)      | 44     | COMPLETE    |
+| 29| NPS Score Tracking               | 45     | COMPLETE    |
+| 30| Help Widget (Support Chatbot)    | 46     | COMPLETE    |
+| 31| In-App Notifications             | 47     | COMPLETE    |
+| 32| Audit Log Viewer                 | 48     | COMPLETE    |
+| 33| Legal & Compliance Pages         | 49     | COMPLETE    |
+| 34| Metrics Alerts & Reports         | 50     | COMPLETE    |
+| 35| Database Backup Config           | 51     | COMPLETE    |
+| 36| API Token Rotation               | 52     | COMPLETE    |
 
 ---
 
@@ -754,6 +910,14 @@ When creating a new muse from this template:
 **Admin Setup UX Overhaul**: February 6, 2026  
 **Customer Service Tools**: February 6, 2026  
 **Admin Documentation**: February 6, 2026  
+**Metrics Dashboard (10 KPIs)**: February 6, 2026  
+**NPS Score Tracking**: February 6, 2026  
+**Help Widget (Support Chatbot)**: February 6, 2026  
+**In-App Notifications**: February 6, 2026  
+**Audit Log Viewer**: February 6, 2026  
+**Legal & Compliance Pages**: February 6, 2026  
+**Metrics Alerts & Reports**: February 6, 2026  
+**E2E Tests Expanded to 46**: February 6, 2026  
 
 ### Completed Work (Next.js + Vercel):
 - [x] Module 1: Foundation - Landing page, dark/light mode, header/footer, Vercel deployment
@@ -770,7 +934,7 @@ When creating a new muse from this template:
 - [x] Module 16: AI Integration - Pluggable providers (xAI Grok, OpenAI, Anthropic), streaming chat API, admin configuration
 - [x] Module 25: Branding Manager - Setup Dashboard with 4 tabs, dynamic branding, navigation config, announcement bar
 - [x] Module 31: Onboarding Wizard - 4-step guided admin setup
-- [x] Module 34: E2E Testing - 38 Playwright tests across 5 suites
+- [x] Module 34: E2E Testing - 46 Playwright tests across 7 files
 - [x] Module 35: Blog/Changelog - Markdown content, public pages, admin CRUD
 - [x] Module 36: Email Templates - Admin-editable templates, preview, test sending
 - [x] Module 37: Waitlist Mode - Pre-launch email collection, CSV export
@@ -779,7 +943,16 @@ When creating a new muse from this template:
 - [x] Module 40: Rate Limiting - Upstash Redis sliding window with in-memory fallback
 - [x] Module 41: Admin Setup UX - Split into 6 focused sub-pages with sidebar navigation
 - [x] Module 42: Customer Service Tools - Subscription status, user detail, invoices, admin notes
-- [x] Module 43: Admin Documentation - Comprehensive admin guide
+- [x] Module 43: Admin Documentation - Comprehensive admin guide (23 sections)
+- [x] Module 44: Metrics Dashboard - 10 KPIs, NPS score, growth charts, alert thresholds
+- [x] Module 45: NPS Score Tracking - 0-10 rating in feedback and help widgets
+- [x] Module 46: Help Widget - AI-powered floating support chatbot
+- [x] Module 47: In-App Notifications - Bell icon, unread badges, auto-polling
+- [x] Module 48: Audit Log Viewer - Paginated, filterable admin page
+- [x] Module 49: Legal & Compliance - 9 legal pages, cookie consent, compliance settings
+- [x] Module 50: Metrics Alerts & Reports - Churn/growth thresholds, scheduled email reports
+- [x] Module 51: Database Backup Config - Admin UI for backup preferences
+- [x] Module 52: API Token Rotation - Automated webhook secret rotation
 
 ### Next Steps:
 - [ ] Clone template for first production muse (ExtrusionCalculator.com)
@@ -844,6 +1017,14 @@ When creating a new muse from this template:
 | 2026-02-06 | Upgrade rate limiting to Upstash            | In-memory rate limiting doesn't work on serverless|
 | 2026-02-06 | Split admin setup into 6 sub-pages          | Monolithic page too large, slow to load          |
 | 2026-02-06 | Add customer service tools                  | Admin needs visibility into user subscriptions   |
+| 2026-02-06 | Add metrics dashboard with 10 KPIs          | Business intelligence for SaaS operators         |
+| 2026-02-06 | Add NPS score tracking                      | Measure customer satisfaction across widgets      |
+| 2026-02-06 | Add help widget (support chatbot)           | AI-powered self-service support for users         |
+| 2026-02-06 | Add in-app notifications                    | Keep users informed of important events           |
+| 2026-02-06 | Add audit log viewer                        | Compliance and admin action tracking              |
+| 2026-02-06 | Add legal & compliance pages                | Legal requirements for SaaS products              |
+| 2026-02-06 | Add metrics alerts & scheduled reports      | Proactive monitoring of business health           |
+| 2026-02-06 | Expand E2E tests to 46 across 7 files       | Comprehensive coverage including new features     |
 
 ---
 
