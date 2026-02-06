@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { SiteSettings, defaultSettings } from '@/types/settings'
-import { createClient } from '@/lib/supabase/client'
 
 export function useSettings() {
   const [settings, setSettings] = useState<SiteSettings | null>(null)
@@ -18,79 +17,34 @@ export function useSettings() {
         setSettings(defaultSettings)
         setLoading(false)
       }
-    }, 5000)
+    }, 8000)
     
     async function loadSettings() {
       try {
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-          settingsLoadedRef.current = true
-          setSettings(defaultSettings)
-          setLoading(false)
-          clearTimeout(timeoutId)
-          return
+        const res = await fetch('/api/public/settings', {
+          signal: controller.signal,
+          cache: 'no-store',
+        })
+
+        if (!res.ok) {
+          throw new Error(`Settings API returned ${res.status}`)
         }
-        
-        const supabase = createClient()
-        const { data, error } = await supabase
-          .from('organization_settings')
-          .select('settings')
-          .eq('app_id', 'default')
-          .single()
-        
-        if (error) {
-          if (error.code !== 'PGRST116') {
-            console.error('Settings error:', error.message)
-          }
+
+        const { settings: loaded } = await res.json()
+
+        if (loaded) {
           settingsLoadedRef.current = true
-          setSettings(defaultSettings)
-          setLoading(false)
-          clearTimeout(timeoutId)
-          return
-        }
-        
-        if (data?.settings) {
-          const dbPages = data.settings.pages || {}
-          const dbNavigation = data.settings.navigation || {}
-          const dbAnnouncement = data.settings.announcement || {}
-          const dbBranding = data.settings.branding || {}
-          setSettings({
-            branding: { 
-              ...defaultSettings.branding, 
-              ...dbBranding,
-              // Deep merge nested theme objects
-              lightTheme: { ...defaultSettings.branding.lightTheme, ...(dbBranding.lightTheme || {}) },
-              darkTheme: { ...defaultSettings.branding.darkTheme, ...(dbBranding.darkTheme || {}) },
-            },
-            pricing: { ...defaultSettings.pricing, ...data.settings.pricing },
-            social: { ...defaultSettings.social, ...data.settings.social },
-            features: { ...defaultSettings.features, ...data.settings.features },
-            content: { ...defaultSettings.content, ...data.settings.content },
-            navigation: {
-              items: dbNavigation.items || defaultSettings.navigation?.items || [],
-            },
-            announcement: { ...defaultSettings.announcement, ...dbAnnouncement },
-            pages: {
-              about: { ...defaultSettings.pages.about, ...dbPages.about },
-              contact: { ...defaultSettings.pages.contact, ...dbPages.contact },
-              legal: { ...defaultSettings.pages.legal, ...dbPages.legal },
-              pricing: { ...defaultSettings.pages.pricing, ...dbPages.pricing },
-              faq: { ...defaultSettings.pages.faq, ...dbPages.faq },
-              customPages: dbPages.customPages || defaultSettings.pages.customPages,
-            },
-            ai: data.settings.ai ? { ...defaultSettings.ai, ...data.settings.ai } : defaultSettings.ai,
-            webhooks: data.settings.webhooks || defaultSettings.webhooks,
-            compliance: data.settings.compliance ? { ...defaultSettings.compliance, ...data.settings.compliance } : defaultSettings.compliance,
-            support: data.settings.support ? { ...defaultSettings.support, ...data.settings.support } : defaultSettings.support,
-            security: data.settings.security ? { ...defaultSettings.security, ...data.settings.security } : defaultSettings.security,
-          })
+          setSettings(loaded as SiteSettings)
         } else {
+          settingsLoadedRef.current = true
           setSettings(defaultSettings)
         }
-      } catch (err) {
+      } catch (err: any) {
+        if (err?.name === 'AbortError') return
         console.error('Failed to load settings:', err)
+        settingsLoadedRef.current = true
         setSettings(defaultSettings)
       } finally {
-        settingsLoadedRef.current = true
         clearTimeout(timeoutId)
         setLoading(false)
       }
