@@ -2,6 +2,8 @@ import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { defaultSettings, SiteSettings } from '@/types/settings'
 
+export const dynamic = 'force-dynamic'
+
 function getSupabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -62,7 +64,7 @@ export async function GET() {
 
     return NextResponse.json({ settings: mergedSettings }, {
       headers: {
-        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
     })
   } catch (err) {
