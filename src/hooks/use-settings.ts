@@ -73,10 +73,10 @@ export function useSettings() {
               customPages: dbPages.customPages || defaultSettings.pages.customPages,
             },
             ai: data.settings.ai ? { ...defaultSettings.ai, ...data.settings.ai } : defaultSettings.ai,
-            webhooks: data.settings.webhooks || undefined,
-            compliance: data.settings.compliance || undefined,
-            support: data.settings.support || undefined,
-            security: data.settings.security || undefined,
+            webhooks: data.settings.webhooks || defaultSettings.webhooks,
+            compliance: data.settings.compliance ? { ...defaultSettings.compliance, ...data.settings.compliance } : defaultSettings.compliance,
+            support: data.settings.support ? { ...defaultSettings.support, ...data.settings.support } : defaultSettings.support,
+            security: data.settings.security ? { ...defaultSettings.security, ...data.settings.security } : defaultSettings.security,
           })
         } else {
           setSettings(defaultSettings)
