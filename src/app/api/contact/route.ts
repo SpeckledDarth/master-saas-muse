@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { dispatchWebhook } from '@/lib/webhooks/dispatcher'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) return null
+  return new Resend(apiKey)
+}
 
 export async function POST(request: Request) {
   try {
@@ -18,7 +22,8 @@ export async function POST(request: Request) {
 
     const recipientEmail = to || process.env.CONTACT_EMAIL || 'support@example.com'
 
-    if (!process.env.RESEND_API_KEY) {
+    const resend = getResendClient()
+    if (!resend) {
       console.log('Contact form submission (Resend not configured):', {
         from: email,
         name,
@@ -26,6 +31,7 @@ export async function POST(request: Request) {
         message,
         to: recipientEmail,
       })
+      dispatchWebhook('contact.submitted', { name, email, subject, message })
       return NextResponse.json({ success: true, message: 'Message logged (email not configured)' })
     }
 
