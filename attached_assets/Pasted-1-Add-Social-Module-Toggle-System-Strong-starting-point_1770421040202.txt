@@ -1,0 +1,41 @@
+1. Add Social Module Toggle System
+Strong starting point—establishes the foundation for modularity. Agree fully: This fits seamlessly into the Features & Integrations tab, with sub-toggles for tiers (Universal/Power) and perhaps a quick description/preview of what enables.
+•	Refinements/Additions: Make the toggle trigger a dependency check (e.g., alert if required SDKs aren't installed). Add a "Module Status" indicator (e.g., green if configured).
+•	Why It Fits: Prevents bloat—users enable only if needed. Honest con: If not user-tested early, UI glitches could arise; mock it first.
+2. Build Social Account Connection System
+Essential and well-placed early—OAuth for platforms like Twitter/X, LinkedIn, Instagram ties directly to MuseKit's auth system.
+•	Refinements/Additions: Use dynamic imports for SDKs (e.g., lazy-load to keep bundles lean). Add token validation on connect (e.g., test API call to confirm access).
+•	Why It Fits: Encrypted storage in Supabase is secure and cloneable. Honest con: Platform-specific quirks (e.g., Instagram's approval process) could delay—start with 2-3 key ones, expand later.
+3. Create AI Content Generation Endpoint
+Great mid-plan step—builds on MuseKit's pluggable AI without reinvention.
+•	Refinements/Additions: Include multimodal support (e.g., text + image gen via Grok if available). Add usage logging to feed the metrics extension later.
+•	Why It Fits: Prompts can be tier-specific (e.g., basic captions in Universal, advanced personalization in Power). Honest con: AI costs could creep if not capped early—tie to MuseKit rate limiting here.
+4. Add Post Scheduling and Queue Jobs
+Core to passivity—leveraging BullMQ makes this efficient.
+•	Refinements/Additions: Define job types clearly (e.g., "Immediate Post" vs. "Scheduled Batch"). Add retry logic for API failures.
+•	Why It Fits: Aligns with n8n for automation. Honest con: Queue overload in high-volume clones—monitor with Upstash metrics.
+5. Build Social API Status Checker
+Smart proactive addition—addresses dependency risks head-on.
+•	Refinements/Additions: Make it a BullMQ job (daily ping) with notifications via Resend/in-app bell. Include a dashboard widget for real-time status.
+•	Why It Fits: Enhances reliability without complexity. Honest con: Over-notification risk—threshold it (e.g., only alert on repeated failures).
+6. Extend Metrics Dashboard with Social KPIs
+Logical progression—builds on existing Recharts setup.
+•	Refinements/Additions: Add 2-3 KPIs like "Posts Generated" or "Engagement Rate." Include tier-specific views (e.g., filter by Universal/Power).
+•	Why It Fits: Cloneable and data-driven. Honest con: Data privacy—ensure aggregation anonymizes user info.
+7. Add Onboarding Wizard Social Prompt
+Nice user-friendly touch—integrates seamlessly with the existing wizard.
+•	Refinements/Additions: Make it conditional (e.g., show only if module toggled). Add a demo video or tooltip for quick understanding.
+•	Why It Fits: Reduces adoption friction. Honest con: If wizard gets too long, it could overwhelm—keep the prompt concise.
+8. Add Fallback for Automation Downtime
+Excellent safeguard—ties into our earlier discussion on n8n risks.
+•	Refinements/Additions/Corrections: Use Vercel Cron as fallback for critical jobs (e.g., if n8n ping fails, switch to local queues). Test with simulated downtime. Minor correction: Scope to essentials only (e.g., posting, not analytics) to avoid overkill.
+•	Why It Fits: Ensures passivity. Honest con: Adds testing complexity—dedicate time in step 9.
+9. Write End-to-End Tests for Features
+Crucial quality gate—building on MuseKit's 46 tests is wise.
+•	Refinements/Additions: Aim for 6-8 new Playwright tests (e.g., toggle on/off, full post flow). Run in CI/CD for clones.
+•	Why It Fits: Prevents regressions. Honest con: Time-intensive—parallelize with other steps if possible.
+10. Update Documentation for New Module
+Perfect closer—ensures maintainability.
+•	Refinements/Additions: Add screenshots/code snippets in the admin guide. Include a "Troubleshooting" section for common issues (e.g., API errors).
+•	Why It Fits: Supports MuseKit portfolio scaling. Honest con: Docs can lag—update iteratively during build.
+
