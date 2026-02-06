@@ -2,7 +2,7 @@
 
 This guide walks you through creating a new SaaS from the Master SaaS Muse Template.
 
-**Template Status: MVP COMPLETE + AI + Webhooks + Testing (February 2026)**
+**Template Status: MVP COMPLETE + SSO + Queue + Customer Service Tools (February 2026)**
 
 ---
 
@@ -80,7 +80,7 @@ cd master-saas-muse
 ```bash
 git init
 git add .
-git commit -m "Initial Next.js 14 setup"
+git commit -m "Initial Next.js 16 setup"
 git remote add origin https://github.com/YOUR_USERNAME/master-saas-muse.git
 git branch -M main
 git push -u origin main
@@ -168,6 +168,12 @@ XAI_API_KEY=xai-...
 # ANTHROPIC_API_KEY=sk-ant-...
 
 # ===================
+# QUEUE & RATE LIMITING (Optional)
+# ===================
+UPSTASH_REDIS_REST_URL=https://...upstash.io
+UPSTASH_REDIS_REST_TOKEN=AX...
+
+# ===================
 # APP
 # ===================
 NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
@@ -207,13 +213,23 @@ master-saas-muse/
 │   │   │   ├── email-templates/page.tsx
 │   │   │   ├── feedback/page.tsx
 │   │   │   ├── onboarding/page.tsx
-│   │   │   ├── setup/page.tsx
+│   │   │   ├── queue/page.tsx
+│   │   │   ├── sso/page.tsx
+│   │   │   ├── setup/
+│   │   │   │   ├── layout.tsx
+│   │   │   │   ├── branding/page.tsx
+│   │   │   │   ├── content/page.tsx
+│   │   │   │   ├── pages/page.tsx
+│   │   │   │   ├── pricing/page.tsx
+│   │   │   │   ├── social/page.tsx
+│   │   │   │   └── features/page.tsx
 │   │   │   ├── team/page.tsx
 │   │   │   ├── users/page.tsx
 │   │   │   └── waitlist/page.tsx
 │   │   ├── api/
-│   │   │   ├── admin/ (setup, stats, posts, users, team, invitations, email-templates, webhooks)
+│   │   │   ├── admin/ (setup, stats, posts, users, users/[userId], notes, team, invitations, email-templates, webhooks, sso)
 │   │   │   ├── ai/ (chat, providers)
+│   │   │   ├── auth/sso/check/
 │   │   │   ├── stripe/ (checkout, portal, products, subscription, webhook)
 │   │   │   ├── email/send/
 │   │   │   ├── feedback/
@@ -246,11 +262,16 @@ master-saas-muse/
 │   │   ├── email/ (client, service, template)
 │   │   ├── ai/ (provider - xAI, OpenAI, Anthropic)
 │   │   ├── webhooks/ (dispatcher - HMAC, retry, fire-and-forget)
+│   │   ├── sso/ (provider - SAML SSO management)
+│   │   ├── queue/ (index - BullMQ job queue)
 │   │   ├── validation/ (schemas, index)
-│   │   ├── rate-limit/
+│   │   ├── rate-limit/ (index - Upstash Redis sliding window)
 │   │   ├── logging/
 │   │   ├── settings/
 │   │   └── team-permissions.ts
+│   ├── hooks/
+│   │   ├── use-setup-settings.ts
+│   │   └── use-setup-settings-context.tsx
 │   ├── types/
 │   │   └── settings.ts (all settings interfaces)
 │   ├── instrumentation-client.ts (Sentry client)
@@ -380,6 +401,18 @@ CREATE TABLE invitations (
 );
 
 -- ===================
+-- ADMIN NOTES (for customer service)
+-- ===================
+CREATE TABLE IF NOT EXISTS admin_notes (
+  id SERIAL PRIMARY KEY,
+  user_id UUID NOT NULL,
+  note TEXT NOT NULL,
+  created_by UUID NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_admin_notes_user_id ON admin_notes(user_id);
+
+-- ===================
 -- ENABLE RLS
 -- ===================
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
@@ -389,6 +422,7 @@ ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE organization_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invitations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE admin_notes ENABLE ROW LEVEL SECURITY;
 
 -- ===================
 -- RLS POLICIES
@@ -452,6 +486,10 @@ CREATE POLICY "Service role full access org_members" ON organization_members
 -- Invitations (service role manages via admin client)
 CREATE POLICY "Service role full access invitations" ON invitations
   FOR ALL USING (true);
+
+-- Admin Notes (service role only)
+CREATE POLICY "Service role full access admin_notes" ON admin_notes
+  FOR ALL USING (true) WITH CHECK (true);
 ```
 
 > **Important RLS Note**: The policies above for organization tables use `FOR ALL USING (true)` which is permissive. **Access is controlled server-side** by using the Supabase admin client (service role) in API routes, not by RLS. This means:
@@ -550,7 +588,7 @@ Create in Stripe Dashboard:
 | Profile with Avatar + Connected Providers | Complete |
 | Admin Dashboard with Metrics | Complete |
 | User Management | Complete |
-| Setup Dashboard (Branding, Pricing, Social, Features) | Complete |
+| Setup Dashboard (6 Sub-Pages: Branding, Content, Pages, Pricing, Social, Features) | Complete |
 | Onboarding Wizard (4-step guided setup) | Complete |
 | Stripe Billing + Feature Gating | Complete |
 | Customer Portal | Complete |
@@ -572,6 +610,11 @@ Create in Stripe Dashboard:
 | Dark/Light Mode | Complete |
 | Custom Pages System | Complete |
 | Announcement Bar | Complete |
+| SSO/SAML Enterprise Auth | Complete |
+| Queue Infrastructure (BullMQ + Upstash) | Complete |
+| Rate Limiting (Upstash Redis) | Complete |
+| Customer Service Tools | Complete |
+| Admin Setup UX (6 Sub-Pages) | Complete |
 
 ---
 

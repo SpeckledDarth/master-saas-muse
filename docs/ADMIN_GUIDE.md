@@ -17,6 +17,7 @@ A complete guide for managing your MuseKit-powered application. Written for team
    - [Social Links](#social-links)
    - [Features & Integrations](#features--integrations)
 5. [User Management](#user-management)
+   - [Customer Service Tools](#customer-service-tools)
 6. [Team Management](#team-management)
 7. [Blog & Changelog](#blog--changelog)
 8. [Analytics](#analytics)
@@ -90,7 +91,7 @@ You only need to complete this once. After that, use the Setup Dashboard for ong
 
 **Where:** `/admin/setup`
 
-The Setup Dashboard is your master control panel for configuring every aspect of your site. It's organized into six sections, each accessible from the sidebar navigation.
+The Setup Dashboard is your master control panel for configuring every aspect of your site. It's split into six focused sub-pages, each accessible from a sidebar navigation menu. Each sub-page handles only its own section, making it faster to load and easier to navigate.
 
 ### Branding
 
@@ -188,11 +189,33 @@ Toggle features on and off, and configure AI and webhook integrations. See [Feat
 
 View and manage all users who have signed up for your platform:
 
-- **View user list** — See email, role, and signup date for every user
+- **View user list** — See email, role, subscription status (Plan column), and signup date for every user
 - **Search and filter** — Find specific users quickly
 - **Change roles** — Promote or demote users (Member, Manager, Admin)
 - **Delete users** — Remove accounts (cannot be undone)
 - **Invite new users** — Send email invitations to bring people onto the platform
+- **Export CSV** — Download the full user list as a spreadsheet
+
+### Customer Service Tools
+
+Click the **eye icon** on any user row to open their detailed profile. The detail panel has three tabs:
+
+**Overview Tab:**
+- Full user profile (name, email, avatar, provider, phone, join date, last login)
+- Subscription details (plan tier, status, renewal date, cancel status)
+- Quick actions:
+  - **Manage in Stripe** — Opens the Stripe Customer Portal for that user (manage their subscription, payment method, invoices)
+  - **Send Email** — Opens your email client pre-addressed to that user
+
+**Invoices Tab:**
+- Shows the user's recent payment history from Stripe
+- Each invoice shows date, amount, payment status, and a link to view the full invoice
+
+**Notes Tab:**
+- Internal notes visible only to admin team members — the user never sees these
+- Add notes about customer interactions, support tickets, or special arrangements
+- Delete notes you no longer need
+- Each note shows who wrote it and when
 
 ---
 

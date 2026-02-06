@@ -4,7 +4,7 @@ This checklist guides you through setting up a new project from the Master SaaS 
 
 **Estimated time: 15-30 minutes**
 
-**Template Status: MVP COMPLETE + AI + Webhooks + Testing (February 2026)**
+**Template Status: MVP COMPLETE + SSO + Queue + Customer Service Tools (February 2026)**
 
 ---
 
@@ -19,6 +19,7 @@ This checklist guides you through setting up a new project from the Master SaaS 
 - [ ] Plausible account (optional, for analytics)
 - [ ] Sentry account (optional, for error tracking)
 - [ ] xAI/OpenAI/Anthropic API key (optional, for AI features)
+- [ ] Upstash account (for Redis queue and rate limiting)
 
 ---
 
@@ -69,8 +70,11 @@ Run the SQL from `docs/SETUP_GUIDE.md` in Supabase SQL Editor:
 - [ ] Create `organizations` table
 - [ ] Create `organization_members` table
 - [ ] Create `invitations` table
+- [ ] Create `admin_notes` table (for customer service notes)
 - [ ] Enable Row Level Security on all tables
 - [ ] Create RLS policies
+
+> **New Table:** The `admin_notes` table is used by the Customer Service Tools in the admin Users page. See `docs/SETUP_GUIDE.md` for the SQL.
 
 ---
 
@@ -217,6 +221,21 @@ Skip this if you only need email/password authentication. Configure only the pro
 
 ---
 
+## Step 9b: Configure Upstash Redis (Optional, 3 min)
+
+Required for background job processing (email sending, webhook retries) and production-grade rate limiting.
+
+- [ ] Go to [Upstash Console](https://console.upstash.com)
+- [ ] Create a new Redis database
+- [ ] Copy the REST URL and token
+- [ ] Add environment variables:
+  - `UPSTASH_REDIS_REST_URL` = your Redis REST URL
+  - `UPSTASH_REDIS_REST_TOKEN` = your Redis REST token
+
+> **Note:** If Upstash is not configured, the app still works — emails send directly (not queued), and rate limiting falls back to in-memory. Upstash is recommended for production.
+
+---
+
 ## Step 10: Deploy to Vercel (5 min)
 
 - [ ] Connect GitHub repository to Vercel
@@ -238,9 +257,9 @@ Skip this if you only need email/password authentication. Configure only the pro
 
 ## Step 12: Configure Your SaaS (Setup Dashboard)
 
-This is the key step that makes each clone unique! Go to `/admin/setup` and configure:
+This is the key step that makes each clone unique! Go to `/admin/setup` and configure. The setup is organized into 6 focused sub-pages with a sidebar navigation:
 
-### Branding Tab
+### Branding Sub-Page
 - [ ] **App Name** - Your SaaS product name (e.g., "ExtrusionCalc Pro")
 - [ ] **Tagline** - Short description (e.g., "Professional extrusion calculations")
 - [ ] **Company Name** - Your business name
@@ -250,18 +269,18 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] **Primary Color** - Main brand color (use color picker)
 - [ ] **Accent Color** - Secondary brand color
 
-### Pricing Tab
+### Pricing Sub-Page
 - [ ] Click "Manage Products in Stripe" button to open Stripe Dashboard
 - [ ] Pricing is managed directly in Stripe (see Step 6 for metadata setup)
 - [ ] Changes in Stripe automatically appear on your pricing page
 
-### Social Tab
+### Social Sub-Page
 - [ ] Add your Twitter/X link
 - [ ] Add your LinkedIn link
 - [ ] Add your GitHub link (optional)
 - [ ] Add your company website
 
-### Features Tab
+### Features Sub-Page
 
 **Authentication Controls:**
 - [ ] Toggle Email Authentication (on/off)
@@ -374,6 +393,10 @@ Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
 - [ ] Feedback widget appears on pages (if enabled)
 - [ ] Waitlist mode works (if enabled)
 - [ ] Sentry captures errors (if configured)
+- [ ] Customer service tools work (click eye icon on user in Admin > Users)
+- [ ] Admin notes can be added and deleted on user profiles
+- [ ] Queue dashboard accessible at `/admin/queue` (if Upstash configured)
+- [ ] SSO admin page accessible at `/admin/sso`
 
 ---
 
@@ -402,6 +425,8 @@ Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
 | `XAI_API_KEY` | xAI/Grok API key (for AI features) |
 | `OPENAI_API_KEY` | OpenAI API key (alternative AI provider) |
 | `ANTHROPIC_API_KEY` | Anthropic API key (alternative AI provider) |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis URL (queue + rate limiting) |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis auth token |
 
 ---
 
@@ -438,6 +463,9 @@ Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
 - **Email Template** editor with preview and test sending
 - **Waitlist** management with CSV export
 - **Feedback** management with status filters
+- **Customer Service Tools** (subscription status, user detail, invoices, admin notes)
+- **Queue Dashboard** (monitor background jobs)
+- **SSO/SAML Management** (enterprise single sign-on)
 
 ### Billing (Stripe)
 - Subscription checkout (Pro $29/mo, Team $99/mo)
@@ -476,7 +504,7 @@ Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
 ### Security
 - Supabase Row Level Security (RLS)
 - Zod input validation
-- Rate limiting (in-memory, upgrade to Redis for production)
+- Rate limiting (Upstash Redis with in-memory fallback)
 - Security headers (HSTS, X-Frame-Options, etc.)
 - HMAC-SHA256 webhook signature verification
 
@@ -486,13 +514,23 @@ Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
 - Structured logging utility
 - 38 Playwright E2E tests across 5 suites
 
+### Feature Completion Status
+
+| Feature | Status |
+|---------|--------|
+| SSO/SAML Enterprise Auth | Complete |
+| Queue Infrastructure (BullMQ + Upstash) | Complete |
+| Rate Limiting (Upstash Redis) | Complete |
+| Customer Service Tools | Complete |
+| Admin Setup UX (6 Sub-Pages) | Complete |
+
 ---
 
 ## Pre-Production Checklist
 
 Before launching with live customer data:
 
-- [ ] Upgrade rate limiting from in-memory to Upstash Redis
+- [ ] Verify Upstash Redis is configured for rate limiting and queue
 - [ ] Configure Sentry with your DSN and project details
 - [ ] Set up uptime monitoring
 - [ ] Configure custom domain

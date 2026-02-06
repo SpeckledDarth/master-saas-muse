@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This document is the single source of truth for the Master SaaS Muse Template development. We are migrating from Vite + Express (Replit) to **Next.js 14 + Vercel** to achieve proper SSR/SEO capabilities essential for organic traffic growth.
+This document is the single source of truth for the Master SaaS Muse Template development. We migrated from Vite + Express (Replit) to **Next.js 16+ + Vercel** to achieve proper SSR/SEO capabilities essential for organic traffic growth.
 
 ### Why the Migration?
 - **SEO**: Next.js provides built-in SSR/ISR for search engine optimization
@@ -27,7 +27,7 @@ This document is the single source of truth for the Master SaaS Muse Template de
 
 | Layer              | Technology                                      |
 |--------------------|-------------------------------------------------|
-| Frontend           | Next.js 14+ (App Router), React 18+, TypeScript |
+| Frontend           | Next.js 16+ (App Router), React 18+, TypeScript |
 | Styling            | Tailwind CSS + shadcn/ui + next-themes          |
 | Backend / DB / Auth| Supabase (PostgreSQL + Auth + RLS + Storage)    |
 | Hosting            | Vercel                                          |
@@ -52,7 +52,7 @@ This document is the single source of truth for the Master SaaS Muse Template de
 | 7      | Security & RLS           | COMPLETE    | MVP      |
 | 8      | Monitoring & Docs        | COMPLETE    | MVP      |
 | 9      | **Team Collaboration**   | **COMPLETE**| **MVP**  |
-| 10     | Analytics & Tracking     | NOT STARTED | v1.1     |
+| 10     | Analytics & Tracking     | PARTIAL     | v1.1     |
 | 11     | Affiliate System         | NOT STARTED | v1.1     |
 | 12     | **n8n Automation**       | **COMPLETE**| **v1.1** |
 | 13     | Notifications            | NOT STARTED | v1.1     |
@@ -80,6 +80,12 @@ This document is the single source of truth for the Master SaaS Muse Template de
 | 35     | **Blog/Changelog**       | **COMPLETE**| **MVP**  |
 | 36     | **Email Templates**      | **COMPLETE**| **MVP**  |
 | 37     | **Waitlist Mode**        | **COMPLETE**| **MVP**  |
+| 38     | **SSO/SAML Enterprise Auth**  | **COMPLETE** | **v1.1** |
+| 39     | **Queue Infrastructure**      | **COMPLETE** | **v1.1** |
+| 40     | **Rate Limiting (Upstash)**   | **COMPLETE** | **v1.1** |
+| 41     | **Admin Setup UX Overhaul**   | **COMPLETE** | **v1.1** |
+| 42     | **Customer Service Tools**    | **COMPLETE** | **v1.1** |
+| 43     | **Admin Documentation**       | **COMPLETE** | **v1.1** |
 
 ---
 
@@ -524,6 +530,141 @@ playwright.config.ts             # Playwright configuration
 
 ---
 
+### Module 38: SSO/SAML Enterprise Authentication
+**Estimated Time**: 1 day  
+**Dependencies**: Module 2  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Supabase SAML SSO provider management (full CRUD via Admin API)
+- [x] Admin SSO dashboard at `/admin/sso`
+- [x] Domain-based SSO detection on login page
+- [x] Public endpoint for SSO domain checking (`/api/auth/sso/check`)
+- [x] SP Metadata URL and ACS URL display for IdP configuration
+- [x] `ssoEnabled` feature toggle in admin settings
+
+**Key Files**:
+```
+src/
+├── lib/sso/provider.ts
+├── app/admin/sso/page.tsx
+└── app/api/
+    ├── admin/sso/route.ts
+    └── auth/sso/check/route.ts
+```
+
+---
+
+### Module 39: Queue Infrastructure (BullMQ + Upstash Redis)
+**Estimated Time**: 1 day  
+**Dependencies**: Module 3  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] BullMQ job queue with Upstash Redis backend
+- [x] 3 job types: email, webhook-retry, report
+- [x] Worker with 5 concurrency, 3 retry attempts
+- [x] Admin queue dashboard at `/admin/queue`
+- [x] Queue metrics: waiting, active, completed, failed, delayed, paused
+- [x] Retry and clear failed jobs from admin UI
+
+**Key Files**:
+```
+src/
+├── lib/queue/index.ts
+├── app/admin/queue/page.tsx
+└── instrumentation.ts (worker startup)
+```
+
+---
+
+### Module 40: Rate Limiting (Upstash Redis)
+**Estimated Time**: 0.5 days  
+**Dependencies**: Module 39  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Sliding window rate limiting with Upstash Redis
+- [x] In-memory fallback when Redis is unavailable
+- [x] Configurable limits per endpoint
+
+**Key Files**:
+```
+src/lib/rate-limit/index.ts
+```
+
+---
+
+### Module 41: Admin Setup UX Overhaul
+**Estimated Time**: 1 day  
+**Dependencies**: Module 25  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Split monolithic setup page into 6 focused sub-pages
+- [x] Shared state management hook (`use-setup-settings.ts`)
+- [x] React context provider for cross-page state sharing
+- [x] Layout with sidebar navigation
+- [x] Sub-pages: branding, content, pages, pricing, social, features
+
+**Key Files**:
+```
+src/
+├── hooks/
+│   ├── use-setup-settings.ts
+│   └── use-setup-settings-context.tsx
+└── app/admin/setup/
+    ├── layout.tsx
+    ├── branding/page.tsx
+    ├── content/page.tsx
+    ├── pages/page.tsx
+    ├── pricing/page.tsx
+    ├── social/page.tsx
+    └── features/page.tsx
+```
+
+---
+
+### Module 42: Customer Service Tools
+**Estimated Time**: 1 day  
+**Dependencies**: Module 3, Module 5  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Subscription status column in admin users table
+- [x] Enhanced user detail dialog with 3 tabs (Overview, Invoices, Notes)
+- [x] Stripe subscription and invoice data in user detail
+- [x] Direct link to Stripe Customer Portal per user
+- [x] Admin notes system for internal customer service tracking
+- [x] Notes CRUD API (`/api/admin/notes`)
+- [x] Detailed user info API (`/api/admin/users/[userId]`)
+
+**Database Tables**:
+- `admin_notes` (id, user_id, note, created_by, created_at)
+
+**Key Files**:
+```
+src/
+├── app/admin/users/page.tsx
+└── app/api/admin/
+    ├── users/[userId]/route.ts
+    └── notes/route.ts
+```
+
+---
+
+### Module 43: Admin Documentation
+**Estimated Time**: 0.5 days  
+**Dependencies**: All modules  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Comprehensive Admin Guide (`docs/ADMIN_GUIDE.md`) - 18 sections, 500+ lines
+- [x] Non-technical language for team members managing the platform
+- [x] Covers all admin features, setup, and best practices
+
+---
+
 ## MVP Feature Checklist (from 33-Feature List)
 
 | # | Feature                          | Module | Status      |
@@ -549,6 +690,12 @@ playwright.config.ts             # Playwright configuration
 | 19| E2E Testing (Playwright)         | 34     | COMPLETE    |
 | 20| OAuth Enhancement (5 providers)  | 2      | COMPLETE    |
 | 21| SEO/Sitemap                      | 6      | COMPLETE    |
+| 22| SSO/SAML Enterprise Auth         | 38     | COMPLETE    |
+| 23| Queue Infrastructure (BullMQ)    | 39     | COMPLETE    |
+| 24| Rate Limiting (Upstash Redis)    | 40     | COMPLETE    |
+| 25| Admin Setup UX Overhaul          | 41     | COMPLETE    |
+| 26| Customer Service Tools           | 42     | COMPLETE    |
+| 27| Admin Documentation              | 43     | COMPLETE    |
 
 ---
 
@@ -601,6 +748,12 @@ When creating a new muse from this template:
 **Sentry Monitoring**: February 5, 2026  
 **AI Integration (xAI Grok)**: February 6, 2026  
 **Webhook/n8n Integration**: February 6, 2026  
+**SSO/SAML Enterprise Auth**: February 6, 2026  
+**Queue Infrastructure**: February 6, 2026  
+**Rate Limiting**: February 6, 2026  
+**Admin Setup UX Overhaul**: February 6, 2026  
+**Customer Service Tools**: February 6, 2026  
+**Admin Documentation**: February 6, 2026  
 
 ### Completed Work (Next.js + Vercel):
 - [x] Module 1: Foundation - Landing page, dark/light mode, header/footer, Vercel deployment
@@ -621,12 +774,18 @@ When creating a new muse from this template:
 - [x] Module 35: Blog/Changelog - Markdown content, public pages, admin CRUD
 - [x] Module 36: Email Templates - Admin-editable templates, preview, test sending
 - [x] Module 37: Waitlist Mode - Pre-launch email collection, CSV export
+- [x] Module 38: SSO/SAML - Enterprise authentication with domain-based detection
+- [x] Module 39: Queue Infrastructure - BullMQ with Upstash Redis, admin dashboard
+- [x] Module 40: Rate Limiting - Upstash Redis sliding window with in-memory fallback
+- [x] Module 41: Admin Setup UX - Split into 6 focused sub-pages with sidebar navigation
+- [x] Module 42: Customer Service Tools - Subscription status, user detail, invoices, admin notes
+- [x] Module 43: Admin Documentation - Comprehensive admin guide
 
 ### Next Steps:
 - [ ] Clone template for first production muse (ExtrusionCalculator.com)
 - [ ] Add RLS policies for organization_members table in Supabase (currently bypassed via admin client)
-- [ ] Upgrade rate limiting from in-memory to Upstash Redis
-- [ ] Background job processing (Upstash/BullMQ) for emails and reports
+- [x] Upgrade rate limiting from in-memory to Upstash Redis
+- [x] Background job processing (Upstash/BullMQ) for emails and reports
 - [ ] v1.1 features as prioritized
 
 ---
@@ -658,6 +817,10 @@ When creating a new muse from this template:
 - `OPENAI_API_KEY` - For OpenAI features (if selected as provider)
 - `ANTHROPIC_API_KEY` - For Anthropic features (if selected as provider)
 
+### Queue & Rate Limiting
+- `UPSTASH_REDIS_REST_URL` - Upstash Redis URL for queue and rate limiting
+- `UPSTASH_REDIS_REST_TOKEN` - Upstash Redis authentication token
+
 ### Application
 - `NEXT_PUBLIC_APP_URL`
 - `SESSION_SECRET`
@@ -676,15 +839,19 @@ When creating a new muse from this template:
 | 2026-02-05 | Integrate Sentry error tracking             | Production monitoring for reliability          |
 | 2026-02-06 | Add pluggable AI integration                | AI features increasingly expected in SaaS      |
 | 2026-02-06 | Add webhook/n8n automation system           | Enable workflow automation with external tools |
+| 2026-02-06 | Add SSO/SAML enterprise auth                | Enterprise customers need SSO for compliance    |
+| 2026-02-06 | Add BullMQ queue with Upstash Redis         | Background jobs needed for emails and reports    |
+| 2026-02-06 | Upgrade rate limiting to Upstash            | In-memory rate limiting doesn't work on serverless|
+| 2026-02-06 | Split admin setup into 6 sub-pages          | Monolithic page too large, slow to load          |
+| 2026-02-06 | Add customer service tools                  | Admin needs visibility into user subscriptions   |
 
 ---
 
 ## Next Steps
 
 1. **Immediate**: Clone template for ExtrusionCalculator.com
-2. **Pre-Production**: Upgrade rate limiting from in-memory to Upstash Redis
-3. **Pre-Production**: Add background job processing (Upstash/BullMQ)
-4. **Post-Launch**: Add v1.1 features based on user feedback
+2. **Testing**: Run Playwright E2E test suites and verify all features
+3. **Post-Launch**: Add v1.1 features based on user feedback
 
 ---
 
