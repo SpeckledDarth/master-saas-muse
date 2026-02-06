@@ -1,0 +1,53 @@
+export type JobType = 'email' | 'webhook-retry' | 'report'
+
+export interface EmailJobData {
+  type: 'email'
+  emailType: 'welcome' | 'subscription-confirmed' | 'subscription-cancelled' | 'team-invite' | 'generic'
+  to: string | string[]
+  subject: string
+  html: string
+  text?: string
+  replyTo?: string
+  metadata?: Record<string, unknown>
+}
+
+export interface WebhookRetryJobData {
+  type: 'webhook-retry'
+  url: string
+  event: string
+  payload: string
+  secret: string
+  attempt: number
+  maxAttempts: number
+}
+
+export interface ReportJobData {
+  type: 'report'
+  reportType: 'usage' | 'analytics' | 'audit'
+  parameters: Record<string, unknown>
+  requestedBy: string
+}
+
+export type QueueJobData = EmailJobData | WebhookRetryJobData | ReportJobData
+
+export interface JobStatus {
+  id: string
+  name: string
+  data: QueueJobData
+  status: 'waiting' | 'active' | 'completed' | 'failed' | 'delayed'
+  progress: number
+  attemptsMade: number
+  failedReason?: string
+  createdAt: number
+  processedAt?: number
+  finishedAt?: number
+}
+
+export interface QueueMetrics {
+  waiting: number
+  active: number
+  completed: number
+  failed: number
+  delayed: number
+  paused: number
+}

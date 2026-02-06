@@ -7,3 +7,8 @@ export {
   type SendEmailOptions,
   type EmailResult,
 } from './service';
+export {
+  queueEmail,
+  queueWelcomeEmail,
+  queueSubscriptionEmail,
+} from './queue-helpers';

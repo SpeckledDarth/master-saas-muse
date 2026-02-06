@@ -3830,6 +3830,22 @@ export default function SetupPage() {
           </Card>
 
           <Card className="mt-6">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Enterprise SSO / SAML</p>
+                  <p className="text-sm text-muted-foreground">Enable SAML 2.0 single sign-on for enterprise customers</p>
+                </div>
+                <Switch
+                  checked={settings.features.ssoEnabled}
+                  onCheckedChange={checked => updateFeatures('ssoEnabled', checked)}
+                  data-testid="switch-sso-enabled"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mt-6">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />

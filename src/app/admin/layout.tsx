@@ -201,6 +201,28 @@ export default function AdminLayout({
                   </Link>
                 </Button>
               )}
+              {isAppAdmin && (
+                <Button 
+                  variant={pathname === '/admin/queue' ? 'secondary' : 'ghost'} 
+                  size="sm" 
+                  asChild
+                >
+                  <Link href="/admin/queue" data-testid="link-admin-queue">
+                    Queue
+                  </Link>
+                </Button>
+              )}
+              {isAppAdmin && (
+                <Button 
+                  variant={pathname === '/admin/sso' ? 'secondary' : 'ghost'} 
+                  size="sm" 
+                  asChild
+                >
+                  <Link href="/admin/sso" data-testid="link-admin-sso">
+                    SSO
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>

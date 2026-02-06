@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUncachableStripeClient } from '@/lib/stripe/client';
 import { stripeService } from '@/lib/stripe/service';
-import { sendSubscriptionConfirmationEmail, sendSubscriptionCancelledEmail } from '@/lib/email';
+import { queueSubscriptionEmail, sendSubscriptionCancelledEmail } from '@/lib/email';
 import { dispatchWebhook } from '@/lib/webhooks/dispatcher';
 import Stripe from 'stripe';
 
@@ -68,13 +68,13 @@ export async function POST(request: NextRequest) {
                 amount = subscription.items.data[0].price.unit_amount;
               }
 
-              await sendSubscriptionConfirmationEmail(
+              await queueSubscriptionEmail(
                 customerData.email,
                 customerData.name,
                 planName,
                 amount
               );
-              console.log('Subscription confirmation email sent to:', customerData.email);
+              console.log('Subscription confirmation email queued for:', customerData.email);
             }
           }
 

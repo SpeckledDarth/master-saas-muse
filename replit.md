@@ -100,13 +100,35 @@ The project is built with Next.js 16+ (App Router), React 18+, and TypeScript. S
 | `contact.submitted` | `/api/contact/route.ts` | `contactSubmitted` |
 | `test.ping` | Admin webhook test | `null` (always fires) |
 
+### Session 3 Progress (Feb 6, 2026)
+
+4. **SSO/SAML Enterprise Authentication** - Implemented:
+   - `src/lib/sso/provider.ts` - Full CRUD for Supabase SAML SSO providers via Admin API
+   - `src/app/api/admin/sso/route.ts` - Admin API for listing, creating, deleting SSO providers
+   - `src/app/api/auth/sso/check/route.ts` - Public endpoint for domain-based SSO detection
+   - `src/app/admin/sso/page.tsx` - Admin dashboard for managing identity providers
+   - Login page SSO detection: auto-detects SSO domains on email input, shows SSO login button
+   - `ssoEnabled` feature toggle added to FeatureToggles and Setup Dashboard
+   - SSO admin nav link added to admin layout
+   - SAML config display: SP Metadata URL and ACS URL for IdP configuration
+
+5. **Queue Infrastructure** - BullMQ with Upstash Redis:
+   - `src/lib/queue/index.ts` - Job queue with 3 types (email, webhook-retry, report)
+   - Worker runs in `instrumentation.ts` with 5 concurrency, 3 retry attempts
+   - `src/app/admin/queue/page.tsx` - Admin queue dashboard with metrics
+
+6. **Rate Limiting** - Upstash Redis sliding window:
+   - `src/lib/rate-limit/index.ts` - Falls back to in-memory if Redis unavailable
+
 ### Next Session Priority
 - Run Playwright E2E test suites (38 tests across 5 suites)
 - Test AI chat through the UI (requires authenticated user)
 - Test webhook admin UI (URL/secret/event toggle configuration)
 - Verify Stripe webhook integration with test events
+- Test SSO provider creation (requires Supabase Pro for SAML)
 
 ### Available Secrets
 - `XAI_API_KEY` - Set and working for Grok
 - `STRIPE_SECRET_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY` (via integration) - Production secrets
 - `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT` - Monitoring
+- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` - Redis for queue/rate limiting

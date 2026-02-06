@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, Mail } from 'lucide-react'
+import { Loader2, Mail, Shield } from 'lucide-react'
 import { SiGoogle, SiGithub, SiApple, SiX } from 'react-icons/si'
 
 function LoginForm() {
@@ -22,6 +22,9 @@ function LoginForm() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [magicLinkLoading, setMagicLinkLoading] = useState(false)
+  const [ssoLoading, setSsoLoading] = useState(false)
+  const [ssoAvailable, setSsoAvailable] = useState(false)
+  const [ssoDomain, setSsoDomain] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [redirectTo, setRedirectTo] = useState(urlRedirectTo)
@@ -77,6 +80,62 @@ function LoginForm() {
         redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(finalRedirect)}`,
       },
     })
+  }
+
+  useEffect(() => {
+    if (!features.ssoEnabled) return
+    const domain = email.includes('@') ? email.split('@')[1] : null
+    if (!domain || domain.length < 3) {
+      setSsoAvailable(false)
+      setSsoDomain(null)
+      return
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/auth/sso/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ domain }),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setSsoAvailable(data.hasSSO)
+          setSsoDomain(data.hasSSO ? domain : null)
+        }
+      } catch {
+        setSsoAvailable(false)
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [email, features.ssoEnabled])
+
+  async function handleSSOLogin() {
+    if (!ssoDomain) return
+    setSsoLoading(true)
+    setError(null)
+
+    const supabase = createClient()
+    const pendingToken = localStorage.getItem('pendingInviteToken')
+    const finalRedirect = pendingToken ? `/invite/${pendingToken}` : redirectTo
+
+    const { data, error } = await supabase.auth.signInWithSSO({
+      domain: ssoDomain,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(finalRedirect)}`,
+      },
+    })
+
+    if (error) {
+      setError(error.message)
+      setSsoLoading(false)
+      return
+    }
+
+    if (data?.url) {
+      window.location.href = data.url
+    }
   }
 
   async function handleMagicLink() {
@@ -265,6 +324,36 @@ function LoginForm() {
               )}
               Send magic link instead
             </Button>
+          )}
+
+          {ssoAvailable && ssoDomain && (
+            <>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    SSO detected for {ssoDomain}
+                  </span>
+                </div>
+              </div>
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full" 
+                onClick={handleSSOLogin}
+                disabled={ssoLoading}
+                data-testid="button-sso-login"
+              >
+                {ssoLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Shield className="mr-2 h-4 w-4" />
+                )}
+                Sign in with SSO
+              </Button>
+            </>
           )}
         </form>
 

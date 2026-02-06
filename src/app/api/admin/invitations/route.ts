@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getTeamPermissions, type TeamRole } from '@/lib/team-permissions'
-import { sendEmail } from '@/lib/email'
+import { queueEmail } from '@/lib/email'
 
 async function checkUserPermissions(userId: string, adminClient: any) {
   const { data: userRole } = await adminClient
@@ -126,7 +126,8 @@ export async function POST(request: NextRequest) {
 
       // Send email
       try {
-        await sendEmail({
+        await queueEmail({
+          emailType: 'team-invite',
           to: invitation.email,
           subject: `Reminder: You've been invited to join ${appName}`,
           html: `

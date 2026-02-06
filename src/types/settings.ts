@@ -73,6 +73,7 @@ export interface FeatureToggles {
   waitlistMode: boolean
   feedbackWidget: boolean
   aiEnabled: boolean
+  ssoEnabled: boolean
 }
 
 export type AIProvider = 'xai' | 'openai' | 'anthropic'
@@ -449,6 +450,7 @@ export const defaultSettings: SiteSettings = {
     waitlistMode: false,
     feedbackWidget: true,
     aiEnabled: false,
+    ssoEnabled: false,
   },
   ai: {
     provider: 'xai',
