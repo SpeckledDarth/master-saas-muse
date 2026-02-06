@@ -1,4 +1,4 @@
-export type JobType = 'email' | 'webhook-retry' | 'report'
+export type JobType = 'email' | 'webhook-retry' | 'report' | 'metrics-report' | 'metrics-alert' | 'token-rotation'
 
 export interface EmailJobData {
   type: 'email'
@@ -28,7 +28,29 @@ export interface ReportJobData {
   requestedBy: string
 }
 
-export type QueueJobData = EmailJobData | WebhookRetryJobData | ReportJobData
+export interface MetricsReportJobData {
+  type: 'metrics-report'
+  reportType: 'weekly' | 'monthly'
+  recipientEmail: string
+  requestedBy: string
+}
+
+export interface MetricsAlertJobData {
+  type: 'metrics-alert'
+  alertType: 'churn-threshold' | 'revenue-drop' | 'user-growth-stall'
+  threshold: number
+  currentValue: number
+  recipientEmail: string
+}
+
+export interface TokenRotationJobData {
+  type: 'token-rotation'
+  rotationType: 'webhook-secret' | 'api-key'
+  resourceId: string
+  requestedBy: string
+}
+
+export type QueueJobData = EmailJobData | WebhookRetryJobData | ReportJobData | MetricsReportJobData | MetricsAlertJobData | TokenRotationJobData
 
 export interface JobStatus {
   id: string

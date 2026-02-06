@@ -1,6 +1,6 @@
 import { Queue, Worker, Job, QueueEvents } from 'bullmq'
 import { getIORedisConnection, createNewIORedisConnection } from '@/lib/redis/connection'
-import type { QueueJobData, EmailJobData, WebhookRetryJobData, ReportJobData, QueueMetrics, JobStatus } from './types'
+import type { QueueJobData, EmailJobData, WebhookRetryJobData, ReportJobData, MetricsReportJobData, MetricsAlertJobData, TokenRotationJobData, QueueMetrics, JobStatus } from './types'
 
 const QUEUE_NAME = 'musekit-jobs'
 
@@ -104,6 +104,135 @@ async function processReportJob(job: Job<ReportJobData>): Promise<void> {
   console.log(`[Queue] Report ${job.data.reportType} completed`)
 }
 
+async function processMetricsReportJob(job: Job<MetricsReportJobData>): Promise<void> {
+  console.log(`[Queue] Processing ${job.data.reportType} metrics report for ${job.data.recipientEmail}`)
+  
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+    
+    const { getEmailClient } = await import('@/lib/email/client')
+    const { client, fromEmail } = await getEmailClient()
+    
+    const periodLabel = job.data.reportType === 'weekly' ? 'Weekly' : 'Monthly'
+    
+    const html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #6366f1;">${periodLabel} Metrics Report</h2>
+        <p>Your scheduled ${periodLabel.toLowerCase()} metrics report is ready.</p>
+        <p style="margin-top: 16px;">
+          <a href="${baseUrl}/admin/metrics" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+            View Full Dashboard
+          </a>
+        </p>
+        <p style="color: #666; font-size: 12px; margin-top: 24px;">
+          This is an automated report. Visit your admin dashboard for detailed metrics.
+        </p>
+      </div>
+    `
+    
+    await client.emails.send({
+      from: fromEmail,
+      to: [job.data.recipientEmail],
+      subject: `${periodLabel} Metrics Report`,
+      html,
+    })
+    
+    console.log(`[Queue] Metrics report sent to ${job.data.recipientEmail}`)
+  } catch (err) {
+    console.error(`[Queue] Metrics report job failed:`, (err as Error).message)
+    throw err
+  }
+}
+
+async function processMetricsAlertJob(job: Job<MetricsAlertJobData>): Promise<void> {
+  console.log(`[Queue] Processing metrics alert: ${job.data.alertType}`)
+  
+  try {
+    const { getEmailClient } = await import('@/lib/email/client')
+    const { client, fromEmail } = await getEmailClient()
+    
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+    
+    const alertLabels: Record<string, string> = {
+      'churn-threshold': 'Churn Rate Alert',
+      'revenue-drop': 'Revenue Drop Alert',
+      'user-growth-stall': 'User Growth Stall Alert',
+    }
+    
+    const alertDescriptions: Record<string, string> = {
+      'churn-threshold': `Your churn rate has reached ${job.data.currentValue.toFixed(1)}%, exceeding your threshold of ${job.data.threshold}%.`,
+      'revenue-drop': `Your MRR has dropped to $${(job.data.currentValue / 100).toFixed(2)}, which is below your alert threshold.`,
+      'user-growth-stall': `User growth has stalled at ${job.data.currentValue} new users this month, below your threshold of ${job.data.threshold}.`,
+    }
+    
+    const html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #ef4444;">${alertLabels[job.data.alertType] || 'Metrics Alert'}</h2>
+        <p>${alertDescriptions[job.data.alertType] || 'A metric has exceeded its configured threshold.'}</p>
+        <p style="margin-top: 16px;">
+          <a href="${baseUrl}/admin/metrics" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+            View Dashboard
+          </a>
+        </p>
+        <p style="color: #666; font-size: 12px; margin-top: 24px;">
+          You can configure alert thresholds in Admin &gt; Setup &gt; Security.
+        </p>
+      </div>
+    `
+    
+    await client.emails.send({
+      from: fromEmail,
+      to: [job.data.recipientEmail],
+      subject: `Alert: ${alertLabels[job.data.alertType] || 'Metrics Threshold Exceeded'}`,
+      html,
+    })
+    
+    console.log(`[Queue] Alert email sent for ${job.data.alertType}`)
+  } catch (err) {
+    console.error(`[Queue] Metrics alert job failed:`, (err as Error).message)
+    throw err
+  }
+}
+
+async function processTokenRotationJob(job: Job<TokenRotationJobData>): Promise<void> {
+  console.log(`[Queue] Processing token rotation: ${job.data.rotationType} for resource ${job.data.resourceId}`)
+  
+  try {
+    const crypto = await import('crypto')
+    const newSecret = crypto.randomBytes(32).toString('hex')
+    
+    if (job.data.rotationType === 'webhook-secret') {
+      const { createAdminClient } = await import('@/lib/supabase/admin')
+      const adminClient = createAdminClient()
+      
+      const { data: orgSettings } = await adminClient
+        .from('organization_settings')
+        .select('settings')
+        .eq('organization_id', 1)
+        .maybeSingle()
+      
+      if (orgSettings?.settings) {
+        const settings = orgSettings.settings as any
+        if (settings.webhooks) {
+          settings.webhooks.secret = newSecret
+          await adminClient
+            .from('organization_settings')
+            .update({ settings })
+            .eq('organization_id', 1)
+        }
+      }
+      
+      console.log(`[Queue] Webhook secret rotated successfully`)
+    }
+    
+    await job.updateProgress(100)
+    console.log(`[Queue] Token rotation completed: ${job.data.rotationType}`)
+  } catch (err) {
+    console.error(`[Queue] Token rotation job failed:`, (err as Error).message)
+    throw err
+  }
+}
+
 async function processJob(job: Job<QueueJobData>): Promise<void> {
   console.log(`[Queue] Processing job ${job.id}: ${job.data.type}`)
 
@@ -114,6 +243,12 @@ async function processJob(job: Job<QueueJobData>): Promise<void> {
       return processWebhookRetryJob(job as Job<WebhookRetryJobData>)
     case 'report':
       return processReportJob(job as Job<ReportJobData>)
+    case 'metrics-report':
+      return processMetricsReportJob(job as Job<MetricsReportJobData>)
+    case 'metrics-alert':
+      return processMetricsAlertJob(job as Job<MetricsAlertJobData>)
+    case 'token-rotation':
+      return processTokenRotationJob(job as Job<TokenRotationJobData>)
     default:
       throw new Error(`Unknown job type: ${(job.data as QueueJobData).type}`)
   }
@@ -181,6 +316,39 @@ export async function addReportJob(data: Omit<ReportJobData, 'type'>): Promise<s
 
   const job = await q.add('report', { type: 'report' as const, ...data }, {
     priority: 5,
+  })
+
+  return job.id || null
+}
+
+export async function addMetricsReportJob(data: Omit<MetricsReportJobData, 'type'>): Promise<string | null> {
+  const q = getQueue()
+  if (!q) return null
+
+  const job = await q.add('metrics-report', { type: 'metrics-report' as const, ...data }, {
+    priority: 4,
+  })
+
+  return job.id || null
+}
+
+export async function addMetricsAlertJob(data: Omit<MetricsAlertJobData, 'type'>): Promise<string | null> {
+  const q = getQueue()
+  if (!q) return null
+
+  const job = await q.add('metrics-alert', { type: 'metrics-alert' as const, ...data }, {
+    priority: 1,
+  })
+
+  return job.id || null
+}
+
+export async function addTokenRotationJob(data: Omit<TokenRotationJobData, 'type'>): Promise<string | null> {
+  const q = getQueue()
+  if (!q) return null
+
+  const job = await q.add('token-rotation', { type: 'token-rotation' as const, ...data }, {
+    priority: 3,
   })
 
   return job.id || null

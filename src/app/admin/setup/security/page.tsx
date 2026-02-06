@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Shield } from 'lucide-react'
+import { Shield, Database, RefreshCw, Bell } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export default function SecurityPage() {
   const { settings, saving, saved, handleSave, updateSecurity } = useSetupSettingsContext()
@@ -182,6 +183,204 @@ export default function SecurityPage() {
               data-testid="switch-account-deletion-enabled"
             />
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Database className="h-5 w-5" />
+            Database Backups
+          </CardTitle>
+          <CardDescription>
+            Configure automated database backup schedule (managed by Supabase)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between py-3 border-b">
+            <div>
+              <p className="font-medium">Enable Backup Notifications</p>
+              <p className="text-sm text-muted-foreground">Get notified about backup status via email</p>
+            </div>
+            <Switch
+              checked={settings.security?.backupEnabled ?? false}
+              onCheckedChange={checked => updateSecurity('backupEnabled', checked)}
+              data-testid="switch-backup-enabled"
+            />
+          </div>
+
+          {settings.security?.backupEnabled && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="backup-frequency">Backup Frequency</Label>
+                <Select
+                  value={settings.security?.backupFrequency ?? 'daily'}
+                  onValueChange={(value) => updateSecurity('backupFrequency', value as 'daily' | 'weekly' | 'monthly')}
+                >
+                  <SelectTrigger id="backup-frequency" data-testid="select-backup-frequency">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="backup-retention">Retention Period (days)</Label>
+                <Input
+                  id="backup-retention"
+                  type="number"
+                  min="7"
+                  max="365"
+                  value={settings.security?.backupRetentionDays ?? 30}
+                  onChange={(e) => updateSecurity('backupRetentionDays', parseInt(e.target.value, 10))}
+                  data-testid="input-backup-retention"
+                />
+                <p className="text-xs text-muted-foreground">
+                  How long to retain backups (7-365 days). Supabase Pro plans include daily backups with 7-day retention by default.
+                </p>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RefreshCw className="h-5 w-5" />
+            API Token Rotation
+          </CardTitle>
+          <CardDescription>
+            Configure automatic rotation of API tokens and secrets
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between py-3 border-b">
+            <div>
+              <p className="font-medium">Enable Token Rotation</p>
+              <p className="text-sm text-muted-foreground">Automatically rotate API tokens on a schedule</p>
+            </div>
+            <Switch
+              checked={settings.security?.tokenRotationEnabled ?? false}
+              onCheckedChange={checked => updateSecurity('tokenRotationEnabled', checked)}
+              data-testid="switch-token-rotation-enabled"
+            />
+          </div>
+
+          {settings.security?.tokenRotationEnabled && (
+            <div className="space-y-2">
+              <Label htmlFor="token-rotation-interval">Rotation Interval (days)</Label>
+              <Input
+                id="token-rotation-interval"
+                type="number"
+                min="1"
+                max="365"
+                value={settings.security?.tokenRotationIntervalDays ?? 90}
+                onChange={(e) => updateSecurity('tokenRotationIntervalDays', parseInt(e.target.value, 10))}
+                data-testid="input-token-rotation-interval"
+              />
+              <p className="text-xs text-muted-foreground">
+                How often to rotate webhook secrets and API tokens (default: 90 days)
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Metrics Alerts
+          </CardTitle>
+          <CardDescription>
+            Get notified when key metrics cross thresholds
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between py-3 border-b">
+            <div>
+              <p className="font-medium">Enable Metric Alerts</p>
+              <p className="text-sm text-muted-foreground">Send email alerts when KPIs exceed thresholds</p>
+            </div>
+            <Switch
+              checked={settings.security?.alertsEnabled ?? false}
+              onCheckedChange={checked => updateSecurity('alertsEnabled', checked)}
+              data-testid="switch-alerts-enabled"
+            />
+          </div>
+
+          {settings.security?.alertsEnabled && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="alert-email">Alert Recipient Email</Label>
+                <Input
+                  id="alert-email"
+                  type="email"
+                  placeholder="admin@example.com"
+                  value={settings.security?.alertRecipientEmail ?? ''}
+                  onChange={(e) => updateSecurity('alertRecipientEmail', e.target.value)}
+                  data-testid="input-alert-email"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="churn-threshold">Churn Rate Threshold (%)</Label>
+                <Input
+                  id="churn-threshold"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={settings.security?.alertChurnThreshold ?? 5}
+                  onChange={(e) => updateSecurity('alertChurnThreshold', parseFloat(e.target.value))}
+                  data-testid="input-churn-threshold"
+                />
+                <p className="text-xs text-muted-foreground">Alert when monthly churn exceeds this percentage</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="min-monthly-users">Minimum Monthly New Users</Label>
+                <Input
+                  id="min-monthly-users"
+                  type="number"
+                  min="0"
+                  value={settings.security?.alertMinMonthlyUsers ?? 10}
+                  onChange={(e) => updateSecurity('alertMinMonthlyUsers', parseInt(e.target.value, 10))}
+                  data-testid="input-min-monthly-users"
+                />
+                <p className="text-xs text-muted-foreground">Alert when new signups fall below this number</p>
+              </div>
+
+              <div className="flex items-center justify-between py-3 border-t border-b">
+                <div>
+                  <p className="font-medium">Weekly Report</p>
+                  <p className="text-sm text-muted-foreground">Email a weekly metrics summary</p>
+                </div>
+                <Switch
+                  checked={settings.security?.weeklyReportEnabled ?? false}
+                  onCheckedChange={checked => updateSecurity('weeklyReportEnabled', checked)}
+                  data-testid="switch-weekly-report"
+                />
+              </div>
+
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="font-medium">Monthly Report</p>
+                  <p className="text-sm text-muted-foreground">Email a monthly metrics summary</p>
+                </div>
+                <Switch
+                  checked={settings.security?.monthlyReportEnabled ?? false}
+                  onCheckedChange={checked => updateSecurity('monthlyReportEnabled', checked)}
+                  data-testid="switch-monthly-report"
+                />
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 

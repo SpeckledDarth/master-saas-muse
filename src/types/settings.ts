@@ -332,6 +332,28 @@ export interface SecuritySettings {
   dataExportEnabled: boolean
   accountDeletionEnabled: boolean
   captchaEnabled: boolean
+  backupEnabled: boolean
+  backupFrequency: 'daily' | 'weekly' | 'monthly'
+  backupRetentionDays: number
+  tokenRotationEnabled: boolean
+  tokenRotationIntervalDays: number
+  alertsEnabled: boolean
+  alertRecipientEmail: string
+  alertChurnThreshold: number
+  alertMinMonthlyUsers: number
+  weeklyReportEnabled: boolean
+  monthlyReportEnabled: boolean
+}
+
+export interface MetricsSettings {
+  alerts: {
+    enabled: boolean
+    recipientEmail: string
+    churnThreshold: number
+    minMonthlyUsers: number
+    weeklyReportEnabled: boolean
+    monthlyReportEnabled: boolean
+  }
 }
 
 export interface PricingPageSettings {
@@ -412,6 +434,7 @@ export interface SiteSettings {
   compliance?: ComplianceSettings
   support?: SupportSettings
   security?: SecuritySettings
+  metrics?: MetricsSettings
 }
 
 export const defaultLightTheme: ThemeColors = {
@@ -1086,5 +1109,16 @@ We regularly review and update our security practices. This page reflects our cu
     dataExportEnabled: true,
     accountDeletionEnabled: true,
     captchaEnabled: false,
+    backupEnabled: false,
+    backupFrequency: 'daily',
+    backupRetentionDays: 30,
+    tokenRotationEnabled: false,
+    tokenRotationIntervalDays: 90,
+    alertsEnabled: false,
+    alertRecipientEmail: '',
+    alertChurnThreshold: 5,
+    alertMinMonthlyUsers: 10,
+    weeklyReportEnabled: false,
+    monthlyReportEnabled: false,
   },
 }

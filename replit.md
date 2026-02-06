@@ -44,6 +44,12 @@ The UI features dynamic branding, configurable navigation, customizable hero sec
 - **In-App Notifications**: Bell icon with unread badge, popover notification list, type-specific icons, auto-polling, mark all read, server-side notification creation utility.
 - **User Impersonation**: Admin can impersonate users for debugging. Cookie-based session with 30-min expiry, yellow warning banner, audit logging, and "Stop Impersonation" button.
 - **Audit Log Viewer**: Admin page with paginated, filterable audit log table showing user actions, timestamps, and details.
+- **Extended Metrics Dashboard**: 10 KPIs including ARPU, LTV, Churn Rate, Conversion Rate, NPS Score alongside existing metrics (Total Users, New Users, Active Subscriptions, MRR). Features "Email Report" and "Check Alerts" action buttons.
+- **NPS Score Tracking**: Feedback submissions accept optional NPS score (0-10), aggregated into Net Promoter Score on metrics dashboard with color-coded display.
+- **Scheduled Metrics Reports**: BullMQ job type for emailing weekly/monthly KPI summaries via Resend with admin-triggered and configurable automatic delivery.
+- **Metrics Alerts**: Configurable thresholds for churn rate and user growth with email notifications when exceeded. Alert settings managed in Admin > Setup > Security.
+- **Database Backup Configuration**: Admin UI for configuring backup notification preferences, frequency, and retention periods (managed by Supabase).
+- **API Token Rotation**: BullMQ job type for automated webhook secret rotation with configurable interval, managed via Admin > Setup > Security.
 
 **System Design Choices:**
 The architecture uses a unified frontend and backend with Next.js API routes, modular component-based development, RLS and application-level logic for access control, and clear separation of concerns for third-party services. It employs a fire-and-forget webhook delivery pattern and pluggable abstraction layers for AI providers.

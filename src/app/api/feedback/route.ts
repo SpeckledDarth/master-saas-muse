@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
     const body = await request.json()
-    const { message, email, pageUrl } = body
+    const { message, email, pageUrl, npsScore } = body
 
     if (!message || message.trim().length < 10) {
       return NextResponse.json({ error: 'Please provide more details' }, { status: 400 })
@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
         email: email || user?.email,
         user_id: user?.id,
         page_url: pageUrl,
+        nps_score: typeof npsScore === 'number' && npsScore >= 0 && npsScore <= 10 ? npsScore : null,
       })
 
     if (error) {

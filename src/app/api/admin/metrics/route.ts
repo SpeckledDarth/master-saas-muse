@@ -145,6 +145,79 @@ export async function GET() {
       waitlistCount = 0
     }
 
+    let cancelledThisMonth = 0
+    const churnTrend: { date: string; count: number }[] = []
+
+    try {
+      const { data: cancelledSubs } = await adminClient
+        .from('subscriptions')
+        .select('id, status, current_period_end, canceled_at')
+        .eq('status', 'canceled')
+        .gte('current_period_end', monthAgo)
+
+      if (cancelledSubs) {
+        cancelledThisMonth = cancelledSubs.length
+
+        const churnMap = new Map<string, number>()
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
+          const key = d.toISOString().split('T')[0]
+          churnMap.set(key, 0)
+        }
+        for (const s of cancelledSubs) {
+          const dateKey = (s.canceled_at || s.current_period_end || '').split('T')[0]
+          if (churnMap.has(dateKey)) {
+            churnMap.set(dateKey, (churnMap.get(dateKey) || 0) + 1)
+          }
+        }
+        for (const [date, count] of churnMap) {
+          churnTrend.push({ date, count })
+        }
+      }
+    } catch {
+      cancelledThisMonth = 0
+    }
+
+    if (churnTrend.length === 0) {
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
+        const key = d.toISOString().split('T')[0]
+        churnTrend.push({ date: key, count: 0 })
+      }
+    }
+
+    const arpu = totalUsers > 0 ? Math.round(mrr / totalUsers) : 0
+    const churnRate = (activeSubscriptions + cancelledThisMonth) > 0
+      ? (cancelledThisMonth / (activeSubscriptions + cancelledThisMonth)) * 100
+      : 0
+    const ltv = churnRate > 0 ? Math.round(arpu / (churnRate / 100)) : arpu * 24
+    const conversionRate = totalUsers > 0 ? (activeSubscriptions / totalUsers) * 100 : 0
+
+    let npsScore = 0
+    let npsResponses = 0
+
+    try {
+      const { data: npsData } = await adminClient
+        .from('feedback')
+        .select('nps_score')
+        .not('nps_score', 'is', null)
+
+      if (npsData && npsData.length > 0) {
+        npsResponses = npsData.length
+        let promoters = 0
+        let detractors = 0
+        for (const row of npsData) {
+          const score = row.nps_score as number
+          if (score >= 9) promoters++
+          else if (score <= 6) detractors++
+        }
+        npsScore = Math.round(((promoters - detractors) / npsResponses) * 100)
+      }
+    } catch {
+      npsScore = 0
+      npsResponses = 0
+    }
+
     return NextResponse.json({
       totalUsers,
       newUsersToday,
@@ -156,6 +229,14 @@ export async function GET() {
       waitlistCount,
       userGrowth,
       revenueGrowth,
+      arpu,
+      ltv,
+      churnRate,
+      conversionRate,
+      npsScore,
+      npsResponses,
+      cancelledThisMonth,
+      churnTrend,
     })
   } catch (error) {
     console.error('Admin metrics error:', error)
