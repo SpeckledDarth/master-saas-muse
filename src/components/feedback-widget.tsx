@@ -13,6 +13,7 @@ export function FeedbackWidget() {
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const [email, setEmail] = useState('')
+  const [npsScore, setNpsScore] = useState<number | null>(null)
   const [sending, setSending] = useState(false)
   const [user, setUser] = useState<any>(null)
   const { toast } = useToast()
@@ -66,6 +67,7 @@ export function FeedbackWidget() {
           message,
           email: email || user?.email,
           pageUrl: window.location.pathname,
+          npsScore,
         }),
       })
 
@@ -75,6 +77,7 @@ export function FeedbackWidget() {
         toast({ title: 'Thank you!', description: 'Your feedback has been submitted.' })
         setMessage('')
         setEmail('')
+        setNpsScore(null)
         setOpen(false)
       } else {
         toast({ title: 'Error', description: data.error, variant: 'destructive' })
@@ -137,6 +140,31 @@ export function FeedbackWidget() {
                 rows={4}
                 data-testid="input-feedback-message"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label>How likely are you to recommend us? <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 11 }, (_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setNpsScore(npsScore === i ? null : i)}
+                    className={`flex-1 text-xs py-1 rounded-md border transition-colors ${
+                      npsScore === i
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-muted/50 text-muted-foreground border-transparent hover-elevate'
+                    }`}
+                    data-testid={`button-nps-${i}`}
+                  >
+                    {i}
+                  </button>
+                ))}
+              </div>
+              <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span>Not likely</span>
+                <span>Very likely</span>
+              </div>
             </div>
 
             <Button
