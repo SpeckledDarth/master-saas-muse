@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
@@ -16,6 +16,8 @@ export function FeedbackWidget() {
   const [sending, setSending] = useState(false)
   const [user, setUser] = useState<any>(null)
   const { toast } = useToast()
+  const panelRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   async function checkUser() {
     const supabase = createClient()
@@ -27,6 +29,21 @@ export function FeedbackWidget() {
     checkUser()
     setOpen(true)
   }
+
+  useEffect(() => {
+    if (!open) return
+    function handleClickOutside(e: MouseEvent) {
+      const target = e.target as Node
+      if (
+        panelRef.current && !panelRef.current.contains(target) &&
+        buttonRef.current && !buttonRef.current.contains(target)
+      ) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [open])
 
   async function handleSubmit() {
     if (!message.trim()) {
@@ -72,16 +89,17 @@ export function FeedbackWidget() {
   return (
     <>
       <Button
-        onClick={handleOpen}
+        ref={buttonRef}
+        onClick={open ? () => setOpen(false) : handleOpen}
         className="fixed bottom-4 right-4 rounded-full w-14 h-14 shadow-lg z-50"
         size="icon"
         data-testid="button-feedback"
       >
-        <MessageSquare className="h-6 w-6" />
+        {open ? <X className="h-6 w-6" /> : <MessageSquare className="h-6 w-6" />}
       </Button>
 
       {open && (
-        <div className="fixed bottom-20 right-4 w-80 bg-card border rounded-lg shadow-xl z-50 p-4">
+        <div ref={panelRef} className="fixed bottom-20 right-4 w-80 bg-card border rounded-lg shadow-xl z-50 p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">Send Feedback</h3>
             <Button

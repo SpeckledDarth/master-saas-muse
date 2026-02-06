@@ -72,6 +72,11 @@ export function useSettings() {
               faq: { ...defaultSettings.pages.faq, ...dbPages.faq },
               customPages: dbPages.customPages || defaultSettings.pages.customPages,
             },
+            ai: data.settings.ai ? { ...defaultSettings.ai, ...data.settings.ai } : defaultSettings.ai,
+            webhooks: data.settings.webhooks || undefined,
+            compliance: data.settings.compliance || undefined,
+            support: data.settings.support || undefined,
+            security: data.settings.security || undefined,
           })
         } else {
           setSettings(defaultSettings)

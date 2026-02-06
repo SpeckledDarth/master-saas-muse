@@ -4,6 +4,10 @@ import { useSettings } from '@/hooks/use-settings'
 import { Loader2 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 
+function stripFirstHeading(content: string): string {
+  return content.replace(/^#\s+[^\n]+\n*/, '')
+}
+
 export default function PrivacyPage() {
   const { settings, loading } = useSettings()
 
@@ -35,10 +39,10 @@ export default function PrivacyPage() {
           data-testid="content-privacy"
         >
           <ReactMarkdown>
-            {legal?.privacyPolicy
+            {stripFirstHeading(legal?.privacyPolicy
               ?.replace(/\{appName\}/g, branding?.appName || 'Our Service')
               ?.replace(/\{supportEmail\}/g, branding?.supportEmail || 'support@example.com') || 
-             'Privacy Policy content has not been configured yet.'}
+             'Privacy Policy content has not been configured yet.')}
           </ReactMarkdown>
         </div>
       </div>

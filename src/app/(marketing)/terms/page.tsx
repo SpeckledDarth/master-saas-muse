@@ -4,6 +4,10 @@ import { useSettings } from '@/hooks/use-settings'
 import { Loader2 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 
+function stripFirstHeading(content: string): string {
+  return content.replace(/^#\s+[^\n]+\n*/, '')
+}
+
 export default function TermsPage() {
   const { settings, loading } = useSettings()
 
@@ -35,10 +39,10 @@ export default function TermsPage() {
           data-testid="content-terms"
         >
           <ReactMarkdown>
-            {legal?.termsOfService
+            {stripFirstHeading(legal?.termsOfService
               ?.replace(/\{appName\}/g, branding?.appName || 'Our Service')
               ?.replace(/\{supportEmail\}/g, branding?.supportEmail || 'support@example.com') || 
-             'Terms of Service content has not been configured yet.'}
+             'Terms of Service content has not been configured yet.')}
           </ReactMarkdown>
         </div>
       </div>

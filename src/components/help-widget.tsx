@@ -23,6 +23,8 @@ export function HelpWidget({
   const [inputValue, setInputValue] = useState('')
   const [loading, setLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (isOpen && messages.length === 0 && welcomeMessage) {
@@ -33,6 +35,21 @@ export function HelpWidget({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
+
+  useEffect(() => {
+    if (!isOpen) return
+    function handleClickOutside(e: MouseEvent) {
+      const target = e.target as Node
+      if (
+        panelRef.current && !panelRef.current.contains(target) &&
+        buttonRef.current && !buttonRef.current.contains(target)
+      ) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isOpen])
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault()
@@ -64,6 +81,7 @@ export function HelpWidget({
   return (
     <>
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className="fixed z-50 rounded-full p-3 shadow-lg text-white"
         style={{
@@ -79,6 +97,7 @@ export function HelpWidget({
 
       {isOpen && (
         <div
+          ref={panelRef}
           className="fixed z-50 rounded-lg border bg-card shadow-xl flex flex-col"
           style={{
             bottom: '5rem',

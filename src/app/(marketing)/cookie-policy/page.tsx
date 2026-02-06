@@ -4,6 +4,10 @@ import { useSettings } from '@/hooks/use-settings'
 import { Loader2 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 
+function stripFirstHeading(content: string): string {
+  return content.replace(/^#\s+[^\n]+\n*/, '')
+}
+
 export default function CookiePolicyPage() {
   const { settings, loading } = useSettings()
 
@@ -43,10 +47,10 @@ export default function CookiePolicyPage() {
         </div>
         <div className="prose prose-neutral dark:prose-invert max-w-none" data-testid="content-cookie-policy">
           <ReactMarkdown>
-            {legal?.cookiePolicy
+            {stripFirstHeading(legal?.cookiePolicy
               ?.replace(/\{appName\}/g, branding?.appName || 'Our Service')
               ?.replace(/\{supportEmail\}/g, branding?.supportEmail || 'support@example.com') || 
-             'Content has not been configured yet.'}
+             'Content has not been configured yet.')}
           </ReactMarkdown>
         </div>
       </div>
