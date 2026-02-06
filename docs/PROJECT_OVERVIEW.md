@@ -53,9 +53,11 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 
 ## Key Features
 
-### User Management
-- Email/password and Google sign-in
-- User profiles and settings
+### User Management & Authentication
+- Email/password signup with email verification
+- 5 OAuth providers: Google, GitHub, Apple, Twitter/X, Magic Link
+- Admin-controlled OAuth toggles (enable/disable from dashboard)
+- User profiles with avatar upload and connected provider management
 - Role-based access (admin, member, viewer)
 
 ### Subscription Billing (Stripe)
@@ -83,21 +85,42 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Social links setup
 
 ### Content Management
-- Blog/changelog system
-- Markdown-based content
+- Blog/changelog system with markdown and live preview
 - Public and draft posts
+- Admin CRUD interface
 
 ### Marketing Tools
-- Waitlist mode for pre-launch
-- SEO-optimized pages
-- Sitemap generation
-- Feedback collection widget
+- Waitlist mode for pre-launch email collection with CSV export
+- SEO-optimized pages with auto-generated sitemap and robots.txt
+- Feedback collection widget (logged-in and anonymous users)
+- Announcement bar with admin controls
+- Custom pages system
 
 ### Email System
-- Customizable email templates
-- Welcome emails, subscription confirmations
+- Customizable email templates with admin editor
+- Template preview and test email sending
+- Welcome emails, subscription confirmations, cancellation notifications
 - Team invitation emails
 - Powered by Resend
+
+### AI Integration
+- Pluggable AI provider system (xAI Grok, OpenAI, Anthropic)
+- Admin-configurable provider, model, temperature, max tokens, system prompt
+- Chat completion API with streaming support
+- Feature toggle to enable/disable AI features
+
+### Webhook Automation
+- Event-driven webhook system for n8n, Zapier, Make, or any HTTP endpoint
+- 8 events: feedback, waitlist, subscriptions, team, contact form
+- HMAC-SHA256 payload signing for security
+- Fire-and-forget delivery with retry logic
+- Admin-configurable URL, secret, and per-event toggles
+
+### Monitoring & Testing
+- Sentry error tracking (server + browser errors)
+- Plausible privacy-friendly analytics
+- 38 Playwright E2E tests across 5 test suites
+- Structured logging utility
 
 ---
 
@@ -110,7 +133,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 | **Frontend** | Vercel + Next.js 16+ + shadcn/ui + Tailwind CSS | Modern React framework with server-side rendering, beautiful UI components, and utility-first styling |
 | **Backend/API** | Next.js API Routes + OAuth SDKs | Serverless API endpoints with authentication provider integrations |
 | **Database/Storage** | Supabase (PostgreSQL + Storage + Auth) | Managed database, file storage, and built-in authentication with Row Level Security |
-| **Authentication** | Supabase Auth + OAuth Providers | Email/password, Google OAuth, and extensible to other providers (GitHub, Twitter, etc.) |
+| **Authentication** | Supabase Auth + 5 OAuth Providers | Email/password, Google, GitHub, Apple, Twitter/X OAuth, and Magic Link passwordless |
 | **AI & Automation** | xAI Grok API + n8n | AI capabilities and workflow automation |
 | **Operations** | Resend (Emails) + Sentry (Monitoring) + Plausible (Analytics) + Upstash/BullMQ (Queues) | Transactional emails, error tracking, privacy-friendly metrics, and background job processing |
 | **Monetization** | Stripe | Subscription billing, payment processing, and customer portal |
@@ -153,30 +176,39 @@ This means you can run multiple SaaS products from one template, or allow custom
 
 ## Current Status
 
-### Completed (MVP)
+### Completed
 
 | Feature | Status |
 |---------|--------|
-| User Authentication | Complete |
-| Stripe Billing | Complete |
-| Admin Dashboard | Complete |
+| User Authentication (Email + 5 OAuth) | Complete |
+| Stripe Billing & Feature Gating | Complete |
+| Admin Dashboard & User Management | Complete |
 | Team/Organization System | Complete |
-| Blog/Changelog | Complete |
-| Email Templates | Complete |
+| Blog/Changelog System | Complete |
+| Email Template Editor | Complete |
 | Waitlist Mode | Complete |
 | Feedback Widget | Complete |
 | SEO/Sitemap | Complete |
-| Setup Wizard | Complete |
+| Setup Dashboard (Branding Manager) | Complete |
+| Onboarding Wizard | Complete |
+| AI Integration (xAI/OpenAI/Anthropic) | Complete |
+| Webhook/n8n Automation | Complete |
+| Sentry Error Tracking | Complete |
+| Plausible Analytics | Complete |
+| E2E Testing (38 Playwright tests) | Complete |
+| Dark/Light Mode | Complete |
+| OAuth Admin Controls | Complete |
 
 ### Planned (Post-MVP)
 
-- Advanced analytics
+- Advanced analytics dashboards
 - Affiliate/referral system
-- AI integrations
 - Push notifications
 - Internationalization (multiple languages)
 - A/B testing
 - White-label support
+- Background job processing (Upstash/BullMQ)
+- Production-grade rate limiting (Upstash Redis)
 
 ---
 
@@ -190,13 +222,13 @@ This section compares the planned technology stack against what is currently imp
 |-------|------------|--------|-------|
 | **Frontend** | Vercel | Implemented | Production deployment configured |
 | | Next.js 16+ | Implemented | App Router with TypeScript |
-| | shadcn/ui | Implemented | Full component library installed |
+| | shadcn/ui | Implemented | Full component library installed (70+ components) |
 | | Tailwind CSS | Implemented | With dark mode support |
-| **Backend/API** | Next.js API Routes | Implemented | All endpoints functional |
-| | OAuth SDKs | Implemented | All providers via Supabase Auth |
+| **Backend/API** | Next.js API Routes | Implemented | 25+ API routes functional |
+| | OAuth SDKs | Implemented | All 5 providers via Supabase Auth |
 | **Database** | Supabase PostgreSQL | Implemented | 13 tables in production |
 | | Supabase Storage | Implemented | Used for avatars + branding images |
-| | Supabase Auth | Implemented | Email + all OAuth providers |
+| | Supabase Auth | Implemented | Email + all 5 OAuth providers |
 | | Row Level Security | Implemented | Policies on key tables |
 | **Authentication** | Email/Password | Implemented | Full flow with verification |
 | | Google OAuth | Implemented | One-click sign-in working |
@@ -205,12 +237,15 @@ This section compares the planned technology stack against what is currently imp
 | | Twitter/X OAuth | Implemented | UI ready, enable in Supabase Dashboard |
 | | Magic Links | Implemented | Passwordless login via Supabase OTP |
 | | SSO/SAML | Not Started | Enterprise feature for later |
-| **AI & Automation** | xAI Grok API | Not Started | Planned for v1.1 |
-| | n8n Workflows | Not Started | Planned for v1.1 |
-| **Operations** | Resend (Emails) | Implemented | Templates + test sending working |
-| | Sentry (Monitoring) | Implemented | Error tracking + global error handler |
+| **AI & Automation** | xAI Grok API | Implemented | Pluggable provider with streaming chat API |
+| | OpenAI | Implemented | Configurable via admin dashboard |
+| | Anthropic | Implemented | Configurable via admin dashboard |
+| | n8n/Webhook System | Implemented | 8 events, HMAC signing, fire-and-forget |
+| **Operations** | Resend (Emails) | Implemented | Templates + test sending + admin editor |
+| | Sentry (Monitoring) | Implemented | Server + browser errors via tunnel route |
 | | Plausible (Analytics) | Implemented | Script integrated |
 | | Upstash/BullMQ (Queues) | Not Started | Planned for async jobs |
+| **Testing** | Playwright E2E | Implemented | 38 tests across 5 suites |
 | **Monetization** | Stripe Billing | Implemented | Subscriptions + portal working |
 
 ### Summary
@@ -220,17 +255,17 @@ This section compares the planned technology stack against what is currently imp
 | Frontend | 4/4 | 0 | 0 |
 | Backend/API | 2/2 | 0 | 0 |
 | Database/Storage | 4/4 | 0 | 0 |
-| Authentication | 6/7 | 0 | 1/7 |
-| AI & Automation | 0/2 | 0 | 2/2 |
-| Operations | 2/4 | 0 | 2/4 |
+| Authentication | 6/7 | 0 | 1/7 (SSO) |
+| AI & Automation | 4/4 | 0 | 0 |
+| Operations | 3/4 | 0 | 1/4 (Queues) |
+| Testing | 1/1 | 0 | 0 |
 | Monetization | 1/1 | 0 | 0 |
 
-### Priority Gaps for v1.1
+### Remaining Gaps for Future Versions
 
-1. **xAI Grok API** - AI features for enhanced user experience
-2. **n8n Integration** - Workflow automation for admin tasks
-3. **Upstash Redis** - Production-ready rate limiting
-4. **Upstash/BullMQ** - Background job processing for emails, reports
+1. **SSO/SAML** - Enterprise single sign-on (when needed)
+2. **Upstash Redis** - Production-ready rate limiting (currently in-memory)
+3. **Upstash/BullMQ** - Background job processing for emails, reports
 
 ---
 
@@ -271,3 +306,7 @@ If you're interested in using MuseKit for your project:
 This is an actively developed project. The core MVP features are complete and production-ready. Post-MVP features are being added based on real-world usage and feedback.
 
 For the latest status and roadmap, refer to the Master Plan document.
+
+---
+
+*Last Updated: February 6, 2026*

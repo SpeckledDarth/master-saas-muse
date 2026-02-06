@@ -4,7 +4,7 @@ This checklist guides you through setting up a new project from the Master SaaS 
 
 **Estimated time: 15-30 minutes**
 
-**Template Status: MVP COMPLETE + Team Collaboration (February 2026)**
+**Template Status: MVP COMPLETE + AI + Webhooks + Testing (February 2026)**
 
 ---
 
@@ -14,9 +14,11 @@ This checklist guides you through setting up a new project from the Master SaaS 
 - [ ] Supabase account (free tier works)
 - [ ] Stripe account (for payments)
 - [ ] Vercel account (for deployment)
-- [ ] Google Cloud account (optional, for OAuth)
-- [ ] Plausible account (optional, for analytics)
 - [ ] Resend account (for transactional emails)
+- [ ] Google Cloud account (optional, for Google OAuth)
+- [ ] Plausible account (optional, for analytics)
+- [ ] Sentry account (optional, for error tracking)
+- [ ] xAI/OpenAI/Anthropic API key (optional, for AI features)
 
 ---
 
@@ -277,6 +279,30 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] Maintenance Mode (off for launch)
 - [ ] Toggle Feedback Widget (on/off)
 
+**AI Settings (Optional):**
+- [ ] Toggle AI Enabled (on/off)
+- [ ] Select AI Provider (xAI Grok, OpenAI, or Anthropic)
+- [ ] Select Model (e.g., grok-3, gpt-4o, claude-3-sonnet)
+- [ ] Configure Temperature (0-1)
+- [ ] Set Max Tokens
+- [ ] Write System Prompt (instructions for the AI)
+- [ ] Add the corresponding API key to Vercel environment variables:
+  - xAI: `XAI_API_KEY`
+  - OpenAI: `OPENAI_API_KEY`
+  - Anthropic: `ANTHROPIC_API_KEY`
+
+**Webhook/n8n Configuration (Optional):**
+- [ ] Toggle Webhooks Enabled (on/off)
+- [ ] Enter Webhook URL (your n8n, Zapier, or Make endpoint)
+- [ ] Enter Webhook Secret (for HMAC payload signing)
+- [ ] Toggle individual events on/off:
+  - Feedback Submitted
+  - Waitlist Entry
+  - Subscription Created/Updated/Cancelled
+  - Team Invited / Team Member Joined
+  - Contact Submitted
+- [ ] Click "Test Webhook" to verify connectivity
+
 **Click "Save Changes" when done!**
 
 ---
@@ -308,7 +334,24 @@ If you want to invite team members to help manage the SaaS:
 
 ---
 
-## Step 14: Verify Everything Works
+## Step 14: Run E2E Tests (Optional, 5 min)
+
+```bash
+# Install Playwright browsers (first time only)
+npx playwright install chromium
+
+# Run all tests against your Vercel deployment
+TEST_USER_EMAIL=your-admin@email.com \
+TEST_USER_PASSWORD='your-password' \
+TEST_BASE_URL=https://your-app.vercel.app \
+npx playwright test
+```
+
+Tests cover: Blog CRUD, Waitlist, Feedback, Email Templates, Public Waitlist.
+
+---
+
+## Step 15: Verify Everything Works
 
 - [ ] Landing page loads with your branding
 - [ ] App name displays correctly in header
@@ -325,6 +368,12 @@ If you want to invite team members to help manage the SaaS:
 - [ ] Pricing page shows your customized plans at `/pricing`
 - [ ] Stripe checkout works (test mode)
 - [ ] Billing page shows subscription at `/billing`
+- [ ] AI chat works (if AI enabled and API key configured)
+- [ ] Webhook test delivers (if webhook URL configured)
+- [ ] Blog posts can be created and published at `/admin/blog`
+- [ ] Feedback widget appears on pages (if enabled)
+- [ ] Waitlist mode works (if enabled)
+- [ ] Sentry captures errors (if configured)
 
 ---
 
@@ -350,6 +399,9 @@ If you want to invite team members to help manage the SaaS:
 | `SENTRY_ORG` | Sentry organization slug |
 | `SENTRY_PROJECT` | Sentry project slug |
 | `SENTRY_AUTH_TOKEN` | Sentry auth token (for source maps) |
+| `XAI_API_KEY` | xAI/Grok API key (for AI features) |
+| `OPENAI_API_KEY` | OpenAI API key (alternative AI provider) |
+| `ANTHROPIC_API_KEY` | Anthropic API key (alternative AI provider) |
 
 ---
 
@@ -357,7 +409,6 @@ If you want to invite team members to help manage the SaaS:
 
 ### Authentication
 - Email/password signup with confirmation
-- Email/password login
 - **5 OAuth Providers** (configurable via Admin Dashboard):
   - Google OAuth (enabled by default)
   - GitHub OAuth
@@ -365,8 +416,8 @@ If you want to invite team members to help manage the SaaS:
   - X (Twitter) OAuth
   - Magic Link passwordless login (enabled by default)
 - Password reset flow
-- Protected routes
-- Session persistence
+- Protected routes and session persistence
+- Profile page with connected providers management
 - **Admin-controlled OAuth toggles** (show/hide providers on login page)
 
 ### User Features
@@ -376,12 +427,17 @@ If you want to invite team members to help manage the SaaS:
 
 ### Admin Features
 - Admin dashboard with metrics
-- **Setup Dashboard** (configure branding, pricing, features)
-- User management (view, edit roles)
+- **Setup Dashboard** (configure branding, pricing, social, features)
+- User management (view, edit roles, search)
 - Organization settings
 - Audit logging
 - **Team Management** (invite members, assign roles)
 - Role-based permissions (Owner/Manager/Member/Viewer)
+- **Onboarding Wizard** (4-step guided setup)
+- **Blog/Changelog** management
+- **Email Template** editor with preview and test sending
+- **Waitlist** management with CSV export
+- **Feedback** management with status filters
 
 ### Billing (Stripe)
 - Subscription checkout (Pro $29/mo, Team $99/mo)
@@ -393,17 +449,42 @@ If you want to invite team members to help manage the SaaS:
 - Welcome email on signup
 - Subscription confirmation email
 - Cancellation notification email
+- Team invitation email
+- Admin-editable templates
+
+### AI Integration
+- Pluggable provider system (xAI Grok, OpenAI, Anthropic)
+- Admin-configurable model, temperature, system prompt
+- Chat completion API with streaming support
+- Feature toggle to enable/disable
+
+### Webhook/n8n Automation
+- Event-driven webhook system (8 events)
+- HMAC-SHA256 payload signing
+- Fire-and-forget delivery with retry
+- Admin-configurable URL, secret, per-event toggles
+- Compatible with n8n, Zapier, Make
+
+### Content & Marketing
+- Blog/changelog system (markdown with live preview)
+- Waitlist mode for pre-launch
+- Feedback widget (logged-in and anonymous)
+- SEO-optimized pages with sitemap
+- Custom pages system
+- Announcement bar
 
 ### Security
 - Supabase Row Level Security (RLS)
 - Zod input validation
 - Rate limiting (in-memory, upgrade to Redis for production)
 - Security headers (HSTS, X-Frame-Options, etc.)
+- HMAC-SHA256 webhook signature verification
 
-### Analytics & Monitoring
+### Analytics, Monitoring & Testing
 - Plausible analytics (privacy-friendly)
+- Sentry error tracking (server + browser)
 - Structured logging utility
-- Sentry error tracking (fully integrated)
+- 38 Playwright E2E tests across 5 suites
 
 ---
 
@@ -416,8 +497,11 @@ Before launching with live customer data:
 - [ ] Set up uptime monitoring
 - [ ] Configure custom domain
 - [ ] Switch Stripe to live mode
-- [ ] Verify email deliverability
+- [ ] Verify email deliverability (verify your own domain in Resend)
+- [ ] Run full E2E test suite against production
+- [ ] Verify AI API key is set (if using AI features)
+- [ ] Test webhook delivery to your n8n/Zapier endpoint (if using)
 
 ---
 
-*Last Updated: February 5, 2026*
+*Last Updated: February 6, 2026*

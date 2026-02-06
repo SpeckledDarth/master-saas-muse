@@ -2,7 +2,7 @@
 
 This guide walks you through creating a new SaaS from the Master SaaS Muse Template.
 
-**Template Status: MVP COMPLETE + Team Collaboration (February 2026)**
+**Template Status: MVP COMPLETE + AI + Webhooks + Testing (February 2026)**
 
 ---
 
@@ -161,9 +161,17 @@ SENTRY_PROJECT=your-project-slug
 SENTRY_AUTH_TOKEN=sntrys_...
 
 # ===================
+# AI (Optional - set one based on chosen provider)
+# ===================
+XAI_API_KEY=xai-...
+# OPENAI_API_KEY=sk-...
+# ANTHROPIC_API_KEY=sk-ant-...
+
+# ===================
 # APP
 # ===================
 NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
+SESSION_SECRET=your-session-secret
 ```
 
 ---
@@ -178,51 +186,92 @@ master-saas-muse/
 │   │   │   ├── login/page.tsx
 │   │   │   ├── signup/page.tsx
 │   │   │   ├── reset-password/page.tsx
-│   │   │   └── layout.tsx
+│   │   │   └── update-password/page.tsx
 │   │   ├── (dashboard)/
 │   │   │   ├── profile/page.tsx
-│   │   │   ├── billing/page.tsx
-│   │   │   ├── settings/page.tsx
-│   │   │   └── layout.tsx
+│   │   │   └── billing/page.tsx
 │   │   ├── (marketing)/
-│   │   │   ├── page.tsx (landing)
+│   │   │   ├── about/page.tsx
+│   │   │   ├── contact/page.tsx
+│   │   │   ├── docs/page.tsx
+│   │   │   ├── faq/page.tsx
+│   │   │   ├── features/page.tsx
 │   │   │   ├── pricing/page.tsx
-│   │   │   └── layout.tsx
+│   │   │   ├── privacy/page.tsx
+│   │   │   ├── terms/page.tsx
+│   │   │   └── p/[slug]/page.tsx
 │   │   ├── admin/
 │   │   │   ├── page.tsx (dashboard)
+│   │   │   ├── analytics/page.tsx
+│   │   │   ├── blog/page.tsx
+│   │   │   ├── email-templates/page.tsx
+│   │   │   ├── feedback/page.tsx
+│   │   │   ├── onboarding/page.tsx
+│   │   │   ├── setup/page.tsx
+│   │   │   ├── team/page.tsx
 │   │   │   ├── users/page.tsx
-│   │   │   ├── settings/page.tsx
-│   │   │   └── layout.tsx
+│   │   │   └── waitlist/page.tsx
 │   │   ├── api/
-│   │   │   ├── admin/
-│   │   │   ├── stripe/
-│   │   │   ├── email/
-│   │   │   └── webhooks/
+│   │   │   ├── admin/ (setup, stats, posts, users, team, invitations, email-templates, webhooks)
+│   │   │   ├── ai/ (chat, providers)
+│   │   │   ├── stripe/ (checkout, portal, products, subscription, webhook)
+│   │   │   ├── email/send/
+│   │   │   ├── feedback/
+│   │   │   ├── invite/[token]/ (validate, accept)
+│   │   │   ├── contact/
+│   │   │   ├── user/membership/
+│   │   │   └── waitlist/
+│   │   ├── auth/callback/route.ts
+│   │   ├── blog/ (listing + [slug])
+│   │   ├── changelog/
+│   │   ├── checkout/success/
+│   │   ├── invite/[token]/
+│   │   ├── monitoring/route.ts (Sentry tunnel)
 │   │   ├── globals.css
 │   │   └── layout.tsx
 │   ├── components/
-│   │   ├── ui/ (shadcn)
-│   │   ├── layout/
-│   │   ├── auth/
-│   │   ├── admin/
-│   │   ├── subscription/
-│   │   └── analytics/
+│   │   ├── ui/ (70+ shadcn components)
+│   │   ├── layout/ (header, footer)
+│   │   ├── landing/ (hero, marquee, counters, etc.)
+│   │   ├── branding/ (dynamic branding)
+│   │   ├── auth/ (UserNav)
+│   │   ├── admin/ (image-upload)
+│   │   ├── subscription/ (UpgradeBanner)
+│   │   ├── analytics/ (plausible)
+│   │   ├── feedback-widget.tsx
+│   │   └── waitlist-form.tsx
 │   ├── lib/
-│   │   ├── supabase/
-│   │   ├── stripe/
-│   │   ├── email/
-│   │   ├── validation/
+│   │   ├── supabase/ (client, server, admin)
+│   │   ├── stripe/ (client, service, feature-gate, webhook-handlers)
+│   │   ├── email/ (client, service, template)
+│   │   ├── ai/ (provider - xAI, OpenAI, Anthropic)
+│   │   ├── webhooks/ (dispatcher - HMAC, retry, fire-and-forget)
+│   │   ├── validation/ (schemas, index)
 │   │   ├── rate-limit/
-│   │   └── logging/
-│   └── hooks/
+│   │   ├── logging/
+│   │   ├── settings/
+│   │   └── team-permissions.ts
+│   ├── types/
+│   │   └── settings.ts (all settings interfaces)
+│   ├── instrumentation-client.ts (Sentry client)
+│   └── instrumentation.ts (Sentry server)
+├── tests/
+│   ├── auth.setup.ts
+│   ├── blog.spec.ts
+│   ├── waitlist.spec.ts
+│   ├── feedback.spec.ts
+│   ├── email-templates.spec.ts
+│   └── public-waitlist.spec.ts
 ├── docs/
 │   ├── MASTER_PLAN.md
 │   ├── MUSE_CHECKLIST.md
+│   ├── PROJECT_OVERVIEW.md
 │   └── SETUP_GUIDE.md
-├── config/
-│   └── muse.config.json
 ├── middleware.ts
 ├── next.config.ts
+├── playwright.config.ts
+├── sentry.server.config.ts
+├── sentry.edge.config.ts
 ├── .env.template
 └── package.json
 ```
@@ -491,31 +540,39 @@ Create in Stripe Dashboard:
 
 ---
 
-## What's Included (MVP + Team)
+## What's Included (Full Feature Set)
 
 | Feature | Status |
 |---------|--------|
 | Email/Password Auth | Complete |
-| **5 OAuth Providers** | **Complete** |
-| OAuth Admin Controls | Complete |
-| Magic Link Passwordless | Complete |
-| Profile with Avatar | Complete |
-| Admin Dashboard | Complete |
+| 5 OAuth Providers (Google, GitHub, Apple, X, Magic Link) | Complete |
+| OAuth Admin Controls (enable/disable from dashboard) | Complete |
+| Profile with Avatar + Connected Providers | Complete |
+| Admin Dashboard with Metrics | Complete |
 | User Management | Complete |
-| Stripe Billing | Complete |
+| Setup Dashboard (Branding, Pricing, Social, Features) | Complete |
+| Onboarding Wizard (4-step guided setup) | Complete |
+| Stripe Billing + Feature Gating | Complete |
 | Customer Portal | Complete |
-| Feature Gating | Complete |
-| Email Notifications | Complete |
-| Row Level Security | Complete |
-| Rate Limiting | Complete |
-| Security Headers | Complete |
+| Team Collaboration (Owner/Manager/Member/Viewer) | Complete |
+| Email Invitations | Complete |
+| Email Template Editor + Test Sending | Complete |
+| Blog/Changelog System (Markdown) | Complete |
+| Waitlist Mode + CSV Export | Complete |
+| Feedback Widget | Complete |
+| AI Integration (xAI Grok, OpenAI, Anthropic) | Complete |
+| Webhook/n8n Automation (8 events, HMAC signing) | Complete |
+| Sentry Error Tracking (Server + Browser) | Complete |
 | Plausible Analytics | Complete |
+| E2E Testing (38 Playwright Tests) | Complete |
+| SEO/Sitemap | Complete |
+| Row Level Security (RLS) | Complete |
+| Rate Limiting + Security Headers | Complete |
 | Structured Logging | Complete |
-| **Team Collaboration** | **Complete** |
-| **Role-Based Permissions** | **Complete** |
-| **Email Invitations** | **Complete** |
-| **Sentry Error Tracking** | **Complete** |
+| Dark/Light Mode | Complete |
+| Custom Pages System | Complete |
+| Announcement Bar | Complete |
 
 ---
 
-*Last Updated: February 5, 2026*
+*Last Updated: February 6, 2026*
