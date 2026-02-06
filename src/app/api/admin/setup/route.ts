@@ -88,7 +88,6 @@ export async function GET(request: NextRequest) {
     branding: { 
       ...defaultSettings.branding, 
       ...dbBranding,
-      // Deep merge nested theme objects
       lightTheme: { ...defaultSettings.branding.lightTheme, ...(dbBranding.lightTheme || {}) },
       darkTheme: { ...defaultSettings.branding.darkTheme, ...(dbBranding.darkTheme || {}) },
     },
@@ -114,6 +113,9 @@ export async function GET(request: NextRequest) {
       faq: { ...defaultSettings.pages.faq, ...dbPages.faq },
       customPages: dbPages.customPages || defaultSettings.pages.customPages,
     },
+    support: { ...defaultSettings.support, ...(data?.settings?.support || {}) },
+    compliance: { ...defaultSettings.compliance, ...(data?.settings?.compliance || {}) },
+    security: { ...defaultSettings.security, ...(data?.settings?.security || {}) },
   }
   
   return NextResponse.json({ settings: mergedSettings })
@@ -156,7 +158,6 @@ export async function POST(request: NextRequest) {
       ...defaultSettings.branding, 
       ...currentBranding, 
       ...incomingBranding,
-      // Deep merge nested theme objects
       lightTheme: { 
         ...defaultSettings.branding.lightTheme, 
         ...(currentBranding.lightTheme || {}), 
@@ -195,6 +196,9 @@ export async function POST(request: NextRequest) {
       faq: { ...defaultSettings.pages.faq, ...currentPages.faq, ...incomingPages.faq },
       customPages: incomingPages.customPages || currentPages.customPages || defaultSettings.pages.customPages,
     },
+    support: { ...defaultSettings.support, ...(currentSettings.support || {}), ...(settings.support || {}) },
+    compliance: { ...defaultSettings.compliance, ...(currentSettings.compliance || {}), ...(settings.compliance || {}) },
+    security: { ...defaultSettings.security, ...(currentSettings.security || {}), ...(settings.security || {}) },
   }
   
   console.log('[Setup API] Merged branding to save:', JSON.stringify(newSettings.branding, null, 2))
