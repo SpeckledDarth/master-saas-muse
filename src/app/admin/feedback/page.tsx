@@ -15,6 +15,7 @@ interface Feedback {
   page_url: string
   status: 'new' | 'reviewed' | 'resolved'
   created_at: string
+  nps_score: number | null
 }
 
 export default function FeedbackPage() {
@@ -161,6 +162,21 @@ export default function FeedbackPage() {
                   <CardTitle className="text-base font-medium flex items-center gap-2 flex-wrap">
                     {item.email || 'Anonymous'}
                     {getStatusBadge(item.status)}
+                    {item.nps_score !== null && item.nps_score !== undefined && (
+                      <Badge
+                        variant="outline"
+                        className={
+                          item.nps_score >= 9
+                            ? 'border-green-500 text-green-600 dark:text-green-400'
+                            : item.nps_score >= 7
+                              ? 'border-yellow-500 text-yellow-600 dark:text-yellow-400'
+                              : 'border-red-500 text-red-600 dark:text-red-400'
+                        }
+                        data-testid={`badge-nps-${item.id}`}
+                      >
+                        NPS: {item.nps_score}
+                      </Badge>
+                    )}
                   </CardTitle>
                   <CardDescription className="flex items-center gap-2 flex-wrap">
                     {new Date(item.created_at).toLocaleString()}

@@ -26,6 +26,10 @@ interface MetricsData {
   npsResponses: number
   cancelledThisMonth: number
   churnTrend: { date: string; count: number }[]
+  alertThresholds?: {
+    alertChurnThreshold?: number
+    alertMinMonthlyUsers?: number
+  }
 }
 
 export default function MetricsPage() {
@@ -189,6 +193,11 @@ export default function MetricsPage() {
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-new-users-month">{metrics?.newUsersThisMonth ?? 0}</div>
             <p className="text-xs text-muted-foreground">+{metrics?.newUsersThisWeek ?? 0} this week</p>
+            {typeof metrics?.alertThresholds?.alertMinMonthlyUsers === 'number' && (
+              <p className="text-xs text-muted-foreground mt-1" data-testid="text-min-users-threshold">
+                Alert if below: {metrics.alertThresholds.alertMinMonthlyUsers}
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -246,6 +255,11 @@ export default function MetricsPage() {
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-churn-rate">{(metrics?.churnRate ?? 0).toFixed(1)}%</div>
             <p className="text-xs text-muted-foreground">{metrics?.cancelledThisMonth ?? 0} cancelled this month</p>
+            {typeof metrics?.alertThresholds?.alertChurnThreshold === 'number' && (
+              <p className="text-xs text-muted-foreground mt-1" data-testid="text-churn-threshold">
+                Alert threshold: {metrics.alertThresholds.alertChurnThreshold}%
+              </p>
+            )}
           </CardContent>
         </Card>
 

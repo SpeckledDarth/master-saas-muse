@@ -218,6 +218,24 @@ export async function GET() {
       npsResponses = 0
     }
 
+    let alertThresholds: { alertChurnThreshold?: number; alertMinMonthlyUsers?: number } = {}
+    try {
+      const { data: orgSettings } = await adminClient
+        .from('organization_settings')
+        .select('settings')
+        .eq('organization_id', 1)
+        .maybeSingle()
+      const security = orgSettings?.settings?.security || {}
+      if (typeof security.alertChurnThreshold === 'number') {
+        alertThresholds.alertChurnThreshold = security.alertChurnThreshold
+      }
+      if (typeof security.alertMinMonthlyUsers === 'number') {
+        alertThresholds.alertMinMonthlyUsers = security.alertMinMonthlyUsers
+      }
+    } catch {
+      // Thresholds are optional
+    }
+
     return NextResponse.json({
       totalUsers,
       newUsersToday,
@@ -237,6 +255,7 @@ export async function GET() {
       npsResponses,
       cancelledThisMonth,
       churnTrend,
+      alertThresholds,
     })
   } catch (error) {
     console.error('Admin metrics error:', error)

@@ -74,11 +74,11 @@ export function FeedbackWidget() {
       const data = await res.json()
 
       if (res.ok) {
-        toast({ title: 'Thank you!', description: 'Your feedback has been submitted.' })
         setMessage('')
         setEmail('')
         setNpsScore(null)
         setOpen(false)
+        toast({ title: 'Thank you!', description: 'Your feedback has been submitted successfully.' })
       } else {
         toast({ title: 'Error', description: data.error, variant: 'destructive' })
       }
@@ -152,7 +152,7 @@ export function FeedbackWidget() {
                     size="sm"
                     variant={npsScore === i ? 'default' : 'ghost'}
                     onClick={() => setNpsScore(npsScore === i ? null : i)}
-                    className="flex-1 min-w-0 px-0"
+                    className="flex-1 min-w-0"
                     data-testid={`button-nps-${i}`}
                   >
                     {i}
