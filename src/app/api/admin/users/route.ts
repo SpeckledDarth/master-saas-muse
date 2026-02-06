@@ -45,6 +45,12 @@ export async function GET() {
       .select('user_id, role, joined_at')
       .eq('organization_id', 1)
 
+    // Get profiles with stripe customer IDs
+    const { data: profilesWithStripe } = await adminClient
+      .from('profiles')
+      .select('id, stripe_customer_id, stripe_subscription_id')
+      .not('stripe_customer_id', 'is', null)
+
     // Get all auth users to get emails
     let authUsers: any[] = []
     try {
@@ -66,6 +72,7 @@ export async function GET() {
     // Create role maps for quick lookup
     const appRoleMap = new Map<string, string>()
     const teamRoleMap = new Map<string, string>()
+    const stripeMap = new Map<string, { stripe_customer_id: string; stripe_subscription_id: string | null }>()
 
     if (allRoles) {
       for (const role of allRoles) {
@@ -79,12 +86,22 @@ export async function GET() {
       }
     }
 
+    if (profilesWithStripe) {
+      for (const profile of profilesWithStripe) {
+        stripeMap.set(profile.id, {
+          stripe_customer_id: profile.stripe_customer_id,
+          stripe_subscription_id: profile.stripe_subscription_id
+        })
+      }
+    }
+
     // Build user list from all auth users
     const userMap = new Map<string, { user_id: string; role: string; created_at: string; email: string }>()
 
     const usersData = authUsers.map(authUser => {
       const appRole = appRoleMap.get(authUser.id)
       const teamRole = teamRoleMap.get(authUser.id)
+      const stripeData = stripeMap.get(authUser.id)
       
       // Priority: app admin > team role > empty
       let displayRole = ''
@@ -104,7 +121,9 @@ export async function GET() {
         phone: authUser.phone || null,
         name: authUser.user_metadata?.full_name || authUser.user_metadata?.display_name || null,
         avatar_url: authUser.user_metadata?.avatar_url || null,
-        provider: authUser.app_metadata?.provider || 'email'
+        provider: authUser.app_metadata?.provider || 'email',
+        stripe_customer_id: stripeData?.stripe_customer_id || null,
+        has_subscription: stripeData?.stripe_subscription_id !== null && stripeData?.stripe_subscription_id !== undefined
       }
     })
 

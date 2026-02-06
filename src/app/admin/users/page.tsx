@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
@@ -11,7 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
-import { Loader2, Search, Users, Eye, Trash2, UserPlus, Download, Mail, Calendar, Clock, Shield, CheckCircle, XCircle, Crown, UserCog, User, Eye as ViewerIcon } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import { Loader2, Search, Users, Eye, Trash2, UserPlus, Download, Mail, Calendar, Clock, Shield, CheckCircle, XCircle, Crown, UserCog, User, Eye as ViewerIcon, ExternalLink, MessageSquare, FileText, StickyNote, Plus, CreditCard } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface UserWithRole {
@@ -25,6 +27,28 @@ interface UserWithRole {
   name: string | null
   avatar_url: string | null
   provider: string
+  stripe_customer_id: string | null
+  has_subscription: boolean
+}
+
+interface UserDetail {
+  user: {
+    id: string; email: string; name: string | null; avatar_url: string | null;
+    provider: string; created_at: string; last_sign_in_at: string | null; email_confirmed_at: string | null;
+  }
+  subscription: {
+    status: string; tier: string; planName: string | null; amount: number;
+    currentPeriodEnd: string | null; cancelAtPeriodEnd: boolean; subscriptionId: string | null;
+  }
+  invoices: Array<{
+    id: string; amount_paid: number; status: string; created: string;
+    invoice_url: string | null; hosted_invoice_url: string | null;
+  }>
+  notes: Array<{
+    id: number; note: string; created_by_email: string; created_at: string;
+  }>
+  stripeCustomerId: string | null
+  stripePortalUrl: string | null
 }
 
 export default function UsersPage() {
@@ -33,12 +57,17 @@ export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [updatingRole, setUpdatingRole] = useState<string | null>(null)
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null)
+  const [userDetail, setUserDetail] = useState<UserDetail | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
   const [userToDelete, setUserToDelete] = useState<UserWithRole | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [showInviteDialog, setShowInviteDialog] = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState('member')
   const [inviting, setInviting] = useState(false)
+  const [newNote, setNewNote] = useState('')
+  const [addingNote, setAddingNote] = useState(false)
+  const [deletingNoteId, setDeletingNoteId] = useState<number | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -68,6 +97,29 @@ export default function UsersPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const loadUserDetail = useCallback(async (userId: string) => {
+    setDetailLoading(true)
+    setUserDetail(null)
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`)
+      const data = await response.json()
+      if (response.ok) {
+        setUserDetail(data)
+      } else {
+        toast({ title: 'Failed to load user details', description: data.error, variant: 'destructive' })
+      }
+    } catch (error) {
+      toast({ title: 'Failed to load user details', description: 'Please try again', variant: 'destructive' })
+    } finally {
+      setDetailLoading(false)
+    }
+  }, [toast])
+
+  function handleViewUser(user: UserWithRole) {
+    setSelectedUser(user)
+    loadUserDetail(user.id)
   }
 
   async function handleRoleChange(userId: string, newRole: string) {
@@ -149,6 +201,51 @@ export default function UsersPage() {
       toast({ title: 'Failed to send invitation', description: 'Please try again', variant: 'destructive' })
     } finally {
       setInviting(false)
+    }
+  }
+
+  async function handleAddNote() {
+    if (!newNote.trim() || !selectedUser) return
+    setAddingNote(true)
+    try {
+      const response = await fetch('/api/admin/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: selectedUser.id, note: newNote })
+      })
+      const data = await response.json()
+      if (response.ok) {
+        toast({ title: 'Note added' })
+        setNewNote('')
+        loadUserDetail(selectedUser.id)
+      } else {
+        toast({ title: 'Failed to add note', description: data.error, variant: 'destructive' })
+      }
+    } catch (error) {
+      toast({ title: 'Failed to add note', description: 'Please try again', variant: 'destructive' })
+    } finally {
+      setAddingNote(false)
+    }
+  }
+
+  async function handleDeleteNote(noteId: number) {
+    if (!selectedUser) return
+    setDeletingNoteId(noteId)
+    try {
+      const response = await fetch(`/api/admin/notes?noteId=${noteId}`, {
+        method: 'DELETE'
+      })
+      const data = await response.json()
+      if (response.ok) {
+        toast({ title: 'Note deleted' })
+        loadUserDetail(selectedUser.id)
+      } else {
+        toast({ title: 'Failed to delete note', description: data.error, variant: 'destructive' })
+      }
+    } catch (error) {
+      toast({ title: 'Failed to delete note', description: 'Please try again', variant: 'destructive' })
+    } finally {
+      setDeletingNoteId(null)
     }
   }
 
@@ -282,6 +379,7 @@ export default function UsersPage() {
                 <TableRow>
                   <TableHead>User</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead className="hidden md:table-cell">Plan</TableHead>
                   <TableHead className="hidden md:table-cell">Status</TableHead>
                   <TableHead className="hidden lg:table-cell">Last Active</TableHead>
                   <TableHead className="hidden lg:table-cell">Joined</TableHead>
@@ -341,6 +439,18 @@ export default function UsersPage() {
                       </Select>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
+                      {user.has_subscription ? (
+                        <Badge variant="outline" className="text-green-600 border-green-600" data-testid={`badge-plan-${user.id}`}>
+                          <CreditCard className="h-3 w-3 mr-1" />
+                          Subscribed
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" data-testid={`badge-plan-${user.id}`}>
+                          Free
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <div className="flex items-center gap-2">
                         {user.email_confirmed_at ? (
                           <Badge variant="outline" className="text-green-600 border-green-600">
@@ -372,7 +482,7 @@ export default function UsersPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => setSelectedUser(user)}
+                          onClick={() => handleViewUser(user)}
                           data-testid={`button-view-user-${user.id}`}
                         >
                           <Eye className="h-4 w-4" />
@@ -392,7 +502,7 @@ export default function UsersPage() {
                 ))}
                 {filteredUsers.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                       {searchQuery ? 'No users match your search' : 'No users found'}
                     </TableCell>
                   </TableRow>
@@ -403,57 +513,254 @@ export default function UsersPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
-        <DialogContent className="sm:max-w-md">
+      <Dialog open={!!selectedUser} onOpenChange={(open) => { if (!open) { setSelectedUser(null); setUserDetail(null); setNewNote(''); } }}>
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>User Details</DialogTitle>
             <DialogDescription>View detailed information about this user</DialogDescription>
           </DialogHeader>
-          {selectedUser && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={selectedUser.avatar_url || undefined} alt={selectedUser.email} />
-                  <AvatarFallback className="text-lg">{selectedUser.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-semibold text-lg">{selectedUser.name || selectedUser.email.split('@')[0]}</h3>
-                  <p className="text-muted-foreground">{selectedUser.email}</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <Label className="text-muted-foreground">User ID</Label>
-                  <p className="font-mono text-xs break-all">{selectedUser.id}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Role</Label>
-                  <p className="capitalize">{selectedUser.role || 'No role assigned'}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Auth Provider</Label>
-                  <p className="capitalize">{selectedUser.provider}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Phone</Label>
-                  <p>{selectedUser.phone || 'Not set'}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Email Verified</Label>
-                  <p>{selectedUser.email_confirmed_at ? 'Yes' : 'No'}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Joined</Label>
-                  <p>{formatDate(selectedUser.created_at)}</p>
-                </div>
-                <div className="col-span-2">
-                  <Label className="text-muted-foreground">Last Sign In</Label>
-                  <p>{selectedUser.last_sign_in_at ? formatDate(selectedUser.last_sign_in_at) : 'Never signed in'}</p>
-                </div>
-              </div>
+          {detailLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin" data-testid="loader-user-detail" />
             </div>
-          )}
+          ) : userDetail ? (
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="w-full" data-testid="tabs-user-detail">
+                <TabsTrigger value="overview" className="flex-1" data-testid="tab-overview">
+                  <User className="h-4 w-4 mr-2" />
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="invoices" className="flex-1" data-testid="tab-invoices">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Invoices
+                </TabsTrigger>
+                <TabsTrigger value="notes" className="flex-1" data-testid="tab-notes">
+                  <StickyNote className="h-4 w-4 mr-2" />
+                  Notes
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="overview" className="space-y-6 mt-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={userDetail.user.avatar_url || undefined} alt={userDetail.user.email} />
+                    <AvatarFallback className="text-lg">{userDetail.user.email.slice(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-semibold text-lg" data-testid="text-user-name">{userDetail.user.name || userDetail.user.email.split('@')[0]}</h3>
+                    <p className="text-muted-foreground" data-testid="text-user-email">{userDetail.user.email}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <Label className="text-muted-foreground">User ID</Label>
+                    <p className="font-mono text-xs break-all" data-testid="text-user-id">{userDetail.user.id}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Role</Label>
+                    <p className="capitalize" data-testid="text-user-role">{selectedUser?.role || 'No role assigned'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Auth Provider</Label>
+                    <p className="capitalize" data-testid="text-user-provider">{userDetail.user.provider}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Phone</Label>
+                    <p data-testid="text-user-phone">{selectedUser?.phone || 'Not set'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Email Verified</Label>
+                    <p data-testid="text-user-verified">{userDetail.user.email_confirmed_at ? 'Yes' : 'No'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Joined</Label>
+                    <p data-testid="text-user-joined">{formatDate(userDetail.user.created_at)}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <Label className="text-muted-foreground">Last Sign In</Label>
+                    <p data-testid="text-user-last-signin">{userDetail.user.last_sign_in_at ? formatDate(userDetail.user.last_sign_in_at) : 'Never signed in'}</p>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4 space-y-3">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    Subscription
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <Label className="text-muted-foreground">Plan</Label>
+                      <div className="mt-1">
+                        <Badge variant={userDetail.subscription.tier !== 'free' ? 'default' : 'secondary'} data-testid="badge-subscription-tier">
+                          {userDetail.subscription.tier.charAt(0).toUpperCase() + userDetail.subscription.tier.slice(1)}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-muted-foreground">Status</Label>
+                      <p className="capitalize" data-testid="text-subscription-status">{userDetail.subscription.status}</p>
+                    </div>
+                    <div>
+                      <Label className="text-muted-foreground">Renewal Date</Label>
+                      <p data-testid="text-subscription-renewal">{formatDate(userDetail.subscription.currentPeriodEnd)}</p>
+                    </div>
+                    <div>
+                      <Label className="text-muted-foreground">Cancel at Period End</Label>
+                      <p data-testid="text-subscription-cancel">{userDetail.subscription.cancelAtPeriodEnd ? 'Yes' : 'No'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4 flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!userDetail.stripePortalUrl}
+                    onClick={() => userDetail.stripePortalUrl && window.open(userDetail.stripePortalUrl, '_blank')}
+                    data-testid="button-manage-stripe"
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Manage in Stripe
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    data-testid="button-send-email"
+                  >
+                    <a href={`mailto:${userDetail.user.email}`}>
+                      <Mail className="h-4 w-4 mr-2" />
+                      Send Email
+                    </a>
+                  </Button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="invoices" className="mt-4">
+                {!userDetail.stripeCustomerId ? (
+                  <div className="text-center py-8 text-muted-foreground" data-testid="text-no-stripe-customer">
+                    <CreditCard className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>No Stripe customer</p>
+                  </div>
+                ) : userDetail.invoices.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground" data-testid="text-no-invoices">
+                    <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>No invoices found</p>
+                  </div>
+                ) : (
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Amount</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {userDetail.invoices.map((invoice) => (
+                          <TableRow key={invoice.id} data-testid={`row-invoice-${invoice.id}`}>
+                            <TableCell data-testid={`text-invoice-date-${invoice.id}`}>
+                              {formatDate(invoice.created)}
+                            </TableCell>
+                            <TableCell data-testid={`text-invoice-amount-${invoice.id}`}>
+                              ${(invoice.amount_paid / 100).toFixed(2)}
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={invoice.status === 'paid' ? 'default' : 'secondary'}
+                                data-testid={`badge-invoice-status-${invoice.id}`}
+                              >
+                                {invoice.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {invoice.hosted_invoice_url && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  asChild
+                                  data-testid={`link-invoice-${invoice.id}`}
+                                >
+                                  <a href={invoice.hosted_invoice_url} target="_blank" rel="noopener noreferrer">
+                                    <ExternalLink className="h-4 w-4 mr-2" />
+                                    View
+                                  </a>
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="notes" className="mt-4 space-y-4">
+                <div className="space-y-3">
+                  {userDetail.notes.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground" data-testid="text-no-notes">
+                      <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No notes yet</p>
+                    </div>
+                  ) : (
+                    userDetail.notes.map((note) => (
+                      <div key={note.id} className="border rounded-md p-3 space-y-1" data-testid={`note-${note.id}`}>
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm" data-testid={`text-note-content-${note.id}`}>{note.note}</p>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteNote(note.id)}
+                            disabled={deletingNoteId === note.id}
+                            className="text-destructive hover:text-destructive shrink-0"
+                            data-testid={`button-delete-note-${note.id}`}
+                          >
+                            {deletingNoteId === note.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground" data-testid={`text-note-meta-${note.id}`}>
+                          {note.created_by_email} &middot; {formatDate(note.created_at)}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="border-t pt-4 space-y-3">
+                  <Label htmlFor="new-note">Add a note</Label>
+                  <Textarea
+                    id="new-note"
+                    placeholder="Write a note about this user..."
+                    value={newNote}
+                    onChange={(e) => setNewNote(e.target.value)}
+                    className="resize-none"
+                    data-testid="textarea-new-note"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={handleAddNote}
+                    disabled={addingNote || !newNote.trim()}
+                    data-testid="button-add-note"
+                  >
+                    {addingNote ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <Plus className="h-4 w-4 mr-2" />
+                    )}
+                    Add Note
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+          ) : null}
         </DialogContent>
       </Dialog>
 

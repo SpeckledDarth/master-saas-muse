@@ -134,12 +134,38 @@ The project is built with Next.js 16+ (App Router), React 18+, and TypeScript. S
    - 500+ lines of documentation for team members managing the platform
    - Covers: Dashboard, Onboarding, Setup (all 6 sections), Users, Teams, Blog, Analytics, Feedback, Waitlist, Email Templates, Queue, SSO, Billing, Webhooks, AI, Feature Toggles, Public Pages
 
+9. **Customer Service Tools for Admin Users Page** - Enhanced user management:
+   - `src/app/api/admin/users/[userId]/route.ts` - Detailed user info API (profile, Stripe subscription, invoices, notes, portal URL)
+   - `src/app/api/admin/notes/route.ts` - Admin notes CRUD (POST create, DELETE remove)
+   - `src/app/admin/users/page.tsx` - Enhanced with subscription status column, tabbed detail panel
+   - Subscription status column shows "Subscribed" (green) or "Free" for each user
+   - User detail dialog has 3 tabs: Overview (profile + subscription + quick actions), Invoices (Stripe history), Notes (internal admin notes)
+   - Quick actions: "Manage in Stripe" (opens Stripe Customer Portal), "Send Email" (mailto link)
+   - Admin notes system for internal customer service tracking (requires `admin_notes` table in Supabase)
+   - Test users created: member.test@musekit.io (Member), viewer.test@musekit.io (Viewer), freeuser.test@musekit.io (no role), manager.test@musekit.io (Manager)
+
+### Pending: admin_notes Table Creation
+Run this SQL in Supabase Dashboard > SQL Editor:
+```sql
+CREATE TABLE IF NOT EXISTS admin_notes (
+  id SERIAL PRIMARY KEY,
+  user_id UUID NOT NULL,
+  note TEXT NOT NULL,
+  created_by UUID NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_admin_notes_user_id ON admin_notes(user_id);
+ALTER TABLE admin_notes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role full access" ON admin_notes FOR ALL USING (true) WITH CHECK (true);
+```
+
 ### Next Session Priority
 - Run Playwright E2E test suites (38 tests across 5 suites)
 - Test AI chat through the UI (requires authenticated user)
 - Test webhook admin UI (URL/secret/event toggle configuration)
 - Verify Stripe webhook integration with test events
 - Test SSO provider creation (requires Supabase Pro for SAML)
+- Test customer service tools with Stripe test data
 
 ### Available Secrets
 - `XAI_API_KEY` - Set and working for Grok
