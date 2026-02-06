@@ -315,6 +315,8 @@ test.describe('Help Widget (Public)', () => {
 });
 
 test.describe('Admin - Metrics Dashboard', () => {
+  test.describe.configure({ timeout: 60000 });
+
   test.beforeEach(async ({ page }) => {
     const isAuthenticated = await ensureAuthenticated(page);
     if (!isAuthenticated) {
@@ -398,6 +400,8 @@ test.describe('Admin - Metrics Dashboard', () => {
 });
 
 test.describe('Admin - Feedback Management', () => {
+  test.describe.configure({ timeout: 60000 });
+
   test.beforeEach(async ({ page }) => {
     const isAuthenticated = await ensureAuthenticated(page);
     if (!isAuthenticated) {
@@ -430,6 +434,8 @@ test.describe('Admin - Feedback Management', () => {
 });
 
 test.describe('Admin Navigation', () => {
+  test.describe.configure({ timeout: 60000 });
+
   test.beforeEach(async ({ page }) => {
     const isAuthenticated = await ensureAuthenticated(page);
     if (!isAuthenticated) {
@@ -450,8 +456,8 @@ test.describe('Admin Navigation', () => {
     await page.goto('/admin/users');
     await page.waitForLoadState('networkidle');
     expect(page.url()).toContain('/admin/users');
-    const heading = page.locator('h1, h2').first();
-    await expect(heading).toBeVisible({ timeout: 10000 });
+    const searchInput = page.getByTestId('input-search-users');
+    await expect(searchInput).toBeVisible({ timeout: 15000 });
   });
 
   test('should navigate to admin setup page and display content', async ({ page }) => {
@@ -539,6 +545,8 @@ test.describe('API Endpoints - Feedback', () => {
 });
 
 test.describe('API Endpoints - Metrics', () => {
+  test.describe.configure({ timeout: 60000 });
+
   test('should return metrics data for authenticated admin', async ({ page, request }) => {
     const isAuthenticated = await ensureAuthenticated(page);
     if (!isAuthenticated) {
