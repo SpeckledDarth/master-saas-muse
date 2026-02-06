@@ -6,7 +6,9 @@ import { ThemeSettingsProvider } from "@/components/theme-settings-provider"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { PlausibleAnalytics } from "@/components/analytics/plausible"
-import { ConditionalFeedbackWidget } from "@/components/conditional-feedback-widget"
+import { ImpersonationBanner } from "@/components/impersonation-banner"
+import { CookieConsentWrapper } from "@/components/cookie-consent-wrapper"
+import { UnifiedSupportWidget } from "@/components/unified-support-widget"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -52,10 +54,12 @@ export default function RootLayout({
         >
           <ThemeSettingsProvider>
             <div className="flex min-h-screen flex-col">
+              <ImpersonationBanner />
               <Header />
               <main className="flex-1">{children}</main>
               <Footer />
-              <ConditionalFeedbackWidget />
+              <CookieConsentWrapper />
+              <UnifiedSupportWidget />
             </div>
           </ThemeSettingsProvider>
         </ThemeProvider>

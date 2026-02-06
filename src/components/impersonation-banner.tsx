@@ -30,7 +30,7 @@ export function ImpersonationBanner() {
   if (!active) return null
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[100] bg-yellow-500 text-yellow-950 px-4 py-2" data-testid="banner-impersonation">
+    <div className="w-full bg-yellow-500 text-yellow-950 px-4 py-2" data-testid="banner-impersonation">
       <div className="container mx-auto flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 shrink-0" />
