@@ -66,38 +66,47 @@ The project is built with Next.js 16+ (App Router), React 18+, and TypeScript. S
 
 ## Session Status (February 6, 2026)
 
-### Last Completed
-- Comprehensive documentation update across all 5 docs (replit.md, MASTER_PLAN.md v3.0, PROJECT_OVERVIEW.md, MUSE_CHECKLIST.md, SETUP_GUIDE.md)
-- All docs synchronized: feature lists, completion statuses, dates (Feb 6, 2026), env var references
-- Architect review passed on all documentation
+### Last Completed (Session 2 - Feb 6, 2026)
+**AI and Webhook Integration Testing - ALL PASSED**
 
-### Next Session Priority (February 7, 2026)
-**Test and debug AI (Grok) and Webhook (n8n) features:**
+1. **AI (Grok) Integration** - Verified working:
+   - xAI Grok API (streaming + non-streaming) confirmed working with `XAI_API_KEY`
+   - `/api/ai/chat` endpoint returns 401 for unauthenticated requests (correct)
+   - Admin AI settings in Supabase: `provider: xai, model: grok-3-mini-fast, temperature: 0.7`
+   - Error handling works for bad models and missing API keys
+   - Provider config supports xAI, OpenAI, Anthropic with model lists
 
-1. **AI Integration Testing** (`src/lib/ai/provider.ts`, `/api/ai/chat`)
-   - Verify xAI Grok provider works with `XAI_API_KEY` secret
-   - Test chat completion endpoint with streaming
-   - Test admin config (model selection, temperature, system prompt)
-   - Test feature toggle (enable/disable AI from Setup Dashboard)
-   - Verify error handling for missing/invalid API keys
+2. **Webhook Integration** - Verified working:
+   - All 8 event types + `test.ping` properly wired to features
+   - HMAC-SHA256 signing works correctly
+   - Retry logic (3 attempts with exponential backoff) confirmed
+   - Event toggles properly gate dispatch (`EVENT_TO_SETTING` mapping)
+   - `feedback.submitted` and `contact.submitted` webhooks confirmed delivered in logs
 
-2. **Webhook/n8n Integration Testing** (`src/lib/webhooks/dispatcher.ts`, `/api/admin/webhooks`)
-   - Test webhook dispatcher with HMAC-SHA256 signing
-   - Test all 8 event types fire correctly
-   - Test retry logic on delivery failure
-   - Test admin webhook configuration UI (URL, secret, per-event toggles)
-   - Test "Send Test" functionality from admin panel
-   - Optionally test with actual n8n endpoint if available
+3. **Bug Fix**: `src/app/api/contact/route.ts`
+   - Changed module-level `new Resend(process.env.RESEND_API_KEY)` to lazy `getResendClient()` function
+   - Added `dispatchWebhook('contact.submitted', ...)` to no-Resend code path
 
-### Key Files for Testing
-- `src/lib/ai/provider.ts` - AI provider abstraction (xAI, OpenAI, Anthropic)
-- `src/lib/webhooks/dispatcher.ts` - Webhook dispatcher with HMAC signing
-- `src/app/api/ai/chat/route.ts` - AI chat API endpoint
-- `src/app/api/admin/webhooks/route.ts` - Webhook admin API
-- `src/types/settings.ts` - Settings interfaces (AI config, webhook config)
-- `tests/` - E2E test files (38 Playwright tests across 5 suites)
+### Webhook Event Wiring Map
+| Event | Source File | Toggle Key |
+|---|---|---|
+| `feedback.submitted` | `/api/feedback/route.ts` | `feedbackSubmitted` |
+| `waitlist.entry` | `/api/waitlist/route.ts` | `waitlistEntry` |
+| `subscription.created` | `/api/stripe/webhook/route.ts` | `subscriptionCreated` |
+| `subscription.updated` | `/api/stripe/webhook/route.ts` | `subscriptionUpdated` |
+| `subscription.cancelled` | `/api/stripe/webhook/route.ts` | `subscriptionCancelled` |
+| `team.invited` | `/api/admin/team/route.ts` | `teamInvited` |
+| `team.member_joined` | `/api/invite/[token]/accept/route.ts` | `teamMemberJoined` |
+| `contact.submitted` | `/api/contact/route.ts` | `contactSubmitted` |
+| `test.ping` | Admin webhook test | `null` (always fires) |
+
+### Next Session Priority
+- Run Playwright E2E test suites (38 tests across 5 suites)
+- Test AI chat through the UI (requires authenticated user)
+- Test webhook admin UI (URL/secret/event toggle configuration)
+- Verify Stripe webhook integration with test events
 
 ### Available Secrets
-- `XAI_API_KEY` - Set and ready for Grok testing
+- `XAI_API_KEY` - Set and working for Grok
 - `STRIPE_SECRET_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY` (via integration) - Production secrets
 - `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT` - Monitoring
