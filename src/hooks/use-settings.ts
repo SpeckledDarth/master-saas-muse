@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { SiteSettings, defaultSettings } from '@/types/settings'
 import { createClient } from '@/lib/supabase/client'
 
@@ -8,22 +8,25 @@ export function useSettings() {
   const [settings, setSettings] = useState<SiteSettings | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const settingsLoadedRef = useRef(false)
 
   useEffect(() => {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => {
       controller.abort()
-      if (!settings) {
+      if (!settingsLoadedRef.current) {
         setSettings(defaultSettings)
+        setLoading(false)
       }
-      setLoading(false)
     }, 5000)
     
     async function loadSettings() {
       try {
         if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+          settingsLoadedRef.current = true
           setSettings(defaultSettings)
           setLoading(false)
+          clearTimeout(timeoutId)
           return
         }
         
@@ -38,8 +41,10 @@ export function useSettings() {
           if (error.code !== 'PGRST116') {
             console.error('Settings error:', error.message)
           }
+          settingsLoadedRef.current = true
           setSettings(defaultSettings)
           setLoading(false)
+          clearTimeout(timeoutId)
           return
         }
         
@@ -85,6 +90,7 @@ export function useSettings() {
         console.error('Failed to load settings:', err)
         setSettings(defaultSettings)
       } finally {
+        settingsLoadedRef.current = true
         clearTimeout(timeoutId)
         setLoading(false)
       }
