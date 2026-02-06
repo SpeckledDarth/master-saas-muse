@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { NotificationBell } from '@/components/notification-bell'
 import { UserNav } from '@/components/auth/UserNav'
 import { useSettings } from '@/hooks/use-settings'
 import { useEffect, useState } from 'react'
@@ -147,6 +148,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <NotificationBell />
           <ThemeToggle />
           <UserNav />
         </div>

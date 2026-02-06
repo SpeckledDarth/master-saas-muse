@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, Search, Users, Eye, Trash2, UserPlus, Download, Mail, Calendar, Clock, Shield, CheckCircle, XCircle, Crown, UserCog, User, Eye as ViewerIcon, ExternalLink, MessageSquare, FileText, StickyNote, Plus, CreditCard } from 'lucide-react'
+import { Loader2, Search, Users, Eye, Trash2, UserPlus, Download, Mail, Calendar, Clock, Shield, CheckCircle, XCircle, Crown, UserCog, User, Eye as ViewerIcon, ExternalLink, MessageSquare, FileText, StickyNote, Plus, CreditCard, UserCheck } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface UserWithRole {
@@ -68,6 +68,7 @@ export default function UsersPage() {
   const [newNote, setNewNote] = useState('')
   const [addingNote, setAddingNote] = useState(false)
   const [deletingNoteId, setDeletingNoteId] = useState<number | null>(null)
+  const [impersonating, setImpersonating] = useState<string | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -246,6 +247,28 @@ export default function UsersPage() {
       toast({ title: 'Failed to delete note', description: 'Please try again', variant: 'destructive' })
     } finally {
       setDeletingNoteId(null)
+    }
+  }
+
+  async function handleImpersonate(userId: string) {
+    setImpersonating(userId)
+    try {
+      const response = await fetch('/api/admin/impersonate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      })
+      const data = await response.json()
+      if (response.ok) {
+        toast({ title: 'Impersonation started', description: `Now viewing as ${data.targetUser.email}` })
+        window.location.href = '/'
+      } else {
+        toast({ title: 'Failed to impersonate', description: data.error, variant: 'destructive' })
+      }
+    } catch (error) {
+      toast({ title: 'Failed to impersonate', description: 'Please try again', variant: 'destructive' })
+    } finally {
+      setImpersonating(null)
     }
   }
 
@@ -633,6 +656,20 @@ export default function UsersPage() {
                       <Mail className="h-4 w-4 mr-2" />
                       Send Email
                     </a>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => selectedUser && handleImpersonate(selectedUser.id)}
+                    disabled={impersonating === selectedUser?.id}
+                    data-testid="button-impersonate-user"
+                  >
+                    {impersonating === selectedUser?.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <UserCheck className="h-4 w-4 mr-2" />
+                    )}
+                    Impersonate User
                   </Button>
                 </div>
               </TabsContent>

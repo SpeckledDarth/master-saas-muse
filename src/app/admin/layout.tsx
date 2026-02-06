@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Loader2, BarChart3 } from 'lucide-react'
+import { Loader2, BarChart3, ScrollText } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { getTeamPermissions, type TeamRole, type TeamPermissions } from '@/lib/team-permissions'
@@ -210,6 +210,18 @@ export default function AdminLayout({
                 >
                   <Link href="/admin/email-templates" data-testid="link-admin-emails">
                     Emails
+                  </Link>
+                </Button>
+              )}
+              {(isAppAdmin || permissions?.canViewAnalytics) && (
+                <Button 
+                  variant={pathname === '/admin/audit-logs' ? 'secondary' : 'ghost'} 
+                  size="sm" 
+                  asChild
+                >
+                  <Link href="/admin/audit-logs" data-testid="link-admin-audit-logs">
+                    <ScrollText className="h-4 w-4 mr-1" />
+                    Audit Logs
                   </Link>
                 </Button>
               )}

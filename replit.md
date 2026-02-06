@@ -41,6 +41,9 @@ The UI features dynamic branding, configurable navigation, customizable hero sec
 - **Legal & Compliance System**: Configuration for compliance (Acceptable Use, Cookie Policy, etc.), support (chatbot widget), and security (MFA, password requirements) settings. Includes 7 new public legal page routes with dynamic variable replacement and a cookie consent banner.
 - **Floating Support Chatbot Widget**: Configurable chatbot with AI-powered responses and rate limiting.
 - **Admin Metrics Dashboard**: API endpoint and dashboard for aggregating user counts, subscriptions, MRR, feedback, and waitlist stats with KPI cards and line charts.
+- **In-App Notifications**: Bell icon with unread badge, popover notification list, type-specific icons, auto-polling, mark all read, server-side notification creation utility.
+- **User Impersonation**: Admin can impersonate users for debugging. Cookie-based session with 30-min expiry, yellow warning banner, audit logging, and "Stop Impersonation" button.
+- **Audit Log Viewer**: Admin page with paginated, filterable audit log table showing user actions, timestamps, and details.
 
 **System Design Choices:**
 The architecture uses a unified frontend and backend with Next.js API routes, modular component-based development, RLS and application-level logic for access control, and clear separation of concerns for third-party services. It employs a fire-and-forget webhook delivery pattern and pluggable abstraction layers for AI providers.
