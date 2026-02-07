@@ -1,0 +1,58 @@
+#### 1. Add Social Module Toggle System
+   - **Reasoning:** This establishes the modularity foundation, allowing admins to enable/disable the feature without code changes, fitting MuseKit's flexible design. It prevents bloat for non-social clones and supports tiered access (Universal for basic posting, Power for advanced AI/scheduling).
+   - **Refinements/Additions:** Include sub-toggles for tiers in the Features & Integrations tab, with a quick description/preview. Trigger a dependency check (e.g., alert if SDKs aren't installed) and add a "Module Status" indicator (green if configured).
+   - **Why It Fits:** Aligns with existing toggles (e.g., waitlist mode), making it cloneable and user-friendly.
+   - **Honest Con:** If not tested early, UI glitches could arise—mock it first to ensure seamless integration.
+
+#### 2. Build Social Account Connection System
+   - **Reasoning:** Essential for core functionality, enabling users to link platforms (e.g., Twitter/X, LinkedIn, Instagram) via OAuth, with encrypted token storage in Supabase. This is the entry point for posting/monitoring, making the module usable.
+   - **Refinements/Additions:** Use dynamic imports for SDKs (lazy-load to keep bundles lean). Add token validation on connect (e.g., test API call for access confirmation). Start with 2-3 key platforms, expand later.
+   - **Why It Fits:** Leverages MuseKit's Supabase Auth for security and cloneability, tying into existing OAuth toggles.
+   - **Honest Con:** Platform-specific quirks (e.g., Instagram approval) could delay—focus on essentials to avoid holdups.
+
+#### 3. Create AI Content Generation Endpoint
+   - **Reasoning:** Builds the "smart" core for AI-driven posts/captions, using MuseKit's pluggable AI (Grok/OpenAI/Anthropic) to generate brand-aligned content. This differentiates the Power tier and supports passivity.
+   - **Refinements/Additions:** Include multimodal support (text + image gen via Grok if available). Add usage logging to feed later metrics, and tie to rate limiting for caps (e.g., 10/mo free).
+   - **Why It Fits:** Prompts can be tier-specific (basic in Universal, advanced in Power), enhancing upsells without reinvention.
+   - **Honest Con:** AI costs could creep—enforce caps early to control.
+
+#### 4. Add Post Scheduling and Queue Jobs
+   - **Reasoning:** Delivers the passive heart—automated posting via BullMQ queues, enabling "set-it-and-forget-it" schedules. This makes the module truly hands-off, aligning with MuseKit portfolio goals.
+   - **Refinements/Additions:** Define job types (e.g., "Immediate Post" vs. "Scheduled Batch"). Add retry logic for failures.
+   - **Why It Fits:** Integrates with n8n for workflows, cloneable across apps.
+   - **Honest Con:** Queue overload in volume—monitor with Upstash to prevent.
+
+#### 5. Build Social API Status Checker
+   - **Reasoning:** Proactively addresses dependency risks by monitoring API health (e.g., daily pings), ensuring reliability and reducing downtime impacts on agents/posting.
+   - **Refinements/Additions:** Make it a BullMQ job with notifications via Resend/in-app bell. Include a dashboard widget for status.
+   - **Why It Fits:** Enhances passivity without complexity, tying into MuseKit's alerts.
+   - **Honest Con:** Over-notification risk—threshold alerts (e.g., only repeated failures).
+
+#### 6. Extend Metrics Dashboard with Social KPIs
+   - **Reasoning:** Provides data-driven insights (e.g., posts generated, engagement rate), extending MuseKit's Recharts setup for module-specific tracking and tier gating.
+   - **Refinements/Additions:** Add 2-3 KPIs like "Posts Generated" or "Engagement Rate." Include tier views (filter by Universal/Power) and ensure anonymization for privacy.
+   - **Why It Fits:** Cloneable and empowers decisions across apps.
+   - **Honest Con:** Data privacy concerns—aggregate carefully.
+
+#### 7. Add Onboarding Wizard Social Prompt
+   - **Reasoning:** Improves adoption by guiding users to enable the module during setup, reducing friction for new clones.
+   - **Refinements/Additions:** Make it conditional (show if relevant) with a demo tooltip/video.
+   - **Why It Fits:** Fits the existing wizard, user-friendly for solopreneurs.
+   - **Honest Con:** Could lengthen wizard—keep concise.
+
+#### 8. Add Fallback for Automation Downtime
+   - **Reasoning:** Safeguards passivity by switching to alternatives (e.g., local queues) if n8n/API fails, ensuring core functions continue.
+   - **Refinements/Additions:** Use Vercel Cron for critical jobs; test with simulated downtime. Scope to essentials (e.g., posting only).
+   - **Why It Fits:** Ties into BullMQ, cloneable for reliability.
+   - **Honest Con:** Adds testing complexity—address in step 9.
+
+#### 9. Write End-to-End Tests for Features
+   - **Reasoning:** Ensures quality and prevents regressions, building on MuseKit's 46 tests for module-specific flows (e.g., toggle/posting).
+   - **Refinements/Additions:** Aim for 6-8 new Playwright tests (e.g., full post flow). Run in CI/CD.
+   - **Why It Fits:** Critical for production-ready clones.
+   - **Honest Con:** Time-intensive—parallelize if possible.
+
+#### 10. Update Documentation for New Module
+   - **Reasoning:** Ensures maintainability and user guidance, with screenshots/troubleshooting for the module.
+   - **Refinements/Additions:** Include code snippets and a "Troubleshooting" section (e.g., API errors).
+   - **Why It Fits:** Supports scaling MuseKit portfolio.

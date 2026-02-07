@@ -1,0 +1,12 @@
+The "tier-filtered metrics view" recommendation was a refinement I suggested for Step 6 in the build plan (extending the metrics dashboard with social KPIs). Let me break it down in simple terms, explain what it is, and highlight its value based on our discussions about making the social module cloneable, user-friendly, and monetization-ready.
+What It Is
+In essence, it's a way to add filtering capabilities to the metrics dashboard so admins (or users, if exposed) can view data segmented by subscription tiers (e.g., Universal vs. Power in your social module). For example:
+•	Without filtering: The dashboard shows aggregate KPIs like "Posts Generated" or "Engagement Rate" across all users.
+•	With tier-filtering: Add a dropdown or tabs to slice the data—e.g., "Show only Universal tier users" (basic features) vs. "Power tier users" (advanced AI/scheduling). This could use MuseKit's existing Recharts for dynamic charts that update on filter selection.
+Technically, it's straightforward: Query Supabase/Stripe for tier data (e.g., via user roles or subscription status), then apply filters in the API route fetching metrics. The view remains in the admin dashboard but could be gated (e.g., full filters only for Power admins via RLS).
+Its Value
+This feature adds significant polish and utility without much extra effort. Here's why it's valuable:
+•	Better Insights for You as Founder: In your portfolio model, it lets you analyze tier performance quickly—e.g., "Is Power tier driving 80% of engagement?" This informs upsells (e.g., email nudges via Resend for Universal users) and reduces churn by spotting patterns (e.g., high drop-off in basic tier).
+•	Monetization Boost: Highlights tier differences visually, making upgrades obvious (e.g., Power shows "unlimited posts" metrics spiking). It supports your two-tier structure, turning the dashboard into a sales tool—users see the "value gap" in real data.
+•	User-Centric and Cloneable: For end-users (e.g., agencies in Power tier), it provides segmented views (e.g., client-specific trends), enhancing satisfaction. Since it's built on MuseKit's metrics tab, it's automatically cloneable—every app gets it toggled on, saving time across your 10-app goal.
+•	Passivity and Scalability: Ties into alerts (e.g., notify if Power engagement drops)—automates monitoring via BullMQ, keeping your routine light as the portfolio grows.
