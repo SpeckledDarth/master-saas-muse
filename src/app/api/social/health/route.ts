@@ -51,7 +51,7 @@ async function isAdminUser(userId: string): Promise<boolean> {
   }
 }
 
-const PLATFORMS: SocialPlatform[] = ['twitter', 'linkedin', 'instagram']
+const PLATFORMS: SocialPlatform[] = ['twitter', 'linkedin', 'instagram', 'youtube', 'facebook', 'tiktok', 'reddit', 'pinterest', 'snapchat', 'discord']
 
 export async function GET() {
   const user = await getAuthenticatedUser()

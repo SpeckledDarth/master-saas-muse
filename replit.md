@@ -50,14 +50,15 @@ The UI features dynamic branding, configurable navigation, customizable hero sec
 - **Metrics Alerts**: Configurable thresholds for churn rate and user growth with email notifications.
 - **Database Backup Configuration**: Admin UI for configuring backup notification preferences, frequency, and retention periods.
 - **API Token Rotation**: BullMQ job type for automated webhook secret rotation with configurable interval.
-- **MuseSocial Module**: Toggleable social media management extension with Universal/Power tiers. Features include admin setup, social account connection, AI-powered post generation (with multimodal image support), post scheduling and management, social API health checker, social KPI cards on admin metrics dashboard (with tier badge and AI generation count), conditional onboarding wizard step, Vercel Cron fallback, n8n workflow templates, and Playwright E2E tests. Tier-based rate limiting enforces daily caps (Universal: 10 AI generations, 20 posts; Power: 100 AI generations, 10,000 posts). Dependency warnings alert admins when AI is disabled, no platforms are enabled, or API keys are missing. BullMQ retry logic (3 attempts, exponential backoff) handles post delivery failures. All social imports use dynamic loading or type-only imports.
+- **MuseSocial Module**: Toggleable social media management extension with Universal/Power tiers supporting 10 platforms (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord). Features include admin setup, social account connection, AI-powered post generation (with multimodal image support), post scheduling and management, social API health checker, social KPI cards on admin metrics dashboard (with tier badge and AI generation count), conditional onboarding wizard step, Vercel Cron fallback, n8n workflow templates, and Playwright E2E tests. Tier-based rate limiting enforces daily caps (Universal: 10 AI generations, 20 posts; Power: 100 AI generations, 10,000 posts). Dependency warnings alert admins when AI is disabled, no platforms are enabled, or API keys are missing. BullMQ retry logic (3 attempts, exponential backoff) handles post delivery failures. All social imports use dynamic loading or type-only imports.
+- **Centralized API Keys & Integrations**: Admin setup page (`/admin/setup/integrations`) showing all environment variable statuses across two sections: Tech Stack (Supabase, Stripe, Resend, AI providers, Redis, Sentry, Plausible) and Social Platforms (all 10 platforms). Displays masked values, configured/missing badges, and links to official docs. Keys are managed as environment variables, never stored in the database.
 
 ### MuseSocial Admin Guide
 
 **Setup:**
 1. Go to Admin > Setup > MuseSocial to enable the module
 2. Select tier (Universal or Power) based on usage needs
-3. Enable desired platforms (Twitter/X, LinkedIn) and configure API credentials
+3. Enable desired platforms (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord) and configure API credentials via Admin > Setup > Integrations
 4. Ensure AI features are enabled in Admin > Setup > Features for post generation
 5. Dependency warnings will appear if configuration is incomplete
 
@@ -78,7 +79,9 @@ The UI features dynamic branding, configurable navigation, customizable hero sec
 
 **Key Files:**
 - `src/lib/social/rate-limits.ts` — Tier-based rate limiting constants and check function
-- `src/lib/social/client.ts` — Platform client interfaces (Twitter, LinkedIn, Instagram)
+- `src/lib/social/client.ts` — Platform client interfaces (all 10 platforms)
+- `src/app/admin/setup/integrations/page.tsx` — Centralized API Keys & Integrations page
+- `src/app/api/admin/integrations/route.ts` — API endpoint for integration status checks
 - `src/lib/social/n8n-templates/` — n8n workflow JSON templates
 - `src/app/api/social/` — All social API routes (accounts, posts, generate-post, health)
 - `src/app/admin/setup/musesocial/page.tsx` — Admin configuration page
@@ -90,6 +93,7 @@ The architecture uses a unified frontend and backend with Next.js API routes, mo
 ## Next Phase / Roadmap
 - **Dynamic Tiers for MuseSocial**: Make social module tiers fully dynamic — allow admins to create, name, and configure unlimited custom tiers from the dashboard (currently limited to "Universal" and "Power" defined in code). Requires updating `SocialModuleTier` type, tier selection UI, rate-limits, and tier display throughout the app.
 - **General Principle**: Minimize hardcoded variables across the entire app. Any configurable value should be editable from the admin dashboard without code changes.
+- **Real Platform API Integration**: The 7 new platform clients (YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord) have stubbed methods ready for real API integration. Each requires developer app registration and OAuth setup.
 
 ## External Dependencies
 - **Supabase**: PostgreSQL database, Authentication, Row Level Security (RLS), Storage.

@@ -54,7 +54,7 @@ export interface SocialPostJobData {
   type: 'social-post'
   postId: string
   userId: string
-  platform: 'twitter' | 'linkedin' | 'instagram'
+  platform: string
   content: string
   mediaUrls?: string[]
   scheduledAt?: string
@@ -62,14 +62,14 @@ export interface SocialPostJobData {
 
 export interface SocialHealthCheckJobData {
   type: 'social-health-check'
-  platforms: ('twitter' | 'linkedin' | 'instagram')[]
+  platforms: string[]
   alertEmail?: string
   failureThreshold: number
 }
 
 export interface SocialTrendMonitorJobData {
   type: 'social-trend-monitor'
-  platform: 'twitter' | 'linkedin'
+  platform: string
   keywords: string[]
   userId: string
 }

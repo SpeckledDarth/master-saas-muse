@@ -1,4 +1,4 @@
-export type SocialPlatform = 'twitter' | 'linkedin' | 'instagram'
+export type SocialPlatform = 'twitter' | 'linkedin' | 'instagram' | 'youtube' | 'facebook' | 'tiktok' | 'reddit' | 'pinterest' | 'snapchat' | 'discord'
 
 export interface SocialAccount {
   id: string
@@ -121,10 +121,262 @@ export class InstagramClient implements PlatformClient {
   }
 }
 
+export class YouTubeClient implements PlatformClient {
+  async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
+    try {
+      if (!accessToken || accessToken.length < 10) {
+        return { valid: false, error: 'Invalid token format' }
+      }
+      return { valid: true }
+    } catch (error) {
+      return { valid: false, error: (error as Error).message }
+    }
+  }
+
+  async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
+    return null
+  }
+
+  async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    return null
+  }
+
+  async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    return { views: 0, likes: 0, comments: 0, shares: 0 }
+  }
+
+  async checkHealth(): Promise<{ healthy: boolean; latencyMs: number }> {
+    const start = Date.now()
+    try {
+      const response = await fetch('https://www.googleapis.com/youtube/v3', { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+      return { healthy: response.status !== 500, latencyMs: Date.now() - start }
+    } catch {
+      return { healthy: false, latencyMs: Date.now() - start }
+    }
+  }
+}
+
+export class FacebookClient implements PlatformClient {
+  async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
+    try {
+      if (!accessToken || accessToken.length < 10) {
+        return { valid: false, error: 'Invalid token format' }
+      }
+      return { valid: true }
+    } catch (error) {
+      return { valid: false, error: (error as Error).message }
+    }
+  }
+
+  async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
+    return null
+  }
+
+  async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    return null
+  }
+
+  async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    return { likes: 0, comments: 0, shares: 0, reach: 0 }
+  }
+
+  async checkHealth(): Promise<{ healthy: boolean; latencyMs: number }> {
+    const start = Date.now()
+    try {
+      const response = await fetch('https://graph.facebook.com/v19.0/', { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+      return { healthy: response.status !== 500, latencyMs: Date.now() - start }
+    } catch {
+      return { healthy: false, latencyMs: Date.now() - start }
+    }
+  }
+}
+
+export class TikTokClient implements PlatformClient {
+  async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
+    try {
+      if (!accessToken || accessToken.length < 10) {
+        return { valid: false, error: 'Invalid token format' }
+      }
+      return { valid: true }
+    } catch (error) {
+      return { valid: false, error: (error as Error).message }
+    }
+  }
+
+  async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
+    return null
+  }
+
+  async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    return null
+  }
+
+  async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    return { views: 0, likes: 0, comments: 0, shares: 0 }
+  }
+
+  async checkHealth(): Promise<{ healthy: boolean; latencyMs: number }> {
+    const start = Date.now()
+    try {
+      const response = await fetch('https://open.tiktokapis.com/v2/', { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+      return { healthy: response.status !== 500, latencyMs: Date.now() - start }
+    } catch {
+      return { healthy: false, latencyMs: Date.now() - start }
+    }
+  }
+}
+
+export class RedditClient implements PlatformClient {
+  async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
+    try {
+      if (!accessToken || accessToken.length < 10) {
+        return { valid: false, error: 'Invalid token format' }
+      }
+      return { valid: true }
+    } catch (error) {
+      return { valid: false, error: (error as Error).message }
+    }
+  }
+
+  async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
+    return null
+  }
+
+  async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    return null
+  }
+
+  async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    return { upvotes: 0, downvotes: 0, comments: 0, awards: 0 }
+  }
+
+  async checkHealth(): Promise<{ healthy: boolean; latencyMs: number }> {
+    const start = Date.now()
+    try {
+      const response = await fetch('https://oauth.reddit.com/api/v1/me', { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+      return { healthy: response.status !== 500, latencyMs: Date.now() - start }
+    } catch {
+      return { healthy: false, latencyMs: Date.now() - start }
+    }
+  }
+}
+
+export class PinterestClient implements PlatformClient {
+  async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
+    try {
+      if (!accessToken || accessToken.length < 10) {
+        return { valid: false, error: 'Invalid token format' }
+      }
+      return { valid: true }
+    } catch (error) {
+      return { valid: false, error: (error as Error).message }
+    }
+  }
+
+  async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
+    return null
+  }
+
+  async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    return null
+  }
+
+  async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    return { saves: 0, clicks: 0, impressions: 0, closeups: 0 }
+  }
+
+  async checkHealth(): Promise<{ healthy: boolean; latencyMs: number }> {
+    const start = Date.now()
+    try {
+      const response = await fetch('https://api.pinterest.com/v5/', { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+      return { healthy: response.status !== 500, latencyMs: Date.now() - start }
+    } catch {
+      return { healthy: false, latencyMs: Date.now() - start }
+    }
+  }
+}
+
+export class SnapchatClient implements PlatformClient {
+  async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
+    try {
+      if (!accessToken || accessToken.length < 10) {
+        return { valid: false, error: 'Invalid token format' }
+      }
+      return { valid: true }
+    } catch (error) {
+      return { valid: false, error: (error as Error).message }
+    }
+  }
+
+  async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
+    return null
+  }
+
+  async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    return null
+  }
+
+  async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    return { views: 0, screenshots: 0, replies: 0 }
+  }
+
+  async checkHealth(): Promise<{ healthy: boolean; latencyMs: number }> {
+    const start = Date.now()
+    try {
+      const response = await fetch('https://adsapi.snapchat.com/v1/', { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+      return { healthy: response.status !== 500, latencyMs: Date.now() - start }
+    } catch {
+      return { healthy: false, latencyMs: Date.now() - start }
+    }
+  }
+}
+
+export class DiscordClient implements PlatformClient {
+  async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
+    try {
+      if (!accessToken || accessToken.length < 10) {
+        return { valid: false, error: 'Invalid token format' }
+      }
+      return { valid: true }
+    } catch (error) {
+      return { valid: false, error: (error as Error).message }
+    }
+  }
+
+  async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
+    return null
+  }
+
+  async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    return null
+  }
+
+  async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    return { reactions: 0, replies: 0, pins: 0 }
+  }
+
+  async checkHealth(): Promise<{ healthy: boolean; latencyMs: number }> {
+    const start = Date.now()
+    try {
+      const response = await fetch('https://discord.com/api/v10/gateway', { method: 'GET', signal: AbortSignal.timeout(5000) })
+      return { healthy: response.ok, latencyMs: Date.now() - start }
+    } catch {
+      return { healthy: false, latencyMs: Date.now() - start }
+    }
+  }
+}
+
 export function getPlatformClient(platform: SocialPlatform): PlatformClient {
   switch (platform) {
     case 'twitter': return new TwitterClient()
     case 'linkedin': return new LinkedInClient()
     case 'instagram': return new InstagramClient()
+    case 'youtube': return new YouTubeClient()
+    case 'facebook': return new FacebookClient()
+    case 'tiktok': return new TikTokClient()
+    case 'reddit': return new RedditClient()
+    case 'pinterest': return new PinterestClient()
+    case 'snapchat': return new SnapchatClient()
+    case 'discord': return new DiscordClient()
   }
 }

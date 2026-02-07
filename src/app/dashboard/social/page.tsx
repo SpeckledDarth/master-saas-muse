@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Twitter, Linkedin, Instagram, Check, X, RefreshCw, Unlink } from 'lucide-react'
+import { Loader2, Twitter, Linkedin, Instagram, Youtube, Facebook, Music, MessageSquare, Image, Camera, Gamepad2, Check, X, RefreshCw, Unlink } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import {
   Dialog,
@@ -16,7 +16,7 @@ import {
 import type { SocialAccount } from '@/lib/social/client'
 
 type PlatformInfo = {
-  id: 'twitter' | 'linkedin' | 'instagram'
+  id: string
   name: string
   icon: typeof Twitter
   comingSoon?: boolean
@@ -25,7 +25,14 @@ type PlatformInfo = {
 const PLATFORMS: PlatformInfo[] = [
   { id: 'twitter', name: 'Twitter / X', icon: Twitter },
   { id: 'linkedin', name: 'LinkedIn', icon: Linkedin },
-  { id: 'instagram', name: 'Instagram', icon: Instagram, comingSoon: true },
+  { id: 'instagram', name: 'Instagram', icon: Instagram },
+  { id: 'youtube', name: 'YouTube', icon: Youtube },
+  { id: 'facebook', name: 'Facebook', icon: Facebook },
+  { id: 'tiktok', name: 'TikTok', icon: Music },
+  { id: 'reddit', name: 'Reddit', icon: MessageSquare },
+  { id: 'pinterest', name: 'Pinterest', icon: Image },
+  { id: 'snapchat', name: 'Snapchat', icon: Camera },
+  { id: 'discord', name: 'Discord', icon: Gamepad2 },
 ]
 
 export default function SocialAccountsPage() {

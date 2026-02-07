@@ -9,7 +9,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Share2, Twitter, Linkedin, Instagram, AlertTriangle } from 'lucide-react'
+import { Share2, Twitter, Linkedin, Instagram, Youtube, Facebook, Music, MessageSquare, Image, Camera, Gamepad2, AlertTriangle } from 'lucide-react'
+import { SiTiktok, SiReddit, SiPinterest, SiSnapchat, SiDiscord } from 'react-icons/si'
 import { defaultSettings } from '@/types/settings'
 import type { SocialModuleTier } from '@/types/settings'
 
@@ -81,7 +82,7 @@ export default function MuseSocialPage() {
         const missingKeys = enabledPlatforms.filter(([, cfg]) => !cfg.apiKeyConfigured)
         if (missingKeys.length > 0) {
           const names = missingKeys.map(([p]) => p.charAt(0).toUpperCase() + p.slice(1)).join(', ')
-          warnings.push({ key: 'api-keys', testId: 'text-dependency-api-keys', message: `API credentials not configured for ${names}` })
+          warnings.push({ key: 'api-keys', testId: 'text-dependency-api-keys', message: `API credentials not configured for ${names}. Configure them in Integrations.` })
         }
         if (warnings.length === 0) return null
         return (
@@ -254,7 +255,7 @@ export default function MuseSocialPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between py-3">
+              <div className="flex items-center justify-between py-3 border-b">
                 <div className="flex items-center gap-3">
                   <Instagram className="h-5 w-5" />
                   <div>
@@ -269,6 +270,132 @@ export default function MuseSocialPage() {
                   checked={socialModule.platforms.instagram.enabled}
                   onCheckedChange={checked => updatePlatform('instagram', 'enabled', checked)}
                   data-testid="switch-platform-instagram"
+                />
+              </div>
+
+              <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center gap-3">
+                  <Youtube className="h-5 w-5" />
+                  <div>
+                    <p className="font-medium">YouTube</p>
+                    <p className="text-sm text-muted-foreground">Requires Google Cloud Console app</p>
+                    {socialModule.platforms.youtube?.enabled && (
+                      <p className="text-sm text-muted-foreground">Not connected</p>
+                    )}
+                  </div>
+                </div>
+                <Switch
+                  checked={socialModule.platforms.youtube?.enabled ?? false}
+                  onCheckedChange={checked => updatePlatform('youtube', 'enabled', checked)}
+                  data-testid="switch-platform-youtube"
+                />
+              </div>
+
+              <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center gap-3">
+                  <Facebook className="h-5 w-5" />
+                  <div>
+                    <p className="font-medium">Facebook</p>
+                    <p className="text-sm text-muted-foreground">Requires Meta Business app review</p>
+                    {socialModule.platforms.facebook?.enabled && (
+                      <p className="text-sm text-muted-foreground">Not connected</p>
+                    )}
+                  </div>
+                </div>
+                <Switch
+                  checked={socialModule.platforms.facebook?.enabled ?? false}
+                  onCheckedChange={checked => updatePlatform('facebook', 'enabled', checked)}
+                  data-testid="switch-platform-facebook"
+                />
+              </div>
+
+              <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center gap-3">
+                  <Music className="h-5 w-5" />
+                  <div>
+                    <p className="font-medium">TikTok</p>
+                    <p className="text-sm text-muted-foreground">Requires TikTok Developer Portal app</p>
+                    {socialModule.platforms.tiktok?.enabled && (
+                      <p className="text-sm text-muted-foreground">Not connected</p>
+                    )}
+                  </div>
+                </div>
+                <Switch
+                  checked={socialModule.platforms.tiktok?.enabled ?? false}
+                  onCheckedChange={checked => updatePlatform('tiktok', 'enabled', checked)}
+                  data-testid="switch-platform-tiktok"
+                />
+              </div>
+
+              <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center gap-3">
+                  <MessageSquare className="h-5 w-5" />
+                  <div>
+                    <p className="font-medium">Reddit</p>
+                    <p className="text-sm text-muted-foreground">Requires Reddit API application</p>
+                    {socialModule.platforms.reddit?.enabled && (
+                      <p className="text-sm text-muted-foreground">Not connected</p>
+                    )}
+                  </div>
+                </div>
+                <Switch
+                  checked={socialModule.platforms.reddit?.enabled ?? false}
+                  onCheckedChange={checked => updatePlatform('reddit', 'enabled', checked)}
+                  data-testid="switch-platform-reddit"
+                />
+              </div>
+
+              <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center gap-3">
+                  <Image className="h-5 w-5" />
+                  <div>
+                    <p className="font-medium">Pinterest</p>
+                    <p className="text-sm text-muted-foreground">Requires Pinterest Business developer app</p>
+                    {socialModule.platforms.pinterest?.enabled && (
+                      <p className="text-sm text-muted-foreground">Not connected</p>
+                    )}
+                  </div>
+                </div>
+                <Switch
+                  checked={socialModule.platforms.pinterest?.enabled ?? false}
+                  onCheckedChange={checked => updatePlatform('pinterest', 'enabled', checked)}
+                  data-testid="switch-platform-pinterest"
+                />
+              </div>
+
+              <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center gap-3">
+                  <Camera className="h-5 w-5" />
+                  <div>
+                    <p className="font-medium">Snapchat</p>
+                    <p className="text-sm text-muted-foreground">Requires Snap Kit developer access</p>
+                    {socialModule.platforms.snapchat?.enabled && (
+                      <p className="text-sm text-muted-foreground">Not connected</p>
+                    )}
+                  </div>
+                </div>
+                <Switch
+                  checked={socialModule.platforms.snapchat?.enabled ?? false}
+                  onCheckedChange={checked => updatePlatform('snapchat', 'enabled', checked)}
+                  data-testid="switch-platform-snapchat"
+                />
+              </div>
+
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <Gamepad2 className="h-5 w-5" />
+                  <div>
+                    <p className="font-medium">Discord</p>
+                    <p className="text-sm text-muted-foreground">Requires Discord Developer Portal bot/app</p>
+                    {socialModule.platforms.discord?.enabled && (
+                      <p className="text-sm text-muted-foreground">Not connected</p>
+                    )}
+                  </div>
+                </div>
+                <Switch
+                  checked={socialModule.platforms.discord?.enabled ?? false}
+                  onCheckedChange={checked => updatePlatform('discord', 'enabled', checked)}
+                  data-testid="switch-platform-discord"
                 />
               </div>
             </CardContent>

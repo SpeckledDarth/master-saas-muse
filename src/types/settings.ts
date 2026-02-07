@@ -359,7 +359,7 @@ export interface MetricsSettings {
 
 export type SocialModuleTier = 'universal' | 'power'
 
-export type SocialPlatform = 'twitter' | 'linkedin' | 'instagram'
+export type SocialPlatform = 'twitter' | 'linkedin' | 'instagram' | 'youtube' | 'facebook' | 'tiktok' | 'reddit' | 'pinterest' | 'snapchat' | 'discord'
 
 export interface SocialAccountConfig {
   enabled: boolean
@@ -1168,6 +1168,13 @@ We regularly review and update our security practices. This page reflects our cu
       twitter: { enabled: false, apiKeyConfigured: false },
       linkedin: { enabled: false, apiKeyConfigured: false },
       instagram: { enabled: false, apiKeyConfigured: false },
+      youtube: { enabled: false, apiKeyConfigured: false },
+      facebook: { enabled: false, apiKeyConfigured: false },
+      tiktok: { enabled: false, apiKeyConfigured: false },
+      reddit: { enabled: false, apiKeyConfigured: false },
+      pinterest: { enabled: false, apiKeyConfigured: false },
+      snapchat: { enabled: false, apiKeyConfigured: false },
+      discord: { enabled: false, apiKeyConfigured: false },
     },
     posting: {
       defaultBrandVoice: '',
