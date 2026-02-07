@@ -6,14 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Palette, FileText, BookOpen, DollarSign, Globe, Settings, Save, Check, Loader2, Scale, MessageCircle, Shield, Share2 } from 'lucide-react'
 import { SetupSettingsProvider, useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
 
-const sections = [
+const coreSections = [
   { id: 'branding', label: 'Branding', icon: Palette, href: '/admin/setup/branding' },
   { id: 'content', label: 'Content', icon: FileText, href: '/admin/setup/content' },
   { id: 'pages', label: 'Pages', icon: BookOpen, href: '/admin/setup/pages' },
   { id: 'pricing', label: 'Pricing', icon: DollarSign, href: '/admin/setup/pricing' },
   { id: 'social', label: 'Social', icon: Globe, href: '/admin/setup/social' },
   { id: 'features', label: 'Features', icon: Settings, href: '/admin/setup/features' },
-  { id: 'musesocial', label: 'MuseSocial', icon: Share2, href: '/admin/setup/musesocial' },
   { id: 'compliance', label: 'Compliance', icon: Scale, href: '/admin/setup/compliance' },
   { id: 'support', label: 'Support', icon: MessageCircle, href: '/admin/setup/support' },
   { id: 'security', label: 'Security', icon: Shield, href: '/admin/setup/security' },
@@ -22,6 +21,7 @@ const sections = [
 function SetupLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const ctx = useSetupSettingsContext()
+  const socialEnabled = ctx.settings?.features?.socialModuleEnabled ?? false
 
   if (ctx.loading) {
     return (
@@ -30,6 +30,8 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
       </div>
     )
   }
+
+  const isMuseSocialActive = pathname === '/admin/setup/musesocial'
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl">
@@ -57,7 +59,7 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
       <div className="flex gap-6">
         <nav className="w-48 shrink-0">
           <div className="space-y-1 sticky top-20">
-            {sections.map((section) => {
+            {coreSections.map((section) => {
               const isActive = pathname === section.href || (pathname === '/admin/setup' && section.id === 'branding')
               return (
                 <Link key={section.id} href={section.href}>
@@ -72,6 +74,23 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
                 </Link>
               )
             })}
+
+            {socialEnabled && (
+              <>
+                <div className="border-t my-3" />
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 pb-1">Modules</p>
+                <Link href="/admin/setup/musesocial">
+                  <Button
+                    variant={isMuseSocialActive ? 'secondary' : 'ghost'}
+                    className={`w-full justify-start ${!isMuseSocialActive ? 'text-primary' : ''}`}
+                    data-testid="tab-musesocial"
+                  >
+                    <Share2 className="h-4 w-4 mr-2" />
+                    MuseSocial
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </nav>
 
