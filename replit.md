@@ -50,7 +50,39 @@ The UI features dynamic branding, configurable navigation, customizable hero sec
 - **Metrics Alerts**: Configurable thresholds for churn rate and user growth with email notifications.
 - **Database Backup Configuration**: Admin UI for configuring backup notification preferences, frequency, and retention periods.
 - **API Token Rotation**: BullMQ job type for automated webhook secret rotation with configurable interval.
-- **MuseSocial Module**: Toggleable social media management extension with Universal/Power tiers. Features include admin setup, social account connection, AI-powered post generation, post scheduling and management, social API health checker, social KPI cards on admin metrics dashboard, conditional onboarding wizard step, Vercel Cron fallback, and Playwright E2E tests.
+- **MuseSocial Module**: Toggleable social media management extension with Universal/Power tiers. Features include admin setup, social account connection, AI-powered post generation (with multimodal image support), post scheduling and management, social API health checker, social KPI cards on admin metrics dashboard (with tier badge and AI generation count), conditional onboarding wizard step, Vercel Cron fallback, n8n workflow templates, and Playwright E2E tests. Tier-based rate limiting enforces daily caps (Universal: 10 AI generations, 20 posts; Power: 100 AI generations, 10,000 posts). Dependency warnings alert admins when AI is disabled, no platforms are enabled, or API keys are missing. BullMQ retry logic (3 attempts, exponential backoff) handles post delivery failures. All social imports use dynamic loading or type-only imports.
+
+### MuseSocial Admin Guide
+
+**Setup:**
+1. Go to Admin > Setup > MuseSocial to enable the module
+2. Select tier (Universal or Power) based on usage needs
+3. Enable desired platforms (Twitter/X, LinkedIn) and configure API credentials
+4. Ensure AI features are enabled in Admin > Setup > Features for post generation
+5. Dependency warnings will appear if configuration is incomplete
+
+**Tier Differences:**
+- Universal: Basic posting/monitoring, 10 AI generations/day, 20 posts/day
+- Power: Full scheduling, trend analysis, AI content generation, analytics, automation, 100 AI generations/day, effectively unlimited posts
+
+**n8n Integration:**
+- Template files in `src/lib/social/n8n-templates/`: auto-post-rss, ai-generate-and-schedule, engagement-monitor
+- Set MUSEKIT_URL and MUSEKIT_SESSION_COOKIE environment variables in n8n
+
+**Troubleshooting:**
+- "Social module not enabled": Admin must toggle on in Setup > MuseSocial
+- "AI features not enabled": Enable AI in Setup > Features
+- "Rate limit exceeded": User hit daily tier cap; upgrade to Power or wait for reset
+- Posts stuck in "scheduled": Check BullMQ queue dashboard, verify Redis connection
+- Token validation fails: Re-connect the social account with fresh credentials
+
+**Key Files:**
+- `src/lib/social/rate-limits.ts` — Tier-based rate limiting constants and check function
+- `src/lib/social/client.ts` — Platform client interfaces (Twitter, LinkedIn, Instagram)
+- `src/lib/social/n8n-templates/` — n8n workflow JSON templates
+- `src/app/api/social/` — All social API routes (accounts, posts, generate-post, health)
+- `src/app/admin/setup/musesocial/page.tsx` — Admin configuration page
+- `src/app/dashboard/social/page.tsx` — User-facing social accounts page
 
 **System Design Choices:**
 The architecture uses a unified frontend and backend with Next.js API routes, modular component-based development, RLS and application-level logic for access control, and clear separation of concerns for third-party services. It employs a fire-and-forget webhook delivery pattern and pluggable abstraction layers for AI providers.

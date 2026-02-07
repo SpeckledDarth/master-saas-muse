@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Loader2, Users, DollarSign, CreditCard, UserPlus, MessageSquare, ListChecks, TrendingDown, Target, ThumbsUp, BarChart3, Send, Bell, Share2 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -32,6 +33,7 @@ interface MetricsData {
   }
   socialMetrics?: {
     socialModuleEnabled: boolean
+    currentTier: string
     totalPosts: number
     postsThisMonth: number
     scheduledPosts: number
@@ -361,7 +363,14 @@ export default function MetricsPage() {
         </Card>
       </div>
       {metrics?.socialMetrics?.socialModuleEnabled && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Current Tier:</span>
+            <Badge variant="default" data-testid="badge-social-tier">
+              {metrics.socialMetrics.currentTier === 'power' ? 'Power' : 'Universal'}
+            </Badge>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card data-testid="card-social-total-posts">
             <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Social Posts</CardTitle>
@@ -416,6 +425,7 @@ export default function MetricsPage() {
               <p className="text-xs text-muted-foreground">AI-created posts</p>
             </CardContent>
           </Card>
+        </div>
         </div>
       )}
     </div>

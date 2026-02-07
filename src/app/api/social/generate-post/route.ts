@@ -140,6 +140,17 @@ export async function POST(request: NextRequest) {
 
   const { platform, topic, brandVoice, style, includeHashtags, maxLength, imageUrl } = body
 
+  if (imageUrl && typeof imageUrl === 'string' && imageUrl.trim()) {
+    try {
+      const parsed = new URL(imageUrl)
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        return NextResponse.json({ error: 'Image URL must use http or https protocol' }, { status: 400 })
+      }
+    } catch {
+      return NextResponse.json({ error: 'Invalid image URL format' }, { status: 400 })
+    }
+  }
+
   if (!platform || !['twitter', 'linkedin', 'instagram'].includes(platform)) {
     return NextResponse.json({ error: 'Invalid platform. Must be twitter, linkedin, or instagram.' }, { status: 400 })
   }

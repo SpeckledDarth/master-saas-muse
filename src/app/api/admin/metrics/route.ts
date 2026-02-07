@@ -239,6 +239,7 @@ export async function GET() {
 
     let socialMetrics = {
       socialModuleEnabled: false,
+      currentTier: 'universal',
       totalPosts: 0,
       postsThisMonth: 0,
       scheduledPosts: 0,
@@ -254,6 +255,7 @@ export async function GET() {
         .maybeSingle()
       
       socialMetrics.socialModuleEnabled = (orgSettings2?.settings as any)?.features?.socialModuleEnabled ?? false
+      socialMetrics.currentTier = (orgSettings2?.settings as any)?.socialModule?.tier ?? 'universal'
 
       if (socialMetrics.socialModuleEnabled) {
         try {
