@@ -377,7 +377,6 @@ export interface SocialModuleSettings {
   platforms: Record<SocialPlatform, SocialAccountConfig>
   posting: {
     defaultBrandVoice: string
-    maxPostsPerDay: number
     requireApproval: boolean
   }
   monitoring: {
@@ -1172,7 +1171,6 @@ We regularly review and update our security practices. This page reflects our cu
     },
     posting: {
       defaultBrandVoice: '',
-      maxPostsPerDay: 10,
       requireApproval: true,
     },
     monitoring: {

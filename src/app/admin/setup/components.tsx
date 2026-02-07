@@ -1,7 +1,21 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Loader2, Save, Check, Zap, Shield, Sparkles, Users, BarChart, Lock, Rocket, Heart, Star, Target, Award, Lightbulb } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Loader2, Save, Check, Zap, Shield, Sparkles, Users, BarChart, Lock, Rocket, Heart, Star, Target, Award, Lightbulb, Info } from 'lucide-react'
+
+export function InfoTooltip({ text }: { text: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Info className="h-4 w-4 text-muted-foreground cursor-help shrink-0" data-testid="icon-info-tooltip" />
+      </TooltipTrigger>
+      <TooltipContent className="max-w-xs">
+        <p className="text-sm">{text}</p>
+      </TooltipContent>
+    </Tooltip>
+  )
+}
 
 export function MiniSaveButton({ saving, saved, onClick, testId }: { saving: boolean; saved: boolean; onClick: () => void; testId: string }) {
   return (

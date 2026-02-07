@@ -295,19 +295,6 @@ export default function MuseSocialPage() {
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="max-posts">Max Posts Per Day</Label>
-                <Input
-                  id="max-posts"
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={socialModule.posting.maxPostsPerDay}
-                  onChange={(e) => updatePosting('maxPostsPerDay', parseInt(e.target.value, 10) || 10)}
-                  data-testid="input-max-posts-per-day"
-                />
-              </div>
-
               <div className="flex items-center justify-between py-3 border-t">
                 <div>
                   <p className="font-medium">Require Approval</p>

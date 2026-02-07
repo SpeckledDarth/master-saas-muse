@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Palette, FileText, BookOpen, DollarSign, Globe, Settings, Save, Check, Loader2, Scale, MessageCircle, Shield, Share2 } from 'lucide-react'
 import { SetupSettingsProvider, useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 const coreSections = [
   { id: 'branding', label: 'Branding', icon: Palette, href: '/admin/setup/branding' },
@@ -119,8 +120,10 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
 
 export default function SetupLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SetupSettingsProvider>
-      <SetupLayoutInner>{children}</SetupLayoutInner>
-    </SetupSettingsProvider>
+    <TooltipProvider delayDuration={300}>
+      <SetupSettingsProvider>
+        <SetupLayoutInner>{children}</SetupLayoutInner>
+      </SetupSettingsProvider>
+    </TooltipProvider>
   )
 }
