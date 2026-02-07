@@ -87,6 +87,10 @@ The UI features dynamic branding, configurable navigation, customizable hero sec
 **System Design Choices:**
 The architecture uses a unified frontend and backend with Next.js API routes, modular component-based development, RLS and application-level logic for access control, and clear separation of concerns for third-party services. It employs a fire-and-forget webhook delivery pattern and pluggable abstraction layers for AI providers.
 
+## Next Phase / Roadmap
+- **Dynamic Tiers for MuseSocial**: Make social module tiers fully dynamic — allow admins to create, name, and configure unlimited custom tiers from the dashboard (currently limited to "Universal" and "Power" defined in code). Requires updating `SocialModuleTier` type, tier selection UI, rate-limits, and tier display throughout the app.
+- **General Principle**: Minimize hardcoded variables across the entire app. Any configurable value should be editable from the admin dashboard without code changes.
+
 ## External Dependencies
 - **Supabase**: PostgreSQL database, Authentication, Row Level Security (RLS), Storage.
 - **Stripe**: Subscription payments, webhooks, customer portal.
