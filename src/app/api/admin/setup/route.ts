@@ -116,6 +116,26 @@ export async function GET(request: NextRequest) {
     support: { ...defaultSettings.support, ...(data?.settings?.support || {}) },
     compliance: { ...defaultSettings.compliance, ...(data?.settings?.compliance || {}) },
     security: { ...defaultSettings.security, ...(data?.settings?.security || {}) },
+    socialModule: {
+      ...defaultSettings.socialModule!,
+      ...(data?.settings?.socialModule || {}),
+      platforms: {
+        ...defaultSettings.socialModule!.platforms,
+        ...(data?.settings?.socialModule?.platforms || {}),
+      },
+      posting: {
+        ...defaultSettings.socialModule!.posting,
+        ...(data?.settings?.socialModule?.posting || {}),
+      },
+      monitoring: {
+        ...defaultSettings.socialModule!.monitoring,
+        ...(data?.settings?.socialModule?.monitoring || {}),
+      },
+      statusChecker: {
+        ...defaultSettings.socialModule!.statusChecker,
+        ...(data?.settings?.socialModule?.statusChecker || {}),
+      },
+    },
   }
   
   return NextResponse.json({ settings: mergedSettings })
@@ -199,6 +219,31 @@ export async function POST(request: NextRequest) {
     support: { ...defaultSettings.support, ...(currentSettings.support || {}), ...(settings.support || {}) },
     compliance: { ...defaultSettings.compliance, ...(currentSettings.compliance || {}), ...(settings.compliance || {}) },
     security: { ...defaultSettings.security, ...(currentSettings.security || {}), ...(settings.security || {}) },
+    socialModule: {
+      ...defaultSettings.socialModule!,
+      ...(currentSettings.socialModule || {}),
+      ...(settings.socialModule || {}),
+      platforms: {
+        ...defaultSettings.socialModule!.platforms,
+        ...(currentSettings.socialModule?.platforms || {}),
+        ...(settings.socialModule?.platforms || {}),
+      },
+      posting: {
+        ...defaultSettings.socialModule!.posting,
+        ...(currentSettings.socialModule?.posting || {}),
+        ...(settings.socialModule?.posting || {}),
+      },
+      monitoring: {
+        ...defaultSettings.socialModule!.monitoring,
+        ...(currentSettings.socialModule?.monitoring || {}),
+        ...(settings.socialModule?.monitoring || {}),
+      },
+      statusChecker: {
+        ...defaultSettings.socialModule!.statusChecker,
+        ...(currentSettings.socialModule?.statusChecker || {}),
+        ...(settings.socialModule?.statusChecker || {}),
+      },
+    },
   }
   
   console.log('[Setup API] Merged branding to save:', JSON.stringify(newSettings.branding, null, 2))
