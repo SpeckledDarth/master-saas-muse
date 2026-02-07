@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Share2, Twitter, Linkedin, Instagram } from 'lucide-react'
+import { Share2, Twitter, Linkedin, Instagram, AlertTriangle } from 'lucide-react'
 import { defaultSettings } from '@/types/settings'
 import type { SocialModuleTier } from '@/types/settings'
 
@@ -66,6 +66,38 @@ export default function MuseSocialPage() {
           </div>
         </CardContent>
       </Card>
+
+      {isEnabled && (() => {
+        const warnings: { key: string; testId: string; message: string }[] = []
+        if (!settings.features.aiEnabled) {
+          warnings.push({ key: 'ai', testId: 'text-dependency-ai', message: 'AI features must be enabled for post generation' })
+        }
+        const platformEntries = Object.entries(socialModule.platforms) as [string, { enabled: boolean; apiKeyConfigured: boolean }][]
+        const enabledPlatforms = platformEntries.filter(([, cfg]) => cfg.enabled)
+        if (enabledPlatforms.length === 0) {
+          warnings.push({ key: 'no-platforms', testId: 'text-dependency-no-platforms', message: 'Enable at least one social platform' })
+        }
+        const missingKeys = enabledPlatforms.filter(([, cfg]) => !cfg.apiKeyConfigured)
+        if (missingKeys.length > 0) {
+          const names = missingKeys.map(([p]) => p.charAt(0).toUpperCase() + p.slice(1)).join(', ')
+          warnings.push({ key: 'api-keys', testId: 'text-dependency-api-keys', message: `API credentials not configured for ${names}` })
+        }
+        if (warnings.length === 0) return null
+        return (
+          <Card className="border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/20" data-testid="alert-dependency-warning">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 mt-0.5 shrink-0" />
+                <div className="space-y-1">
+                  {warnings.map((w) => (
+                    <p key={w.key} className="text-sm text-yellow-800 dark:text-yellow-200" data-testid={w.testId}>{w.message}</p>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )
+      })()}
 
       {isEnabled && (
         <>

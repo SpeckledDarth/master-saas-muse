@@ -4,6 +4,8 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { defaultSettings } from '@/types/settings'
 import { addSocialPostJob } from '@/lib/queue'
+import { checkSocialRateLimit, UNIVERSAL_LIMITS, POWER_LIMITS } from '@/lib/social/rate-limits'
+import type { SocialModuleTier } from '@/types/settings'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -30,10 +32,14 @@ async function getAuthenticatedUser() {
   return user
 }
 
-async function isModuleEnabled(): Promise<boolean> {
+async function getModuleConfig(): Promise<{ enabled: boolean; tier: SocialModuleTier }> {
   const admin = getSupabaseAdmin()
   const { data } = await admin.from('organization_settings').select('settings').eq('app_id', 'default').single()
-  return data?.settings?.features?.socialModuleEnabled ?? false
+  const settings = data?.settings || defaultSettings
+  return {
+    enabled: settings.features?.socialModuleEnabled ?? false,
+    tier: settings.socialModule?.tier || 'universal',
+  }
 }
 
 const VALID_PLATFORMS = ['twitter', 'linkedin', 'instagram'] as const
@@ -44,7 +50,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const enabled = await isModuleEnabled()
+  const { enabled } = await getModuleConfig()
   if (!enabled) {
     return NextResponse.json({ error: 'Social module is not enabled' }, { status: 403 })
   }
@@ -98,9 +104,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const enabled = await isModuleEnabled()
+  const { enabled, tier } = await getModuleConfig()
   if (!enabled) {
     return NextResponse.json({ error: 'Social module is not enabled' }, { status: 403 })
+  }
+
+  const tierLimits = tier === 'power' ? POWER_LIMITS : UNIVERSAL_LIMITS
+  const rateLimitResult = await checkSocialRateLimit(user.id, 'post', tier)
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      {
+        error: `Post creation limit reached for ${tier} tier (${tierLimits.post} per day). Upgrade your tier or try again later.`,
+        tier,
+        limit: tierLimits.post,
+        retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
+      },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': tierLimits.post.toString(),
+          'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+          'X-RateLimit-Reset': rateLimitResult.reset.toString(),
+          'Retry-After': Math.ceil((rateLimitResult.reset - Date.now()) / 1000).toString(),
+        },
+      }
+    )
   }
 
   let body: { platform?: string; content?: string; scheduledAt?: string; mediaUrls?: string[] }
