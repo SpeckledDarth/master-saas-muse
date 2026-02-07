@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Palette, FileText, BookOpen, DollarSign, Globe, Settings, Save, Check, Loader2, Scale, MessageCircle, Shield, Share2 } from 'lucide-react'
 import { SetupSettingsProvider, useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
@@ -21,7 +22,21 @@ const coreSections = [
 function SetupLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const ctx = useSetupSettingsContext()
-  const socialEnabled = ctx.settings?.features?.socialModuleEnabled ?? false
+  const initializedRef = useRef(false)
+  const [savedSocialEnabled, setSavedSocialEnabled] = useState(false)
+
+  useEffect(() => {
+    if (!ctx.loading && !initializedRef.current) {
+      initializedRef.current = true
+      setSavedSocialEnabled(ctx.settings?.features?.socialModuleEnabled ?? false)
+    }
+  }, [ctx.loading, ctx.settings?.features?.socialModuleEnabled])
+
+  useEffect(() => {
+    if (ctx.saved) {
+      setSavedSocialEnabled(ctx.settings?.features?.socialModuleEnabled ?? false)
+    }
+  }, [ctx.saved, ctx.settings?.features?.socialModuleEnabled])
 
   if (ctx.loading) {
     return (
@@ -75,7 +90,7 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
               )
             })}
 
-            {socialEnabled && (
+            {savedSocialEnabled && (
               <>
                 <div className="border-t my-3" />
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 pb-1">Modules</p>
