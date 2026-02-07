@@ -51,14 +51,14 @@ The UI features dynamic branding, configurable navigation, customizable hero sec
 - **Database Backup Configuration**: Admin UI for configuring backup notification preferences, frequency, and retention periods.
 - **API Token Rotation**: BullMQ job type for automated webhook secret rotation with configurable interval.
 - **MuseSocial Module**: Toggleable social media management extension with Universal/Power tiers supporting 10 platforms (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord). Features include admin setup, social account connection, AI-powered post generation (with multimodal image support), post scheduling and management, social API health checker, social KPI cards on admin metrics dashboard (with tier badge and AI generation count), conditional onboarding wizard step, Vercel Cron fallback, n8n workflow templates, and Playwright E2E tests. Tier-based rate limiting enforces daily caps (Universal: 10 AI generations, 20 posts; Power: 100 AI generations, 10,000 posts). Dependency warnings alert admins when AI is disabled, no platforms are enabled, or API keys are missing. BullMQ retry logic (3 attempts, exponential backoff) handles post delivery failures. All social imports use dynamic loading or type-only imports.
-- **Centralized API Keys & Integrations**: Admin setup page (`/admin/setup/integrations`) with editable key management across two sections: Tech Stack (Supabase, Stripe, Resend, AI providers, Redis, Sentry, Plausible) and Social Platforms (all 10 platforms). Admins can enter, update, and remove API keys directly from the dashboard. Keys saved from the dashboard are stored in the `config_secrets` database table and take effect immediately. Environment variables from the hosting platform are also recognized. Displays masked values, configured/missing badges, source badges (Dashboard vs Env Var), and links to official docs.
+- **Centralized API Keys & Integrations**: Admin setup page (`/admin/setup/integrations`) manages Tech Stack keys (Supabase, Stripe, Resend, AI providers, Redis, Sentry, Plausible) with collapsible groups (collapsed by default), Required/Optional labels, format validation on save, and inline edit/reveal/delete. Social platform API keys have been moved to the MuseSocial setup page (`/admin/setup/musesocial`) so they're only accessible when the module is enabled. Both pages share the same UX pattern: collapsible groups with status indicators, inline editing with auto-reveal, and source badges (Dashboard vs Env Var). Keys are stored in the `config_secrets` database table and take effect immediately. The API supports `?section=tech|social` query params for targeted fetching.
 
 ### MuseSocial Admin Guide
 
 **Setup:**
 1. Go to Admin > Setup > MuseSocial to enable the module
 2. Select tier (Universal or Power) based on usage needs
-3. Enable desired platforms (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord) and configure API credentials via Admin > Setup > Integrations
+3. Enable desired platforms (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord) and configure API credentials in the Platform API Keys section on the same page
 4. Ensure AI features are enabled in Admin > Setup > Features for post generation
 5. Dependency warnings will appear if configuration is incomplete
 
@@ -80,8 +80,8 @@ The UI features dynamic branding, configurable navigation, customizable hero sec
 **Key Files:**
 - `src/lib/social/rate-limits.ts` — Tier-based rate limiting constants and check function
 - `src/lib/social/client.ts` — Platform client interfaces (all 10 platforms)
-- `src/app/admin/setup/integrations/page.tsx` — Centralized API Keys & Integrations page
-- `src/app/api/admin/integrations/route.ts` — API endpoint for integration CRUD (GET, POST, DELETE)
+- `src/app/admin/setup/integrations/page.tsx` — Centralized API Keys & Integrations page (Tech Stack only, collapsible groups)
+- `src/app/api/admin/integrations/route.ts` — API endpoint for integration CRUD (GET with ?section=tech|social, POST, PATCH, DELETE)
 - `src/lib/config/secrets.ts` — Config secrets utility (getConfigValue, DB + env var resolution)
 - `src/lib/config/ensure-table.ts` — Auto-creates config_secrets table on first use
 - `src/lib/social/n8n-templates/` — n8n workflow JSON templates

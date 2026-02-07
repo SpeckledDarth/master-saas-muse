@@ -66,6 +66,7 @@ interface IntegrationKey {
   configured: boolean
   docsUrl: string
   source: 'env' | 'db' | null
+  required: boolean
 }
 
 interface IntegrationGroup {
@@ -84,31 +85,31 @@ function resolveValue(envVar: string, dbSecrets: Record<string, string>): { valu
 }
 
 function buildTechStackGroups(dbSecrets: Record<string, string>): IntegrationGroup[] {
-  function k(id: string, label: string, envVar: string, docsUrl: string): IntegrationKey {
+  function k(id: string, label: string, envVar: string, docsUrl: string, required = false): IntegrationKey {
     const { value, source } = resolveValue(envVar, dbSecrets)
-    return { id, label, envVar, masked: maskValue(value), configured: !!value, docsUrl, source }
+    return { id, label, envVar, masked: maskValue(value), configured: !!value, docsUrl, source, required }
   }
 
   return [
     {
       id: 'supabase', label: 'Supabase', icon: 'database',
       keys: [
-        k('supabase-url', 'Project URL', 'NEXT_PUBLIC_SUPABASE_URL', 'https://supabase.com/dashboard/project/_/settings/api'),
-        k('supabase-anon', 'Anon Key', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'https://supabase.com/dashboard/project/_/settings/api'),
-        k('supabase-service', 'Service Role Key', 'SUPABASE_SERVICE_ROLE_KEY', 'https://supabase.com/dashboard/project/_/settings/api'),
+        k('supabase-url', 'Project URL', 'NEXT_PUBLIC_SUPABASE_URL', 'https://supabase.com/dashboard/project/_/settings/api', true),
+        k('supabase-anon', 'Anon Key', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'https://supabase.com/dashboard/project/_/settings/api', true),
+        k('supabase-service', 'Service Role Key', 'SUPABASE_SERVICE_ROLE_KEY', 'https://supabase.com/dashboard/project/_/settings/api', true),
       ],
     },
     {
       id: 'stripe', label: 'Stripe', icon: 'credit-card',
       keys: [
-        k('stripe-secret', 'Secret Key', 'STRIPE_SECRET_KEY', 'https://dashboard.stripe.com/apikeys'),
-        k('stripe-webhook', 'Webhook Secret', 'STRIPE_WEBHOOK_SECRET', 'https://dashboard.stripe.com/webhooks'),
+        k('stripe-secret', 'Secret Key', 'STRIPE_SECRET_KEY', 'https://dashboard.stripe.com/apikeys', true),
+        k('stripe-webhook', 'Webhook Secret', 'STRIPE_WEBHOOK_SECRET', 'https://dashboard.stripe.com/webhooks', true),
       ],
     },
     {
       id: 'resend', label: 'Resend', icon: 'mail',
       keys: [
-        k('resend-key', 'API Key', 'RESEND_API_KEY', 'https://resend.com/api-keys'),
+        k('resend-key', 'API Key', 'RESEND_API_KEY', 'https://resend.com/api-keys', true),
       ],
     },
     {
@@ -147,7 +148,7 @@ function buildTechStackGroups(dbSecrets: Record<string, string>): IntegrationGro
 function buildSocialPlatformGroups(dbSecrets: Record<string, string>): IntegrationGroup[] {
   function k(id: string, label: string, envVar: string, docsUrl: string): IntegrationKey {
     const { value, source } = resolveValue(envVar, dbSecrets)
-    return { id, label, envVar, masked: maskValue(value), configured: !!value, docsUrl, source }
+    return { id, label, envVar, masked: maskValue(value), configured: !!value, docsUrl, source, required: false }
   }
 
   return [
@@ -227,7 +228,7 @@ function buildSocialPlatformGroups(dbSecrets: Record<string, string>): Integrati
   ]
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const user = await getAuthenticatedUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -238,7 +239,31 @@ export async function GET() {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
   }
 
+  const section = request.nextUrl.searchParams.get('section')
   const dbSecrets = await getAllDbSecrets()
+
+  if (section === 'social') {
+    const socialPlatforms = buildSocialPlatformGroups(dbSecrets)
+    const socialConfigured = socialPlatforms.reduce((sum, g) => sum + g.keys.filter(k => k.configured).length, 0)
+    const socialTotal = socialPlatforms.reduce((sum, g) => sum + g.keys.length, 0)
+    return NextResponse.json({
+      socialPlatforms,
+      summary: { socialConfigured, socialTotal },
+    })
+  }
+
+  if (section === 'tech') {
+    const techStack = buildTechStackGroups(dbSecrets)
+    const techConfigured = techStack.reduce((sum, g) => sum + g.keys.filter(k => k.configured).length, 0)
+    const techTotal = techStack.reduce((sum, g) => sum + g.keys.length, 0)
+    const requiredKeys = techStack.flatMap(g => g.keys).filter(k => k.required)
+    const requiredConfigured = requiredKeys.filter(k => k.configured).length
+    const requiredTotal = requiredKeys.length
+    return NextResponse.json({
+      techStack,
+      summary: { techConfigured, techTotal, requiredConfigured, requiredTotal },
+    })
+  }
 
   const techStack = buildTechStackGroups(dbSecrets)
   const socialPlatforms = buildSocialPlatformGroups(dbSecrets)
@@ -247,6 +272,9 @@ export async function GET() {
   const techTotal = techStack.reduce((sum, g) => sum + g.keys.length, 0)
   const socialConfigured = socialPlatforms.reduce((sum, g) => sum + g.keys.filter(k => k.configured).length, 0)
   const socialTotal = socialPlatforms.reduce((sum, g) => sum + g.keys.length, 0)
+  const requiredKeys = techStack.flatMap(g => g.keys).filter(k => k.required)
+  const requiredConfigured = requiredKeys.filter(k => k.configured).length
+  const requiredTotal = requiredKeys.length
 
   return NextResponse.json({
     techStack,
@@ -256,6 +284,8 @@ export async function GET() {
       techTotal,
       socialConfigured,
       socialTotal,
+      requiredConfigured,
+      requiredTotal,
     },
   })
 }

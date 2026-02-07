@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect, useCallback } from 'react'
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
 import { SaveButton, InfoTooltip } from '../components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,15 +10,383 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Share2, Twitter, Linkedin, Instagram, Youtube, Facebook, Music, MessageSquare, Image, Camera, Gamepad2, AlertTriangle } from 'lucide-react'
-import { SiTiktok, SiReddit, SiPinterest, SiSnapchat, SiDiscord } from 'react-icons/si'
+import { Button } from '@/components/ui/button'
+import {
+  Share2, Twitter, Linkedin, Instagram, Youtube, Facebook, Music, MessageSquare, Image, Camera, Gamepad2,
+  AlertTriangle, KeyRound, ChevronDown, ChevronRight, CircleDot,
+  ExternalLink, Loader2, Pencil, Check, X, Eye, EyeOff, Trash2
+} from 'lucide-react'
 import { defaultSettings } from '@/types/settings'
 import type { SocialModuleTier } from '@/types/settings'
+
+interface IntegrationKey {
+  id: string
+  label: string
+  envVar: string
+  masked: string | null
+  configured: boolean
+  docsUrl: string
+  source: 'env' | 'db' | null
+  required: boolean
+}
+
+interface IntegrationGroup {
+  id: string
+  label: string
+  icon: string
+  keys: IntegrationKey[]
+}
+
+const SOCIAL_ICONS: Record<string, typeof Twitter> = {
+  twitter: Twitter,
+  linkedin: Linkedin,
+  instagram: Instagram,
+  youtube: Youtube,
+  facebook: Facebook,
+  tiktok: Music,
+  reddit: MessageSquare,
+  pinterest: Image,
+  snapchat: Camera,
+  discord: Gamepad2,
+}
+
+function SocialKeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => void }) {
+  const [editing, setEditing] = useState(false)
+  const [inputValue, setInputValue] = useState('')
+  const [revealedValue, setRevealedValue] = useState<string | null>(null)
+  const [revealed, setRevealed] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [revealing, setRevealing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleReveal() {
+    if (revealed) {
+      setRevealed(false)
+      setRevealedValue(null)
+      return
+    }
+    setRevealing(true)
+    try {
+      const res = await fetch('/api/admin/integrations', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ envVar: keyData.envVar }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.value) {
+          setRevealedValue(data.value)
+          setRevealed(true)
+        }
+      }
+    } catch {
+    } finally {
+      setRevealing(false)
+    }
+  }
+
+  async function handleStartEdit() {
+    setEditing(true)
+    setError(null)
+    if (revealedValue) {
+      setInputValue(revealedValue)
+      return
+    }
+    if (keyData.configured) {
+      try {
+        const res = await fetch('/api/admin/integrations', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ envVar: keyData.envVar }),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          if (data.value) {
+            setInputValue(data.value)
+            setRevealedValue(data.value)
+            return
+          }
+        }
+      } catch {}
+    }
+    setInputValue('')
+  }
+
+  function handleCancel() {
+    setEditing(false)
+    setInputValue('')
+    setError(null)
+  }
+
+  async function handleSave() {
+    if (!inputValue.trim()) {
+      setError('Value cannot be empty')
+      return
+    }
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/admin/integrations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ envVar: keyData.envVar, value: inputValue.trim() }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        setError(data.error || 'Failed to save')
+        return
+      }
+      setEditing(false)
+      setInputValue('')
+      setRevealed(false)
+      setRevealedValue(null)
+      onSaved()
+    } catch {
+      setError('Network error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!confirm(`Remove the saved value for ${keyData.label}? This cannot be undone.`)) return
+    setDeleting(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/admin/integrations', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ envVar: keyData.envVar }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        setError(data.error || 'Failed to remove')
+        return
+      }
+      setRevealed(false)
+      setRevealedValue(null)
+      setEditing(false)
+      onSaved()
+    } catch {
+      setError('Network error')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const displayValue = revealed && revealedValue
+    ? revealedValue
+    : keyData.configured
+    ? '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'
+    : ''
+
+  return (
+    <div className="group" data-testid={`key-row-${keyData.id}`}>
+      <div className="grid grid-cols-[1fr_2fr_auto] items-center gap-4 py-3 px-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm font-medium truncate" data-testid={`label-${keyData.id}`}>
+              {keyData.label}
+            </span>
+            <a
+              href={keyData.docsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              data-testid={`link-docs-${keyData.id}`}
+            >
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+          <code className="text-[11px] text-muted-foreground font-mono" data-testid={`env-var-${keyData.id}`}>
+            {keyData.envVar}
+          </code>
+        </div>
+
+        <div className="min-w-0">
+          {editing ? (
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                value={inputValue}
+                onChange={(e) => { setInputValue(e.target.value); setError(null) }}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') handleCancel() }}
+                placeholder={`Enter ${keyData.label}...`}
+                className="font-mono text-sm"
+                autoFocus
+                data-testid={`input-${keyData.id}`}
+              />
+              <Button
+                size="icon"
+                onClick={handleSave}
+                disabled={saving || !inputValue.trim()}
+                data-testid={`button-save-${keyData.id}`}
+              >
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleCancel}
+                data-testid={`button-cancel-${keyData.id}`}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div
+              className={`font-mono text-sm py-2 px-3 rounded-md border flex items-center cursor-pointer hover-elevate ${
+                keyData.configured
+                  ? 'bg-muted/40'
+                  : 'bg-muted/20 border-dashed'
+              }`}
+              onClick={handleStartEdit}
+              data-testid={`value-display-${keyData.id}`}
+            >
+              {keyData.configured ? (
+                <span className={revealed ? 'break-all' : 'select-none text-muted-foreground'}>
+                  {displayValue}
+                </span>
+              ) : (
+                <span className="text-muted-foreground/60 text-xs">Click to add value...</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1">
+          {keyData.source && (
+            <Badge
+              variant="secondary"
+              className="text-[10px] px-1.5 py-0 mr-1 whitespace-nowrap"
+              data-testid={`source-badge-${keyData.id}`}
+            >
+              {keyData.source === 'db' ? 'Dashboard' : 'Env Var'}
+            </Badge>
+          )}
+          {keyData.configured && !editing && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleReveal}
+              disabled={revealing}
+              title={revealed ? 'Hide value' : 'Reveal value'}
+              data-testid={`button-reveal-${keyData.id}`}
+            >
+              {revealing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : revealed ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </Button>
+          )}
+          {!editing && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleStartEdit}
+              title="Edit value"
+              data-testid={`button-edit-${keyData.id}`}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+          {keyData.configured && !editing && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleDelete}
+              disabled={deleting}
+              title="Remove value"
+              data-testid={`button-delete-${keyData.id}`}
+            >
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            </Button>
+          )}
+        </div>
+      </div>
+      {error && (
+        <p className="text-xs text-destructive px-4 pb-2" data-testid={`error-${keyData.id}`}>{error}</p>
+      )}
+    </div>
+  )
+}
+
+function SocialKeyGroup({ group, onSaved }: { group: IntegrationGroup; onSaved: () => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const Icon = SOCIAL_ICONS[group.icon] || KeyRound
+  const groupConfigured = group.keys.filter(k => k.configured).length
+  const groupTotal = group.keys.length
+  const allConfigured = groupConfigured === groupTotal
+
+  return (
+    <div data-testid={`group-${group.id}`}>
+      <button
+        type="button"
+        className="w-full flex items-center gap-3 px-6 py-3 bg-muted/30 border-t text-left hover-elevate"
+        onClick={() => setExpanded(!expanded)}
+        data-testid={`button-toggle-${group.id}`}
+      >
+        {expanded ? (
+          <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+        ) : (
+          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+        )}
+        <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+        <span className="text-sm font-semibold">{group.label}</span>
+        <div className="flex items-center gap-1.5">
+          {group.keys.map((k) => (
+            <CircleDot
+              key={k.id}
+              className={`h-2.5 w-2.5 ${k.configured ? 'text-green-500' : 'text-muted-foreground/40'}`}
+            />
+          ))}
+        </div>
+        <Badge variant={allConfigured ? 'default' : 'secondary'} className="text-[10px] px-1.5 py-0 ml-auto">
+          {groupConfigured}/{groupTotal}
+        </Badge>
+      </button>
+      {expanded && (
+        <div className="divide-y">
+          {group.keys.map(key => (
+            <SocialKeyRow key={key.id} keyData={key} onSaved={onSaved} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function MuseSocialPage() {
   const { settings, saving, saved, handleSave, updateSocialModule } = useSetupSettingsContext()
 
   const socialModule = settings.socialModule || defaultSettings.socialModule!
+
+  const [socialPlatforms, setSocialPlatforms] = useState<IntegrationGroup[]>([])
+  const [socialSummary, setSocialSummary] = useState({ socialConfigured: 0, socialTotal: 0 })
+  const [loadingKeys, setLoadingKeys] = useState(false)
+
+  const fetchSocialKeys = useCallback(async () => {
+    setLoadingKeys(true)
+    try {
+      const res = await fetch('/api/admin/integrations?section=social')
+      if (res.ok) {
+        const data = await res.json()
+        setSocialPlatforms(data.socialPlatforms || [])
+        setSocialSummary(data.summary || { socialConfigured: 0, socialTotal: 0 })
+      }
+    } catch {}
+    setLoadingKeys(false)
+  }, [])
+
+  useEffect(() => {
+    if (settings.features.socialModuleEnabled) {
+      fetchSocialKeys()
+    }
+  }, [settings.features.socialModuleEnabled, fetchSocialKeys])
 
   function updatePosting(key: string, value: any) {
     const current = settings.socialModule || defaultSettings.socialModule!
@@ -82,7 +451,7 @@ export default function MuseSocialPage() {
         const missingKeys = enabledPlatforms.filter(([, cfg]) => !cfg.apiKeyConfigured)
         if (missingKeys.length > 0) {
           const names = missingKeys.map(([p]) => p.charAt(0).toUpperCase() + p.slice(1)).join(', ')
-          warnings.push({ key: 'api-keys', testId: 'text-dependency-api-keys', message: `API credentials not configured for ${names}. Configure them in Integrations.` })
+          warnings.push({ key: 'api-keys', testId: 'text-dependency-api-keys', message: `API credentials not configured for ${names}. Set them in the API Keys section below.` })
         }
         if (warnings.length === 0) return null
         return (
@@ -261,9 +630,6 @@ export default function MuseSocialPage() {
                   <div>
                     <p className="font-medium">Instagram</p>
                     <p className="text-sm text-muted-foreground">Coming soon — requires extended API approval</p>
-                    {socialModule.platforms.instagram.enabled && (
-                      <p className="text-sm text-muted-foreground">Not connected</p>
-                    )}
                   </div>
                 </div>
                 <Switch
@@ -279,9 +645,6 @@ export default function MuseSocialPage() {
                   <div>
                     <p className="font-medium">YouTube</p>
                     <p className="text-sm text-muted-foreground">Requires Google Cloud Console app</p>
-                    {socialModule.platforms.youtube?.enabled && (
-                      <p className="text-sm text-muted-foreground">Not connected</p>
-                    )}
                   </div>
                 </div>
                 <Switch
@@ -297,9 +660,6 @@ export default function MuseSocialPage() {
                   <div>
                     <p className="font-medium">Facebook</p>
                     <p className="text-sm text-muted-foreground">Requires Meta Business app review</p>
-                    {socialModule.platforms.facebook?.enabled && (
-                      <p className="text-sm text-muted-foreground">Not connected</p>
-                    )}
                   </div>
                 </div>
                 <Switch
@@ -315,9 +675,6 @@ export default function MuseSocialPage() {
                   <div>
                     <p className="font-medium">TikTok</p>
                     <p className="text-sm text-muted-foreground">Requires TikTok Developer Portal app</p>
-                    {socialModule.platforms.tiktok?.enabled && (
-                      <p className="text-sm text-muted-foreground">Not connected</p>
-                    )}
                   </div>
                 </div>
                 <Switch
@@ -333,9 +690,6 @@ export default function MuseSocialPage() {
                   <div>
                     <p className="font-medium">Reddit</p>
                     <p className="text-sm text-muted-foreground">Requires Reddit API application</p>
-                    {socialModule.platforms.reddit?.enabled && (
-                      <p className="text-sm text-muted-foreground">Not connected</p>
-                    )}
                   </div>
                 </div>
                 <Switch
@@ -351,9 +705,6 @@ export default function MuseSocialPage() {
                   <div>
                     <p className="font-medium">Pinterest</p>
                     <p className="text-sm text-muted-foreground">Requires Pinterest Business developer app</p>
-                    {socialModule.platforms.pinterest?.enabled && (
-                      <p className="text-sm text-muted-foreground">Not connected</p>
-                    )}
                   </div>
                 </div>
                 <Switch
@@ -369,9 +720,6 @@ export default function MuseSocialPage() {
                   <div>
                     <p className="font-medium">Snapchat</p>
                     <p className="text-sm text-muted-foreground">Requires Snap Kit developer access</p>
-                    {socialModule.platforms.snapchat?.enabled && (
-                      <p className="text-sm text-muted-foreground">Not connected</p>
-                    )}
                   </div>
                 </div>
                 <Switch
@@ -387,9 +735,6 @@ export default function MuseSocialPage() {
                   <div>
                     <p className="font-medium">Discord</p>
                     <p className="text-sm text-muted-foreground">Requires Discord Developer Portal bot/app</p>
-                    {socialModule.platforms.discord?.enabled && (
-                      <p className="text-sm text-muted-foreground">Not connected</p>
-                    )}
                   </div>
                 </div>
                 <Switch
@@ -398,6 +743,39 @@ export default function MuseSocialPage() {
                   data-testid="switch-platform-discord"
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <KeyRound className="h-5 w-5" />
+                    Platform API Keys
+                    <InfoTooltip text="API keys and secrets for each social platform. Click a platform to expand and manage its keys. Keys are stored securely in your database." />
+                  </CardTitle>
+                  <CardDescription>Configure API credentials for your enabled social platforms</CardDescription>
+                </div>
+                <Badge variant={socialSummary.socialConfigured === socialSummary.socialTotal ? 'default' : 'secondary'}>
+                  {socialSummary.socialConfigured}/{socialSummary.socialTotal} configured
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              {loadingKeys ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : (
+                socialPlatforms.map((group) => (
+                  <SocialKeyGroup
+                    key={group.id}
+                    group={group}
+                    onSaved={fetchSocialKeys}
+                  />
+                ))
+              )}
             </CardContent>
           </Card>
 

@@ -8,9 +8,9 @@ import { Input } from '@/components/ui/input'
 import { InfoTooltip } from '../components'
 import {
   Loader2, ExternalLink, Database, CreditCard, Mail, Brain,
-  Server, ShieldAlert, BarChart3, Twitter, Linkedin, Instagram, Youtube,
-  Facebook, Music, MessageSquare, Image, Camera, Gamepad2, KeyRound,
-  Pencil, Save, Trash2, Eye, EyeOff, Check, X, CircleDot
+  Server, ShieldAlert, BarChart3, KeyRound,
+  Pencil, Save, Trash2, Eye, EyeOff, Check, X, CircleDot,
+  ChevronDown, ChevronRight
 } from 'lucide-react'
 
 interface IntegrationKey {
@@ -21,6 +21,7 @@ interface IntegrationKey {
   configured: boolean
   docsUrl: string
   source: 'env' | 'db' | null
+  required: boolean
 }
 
 interface IntegrationGroup {
@@ -40,17 +41,14 @@ const TECH_ICONS: Record<string, typeof Database> = {
   'bar-chart': BarChart3,
 }
 
-const SOCIAL_ICONS: Record<string, typeof Twitter> = {
-  twitter: Twitter,
-  linkedin: Linkedin,
-  instagram: Instagram,
-  youtube: Youtube,
-  facebook: Facebook,
-  tiktok: Music,
-  reddit: MessageSquare,
-  pinterest: Image,
-  snapchat: Camera,
-  discord: Gamepad2,
+const FORMAT_VALIDATORS: Record<string, { pattern: RegExp; hint: string }> = {
+  STRIPE_SECRET_KEY: { pattern: /^(sk_live_|sk_test_|rk_live_|rk_test_)/, hint: 'Should start with sk_live_, sk_test_, rk_live_, or rk_test_' },
+  STRIPE_WEBHOOK_SECRET: { pattern: /^whsec_/, hint: 'Should start with whsec_' },
+  NEXT_PUBLIC_SUPABASE_URL: { pattern: /\.supabase\.co\/?$/, hint: 'Should be a Supabase URL ending in .supabase.co' },
+  NEXT_PUBLIC_SENTRY_DSN: { pattern: /^https:\/\/.*@.*\.ingest\..*sentry\.io\//, hint: 'Should be a valid Sentry DSN URL' },
+  OPENAI_API_KEY: { pattern: /^sk-/, hint: 'Should start with sk-' },
+  UPSTASH_REDIS_REST_URL: { pattern: /^https:\/\//, hint: 'Should be a valid HTTPS URL' },
+  NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL: { pattern: /^https:\/\//, hint: 'Should be a valid HTTPS URL' },
 }
 
 function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => void }) {
@@ -122,9 +120,22 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
     setError(null)
   }
 
+  function validateFormat(value: string): string | null {
+    const validator = FORMAT_VALIDATORS[keyData.envVar]
+    if (validator && !validator.pattern.test(value)) {
+      return validator.hint
+    }
+    return null
+  }
+
   async function handleSave() {
     if (!inputValue.trim()) {
       setError('Value cannot be empty')
+      return
+    }
+    const formatError = validateFormat(inputValue.trim())
+    if (formatError) {
+      setError(formatError)
       return
     }
     setSaving(true)
@@ -192,6 +203,11 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
             <span className="text-sm font-medium truncate" data-testid={`label-${keyData.id}`}>
               {keyData.label}
             </span>
+            {keyData.required ? (
+              <Badge variant="destructive" className="text-[10px] px-1.5 py-0" data-testid={`badge-required-${keyData.id}`}>Required</Badge>
+            ) : (
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0" data-testid={`badge-optional-${keyData.id}`}>Optional</Badge>
+            )}
             <a
               href={keyData.docsUrl}
               target="_blank"
@@ -216,7 +232,7 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
                 onChange={(e) => { setInputValue(e.target.value); setError(null) }}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') handleCancel() }}
                 placeholder={`Enter ${keyData.label}...`}
-                className="font-mono text-sm h-9"
+                className="font-mono text-sm"
                 autoFocus
                 data-testid={`input-${keyData.id}`}
               />
@@ -318,19 +334,71 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
   )
 }
 
+function CollapsibleGroup({ group, iconMap, onSaved }: { group: IntegrationGroup; iconMap: Record<string, typeof Database>; onSaved: () => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const Icon = iconMap[group.icon] || KeyRound
+  const groupConfigured = group.keys.filter(k => k.configured).length
+  const groupTotal = group.keys.length
+  const allConfigured = groupConfigured === groupTotal
+  const hasRequired = group.keys.some(k => k.required)
+  const requiredMissing = group.keys.filter(k => k.required && !k.configured).length
+
+  return (
+    <div data-testid={`group-${group.id}`}>
+      <button
+        type="button"
+        className="w-full flex items-center gap-3 px-6 py-3 bg-muted/30 border-t text-left hover-elevate"
+        onClick={() => setExpanded(!expanded)}
+        data-testid={`button-toggle-${group.id}`}
+      >
+        {expanded ? (
+          <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+        ) : (
+          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+        )}
+        <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+        <span className="text-sm font-semibold">{group.label}</span>
+        <div className="flex items-center gap-1.5">
+          {group.keys.map((k) => (
+            <CircleDot
+              key={k.id}
+              className={`h-2.5 w-2.5 ${k.configured ? 'text-green-500' : k.required ? 'text-destructive' : 'text-muted-foreground/40'}`}
+            />
+          ))}
+        </div>
+        <div className="flex items-center gap-2 ml-auto">
+          {requiredMissing > 0 && hasRequired && (
+            <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
+              {requiredMissing} required missing
+            </Badge>
+          )}
+          <Badge variant={allConfigured ? 'default' : 'secondary'} className="text-[10px] px-1.5 py-0">
+            {groupConfigured}/{groupTotal}
+          </Badge>
+        </div>
+      </button>
+      {expanded && (
+        <div className="divide-y">
+          {group.keys.map(key => (
+            <KeyRow key={key.id} keyData={key} onSaved={onSaved} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function IntegrationsPage() {
   const [loading, setLoading] = useState(true)
   const [techStack, setTechStack] = useState<IntegrationGroup[]>([])
-  const [socialPlatforms, setSocialPlatforms] = useState<IntegrationGroup[]>([])
-  const [summary, setSummary] = useState({ techConfigured: 0, techTotal: 0, socialConfigured: 0, socialTotal: 0 })
+  const [summary, setSummary] = useState({ techConfigured: 0, techTotal: 0, requiredConfigured: 0, requiredTotal: 0 })
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/integrations')
+      const res = await fetch('/api/admin/integrations?section=tech')
       if (!res.ok) throw new Error('Failed to fetch')
       const data = await res.json()
       setTechStack(data.techStack)
-      setSocialPlatforms(data.socialPlatforms)
       setSummary(data.summary)
     } catch {
     } finally {
@@ -350,68 +418,14 @@ export default function IntegrationsPage() {
     )
   }
 
-  function renderSection(title: string, description: string, groups: IntegrationGroup[], iconMap: Record<string, typeof Database>, configuredCount: number, totalCount: number) {
-    return (
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <KeyRound className="h-5 w-5" />
-                {title}
-                <InfoTooltip text="Click any value field to edit it. Use the eye icon to reveal a saved value. Keys saved here are stored in your database and take effect immediately." />
-              </CardTitle>
-              <CardDescription>{description}</CardDescription>
-            </div>
-            <Badge variant={configuredCount === totalCount ? 'default' : 'secondary'}>
-              {configuredCount}/{totalCount} configured
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          {groups.map((group) => {
-            const Icon = iconMap[group.icon] || KeyRound
-            const groupConfigured = group.keys.filter(k => k.configured).length
-            const groupTotal = group.keys.length
-
-            return (
-              <div key={group.id} data-testid={`group-${group.id}`}>
-                <div className="flex items-center gap-3 px-6 py-3 bg-muted/30 border-t">
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-semibold">{group.label}</span>
-                  <div className="flex items-center gap-1.5">
-                    {group.keys.map((k) => (
-                      <CircleDot
-                        key={k.id}
-                        className={`h-2.5 w-2.5 ${k.configured ? 'text-green-500' : 'text-muted-foreground/40'}`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-xs text-muted-foreground ml-auto">
-                    {groupConfigured}/{groupTotal}
-                  </span>
-                </div>
-                <div className="divide-y">
-                  {group.keys.map(key => (
-                    <KeyRow key={key.id} keyData={key} onSaved={fetchData} />
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </CardContent>
-      </Card>
-    )
-  }
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
-        <Card data-testid="card-tech-summary">
+        <Card data-testid="card-total-summary">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div>
-                <p className="text-sm text-muted-foreground">Tech Stack Keys</p>
+                <p className="text-sm text-muted-foreground">Total Keys</p>
                 <p className="text-2xl font-bold" data-testid="text-tech-count">{summary.techConfigured}/{summary.techTotal}</p>
               </div>
               <Badge variant={summary.techConfigured === summary.techTotal ? 'default' : 'secondary'}>
@@ -420,38 +434,45 @@ export default function IntegrationsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card data-testid="card-social-summary">
+        <Card data-testid="card-required-summary">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div>
-                <p className="text-sm text-muted-foreground">Social Platform Keys</p>
-                <p className="text-2xl font-bold" data-testid="text-social-count">{summary.socialConfigured}/{summary.socialTotal}</p>
+                <p className="text-sm text-muted-foreground">Required Keys</p>
+                <p className="text-2xl font-bold" data-testid="text-required-count">{summary.requiredConfigured}/{summary.requiredTotal}</p>
               </div>
-              <Badge variant={summary.socialConfigured === summary.socialTotal ? 'default' : 'secondary'}>
-                {summary.socialConfigured === summary.socialTotal ? 'All Set' : 'Incomplete'}
+              <Badge variant={summary.requiredConfigured === summary.requiredTotal ? 'default' : 'destructive'}>
+                {summary.requiredConfigured === summary.requiredTotal ? 'All Set' : `${summary.requiredTotal - summary.requiredConfigured} Missing`}
               </Badge>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {renderSection(
-        'Tech Stack Integrations',
-        'Database, payments, email, AI, caching, monitoring, and analytics',
-        techStack,
-        TECH_ICONS,
-        summary.techConfigured,
-        summary.techTotal
-      )}
-
-      {renderSection(
-        'Social Media Platforms',
-        'API keys and secrets for social posting, monitoring, and analytics',
-        socialPlatforms,
-        SOCIAL_ICONS,
-        summary.socialConfigured,
-        summary.socialTotal
-      )}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <KeyRound className="h-5 w-5" />
+                Tech Stack Integrations
+                <InfoTooltip text="Click any group to expand it. Click a value field to edit. Use the eye icon to reveal a saved value. Keys saved here are stored in your database and take effect immediately." />
+              </CardTitle>
+              <CardDescription>Database, payments, email, AI, caching, monitoring, and analytics</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {techStack.map((group) => (
+            <CollapsibleGroup
+              key={group.id}
+              group={group}
+              iconMap={TECH_ICONS}
+              onSaved={fetchData}
+            />
+          ))}
+        </CardContent>
+      </Card>
 
       <div className="p-4 rounded-md bg-muted/30 border text-sm text-muted-foreground space-y-1" data-testid="text-env-info">
         <p>Keys can be set in two ways:</p>
@@ -459,7 +480,7 @@ export default function IntegrationsPage() {
           <li><Badge variant="secondary" className="text-[10px] px-1.5 py-0 mr-1">Dashboard</Badge>Saved from this page, stored in your database, takes effect immediately</li>
           <li><Badge variant="secondary" className="text-[10px] px-1.5 py-0 mr-1">Env Var</Badge>Set in your hosting platform (Vercel, Replit, etc.), recognized automatically</li>
         </ul>
-        <p className="pt-1">Dashboard-saved keys take priority over environment variables.</p>
+        <p className="pt-1">Dashboard-saved keys take priority over environment variables. Social platform keys are managed in the MuseSocial setup page.</p>
       </div>
     </div>
   )
