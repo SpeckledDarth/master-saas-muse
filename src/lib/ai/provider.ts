@@ -86,7 +86,7 @@ export function createAIClient(provider: AIProvider): OpenAI | null {
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant'
-  content: string
+  content: string | Array<{type: string; text?: string; image_url?: {url: string}}>
 }
 
 export function validateMessages(messages: unknown): { valid: boolean; error?: string; messages?: ChatMessage[] } {
@@ -106,11 +106,27 @@ export function validateMessages(messages: unknown): { valid: boolean; error?: s
     if (!['system', 'user', 'assistant'].includes(msg.role)) {
       return { valid: false, error: `Invalid role: ${msg.role}` }
     }
-    if (typeof msg.content !== 'string') {
-      return { valid: false, error: 'Message content must be a string' }
-    }
-    if (msg.content.length > MAX_MESSAGE_LENGTH) {
-      return { valid: false, error: `Message too long (max ${MAX_MESSAGE_LENGTH} chars)` }
+    if (typeof msg.content === 'string') {
+      if (msg.content.length > MAX_MESSAGE_LENGTH) {
+        return { valid: false, error: `Message too long (max ${MAX_MESSAGE_LENGTH} chars)` }
+      }
+    } else if (Array.isArray(msg.content)) {
+      for (const contentItem of msg.content) {
+        if (!contentItem || typeof contentItem !== 'object') {
+          return { valid: false, error: 'Invalid content item' }
+        }
+        if (contentItem.type === 'text' && typeof contentItem.text === 'string') {
+          if (contentItem.text.length > MAX_MESSAGE_LENGTH) {
+            return { valid: false, error: `Message text too long (max ${MAX_MESSAGE_LENGTH} chars)` }
+          }
+        } else if (contentItem.type === 'image_url' && contentItem.image_url?.url) {
+          continue
+        } else {
+          return { valid: false, error: 'Invalid content item format' }
+        }
+      }
+    } else {
+      return { valid: false, error: 'Message content must be a string or array' }
     }
   }
   return { valid: true, messages: messages as ChatMessage[] }
@@ -145,7 +161,7 @@ export async function chatCompletion(
 
   const response = await client.chat.completions.create({
     model: settings.model,
-    messages: allMessages,
+    messages: allMessages as unknown as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
     max_tokens: settings.maxTokens,
     temperature: settings.temperature,
   })
@@ -181,7 +197,7 @@ export async function chatCompletionStream(
 
   const stream = await client.chat.completions.create({
     model: settings.model,
-    messages: allMessages,
+    messages: allMessages as unknown as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
     max_tokens: settings.maxTokens,
     temperature: settings.temperature,
     stream: true,

@@ -243,6 +243,7 @@ export async function GET() {
       postsThisMonth: 0,
       scheduledPosts: 0,
       connectedAccounts: 0,
+      aiGeneratedPosts: 0,
     }
 
     try {
@@ -268,6 +269,14 @@ export async function GET() {
             .select('*', { count: 'exact', head: true })
             .gte('created_at', monthAgo)
           socialMetrics.postsThisMonth = monthCount ?? 0
+        } catch {}
+
+        try {
+          const { count: aiCount } = await adminClient
+            .from('social_posts')
+            .select('*', { count: 'exact', head: true })
+            .eq('ai_generated', true)
+          socialMetrics.aiGeneratedPosts = aiCount ?? 0
         } catch {}
 
         try {

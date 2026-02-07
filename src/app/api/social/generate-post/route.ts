@@ -131,14 +131,14 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  let body: { platform?: string; topic?: string; brandVoice?: string; style?: string; includeHashtags?: boolean; maxLength?: number }
+  let body: { platform?: string; topic?: string; brandVoice?: string; style?: string; includeHashtags?: boolean; maxLength?: number; imageUrl?: string }
   try {
     body = await request.json()
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { platform, topic, brandVoice, style, includeHashtags, maxLength } = body
+  const { platform, topic, brandVoice, style, includeHashtags, maxLength, imageUrl } = body
 
   if (!platform || !['twitter', 'linkedin', 'instagram'].includes(platform)) {
     return NextResponse.json({ error: 'Invalid platform. Must be twitter, linkedin, or instagram.' }, { status: 400 })
@@ -163,9 +163,22 @@ export async function POST(request: NextRequest) {
   )
 
   try {
+    const userMessage: { role: 'user' as const; content: string | Array<{type: string; text?: string; image_url?: {url: string}}> } = imageUrl && imageUrl.trim()
+      ? {
+          role: 'user' as const,
+          content: [
+            { type: 'text' as const, text: `Generate a ${platform} post about: ${topic.trim()}` },
+            { type: 'image_url' as const, image_url: { url: imageUrl } },
+          ],
+        }
+      : {
+          role: 'user' as const,
+          content: `Generate a ${platform} post about: ${topic.trim()}`,
+        }
+
     const result = await chatCompletion(
       { ...aiSettings, systemPrompt: socialPrompt },
-      [{ role: 'user', content: `Generate a ${platform} post about: ${topic.trim()}` }]
+      [userMessage]
     )
 
     const generatedContent = result.content.trim()
@@ -183,13 +196,19 @@ export async function POST(request: NextRequest) {
     } catch {
     }
 
-    return NextResponse.json({
+    const response: any = {
       content: generatedContent,
       platform,
       characterCount: generatedContent.length,
       maxLength: effectiveMaxLength,
       usage: result.usage,
-    })
+    }
+
+    if (imageUrl && imageUrl.trim()) {
+      response.imageUrl = imageUrl
+    }
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error('Social post generation error:', error)
     return NextResponse.json(

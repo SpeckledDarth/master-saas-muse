@@ -36,6 +36,7 @@ interface MetricsData {
     postsThisMonth: number
     scheduledPosts: number
     connectedAccounts: number
+    aiGeneratedPosts: number
   }
 }
 
@@ -402,6 +403,17 @@ export default function MetricsPage() {
             <CardContent>
               <div className="text-2xl font-bold" data-testid="text-social-accounts">{metrics.socialMetrics.connectedAccounts}</div>
               <p className="text-xs text-muted-foreground">Active connections</p>
+            </CardContent>
+          </Card>
+
+          <Card data-testid="card-social-ai-generated">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">AI Generated</CardTitle>
+              <Share2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" data-testid="text-social-ai-generated">{metrics.socialMetrics.aiGeneratedPosts}</div>
+              <p className="text-xs text-muted-foreground">AI-created posts</p>
             </CardContent>
           </Card>
         </div>
