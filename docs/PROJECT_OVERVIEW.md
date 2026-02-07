@@ -90,13 +90,15 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Scheduled weekly/monthly KPI summary emails
 
 ### Setup Dashboard
-- Split into 6 focused sub-pages with sidebar navigation
+- Split into 8 focused sub-pages with sidebar navigation
 - Branding customization (logo, colors, app name, hero styles)
 - Content management (homepage sections)
 - Pages configuration (about, contact, terms, privacy, custom pages)
 - Pricing configuration (Stripe integration)
 - Social links setup
 - Features & integrations (auth toggles, AI, webhooks, security, compliance, support)
+- API Keys & Integrations (centralized key management with collapsible groups, format validation)
+- MuseSocial configuration (social media module, platform API keys)
 
 ### Content Management
 - Blog/changelog system with markdown and live preview
@@ -144,6 +146,28 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Fire-and-forget delivery with retry logic
 - Admin-configurable URL, secret, and per-event toggles
 - Automated API token rotation
+
+### MuseSocial Module (Social Media Management)
+- Toggleable social media management extension with two tiers: Universal and Power
+- 10 platform support: Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord
+- AI-powered post generation with multimodal image support
+- Post scheduling, management, and social API health checker
+- Tier-based rate limiting (Universal: 10 AI generations/day, 20 posts/day; Power: 100 AI generations/day, 10,000 posts/day)
+- Social KPI cards on admin metrics dashboard
+- n8n workflow templates for automation (auto-post-rss, ai-generate-and-schedule, engagement-monitor)
+- BullMQ retry logic (3 attempts, exponential backoff) for post delivery
+- Conditional onboarding wizard step, Vercel Cron fallback
+- Dependency warnings when configuration is incomplete
+
+### Centralized API Keys & Integrations
+- Admin setup page for managing all service API keys from the dashboard
+- Collapsible groups (collapsed by default) with status indicators (green/red/gray dots)
+- Required/Optional labels (Supabase, Stripe, Resend = required; others = optional)
+- Format validation on save (Stripe sk_ prefix, Supabase URL pattern, OpenAI sk- prefix, Sentry DSN, HTTPS URLs)
+- Summary cards showing total keys and required keys configured
+- Inline edit/reveal/delete with source badges (Dashboard vs Env Var)
+- Social platform API keys feature-gated on MuseSocial setup page
+- DB-stored keys take priority over environment variables
 
 ### Enterprise Features
 - SSO/SAML single sign-on with domain-based detection
@@ -258,9 +282,14 @@ This means you can run multiple SaaS products from one template, or allow custom
 | Metrics Alerts (Churn + Growth) | Complete |
 | Database Backup Configuration | Complete |
 | API Token Rotation | Complete |
+| MuseSocial Module (10 platforms, 2 tiers) | Complete |
+| Centralized API Keys & Integrations | Complete |
 
-### Planned (Post-MVP)
+### Planned (Post-MVP / Roadmap)
 
+- **Dynamic Tiers for MuseSocial** — Allow admins to create unlimited custom tiers from the dashboard (currently Universal and Power)
+- **Real Platform API Integration** — 7 newer platform clients (YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord) have stubbed methods ready for real API integration
+- **Minimize Hardcoded Variables** — Make all configurable values editable from admin dashboard without code changes
 - Affiliate/referral system
 - Push notifications
 - Internationalization (multiple languages)
@@ -298,6 +327,7 @@ This section compares the planned technology stack against what is currently imp
 | | OpenAI | Implemented | Configurable via admin dashboard |
 | | Anthropic | Implemented | Configurable via admin dashboard |
 | | n8n/Webhook System | Implemented | 8 events, HMAC signing, fire-and-forget |
+| **Social Media** | MuseSocial Module | Implemented | 10 platforms, 2 tiers, AI post generation |
 | **Operations** | Resend (Emails) | Implemented | Templates + test sending + admin editor + scheduled reports |
 | | Sentry (Monitoring) | Implemented | Server + browser errors via tunnel route |
 | | Plausible (Analytics) | Implemented | Script integrated |
@@ -315,6 +345,7 @@ This section compares the planned technology stack against what is currently imp
 | Database/Storage | 4/4 | 0 | 0 |
 | Authentication | 7/7 | 0 | 0 |
 | AI & Automation | 4/4 | 0 | 0 |
+| Social Media | 1/1 | 0 | 0 |
 | Operations | 4/4 | 0 | 0 |
 | Testing | 1/1 | 0 | 0 |
 | Monetization | 1/1 | 0 | 0 |
@@ -366,4 +397,4 @@ For the latest status and roadmap, refer to the Master Plan document.
 
 ---
 
-*Last Updated: February 6, 2026*
+*Last Updated: February 7, 2026*

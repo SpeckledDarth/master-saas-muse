@@ -257,7 +257,7 @@ Required for background job processing (email sending, webhook retries, schedule
 
 ## Step 12: Configure Your SaaS (Setup Dashboard)
 
-This is the key step that makes each clone unique! Go to `/admin/setup` and configure. The setup is organized into 6 focused sub-pages with a sidebar navigation:
+This is the key step that makes each clone unique! Go to `/admin/setup` and configure. The setup is organized into 8 focused sub-pages with a sidebar navigation:
 
 ### Branding Sub-Page
 - [ ] **App Name** - Your SaaS product name (e.g., "ExtrusionCalc Pro")
@@ -338,6 +338,26 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] Customize chatbot system prompt
 
 **Click "Save Changes" when done!**
+
+### Integrations Sub-Page (API Keys)
+- [ ] Navigate to `/admin/setup/integrations`
+- [ ] Configure Tech Stack API keys in collapsible groups:
+  - **Supabase** (Required): URL and Anon Key
+  - **Stripe** (Required): Secret Key (validates `sk_` prefix)
+  - **Resend** (Optional): API Key
+  - **AI Providers** (Optional): xAI, OpenAI, or Anthropic API keys
+  - **Redis** (Optional): Upstash REST URL and Token
+  - **Monitoring** (Optional): Sentry DSN, Plausible Domain
+- [ ] Keys show source badges (Dashboard vs Env Var)
+- [ ] Format validation runs on save
+
+### MuseSocial Sub-Page (Social Module)
+- [ ] Navigate to `/admin/setup/musesocial`
+- [ ] Toggle MuseSocial module on/off
+- [ ] Select tier (Universal or Power)
+- [ ] Enable desired platforms (up to 10)
+- [ ] Configure platform API credentials in the Platform API Keys section
+- [ ] Verify dependency warnings appear if AI is disabled or no platforms enabled
 
 ---
 
@@ -421,6 +441,9 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - [ ] Notification bell appears in header
 - [ ] Legal pages load correctly (privacy, terms, cookie-policy, etc.)
 - [ ] Cookie consent banner appears (if enabled)
+- [ ] Integrations page loads at `/admin/setup/integrations` with collapsible groups
+- [ ] MuseSocial setup page loads at `/admin/setup/musesocial`
+- [ ] Social dashboard loads at `/dashboard/social` (if MuseSocial enabled)
 
 ---
 
@@ -480,7 +503,8 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - **Metrics Dashboard** (10 KPIs: Total Users, New Users, Active Subscriptions, MRR, ARPU, LTV, Churn Rate, Conversion Rate, Feedback Count, Waitlist Count)
 - **NPS Score** card with color-coded Net Promoter Score
 - **Alert thresholds** for churn rate and user growth with email notifications
-- **Setup Dashboard** (configure branding, pricing, social, features, security, compliance, support)
+- **Setup Dashboard** (configure branding, pricing, social, features, security, compliance, support, integrations, MuseSocial)
+- **Centralized API Keys** (collapsible groups, Required/Optional labels, format validation, source badges)
 - User management (view, edit roles, search)
 - **User Impersonation** (view app as any user for debugging, 30-min sessions, audit logged)
 - Organization settings
@@ -542,6 +566,26 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - 9 legal/compliance pages with dynamic variable replacement
 - Cookie consent banner
 
+### MuseSocial Module
+- Toggleable social media management extension
+- 2 tiers: Universal (basic) and Power (advanced)
+- 10 platform support (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord)
+- AI-powered post generation with multimodal image support
+- Post scheduling and management
+- Tier-based rate limiting (Universal: 10 AI gen/day, 20 posts/day; Power: 100 AI gen/day, 10k posts/day)
+- Platform API health checker
+- Social KPI cards on admin metrics dashboard
+- BullMQ retry logic for post delivery failures
+- n8n workflow templates for automation
+
+### Centralized API Keys & Integrations
+- Admin setup page at `/admin/setup/integrations` for Tech Stack keys
+- Social platform keys managed on MuseSocial page
+- Collapsible groups (collapsed by default) with status indicators
+- Required/Optional labels and format validation on save
+- Inline edit/reveal/delete with source badges (Dashboard vs Env Var)
+- Keys stored in `config_secrets` database table
+
 ### Security
 - Supabase Row Level Security (RLS)
 - Zod input validation
@@ -563,7 +607,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 | Queue Infrastructure (BullMQ + Upstash) | Complete |
 | Rate Limiting (Upstash Redis) | Complete |
 | Customer Service Tools | Complete |
-| Admin Setup UX (6 Sub-Pages) | Complete |
+| Admin Setup UX (8 Sub-Pages) | Complete |
 | Metrics Dashboard (10 KPIs + NPS) | Complete |
 | Help Widget (Support Chatbot) | Complete |
 | NPS Score Tracking | Complete |
@@ -572,6 +616,8 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 | Audit Log Viewer | Complete |
 | Legal & Compliance Pages | Complete |
 | Metrics Alerts & Reports | Complete |
+| MuseSocial Module (10 platforms, 2 tiers) | Complete |
+| Centralized API Keys & Integrations | Complete |
 
 ---
 

@@ -16,6 +16,8 @@ A complete guide for managing your MuseKit-powered application. Written for team
    - [Pricing](#pricing)
    - [Social Links](#social-links)
    - [Features & Integrations](#features--integrations)
+   - [API Keys & Integrations](#api-keys--integrations)
+   - [MuseSocial](#musesocial)
 5. [User Management](#user-management)
    - [Customer Service Tools](#customer-service-tools)
    - [User Impersonation](#user-impersonation)
@@ -40,8 +42,9 @@ A complete guide for managing your MuseKit-powered application. Written for team
 19. [In-App Notifications](#in-app-notifications)
 20. [Audit Log Viewer](#audit-log-viewer)
 21. [Legal & Compliance Pages](#legal--compliance-pages)
-22. [Feature Toggles Reference](#feature-toggles-reference)
-23. [Public Pages Your Visitors See](#public-pages-your-visitors-see)
+22. [MuseSocial Module](#musesocial-module)
+23. [Feature Toggles Reference](#feature-toggles-reference)
+24. [Public Pages Your Visitors See](#public-pages-your-visitors-see)
 
 ---
 
@@ -102,7 +105,7 @@ You only need to complete this once. After that, use the Setup Dashboard for ong
 
 **Where:** `/admin/setup`
 
-The Setup Dashboard is your master control panel for configuring every aspect of your site. It's split into six focused sub-pages, each accessible from a sidebar navigation menu. Each sub-page handles only its own section, making it faster to load and easier to navigate.
+The Setup Dashboard is your master control panel for configuring every aspect of your site. It's split into eight focused sub-pages, each accessible from a sidebar navigation menu. Each sub-page handles only its own section, making it faster to load and easier to navigate.
 
 ### Branding
 
@@ -197,6 +200,38 @@ Toggle features on and off, and configure AI and webhook integrations. This page
 - **Support settings** — Configure the floating support chatbot widget, set the fallback email, and customize the chatbot's system prompt
 
 See [Feature Toggles Reference](#feature-toggles-reference) for details on each toggle.
+
+### API Keys & Integrations
+
+**Where:** `/admin/setup/integrations`
+
+Manage all your third-party service API keys from one centralized page. Keys are organized into collapsible groups by service:
+
+- **Supabase** (Required) — Project URL, Anon Key, Service Role Key
+- **Stripe** (Required) — Secret Key, Publishable Key
+- **Resend** (Required) — API Key, From Email
+- **AI Providers** (Optional) — xAI API Key, OpenAI API Key, Anthropic API Key
+- **Upstash Redis** (Optional) — REST URL, REST Token
+- **Sentry** (Optional) — DSN, Org, Project
+- **Plausible** (Optional) — Domain
+
+**How it works:**
+- Each group is collapsed by default — click the group header to expand
+- Colored dots next to each key show its status: green (configured), red (required but missing), gray (optional and missing)
+- Summary cards at the top show how many keys are configured overall and how many required keys are set
+- Click the pencil icon or the masked value to edit a key inline
+- Click the eye icon to reveal a key's value temporarily
+- Click the trash icon to delete a key
+- **Source badges** indicate whether a key is stored in the Dashboard (database) or comes from an Environment Variable on your hosting platform
+- Format validation catches common errors when saving (e.g., Stripe keys must start with `sk_`)
+
+**Note:** Social platform API keys are managed on the MuseSocial setup page instead, so they only appear when the social module is enabled.
+
+### MuseSocial
+
+**Where:** `/admin/setup/musesocial`
+
+Configure the MuseSocial social media management module. See [MuseSocial Module](#musesocial-module) for full details.
 
 ---
 
@@ -616,6 +651,79 @@ MuseKit includes a comprehensive set of legal pages that are automatically avail
 
 ---
 
+## MuseSocial Module
+
+MuseSocial is a toggleable social media management extension built into MuseKit. When enabled, it adds social posting, scheduling, and AI-powered content generation capabilities.
+
+### Enabling MuseSocial
+
+1. Go to **Admin > Setup > MuseSocial** (`/admin/setup/musesocial`)
+2. Toggle the module **on**
+3. Select your tier: **Universal** or **Power**
+4. Enable the platforms you want to support (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord)
+5. Scroll down to **Platform API Keys** and enter your API credentials for each enabled platform
+
+### Tiers
+
+| Feature | Universal | Power |
+|---------|-----------|-------|
+| Basic posting & monitoring | Yes | Yes |
+| Full scheduling | No | Yes |
+| Trend analysis | No | Yes |
+| AI content generation | Limited | Full |
+| Analytics & automation | No | Yes |
+| AI generations per day | 10 | 100 |
+| Posts per day | 20 | 10,000 |
+
+### Platform API Keys
+
+When MuseSocial is enabled, a **Platform API Keys** section appears on the MuseSocial setup page. This works the same way as the main API Keys page:
+
+- Keys are organized by platform in collapsible groups
+- Each platform shows a status badge (configured count)
+- Inline edit, reveal, and delete controls
+- Source badges show whether keys come from the Dashboard or Environment Variables
+
+### What Users See
+
+When MuseSocial is enabled, users see a **Social Accounts** page in their dashboard (`/dashboard/social`) where they can:
+- Connect their social media accounts
+- Create and schedule posts (with AI-powered content generation if AI features are enabled)
+- View post status and history
+
+### Dependencies & Warnings
+
+MuseSocial shows dependency warnings on the setup page when:
+- **AI features are disabled** — AI-powered post generation requires AI to be enabled in Setup > Features
+- **No platforms are enabled** — At least one platform must be toggled on
+- **API keys are missing** — Platform API credentials must be configured for enabled platforms
+
+### Social KPI Cards
+
+When MuseSocial is enabled, additional KPI cards appear on the admin Metrics Dashboard showing:
+- Current tier badge (Universal/Power)
+- AI generation count for the current period
+- Social posting activity
+
+### n8n Integration
+
+MuseSocial includes pre-built n8n workflow templates for automation:
+- **Auto-post RSS** — Automatically post new RSS feed items to social platforms
+- **AI Generate & Schedule** — Use AI to generate and schedule social content
+- **Engagement Monitor** — Monitor social engagement metrics
+
+Templates are located in `src/lib/social/n8n-templates/`. Set `MUSEKIT_URL` and `MUSEKIT_SESSION_COOKIE` environment variables in your n8n instance.
+
+### Troubleshooting
+
+- **"Social module not enabled"** — Admin must toggle on in Setup > MuseSocial
+- **"AI features not enabled"** — Enable AI in Setup > Features
+- **"Rate limit exceeded"** — User hit daily tier cap; upgrade to Power or wait for daily reset
+- **Posts stuck in "scheduled"** — Check BullMQ queue dashboard (`/admin/queue`), verify Redis connection
+- **Token validation fails** — Re-connect the social account with fresh credentials
+
+---
+
 ## Feature Toggles Reference
 
 Here's what each feature toggle does:
@@ -638,6 +746,7 @@ Here's what each feature toggle does:
 | **Support Chatbot** | Show a floating AI-powered help chat widget |
 | **AI Features** | Enable the AI chat assistant |
 | **Enterprise SSO / SAML** | Enable SAML-based single sign-on for enterprise users |
+| **MuseSocial Module** | Enable social media management (posting, scheduling, AI content generation) |
 
 ---
 
@@ -670,6 +779,7 @@ These are the pages your customers and visitors can access:
 | **Billing** | `/billing` | Subscription management (logged-in users) |
 | **Profile** | `/profile` | User profile settings (logged-in users) |
 | **Custom Pages** | `/p/{slug}` | Up to 4 custom pages you create |
+| **Dashboard Social** | `/dashboard/social` | Social media accounts (when MuseSocial is enabled) |
 
 All pages automatically support dark/light mode and are responsive on mobile devices.
 
@@ -687,7 +797,9 @@ All pages automatically support dark/light mode and are responsive on mobile dev
 - **Check the Metrics Dashboard regularly** — Monitor KPIs and set up alert thresholds to catch issues early
 - **Review the Audit Log** — Periodically check the audit log for unexpected admin actions
 - **Backup before major changes** — The platform supports checkpoints, but it's good practice to note your current settings before making sweeping changes
+- **API Keys page first** — After initial setup, configure your required API keys on the Integrations page to ensure all services are connected
+- **MuseSocial setup** — If using social features, enable the module first, then configure platforms and API keys on the same page
 
 ---
 
-*Last Updated: February 6, 2026*
+*Last Updated: February 7, 2026*

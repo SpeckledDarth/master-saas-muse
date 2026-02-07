@@ -1,8 +1,8 @@
 # Master SaaS Muse Template - Development Master Plan
 
-**Version**: 3.0  
-**Date**: February 6, 2026  
-**Status**: MVP Complete + Post-MVP Features  
+**Version**: 4.0  
+**Date**: February 7, 2026  
+**Status**: MVP Complete + Post-MVP Features + MuseSocial Module  
 
 ---
 
@@ -63,7 +63,7 @@ This document is the single source of truth for the Master SaaS Muse Template de
 | 18     | Internationalization     | NOT STARTED | v1.1     |
 | 19     | A/B Testing              | NOT STARTED | v1.1     |
 | 20     | **User Impersonation**   | **COMPLETE**| **v1.1** |
-| 21     | Social Media Management  | NOT STARTED | v1.1     |
+| 21     | **MuseSocial Module**    | **COMPLETE**| **v1.1** |
 | 22     | Launch Plan Tools        | NOT STARTED | v1.1     |
 | 23     | Operations & Support     | NOT STARTED | v1.1     |
 | 24     | Multi-Role Dashboards    | NOT STARTED | v1.1     |
@@ -95,6 +95,7 @@ This document is the single source of truth for the Master SaaS Muse Template de
 | 50     | **Metrics Alerts & Reports**  | **COMPLETE** | **v1.1** |
 | 51     | **Database Backup Config**    | **COMPLETE** | **v1.1** |
 | 52     | **API Token Rotation**        | **COMPLETE** | **v1.1** |
+| 53     | **Centralized API Keys & Integrations** | **COMPLETE** | **v1.1** |
 
 ---
 
@@ -812,6 +813,78 @@ src/lib/notifications/
 
 ---
 
+### Module 21: MuseSocial Module (Social Media Management)
+**Estimated Time**: 3-4 days  
+**Dependencies**: Module 3, Module 16 (AI), Module 39 (Queue)  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Toggleable social media management extension
+- [x] Two tiers: Universal (basic posting, 10 AI generations/day, 20 posts/day) and Power (full features, 100 AI generations/day, 10,000 posts/day)
+- [x] 10 platform support: Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord
+- [x] Admin setup page at `/admin/setup/musesocial` with module enable/disable, tier selection, platform toggles
+- [x] Platform API Keys section on MuseSocial setup page with collapsible groups, inline edit/reveal/delete, status indicators
+- [x] Social account connection for users at `/dashboard/social`
+- [x] AI-powered post generation with multimodal image support
+- [x] Post scheduling and management
+- [x] Social API health checker
+- [x] Social KPI cards on admin metrics dashboard (tier badge, AI generation count)
+- [x] Conditional onboarding wizard step (only appears when module is enabled)
+- [x] Vercel Cron fallback for scheduled post delivery
+- [x] n8n workflow templates (auto-post-rss, ai-generate-and-schedule, engagement-monitor)
+- [x] Playwright E2E tests for social features
+- [x] Tier-based rate limiting with daily caps
+- [x] Dependency warnings when AI is disabled, no platforms enabled, or API keys missing
+- [x] BullMQ retry logic (3 attempts, exponential backoff) for post delivery failures
+- [x] All social imports use dynamic loading or type-only imports (tree-shaking safe)
+
+**Key Files**:
+```
+src/
+├── lib/social/
+│   ├── client.ts                    # Platform client interfaces (all 10 platforms)
+│   ├── rate-limits.ts               # Tier-based rate limiting constants and check function
+│   └── n8n-templates/               # n8n workflow JSON templates
+├── app/
+│   ├── admin/setup/musesocial/page.tsx  # Admin configuration + Platform API Keys
+│   ├── dashboard/social/page.tsx        # User-facing social accounts page
+│   └── api/social/                      # Social API routes (accounts, posts, generate-post, health)
+```
+
+---
+
+### Module 53: Centralized API Keys & Integrations
+**Estimated Time**: 1-2 days  
+**Dependencies**: Module 3, Module 41  
+**Status**: COMPLETE (February 2026)
+
+**Deliverables**:
+- [x] Admin setup page at `/admin/setup/integrations` for Tech Stack API keys
+- [x] Collapsible groups (collapsed by default) with chevron toggle
+- [x] Status indicators: green dot (configured), red dot (required missing), gray dot (optional missing)
+- [x] Summary cards at top: "Total Keys" and "Required Keys" with All Set / Missing badges
+- [x] Required/Optional labels on each key (Supabase, Stripe, Resend = required; others = optional)
+- [x] Format validation on save (Stripe sk_ prefix, Supabase URL pattern, OpenAI sk- prefix, Sentry DSN, HTTPS URLs)
+- [x] Inline edit/reveal/delete with source badges (Dashboard vs Env Var)
+- [x] Social platform API keys moved to MuseSocial setup page (feature-gated)
+- [x] API supports `?section=tech|social` query params for targeted fetching
+- [x] Keys stored in `config_secrets` database table, take effect immediately
+- [x] DB values take priority over environment variables
+- [x] 40+ allowed env var names in allowlist
+
+**Key Files**:
+```
+src/
+├── app/
+│   ├── admin/setup/integrations/page.tsx  # Tech Stack keys (collapsible groups)
+│   └── api/admin/integrations/route.ts    # CRUD API (GET ?section=, POST, PATCH, DELETE)
+├── lib/config/
+│   ├── secrets.ts                         # getConfigValue utility (DB + env var resolution)
+│   └── ensure-table.ts                    # Auto-creates config_secrets table on first use
+```
+
+---
+
 ## MVP Feature Checklist (from 33-Feature List)
 
 | # | Feature                          | Module | Status      |
@@ -852,6 +925,8 @@ src/lib/notifications/
 | 34| Metrics Alerts & Reports         | 50     | COMPLETE    |
 | 35| Database Backup Config           | 51     | COMPLETE    |
 | 36| API Token Rotation               | 52     | COMPLETE    |
+| 37| MuseSocial Module (10 platforms) | 21     | COMPLETE    |
+| 38| Centralized API Keys & Integrations | 53 | COMPLETE    |
 
 ---
 
@@ -895,7 +970,7 @@ When creating a new muse from this template:
 
 ## Progress Tracking
 
-### Current Phase: MVP COMPLETE + Post-MVP Features
+### Current Phase: MVP COMPLETE + Post-MVP Features + MuseSocial
 **Start Date**: December 29, 2025  
 **MVP Completion**: January 25, 2026  
 **Team Collaboration Added**: February 4, 2026  
@@ -918,6 +993,8 @@ When creating a new muse from this template:
 **Legal & Compliance Pages**: February 6, 2026  
 **Metrics Alerts & Reports**: February 6, 2026  
 **E2E Tests Expanded to 46**: February 6, 2026  
+**MuseSocial Module (10 platforms, 2 tiers)**: February 7, 2026  
+**Centralized API Keys & Integrations**: February 7, 2026  
 
 ### Completed Work (Next.js + Vercel):
 - [x] Module 1: Foundation - Landing page, dark/light mode, header/footer, Vercel deployment
@@ -953,12 +1030,17 @@ When creating a new muse from this template:
 - [x] Module 50: Metrics Alerts & Reports - Churn/growth thresholds, scheduled email reports
 - [x] Module 51: Database Backup Config - Admin UI for backup preferences
 - [x] Module 52: API Token Rotation - Automated webhook secret rotation
+- [x] Module 21: MuseSocial Module - Toggleable social media management with 10 platforms, 2 tiers, AI-powered post generation, scheduling, n8n templates, E2E tests
+- [x] Module 53: Centralized API Keys & Integrations - Collapsible groups, Required/Optional labels, format validation, social keys on MuseSocial page
 
 ### Next Steps:
 - [ ] Clone template for first production muse (ExtrusionCalculator.com)
 - [ ] Add RLS policies for organization_members table in Supabase (currently bypassed via admin client)
 - [x] Upgrade rate limiting from in-memory to Upstash Redis
 - [x] Background job processing (Upstash/BullMQ) for emails and reports
+- [ ] Dynamic tiers for MuseSocial (allow admins to create unlimited custom tiers from dashboard)
+- [ ] Real platform API integration for 7 newer platforms (YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord)
+- [ ] Minimize hardcoded variables — make all configurable values editable from admin dashboard
 - [ ] v1.1 features as prioritized
 
 ---
@@ -1025,6 +1107,10 @@ When creating a new muse from this template:
 | 2026-02-06 | Add legal & compliance pages                | Legal requirements for SaaS products              |
 | 2026-02-06 | Add metrics alerts & scheduled reports      | Proactive monitoring of business health           |
 | 2026-02-06 | Expand E2E tests to 46 across 7 files       | Comprehensive coverage including new features     |
+| 2026-02-07 | Add MuseSocial module (10 platforms, 2 tiers) | Social media management is key SaaS differentiator |
+| 2026-02-07 | Centralized API Keys with collapsible groups  | Admins need easy way to manage all service keys    |
+| 2026-02-07 | Move social API keys to MuseSocial page       | Feature-gate social keys, reduce clutter on main page |
+| 2026-02-07 | Add format validation for API keys            | Prevent common entry errors with key format checks |
 
 ---
 
@@ -1032,8 +1118,10 @@ When creating a new muse from this template:
 
 1. **Immediate**: Clone template for ExtrusionCalculator.com
 2. **Testing**: Run Playwright E2E test suites and verify all features
-3. **Post-Launch**: Add v1.1 features based on user feedback
+3. **MuseSocial Enhancements**: Dynamic tiers (admin-created custom tiers), real platform API integration for 7 newer platforms
+4. **General**: Minimize hardcoded variables — make all configurable values editable from admin dashboard without code changes
+5. **Post-Launch**: Add v1.1 features based on user feedback
 
 ---
 
-*Last Updated: February 6, 2026*
+*Last Updated: February 7, 2026*
