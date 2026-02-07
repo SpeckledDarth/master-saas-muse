@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { DollarSign, Loader2, Save, Check } from 'lucide-react'
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton } from '../components'
+import { SaveButton, InfoTooltip } from '../components'
 
 export default function PricingPage() {
   const { settings, saving, saved, handleSave, updatePricing } = useSetupSettingsContext()
@@ -17,7 +17,7 @@ export default function PricingPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Free Tier Configuration</CardTitle>
+          <CardTitle className="flex items-center gap-2">Free Tier Configuration <InfoTooltip text="A free plan reduces signup friction and feeds your conversion funnel. Configure what free users get access to." /></CardTitle>
           <CardDescription>
             Configure your free plan that appears on the pricing page
           </CardDescription>
@@ -79,7 +79,7 @@ export default function PricingPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Paid Pricing Plans</CardTitle>
+          <CardTitle className="flex items-center gap-2">Paid Pricing Plans <InfoTooltip text="Revenue-generating subscription tiers managed through Stripe. Changes in Stripe automatically sync to your pricing page." /></CardTitle>
           <CardDescription>
             Manage your subscription tiers in Stripe Dashboard
           </CardDescription>

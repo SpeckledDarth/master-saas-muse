@@ -1,7 +1,7 @@
 'use client'
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { MiniSaveButton, SaveButton, IconComponent, iconOptions } from '../components'
+import { MiniSaveButton, SaveButton, IconComponent, iconOptions, InfoTooltip } from '../components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,7 +30,7 @@ export default function BrandingPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Branding Settings</CardTitle>
+          <CardTitle className="flex items-center gap-2">Branding Settings <InfoTooltip text="Define your brand identity — name, colors, and logo. These appear across your app header, emails, and browser tabs." /></CardTitle>
           <CardDescription>
             Configure your app name, colors, and company information
           </CardDescription>
@@ -512,7 +512,7 @@ export default function BrandingPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5" />
-            Light Mode Theme
+            Light Mode Theme <InfoTooltip text="Fine-tune the color palette visitors see in light mode. Changes apply across all pages." />
           </CardTitle>
           <CardDescription>Customize colors for light mode</CardDescription>
         </CardHeader>
@@ -590,7 +590,7 @@ export default function BrandingPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5" />
-            Dark Mode Theme
+            Dark Mode Theme <InfoTooltip text="Fine-tune the color palette visitors see in dark mode. Defaults work well for most apps." />
           </CardTitle>
           <CardDescription>Customize colors for dark mode</CardDescription>
         </CardHeader>
@@ -668,7 +668,7 @@ export default function BrandingPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Announcement Bar</CardTitle>
+              <CardTitle className="flex items-center gap-2">Announcement Bar <InfoTooltip text="A top-of-page banner for promotions, product launches, or important updates. Visitors can dismiss it." /></CardTitle>
               <CardDescription>
                 Display a top banner for promotions or announcements
               </CardDescription>
@@ -793,7 +793,7 @@ export default function BrandingPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Navigation Menu</CardTitle>
+              <CardTitle className="flex items-center gap-2">Navigation Menu <InfoTooltip text="Controls which links appear in the top navigation bar. Add badges to highlight new or upcoming features." /></CardTitle>
               <CardDescription>
                 Configure which links appear in the top navigation bar of your website
               </CardDescription>

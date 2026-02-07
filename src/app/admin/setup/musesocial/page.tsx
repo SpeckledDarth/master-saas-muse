@@ -1,7 +1,7 @@
 'use client'
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton } from '../components'
+import { SaveButton, InfoTooltip } from '../components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -47,6 +47,7 @@ export default function MuseSocialPage() {
           <CardTitle className="flex items-center gap-2">
             <Share2 className="h-5 w-5" />
             Module Status
+            <InfoTooltip text="Controls whether the social media features are available to your users. Enable it in the Features tab." />
           </CardTitle>
           <CardDescription>
             MuseSocial social media management module
@@ -103,7 +104,7 @@ export default function MuseSocialPage() {
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Tier Selection</CardTitle>
+              <CardTitle className="flex items-center gap-2">Tier Selection <InfoTooltip text="Determines which social features your users can access and their daily usage limits." /></CardTitle>
               <CardDescription>
                 Choose the feature tier for your social module
               </CardDescription>
@@ -136,7 +137,7 @@ export default function MuseSocialPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Tier Rate Limits</CardTitle>
+              <CardTitle className="flex items-center gap-2">Tier Rate Limits <InfoTooltip text="Set daily caps per user to control API costs. Higher limits mean more API calls to social platforms." /></CardTitle>
               <CardDescription>
                 Configure daily usage caps for each tier. These limits apply per user per day.
               </CardDescription>
@@ -213,7 +214,7 @@ export default function MuseSocialPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Platform Connections</CardTitle>
+              <CardTitle className="flex items-center gap-2">Platform Connections <InfoTooltip text="Enable the social platforms your users can post to. Each platform requires its own API credentials." /></CardTitle>
               <CardDescription>
                 Connect your social media accounts
               </CardDescription>
@@ -275,7 +276,7 @@ export default function MuseSocialPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Posting Configuration</CardTitle>
+              <CardTitle className="flex items-center gap-2">Posting Configuration <InfoTooltip text="Controls how AI generates and publishes social content, including brand voice and approval workflow." /></CardTitle>
               <CardDescription>
                 Configure how posts are created and published
               </CardDescription>
@@ -312,7 +313,7 @@ export default function MuseSocialPage() {
           {socialModule.tier === 'power' && (
             <Card>
               <CardHeader>
-                <CardTitle>Monitoring</CardTitle>
+                <CardTitle className="flex items-center gap-2">Monitoring <InfoTooltip text="Track brand mentions and trends across platforms automatically. Available only on the Power tier." /></CardTitle>
                 <CardDescription>
                   Configure social media monitoring and automation
                 </CardDescription>
@@ -360,7 +361,7 @@ export default function MuseSocialPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>API Health Checker</CardTitle>
+              <CardTitle className="flex items-center gap-2">API Health Checker <InfoTooltip text="Monitors whether social platform APIs are reachable and functioning, with alerts for repeated failures." /></CardTitle>
               <CardDescription>
                 Monitor the health of social media API connections
               </CardDescription>

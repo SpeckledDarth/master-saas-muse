@@ -1,7 +1,7 @@
 'use client'
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton } from '../components'
+import { SaveButton, InfoTooltip } from '../components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,7 +20,7 @@ export default function FeaturesPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Feature Toggles</CardTitle>
+          <CardTitle className="flex items-center gap-2">Feature Toggles <InfoTooltip text="Turn individual features on or off without deploying code changes. Disabled features are hidden from users." /></CardTitle>
           <CardDescription>
             Enable or disable features for your SaaS
           </CardDescription>
@@ -229,6 +229,7 @@ export default function FeaturesPage() {
           <CardTitle className="flex items-center gap-2">
             <Globe className="h-5 w-5" />
             Webhook / n8n Integration
+            <InfoTooltip text="Sends real-time event data to external tools like n8n or Zapier for workflow automation." />
           </CardTitle>
           <CardDescription>
             Send real-time events to n8n, Zapier, or any webhook URL when key actions happen in your app.
@@ -336,6 +337,7 @@ export default function FeaturesPage() {
             <CardTitle className="flex items-center gap-2">
               <Bot className="h-5 w-5" />
               AI Provider Configuration
+              <InfoTooltip text="Choose which AI service powers your app's intelligent features. Set the API key as an environment variable." />
             </CardTitle>
             <CardDescription>
               Configure which AI provider and model to use. Set the API key as an environment variable in your deployment.

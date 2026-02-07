@@ -1,7 +1,7 @@
 'use client'
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton } from '../components'
+import { SaveButton, InfoTooltip } from '../components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,7 +19,7 @@ export default function SupportPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageCircle className="h-5 w-5" />
-            Support Widget
+            Support Widget <InfoTooltip text="A floating chatbot that provides instant help to visitors on every page of your site." />
           </CardTitle>
           <CardDescription>
             Configure the AI-powered support chatbot widget
@@ -101,7 +101,7 @@ export default function SupportPage() {
       {settings.support?.enabled && (
         <Card>
           <CardHeader>
-            <CardTitle>AI Support Configuration</CardTitle>
+            <CardTitle className="flex items-center gap-2">AI Support Configuration <InfoTooltip text="Controls how the AI assistant responds to user questions. Customize the personality and knowledge base." /></CardTitle>
             <CardDescription>
               Configure how your AI support assistant should behave
             </CardDescription>

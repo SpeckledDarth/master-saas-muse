@@ -1,7 +1,7 @@
 'use client'
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton } from '../components'
+import { SaveButton, InfoTooltip } from '../components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,7 +18,7 @@ export default function SecurityPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            Authentication Security
+            Authentication Security <InfoTooltip text="Protect user accounts with multi-factor authentication and CAPTCHA to prevent automated attacks." />
           </CardTitle>
           <CardDescription>
             Configure security settings for user authentication
@@ -67,7 +67,7 @@ export default function SecurityPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Password Requirements</CardTitle>
+          <CardTitle className="flex items-center gap-2">Password Requirements <InfoTooltip text="Stronger password rules reduce the risk of account compromise. Balance security with user convenience." /></CardTitle>
           <CardDescription>
             Define password policies for user accounts
           </CardDescription>
@@ -129,7 +129,7 @@ export default function SecurityPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Session Management</CardTitle>
+          <CardTitle className="flex items-center gap-2">Session Management <InfoTooltip text="Controls how long users stay logged in before being asked to re-authenticate." /></CardTitle>
           <CardDescription>
             Configure user session and timeout settings
           </CardDescription>
@@ -154,7 +154,7 @@ export default function SecurityPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>User Data Rights</CardTitle>
+          <CardTitle className="flex items-center gap-2">User Data Rights <InfoTooltip text="GDPR and CCPA compliance — give users the ability to export or delete their personal data." /></CardTitle>
           <CardDescription>
             Configure user data access and deletion policies
           </CardDescription>
@@ -190,7 +190,7 @@ export default function SecurityPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Database className="h-5 w-5" />
-            Database Backups
+            Database Backups <InfoTooltip text="Automated backup notifications ensure you know your data is safe. Actual backups are managed by Supabase." />
           </CardTitle>
           <CardDescription>
             Configure automated database backup schedule (managed by Supabase)
@@ -252,7 +252,7 @@ export default function SecurityPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <RefreshCw className="h-5 w-5" />
-            API Token Rotation
+            API Token Rotation <InfoTooltip text="Regularly changing API secrets limits damage from potential security leaks." />
           </CardTitle>
           <CardDescription>
             Configure automatic rotation of API tokens and secrets
@@ -295,7 +295,7 @@ export default function SecurityPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
-            Metrics Alerts
+            Metrics Alerts <InfoTooltip text="Automatic email warnings when business KPIs like churn rate or user growth move in the wrong direction." />
           </CardTitle>
           <CardDescription>
             Get notified when key metrics cross thresholds

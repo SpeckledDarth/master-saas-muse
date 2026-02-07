@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton } from '../components'
+import { SaveButton, InfoTooltip } from '../components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -74,7 +74,7 @@ export default function CompliancePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            Compliance Pages
+            Compliance Pages <InfoTooltip text="Legal pages protect your business and build user trust. Terms and Privacy Policy are always enabled." />
           </CardTitle>
           <CardDescription>
             Toggle optional legal and compliance pages. Terms of Service and Privacy Policy are always enabled as core pages.
@@ -171,7 +171,7 @@ export default function CompliancePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Cookie className="h-5 w-5" />
-            Cookie Consent Banner
+            Cookie Consent Banner <InfoTooltip text="Required by GDPR and similar privacy laws for EU visitors. Lets users choose which cookies to accept." />
           </CardTitle>
           <CardDescription>
             Configure the cookie consent banner shown to visitors
@@ -254,7 +254,7 @@ export default function CompliancePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Edit Legal Pages</CardTitle>
+          <CardTitle className="flex items-center gap-2">Edit Legal Pages <InfoTooltip text="Customize your legal documents with Markdown formatting. Use placeholders for dynamic values." /></CardTitle>
           <CardDescription>
             Edit the content for each legal page. Click a page name to expand its editor.
           </CardDescription>

@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Loader2, Save, Check } from 'lucide-react'
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton } from '../components'
+import { SaveButton, InfoTooltip } from '../components'
 
 export default function SocialPage() {
   const { settings, saving, saved, handleSave, updateSocial } = useSetupSettingsContext()
@@ -15,7 +15,7 @@ export default function SocialPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Social Links</CardTitle>
+          <CardTitle className="flex items-center gap-2">Social Links <InfoTooltip text="Displayed in your site footer. Helps with SEO and lets visitors find your brand across platforms." /></CardTitle>
           <CardDescription>
             Add links to your social media profiles
           </CardDescription>

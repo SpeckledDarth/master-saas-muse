@@ -1,7 +1,7 @@
 'use client'
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { MiniSaveButton, SaveButton, IconComponent, iconOptions } from '../components'
+import { MiniSaveButton, SaveButton, IconComponent, iconOptions, InfoTooltip } from '../components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -49,7 +49,7 @@ export default function ContentPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Features Section</CardTitle>
+              <CardTitle className="flex items-center gap-2">Features Section <InfoTooltip text="Highlight your product's key selling points on the homepage. Each card shows an icon, title, and description." /></CardTitle>
               <CardDescription>Highlight what makes your product special</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -160,7 +160,7 @@ export default function ContentPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Testimonials</CardTitle>
+              <CardTitle className="flex items-center gap-2">Testimonials <InfoTooltip text="Social proof from real customers builds trust and improves conversion rates." /></CardTitle>
               <CardDescription>Show what customers say about your product</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -272,7 +272,7 @@ export default function ContentPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>FAQ Section</CardTitle>
+              <CardTitle className="flex items-center gap-2">FAQ Section <InfoTooltip text="Answers common questions to reduce support tickets and help visitors make purchase decisions." /></CardTitle>
               <CardDescription>Answer common questions</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -349,7 +349,7 @@ export default function ContentPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Call to Action</CardTitle>
+              <CardTitle className="flex items-center gap-2">Call to Action <InfoTooltip text="The final prompt encouraging visitors to sign up. A strong CTA can significantly boost conversions." /></CardTitle>
               <CardDescription>Final prompt to get users to sign up</CardDescription>
             </div>
             <Switch
@@ -407,7 +407,7 @@ export default function ContentPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Trusted By / Logo Marquee</CardTitle>
+              <CardTitle className="flex items-center gap-2">Trusted By / Logo Marquee <InfoTooltip text="Scrolling logos of trusted companies add credibility and social proof to your landing page." /></CardTitle>
               <CardDescription>Show scrolling logos of companies that trust you</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -542,7 +542,7 @@ export default function ContentPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Metrics / Counters</CardTitle>
+              <CardTitle className="flex items-center gap-2">Metrics / Counters <InfoTooltip text="Animated number counters that highlight key achievements like users, revenue, or uptime." /></CardTitle>
               <CardDescription>Show animated metric counters (e.g., "10,000+ Customers")</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -719,7 +719,7 @@ export default function ContentPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>How It Works / Process Steps</CardTitle>
+              <CardTitle className="flex items-center gap-2">How It Works / Process Steps <InfoTooltip text="A numbered step-by-step guide that shows visitors how to get started with your product." /></CardTitle>
               <CardDescription>Show step-by-step process visualization</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -845,7 +845,7 @@ export default function ContentPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Image + Text Blocks</CardTitle>
+              <CardTitle className="flex items-center gap-2">Image + Text Blocks <InfoTooltip text="Alternating image and text sections for storytelling. Great for showcasing features in detail." /></CardTitle>
               <CardDescription>Alternating image and text sections (like GitBook/TheWone)</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -1048,7 +1048,7 @@ export default function ContentPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Customer Stories</CardTitle>
+              <CardTitle className="flex items-center gap-2">Customer Stories <InfoTooltip text="In-depth success stories with photos, quotes, and company details. More detailed than testimonials." /></CardTitle>
               <CardDescription>Showcase customer success stories with photos and quotes</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -1237,7 +1237,7 @@ export default function ContentPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Section Backgrounds</CardTitle>
+              <CardTitle className="flex items-center gap-2">Section Backgrounds <InfoTooltip text="Customize the visual style of each homepage section. Use contrast to draw attention to key areas." /></CardTitle>
               <CardDescription>Customize background styles for each section</CardDescription>
             </div>
             <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-backgrounds" />

@@ -1,7 +1,7 @@
 'use client'
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton } from '../components'
+import { SaveButton, InfoTooltip } from '../components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,7 +19,7 @@ export default function PagesSetupPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>About Page</CardTitle>
+          <CardTitle className="flex items-center gap-2">About Page <InfoTooltip text="Tell your company's story and introduce your team. Builds trust and connection with potential customers." /></CardTitle>
           <CardDescription>
             Configure the content for your About Us page
           </CardDescription>
@@ -191,7 +191,7 @@ export default function PagesSetupPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Contact Page</CardTitle>
+          <CardTitle className="flex items-center gap-2">Contact Page <InfoTooltip text="How customers can reach you — form, email, phone, and address. Essential for building trust." /></CardTitle>
           <CardDescription>
             Configure contact information and form settings
           </CardDescription>
@@ -310,7 +310,7 @@ export default function PagesSetupPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Terms of Service</CardTitle>
+          <CardTitle className="flex items-center gap-2">Terms of Service <InfoTooltip text="Legal agreement between you and your users. Required for most app stores and payment processors." /></CardTitle>
           <CardDescription>
             Edit your Terms of Service content (supports Markdown)
           </CardDescription>
@@ -341,7 +341,7 @@ export default function PagesSetupPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Privacy Policy</CardTitle>
+          <CardTitle className="flex items-center gap-2">Privacy Policy <InfoTooltip text="Explains what data you collect and how you use it. Required by GDPR, CCPA, and most privacy laws." /></CardTitle>
           <CardDescription>
             Edit your Privacy Policy content (supports Markdown)
           </CardDescription>
@@ -372,7 +372,7 @@ export default function PagesSetupPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Pricing Page</CardTitle>
+          <CardTitle className="flex items-center gap-2">Pricing Page <InfoTooltip text="Controls how your pricing page header appears to visitors. Plans are managed in Stripe." /></CardTitle>
           <CardDescription>
             Configure the appearance of your pricing page
           </CardDescription>
@@ -440,7 +440,7 @@ export default function PagesSetupPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>FAQ Page</CardTitle>
+          <CardTitle className="flex items-center gap-2">FAQ Page <InfoTooltip text="Standalone FAQ page with its own URL. Separate from the homepage FAQ section configured in Content." /></CardTitle>
           <CardDescription>
             Configure the appearance of your FAQ page
           </CardDescription>
@@ -508,7 +508,7 @@ export default function PagesSetupPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Custom Pages</CardTitle>
+          <CardTitle className="flex items-center gap-2">Custom Pages <InfoTooltip text="Create up to 4 additional marketing pages with custom names and URLs, editable with Markdown." /></CardTitle>
           <CardDescription>
             Configure up to 4 additional marketing pages with custom names
           </CardDescription>
