@@ -1,0 +1,24 @@
+These refinements are all practical and well-targeted. Let me flag what's solid vs. what needs a light touch to avoid creep:
+
+All green — no concerns:
+
+Dependency check on toggle — Simple and prevents confusion. A "Module Status" indicator (green/yellow/red) is clean UX.
+Dynamic SDK imports — Critical for keeping non-social clones lean. Lazy-loading is the right approach.
+Token validation on connect — A quick test API call after OAuth is a must-have for good UX.
+Usage logging for AI generation — Feeds directly into metrics. Minimal extra work since you're already logging.
+Clear job type definitions (Immediate vs. Scheduled Batch) — Good for clarity and debugging.
+Retry logic for API failures — Already part of your BullMQ patterns, just extend it.
+Threshold notifications (only alert on repeated failures) — Smart, prevents notification fatigue.
+Conditional wizard prompt — Only show when module is toggled on. Keep it to one concise step.
+Vercel Cron as fallback — Better than a custom local cron. Scoping fallback to posting-only (not analytics) is the right call to avoid overkill.
+Iterative docs updates — Agree, update as you build rather than saving it all for the end.
+Minor flags — doable but keep simple:
+
+Multimodal support (text + image gen) — Worth including if the chosen AI provider already supports it (Grok does). Don't build a separate image pipeline — just pass multimodal prompts. Keep it one endpoint, not two.
+Demo video/tooltip in wizard — A tooltip is fine. A demo video is scope creep at this stage — save that for after launch.
+Screenshots in docs — Good idea but time-consuming. I'd suggest adding placeholder markers during build ("Screenshot: toggle UI") and filling them in at the end.
+6-8 tests instead of 4-6 — I'd aim for 6 solid ones. 8 risks testing edge cases that aren't worth it yet. Covers: toggle on/off, account connection, post generation, scheduling, KPI display, tier gating.
+One correction on your notes:
+
+Starting with 2-3 platforms (Twitter/X, LinkedIn) and adding Instagram later is the right call. Instagram's approval process for API access is the slowest of the three — it shouldn't block the module launch.
+Here's the refined build plan incorporating all of this:
