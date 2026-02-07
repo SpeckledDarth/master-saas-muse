@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Loader2, BarChart3, ScrollText } from 'lucide-react'
+import { Loader2, BarChart3, ScrollText, Share2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { getTeamPermissions, type TeamRole, type TeamPermissions } from '@/lib/team-permissions'
+import { useSettings } from '@/hooks/use-settings'
 
 export default function AdminLayout({
   children,
@@ -19,6 +20,8 @@ export default function AdminLayout({
   const [hasAccess, setHasAccess] = useState(false)
   const [isAppAdmin, setIsAppAdmin] = useState(false)
   const [permissions, setPermissions] = useState<TeamPermissions | null>(null)
+  const { settings: siteSettings } = useSettings()
+  const socialModuleEnabled = siteSettings?.features?.socialModuleEnabled ?? false
 
   useEffect(() => {
     async function checkAccess() {
