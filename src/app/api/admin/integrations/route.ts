@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
+import { isAllowedKey, setDbSecret, deleteDbSecret, getAllDbSecrets } from '@/lib/config/secrets'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -49,7 +50,7 @@ async function isAdminUser(userId: string): Promise<boolean> {
   }
 }
 
-function maskValue(value: string | undefined): string | null {
+function maskValue(value: string | undefined | null): string | null {
   if (!value) return null
   if (value.length <= 8) return '••••••••'
   const prefix = value.substring(0, 4)
@@ -64,6 +65,7 @@ interface IntegrationKey {
   masked: string | null
   configured: boolean
   docsUrl: string
+  source: 'env' | 'db' | null
 }
 
 interface IntegrationGroup {
@@ -73,442 +75,153 @@ interface IntegrationGroup {
   keys: IntegrationKey[]
 }
 
-function buildTechStackGroups(): IntegrationGroup[] {
+function resolveValue(envVar: string, dbSecrets: Record<string, string>): { value: string | undefined; source: 'env' | 'db' | null } {
+  const dbVal = dbSecrets[envVar]
+  if (dbVal) return { value: dbVal, source: 'db' }
+  const envVal = process.env[envVar]
+  if (envVal) return { value: envVal, source: 'env' }
+  return { value: undefined, source: null }
+}
+
+function buildTechStackGroups(dbSecrets: Record<string, string>): IntegrationGroup[] {
+  function k(id: string, label: string, envVar: string, docsUrl: string): IntegrationKey {
+    const { value, source } = resolveValue(envVar, dbSecrets)
+    return { id, label, envVar, masked: maskValue(value), configured: !!value, docsUrl, source }
+  }
+
   return [
     {
-      id: 'supabase',
-      label: 'Supabase',
-      icon: 'database',
+      id: 'supabase', label: 'Supabase', icon: 'database',
       keys: [
-        {
-          id: 'supabase-url',
-          label: 'Project URL',
-          envVar: 'NEXT_PUBLIC_SUPABASE_URL',
-          masked: maskValue(process.env.NEXT_PUBLIC_SUPABASE_URL),
-          configured: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-          docsUrl: 'https://supabase.com/dashboard/project/_/settings/api',
-        },
-        {
-          id: 'supabase-anon',
-          label: 'Anon Key',
-          envVar: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-          masked: maskValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
-          configured: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-          docsUrl: 'https://supabase.com/dashboard/project/_/settings/api',
-        },
-        {
-          id: 'supabase-service',
-          label: 'Service Role Key',
-          envVar: 'SUPABASE_SERVICE_ROLE_KEY',
-          masked: maskValue(process.env.SUPABASE_SERVICE_ROLE_KEY),
-          configured: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-          docsUrl: 'https://supabase.com/dashboard/project/_/settings/api',
-        },
+        k('supabase-url', 'Project URL', 'NEXT_PUBLIC_SUPABASE_URL', 'https://supabase.com/dashboard/project/_/settings/api'),
+        k('supabase-anon', 'Anon Key', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'https://supabase.com/dashboard/project/_/settings/api'),
+        k('supabase-service', 'Service Role Key', 'SUPABASE_SERVICE_ROLE_KEY', 'https://supabase.com/dashboard/project/_/settings/api'),
       ],
     },
     {
-      id: 'stripe',
-      label: 'Stripe',
-      icon: 'credit-card',
+      id: 'stripe', label: 'Stripe', icon: 'credit-card',
       keys: [
-        {
-          id: 'stripe-secret',
-          label: 'Secret Key',
-          envVar: 'STRIPE_SECRET_KEY',
-          masked: maskValue(process.env.STRIPE_SECRET_KEY),
-          configured: !!process.env.STRIPE_SECRET_KEY,
-          docsUrl: 'https://dashboard.stripe.com/apikeys',
-        },
-        {
-          id: 'stripe-webhook',
-          label: 'Webhook Secret',
-          envVar: 'STRIPE_WEBHOOK_SECRET',
-          masked: maskValue(process.env.STRIPE_WEBHOOK_SECRET),
-          configured: !!process.env.STRIPE_WEBHOOK_SECRET,
-          docsUrl: 'https://dashboard.stripe.com/webhooks',
-        },
+        k('stripe-secret', 'Secret Key', 'STRIPE_SECRET_KEY', 'https://dashboard.stripe.com/apikeys'),
+        k('stripe-webhook', 'Webhook Secret', 'STRIPE_WEBHOOK_SECRET', 'https://dashboard.stripe.com/webhooks'),
       ],
     },
     {
-      id: 'resend',
-      label: 'Resend',
-      icon: 'mail',
+      id: 'resend', label: 'Resend', icon: 'mail',
       keys: [
-        {
-          id: 'resend-key',
-          label: 'API Key',
-          envVar: 'RESEND_API_KEY',
-          masked: maskValue(process.env.RESEND_API_KEY),
-          configured: !!process.env.RESEND_API_KEY,
-          docsUrl: 'https://resend.com/api-keys',
-        },
+        k('resend-key', 'API Key', 'RESEND_API_KEY', 'https://resend.com/api-keys'),
       ],
     },
     {
-      id: 'ai-providers',
-      label: 'AI Providers',
-      icon: 'brain',
+      id: 'ai-providers', label: 'AI Providers', icon: 'brain',
       keys: [
-        {
-          id: 'xai-key',
-          label: 'xAI (Grok) API Key',
-          envVar: 'XAI_API_KEY',
-          masked: maskValue(process.env.XAI_API_KEY),
-          configured: !!process.env.XAI_API_KEY,
-          docsUrl: 'https://console.x.ai/',
-        },
-        {
-          id: 'openai-key',
-          label: 'OpenAI API Key',
-          envVar: 'OPENAI_API_KEY',
-          masked: maskValue(process.env.OPENAI_API_KEY),
-          configured: !!process.env.OPENAI_API_KEY,
-          docsUrl: 'https://platform.openai.com/api-keys',
-        },
-        {
-          id: 'anthropic-key',
-          label: 'Anthropic API Key',
-          envVar: 'ANTHROPIC_API_KEY',
-          masked: maskValue(process.env.ANTHROPIC_API_KEY),
-          configured: !!process.env.ANTHROPIC_API_KEY,
-          docsUrl: 'https://console.anthropic.com/settings/keys',
-        },
+        k('xai-key', 'xAI (Grok) API Key', 'XAI_API_KEY', 'https://console.x.ai/'),
+        k('openai-key', 'OpenAI API Key', 'OPENAI_API_KEY', 'https://platform.openai.com/api-keys'),
+        k('anthropic-key', 'Anthropic API Key', 'ANTHROPIC_API_KEY', 'https://console.anthropic.com/settings/keys'),
       ],
     },
     {
-      id: 'redis',
-      label: 'Upstash Redis',
-      icon: 'server',
+      id: 'redis', label: 'Upstash Redis', icon: 'server',
       keys: [
-        {
-          id: 'redis-url',
-          label: 'REST URL',
-          envVar: 'UPSTASH_REDIS_REST_URL',
-          masked: maskValue(process.env.UPSTASH_REDIS_REST_URL),
-          configured: !!process.env.UPSTASH_REDIS_REST_URL,
-          docsUrl: 'https://console.upstash.com/',
-        },
-        {
-          id: 'redis-token',
-          label: 'REST Token',
-          envVar: 'UPSTASH_REDIS_REST_TOKEN',
-          masked: maskValue(process.env.UPSTASH_REDIS_REST_TOKEN),
-          configured: !!process.env.UPSTASH_REDIS_REST_TOKEN,
-          docsUrl: 'https://console.upstash.com/',
-        },
+        k('redis-url', 'REST URL', 'UPSTASH_REDIS_REST_URL', 'https://console.upstash.com/'),
+        k('redis-token', 'REST Token', 'UPSTASH_REDIS_REST_TOKEN', 'https://console.upstash.com/'),
       ],
     },
     {
-      id: 'sentry',
-      label: 'Sentry',
-      icon: 'shield-alert',
+      id: 'sentry', label: 'Sentry', icon: 'shield-alert',
       keys: [
-        {
-          id: 'sentry-dsn',
-          label: 'DSN',
-          envVar: 'NEXT_PUBLIC_SENTRY_DSN',
-          masked: maskValue(process.env.NEXT_PUBLIC_SENTRY_DSN),
-          configured: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
-          docsUrl: 'https://sentry.io/settings/',
-        },
-        {
-          id: 'sentry-org',
-          label: 'Organization',
-          envVar: 'SENTRY_ORG',
-          masked: maskValue(process.env.SENTRY_ORG),
-          configured: !!process.env.SENTRY_ORG,
-          docsUrl: 'https://sentry.io/settings/',
-        },
-        {
-          id: 'sentry-project',
-          label: 'Project',
-          envVar: 'SENTRY_PROJECT',
-          masked: maskValue(process.env.SENTRY_PROJECT),
-          configured: !!process.env.SENTRY_PROJECT,
-          docsUrl: 'https://sentry.io/settings/',
-        },
+        k('sentry-dsn', 'DSN', 'NEXT_PUBLIC_SENTRY_DSN', 'https://sentry.io/settings/'),
+        k('sentry-org', 'Organization', 'SENTRY_ORG', 'https://sentry.io/settings/'),
+        k('sentry-project', 'Project', 'SENTRY_PROJECT', 'https://sentry.io/settings/'),
       ],
     },
     {
-      id: 'plausible',
-      label: 'Plausible Analytics',
-      icon: 'bar-chart',
+      id: 'plausible', label: 'Plausible Analytics', icon: 'bar-chart',
       keys: [
-        {
-          id: 'plausible-domain',
-          label: 'Domain',
-          envVar: 'NEXT_PUBLIC_PLAUSIBLE_DOMAIN',
-          masked: maskValue(process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN),
-          configured: !!process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN,
-          docsUrl: 'https://plausible.io/docs',
-        },
-        {
-          id: 'plausible-script',
-          label: 'Script URL',
-          envVar: 'NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL',
-          masked: maskValue(process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL),
-          configured: !!process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL,
-          docsUrl: 'https://plausible.io/docs',
-        },
+        k('plausible-domain', 'Domain', 'NEXT_PUBLIC_PLAUSIBLE_DOMAIN', 'https://plausible.io/docs'),
+        k('plausible-script', 'Script URL', 'NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL', 'https://plausible.io/docs'),
       ],
     },
   ]
 }
 
-function buildSocialPlatformGroups(): IntegrationGroup[] {
+function buildSocialPlatformGroups(dbSecrets: Record<string, string>): IntegrationGroup[] {
+  function k(id: string, label: string, envVar: string, docsUrl: string): IntegrationKey {
+    const { value, source } = resolveValue(envVar, dbSecrets)
+    return { id, label, envVar, masked: maskValue(value), configured: !!value, docsUrl, source }
+  }
+
   return [
     {
-      id: 'social-twitter',
-      label: 'Twitter / X',
-      icon: 'twitter',
+      id: 'social-twitter', label: 'Twitter / X', icon: 'twitter',
       keys: [
-        {
-          id: 'twitter-api-key',
-          label: 'API Key',
-          envVar: 'TWITTER_API_KEY',
-          masked: maskValue(process.env.TWITTER_API_KEY),
-          configured: !!process.env.TWITTER_API_KEY,
-          docsUrl: 'https://developer.x.com/en/portal/dashboard',
-        },
-        {
-          id: 'twitter-api-secret',
-          label: 'API Secret',
-          envVar: 'TWITTER_API_SECRET',
-          masked: maskValue(process.env.TWITTER_API_SECRET),
-          configured: !!process.env.TWITTER_API_SECRET,
-          docsUrl: 'https://developer.x.com/en/portal/dashboard',
-        },
-        {
-          id: 'twitter-bearer',
-          label: 'Bearer Token',
-          envVar: 'TWITTER_BEARER_TOKEN',
-          masked: maskValue(process.env.TWITTER_BEARER_TOKEN),
-          configured: !!process.env.TWITTER_BEARER_TOKEN,
-          docsUrl: 'https://developer.x.com/en/portal/dashboard',
-        },
+        k('twitter-api-key', 'API Key', 'TWITTER_API_KEY', 'https://developer.x.com/en/portal/dashboard'),
+        k('twitter-api-secret', 'API Secret', 'TWITTER_API_SECRET', 'https://developer.x.com/en/portal/dashboard'),
+        k('twitter-bearer', 'Bearer Token', 'TWITTER_BEARER_TOKEN', 'https://developer.x.com/en/portal/dashboard'),
       ],
     },
     {
-      id: 'social-linkedin',
-      label: 'LinkedIn',
-      icon: 'linkedin',
+      id: 'social-linkedin', label: 'LinkedIn', icon: 'linkedin',
       keys: [
-        {
-          id: 'linkedin-client-id',
-          label: 'Client ID',
-          envVar: 'LINKEDIN_CLIENT_ID',
-          masked: maskValue(process.env.LINKEDIN_CLIENT_ID),
-          configured: !!process.env.LINKEDIN_CLIENT_ID,
-          docsUrl: 'https://www.linkedin.com/developers/apps',
-        },
-        {
-          id: 'linkedin-client-secret',
-          label: 'Client Secret',
-          envVar: 'LINKEDIN_CLIENT_SECRET',
-          masked: maskValue(process.env.LINKEDIN_CLIENT_SECRET),
-          configured: !!process.env.LINKEDIN_CLIENT_SECRET,
-          docsUrl: 'https://www.linkedin.com/developers/apps',
-        },
+        k('linkedin-client-id', 'Client ID', 'LINKEDIN_CLIENT_ID', 'https://www.linkedin.com/developers/apps'),
+        k('linkedin-client-secret', 'Client Secret', 'LINKEDIN_CLIENT_SECRET', 'https://www.linkedin.com/developers/apps'),
       ],
     },
     {
-      id: 'social-instagram',
-      label: 'Instagram',
-      icon: 'instagram',
+      id: 'social-instagram', label: 'Instagram', icon: 'instagram',
       keys: [
-        {
-          id: 'instagram-app-id',
-          label: 'App ID',
-          envVar: 'INSTAGRAM_APP_ID',
-          masked: maskValue(process.env.INSTAGRAM_APP_ID),
-          configured: !!process.env.INSTAGRAM_APP_ID,
-          docsUrl: 'https://developers.facebook.com/apps/',
-        },
-        {
-          id: 'instagram-app-secret',
-          label: 'App Secret',
-          envVar: 'INSTAGRAM_APP_SECRET',
-          masked: maskValue(process.env.INSTAGRAM_APP_SECRET),
-          configured: !!process.env.INSTAGRAM_APP_SECRET,
-          docsUrl: 'https://developers.facebook.com/apps/',
-        },
+        k('instagram-app-id', 'App ID', 'INSTAGRAM_APP_ID', 'https://developers.facebook.com/apps/'),
+        k('instagram-app-secret', 'App Secret', 'INSTAGRAM_APP_SECRET', 'https://developers.facebook.com/apps/'),
       ],
     },
     {
-      id: 'social-youtube',
-      label: 'YouTube',
-      icon: 'youtube',
+      id: 'social-youtube', label: 'YouTube', icon: 'youtube',
       keys: [
-        {
-          id: 'youtube-api-key',
-          label: 'API Key',
-          envVar: 'YOUTUBE_API_KEY',
-          masked: maskValue(process.env.YOUTUBE_API_KEY),
-          configured: !!process.env.YOUTUBE_API_KEY,
-          docsUrl: 'https://console.cloud.google.com/apis/credentials',
-        },
-        {
-          id: 'youtube-client-id',
-          label: 'OAuth Client ID',
-          envVar: 'YOUTUBE_CLIENT_ID',
-          masked: maskValue(process.env.YOUTUBE_CLIENT_ID),
-          configured: !!process.env.YOUTUBE_CLIENT_ID,
-          docsUrl: 'https://console.cloud.google.com/apis/credentials',
-        },
-        {
-          id: 'youtube-client-secret',
-          label: 'OAuth Client Secret',
-          envVar: 'YOUTUBE_CLIENT_SECRET',
-          masked: maskValue(process.env.YOUTUBE_CLIENT_SECRET),
-          configured: !!process.env.YOUTUBE_CLIENT_SECRET,
-          docsUrl: 'https://console.cloud.google.com/apis/credentials',
-        },
+        k('youtube-api-key', 'API Key', 'YOUTUBE_API_KEY', 'https://console.cloud.google.com/apis/credentials'),
+        k('youtube-client-id', 'OAuth Client ID', 'YOUTUBE_CLIENT_ID', 'https://console.cloud.google.com/apis/credentials'),
+        k('youtube-client-secret', 'OAuth Client Secret', 'YOUTUBE_CLIENT_SECRET', 'https://console.cloud.google.com/apis/credentials'),
       ],
     },
     {
-      id: 'social-facebook',
-      label: 'Facebook',
-      icon: 'facebook',
+      id: 'social-facebook', label: 'Facebook', icon: 'facebook',
       keys: [
-        {
-          id: 'facebook-app-id',
-          label: 'App ID',
-          envVar: 'FACEBOOK_APP_ID',
-          masked: maskValue(process.env.FACEBOOK_APP_ID),
-          configured: !!process.env.FACEBOOK_APP_ID,
-          docsUrl: 'https://developers.facebook.com/apps/',
-        },
-        {
-          id: 'facebook-app-secret',
-          label: 'App Secret',
-          envVar: 'FACEBOOK_APP_SECRET',
-          masked: maskValue(process.env.FACEBOOK_APP_SECRET),
-          configured: !!process.env.FACEBOOK_APP_SECRET,
-          docsUrl: 'https://developers.facebook.com/apps/',
-        },
+        k('facebook-app-id', 'App ID', 'FACEBOOK_APP_ID', 'https://developers.facebook.com/apps/'),
+        k('facebook-app-secret', 'App Secret', 'FACEBOOK_APP_SECRET', 'https://developers.facebook.com/apps/'),
       ],
     },
     {
-      id: 'social-tiktok',
-      label: 'TikTok',
-      icon: 'tiktok',
+      id: 'social-tiktok', label: 'TikTok', icon: 'tiktok',
       keys: [
-        {
-          id: 'tiktok-client-key',
-          label: 'Client Key',
-          envVar: 'TIKTOK_CLIENT_KEY',
-          masked: maskValue(process.env.TIKTOK_CLIENT_KEY),
-          configured: !!process.env.TIKTOK_CLIENT_KEY,
-          docsUrl: 'https://developers.tiktok.com/apps/',
-        },
-        {
-          id: 'tiktok-client-secret',
-          label: 'Client Secret',
-          envVar: 'TIKTOK_CLIENT_SECRET',
-          masked: maskValue(process.env.TIKTOK_CLIENT_SECRET),
-          configured: !!process.env.TIKTOK_CLIENT_SECRET,
-          docsUrl: 'https://developers.tiktok.com/apps/',
-        },
+        k('tiktok-client-key', 'Client Key', 'TIKTOK_CLIENT_KEY', 'https://developers.tiktok.com/apps/'),
+        k('tiktok-client-secret', 'Client Secret', 'TIKTOK_CLIENT_SECRET', 'https://developers.tiktok.com/apps/'),
       ],
     },
     {
-      id: 'social-reddit',
-      label: 'Reddit',
-      icon: 'reddit',
+      id: 'social-reddit', label: 'Reddit', icon: 'reddit',
       keys: [
-        {
-          id: 'reddit-client-id',
-          label: 'Client ID',
-          envVar: 'REDDIT_CLIENT_ID',
-          masked: maskValue(process.env.REDDIT_CLIENT_ID),
-          configured: !!process.env.REDDIT_CLIENT_ID,
-          docsUrl: 'https://www.reddit.com/prefs/apps',
-        },
-        {
-          id: 'reddit-client-secret',
-          label: 'Client Secret',
-          envVar: 'REDDIT_CLIENT_SECRET',
-          masked: maskValue(process.env.REDDIT_CLIENT_SECRET),
-          configured: !!process.env.REDDIT_CLIENT_SECRET,
-          docsUrl: 'https://www.reddit.com/prefs/apps',
-        },
+        k('reddit-client-id', 'Client ID', 'REDDIT_CLIENT_ID', 'https://www.reddit.com/prefs/apps'),
+        k('reddit-client-secret', 'Client Secret', 'REDDIT_CLIENT_SECRET', 'https://www.reddit.com/prefs/apps'),
       ],
     },
     {
-      id: 'social-pinterest',
-      label: 'Pinterest',
-      icon: 'pinterest',
+      id: 'social-pinterest', label: 'Pinterest', icon: 'pinterest',
       keys: [
-        {
-          id: 'pinterest-app-id',
-          label: 'App ID',
-          envVar: 'PINTEREST_APP_ID',
-          masked: maskValue(process.env.PINTEREST_APP_ID),
-          configured: !!process.env.PINTEREST_APP_ID,
-          docsUrl: 'https://developers.pinterest.com/apps/',
-        },
-        {
-          id: 'pinterest-app-secret',
-          label: 'App Secret',
-          envVar: 'PINTEREST_APP_SECRET',
-          masked: maskValue(process.env.PINTEREST_APP_SECRET),
-          configured: !!process.env.PINTEREST_APP_SECRET,
-          docsUrl: 'https://developers.pinterest.com/apps/',
-        },
+        k('pinterest-app-id', 'App ID', 'PINTEREST_APP_ID', 'https://developers.pinterest.com/apps/'),
+        k('pinterest-app-secret', 'App Secret', 'PINTEREST_APP_SECRET', 'https://developers.pinterest.com/apps/'),
       ],
     },
     {
-      id: 'social-snapchat',
-      label: 'Snapchat',
-      icon: 'snapchat',
+      id: 'social-snapchat', label: 'Snapchat', icon: 'snapchat',
       keys: [
-        {
-          id: 'snapchat-client-id',
-          label: 'Client ID',
-          envVar: 'SNAPCHAT_CLIENT_ID',
-          masked: maskValue(process.env.SNAPCHAT_CLIENT_ID),
-          configured: !!process.env.SNAPCHAT_CLIENT_ID,
-          docsUrl: 'https://kit.snapchat.com/manage/',
-        },
-        {
-          id: 'snapchat-client-secret',
-          label: 'Client Secret',
-          envVar: 'SNAPCHAT_CLIENT_SECRET',
-          masked: maskValue(process.env.SNAPCHAT_CLIENT_SECRET),
-          configured: !!process.env.SNAPCHAT_CLIENT_SECRET,
-          docsUrl: 'https://kit.snapchat.com/manage/',
-        },
+        k('snapchat-client-id', 'Client ID', 'SNAPCHAT_CLIENT_ID', 'https://kit.snapchat.com/manage/'),
+        k('snapchat-client-secret', 'Client Secret', 'SNAPCHAT_CLIENT_SECRET', 'https://kit.snapchat.com/manage/'),
       ],
     },
     {
-      id: 'social-discord',
-      label: 'Discord',
-      icon: 'discord',
+      id: 'social-discord', label: 'Discord', icon: 'discord',
       keys: [
-        {
-          id: 'discord-client-id',
-          label: 'Client ID',
-          envVar: 'DISCORD_CLIENT_ID',
-          masked: maskValue(process.env.DISCORD_CLIENT_ID),
-          configured: !!process.env.DISCORD_CLIENT_ID,
-          docsUrl: 'https://discord.com/developers/applications',
-        },
-        {
-          id: 'discord-client-secret',
-          label: 'Client Secret',
-          envVar: 'DISCORD_CLIENT_SECRET',
-          masked: maskValue(process.env.DISCORD_CLIENT_SECRET),
-          configured: !!process.env.DISCORD_CLIENT_SECRET,
-          docsUrl: 'https://discord.com/developers/applications',
-        },
-        {
-          id: 'discord-bot-token',
-          label: 'Bot Token',
-          envVar: 'DISCORD_BOT_TOKEN',
-          masked: maskValue(process.env.DISCORD_BOT_TOKEN),
-          configured: !!process.env.DISCORD_BOT_TOKEN,
-          docsUrl: 'https://discord.com/developers/applications',
-        },
+        k('discord-client-id', 'Client ID', 'DISCORD_CLIENT_ID', 'https://discord.com/developers/applications'),
+        k('discord-client-secret', 'Client Secret', 'DISCORD_CLIENT_SECRET', 'https://discord.com/developers/applications'),
+        k('discord-bot-token', 'Bot Token', 'DISCORD_BOT_TOKEN', 'https://discord.com/developers/applications'),
       ],
     },
   ]
@@ -525,8 +238,10 @@ export async function GET() {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
   }
 
-  const techStack = buildTechStackGroups()
-  const socialPlatforms = buildSocialPlatformGroups()
+  const dbSecrets = await getAllDbSecrets()
+
+  const techStack = buildTechStackGroups(dbSecrets)
+  const socialPlatforms = buildSocialPlatformGroups(dbSecrets)
 
   const techConfigured = techStack.reduce((sum, g) => sum + g.keys.filter(k => k.configured).length, 0)
   const techTotal = techStack.reduce((sum, g) => sum + g.keys.length, 0)
@@ -543,4 +258,89 @@ export async function GET() {
       socialTotal,
     },
   })
+}
+
+export async function POST(request: NextRequest) {
+  const user = await getAuthenticatedUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const isAdmin = await isAdminUser(user.id)
+  if (!isAdmin) {
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+  }
+
+  try {
+    const body = await request.json()
+    const { envVar, value } = body
+
+    if (!envVar || typeof envVar !== 'string') {
+      return NextResponse.json({ error: 'Missing envVar' }, { status: 400 })
+    }
+
+    if (!isAllowedKey(envVar)) {
+      return NextResponse.json({ error: 'Key not in allowed list' }, { status: 400 })
+    }
+
+    if (!value || typeof value !== 'string' || value.trim().length === 0) {
+      return NextResponse.json({ error: 'Value cannot be empty' }, { status: 400 })
+    }
+
+    const saved = await setDbSecret(envVar, value.trim(), user.id)
+    if (!saved) {
+      return NextResponse.json({ error: 'Failed to save' }, { status: 500 })
+    }
+
+    return NextResponse.json({
+      success: true,
+      envVar,
+      masked: maskValue(value.trim()),
+      configured: true,
+      source: 'db',
+    })
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const user = await getAuthenticatedUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const isAdmin = await isAdminUser(user.id)
+  if (!isAdmin) {
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+  }
+
+  try {
+    const body = await request.json()
+    const { envVar } = body
+
+    if (!envVar || typeof envVar !== 'string') {
+      return NextResponse.json({ error: 'Missing envVar' }, { status: 400 })
+    }
+
+    if (!isAllowedKey(envVar)) {
+      return NextResponse.json({ error: 'Key not in allowed list' }, { status: 400 })
+    }
+
+    const deleted = await deleteDbSecret(envVar)
+    if (!deleted) {
+      return NextResponse.json({ error: 'Failed to delete' }, { status: 500 })
+    }
+
+    const envStillSet = !!process.env[envVar]
+
+    return NextResponse.json({
+      success: true,
+      envVar,
+      configured: envStillSet,
+      source: envStillSet ? 'env' : null,
+    })
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
 }
