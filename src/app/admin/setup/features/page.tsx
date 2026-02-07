@@ -193,6 +193,18 @@ export default function FeaturesPage() {
               data-testid="switch-ai-enabled"
             />
           </div>
+
+          <div className="flex items-center justify-between py-3 border-t">
+            <div>
+              <p className="font-medium">MuseSocial Module</p>
+              <p className="text-sm text-muted-foreground">Enable social media management (posting, monitoring, AI content generation)</p>
+            </div>
+            <Switch
+              checked={settings.features.socialModuleEnabled}
+              onCheckedChange={checked => updateFeatures('socialModuleEnabled', checked)}
+              data-testid="switch-social-module"
+            />
+          </div>
         </CardContent>
       </Card>
 

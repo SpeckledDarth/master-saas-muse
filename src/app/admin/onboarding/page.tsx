@@ -1,14 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
-import { Check, ChevronRight, Palette, CreditCard, Globe, Sparkles } from 'lucide-react'
+import { Check, ChevronRight, Palette, CreditCard, Globe, Sparkles, Share2, Twitter, Linkedin } from 'lucide-react'
 
 const STEPS = [
   {
@@ -44,6 +45,7 @@ export default function OnboardingPage() {
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [socialEnabled, setSocialEnabled] = useState(false)
   
   const [branding, setBranding] = useState({
     appName: '',
@@ -51,6 +53,21 @@ export default function OnboardingPage() {
     primaryColor: '#6366f1',
     accentColor: '#f59e0b',
   })
+
+  const activeSteps = useMemo(() => {
+    const base = [
+      { id: 1, title: 'Branding', description: 'Set up your app name and colors', icon: Palette },
+      { id: 2, title: 'Stripe', description: 'Connect payment processing', icon: CreditCard },
+      { id: 3, title: 'Content', description: 'Add your marketing content', icon: Globe },
+    ]
+    if (socialEnabled) {
+      base.push({ id: 4, title: 'MuseSocial', description: 'Connect social accounts for automated posting', icon: Share2 })
+      base.push({ id: 5, title: 'Launch', description: 'Review and publish', icon: Sparkles })
+    } else {
+      base.push({ id: 4, title: 'Launch', description: 'Review and publish', icon: Sparkles })
+    }
+    return base
+  }, [socialEnabled])
 
   useEffect(() => {
     fetchOnboarding()
@@ -73,6 +90,14 @@ export default function OnboardingPage() {
     } finally {
       setLoading(false)
     }
+
+    try {
+      const settingsRes = await fetch('/api/public/settings')
+      const settingsData = await settingsRes.json()
+      if (settingsData?.features?.socialModuleEnabled) {
+        setSocialEnabled(true)
+      }
+    } catch {}
   }
 
   async function saveProgress(step: number, completed: number[], isComplete = false) {
@@ -124,7 +149,7 @@ export default function OnboardingPage() {
     const newCompleted = [...completedSteps, currentStep]
     setCompletedSteps(newCompleted)
     
-    if (currentStep < STEPS.length) {
+    if (currentStep < activeSteps.length) {
       const nextStep = currentStep + 1
       setCurrentStep(nextStep)
       await saveProgress(nextStep, newCompleted)
@@ -138,7 +163,7 @@ export default function OnboardingPage() {
   }
 
   function handleSkip() {
-    if (currentStep < STEPS.length) {
+    if (currentStep < activeSteps.length) {
       const nextStep = currentStep + 1
       setCurrentStep(nextStep)
       saveProgress(nextStep, completedSteps)
@@ -153,6 +178,8 @@ export default function OnboardingPage() {
     )
   }
 
+  const launchStepId = socialEnabled ? 5 : 4
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-3xl mx-auto">
@@ -162,7 +189,7 @@ export default function OnboardingPage() {
         </div>
 
         <div className="flex items-center justify-center gap-2 mb-8">
-          {STEPS.map((step, index) => (
+          {activeSteps.map((step, index) => (
             <div key={step.id} className="flex items-center">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
@@ -179,7 +206,7 @@ export default function OnboardingPage() {
                   step.id
                 )}
               </div>
-              {index < STEPS.length - 1 && (
+              {index < activeSteps.length - 1 && (
                 <div
                   className={`w-12 h-0.5 mx-2 ${
                     completedSteps.includes(step.id) ? 'bg-primary' : 'bg-muted'
@@ -193,17 +220,17 @@ export default function OnboardingPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              {STEPS[currentStep - 1]?.icon && (
+              {activeSteps[currentStep - 1]?.icon && (
                 <span className="text-primary">
                   {(() => {
-                    const Icon = STEPS[currentStep - 1].icon
+                    const Icon = activeSteps[currentStep - 1].icon
                     return <Icon className="h-5 w-5" />
                   })()}
                 </span>
               )}
-              {STEPS[currentStep - 1]?.title}
+              {activeSteps[currentStep - 1]?.title}
             </CardTitle>
-            <CardDescription>{STEPS[currentStep - 1]?.description}</CardDescription>
+            <CardDescription>{activeSteps[currentStep - 1]?.description}</CardDescription>
           </CardHeader>
           <CardContent>
             {currentStep === 1 && (
@@ -314,13 +341,40 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {currentStep === 4 && (
+            {currentStep === 4 && socialEnabled && (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  MuseSocial is enabled. You can connect your social media accounts to start automated posting and monitoring.
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-3 rounded-md border">
+                    <div className="flex items-center gap-2">
+                      <Twitter className="h-4 w-4" />
+                      <span className="text-sm font-medium">Twitter / X</span>
+                    </div>
+                    <Badge variant="secondary">Not connected</Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-md border">
+                    <div className="flex items-center gap-2">
+                      <Linkedin className="h-4 w-4" />
+                      <span className="text-sm font-medium">LinkedIn</span>
+                    </div>
+                    <Badge variant="secondary">Not connected</Badge>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  You can configure social accounts later in Dashboard &gt; Social Accounts.
+                </p>
+              </div>
+            )}
+
+            {currentStep === launchStepId && (
               <div className="space-y-4">
                 <p className="text-muted-foreground">
                   Review your setup and launch your app!
                 </p>
                 <div className="space-y-2">
-                  {STEPS.slice(0, -1).map((step) => (
+                  {activeSteps.slice(0, -1).map((step) => (
                     <div
                       key={step.id}
                       className="flex items-center justify-between p-3 border rounded-lg"
@@ -341,7 +395,7 @@ export default function OnboardingPage() {
             )}
 
             <div className="flex items-center justify-between mt-6 pt-4 border-t">
-              {currentStep < STEPS.length ? (
+              {currentStep < activeSteps.length ? (
                 <Button variant="ghost" onClick={handleSkip}>
                   Skip for now
                 </Button>
@@ -349,8 +403,8 @@ export default function OnboardingPage() {
                 <div />
               )}
               <Button onClick={handleStepComplete} disabled={saving} data-testid="button-next-step">
-                {saving ? 'Saving...' : currentStep === STEPS.length ? 'Complete Setup' : 'Continue'}
-                {currentStep < STEPS.length && <ChevronRight className="h-4 w-4 ml-1" />}
+                {saving ? 'Saving...' : currentStep === activeSteps.length ? 'Complete Setup' : 'Continue'}
+                {currentStep < activeSteps.length && <ChevronRight className="h-4 w-4 ml-1" />}
               </Button>
             </div>
           </CardContent>

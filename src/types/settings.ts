@@ -74,6 +74,7 @@ export interface FeatureToggles {
   feedbackWidget: boolean
   aiEnabled: boolean
   ssoEnabled: boolean
+  socialModuleEnabled: boolean
 }
 
 export type AIProvider = 'xai' | 'openai' | 'anthropic'
@@ -356,6 +357,35 @@ export interface MetricsSettings {
   }
 }
 
+export type SocialModuleTier = 'universal' | 'power'
+
+export type SocialPlatform = 'twitter' | 'linkedin' | 'instagram'
+
+export interface SocialAccountConfig {
+  enabled: boolean
+  apiKeyConfigured: boolean
+}
+
+export interface SocialModuleSettings {
+  tier: SocialModuleTier
+  platforms: Record<SocialPlatform, SocialAccountConfig>
+  posting: {
+    defaultBrandVoice: string
+    maxPostsPerDay: number
+    requireApproval: boolean
+  }
+  monitoring: {
+    trendCheckInterval: number
+    mentionAlerts: boolean
+    autoReply: boolean
+  }
+  statusChecker: {
+    enabled: boolean
+    alertOnRepeatedFailures: boolean
+    failureThreshold: number
+  }
+}
+
 export interface PricingPageSettings {
   headline: string
   subheadline: string
@@ -435,6 +465,7 @@ export interface SiteSettings {
   support?: SupportSettings
   security?: SecuritySettings
   metrics?: MetricsSettings
+  socialModule?: SocialModuleSettings
 }
 
 export const defaultLightTheme: ThemeColors = {
@@ -532,6 +563,7 @@ export const defaultSettings: SiteSettings = {
     feedbackWidget: true,
     aiEnabled: false,
     ssoEnabled: false,
+    socialModuleEnabled: false,
   },
   ai: {
     provider: 'xai',
@@ -1120,5 +1152,28 @@ We regularly review and update our security practices. This page reflects our cu
     alertMinMonthlyUsers: 10,
     weeklyReportEnabled: false,
     monthlyReportEnabled: false,
+  },
+  socialModule: {
+    tier: 'universal',
+    platforms: {
+      twitter: { enabled: false, apiKeyConfigured: false },
+      linkedin: { enabled: false, apiKeyConfigured: false },
+      instagram: { enabled: false, apiKeyConfigured: false },
+    },
+    posting: {
+      defaultBrandVoice: '',
+      maxPostsPerDay: 10,
+      requireApproval: true,
+    },
+    monitoring: {
+      trendCheckInterval: 24,
+      mentionAlerts: false,
+      autoReply: false,
+    },
+    statusChecker: {
+      enabled: true,
+      alertOnRepeatedFailures: true,
+      failureThreshold: 3,
+    },
   },
 }

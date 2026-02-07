@@ -50,6 +50,17 @@ The UI features dynamic branding, configurable navigation, customizable hero sec
 - **Metrics Alerts**: Configurable thresholds for churn rate and user growth with email notifications when exceeded. Alert settings managed in Admin > Setup > Security.
 - **Database Backup Configuration**: Admin UI for configuring backup notification preferences, frequency, and retention periods (managed by Supabase).
 - **API Token Rotation**: BullMQ job type for automated webhook secret rotation with configurable interval, managed via Admin > Setup > Security.
+- **MuseSocial Module**: Toggleable social media management extension with two tiers (Universal/Power). Features include:
+  - Admin setup page at `/admin/setup/musesocial` with tier selection, platform toggles, posting config, monitoring settings, and API health checker config.
+  - Social account connection system with OAuth flow stubs for Twitter/X and LinkedIn (Instagram deferred). User-facing page at `/dashboard/social`.
+  - AI-powered post generation via `/api/social/generate-post` leveraging the existing pluggable AI system with platform-specific prompts and brand voice.
+  - Post scheduling and management at `/dashboard/social/posts` with BullMQ queue jobs (`social-post`, `social-health-check`, `social-trend-monitor`).
+  - Social API health checker with threshold-based alerting via email notifications.
+  - Social KPI cards on the admin metrics dashboard (Posts Generated, Posts This Month, Scheduled, Connected Accounts) — visible only when module is enabled.
+  - Conditional onboarding wizard step shown when module is toggled on.
+  - Vercel Cron fallback at `/api/cron/social` (every 15 minutes) for processing scheduled posts and health checks when n8n is unavailable.
+  - SQL schema reference files at `src/lib/social/schema.sql` and `src/lib/social/posts.sql` (tables created manually in Supabase).
+  - 6 Playwright E2E tests covering toggle, account connection, post generation, scheduling, KPI display, and tier gating.
 
 **System Design Choices:**
 The architecture uses a unified frontend and backend with Next.js API routes, modular component-based development, RLS and application-level logic for access control, and clear separation of concerns for third-party services. It employs a fire-and-forget webhook delivery pattern and pluggable abstraction layers for AI providers.

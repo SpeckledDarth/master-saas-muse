@@ -1,4 +1,4 @@
-export type JobType = 'email' | 'webhook-retry' | 'report' | 'metrics-report' | 'metrics-alert' | 'token-rotation'
+export type JobType = 'email' | 'webhook-retry' | 'report' | 'metrics-report' | 'metrics-alert' | 'token-rotation' | 'social-post' | 'social-health-check' | 'social-trend-monitor'
 
 export interface EmailJobData {
   type: 'email'
@@ -50,7 +50,31 @@ export interface TokenRotationJobData {
   requestedBy: string
 }
 
-export type QueueJobData = EmailJobData | WebhookRetryJobData | ReportJobData | MetricsReportJobData | MetricsAlertJobData | TokenRotationJobData
+export interface SocialPostJobData {
+  type: 'social-post'
+  postId: string
+  userId: string
+  platform: 'twitter' | 'linkedin' | 'instagram'
+  content: string
+  mediaUrls?: string[]
+  scheduledAt?: string
+}
+
+export interface SocialHealthCheckJobData {
+  type: 'social-health-check'
+  platforms: ('twitter' | 'linkedin' | 'instagram')[]
+  alertEmail?: string
+  failureThreshold: number
+}
+
+export interface SocialTrendMonitorJobData {
+  type: 'social-trend-monitor'
+  platform: 'twitter' | 'linkedin'
+  keywords: string[]
+  userId: string
+}
+
+export type QueueJobData = EmailJobData | WebhookRetryJobData | ReportJobData | MetricsReportJobData | MetricsAlertJobData | TokenRotationJobData | SocialPostJobData | SocialHealthCheckJobData | SocialTrendMonitorJobData
 
 export interface JobStatus {
   id: string

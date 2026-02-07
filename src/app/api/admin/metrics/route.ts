@@ -237,6 +237,59 @@ export async function GET() {
       alertThresholds = defaultThresholds
     }
 
+    let socialMetrics = {
+      socialModuleEnabled: false,
+      totalPosts: 0,
+      postsThisMonth: 0,
+      scheduledPosts: 0,
+      connectedAccounts: 0,
+    }
+
+    try {
+      const { data: orgSettings2 } = await adminClient
+        .from('organization_settings')
+        .select('settings')
+        .eq('app_id', 'default')
+        .maybeSingle()
+      
+      socialMetrics.socialModuleEnabled = (orgSettings2?.settings as any)?.features?.socialModuleEnabled ?? false
+
+      if (socialMetrics.socialModuleEnabled) {
+        try {
+          const { count: postCount } = await adminClient
+            .from('social_posts')
+            .select('*', { count: 'exact', head: true })
+          socialMetrics.totalPosts = postCount ?? 0
+        } catch {}
+
+        try {
+          const { count: monthCount } = await adminClient
+            .from('social_posts')
+            .select('*', { count: 'exact', head: true })
+            .gte('created_at', monthAgo)
+          socialMetrics.postsThisMonth = monthCount ?? 0
+        } catch {}
+
+        try {
+          const { count: scheduledCount } = await adminClient
+            .from('social_posts')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'scheduled')
+          socialMetrics.scheduledPosts = scheduledCount ?? 0
+        } catch {}
+
+        try {
+          const { count: accountCount } = await adminClient
+            .from('social_accounts')
+            .select('*', { count: 'exact', head: true })
+            .eq('is_valid', true)
+          socialMetrics.connectedAccounts = accountCount ?? 0
+        } catch {}
+      }
+    } catch {
+      // Social tables may not exist
+    }
+
     return NextResponse.json({
       totalUsers,
       newUsersToday,
@@ -257,6 +310,7 @@ export async function GET() {
       cancelledThisMonth,
       churnTrend,
       alertThresholds,
+      socialMetrics,
     })
   } catch (error) {
     console.error('Admin metrics error:', error)
