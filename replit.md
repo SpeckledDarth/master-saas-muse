@@ -74,3 +74,71 @@ The architecture uses a unified frontend and backend with Next.js API routes, mo
 - **Sentry**: Error tracking and monitoring.
 - **xAI/OpenAI/Anthropic**: AI chat completion providers.
 - **Upstash Redis**: For BullMQ queue infrastructure and rate limiting.
+
+---
+
+## MuseSocial Build Plan — DRAFT (NOT YET APPROVED — Feb 7, 2026)
+
+**Status: User is reviewing this plan. DO NOT start building until user explicitly approves.**
+
+### What's Already Built (13 items complete):
+1. Toggle system with Universal/Power tier sub-toggles in Admin > Setup > Features
+2. Admin setup page at `/admin/setup/musesocial` with tier selection, platform toggles, posting config, monitoring, health checker config
+3. Social account connection system with OAuth flow stubs for Twitter/X and LinkedIn (Instagram deferred). User page at `/dashboard/social`
+4. AI-powered post generation endpoint at `/api/social/generate-post` using pluggable AI system
+5. Post scheduling and management at `/dashboard/social/posts` with BullMQ jobs (`social-post`, `social-health-check`, `social-trend-monitor`)
+6. Social API health checker with threshold-based alerting via email notifications
+7. Social KPI cards on admin metrics dashboard (Posts Generated, Posts This Month, Scheduled, Connected Accounts) — only visible when module is enabled
+8. Conditional onboarding wizard step shown when module is toggled on
+9. Vercel Cron fallback at `/api/cron/social` (daily schedule due to Hobby plan) for processing scheduled posts and health checks
+10. SQL schema reference files at `src/lib/social/schema.sql` and `src/lib/social/posts.sql`
+11. 6 Playwright E2E tests (toggle, account connection, post generation, scheduling, KPI display, tier gating)
+12. Module Status indicator (green/red badge) on setup page
+13. MuseSocial sidebar link visibility tied to saved state (only appears/disappears after Save)
+
+### Gap Analysis — 9 Remaining Items to Build (~2-2.5 hours):
+1. **Usage caps per tier via rate limiting** — Universal and Power tiers need different posting limits enforced
+2. **Dependency check on toggle** — Warn admin if required API keys/config are missing when enabling MuseSocial
+3. **Wire token validation into OAuth connect flow** — Test API call after connecting an account to verify tokens work
+4. **Retry logic for social post API failures** — BullMQ retry config with exponential backoff
+5. **Usage logging for AI post generation** — Track generation counts to feed metrics dashboard
+6. **Multimodal support in generate-post endpoint** — Text + image generation via single endpoint (if AI provider supports it, e.g., Grok)
+7. **Dynamic SDK imports / lazy-loading** — Social code should not load when module is off, keeps non-social clones lean
+8. **n8n workflow templates for social automation** — JSON template files for common social workflows
+9. **Expanded documentation** — Dedicated Social Module admin guide section with setup, troubleshooting, and tier differences
+
+### Design Decisions (agreed with user):
+- Start with Twitter/X and LinkedIn only. Instagram deferred (slow API approval process).
+- Multimodal: single endpoint, no separate image pipeline. Pass multimodal prompts if provider supports it.
+- Vercel Cron runs daily (Hobby plan limitation). Scoped to posting-only, not analytics.
+- 6 Playwright tests (not 8 — avoids diminishing returns on edge cases).
+- Tooltip in wizard is fine; demo video is scope creep for now.
+- Docs: add placeholder markers for screenshots during build, fill in at the end.
+- Threshold notifications: only alert on repeated failures, not single ones.
+- Sidebar visibility: MuseSocial link only appears/disappears after settings are saved, not on live toggle.
+
+### Key MuseSocial Files:
+- `src/app/admin/setup/musesocial/page.tsx` — Admin config page
+- `src/app/admin/setup/layout.tsx` — Setup sidebar with conditional MuseSocial link
+- `src/lib/social/client.ts` — Social platform SDK client
+- `src/lib/social/schema.sql` — Database schema reference
+- `src/lib/social/posts.sql` — Posts table schema reference
+- `src/app/api/social/generate-post/route.ts` — AI post generation
+- `src/app/api/social/accounts/route.ts` — Account management
+- `src/app/api/social/accounts/validate/route.ts` — Token validation
+- `src/app/api/social/health/route.ts` — Health checker
+- `src/app/api/social/posts/route.ts` — Post CRUD
+- `src/app/api/cron/social/route.ts` — Vercel Cron fallback
+- `src/app/dashboard/social/page.tsx` — User social dashboard
+- `src/app/dashboard/social/posts/page.tsx` — Post scheduling UI
+- `src/app/admin/metrics/page.tsx` — Metrics with social KPIs
+- `src/lib/queue/types.ts` — BullMQ job type definitions
+- `tests/musesocial.spec.ts` — E2E tests
+
+### Session Recovery Instructions for Future Agents:
+- Read this section FIRST before doing anything.
+- If user says "pick up where we left off" or "continue the plan" — check the Status line above.
+- If status says "NOT YET APPROVED" — ask the user if they're ready to approve and begin.
+- If status says "APPROVED" — start working through the gap analysis items in order.
+- All design decisions above are FINAL — do not re-ask the user about them.
+- Always verify git sync status before ending a session.
