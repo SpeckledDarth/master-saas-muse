@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { defaultSettings } from '@/types/settings'
-import { chatCompletion } from '@/lib/ai/provider'
+import { chatCompletion, type ChatMessage } from '@/lib/ai/provider'
 import type { AISettings } from '@/types/settings'
 import { checkSocialRateLimit, UNIVERSAL_LIMITS, POWER_LIMITS } from '@/lib/social/rate-limits'
 
@@ -174,18 +174,21 @@ export async function POST(request: NextRequest) {
   )
 
   try {
-    const userMessage: { role: 'user' as const; content: string | Array<{type: string; text?: string; image_url?: {url: string}}> } = imageUrl && imageUrl.trim()
-      ? {
-          role: 'user' as const,
-          content: [
-            { type: 'text' as const, text: `Generate a ${platform} post about: ${topic.trim()}` },
-            { type: 'image_url' as const, image_url: { url: imageUrl } },
-          ],
-        }
-      : {
-          role: 'user' as const,
-          content: `Generate a ${platform} post about: ${topic.trim()}`,
-        }
+    let userMessage: ChatMessage
+    if (imageUrl && imageUrl.trim()) {
+      userMessage = {
+        role: 'user',
+        content: [
+          { type: 'text', text: `Generate a ${platform} post about: ${topic.trim()}` },
+          { type: 'image_url', image_url: { url: imageUrl } },
+        ],
+      }
+    } else {
+      userMessage = {
+        role: 'user',
+        content: `Generate a ${platform} post about: ${topic.trim()}`,
+      }
+    }
 
     const result = await chatCompletion(
       { ...aiSettings, systemPrompt: socialPrompt },
