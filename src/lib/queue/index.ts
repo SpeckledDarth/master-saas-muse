@@ -1,6 +1,7 @@
 import { Queue, Worker, Job, QueueEvents } from 'bullmq'
 import { getIORedisConnection, createNewIORedisConnection } from '@/lib/redis/connection'
 import type { QueueJobData, EmailJobData, WebhookRetryJobData, ReportJobData, MetricsReportJobData, MetricsAlertJobData, TokenRotationJobData, SocialPostJobData, SocialHealthCheckJobData, SocialTrendMonitorJobData, QueueMetrics, JobStatus } from './types'
+import type { SocialPlatform } from '@/types/settings'
 
 const QUEUE_NAME = 'musekit-jobs'
 
@@ -254,7 +255,7 @@ async function processSocialPostJob(job: Job<SocialPostJobData>): Promise<void> 
       throw new Error(`No valid ${job.data.platform} account for user ${job.data.userId}`)
     }
 
-    const client = getPlatformClient(job.data.platform)
+    const client = getPlatformClient(job.data.platform as SocialPlatform)
     const result = await client.createPost(account.access_token_encrypted, job.data.content, job.data.mediaUrls)
 
     if (result) {
@@ -282,7 +283,7 @@ async function processSocialHealthCheckJob(job: Job<SocialHealthCheckJobData>): 
     const failures: string[] = []
 
     for (const platform of job.data.platforms) {
-      const client = getPlatformClient(platform)
+      const client = getPlatformClient(platform as SocialPlatform)
       const health = await client.checkHealth()
       console.log(`[Queue] ${platform} health: ${health.healthy ? 'OK' : 'FAILED'} (${health.latencyMs}ms)`)
 
