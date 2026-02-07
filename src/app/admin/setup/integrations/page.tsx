@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InfoTooltip } from '../components'
 import {
-  Loader2, ExternalLink, Check, X, Database, CreditCard, Mail, Brain,
+  Loader2, ExternalLink, Database, CreditCard, Mail, Brain,
   Server, ShieldAlert, BarChart3, Twitter, Linkedin, Instagram, Youtube,
   Facebook, Music, MessageSquare, Image, Camera, Gamepad2, KeyRound,
-  ChevronDown, ChevronRight, Pencil, Save, Trash2, Eye, EyeOff
+  Pencil, Save, Trash2, Eye, EyeOff, Check, X, CircleDot
 } from 'lucide-react'
 
 interface IntegrationKey {
@@ -56,10 +56,71 @@ const SOCIAL_ICONS: Record<string, typeof Twitter> = {
 function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => void }) {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState('')
-  const [showValue, setShowValue] = useState(false)
+  const [revealedValue, setRevealedValue] = useState<string | null>(null)
+  const [revealed, setRevealed] = useState(false)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [revealing, setRevealing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  async function handleReveal() {
+    if (revealed) {
+      setRevealed(false)
+      setRevealedValue(null)
+      return
+    }
+    setRevealing(true)
+    try {
+      const res = await fetch('/api/admin/integrations', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ envVar: keyData.envVar }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.value) {
+          setRevealedValue(data.value)
+          setRevealed(true)
+        }
+      }
+    } catch {
+    } finally {
+      setRevealing(false)
+    }
+  }
+
+  async function handleStartEdit() {
+    setEditing(true)
+    setError(null)
+    if (revealedValue) {
+      setInputValue(revealedValue)
+      return
+    }
+    if (keyData.configured) {
+      try {
+        const res = await fetch('/api/admin/integrations', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ envVar: keyData.envVar }),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          if (data.value) {
+            setInputValue(data.value)
+            setRevealedValue(data.value)
+            return
+          }
+        }
+      } catch {}
+    }
+    setInputValue('')
+  }
+
+  function handleCancel() {
+    setEditing(false)
+    setInputValue('')
+    setError(null)
+  }
 
   async function handleSave() {
     if (!inputValue.trim()) {
@@ -81,7 +142,8 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
       }
       setEditing(false)
       setInputValue('')
-      setShowValue(false)
+      setRevealed(false)
+      setRevealedValue(null)
       onSaved()
     } catch {
       setError('Network error')
@@ -91,6 +153,7 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
   }
 
   async function handleDelete() {
+    if (!confirm(`Remove the saved value for ${keyData.label}? This cannot be undone.`)) return
     setDeleting(true)
     setError(null)
     try {
@@ -104,6 +167,9 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
         setError(data.error || 'Failed to remove')
         return
       }
+      setRevealed(false)
+      setRevealedValue(null)
+      setEditing(false)
       onSaved()
     } catch {
       setError('Network error')
@@ -112,117 +178,141 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
     }
   }
 
-  function handleCancel() {
-    setEditing(false)
-    setInputValue('')
-    setShowValue(false)
-    setError(null)
-  }
+  const displayValue = revealed && revealedValue
+    ? revealedValue
+    : keyData.configured
+    ? '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'
+    : ''
 
   return (
-    <div className="py-3 space-y-2" data-testid={`key-${keyData.id}`}>
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex-1 min-w-0">
+    <div className="group" data-testid={`key-row-${keyData.id}`}>
+      <div className="grid grid-cols-[1fr_2fr_auto] items-center gap-4 py-3 px-4">
+        <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-medium">{keyData.label}</span>
-            {keyData.configured ? (
-              <Check className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
-            ) : (
-              <X className="h-3.5 w-3.5 text-destructive" />
-            )}
+            <span className="text-sm font-medium truncate" data-testid={`label-${keyData.id}`}>
+              {keyData.label}
+            </span>
+            <a
+              href={keyData.docsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              data-testid={`link-docs-${keyData.id}`}
+            >
+              <ExternalLink className="h-3 w-3" />
+            </a>
           </div>
-          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-            <code className="text-xs text-muted-foreground font-mono">{keyData.envVar}</code>
-            {keyData.masked && (
-              <span className="text-xs text-muted-foreground font-mono" data-testid={`masked-${keyData.id}`}>
-                {keyData.masked}
-              </span>
-            )}
-            {keyData.source && (
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0" data-testid={`source-${keyData.id}`}>
-                {keyData.source === 'db' ? 'Dashboard' : 'Env Var'}
-              </Badge>
-            )}
-          </div>
+          <code className="text-[11px] text-muted-foreground font-mono" data-testid={`env-var-${keyData.id}`}>
+            {keyData.envVar}
+          </code>
         </div>
-        <div className="flex items-center gap-1 flex-wrap">
-          <Badge variant={keyData.configured ? 'default' : 'destructive'} data-testid={`badge-key-${keyData.id}`}>
-            {keyData.configured ? 'Configured' : 'Missing'}
-          </Badge>
+
+        <div className="min-w-0">
+          {editing ? (
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                value={inputValue}
+                onChange={(e) => { setInputValue(e.target.value); setError(null) }}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') handleCancel() }}
+                placeholder={`Enter ${keyData.label}...`}
+                className="font-mono text-sm h-9"
+                autoFocus
+                data-testid={`input-${keyData.id}`}
+              />
+              <Button
+                size="icon"
+                onClick={handleSave}
+                disabled={saving || !inputValue.trim()}
+                data-testid={`button-save-${keyData.id}`}
+              >
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleCancel}
+                data-testid={`button-cancel-${keyData.id}`}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div
+              className={`font-mono text-sm py-2 px-3 rounded-md border flex items-center cursor-pointer hover-elevate ${
+                keyData.configured
+                  ? 'bg-muted/40'
+                  : 'bg-muted/20 border-dashed'
+              }`}
+              onClick={handleStartEdit}
+              data-testid={`value-display-${keyData.id}`}
+            >
+              {keyData.configured ? (
+                <span className={revealed ? 'break-all' : 'select-none text-muted-foreground'}>
+                  {displayValue}
+                </span>
+              ) : (
+                <span className="text-muted-foreground/60 text-xs">Click to add value...</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1">
+          {keyData.source && (
+            <Badge
+              variant="secondary"
+              className="text-[10px] px-1.5 py-0 mr-1 whitespace-nowrap"
+              data-testid={`source-badge-${keyData.id}`}
+            >
+              {keyData.source === 'db' ? 'Dashboard' : 'Env Var'}
+            </Badge>
+          )}
+          {keyData.configured && !editing && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleReveal}
+              disabled={revealing}
+              title={revealed ? 'Hide value' : 'Reveal value'}
+              data-testid={`button-reveal-${keyData.id}`}
+            >
+              {revealing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : revealed ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </Button>
+          )}
           {!editing && (
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setEditing(true)}
+              onClick={handleStartEdit}
+              title="Edit value"
               data-testid={`button-edit-${keyData.id}`}
             >
               <Pencil className="h-4 w-4" />
             </Button>
           )}
-          {keyData.source === 'db' && !editing && (
+          {keyData.configured && !editing && (
             <Button
               variant="ghost"
               size="icon"
               onClick={handleDelete}
               disabled={deleting}
+              title="Remove value"
               data-testid={`button-delete-${keyData.id}`}
             >
               {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            asChild
-          >
-            <a href={keyData.docsUrl} target="_blank" rel="noopener noreferrer" data-testid={`link-docs-${keyData.id}`}>
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </Button>
         </div>
       </div>
-      {editing && (
-        <div className="flex items-center gap-2 pl-0">
-          <div className="relative flex-1">
-            <Input
-              type={showValue ? 'text' : 'password'}
-              placeholder={`Enter ${keyData.label}...`}
-              value={inputValue}
-              onChange={(e) => { setInputValue(e.target.value); setError(null) }}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') handleCancel() }}
-              className="pr-10 font-mono text-sm"
-              autoFocus
-              data-testid={`input-${keyData.id}`}
-            />
-            <button
-              type="button"
-              onClick={() => setShowValue(!showValue)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-              data-testid={`button-toggle-visibility-${keyData.id}`}
-            >
-              {showValue ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
-          </div>
-          <Button
-            size="icon"
-            onClick={handleSave}
-            disabled={saving || !inputValue.trim()}
-            data-testid={`button-save-${keyData.id}`}
-          >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleCancel}
-            data-testid={`button-cancel-${keyData.id}`}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
       {error && (
-        <p className="text-xs text-destructive pl-0" data-testid={`error-${keyData.id}`}>{error}</p>
+        <p className="text-xs text-destructive px-4 pb-2" data-testid={`error-${keyData.id}`}>{error}</p>
       )}
     </div>
   )
@@ -233,7 +323,6 @@ export default function IntegrationsPage() {
   const [techStack, setTechStack] = useState<IntegrationGroup[]>([])
   const [socialPlatforms, setSocialPlatforms] = useState<IntegrationGroup[]>([])
   const [summary, setSummary] = useState({ techConfigured: 0, techTotal: 0, socialConfigured: 0, socialTotal: 0 })
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
 
   const fetchData = useCallback(async () => {
     try {
@@ -243,36 +332,15 @@ export default function IntegrationsPage() {
       setTechStack(data.techStack)
       setSocialPlatforms(data.socialPlatforms)
       setSummary(data.summary)
-      if (loading) {
-        const missingGroups = new Set<string>()
-        ;[...data.techStack, ...data.socialPlatforms].forEach((g: IntegrationGroup) => {
-          if (g.keys.some((k: IntegrationKey) => !k.configured)) {
-            missingGroups.add(g.id)
-          }
-        })
-        setExpandedGroups(missingGroups)
-      }
     } catch {
     } finally {
       setLoading(false)
     }
-  }, [loading])
+  }, [])
 
   useEffect(() => {
     fetchData()
   }, [fetchData])
-
-  function toggleGroup(id: string) {
-    setExpandedGroups(prev => {
-      const next = new Set(prev)
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
-      }
-      return next
-    })
-  }
 
   if (loading) {
     return (
@@ -282,38 +350,57 @@ export default function IntegrationsPage() {
     )
   }
 
-  function renderGroup(group: IntegrationGroup, iconMap: Record<string, typeof Database>) {
-    const Icon = iconMap[group.icon] || KeyRound
-    const configured = group.keys.filter(k => k.configured).length
-    const total = group.keys.length
-    const allConfigured = configured === total
-    const isExpanded = expandedGroups.has(group.id)
-
+  function renderSection(title: string, description: string, groups: IntegrationGroup[], iconMap: Record<string, typeof Database>, configuredCount: number, totalCount: number) {
     return (
-      <div key={group.id} className="border rounded-md" data-testid={`group-${group.id}`}>
-        <button
-          type="button"
-          onClick={() => toggleGroup(group.id)}
-          className="w-full flex items-center justify-between gap-2 p-4 text-left hover-elevate rounded-md"
-          data-testid={`button-toggle-${group.id}`}
-        >
-          <div className="flex items-center gap-3 flex-wrap">
-            <Icon className="h-5 w-5 text-muted-foreground" />
-            <span className="font-medium">{group.label}</span>
-            <Badge variant={allConfigured ? 'default' : 'secondary'} data-testid={`badge-status-${group.id}`}>
-              {configured}/{total}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <KeyRound className="h-5 w-5" />
+                {title}
+                <InfoTooltip text="Click any value field to edit it. Use the eye icon to reveal a saved value. Keys saved here are stored in your database and take effect immediately." />
+              </CardTitle>
+              <CardDescription>{description}</CardDescription>
+            </div>
+            <Badge variant={configuredCount === totalCount ? 'default' : 'secondary'}>
+              {configuredCount}/{totalCount} configured
             </Badge>
           </div>
-          {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
-        </button>
-        {isExpanded && (
-          <div className="border-t px-4 pb-4 pt-1 divide-y" data-testid={`keys-${group.id}`}>
-            {group.keys.map(key => (
-              <KeyRow key={key.id} keyData={key} onSaved={fetchData} />
-            ))}
-          </div>
-        )}
-      </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {groups.map((group) => {
+            const Icon = iconMap[group.icon] || KeyRound
+            const groupConfigured = group.keys.filter(k => k.configured).length
+            const groupTotal = group.keys.length
+
+            return (
+              <div key={group.id} data-testid={`group-${group.id}`}>
+                <div className="flex items-center gap-3 px-6 py-3 bg-muted/30 border-t">
+                  <Icon className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-semibold">{group.label}</span>
+                  <div className="flex items-center gap-1.5">
+                    {group.keys.map((k) => (
+                      <CircleDot
+                        key={k.id}
+                        className={`h-2.5 w-2.5 ${k.configured ? 'text-green-500' : 'text-muted-foreground/40'}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs text-muted-foreground ml-auto">
+                    {groupConfigured}/{groupTotal}
+                  </span>
+                </div>
+                <div className="divide-y">
+                  {group.keys.map(key => (
+                    <KeyRow key={key.id} keyData={key} onSaved={fetchData} />
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </CardContent>
+      </Card>
     )
   }
 
@@ -348,42 +435,31 @@ export default function IntegrationsPage() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <KeyRound className="h-5 w-5" />
-            Tech Stack Integrations
-            <InfoTooltip text="Core infrastructure services that power your app. Click the pencil icon on any key to enter or update its value. Keys saved here are stored securely in your database and take effect immediately." />
-          </CardTitle>
-          <CardDescription>
-            Database, payments, email, AI, caching, monitoring, and analytics
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {techStack.map(group => renderGroup(group, TECH_ICONS))}
-        </CardContent>
-      </Card>
+      {renderSection(
+        'Tech Stack Integrations',
+        'Database, payments, email, AI, caching, monitoring, and analytics',
+        techStack,
+        TECH_ICONS,
+        summary.techConfigured,
+        summary.techTotal
+      )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <KeyRound className="h-5 w-5" />
-            Social Media Platforms
-            <InfoTooltip text="API credentials for each social platform. Click the pencil icon to enter your API keys after registering a developer app with each platform." />
-          </CardTitle>
-          <CardDescription>
-            API keys and secrets for social posting, monitoring, and analytics
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {socialPlatforms.map(group => renderGroup(group, SOCIAL_ICONS))}
-        </CardContent>
-      </Card>
+      {renderSection(
+        'Social Media Platforms',
+        'API keys and secrets for social posting, monitoring, and analytics',
+        socialPlatforms,
+        SOCIAL_ICONS,
+        summary.socialConfigured,
+        summary.socialTotal
+      )}
 
-      <div className="p-4 rounded-md bg-muted/50 border">
-        <p className="text-sm text-muted-foreground" data-testid="text-env-info">
-          Keys can be set in two ways: directly from this page (stored in your database) or as environment variables in your hosting platform (Vercel, Replit, etc.). Dashboard-saved keys take effect immediately. Environment variables set in your hosting platform are also recognized and shown here. A <Badge variant="secondary" className="text-[10px] px-1.5 py-0 mx-1 inline">Dashboard</Badge> badge means the key was saved from this page. An <Badge variant="secondary" className="text-[10px] px-1.5 py-0 mx-1 inline">Env Var</Badge> badge means it comes from your deployment environment.
-        </p>
+      <div className="p-4 rounded-md bg-muted/30 border text-sm text-muted-foreground space-y-1" data-testid="text-env-info">
+        <p>Keys can be set in two ways:</p>
+        <ul className="list-disc list-inside space-y-0.5 pl-2">
+          <li><Badge variant="secondary" className="text-[10px] px-1.5 py-0 mr-1">Dashboard</Badge>Saved from this page, stored in your database, takes effect immediately</li>
+          <li><Badge variant="secondary" className="text-[10px] px-1.5 py-0 mr-1">Env Var</Badge>Set in your hosting platform (Vercel, Replit, etc.), recognized automatically</li>
+        </ul>
+        <p className="pt-1">Dashboard-saved keys take priority over environment variables.</p>
       </div>
     </div>
   )

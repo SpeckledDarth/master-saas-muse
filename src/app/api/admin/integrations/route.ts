@@ -304,6 +304,46 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export async function PATCH(request: NextRequest) {
+  const user = await getAuthenticatedUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const isAdmin = await isAdminUser(user.id)
+  if (!isAdmin) {
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+  }
+
+  try {
+    const body = await request.json()
+    const { envVar } = body
+
+    if (!envVar || typeof envVar !== 'string') {
+      return NextResponse.json({ error: 'Missing envVar' }, { status: 400 })
+    }
+
+    if (!isAllowedKey(envVar)) {
+      return NextResponse.json({ error: 'Key not in allowed list' }, { status: 400 })
+    }
+
+    const dbSecrets = await getAllDbSecrets()
+    const dbVal = dbSecrets[envVar]
+    if (dbVal) {
+      return NextResponse.json({ value: dbVal, source: 'db' })
+    }
+
+    const envVal = process.env[envVar]
+    if (envVal) {
+      return NextResponse.json({ value: envVal, source: 'env' })
+    }
+
+    return NextResponse.json({ value: null, source: null })
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   const user = await getAuthenticatedUser()
   if (!user) {
