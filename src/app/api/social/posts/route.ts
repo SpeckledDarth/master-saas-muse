@@ -4,8 +4,8 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { defaultSettings } from '@/types/settings'
 import { addSocialPostJob } from '@/lib/queue'
-import { checkSocialRateLimit, UNIVERSAL_LIMITS, POWER_LIMITS } from '@/lib/social/rate-limits'
-import type { SocialModuleTier } from '@/types/settings'
+import { checkSocialRateLimit, getLimitsForTier } from '@/lib/social/rate-limits'
+import type { SocialModuleTier, TierLimits } from '@/types/settings'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -32,13 +32,14 @@ async function getAuthenticatedUser() {
   return user
 }
 
-async function getModuleConfig(): Promise<{ enabled: boolean; tier: SocialModuleTier }> {
+async function getModuleConfig(): Promise<{ enabled: boolean; tier: SocialModuleTier; configuredTierLimits?: Record<SocialModuleTier, TierLimits> }> {
   const admin = getSupabaseAdmin()
   const { data } = await admin.from('organization_settings').select('settings').eq('app_id', 'default').single()
   const settings = data?.settings || defaultSettings
   return {
     enabled: settings.features?.socialModuleEnabled ?? false,
     tier: settings.socialModule?.tier || 'universal',
+    configuredTierLimits: settings.socialModule?.tierLimits,
   }
 }
 
@@ -104,26 +105,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { enabled, tier } = await getModuleConfig()
+  const { enabled, tier, configuredTierLimits } = await getModuleConfig()
   if (!enabled) {
     return NextResponse.json({ error: 'Social module is not enabled' }, { status: 403 })
   }
 
-  const tierLimits = tier === 'power' ? POWER_LIMITS : UNIVERSAL_LIMITS
-  const rateLimitResult = await checkSocialRateLimit(user.id, 'post', tier)
+  const limits = getLimitsForTier(tier, configuredTierLimits)
+  const rateLimitResult = await checkSocialRateLimit(user.id, 'post', tier, configuredTierLimits)
 
   if (!rateLimitResult.success) {
     return NextResponse.json(
       {
-        error: `Post creation limit reached for ${tier} tier (${tierLimits.post} per day). Upgrade your tier or try again later.`,
+        error: `Post creation limit reached for ${tier} tier (${limits.dailyPosts} per day). Upgrade your tier or try again later.`,
         tier,
-        limit: tierLimits.post,
+        limit: limits.dailyPosts,
         retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
       },
       {
         status: 429,
         headers: {
-          'X-RateLimit-Limit': tierLimits.post.toString(),
+          'X-RateLimit-Limit': limits.dailyPosts.toString(),
           'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
           'X-RateLimit-Reset': rateLimitResult.reset.toString(),
           'Retry-After': Math.ceil((rateLimitResult.reset - Date.now()) / 1000).toString(),

@@ -136,6 +136,83 @@ export default function MuseSocialPage() {
 
           <Card>
             <CardHeader>
+              <CardTitle>Tier Rate Limits</CardTitle>
+              <CardDescription>
+                Configure daily usage caps for each tier. These limits apply per user per day.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <h4 className="font-medium text-sm">Universal Tier</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="universal-ai">AI Generations / Day</Label>
+                    <Input
+                      id="universal-ai"
+                      type="number"
+                      min={1}
+                      value={socialModule.tierLimits?.universal?.dailyAiGenerations ?? 10}
+                      onChange={(e) => updateSocialModule('tierLimits', {
+                        ...socialModule.tierLimits,
+                        universal: { ...socialModule.tierLimits?.universal, dailyAiGenerations: parseInt(e.target.value) || 1 },
+                      })}
+                      data-testid="input-universal-ai-limit"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="universal-posts">Posts / Day</Label>
+                    <Input
+                      id="universal-posts"
+                      type="number"
+                      min={1}
+                      value={socialModule.tierLimits?.universal?.dailyPosts ?? 20}
+                      onChange={(e) => updateSocialModule('tierLimits', {
+                        ...socialModule.tierLimits,
+                        universal: { ...socialModule.tierLimits?.universal, dailyPosts: parseInt(e.target.value) || 1 },
+                      })}
+                      data-testid="input-universal-post-limit"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <h4 className="font-medium text-sm">Power Tier</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="power-ai">AI Generations / Day</Label>
+                    <Input
+                      id="power-ai"
+                      type="number"
+                      min={1}
+                      value={socialModule.tierLimits?.power?.dailyAiGenerations ?? 100}
+                      onChange={(e) => updateSocialModule('tierLimits', {
+                        ...socialModule.tierLimits,
+                        power: { ...socialModule.tierLimits?.power, dailyAiGenerations: parseInt(e.target.value) || 1 },
+                      })}
+                      data-testid="input-power-ai-limit"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="power-posts">Posts / Day</Label>
+                    <Input
+                      id="power-posts"
+                      type="number"
+                      min={1}
+                      value={socialModule.tierLimits?.power?.dailyPosts ?? 10000}
+                      onChange={(e) => updateSocialModule('tierLimits', {
+                        ...socialModule.tierLimits,
+                        power: { ...socialModule.tierLimits?.power, dailyPosts: parseInt(e.target.value) || 1 },
+                      })}
+                      data-testid="input-power-post-limit"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Platform Connections</CardTitle>
               <CardDescription>
                 Connect your social media accounts

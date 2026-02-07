@@ -119,6 +119,16 @@ export async function GET(request: NextRequest) {
     socialModule: {
       ...defaultSettings.socialModule!,
       ...(data?.settings?.socialModule || {}),
+      tierLimits: {
+        universal: {
+          ...defaultSettings.socialModule!.tierLimits.universal,
+          ...(data?.settings?.socialModule?.tierLimits?.universal || {}),
+        },
+        power: {
+          ...defaultSettings.socialModule!.tierLimits.power,
+          ...(data?.settings?.socialModule?.tierLimits?.power || {}),
+        },
+      },
       platforms: {
         ...defaultSettings.socialModule!.platforms,
         ...(data?.settings?.socialModule?.platforms || {}),
@@ -223,6 +233,18 @@ export async function POST(request: NextRequest) {
       ...defaultSettings.socialModule!,
       ...(currentSettings.socialModule || {}),
       ...(settings.socialModule || {}),
+      tierLimits: {
+        universal: {
+          ...defaultSettings.socialModule!.tierLimits.universal,
+          ...(currentSettings.socialModule?.tierLimits?.universal || {}),
+          ...(settings.socialModule?.tierLimits?.universal || {}),
+        },
+        power: {
+          ...defaultSettings.socialModule!.tierLimits.power,
+          ...(currentSettings.socialModule?.tierLimits?.power || {}),
+          ...(settings.socialModule?.tierLimits?.power || {}),
+        },
+      },
       platforms: {
         ...defaultSettings.socialModule!.platforms,
         ...(currentSettings.socialModule?.platforms || {}),

@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { defaultSettings } from '@/types/settings'
 import { chatCompletion, type ChatMessage } from '@/lib/ai/provider'
 import type { AISettings } from '@/types/settings'
-import { checkSocialRateLimit, UNIVERSAL_LIMITS, POWER_LIMITS } from '@/lib/social/rate-limits'
+import { checkSocialRateLimit, getLimitsForTier } from '@/lib/social/rate-limits'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -108,21 +108,22 @@ export async function POST(request: NextRequest) {
   }
 
   const tier = socialModule.tier || 'universal'
-  const tierLimits = tier === 'power' ? POWER_LIMITS : UNIVERSAL_LIMITS
-  const rateLimitResult = await checkSocialRateLimit(user.id, 'generate', tier)
+  const configuredTierLimits = socialModule.tierLimits
+  const limits = getLimitsForTier(tier, configuredTierLimits)
+  const rateLimitResult = await checkSocialRateLimit(user.id, 'generate', tier, configuredTierLimits)
 
   if (!rateLimitResult.success) {
     return NextResponse.json(
       {
-        error: `AI generation limit reached for ${tier} tier (${tierLimits.generate} per day). Upgrade your tier or try again later.`,
+        error: `AI generation limit reached for ${tier} tier (${limits.dailyAiGenerations} per day). Upgrade your tier or try again later.`,
         tier,
-        limit: tierLimits.generate,
+        limit: limits.dailyAiGenerations,
         retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
       },
       {
         status: 429,
         headers: {
-          'X-RateLimit-Limit': tierLimits.generate.toString(),
+          'X-RateLimit-Limit': limits.dailyAiGenerations.toString(),
           'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
           'X-RateLimit-Reset': rateLimitResult.reset.toString(),
           'Retry-After': Math.ceil((rateLimitResult.reset - Date.now()) / 1000).toString(),

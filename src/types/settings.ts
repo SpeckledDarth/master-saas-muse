@@ -366,8 +366,14 @@ export interface SocialAccountConfig {
   apiKeyConfigured: boolean
 }
 
+export interface TierLimits {
+  dailyAiGenerations: number
+  dailyPosts: number
+}
+
 export interface SocialModuleSettings {
   tier: SocialModuleTier
+  tierLimits: Record<SocialModuleTier, TierLimits>
   platforms: Record<SocialPlatform, SocialAccountConfig>
   posting: {
     defaultBrandVoice: string
@@ -1155,6 +1161,10 @@ We regularly review and update our security practices. This page reflects our cu
   },
   socialModule: {
     tier: 'universal',
+    tierLimits: {
+      universal: { dailyAiGenerations: 10, dailyPosts: 20 },
+      power: { dailyAiGenerations: 100, dailyPosts: 10000 },
+    },
     platforms: {
       twitter: { enabled: false, apiKeyConfigured: false },
       linkedin: { enabled: false, apiKeyConfigured: false },
