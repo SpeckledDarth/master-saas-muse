@@ -12,6 +12,7 @@ Preferred communication style: Simple, everyday language.
 - **Roles**: User sets goals and supplies keys when asked. Agent handles all technical execution.
 - **Cognitive load**: Minimize decisions. Ask simple yes/no questions. Avoid jargon unless it affects a decision.
 - **Git Sync Responsibility**: Agent ensures Replit and GitHub repo stay in sync. Before ending sessions or after significant changes, agent verifies sync status and asks user to run push commands if needed. User executes git commands when requested.
+- **CRITICAL - Deployment**: This is a Next.js + Vercel project. The user NEVER uses the Replit preview/webview. All testing and viewing happens on the live Vercel deployment (triggered by git push to GitHub). Replit is used only as a code editor. Never suggest using the Replit preview panel.
 
 ## Deployment Model: Option B (Separate Deployments)
 **Decision Date**: February 2026
