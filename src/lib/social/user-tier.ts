@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 import { stripeService } from '@/lib/stripe/service'
 import { isActiveSubscription } from '@/lib/stripe/feature-gate'
-import type { TierDefinition } from '@/types/settings'
-import { DEFAULT_TIER_DEFINITIONS } from '@/types/settings'
+import type { TierDefinition } from '@/lib/social/types'
+import { DEFAULT_TIER_DEFINITIONS } from '@/lib/social/types'
 
 function buildStripeMetadataMap(tierDefinitions: TierDefinition[]): Record<string, string> {
   const map: Record<string, string> = {}

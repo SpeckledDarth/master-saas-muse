@@ -1,7 +1,7 @@
 import { Queue, Worker, Job, QueueEvents } from 'bullmq'
 import { getIORedisConnection, createNewIORedisConnection } from '@/lib/redis/connection'
 import type { QueueJobData, EmailJobData, WebhookRetryJobData, ReportJobData, MetricsReportJobData, MetricsAlertJobData, TokenRotationJobData, SocialPostJobData, SocialHealthCheckJobData, SocialTrendMonitorJobData, SocialEngagementPullJobData, QueueMetrics, JobStatus } from './types'
-import type { SocialPlatform } from '@/types/settings'
+import type { SocialPlatform } from '@/lib/social/types'
 
 const QUEUE_NAME = 'musekit-jobs'
 

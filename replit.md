@@ -31,27 +31,35 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **Marketing Tools**: Waitlist mode, in-app feedback widget, and customizable marketing pages.
 - **Security**: Supabase RLS, Zod validation, rate limiting, and security headers.
 - **Monitoring**: Sentry for error tracking and Plausible for analytics.
-- **Queue Infrastructure**: BullMQ with Upstash Redis for 10 job types (email, webhook-retry, report, metrics-report, metrics-alert, token-rotation, social-post, social-health-check, social-trend-monitor, social-engagement-pull), managed via an admin dashboard.
+- **Queue Infrastructure**: BullMQ with Upstash Redis for job types (email, webhook-retry, report, metrics-report, metrics-alert, token-rotation, plus social job types for SocioScheduler), managed via an admin dashboard.
 - **Rate Limiting**: Upstash Redis sliding window with in-memory fallback.
 - **In-App Notifications**: Bell icon with unread badges, popover list, and server-side utilities.
 - **User Impersonation**: Admin capability with cookie-based sessions, warning banners, and audit logging.
 - **Metrics & Reporting**: Admin dashboard for KPIs (ARPU, LTV, Churn Rate, NPS), scheduled reports, and alerts.
 - **Database Backup Configuration**: Admin UI for setting backup notification preferences.
 - **API Token Rotation**: Automated webhook secret rotation via BullMQ.
-- **MuseSocial Module**: Toggleable social media management extension supporting 10 platforms, featuring AI-powered post generation, scheduling, and health checks. It includes tier-based rate limiting, a conditional onboarding wizard, and integrates n8n workflow templates. Centralized API keys are managed via dedicated admin setup pages.
-- **SocioScheduler Extension**: A SaaS built on MuseKit, providing AI social media scheduling for solopreneurs. It supports Facebook, LinkedIn, and Twitter/X, with brand preference systems, multi-tier pricing, and an approval queue for AI-generated posts. It uses a database extension pattern for its tables (migrations/extensions/). Key features:
-  - Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `muse_tier` (values: tier_1/tier_2/tier_3, admin-configurable) to rate limits. Tier definitions (display names, metadata values, limits) are stored in admin settings as `tierDefinitions` and editable from the MuseSocial setup page
-  - OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
-  - Engagement analytics dashboard with Recharts charts (`/dashboard/social/engagement`)
-  - Calendar view with month-grid showing scheduled posts and per-platform count tooltips (`/dashboard/social/calendar`)
-  - 7-page social dashboard: overview, calendar, engagement, queue, posts, brand preferences, onboarding
-  - Quick Generate dialog on Overview page (platform picker + topic input, copy-to-clipboard)
-  - Reusable `SocialUpgradeBanner` component (80%+ usage trigger, sessionStorage dismissal, integrated across 5 pages)
-  - 15 admin-editable niche-specific AI prompts with default fallback voice
-  - Admin-configurable engagement pull settings (intervalHours/lookbackHours, 1-168h range)
-  - Structured AI prompt system using all brand preference fields for solopreneur-friendly content
-  - Beta debug mode via `MUSE_DEBUG_MODE=true` env var with mock data at `/api/social/debug`
-  - All RLS policies verified, proper empty states on all dashboard pages, no secrets exposed
+
+### SocioScheduler (Product Layer)
+SocioScheduler is a standalone SaaS product built ON TOP of MuseKit (not a toggleable module within it). MuseKit core has zero awareness of social features -- the dependency is one-way: social code imports from MuseKit core, never the reverse.
+
+**Architecture Separation:**
+- Social types live in `src/lib/social/types.ts` (not in `src/types/settings.ts`)
+- Social settings use `defaultSocialModuleSettings` from `src/lib/social/types.ts`
+- Social admin page (`/admin/setup/musesocial`) is SocioScheduler-specific, not a MuseKit feature
+- Database tables in `migrations/extensions/` are SocioScheduler-specific
+- The `socialModuleEnabled` flag in features is SocioScheduler-specific (not part of MuseKit core FeatureToggles)
+
+**Key Features:**
+- AI social media scheduling for solopreneurs (Facebook, LinkedIn, Twitter/X)
+- Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `muse_tier` (values: tier_1/tier_2/tier_3, admin-configurable) to rate limits. Tier definitions stored in admin settings as `tierDefinitions`
+- OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
+- Engagement analytics dashboard with Recharts charts (`/dashboard/social/engagement`)
+- Calendar view with month-grid showing scheduled posts (`/dashboard/social/calendar`)
+- 7-page social dashboard: overview, calendar, engagement, queue, posts, brand preferences, onboarding
+- Quick Generate dialog, SocialUpgradeBanner component, 15 niche-specific AI prompts
+- Admin-configurable engagement pull settings (intervalHours/lookbackHours, 1-168h range)
+- Beta debug mode via `MUSE_DEBUG_MODE=true` env var with mock data at `/api/social/debug`
+- All RLS policies verified, proper empty states on all dashboard pages, no secrets exposed
 
 **System Design Choices:**
 The architecture uses a unified frontend/backend with Next.js API routes, modular component-based development, RLS and application-level logic for access control, and clear separation of concerns for third-party services. It employs a fire-and-forget webhook delivery pattern and pluggable abstraction layers for AI providers.

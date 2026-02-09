@@ -4,7 +4,9 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { defaultSettings } from '@/types/settings'
 import { chatCompletion, type ChatMessage } from '@/lib/ai/provider'
-import type { AISettings, NicheGuidanceEntry } from '@/types/settings'
+import type { AISettings } from '@/types/settings'
+import type { NicheGuidanceEntry } from '@/lib/social/types'
+import { defaultSocialModuleSettings } from '@/lib/social/types'
 import { checkSocialRateLimit, getLimitsForTier } from '@/lib/social/rate-limits'
 import { getUserSocialTier } from '@/lib/social/user-tier'
 
@@ -36,14 +38,14 @@ async function getAuthenticatedUser() {
 async function getSettings() {
   const admin = getSupabaseAdmin()
   const { data } = await admin.from('organization_settings').select('settings').eq('app_id', 'default').single()
-  const settings = data?.settings || defaultSettings
-  const socialModule = { ...defaultSettings.socialModule!, ...(settings.socialModule || {}) }
+  const settings = (data?.settings || {}) as any
+  const socialModule = { ...defaultSocialModuleSettings, ...(settings.socialModule || {}) }
   return {
     socialEnabled: settings.features?.socialModuleEnabled ?? false,
     aiEnabled: settings.features?.aiEnabled ?? false,
     aiSettings: { ...defaultSettings.ai!, ...(settings.ai || {}) } as AISettings,
     socialModule,
-    nicheGuidance: (socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || []) as NicheGuidanceEntry[],
+    nicheGuidance: (socialModule.nicheGuidance || defaultSocialModuleSettings.nicheGuidance || []) as NicheGuidanceEntry[],
   }
 }
 

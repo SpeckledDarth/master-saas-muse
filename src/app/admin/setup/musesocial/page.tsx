@@ -16,8 +16,8 @@ import {
   AlertTriangle, KeyRound, ChevronDown, ChevronRight, CircleDot,
   ExternalLink, Loader2, Pencil, Check, X, Eye, EyeOff, Trash2, Plus, BookOpen
 } from 'lucide-react'
-import { defaultSettings, DEFAULT_TIER_DEFINITIONS } from '@/types/settings'
-import type { NicheGuidanceEntry, TierDefinition } from '@/types/settings'
+import { DEFAULT_TIER_DEFINITIONS, defaultSocialModuleSettings } from '@/lib/social/types'
+import type { NicheGuidanceEntry, TierDefinition } from '@/lib/social/types'
 
 interface IntegrationKey {
   id: string
@@ -361,9 +361,13 @@ function SocialKeyGroup({ group, onSaved }: { group: IntegrationGroup; onSaved: 
 }
 
 export default function MuseSocialPage() {
-  const { settings, saving, saved, handleSave, updateSocialModule } = useSetupSettingsContext()
+  const { settings, setSettings, saving, saved, handleSave } = useSetupSettingsContext()
 
-  const socialModule = settings.socialModule || defaultSettings.socialModule!
+  const socialModule = (settings as any).socialModule || defaultSocialModuleSettings
+
+  function updateSocialModule<K extends keyof import('@/lib/social/types').SocialModuleSettings>(key: K, value: import('@/lib/social/types').SocialModuleSettings[K]) {
+    setSettings(prev => ({ ...prev, socialModule: { ...((prev as any).socialModule || defaultSocialModuleSettings), [key]: value } } as any))
+  }
 
   const [socialPlatforms, setSocialPlatforms] = useState<IntegrationGroup[]>([])
   const [socialSummary, setSocialSummary] = useState({ socialConfigured: 0, socialTotal: 0 })
@@ -383,32 +387,32 @@ export default function MuseSocialPage() {
   }, [])
 
   useEffect(() => {
-    if (settings.features.socialModuleEnabled) {
+    if ((settings as any).features?.socialModuleEnabled) {
       fetchSocialKeys()
     }
-  }, [settings.features.socialModuleEnabled, fetchSocialKeys])
+  }, [(settings as any).features?.socialModuleEnabled, fetchSocialKeys])
 
   function updatePosting(key: string, value: any) {
-    const current = settings.socialModule || defaultSettings.socialModule!
+    const current = (settings as any).socialModule || defaultSocialModuleSettings
     updateSocialModule('posting', { ...current.posting, [key]: value })
   }
 
   function updateMonitoring(key: string, value: any) {
-    const current = settings.socialModule || defaultSettings.socialModule!
+    const current = (settings as any).socialModule || defaultSocialModuleSettings
     updateSocialModule('monitoring', { ...current.monitoring, [key]: value })
   }
 
   function updateStatusChecker(key: string, value: any) {
-    const current = settings.socialModule || defaultSettings.socialModule!
+    const current = (settings as any).socialModule || defaultSocialModuleSettings
     updateSocialModule('statusChecker', { ...current.statusChecker, [key]: value })
   }
 
   function updatePlatform(platform: string, key: string, value: any) {
-    const current = settings.socialModule || defaultSettings.socialModule!
+    const current = (settings as any).socialModule || defaultSocialModuleSettings
     updateSocialModule('platforms', { ...current.platforms, [platform]: { ...current.platforms[platform as keyof typeof current.platforms], [key]: value } })
   }
 
-  const isEnabled = settings.features.socialModuleEnabled
+  const isEnabled = (settings as any).features?.socialModuleEnabled
 
   return (
     <div className="space-y-6">
@@ -914,14 +918,14 @@ export default function MuseSocialPage() {
                 When a user sets their niche in Brand Preferences, the AI uses the matching guidance below to write posts that sound authentic for their industry.
               </p>
               <div className="space-y-3">
-                {(socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || []).map((entry: NicheGuidanceEntry, index: number) => (
+                {(socialModule.nicheGuidance || defaultSocialModuleSettings.nicheGuidance || []).map((entry: NicheGuidanceEntry, index: number) => (
                   <div key={entry.key + index} className="border rounded-md p-3 space-y-2" data-testid={`niche-entry-${entry.key}`}>
                     <div className="flex items-center justify-between gap-2">
                       <div className="grid grid-cols-2 gap-2 flex-1">
                         <Input
                           value={entry.label}
                           onChange={(e) => {
-                            const updated = [...(socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || [])]
+                            const updated = [...(socialModule.nicheGuidance || defaultSocialModuleSettings.nicheGuidance || [])]
                             updated[index] = { ...updated[index], label: e.target.value, key: e.target.value.toLowerCase().replace(/[\s&]+/g, '_') }
                             updateSocialModule('nicheGuidance', updated)
                           }}
@@ -934,7 +938,7 @@ export default function MuseSocialPage() {
                         variant="ghost"
                         size="icon"
                         onClick={() => {
-                          const updated = [...(socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || [])]
+                          const updated = [...(socialModule.nicheGuidance || defaultSocialModuleSettings.nicheGuidance || [])]
                           updated.splice(index, 1)
                           updateSocialModule('nicheGuidance', updated)
                         }}
@@ -946,7 +950,7 @@ export default function MuseSocialPage() {
                     <Textarea
                       value={entry.guidance}
                       onChange={(e) => {
-                        const updated = [...(socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || [])]
+                        const updated = [...(socialModule.nicheGuidance || defaultSocialModuleSettings.nicheGuidance || [])]
                         updated[index] = { ...updated[index], guidance: e.target.value }
                         updateSocialModule('nicheGuidance', updated)
                       }}
@@ -960,7 +964,7 @@ export default function MuseSocialPage() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  const current = [...(socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || [])]
+                  const current = [...(socialModule.nicheGuidance || defaultSocialModuleSettings.nicheGuidance || [])]
                   current.push({ key: '', label: '', guidance: '' })
                   updateSocialModule('nicheGuidance', current)
                 }}

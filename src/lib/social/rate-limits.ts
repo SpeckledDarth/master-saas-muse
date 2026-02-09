@@ -1,7 +1,7 @@
 import { checkRateLimit } from '@/lib/rate-limit'
 import type { RateLimitResult } from '@/lib/rate-limit'
-import type { TierLimits, TierDefinition } from '@/types/settings'
-import { DEFAULT_TIER_DEFINITIONS } from '@/types/settings'
+import type { TierLimits, TierDefinition } from '@/lib/social/types'
+import { DEFAULT_TIER_DEFINITIONS } from '@/lib/social/types'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const MONTH_MS = 30 * DAY_MS

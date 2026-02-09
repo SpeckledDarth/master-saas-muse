@@ -2,11 +2,10 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-import { defaultSettings } from '@/types/settings'
 import { addSocialPostJob } from '@/lib/queue'
 import { checkSocialRateLimit, getLimitsForTier } from '@/lib/social/rate-limits'
 import { getUserSocialTier } from '@/lib/social/user-tier'
-import type { TierLimits } from '@/types/settings'
+import type { TierLimits } from '@/lib/social/types'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -36,7 +35,7 @@ async function getAuthenticatedUser() {
 async function getModuleConfig(): Promise<{ enabled: boolean; tier: string; configuredTierLimits?: Record<string, TierLimits> }> {
   const admin = getSupabaseAdmin()
   const { data } = await admin.from('organization_settings').select('settings').eq('app_id', 'default').single()
-  const settings = data?.settings || defaultSettings
+  const settings = (data?.settings || {}) as any
   return {
     enabled: settings.features?.socialModuleEnabled ?? false,
     tier: settings.socialModule?.tier || 'tier_1',

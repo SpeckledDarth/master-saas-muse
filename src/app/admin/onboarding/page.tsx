@@ -7,9 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
-import { Check, ChevronRight, Palette, CreditCard, Globe, Sparkles, Share2, Twitter, Linkedin } from 'lucide-react'
+import { Check, ChevronRight, Palette, CreditCard, Globe, Sparkles } from 'lucide-react'
 
 const STEPS = [
   {
@@ -45,8 +44,6 @@ export default function OnboardingPage() {
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [socialEnabled, setSocialEnabled] = useState(false)
-  
   const [branding, setBranding] = useState({
     appName: '',
     tagline: '',
@@ -54,20 +51,12 @@ export default function OnboardingPage() {
     accentColor: '#f59e0b',
   })
 
-  const activeSteps = useMemo(() => {
-    const base = [
-      { id: 1, title: 'Branding', description: 'Set up your app name and colors', icon: Palette },
-      { id: 2, title: 'Stripe', description: 'Connect payment processing', icon: CreditCard },
-      { id: 3, title: 'Content', description: 'Add your marketing content', icon: Globe },
-    ]
-    if (socialEnabled) {
-      base.push({ id: 4, title: 'MuseSocial', description: 'Connect social accounts for automated posting', icon: Share2 })
-      base.push({ id: 5, title: 'Launch', description: 'Review and publish', icon: Sparkles })
-    } else {
-      base.push({ id: 4, title: 'Launch', description: 'Review and publish', icon: Sparkles })
-    }
-    return base
-  }, [socialEnabled])
+  const activeSteps = useMemo(() => [
+    { id: 1, title: 'Branding', description: 'Set up your app name and colors', icon: Palette },
+    { id: 2, title: 'Stripe', description: 'Connect payment processing', icon: CreditCard },
+    { id: 3, title: 'Content', description: 'Add your marketing content', icon: Globe },
+    { id: 4, title: 'Launch', description: 'Review and publish', icon: Sparkles },
+  ], [])
 
   useEffect(() => {
     fetchOnboarding()
@@ -91,13 +80,6 @@ export default function OnboardingPage() {
       setLoading(false)
     }
 
-    try {
-      const settingsRes = await fetch('/api/public/settings')
-      const settingsData = await settingsRes.json()
-      if (settingsData?.features?.socialModuleEnabled) {
-        setSocialEnabled(true)
-      }
-    } catch {}
   }
 
   async function saveProgress(step: number, completed: number[], isComplete = false) {
@@ -177,8 +159,6 @@ export default function OnboardingPage() {
       </div>
     )
   }
-
-  const launchStepId = socialEnabled ? 5 : 4
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -341,34 +321,7 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {currentStep === 4 && socialEnabled && (
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  MuseSocial is enabled. You can connect your social media accounts to start automated posting and monitoring.
-                </p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-3 rounded-md border">
-                    <div className="flex items-center gap-2">
-                      <Twitter className="h-4 w-4" />
-                      <span className="text-sm font-medium">Twitter / X</span>
-                    </div>
-                    <Badge variant="secondary">Not connected</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 rounded-md border">
-                    <div className="flex items-center gap-2">
-                      <Linkedin className="h-4 w-4" />
-                      <span className="text-sm font-medium">LinkedIn</span>
-                    </div>
-                    <Badge variant="secondary">Not connected</Badge>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  You can configure social accounts later in Dashboard &gt; Social Accounts.
-                </p>
-              </div>
-            )}
-
-            {currentStep === launchStepId && (
+            {currentStep === 4 && (
               <div className="space-y-4">
                 <p className="text-muted-foreground">
                   Review your setup and launch your app!

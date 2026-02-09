@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { SiteSettings, defaultSettings } from '@/types/settings'
-import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem, AISettings, WebhookSettings, ComplianceSettings, SupportSettings, SecuritySettings, SocialModuleSettings } from '@/types/settings'
+import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem, AISettings, WebhookSettings, ComplianceSettings, SupportSettings, SecuritySettings } from '@/types/settings'
 
 interface UseSetupSettingsReturn {
   loading: boolean
@@ -60,7 +60,6 @@ interface UseSetupSettingsReturn {
   updateCompliance: <K extends keyof ComplianceSettings>(key: K, value: ComplianceSettings[K]) => void
   updateSupport: <K extends keyof SupportSettings>(key: K, value: SupportSettings[K]) => void
   updateSecurity: <K extends keyof SecuritySettings>(key: K, value: SecuritySettings[K]) => void
-  updateSocialModule: <K extends keyof SocialModuleSettings>(key: K, value: SocialModuleSettings[K]) => void
 }
 
 export function useSetupSettings(): UseSetupSettingsReturn {
@@ -307,10 +306,6 @@ export function useSetupSettings(): UseSetupSettingsReturn {
     setSettings(prev => ({ ...prev, security: { ...(prev.security || defaultSettings.security!), [key]: value } }))
   }
 
-  function updateSocialModule<K extends keyof SocialModuleSettings>(key: K, value: SocialModuleSettings[K]) {
-    setSettings(prev => ({ ...prev, socialModule: { ...(prev.socialModule || defaultSettings.socialModule!), [key]: value } }))
-  }
-
   return {
     loading, saving, saved, settings, setSettings, handleSave, aiProviders,
     updateBranding, updateSocial, updateFeatures, updateAI, updateWebhooks, updateWebhookEvent,
@@ -322,6 +317,6 @@ export function useSetupSettings(): UseSetupSettingsReturn {
     addFAQItem, updateFAQItem, removeFAQItem,
     addTeamMember, updateTeamMember, removeTeamMember,
     webhookTesting, webhookTestResult, testWebhook,
-    updateCompliance, updateSupport, updateSecurity, updateSocialModule,
+    updateCompliance, updateSupport, updateSecurity,
   }
 }

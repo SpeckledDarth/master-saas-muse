@@ -2,7 +2,6 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { defaultSettings } from '@/types/settings'
 import { getPlatformClient, type SocialPlatform } from '@/lib/social/client'
 
 function getSupabaseAdmin() {

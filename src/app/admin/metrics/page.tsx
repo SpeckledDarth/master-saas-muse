@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Users, DollarSign, CreditCard, UserPlus, MessageSquare, ListChecks, TrendingDown, Target, ThumbsUp, BarChart3, Send, Bell, Share2 } from 'lucide-react'
+import { Loader2, Users, DollarSign, CreditCard, UserPlus, MessageSquare, ListChecks, TrendingDown, Target, ThumbsUp, BarChart3, Send, Bell } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
@@ -30,15 +30,6 @@ interface MetricsData {
   alertThresholds?: {
     alertChurnThreshold?: number
     alertMinMonthlyUsers?: number
-  }
-  socialMetrics?: {
-    socialModuleEnabled: boolean
-    currentTier: string
-    totalPosts: number
-    postsThisMonth: number
-    scheduledPosts: number
-    connectedAccounts: number
-    aiGeneratedPosts: number
   }
 }
 
@@ -362,72 +353,6 @@ export default function MetricsPage() {
           </CardContent>
         </Card>
       </div>
-      {metrics?.socialMetrics?.socialModuleEnabled && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Current Tier:</span>
-            <Badge variant="default" data-testid="badge-social-tier">
-              {metrics.socialMetrics.currentTier === 'power' ? 'Power' : 'Universal'}
-            </Badge>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card data-testid="card-social-total-posts">
-            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Social Posts</CardTitle>
-              <Share2 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" data-testid="text-social-total-posts">{metrics.socialMetrics.totalPosts}</div>
-              <p className="text-xs text-muted-foreground">Total generated</p>
-            </CardContent>
-          </Card>
-
-          <Card data-testid="card-social-posts-month">
-            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Posts This Month</CardTitle>
-              <Share2 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" data-testid="text-social-posts-month">{metrics.socialMetrics.postsThisMonth}</div>
-              <p className="text-xs text-muted-foreground">Created this month</p>
-            </CardContent>
-          </Card>
-
-          <Card data-testid="card-social-scheduled">
-            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Scheduled</CardTitle>
-              <Share2 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" data-testid="text-social-scheduled">{metrics.socialMetrics.scheduledPosts}</div>
-              <p className="text-xs text-muted-foreground">Pending posts</p>
-            </CardContent>
-          </Card>
-
-          <Card data-testid="card-social-accounts">
-            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Connected Accounts</CardTitle>
-              <Share2 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" data-testid="text-social-accounts">{metrics.socialMetrics.connectedAccounts}</div>
-              <p className="text-xs text-muted-foreground">Active connections</p>
-            </CardContent>
-          </Card>
-
-          <Card data-testid="card-social-ai-generated">
-            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">AI Generated</CardTitle>
-              <Share2 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" data-testid="text-social-ai-generated">{metrics.socialMetrics.aiGeneratedPosts}</div>
-              <p className="text-xs text-muted-foreground">AI-created posts</p>
-            </CardContent>
-          </Card>
-        </div>
-        </div>
-      )}
     </div>
   )
 }

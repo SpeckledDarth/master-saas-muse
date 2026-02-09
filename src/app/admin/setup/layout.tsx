@@ -2,9 +2,8 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { Palette, FileText, BookOpen, DollarSign, Globe, Settings, Save, Check, Loader2, Scale, MessageCircle, Shield, Share2, KeyRound } from 'lucide-react'
+import { Palette, FileText, BookOpen, DollarSign, Globe, Settings, Save, Check, Loader2, Scale, MessageCircle, Shield, KeyRound } from 'lucide-react'
 import { SetupSettingsProvider, useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
@@ -24,21 +23,6 @@ const coreSections = [
 function SetupLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const ctx = useSetupSettingsContext()
-  const initializedRef = useRef(false)
-  const [savedSocialEnabled, setSavedSocialEnabled] = useState(false)
-
-  useEffect(() => {
-    if (!ctx.loading && !initializedRef.current) {
-      initializedRef.current = true
-      setSavedSocialEnabled(ctx.settings?.features?.socialModuleEnabled ?? false)
-    }
-  }, [ctx.loading, ctx.settings?.features?.socialModuleEnabled])
-
-  useEffect(() => {
-    if (ctx.saved) {
-      setSavedSocialEnabled(ctx.settings?.features?.socialModuleEnabled ?? false)
-    }
-  }, [ctx.saved, ctx.settings?.features?.socialModuleEnabled])
 
   if (ctx.loading) {
     return (
@@ -47,8 +31,6 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
       </div>
     )
   }
-
-  const isMuseSocialActive = pathname === '/admin/setup/musesocial'
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl">
@@ -91,23 +73,6 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
                 </Link>
               )
             })}
-
-            {savedSocialEnabled && (
-              <>
-                <div className="border-t my-3" />
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 pb-1">Modules</p>
-                <Link href="/admin/setup/musesocial">
-                  <Button
-                    variant={isMuseSocialActive ? 'secondary' : 'ghost'}
-                    className={`w-full justify-start ${!isMuseSocialActive ? 'text-primary' : ''}`}
-                    data-testid="tab-musesocial"
-                  >
-                    <Share2 className="h-4 w-4 mr-2" />
-                    MuseSocial
-                  </Button>
-                </Link>
-              </>
-            )}
           </div>
         </nav>
 
