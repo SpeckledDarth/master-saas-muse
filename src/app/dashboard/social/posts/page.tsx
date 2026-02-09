@@ -11,8 +11,10 @@ import { Switch } from '@/components/ui/switch'
 import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Trash2, Edit } from 'lucide-react'
+import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Trash2, Edit, FileText, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { PostPreview } from '@/components/social/post-preview'
+import { BulkImport } from '@/components/social/bulk-import'
 
 type PostStatus = 'draft' | 'scheduled' | 'posting' | 'posted' | 'failed'
 
@@ -34,6 +36,7 @@ interface SocialPost {
 const PLATFORM_LIMITS: Record<string, number> = {
   twitter: 280,
   linkedin: 3000,
+  facebook: 63206,
 }
 
 const STATUS_TABS: { label: string; value: string }[] = [
@@ -63,6 +66,7 @@ function PlatformIcon({ platform, className }: { platform: string; className?: s
 export default function SocialPostsPage() {
   const [posts, setPosts] = useState<SocialPost[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('all')
   const [moduleDisabled, setModuleDisabled] = useState(false)
   const { toast } = useToast()
@@ -103,7 +107,7 @@ export default function SocialPostsPage() {
       const data = await res.json()
       setPosts(data.posts || [])
     } catch {
-      toast({ title: 'Error', description: 'Could not load posts', variant: 'destructive' })
+      setError('Could not load posts. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -261,6 +265,23 @@ export default function SocialPostsPage() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="container mx-auto max-w-4xl py-8 px-4">
+        <Card data-testid="error-state-posts">
+          <CardContent className="py-12 text-center">
+            <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium">Something went wrong</h3>
+            <p className="text-muted-foreground mt-1">{error}</p>
+            <Button className="mt-4" onClick={() => { setError(null); setLoading(true); fetchPosts() }} data-testid="button-retry-posts">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   if (moduleDisabled) {
     return (
       <div className="container mx-auto max-w-4xl py-8 px-4">
@@ -287,13 +308,15 @@ export default function SocialPostsPage() {
             Create, schedule, and manage your social media posts
           </p>
         </div>
-        <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-generate-ai">
-              <Sparkles className="mr-2 h-4 w-4" />
-              Generate with AI
-            </Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2 flex-wrap">
+          <BulkImport onImported={() => { setLoading(true); fetchPosts() }} />
+          <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
+            <DialogTrigger asChild>
+              <Button data-testid="button-generate-ai">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Generate with AI
+              </Button>
+            </DialogTrigger>
           <DialogContent className="sm:max-w-lg" data-testid="dialog-ai-generate">
             <DialogHeader>
               <DialogTitle data-testid="text-ai-dialog-title">Generate Post with AI</DialogTitle>
@@ -391,7 +414,8 @@ export default function SocialPostsPage() {
               </div>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <Card className="mb-6" data-testid="card-create-post">
@@ -465,6 +489,15 @@ export default function SocialPostsPage() {
         </CardContent>
       </Card>
 
+      {content.trim() && (
+        <div className="mb-6" data-testid="section-post-preview">
+          <PostPreview
+            content={content}
+            platform={platform as 'twitter' | 'linkedin' | 'facebook'}
+          />
+        </div>
+      )}
+
       <div className="flex gap-2 mb-4 flex-wrap">
         {STATUS_TABS.map(tab => (
           <Button
@@ -481,9 +514,15 @@ export default function SocialPostsPage() {
       </div>
 
       {posts.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center text-muted-foreground" data-testid="text-no-posts">
-            No posts found. Create your first post above!
+        <Card data-testid="empty-state-posts">
+          <CardContent className="py-12 text-center">
+            <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium" data-testid="text-no-posts">No posts yet</h3>
+            <p className="text-muted-foreground mt-1">
+              {activeTab === 'all'
+                ? 'Create your first social media post using the form above.'
+                : `No ${activeTab} posts found. Try a different filter or create a new post.`}
+            </p>
           </CardContent>
         </Card>
       ) : (

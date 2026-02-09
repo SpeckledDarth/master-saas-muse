@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Save, Sparkles, Plus, X as XIcon } from 'lucide-react'
+import { Loader2, Save, Sparkles, Plus, X as XIcon, Palette, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface BrandPreferences {
@@ -55,7 +55,9 @@ const FREQUENCY_OPTIONS = [
 export default function BrandPreferencesPage() {
   const [prefs, setPrefs] = useState<BrandPreferences>(DEFAULT_PREFS)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [hasExisting, setHasExisting] = useState(false)
   const [newSampleUrl, setNewSampleUrl] = useState('')
   const { toast } = useToast()
 
@@ -71,16 +73,14 @@ export default function BrandPreferencesPage() {
           sample_urls: data.preferences.sample_urls || [],
           preferred_platforms: data.preferences.preferred_platforms || [],
         })
+        setHasExisting(true)
       }
     } catch {
-      toast({
-        title: 'Note',
-        description: 'Brand preferences not set up yet. Fill in the form below to get started.',
-      })
+      setError('Could not load brand preferences. Please try again.')
     } finally {
       setLoading(false)
     }
-  }, [toast])
+  }, [])
 
   useEffect(() => {
     fetchPreferences()
@@ -138,6 +138,23 @@ export default function BrandPreferencesPage() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="container max-w-2xl mx-auto py-8 px-4">
+        <Card data-testid="error-state-brand">
+          <CardContent className="py-12 text-center">
+            <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium">Something went wrong</h3>
+            <p className="text-muted-foreground mt-1">{error}</p>
+            <Button className="mt-4" onClick={() => { setError(null); setLoading(true); fetchPreferences() }} data-testid="button-retry-brand">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="container max-w-2xl mx-auto py-8 px-4 space-y-6">
       <div>
@@ -146,6 +163,18 @@ export default function BrandPreferencesPage() {
           Tell us about your brand so AI-generated posts match your voice and audience.
         </p>
       </div>
+
+      {!hasExisting && (
+        <Card data-testid="empty-state-brand">
+          <CardContent className="py-8 text-center">
+            <Palette className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium">No brand preferences set</h3>
+            <p className="text-muted-foreground mt-1">
+              Fill in the form below to personalize AI-generated content to match your brand voice and audience.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

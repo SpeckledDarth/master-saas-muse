@@ -1,3 +1,5 @@
+import { checkApiRateLimit, recordApiCall } from '@/lib/social/api-rate-limiter'
+
 export type SocialPlatform = 'twitter' | 'linkedin' | 'instagram' | 'youtube' | 'facebook' | 'tiktok' | 'reddit' | 'pinterest' | 'snapchat' | 'discord'
 
 export interface SocialAccount {
@@ -81,6 +83,11 @@ export class LinkedInClient implements PlatformClient {
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    const rateLimitCheck = checkApiRateLimit('linkedin', 'post')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
+
     try {
       const profile = await this.getUserProfile(accessToken)
       if (!profile) return null
@@ -132,6 +139,8 @@ export class LinkedInClient implements PlatformClient {
       const postUrn = response.headers.get('x-restli-id') || ''
       const postId = postUrn.replace('urn:li:ugcPost:', '')
 
+      recordApiCall('linkedin', 'post')
+
       return {
         postId: postUrn || postId,
         url: `https://www.linkedin.com/feed/update/${encodeURIComponent(postUrn)}`,
@@ -143,6 +152,11 @@ export class LinkedInClient implements PlatformClient {
   }
 
   async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    const rateLimitCheck = checkApiRateLimit('linkedin', 'read')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
+
     try {
       const encodedUrn = encodeURIComponent(postId)
       const response = await fetch(
@@ -159,6 +173,9 @@ export class LinkedInClient implements PlatformClient {
         return { likes: 0, comments: 0, shares: 0, impressions: 0 }
       }
       const data = await response.json()
+
+      recordApiCall('linkedin', 'read')
+
       return {
         likes: data.likesSummary?.totalLikes || 0,
         comments: data.commentsSummary?.totalFirstLevelComments || 0,
@@ -224,6 +241,11 @@ export class TwitterClient implements PlatformClient {
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    const rateLimitCheck = checkApiRateLimit('twitter', 'post')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
+
     try {
       const body: any = { text: content }
 
@@ -251,6 +273,8 @@ export class TwitterClient implements PlatformClient {
       const profile = await this.getUserProfile(accessToken)
       const username = profile?.username || 'i'
 
+      recordApiCall('twitter', 'post')
+
       return {
         postId: tweetId,
         url: `https://x.com/${username}/status/${tweetId}`,
@@ -262,6 +286,11 @@ export class TwitterClient implements PlatformClient {
   }
 
   async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    const rateLimitCheck = checkApiRateLimit('twitter', 'read')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
+
     try {
       const response = await fetch(
         `${this.baseUrl}/tweets/${postId}?tweet.fields=public_metrics`,
@@ -276,6 +305,9 @@ export class TwitterClient implements PlatformClient {
       const json = await response.json()
       const metrics = json.data?.public_metrics
       if (!metrics) return { likes: 0, retweets: 0, replies: 0, impressions: 0 }
+
+      recordApiCall('twitter', 'read')
+
       return {
         likes: metrics.like_count || 0,
         retweets: metrics.retweet_count || 0,
@@ -337,6 +369,11 @@ export class FacebookClient implements PlatformClient {
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    const rateLimitCheck = checkApiRateLimit('facebook', 'post')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
+
     try {
       const pagesResponse = await fetch(
         `${this.graphUrl}/me/accounts?fields=id,name,access_token&access_token=${accessToken}`,
@@ -385,6 +422,8 @@ export class FacebookClient implements PlatformClient {
       const data = await response.json()
       const postId = data.id
 
+      recordApiCall('facebook', 'post')
+
       return {
         postId: postId || '',
         url: `https://www.facebook.com/${postId?.replace('_', '/posts/')}`,
@@ -396,6 +435,11 @@ export class FacebookClient implements PlatformClient {
   }
 
   async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    const rateLimitCheck = checkApiRateLimit('facebook', 'read')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
+
     try {
       const response = await fetch(
         `${this.graphUrl}/${postId}?fields=likes.summary(true),comments.summary(true),shares&access_token=${accessToken}`,
@@ -405,6 +449,9 @@ export class FacebookClient implements PlatformClient {
         return { likes: 0, comments: 0, shares: 0, reach: 0 }
       }
       const data = await response.json()
+
+      recordApiCall('facebook', 'read')
+
       return {
         likes: data.likes?.summary?.total_count || 0,
         comments: data.comments?.summary?.total_count || 0,
@@ -433,8 +480,22 @@ export class InstagramClient implements PlatformClient {
   }
 
   async getUserProfile(accessToken: string) { return null }
-  async createPost(accessToken: string, content: string) { return null }
-  async getPostEngagement(accessToken: string, postId: string) { return {} }
+
+  async createPost(accessToken: string, content: string) {
+    const rateLimitCheck = checkApiRateLimit('instagram', 'post')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
+    return null
+  }
+
+  async getPostEngagement(accessToken: string, postId: string) {
+    const rateLimitCheck = checkApiRateLimit('instagram', 'read')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
+    return {}
+  }
   async checkHealth(): Promise<{ healthy: boolean; latencyMs: number }> {
     return { healthy: false, latencyMs: 0 }
   }
@@ -457,10 +518,18 @@ export class YouTubeClient implements PlatformClient {
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    const rateLimitCheck = checkApiRateLimit('youtube', 'post')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return null
   }
 
   async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    const rateLimitCheck = checkApiRateLimit('youtube', 'read')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return { views: 0, likes: 0, comments: 0, shares: 0 }
   }
 
@@ -492,10 +561,18 @@ export class TikTokClient implements PlatformClient {
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    const rateLimitCheck = checkApiRateLimit('tiktok', 'post')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return null
   }
 
   async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    const rateLimitCheck = checkApiRateLimit('tiktok', 'read')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return { views: 0, likes: 0, comments: 0, shares: 0 }
   }
 
@@ -527,10 +604,18 @@ export class RedditClient implements PlatformClient {
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    const rateLimitCheck = checkApiRateLimit('reddit', 'post')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return null
   }
 
   async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    const rateLimitCheck = checkApiRateLimit('reddit', 'read')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return { upvotes: 0, downvotes: 0, comments: 0, awards: 0 }
   }
 
@@ -562,10 +647,18 @@ export class PinterestClient implements PlatformClient {
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    const rateLimitCheck = checkApiRateLimit('pinterest', 'post')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return null
   }
 
   async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    const rateLimitCheck = checkApiRateLimit('pinterest', 'read')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return { saves: 0, clicks: 0, impressions: 0, closeups: 0 }
   }
 
@@ -597,10 +690,18 @@ export class SnapchatClient implements PlatformClient {
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    const rateLimitCheck = checkApiRateLimit('snapchat', 'post')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return null
   }
 
   async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    const rateLimitCheck = checkApiRateLimit('snapchat', 'read')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return { views: 0, screenshots: 0, replies: 0 }
   }
 
@@ -632,10 +733,18 @@ export class DiscordClient implements PlatformClient {
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
+    const rateLimitCheck = checkApiRateLimit('discord', 'post')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return null
   }
 
   async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
+    const rateLimitCheck = checkApiRateLimit('discord', 'read')
+    if (!rateLimitCheck.allowed) {
+      throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
+    }
     return { reactions: 0, replies: 0, pins: 0 }
   }
 

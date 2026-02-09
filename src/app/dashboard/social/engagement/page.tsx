@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, BarChart3, TrendingUp, Users, Sparkles } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Loader2, BarChart3, TrendingUp, Users, Sparkles, AlertCircle } from 'lucide-react'
 import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
+import Link from 'next/link'
 import {
   BarChart,
   Bar,
@@ -55,6 +57,7 @@ function getEngagementCore(data: Record<string, number> | null | undefined): num
 export default function EngagementAnalyticsPage() {
   const [posts, setPosts] = useState<SocialPost[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -63,7 +66,7 @@ export default function EngagementAnalyticsPage() {
       const data = await res.json()
       setPosts(data.posts || [])
     } catch {
-      setPosts([])
+      setError('Could not load engagement data. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -81,18 +84,38 @@ export default function EngagementAnalyticsPage() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="container max-w-5xl mx-auto py-8 px-4">
+        <Card data-testid="error-state-engagement">
+          <CardContent className="py-12 text-center">
+            <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium">Something went wrong</h3>
+            <p className="text-muted-foreground mt-1">{error}</p>
+            <Button className="mt-4" onClick={() => { setError(null); setLoading(true); fetchPosts() }} data-testid="button-retry-engagement">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   if (posts.length === 0) {
     return (
       <div className="container max-w-5xl mx-auto py-8 px-4">
         <h1 className="text-2xl font-bold mb-2" data-testid="text-page-title">Engagement Analytics</h1>
         <p className="text-muted-foreground mb-6">Track your social media performance and engagement metrics.</p>
-        <Card>
+        <Card data-testid="empty-state-engagement">
           <CardContent className="py-12 text-center">
             <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium" data-testid="text-empty-state">No posts yet</h3>
+            <h3 className="text-lg font-medium" data-testid="text-empty-state">No engagement data</h3>
             <p className="text-muted-foreground mt-1">
               Create and publish social media posts to start tracking engagement analytics.
             </p>
+            <Button className="mt-4" asChild data-testid="button-create-post-engagement">
+              <Link href="/dashboard/social/posts">Create Your First Post</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>

@@ -89,11 +89,18 @@ SocioScheduler is a standalone SaaS product built ON TOP of MuseKit (not a toggl
 - Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) uses the product registry (`getUserProductTier(userId, 'socio-scheduler')`) with legacy fallback to direct Stripe metadata lookup. Tier definitions stored in product registry as `tierDefinitions`
 - OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
 - Token encryption at rest via AES-256-GCM (`src/lib/social/crypto.ts`), key in `SOCIAL_ENCRYPTION_KEY` secret
+- Automatic OAuth token refresh for LinkedIn and Twitter (`src/lib/social/token-refresh.ts`), integrated into post publishing flow
+- Platform API rate limiting (`src/lib/social/api-rate-limiter.ts`) - respects per-platform API limits (Twitter 300/3hrs, LinkedIn 100/day, Facebook 200/hr)
 - Scheduled post processing via Vercel cron (`/api/social/cron/process-scheduled`, every 5 min)
 - Engagement data pull via Vercel cron (`/api/social/cron/pull-engagement`, every 6 hours)
+- Email notifications for post success/failure (`src/lib/social/email-notifications.ts`)
+- Trend alert emails with approve/edit/ignore actions (`src/lib/social/trend-alerts.ts`, `/api/social/trend-alerts`)
+- Post preview component showing platform-specific rendering (`src/components/social/post-preview.tsx`)
+- Bulk scheduling via CSV import (`src/components/social/bulk-import.tsx`, `/api/social/bulk-import`)
 - Engagement analytics dashboard with Recharts charts (`/dashboard/social/engagement`)
 - Calendar view with month-grid showing scheduled posts (`/dashboard/social/calendar`)
 - 7-page social dashboard: overview, calendar, engagement, queue, posts, brand preferences, onboarding
+- 4-step onboarding wizard per PRD (connect accounts, brand voice, posting prefs, confirmation)
 - Quick Generate dialog, SocialUpgradeBanner component, 15 niche-specific AI prompts
 - Admin-configurable engagement pull settings (intervalHours/lookbackHours, 1-168h range)
 - Queue job plugin pattern: social types/processors in `src/lib/social/queue-jobs.ts`, core delegates via dynamic import

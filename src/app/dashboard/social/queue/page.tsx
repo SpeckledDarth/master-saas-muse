@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Loader2, Check, X as XIcon, Edit2, Send, Clock, Sparkles, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
+import Link from 'next/link'
 
 interface QueuePost {
   id: string
@@ -38,6 +39,7 @@ const PLATFORM_NAMES: Record<string, string> = {
 export default function ApprovalQueuePage() {
   const [posts, setPosts] = useState<QueuePost[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
@@ -50,15 +52,11 @@ export default function ApprovalQueuePage() {
       const data = await res.json()
       setPosts(data.posts || [])
     } catch {
-      toast({
-        title: 'Error',
-        description: 'Could not load approval queue',
-        variant: 'destructive',
-      })
+      setError('Could not load approval queue. Please try again.')
     } finally {
       setLoading(false)
     }
-  }, [toast])
+  }, [])
 
   useEffect(() => {
     fetchQueue()
@@ -124,6 +122,23 @@ export default function ApprovalQueuePage() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="container max-w-3xl mx-auto py-8 px-4">
+        <Card data-testid="error-state-queue">
+          <CardContent className="py-12 text-center">
+            <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium">Something went wrong</h3>
+            <p className="text-muted-foreground mt-1">{error}</p>
+            <Button className="mt-4" onClick={() => { setError(null); setLoading(true); fetchQueue() }} data-testid="button-retry-queue">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <>
     <SocialUpgradeBanner />
@@ -136,13 +151,16 @@ export default function ApprovalQueuePage() {
       </div>
 
       {posts.length === 0 ? (
-        <Card>
+        <Card data-testid="empty-state-queue">
           <CardContent className="py-12 text-center">
             <Clock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium" data-testid="text-empty-queue">Queue is empty</h3>
             <p className="text-muted-foreground mt-1">
               No posts waiting for review. AI-generated posts will appear here when approval is required.
             </p>
+            <Button className="mt-4" asChild data-testid="button-generate-post-queue">
+              <Link href="/dashboard/social/posts">Create a Post</Link>
+            </Button>
           </CardContent>
         </Card>
       ) : (

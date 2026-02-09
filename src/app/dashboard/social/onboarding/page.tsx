@@ -2,13 +2,14 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
+import { Separator } from '@/components/ui/separator'
 import {
   Check,
   ChevronRight,
@@ -22,6 +23,7 @@ import {
   Linkedin,
   Twitter,
   Loader2,
+  ArrowRight,
 } from 'lucide-react'
 
 const STEPS = [
@@ -154,8 +156,39 @@ function OnboardingContent() {
     }
   }
 
+  async function savePostingPreferences() {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/social/posting-preferences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          frequency: postingPrefs.frequency,
+          require_approval: postingPrefs.requireApproval,
+          auto_hashtags: postingPrefs.autoHashtags,
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        if (data.error?.includes('migration')) {
+          toast({ title: 'Preferences noted', description: 'Your preferences will be saved after database setup is complete.' })
+        } else {
+          toast({ title: 'Warning', description: 'Could not save preferences to server, but you can continue.', variant: 'destructive' })
+        }
+      } else {
+        toast({ title: 'Saved', description: 'Posting preferences saved successfully.' })
+      }
+      setCurrentStep(4)
+    } catch {
+      toast({ title: 'Warning', description: 'Could not save preferences to server, but you can continue.', variant: 'destructive' })
+      setCurrentStep(4)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   function finishOnboarding() {
-    router.push('/dashboard/social')
+    router.push('/dashboard/social/overview')
   }
 
   const canProceed = (step: number) => {
@@ -434,8 +467,13 @@ function OnboardingContent() {
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
-              <Button onClick={() => setCurrentStep(4)} data-testid="button-next-step-3">
-                Next
+              <Button
+                onClick={savePostingPreferences}
+                disabled={loading}
+                data-testid="button-next-step-3"
+              >
+                {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Save & Next
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -445,55 +483,83 @@ function OnboardingContent() {
 
       {currentStep === 4 && (
         <Card>
-          <CardHeader>
-            <CardTitle data-testid="text-step-title">You&apos;re All Set</CardTitle>
-            <CardDescription>
-              Here&apos;s a summary of your setup. You can change any of these later in settings.
+          <CardHeader className="text-center pb-2">
+            <div className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3">
+              <Sparkles className="h-6 w-6 text-primary" />
+            </div>
+            <CardTitle className="text-xl" data-testid="text-step-title">You&apos;re All Set!</CardTitle>
+            <CardDescription className="text-base" data-testid="text-motivational-message">
+              SocioScheduler will start working for you. Your social media presence is about to grow.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <Separator />
+            <p className="text-sm font-medium text-muted-foreground">Setup Summary</p>
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Platforms</span>
-                <div className="flex gap-1">
-                  {connectedPlatforms.map(p => (
-                    <Badge key={p} variant="secondary" data-testid={`badge-summary-platform-${p}`}>
-                      {p}
-                    </Badge>
-                  ))}
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <span className="text-sm text-muted-foreground">Connected Platforms</span>
+                <div className="flex gap-1 flex-wrap">
+                  {connectedPlatforms.length > 0 ? connectedPlatforms.map(p => {
+                    const platformInfo = PLATFORMS.find(pl => pl.id === p)
+                    return (
+                      <Badge key={p} variant="secondary" data-testid={`badge-summary-platform-${p}`}>
+                        {platformInfo ? platformInfo.name : p}
+                      </Badge>
+                    )
+                  }) : (
+                    <span className="text-sm text-muted-foreground" data-testid="text-summary-no-platforms">None connected</span>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Tone</span>
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <span className="text-sm text-muted-foreground">Brand Voice</span>
                 <span className="text-sm font-medium capitalize" data-testid="text-summary-tone">{brandPrefs.tone || 'Not set'}</span>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
                 <span className="text-sm text-muted-foreground">Niche</span>
                 <span className="text-sm font-medium" data-testid="text-summary-niche">{brandPrefs.niche || 'Not set'}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Frequency</span>
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <span className="text-sm text-muted-foreground">Posting Frequency</span>
                 <span className="text-sm font-medium" data-testid="text-summary-frequency">{postingPrefs.frequency}</span>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
                 <span className="text-sm text-muted-foreground">Review before posting</span>
                 <Badge variant={postingPrefs.requireApproval ? 'default' : 'outline'} data-testid="badge-summary-approval">
                   {postingPrefs.requireApproval ? 'Yes' : 'No'}
                 </Badge>
               </div>
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <span className="text-sm text-muted-foreground">Auto-hashtags</span>
+                <Badge variant={postingPrefs.autoHashtags ? 'default' : 'outline'} data-testid="badge-summary-hashtags">
+                  {postingPrefs.autoHashtags ? 'On' : 'Off'}
+                </Badge>
+              </div>
             </div>
-
-            <div className="flex justify-between pt-4">
-              <Button variant="outline" onClick={() => setCurrentStep(3)} data-testid="button-back-step-4">
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Back
-              </Button>
-              <Button onClick={finishOnboarding} data-testid="button-finish-onboarding">
-                <Sparkles className="h-4 w-4 mr-2" />
-                Go to Dashboard
-              </Button>
-            </div>
+            <Separator />
+            <p className="text-xs text-muted-foreground text-center">
+              You can update any of these settings later from your dashboard.
+            </p>
           </CardContent>
+          <CardFooter className="flex flex-col gap-3 pt-0">
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={finishOnboarding}
+              data-testid="button-go-to-dashboard"
+            >
+              Go to Dashboard
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setCurrentStep(3)}
+              data-testid="button-back-step-4"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Back to Preferences
+            </Button>
+          </CardFooter>
         </Card>
       )}
     </div>

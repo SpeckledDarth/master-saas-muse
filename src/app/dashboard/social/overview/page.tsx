@@ -83,9 +83,11 @@ function isToday(dateStr: string): boolean {
 
 export default function SocialOverviewPage() {
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [postsThisMonth, setPostsThisMonth] = useState(0)
   const [aiGensToday, setAiGensToday] = useState(0)
   const [connectedPlatforms, setConnectedPlatforms] = useState(0)
+  const [totalPosts, setTotalPosts] = useState(0)
   const [tierName, setTierName] = useState('Starter')
   const [monthlyPostLimit, setMonthlyPostLimit] = useState<number | null>(null)
   const [quickGenOpen, setQuickGenOpen] = useState(false)
@@ -96,32 +98,44 @@ export default function SocialOverviewPage() {
   const { toast } = useToast()
 
   const fetchData = useCallback(async () => {
-    const results = await Promise.allSettled([
-      fetch('/api/social/posts?limit=200').then(r => r.ok ? r.json() : Promise.reject()),
-      fetch('/api/social/accounts').then(r => r.ok ? r.json() : Promise.reject()),
-      fetch('/api/social/tier').then(r => r.ok ? r.json() : Promise.reject()),
-    ])
+    try {
+      const results = await Promise.allSettled([
+        fetch('/api/social/posts?limit=200').then(r => r.ok ? r.json() : Promise.reject()),
+        fetch('/api/social/accounts').then(r => r.ok ? r.json() : Promise.reject()),
+        fetch('/api/social/tier').then(r => r.ok ? r.json() : Promise.reject()),
+      ])
 
-    if (results[0].status === 'fulfilled') {
-      const posts: SocialPost[] = results[0].value.posts || []
-      setPostsThisMonth(posts.filter(p => isCurrentMonth(p.created_at)).length)
-      setAiGensToday(posts.filter(p => p.ai_generated && isToday(p.created_at)).length)
-    }
-
-    if (results[1].status === 'fulfilled') {
-      const accounts: SocialAccount[] = results[1].value.accounts || []
-      setConnectedPlatforms(accounts.length)
-    }
-
-    if (results[2].status === 'fulfilled') {
-      const tierInfo: TierInfo = results[2].value
-      setTierName(TIER_DISPLAY[tierInfo.tier] || tierInfo.tier)
-      if (tierInfo.limits?.monthlyPosts && tierInfo.limits.monthlyPosts < 999999) {
-        setMonthlyPostLimit(tierInfo.limits.monthlyPosts)
+      const allFailed = results.every(r => r.status === 'rejected')
+      if (allFailed) {
+        setError('Could not load dashboard data. Please try again.')
+        setLoading(false)
+        return
       }
-    }
 
-    setLoading(false)
+      if (results[0].status === 'fulfilled') {
+        const posts: SocialPost[] = results[0].value.posts || []
+        setTotalPosts(posts.length)
+        setPostsThisMonth(posts.filter(p => isCurrentMonth(p.created_at)).length)
+        setAiGensToday(posts.filter(p => p.ai_generated && isToday(p.created_at)).length)
+      }
+
+      if (results[1].status === 'fulfilled') {
+        const accounts: SocialAccount[] = results[1].value.accounts || []
+        setConnectedPlatforms(accounts.length)
+      }
+
+      if (results[2].status === 'fulfilled') {
+        const tierInfo: TierInfo = results[2].value
+        setTierName(TIER_DISPLAY[tierInfo.tier] || tierInfo.tier)
+        if (tierInfo.limits?.monthlyPosts && tierInfo.limits.monthlyPosts < 999999) {
+          setMonthlyPostLimit(tierInfo.limits.monthlyPosts)
+        }
+      }
+    } catch {
+      setError('Could not load dashboard data. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {
@@ -160,6 +174,56 @@ export default function SocialOverviewPage() {
       <div className="flex items-center justify-center min-h-[400px]" data-testid="loading-spinner">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container max-w-4xl mx-auto py-8 px-4">
+        <Card data-testid="error-state-overview">
+          <CardContent className="py-12 text-center">
+            <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium">Something went wrong</h3>
+            <p className="text-muted-foreground mt-1">{error}</p>
+            <Button className="mt-4" onClick={() => { setError(null); setLoading(true); fetchData() }} data-testid="button-retry-overview">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (totalPosts === 0 && connectedPlatforms === 0) {
+    return (
+      <>
+      <SocialUpgradeBanner />
+      <div className="container max-w-4xl mx-auto py-8 px-4 space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold" data-testid="text-page-title">Social Dashboard</h1>
+          <p className="text-muted-foreground mt-1" data-testid="text-page-subtitle">
+            Your social media overview at a glance
+          </p>
+        </div>
+        <Card data-testid="empty-state-overview">
+          <CardContent className="py-12 text-center">
+            <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium">No posts or accounts yet</h3>
+            <p className="text-muted-foreground mt-1">
+              Get started by creating your first post or connecting a social media account.
+            </p>
+            <div className="flex items-center justify-center gap-3 mt-4 flex-wrap">
+              <Button asChild data-testid="button-create-first-post">
+                <Link href="/dashboard/social/posts">Create Your First Post</Link>
+              </Button>
+              <Button variant="outline" asChild data-testid="button-set-brand">
+                <Link href="/dashboard/social/brand">Set Up Brand</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      </>
     )
   }
 

@@ -38,6 +38,7 @@ export type SocialJobData = SocialPostJobData | SocialHealthCheckJobData | Socia
 
 export async function processSocialPostJob(job: Job<SocialPostJobData>): Promise<void> {
   console.log(`[Queue] Processing social post for ${job.data.platform}: ${job.data.postId}`)
+  let failureEmailSent = false
 
   try {
     const { getPlatformClient } = await import('@/lib/social/client')
@@ -45,9 +46,11 @@ export async function processSocialPostJob(job: Job<SocialPostJobData>): Promise
     const { createClient } = await import('@supabase/supabase-js')
     const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
+    const { refreshAccessToken } = await import('@/lib/social/token-refresh')
+
     const { data: account } = await admin
       .from('social_accounts')
-      .select('access_token_encrypted')
+      .select('access_token_encrypted, refresh_token_encrypted')
       .eq('user_id', job.data.userId)
       .eq('platform', job.data.platform)
       .eq('is_valid', true)
@@ -58,8 +61,25 @@ export async function processSocialPostJob(job: Job<SocialPostJobData>): Promise
       throw new Error(`No valid ${job.data.platform} account for user ${job.data.userId}`)
     }
 
-    const accessToken = decryptToken(account.access_token_encrypted)
+    let accessToken = decryptToken(account.access_token_encrypted)
     const client = getPlatformClient(job.data.platform as SocialPlatform)
+
+    const validation = await client.validateToken(accessToken)
+    if (!validation.valid) {
+      if (account.refresh_token_encrypted) {
+        const newToken = await refreshAccessToken(job.data.platform, job.data.userId, account.refresh_token_encrypted)
+        if (newToken) {
+          accessToken = newToken
+        } else {
+          await admin.from('social_posts').update({ status: 'failed', error_message: 'Token expired, please reconnect your account' }).eq('id', job.data.postId)
+          throw new Error(`Token expired for ${job.data.platform} account, user ${job.data.userId}`)
+        }
+      } else {
+        await admin.from('social_posts').update({ status: 'failed', error_message: 'Token expired, please reconnect your account' }).eq('id', job.data.postId)
+        throw new Error(`Token expired for ${job.data.platform} account, user ${job.data.userId}`)
+      }
+    }
+
     const result = await client.createPost(accessToken, job.data.content, job.data.mediaUrls)
 
     if (result) {
@@ -69,12 +89,71 @@ export async function processSocialPostJob(job: Job<SocialPostJobData>): Promise
         platform_post_id: result.postId,
       }).eq('id', job.data.postId)
       console.log(`[Queue] Social post published: ${result.postId}`)
+
+      try {
+        const { sendPostPublishedEmail } = await import('@/lib/social/email-notifications')
+        const { data: { user } } = await admin.auth.admin.getUserById(job.data.userId)
+        if (user?.email) {
+          const emailResult = await sendPostPublishedEmail(
+            user.email,
+            user.user_metadata?.full_name || user.user_metadata?.name || '',
+            job.data.platform,
+            job.data.content,
+            result.url
+          )
+          console.log(`[Queue] Post success email sent: ${emailResult.success}`)
+        }
+      } catch (emailErr) {
+        console.warn(`[Queue] Failed to send post success email:`, (emailErr as Error).message)
+      }
     } else {
       await admin.from('social_posts').update({ status: 'failed', error_message: 'Platform API returned null' }).eq('id', job.data.postId)
+
+      try {
+        const { sendPostFailedEmail } = await import('@/lib/social/email-notifications')
+        const { data: { user } } = await admin.auth.admin.getUserById(job.data.userId)
+        if (user?.email) {
+          const emailResult = await sendPostFailedEmail(
+            user.email,
+            user.user_metadata?.full_name || user.user_metadata?.name || '',
+            job.data.platform,
+            job.data.content,
+            'Platform API returned null'
+          )
+          console.log(`[Queue] Post failure email sent: ${emailResult.success}`)
+          failureEmailSent = true
+        }
+      } catch (emailErr) {
+        console.warn(`[Queue] Failed to send post failure email:`, (emailErr as Error).message)
+      }
+
       throw new Error('Platform createPost returned null')
     }
   } catch (err) {
-    console.error(`[Queue] Social post job failed:`, (err as Error).message)
+    const errorMessage = (err as Error).message
+    console.error(`[Queue] Social post job failed:`, errorMessage)
+
+    if (!failureEmailSent) {
+      try {
+        const { sendPostFailedEmail } = await import('@/lib/social/email-notifications')
+        const { createClient } = await import('@supabase/supabase-js')
+        const adminClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+        const { data: { user } } = await adminClient.auth.admin.getUserById(job.data.userId)
+        if (user?.email) {
+          const emailResult = await sendPostFailedEmail(
+            user.email,
+            user.user_metadata?.full_name || user.user_metadata?.name || '',
+            job.data.platform,
+            job.data.content,
+            errorMessage
+          )
+          console.log(`[Queue] Post failure email sent: ${emailResult.success}`)
+        }
+      } catch (emailErr) {
+        console.warn(`[Queue] Failed to send post failure email:`, (emailErr as Error).message)
+      }
+    }
+
     throw err
   }
 }

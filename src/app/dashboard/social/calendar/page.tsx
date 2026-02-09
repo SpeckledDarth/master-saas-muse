@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Loader2, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
+import { Loader2, ChevronLeft, ChevronRight, CalendarDays, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
+import Link from 'next/link'
 
 interface CalendarPost {
   id: string
@@ -62,6 +63,7 @@ function getFirstDayOfMonth(year: number, month: number): number {
 export default function SocialCalendarPage() {
   const [posts, setPosts] = useState<CalendarPost[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [platformFilter, setPlatformFilter] = useState<string | null>(null)
@@ -77,15 +79,11 @@ export default function SocialCalendarPage() {
       const data = await res.json()
       setPosts(data.posts || [])
     } catch {
-      toast({
-        title: 'Error',
-        description: 'Could not load social posts',
-        variant: 'destructive',
-      })
+      setError('Could not load social posts. Please try again.')
     } finally {
       setLoading(false)
     }
-  }, [toast])
+  }, [])
 
   useEffect(() => {
     fetchPosts()
@@ -174,6 +172,23 @@ export default function SocialCalendarPage() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="container max-w-4xl mx-auto py-8 px-4">
+        <Card data-testid="error-state-calendar">
+          <CardContent className="py-12 text-center">
+            <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium">Something went wrong</h3>
+            <p className="text-muted-foreground mt-1">{error}</p>
+            <Button className="mt-4" onClick={() => { setError(null); setLoading(true); fetchPosts() }} data-testid="button-retry-calendar">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <>
     <SocialUpgradeBanner />
@@ -210,13 +225,16 @@ export default function SocialCalendarPage() {
       )}
 
       {scheduledPosts.length === 0 ? (
-        <Card>
+        <Card data-testid="empty-state-calendar">
           <CardContent className="py-12 text-center">
             <CalendarDays className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium" data-testid="text-empty-calendar">No scheduled posts</h3>
             <p className="text-muted-foreground mt-1">
               You have no posts with a scheduled date. Create a post with a scheduled time to see it here.
             </p>
+            <Button className="mt-4" asChild data-testid="button-create-scheduled-post">
+              <Link href="/dashboard/social/posts">Create a Post</Link>
+            </Button>
           </CardContent>
         </Card>
       ) : (
