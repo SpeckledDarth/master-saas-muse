@@ -2,7 +2,7 @@
 
 **Version**: 5.0  
 **Date**: February 9, 2026  
-**Status**: MVP Complete + Post-MVP Features + MuseSocial Module + SocioScheduler Extension  
+**Status**: MVP Complete + Post-MVP Features + SocioScheduler Module + SocioScheduler Extension  
 
 ---
 
@@ -65,7 +65,7 @@ This document is the single source of truth for the Master SaaS Muse Template de
 | 18     | Internationalization     | NOT STARTED | v1.1     |
 | 19     | A/B Testing              | NOT STARTED | v1.1     |
 | 20     | **User Impersonation**   | **COMPLETE**| **v1.1** |
-| 21     | **MuseSocial Module**    | **COMPLETE**| **v1.1** |
+| 21     | **SocioScheduler Module**    | **COMPLETE**| **v1.1** |
 | 22     | Launch Plan Tools        | NOT STARTED | v1.1     |
 | 23     | Operations & Support     | NOT STARTED | v1.1     |
 | 24     | Multi-Role Dashboards    | NOT STARTED | v1.1     |
@@ -484,7 +484,7 @@ src/
 - [x] Waitlist management tests (10 tests)
 - [x] Feedback management tests (9 tests)
 - [x] Email template tests (10 tests)
-- [x] MuseSocial module tests (8 tests)
+- [x] SocioScheduler module tests (8 tests)
 - [x] Auth setup for authenticated admin testing
 - [x] `data-testid` attributes on all interactive elements
 - [x] Graceful skipping when no test data exists
@@ -501,7 +501,7 @@ tests/
 ├── waitlist.spec.ts             # Waitlist tests (10 tests)
 ├── feedback.spec.ts             # Feedback tests (9 tests)
 ├── email-templates.spec.ts      # Email template tests (10 tests)
-├── musesocial.spec.ts           # MuseSocial module tests (8 tests)
+├── socioscheduler.spec.ts           # SocioScheduler module tests (8 tests)
 └── run-tests.sh                 # Test runner script
 playwright.config.ts             # Playwright configuration
 ```
@@ -627,7 +627,7 @@ src/lib/rate-limit/index.ts
 - [x] Shared state management hook (`use-setup-settings.ts`)
 - [x] React context provider for cross-page state sharing
 - [x] Layout with sidebar navigation
-- [x] Sub-pages: branding, compliance, content, features, integrations, musesocial, pages, pricing, security, social, support
+- [x] Sub-pages: branding, compliance, content, features, integrations, socioscheduler, pages, pricing, security, social, support
 
 **Key Files**:
 ```
@@ -644,7 +644,7 @@ src/
     ├── social/page.tsx
     ├── features/page.tsx
     ├── integrations/page.tsx
-    └── musesocial/page.tsx
+    └── socioscheduler/page.tsx
 ```
 
 ---
@@ -822,7 +822,7 @@ src/lib/notifications/
 
 ---
 
-### Module 21: MuseSocial Module (Social Media Management)
+### Module 21: SocioScheduler Module (Social Media Management)
 **Estimated Time**: 3-4 days  
 **Dependencies**: Module 3, Module 16 (AI), Module 39 (Queue)  
 **Status**: COMPLETE (February 2026)
@@ -831,8 +831,8 @@ src/lib/notifications/
 - [x] Toggleable social media management extension
 - [x] Two tiers: Universal (basic posting, 10 AI generations/day, 20 posts/day) and Power (full features, 100 AI generations/day, 10,000 posts/day)
 - [x] 10 platform support: Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord
-- [x] Admin setup page at `/admin/setup/musesocial` with module enable/disable, tier selection, platform toggles
-- [x] Platform API Keys section on MuseSocial setup page with collapsible groups, inline edit/reveal/delete, status indicators
+- [x] Admin setup page at `/admin/setup/socioscheduler` with module enable/disable, tier selection, platform toggles
+- [x] Platform API Keys section on SocioScheduler setup page with collapsible groups, inline edit/reveal/delete, status indicators
 - [x] Social account connection for users at `/dashboard/social`
 - [x] AI-powered post generation with multimodal image support
 - [x] Post scheduling and management
@@ -855,7 +855,7 @@ src/
 │   ├── rate-limits.ts               # Tier-based rate limiting constants and check function
 │   └── n8n-templates/               # n8n workflow JSON templates
 ├── app/
-│   ├── admin/setup/musesocial/page.tsx  # Admin configuration + Platform API Keys
+│   ├── admin/setup/socioscheduler/page.tsx  # Admin configuration + Platform API Keys
 │   ├── dashboard/social/page.tsx        # User-facing social accounts page
 │   └── api/social/                      # Social API routes (accounts, posts, generate-post, health)
 ```
@@ -875,7 +875,7 @@ src/
 - [x] Required/Optional labels on each key (Supabase, Stripe, Resend = required; others = optional)
 - [x] Format validation on save (Stripe sk_ prefix, Supabase URL pattern, OpenAI sk- prefix, Sentry DSN, HTTPS URLs)
 - [x] Inline edit/reveal/delete with source badges (Dashboard vs Env Var)
-- [x] Social platform API keys moved to MuseSocial setup page (feature-gated)
+- [x] Social platform API keys moved to SocioScheduler setup page (feature-gated)
 - [x] API supports `?section=tech|social` query params for targeted fetching
 - [x] Keys stored in `config_secrets` database table, take effect immediately
 - [x] DB values take priority over environment variables
@@ -896,7 +896,7 @@ src/
 
 ### Module 54: SocioScheduler Extension (AI Social Media Scheduling)
 **Estimated Time**: 5-7 days  
-**Dependencies**: Module 21 (MuseSocial), Module 5 (Stripe), Module 16 (AI), Module 39 (Queue)  
+**Dependencies**: Module 21 (SocioScheduler), Module 5 (Stripe), Module 16 (AI), Module 39 (Queue)  
 **Status**: COMPLETE (February 2026)
 
 SocioScheduler is a SaaS product built **on top of** MuseKit using the database extension pattern. It demonstrates how to build a real product from the template without modifying core schema. Targeted at solopreneurs and gig workers who need AI-powered social media scheduling.
@@ -928,14 +928,14 @@ SocioScheduler is a SaaS product built **on top of** MuseKit using the database 
 - Extended `social_posts` with: `trend_source`, `niche_triggered` columns, plus expanded status values (`queued`, `approved`, `ignored`)
 - Composite index on `social_posts(user_id, status)` for fast queue views
 
-**Stripe Tier Mapping** (metadata key: `muse_tier`, admin-configurable via MuseSocial setup page):
+**Stripe Tier Mapping** (metadata key: `muse_tier`, admin-configurable via SocioScheduler setup page):
 | Tier | Metadata Value | Posts/Day | AI Generations/Day |
 |------|---------------|-----------|-------------------|
 | Starter (tier_1) | `tier_1` | 5 | 3 |
 | Basic (tier_2) | `tier_2` | 20 | 15 |
 | Premium (tier_3) | `tier_3` | 100 | 50 |
 
-> **Note:** Tier definitions are dynamic and admin-configurable. Display names, Stripe metadata values, and rate limits can all be edited from the admin dashboard's MuseSocial setup page. Admins can add or remove tiers as needed — the system is not locked to 3. Default fallback tier is `tier_1`.
+> **Note:** Tier definitions are dynamic and admin-configurable. Display names, Stripe metadata values, and rate limits can all be edited from the admin dashboard's SocioScheduler setup page. Admins can add or remove tiers as needed — the system is not locked to 3. Default fallback tier is `tier_1`.
 
 **Key Files**:
 ```
@@ -1012,7 +1012,7 @@ src/
 | 34| Metrics Alerts & Reports         | 50     | COMPLETE    |
 | 35| Database Backup Config           | 51     | COMPLETE    |
 | 36| API Token Rotation               | 52     | COMPLETE    |
-| 37| MuseSocial Module (10 platforms) | 21     | COMPLETE    |
+| 37| SocioScheduler Module (10 platforms) | 21     | COMPLETE    |
 | 38| Centralized API Keys & Integrations | 53 | COMPLETE    |
 | 39| SocioScheduler Extension         | 54     | COMPLETE    |
 
@@ -1058,7 +1058,7 @@ When creating a new muse from this template:
 
 ## Progress Tracking
 
-### Current Phase: MVP COMPLETE + Post-MVP Features + MuseSocial + SocioScheduler
+### Current Phase: MVP COMPLETE + Post-MVP Features + SocioScheduler + SocioScheduler
 **Start Date**: December 29, 2025  
 **MVP Completion**: January 25, 2026  
 **Team Collaboration Added**: February 4, 2026  
@@ -1081,7 +1081,7 @@ When creating a new muse from this template:
 **Legal & Compliance Pages**: February 6, 2026  
 **Metrics Alerts & Reports**: February 6, 2026  
 **E2E Tests Expanded to 46**: February 6, 2026  
-**MuseSocial Module (10 platforms, 2 tiers)**: February 7, 2026  
+**SocioScheduler Module (10 platforms, 2 tiers)**: February 7, 2026  
 **Centralized API Keys & Integrations**: February 7, 2026  
 **SocioScheduler Extension (OAuth, Tiers, Engagement, Calendar, Brand Prefs)**: February 8, 2026  
 **SocioScheduler Polish (Upgrade Banner, Quick Generate, Engagement Config)**: February 9, 2026  
@@ -1120,8 +1120,8 @@ When creating a new muse from this template:
 - [x] Module 50: Metrics Alerts & Reports - Churn/growth thresholds, scheduled email reports
 - [x] Module 51: Database Backup Config - Admin UI for backup preferences
 - [x] Module 52: API Token Rotation - Automated webhook secret rotation
-- [x] Module 21: MuseSocial Module - Toggleable social media management with 10 platforms, 2 tiers, AI-powered post generation, scheduling, n8n templates, E2E tests
-- [x] Module 53: Centralized API Keys & Integrations - Collapsible groups, Required/Optional labels, format validation, social keys on MuseSocial page
+- [x] Module 21: SocioScheduler Module - Toggleable social media management with 10 platforms, 2 tiers, AI-powered post generation, scheduling, n8n templates, E2E tests
+- [x] Module 53: Centralized API Keys & Integrations - Collapsible groups, Required/Optional labels, format validation, social keys on SocioScheduler page
 - [x] Module 54: SocioScheduler Extension - OAuth flows, Stripe tier integration, engagement analytics, calendar, brand preferences, Quick Generate, upgrade banner, admin-configurable engagement pull
 
 ### Next Steps:
@@ -1129,7 +1129,7 @@ When creating a new muse from this template:
 - [ ] Add RLS policies for organization_members table in Supabase (currently bypassed via admin client)
 - [x] Upgrade rate limiting from in-memory to Upstash Redis
 - [x] Background job processing (Upstash/BullMQ) for emails and reports
-- [ ] Dynamic tiers for MuseSocial (allow admins to create unlimited custom tiers from dashboard)
+- [ ] Dynamic tiers for SocioScheduler (allow admins to create unlimited custom tiers from dashboard)
 - [ ] Real platform API integration for 7 newer platforms (YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord)
 - [ ] Approval queue UI for AI-generated posts (currently data model supports it, UI not built)
 - [ ] v1.1 features as prioritized
@@ -1201,9 +1201,9 @@ When creating a new muse from this template:
 | 2026-02-06 | Add legal & compliance pages                | Legal requirements for SaaS products              |
 | 2026-02-06 | Add metrics alerts & scheduled reports      | Proactive monitoring of business health           |
 | 2026-02-06 | Expand E2E tests to 92 across 7 files       | Comprehensive coverage including new features     |
-| 2026-02-07 | Add MuseSocial module (10 platforms, 2 tiers) | Social media management is key SaaS differentiator |
+| 2026-02-07 | Add SocioScheduler module (10 platforms, 2 tiers) | Social media management is key SaaS differentiator |
 | 2026-02-07 | Centralized API Keys with collapsible groups  | Admins need easy way to manage all service keys    |
-| 2026-02-07 | Move social API keys to MuseSocial page       | Feature-gate social keys, reduce clutter on main page |
+| 2026-02-07 | Move social API keys to SocioScheduler page       | Feature-gate social keys, reduce clutter on main page |
 | 2026-02-07 | Add format validation for API keys            | Prevent common entry errors with key format checks |
 | 2026-02-08 | Build SocioScheduler as extension pattern     | Dogfood MuseKit template cloning; prove extension model |
 | 2026-02-08 | Use database extension pattern (migrations/extensions/) | Keep core MuseKit schema untouched for clean cloning |
@@ -1218,7 +1218,7 @@ When creating a new muse from this template:
 1. **Immediate**: Clone template for ExtrusionCalculator.com
 2. **Testing**: Run Playwright E2E test suites and verify all features
 3. **SocioScheduler Enhancements**: Approval queue UI for AI-generated posts, real platform API posting
-4. **MuseSocial Enhancements**: Dynamic tiers (admin-created custom tiers), real platform API integration for 7 newer platforms
+4. **SocioScheduler Enhancements**: Dynamic tiers (admin-created custom tiers), real platform API integration for 7 newer platforms
 5. **General**: Continue minimizing hardcoded variables
 6. **Post-Launch**: Add v1.1 features based on user feedback
 

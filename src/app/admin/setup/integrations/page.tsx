@@ -480,7 +480,7 @@ export default function IntegrationsPage() {
           <li><Badge variant="secondary" className="text-[10px] px-1.5 py-0 mr-1">Dashboard</Badge>Saved from this page, stored in your database, takes effect immediately</li>
           <li><Badge variant="secondary" className="text-[10px] px-1.5 py-0 mr-1">Env Var</Badge>Set in your hosting platform (Vercel, Replit, etc.), recognized automatically</li>
         </ul>
-        <p className="pt-1">Dashboard-saved keys take priority over environment variables. Social platform keys are managed in the MuseSocial setup page.</p>
+        <p className="pt-1">Dashboard-saved keys take priority over environment variables.</p>
       </div>
     </div>
   )

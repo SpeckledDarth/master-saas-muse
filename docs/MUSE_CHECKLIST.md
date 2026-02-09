@@ -173,7 +173,7 @@ If using SocioScheduler, create additional Stripe products with tier metadata:
 - [ ] Create **Socio Basic** product with metadata: `muse_tier` = `tier_2`
 - [ ] Create **Socio Premium** product with metadata: `muse_tier` = `tier_3`
 
-> **Note:** Tier definitions are admin-configurable from the MuseSocial setup page. The default 3 tiers (tier_1/Starter, tier_2/Basic, tier_3/Premium) ship out of the box. Admins can add, remove, or edit tiers and their limits from the dashboard.
+> **Note:** Tier definitions are admin-configurable from the SocioScheduler setup page. The default 3 tiers (tier_1/Starter, tier_2/Basic, tier_3/Premium) ship out of the box. Admins can add, remove, or edit tiers and their limits from the dashboard.
 
 These tiers map to post/AI generation limits:
 | Tier | Posts/Day | AI Generations/Day |
@@ -382,9 +382,9 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] Keys show source badges (Dashboard vs Env Var)
 - [ ] Format validation runs on save
 
-### MuseSocial Sub-Page (Social Module)
-- [ ] Navigate to `/admin/setup/musesocial`
-- [ ] Toggle MuseSocial module on/off
+### SocioScheduler Sub-Page (Social Module)
+- [ ] Navigate to `/admin/setup/socioscheduler`
+- [ ] Toggle SocioScheduler module on/off
 - [ ] Select tier (Universal or Power)
 - [ ] Enable desired platforms (up to 10)
 - [ ] Configure platform API credentials in the Platform API Keys section
@@ -436,7 +436,7 @@ npx playwright test
 
 Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with NPS), email templates, help widget, admin metrics, responsive design, and API endpoints.
 
-**Test suite: 92 tests across 7 test files (e2e-full: 46, blog: 9, feedback: 9, waitlist: 10, email-templates: 10, musesocial: 8)**
+**Test suite: 92 tests across 7 test files (e2e-full: 46, blog: 9, feedback: 9, waitlist: 10, email-templates: 10, socioscheduler: 8)**
 
 ---
 
@@ -475,8 +475,8 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - [ ] Legal pages load correctly (privacy, terms, cookie-policy, etc.)
 - [ ] Cookie consent banner appears (if enabled)
 - [ ] Integrations page loads at `/admin/setup/integrations` with collapsible groups
-- [ ] MuseSocial setup page loads at `/admin/setup/musesocial`
-- [ ] Social dashboard loads at `/dashboard/social` (if MuseSocial enabled)
+- [ ] SocioScheduler setup page loads at `/admin/setup/socioscheduler`
+- [ ] Social dashboard loads at `/dashboard/social` (if SocioScheduler enabled)
 - [ ] Social overview shows usage progress bar and Quick Generate button (if SocioScheduler)
 - [ ] Social calendar shows month-grid with platform tooltips (if SocioScheduler)
 - [ ] Social engagement page loads with charts (if SocioScheduler)
@@ -542,7 +542,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - **Metrics Dashboard** (10 KPIs: Total Users, New Users, Active Subscriptions, MRR, ARPU, LTV, Churn Rate, Conversion Rate, Feedback Count, Waitlist Count)
 - **NPS Score** card with color-coded Net Promoter Score
 - **Alert thresholds** for churn rate and user growth with email notifications
-- **Setup Dashboard** (configure branding, pricing, social, features, security, compliance, support, integrations, MuseSocial)
+- **Setup Dashboard** (configure branding, pricing, social, features, security, compliance, support, integrations, SocioScheduler)
 - **Centralized API Keys** (collapsible groups, Required/Optional labels, format validation, source badges)
 - User management (view, edit roles, search)
 - **User Impersonation** (view app as any user for debugging, 30-min sessions, audit logged)
@@ -606,7 +606,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - 9 legal/compliance pages with dynamic variable replacement
 - Cookie consent banner
 
-### MuseSocial Module
+### SocioScheduler Module
 - Toggleable social media management extension
 - 2 tiers: Universal (basic) and Power (advanced)
 - 10 platform support (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord)
@@ -635,7 +635,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 
 ### Centralized API Keys & Integrations
 - Admin setup page at `/admin/setup/integrations` for Tech Stack keys
-- Social platform keys managed on MuseSocial page
+- Social platform keys managed on SocioScheduler page
 - Collapsible groups (collapsed by default) with status indicators
 - Required/Optional labels and format validation on save
 - Inline edit/reveal/delete with source badges (Dashboard vs Env Var)
@@ -671,7 +671,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 | Audit Log Viewer | Complete |
 | Legal & Compliance Pages | Complete |
 | Metrics Alerts & Reports | Complete |
-| MuseSocial Module (10 platforms, 2 tiers) | Complete |
+| SocioScheduler Module (10 platforms, 2 tiers) | Complete |
 | Centralized API Keys & Integrations | Complete |
 | SocioScheduler Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
 

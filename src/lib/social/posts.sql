@@ -1,4 +1,4 @@
--- Social posts table for MuseSocial module
+-- Social posts table for SocioScheduler
 create table if not exists social_posts (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users(id) on delete cascade not null,

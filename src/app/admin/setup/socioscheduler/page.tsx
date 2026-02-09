@@ -360,7 +360,7 @@ function SocialKeyGroup({ group, onSaved }: { group: IntegrationGroup; onSaved: 
   )
 }
 
-export default function MuseSocialPage() {
+export default function SocioSchedulerPage() {
   const { settings, setSettings, saving, saved, handleSave } = useSetupSettingsContext()
 
   const socialModule = (settings as any).socialModule || defaultSocialModuleSettings
@@ -424,13 +424,13 @@ export default function MuseSocialPage() {
             <InfoTooltip text="Controls whether the social media features are available to your users. Enable it in the Features tab." />
           </CardTitle>
           <CardDescription>
-            MuseSocial social media management module
+            SocioScheduler social media management module
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div>
-              <p className="font-medium" data-testid="text-module-status-label">MuseSocial Module</p>
+              <p className="font-medium" data-testid="text-module-status-label">SocioScheduler Module</p>
               <p className="text-sm text-muted-foreground">Enable this module in the Features tab</p>
             </div>
             {isEnabled ? (
@@ -1140,7 +1140,7 @@ export default function MuseSocialPage() {
             }
             handleSave()
           }}
-          testId="button-save-musesocial"
+          testId="button-save-socioscheduler"
         />
       </div>
     </div>

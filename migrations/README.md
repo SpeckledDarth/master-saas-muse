@@ -15,7 +15,7 @@ migrations/
 
 ### Core Migrations (`core/`)
 
-These define the foundational tables that every MuseKit clone needs. They include the MuseSocial module tables (social_accounts, social_posts) and any future shared infrastructure.
+These define the foundational tables that every MuseKit clone needs. They include the SocioScheduler module tables (social_accounts, social_posts) and any future shared infrastructure.
 
 **Rules:**
 - Never add Muse-specific fields to core tables

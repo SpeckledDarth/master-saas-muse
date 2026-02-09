@@ -151,7 +151,7 @@ Product-specific files live in isolated directories:
 - `src/lib/social/` - SocioScheduler business logic
 - `src/app/dashboard/social/` - SocioScheduler UI pages
 - `src/app/api/social/` - SocioScheduler API routes
-- `src/app/admin/setup/musesocial/` - SocioScheduler admin config
+- `src/app/admin/setup/socioscheduler/` - SocioScheduler admin config
 - `migrations/extensions/` - SocioScheduler database tables
 
 ---

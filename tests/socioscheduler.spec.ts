@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ensureAuthenticated } from './auth.setup';
 
-test.describe('MuseSocial Module - Admin Setup', () => {
+test.describe('SocioScheduler - Admin Setup', () => {
   test('should toggle social module on and off in Features tab', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
@@ -27,7 +27,7 @@ test.describe('MuseSocial Module - Admin Setup', () => {
     expect(isFinalChecked).toBe(wasChecked);
   });
 
-  test('should display MuseSocial setup page with configuration sections', async ({ page }) => {
+  test('should display SocioScheduler setup page with configuration sections', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
 
@@ -47,7 +47,7 @@ test.describe('MuseSocial Module - Admin Setup', () => {
     await saveButton.click();
     await page.waitForTimeout(2000);
 
-    await page.goto('/admin/setup/musesocial');
+    await page.goto('/admin/setup/socioscheduler');
     await page.waitForLoadState('networkidle');
 
     const moduleStatus = page.getByTestId('card-module-status');
@@ -65,7 +65,7 @@ test.describe('MuseSocial Module - Admin Setup', () => {
   });
 });
 
-test.describe('MuseSocial Module - Account Connection', () => {
+test.describe('SocioScheduler - Account Connection', () => {
   test('should show connected accounts page with platform cards', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
@@ -108,7 +108,7 @@ test.describe('MuseSocial Module - Account Connection', () => {
   });
 });
 
-test.describe('MuseSocial Module - Post Generation', () => {
+test.describe('SocioScheduler - Post Generation', () => {
   test('should display posts page with AI generation dialog', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
@@ -157,12 +157,12 @@ test.describe('MuseSocial Module - Post Generation', () => {
   });
 });
 
-test.describe('MuseSocial Module - Tier Gating', () => {
+test.describe('SocioScheduler - Tier Gating', () => {
   test('should show monitoring section only for Power tier', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
 
-    await page.goto('/admin/setup/musesocial');
+    await page.goto('/admin/setup/socioscheduler');
     await page.waitForLoadState('networkidle');
 
     const tierSelect = page.getByTestId('select-tier');
@@ -196,7 +196,7 @@ test.describe('MuseSocial Module - Tier Gating', () => {
   });
 });
 
-test.describe('MuseSocial Module - Social KPIs on Metrics Dashboard', () => {
+test.describe('SocioScheduler - Social KPIs on Metrics Dashboard', () => {
   test('should show social KPI cards when module is enabled', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');

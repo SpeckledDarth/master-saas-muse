@@ -98,7 +98,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Social links setup
 - Features & integrations (auth toggles, AI, webhooks, security, compliance, support)
 - API Keys & Integrations (centralized key management with collapsible groups, format validation)
-- MuseSocial configuration (social media module, platform API keys, engagement pull settings)
+- SocioScheduler configuration (social media module, platform API keys, engagement pull settings)
 
 ### Content Management
 - Blog/changelog system with markdown and live preview
@@ -147,7 +147,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Admin-configurable URL, secret, and per-event toggles
 - Automated API token rotation
 
-### MuseSocial Module (Social Media Management)
+### SocioScheduler Module (Social Media Management)
 - Toggleable social media management extension with two tiers: Universal and Power
 - 10 platform support: Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord
 - AI-powered post generation with multimodal image support
@@ -182,7 +182,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Format validation on save (Stripe sk_ prefix, Supabase URL pattern, OpenAI sk- prefix, Sentry DSN, HTTPS URLs)
 - Summary cards showing total keys and required keys configured
 - Inline edit/reveal/delete with source badges (Dashboard vs Env Var)
-- Social platform API keys feature-gated on MuseSocial setup page
+- Social platform API keys feature-gated on SocioScheduler setup page
 - DB-stored keys take priority over environment variables
 
 ### Enterprise Features
@@ -306,13 +306,13 @@ MuseKit supports a clean extension model for building products on top of the tem
 | Metrics Alerts (Churn + Growth) | Complete |
 | Database Backup Configuration | Complete |
 | API Token Rotation | Complete |
-| MuseSocial Module (10 platforms, 2 tiers) | Complete |
+| SocioScheduler Module (10 platforms, 2 tiers) | Complete |
 | Centralized API Keys & Integrations | Complete |
 | SocioScheduler Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
 
 ### Planned (Post-MVP / Roadmap)
 
-- **Dynamic Tiers for MuseSocial** — Allow admins to create unlimited custom tiers from the dashboard (currently Universal and Power)
+- **Dynamic Tiers for SocioScheduler** — Allow admins to create unlimited custom tiers from the dashboard (currently Universal and Power)
 - **Real Platform API Integration** — 7 newer platform clients (YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord) have stubbed methods ready for real API integration
 - **Approval Queue UI** — UI for reviewing and approving AI-generated posts (data model supports it)
 - Affiliate/referral system
@@ -352,7 +352,7 @@ This section compares the planned technology stack against what is currently imp
 | | OpenAI | Implemented | Configurable via admin dashboard |
 | | Anthropic | Implemented | Configurable via admin dashboard |
 | | n8n/Webhook System | Implemented | 8 events, HMAC signing, fire-and-forget |
-| **Social Media** | MuseSocial Module | Implemented | 10 platforms, 2 tiers, AI post generation |
+| **Social Media** | SocioScheduler Module | Implemented | 10 platforms, 2 tiers, AI post generation |
 | | SocioScheduler | Implemented | OAuth, tiers, analytics, calendar, brand prefs, Quick Generate |
 | **Operations** | Resend (Emails) | Implemented | Templates + test sending + admin editor + scheduled reports |
 | | Sentry (Monitoring) | Implemented | Server + browser errors via tunnel route |

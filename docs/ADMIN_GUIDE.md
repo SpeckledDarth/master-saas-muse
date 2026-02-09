@@ -17,7 +17,7 @@ A complete guide for managing your MuseKit-powered application. Written for team
    - [Social Links](#social-links)
    - [Features & Integrations](#features--integrations)
    - [API Keys & Integrations](#api-keys--integrations)
-   - [MuseSocial](#musesocial)
+   - [SocioScheduler](#socioscheduler)
 5. [User Management](#user-management)
    - [Customer Service Tools](#customer-service-tools)
    - [User Impersonation](#user-impersonation)
@@ -42,7 +42,7 @@ A complete guide for managing your MuseKit-powered application. Written for team
 19. [In-App Notifications](#in-app-notifications)
 20. [Audit Log Viewer](#audit-log-viewer)
 21. [Legal & Compliance Pages](#legal--compliance-pages)
-22. [MuseSocial Module](#musesocial-module)
+22. [SocioScheduler Module](#socioscheduler-module)
 23. [SocioScheduler Extension](#socioschedule-extension)
 24. [Feature Toggles Reference](#feature-toggles-reference)
 25. [Public Pages Your Visitors See](#public-pages-your-visitors-see)
@@ -226,13 +226,13 @@ Manage all your third-party service API keys from one centralized page. Keys are
 - **Source badges** indicate whether a key is stored in the Dashboard (database) or comes from an Environment Variable on your hosting platform
 - Format validation catches common errors when saving (e.g., Stripe keys must start with `sk_`)
 
-**Note:** Social platform API keys are managed on the MuseSocial setup page instead, so they only appear when the social module is enabled.
+**Note:** Social platform API keys are managed on the SocioScheduler setup page instead, so they only appear when the social module is enabled.
 
-### MuseSocial
+### SocioScheduler
 
-**Where:** `/admin/setup/musesocial`
+**Where:** `/admin/setup/socioscheduler`
 
-Configure the MuseSocial social media management module. See [MuseSocial Module](#musesocial-module) for full details.
+Configure the SocioScheduler social media management module. See [SocioScheduler Module](#socioscheduler-module) for full details.
 
 This page also includes:
 
@@ -662,13 +662,13 @@ MuseKit includes a comprehensive set of legal pages that are automatically avail
 
 ---
 
-## MuseSocial Module
+## SocioScheduler Module
 
-MuseSocial is a toggleable social media management extension built into MuseKit. When enabled, it adds social posting, scheduling, and AI-powered content generation capabilities.
+SocioScheduler is a toggleable social media management extension built into MuseKit. When enabled, it adds social posting, scheduling, and AI-powered content generation capabilities.
 
-### Enabling MuseSocial
+### Enabling SocioScheduler
 
-1. Go to **Admin > Setup > MuseSocial** (`/admin/setup/musesocial`)
+1. Go to **Admin > Setup > SocioScheduler** (`/admin/setup/socioscheduler`)
 2. Toggle the module **on**
 3. Select your tier: **Universal** or **Power**
 4. Enable the platforms you want to support (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord)
@@ -706,7 +706,7 @@ Configure how often the system collects engagement data (likes, shares, comments
 
 ### Platform API Keys
 
-When MuseSocial is enabled, a **Platform API Keys** section appears on the MuseSocial setup page. This works the same way as the main API Keys page:
+When SocioScheduler is enabled, a **Platform API Keys** section appears on the SocioScheduler setup page. This works the same way as the main API Keys page:
 
 - Keys are organized by platform in collapsible groups
 - Each platform shows a status badge (configured count)
@@ -715,28 +715,28 @@ When MuseSocial is enabled, a **Platform API Keys** section appears on the MuseS
 
 ### What Users See
 
-When MuseSocial is enabled, users see a **Social Accounts** page in their dashboard (`/dashboard/social`) where they can:
+When SocioScheduler is enabled, users see a **Social Accounts** page in their dashboard (`/dashboard/social`) where they can:
 - Connect their social media accounts
 - Create and schedule posts (with AI-powered content generation if AI features are enabled)
 - View post status and history
 
 ### Dependencies & Warnings
 
-MuseSocial shows dependency warnings on the setup page when:
+SocioScheduler shows dependency warnings on the setup page when:
 - **AI features are disabled** — AI-powered post generation requires AI to be enabled in Setup > Features
 - **No platforms are enabled** — At least one platform must be toggled on
 - **API keys are missing** — Platform API credentials must be configured for enabled platforms
 
 ### Social KPI Cards
 
-When MuseSocial is enabled, additional KPI cards appear on the admin Metrics Dashboard showing:
+When SocioScheduler is enabled, additional KPI cards appear on the admin Metrics Dashboard showing:
 - Current tier badge (Universal/Power)
 - AI generation count for the current period
 - Social posting activity
 
 ### n8n Integration
 
-MuseSocial includes pre-built n8n workflow templates for automation:
+SocioScheduler includes pre-built n8n workflow templates for automation:
 - **Auto-post RSS** — Automatically post new RSS feed items to social platforms
 - **AI Generate & Schedule** — Use AI to generate and schedule social content
 - **Engagement Monitor** — Monitor social engagement metrics
@@ -745,7 +745,7 @@ Templates are located in `src/lib/social/n8n-templates/`. Set `MUSEKIT_URL` and 
 
 ### Troubleshooting
 
-- **"Social module not enabled"** — Admin must toggle on in Setup > MuseSocial
+- **"Social module not enabled"** — Admin must toggle on in Setup > SocioScheduler
 - **"AI features not enabled"** — Enable AI in Setup > Features
 - **"Rate limit exceeded"** — User hit daily tier cap; upgrade to Power or wait for daily reset
 - **Posts stuck in "scheduled"** — Check BullMQ queue dashboard (`/admin/queue`), verify Redis connection
@@ -759,10 +759,10 @@ SocioScheduler is a full SaaS product built on top of MuseKit using the database
 
 ### What It Adds
 
-SocioScheduler extends MuseSocial with:
+SocioScheduler extends MuseKit's core platform with:
 
 - **OAuth Platform Connections** — Users connect Facebook Page, LinkedIn, and Twitter/X accounts via OAuth with PKCE
-- **Per-User Stripe Tiers** — Subscription metadata maps to admin-configurable tiers (default: Starter/Basic/Premium) with different post and AI generation limits. Tier definitions, display names, Stripe metadata values, and rate limits are all editable from the admin dashboard's MuseSocial setup page
+- **Per-User Stripe Tiers** — Subscription metadata maps to admin-configurable tiers (default: Starter/Basic/Premium) with different post and AI generation limits. Tier definitions, display names, Stripe metadata values, and rate limits are all editable from the admin dashboard's SocioScheduler setup page
 - **Brand Preferences** — Users set their tone, niche, location, target audience, posting goals, preferred platforms, and frequency
 - **AI Post Generation** — Uses 15 niche-specific prompts (admin-editable) combined with brand preferences for solopreneur-friendly content
 - **7-Page Social Dashboard**:
@@ -792,7 +792,7 @@ On the Overview page, users can generate AI posts on-demand:
 
 ### Stripe Tier Limits
 
-Tier definitions are admin-configurable from the MuseSocial setup page (`/admin/setup/musesocial`). You can add, remove, or edit tiers — the system is not locked to 3. Default tiers ship out of the box:
+Tier definitions are admin-configurable from the SocioScheduler setup page (`/admin/setup/socioscheduler`). You can add, remove, or edit tiers — the system is not locked to 3. Default tiers ship out of the box:
 
 | Tier | Posts/Day | AI Generations/Day | Metadata Key | Metadata Value |
 |------|-----------|-------------------|--------------|----------------|
@@ -804,7 +804,7 @@ Tier definitions are admin-configurable from the MuseSocial setup page (`/admin/
 
 To customize tiers from the admin dashboard:
 
-1. Navigate to **Admin > Setup > MuseSocial**
+1. Navigate to **Admin > Setup > SocioScheduler**
 2. Scroll to the **Tier Definitions** section
 3. Edit display names, Stripe metadata values, and rate limits per tier
 4. Add new tiers or remove existing ones as needed
@@ -840,7 +840,7 @@ Here's what each feature toggle does:
 | **Support Chatbot** | Show a floating AI-powered help chat widget |
 | **AI Features** | Enable the AI chat assistant |
 | **Enterprise SSO / SAML** | Enable SAML-based single sign-on for enterprise users |
-| **MuseSocial Module** | Enable social media management (posting, scheduling, AI content generation) |
+| **SocioScheduler Module** | Enable social media management (posting, scheduling, AI content generation) |
 
 ---
 
@@ -873,7 +873,7 @@ These are the pages your customers and visitors can access:
 | **Billing** | `/billing` | Subscription management (logged-in users) |
 | **Profile** | `/profile` | User profile settings (logged-in users) |
 | **Custom Pages** | `/p/{slug}` | Up to 4 custom pages you create |
-| **Social Dashboard** | `/dashboard/social/*` | Social media management (when MuseSocial/SocioScheduler is enabled) |
+| **Social Dashboard** | `/dashboard/social/*` | Social media management (when SocioScheduler is enabled) |
 
 All pages automatically support dark/light mode and are responsive on mobile devices.
 
@@ -892,8 +892,8 @@ All pages automatically support dark/light mode and are responsive on mobile dev
 - **Review the Audit Log** — Periodically check the audit log for unexpected admin actions
 - **Backup before major changes** — The platform supports checkpoints, but it's good practice to note your current settings before making sweeping changes
 - **API Keys page first** — After initial setup, configure your required API keys on the Integrations page to ensure all services are connected
-- **MuseSocial setup** — If using social features, enable the module first, then configure platforms and API keys on the same page
-- **SocioScheduler tiers** — Set up Stripe products with metadata key `muse_tier` and values (`tier_1`, `tier_2`, `tier_3`) to enable per-user tier resolution. Tier definitions are admin-configurable from the MuseSocial setup page
+- **SocioScheduler setup** — If using social features, enable the module first, then configure platforms and API keys on the same page
+- **SocioScheduler tiers** — Set up Stripe products with metadata key `muse_tier` and values (`tier_1`, `tier_2`, `tier_3`) to enable per-user tier resolution. Tier definitions are admin-configurable from the SocioScheduler setup page
 - **Engagement pull settings** — Adjust the engagement pull interval based on your API rate limits and how frequently you need updated metrics
 
 ---

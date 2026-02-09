@@ -79,7 +79,7 @@ SocioScheduler is a standalone SaaS product built ON TOP of MuseKit (not a toggl
 **Architecture Separation:**
 - Social types live in `src/lib/social/types.ts` (not in `src/types/settings.ts`)
 - Social settings use `defaultSocialModuleSettings` from `src/lib/social/types.ts`
-- Social admin page (`/admin/setup/musesocial`) is SocioScheduler-specific, not a MuseKit feature
+- Social admin page (`/admin/setup/socioscheduler`) is SocioScheduler-specific, not a MuseKit feature
 - Database tables in `migrations/extensions/` are SocioScheduler-specific
 - The `socialModuleEnabled` flag in features is SocioScheduler-specific (not part of MuseKit core FeatureToggles)
 

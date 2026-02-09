@@ -1,5 +1,5 @@
 -- MuseKit Core: Social Tables
--- These tables are part of the MuseSocial module and shared across all clones.
+-- These tables support social media scheduling features.
 -- Run this migration on every fresh MuseKit clone.
 
 -- Enable UUID generation if not already enabled

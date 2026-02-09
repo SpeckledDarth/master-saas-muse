@@ -2,7 +2,7 @@
 
 This guide walks you through creating a new SaaS from the Master SaaS Muse Template.
 
-**Template Status: MVP COMPLETE + Full Feature Set + MuseSocial Module + SocioScheduler Extension (February 2026)**
+**Template Status: MVP COMPLETE + Full Feature Set + SocioScheduler Module + SocioScheduler Extension (February 2026)**
 
 ---
 
@@ -241,7 +241,7 @@ master-saas-muse/
 │   │   │   │   ├── content/page.tsx
 │   │   │   │   ├── features/page.tsx
 │   │   │   │   ├── integrations/page.tsx
-│   │   │   │   ├── musesocial/page.tsx
+│   │   │   │   ├── socioscheduler/page.tsx
 │   │   │   │   ├── pages/page.tsx
 │   │   │   │   ├── pricing/page.tsx
 │   │   │   │   ├── security/page.tsx
@@ -668,7 +668,7 @@ If using SocioScheduler, create additional products with these metadata values:
 | Socio Basic | `muse_tier` | `tier_2` | 20 posts/day, 15 AI gen/day |
 | Socio Premium | `muse_tier` | `tier_3` | 100 posts/day, 50 AI gen/day |
 
-The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these metadata values to rate limits. Tier definitions (display names, metadata values, and rate limits) are admin-configurable from the MuseSocial setup page (`/admin/setup/musesocial`). Admins can add or remove tiers as needed.
+The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these metadata values to rate limits. Tier definitions (display names, metadata values, and rate limits) are admin-configurable from the SocioScheduler setup page (`/admin/setup/socioscheduler`). Admins can add or remove tiers as needed.
 
 ### Webhook Endpoint
 - URL: `https://your-app.vercel.app/api/stripe/webhook`
@@ -718,7 +718,7 @@ The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these met
 | Metrics Dashboard (10 KPIs + NPS + Alerts) | Complete |
 | User Management | Complete |
 | User Impersonation | Complete |
-| Setup Dashboard (11 Sub-Pages: Branding, Compliance, Content, Features, Integrations, MuseSocial, Pages, Pricing, Security, Social, Support) | Complete |
+| Setup Dashboard (11 Sub-Pages: Branding, Compliance, Content, Features, Integrations, SocioScheduler, Pages, Pricing, Security, Social, Support) | Complete |
 | Onboarding Wizard (4-step guided setup) | Complete |
 | Stripe Billing + Feature Gating | Complete |
 | Customer Portal | Complete |
@@ -753,7 +753,7 @@ The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these met
 | Metrics Alerts (Churn Rate + User Growth) | Complete |
 | Database Backup Configuration | Complete |
 | API Token Rotation | Complete |
-| MuseSocial Module (10 platforms, 2 tiers) | Complete |
+| SocioScheduler Module (10 platforms, 2 tiers) | Complete |
 | Centralized API Keys & Integrations | Complete |
 | SocioScheduler Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
 
