@@ -90,7 +90,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Scheduled weekly/monthly KPI summary emails
 
 ### Setup Dashboard
-- Split into 8 focused sub-pages with sidebar navigation
+- Split into 11 focused sub-pages with sidebar navigation
 - Branding customization (logo, colors, app name, hero styles)
 - Content management (homepage sections)
 - Pages configuration (about, contact, terms, privacy, custom pages)
@@ -98,7 +98,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Social links setup
 - Features & integrations (auth toggles, AI, webhooks, security, compliance, support)
 - API Keys & Integrations (centralized key management with collapsible groups, format validation)
-- MuseSocial configuration (social media module, platform API keys)
+- MuseSocial configuration (social media module, platform API keys, engagement pull settings)
 
 ### Content Management
 - Blog/changelog system with markdown and live preview
@@ -159,6 +159,22 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Conditional onboarding wizard step, Vercel Cron fallback
 - Dependency warnings when configuration is incomplete
 
+### SocioScheduler Extension (AI Social Media Scheduling)
+- Full SaaS product built on MuseKit using the database extension pattern
+- Targeted at solopreneurs and gig workers for AI-powered social scheduling
+- OAuth flows for Facebook Page, LinkedIn, and Twitter/X with PKCE
+- Per-user Stripe tier resolution (Starter/Basic/Premium) mapped from subscription metadata
+- 7-page social dashboard: overview, calendar, engagement analytics, queue, posts, brand preferences, onboarding
+- Brand preference system (tone, niche, location, target audience, posting goals, frequency)
+- AI post generation with 15 admin-editable niche-specific prompts and default fallback voice
+- Quick Generate dialog for on-demand AI content with copy-to-clipboard
+- Engagement analytics dashboard with Recharts charts
+- Calendar view with month-grid and per-platform count tooltips
+- Reusable upgrade banner (80%+ usage trigger) across all social dashboard pages
+- Admin-configurable engagement pull schedule (interval and lookback hours)
+- Beta debug mode via environment variable for development/testing
+- Database extension pattern: SocioScheduler tables in `migrations/extensions/`, core MuseKit schema untouched
+
 ### Centralized API Keys & Integrations
 - Admin setup page for managing all service API keys from the dashboard
 - Collapsible groups (collapsed by default) with status indicators (green/red/gray dots)
@@ -172,7 +188,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 ### Enterprise Features
 - SSO/SAML single sign-on with domain-based detection
 - Admin-managed identity providers (Okta, Azure AD, Google Workspace)
-- Background job processing with BullMQ and Upstash Redis (4 job types: email, webhook-retry, report, token-rotation)
+- Background job processing with BullMQ and Upstash Redis (10 job types: email, webhook-retry, report, metrics-report, metrics-alert, token-rotation, social-post, social-health-check, social-trend-monitor, social-engagement-pull)
 - Production-grade rate limiting with Upstash Redis (in-memory fallback)
 - Customer service tools (subscription tracking, invoices, admin notes)
 - User impersonation with 30-minute sessions and audit logging
@@ -186,7 +202,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 ### Monitoring & Testing
 - Sentry error tracking (server + browser errors)
 - Plausible privacy-friendly analytics
-- 46 Playwright E2E tests across 7 test files
+- 92 Playwright E2E tests across 7 test files
 - Structured logging utility
 
 ---
@@ -203,7 +219,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 | **Authentication** | Supabase Auth + 5 OAuth Providers | Email/password, Google, GitHub, Apple, Twitter/X OAuth, and Magic Link passwordless |
 | **AI & Automation** | xAI Grok API + n8n | AI capabilities and workflow automation |
 | **Operations** | Resend (Emails) + Sentry (Monitoring) + Plausible (Analytics) + Upstash/BullMQ (Queues) | Transactional emails, error tracking, privacy-friendly metrics, and background job processing |
-| **Queue & Rate Limiting** | Upstash Redis + BullMQ | Background job processing and API rate limiting |
+| **Queue & Rate Limiting** | Upstash Redis + BullMQ | Background job processing (10 job types) and API rate limiting |
 | **Monetization** | Stripe | Subscription billing, payment processing, and customer portal |
 
 ### Authentication & OAuth
@@ -240,6 +256,14 @@ MuseKit supports multiple organizations using the same codebase. Each organizati
 
 This means you can run multiple SaaS products from one template, or allow customers to create their own "workspaces" within your product.
 
+### Database Extension Pattern
+
+MuseKit supports a clean extension model for building products on top of the template:
+- **Core tables** live in `migrations/core/` and are never modified by extensions
+- **Extension tables** live in `migrations/extensions/` and add product-specific schemas
+- This ensures clean template cloning — extensions can be included or excluded per product
+- SocioScheduler is the first product built using this pattern, proving the model works
+
 ---
 
 ## Current Status
@@ -262,19 +286,19 @@ This means you can run multiple SaaS products from one template, or allow custom
 | User Impersonation | Complete |
 | Audit Log Viewer | Complete |
 | SEO/Sitemap | Complete |
-| Setup Dashboard (6 Sub-Pages) | Complete |
+| Setup Dashboard (11 Sub-Pages) | Complete |
 | Onboarding Wizard | Complete |
 | AI Integration (xAI/OpenAI/Anthropic) | Complete |
 | Webhook/n8n Automation | Complete |
 | Sentry Error Tracking | Complete |
 | Plausible Analytics | Complete |
-| E2E Testing (46 Playwright tests, 7 files) | Complete |
+| E2E Testing (92 Playwright tests, 7 files) | Complete |
 | Dark/Light Mode | Complete |
 | OAuth Admin Controls | Complete |
 | SSO/SAML Enterprise Auth | Complete |
-| Queue Infrastructure (BullMQ, 4 Job Types) | Complete |
+| Queue Infrastructure (BullMQ, 10 Job Types) | Complete |
 | Rate Limiting (Upstash Redis) | Complete |
-| Admin Setup UX (6 Sub-Pages) | Complete |
+| Admin Setup UX (11 Sub-Pages) | Complete |
 | Customer Service Tools | Complete |
 | Admin Documentation Guide | Complete |
 | Legal & Compliance Pages (9 pages + cookie consent) | Complete |
@@ -284,12 +308,13 @@ This means you can run multiple SaaS products from one template, or allow custom
 | API Token Rotation | Complete |
 | MuseSocial Module (10 platforms, 2 tiers) | Complete |
 | Centralized API Keys & Integrations | Complete |
+| SocioScheduler Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
 
 ### Planned (Post-MVP / Roadmap)
 
 - **Dynamic Tiers for MuseSocial** — Allow admins to create unlimited custom tiers from the dashboard (currently Universal and Power)
 - **Real Platform API Integration** — 7 newer platform clients (YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord) have stubbed methods ready for real API integration
-- **Minimize Hardcoded Variables** — Make all configurable values editable from admin dashboard without code changes
+- **Approval Queue UI** — UI for reviewing and approving AI-generated posts (data model supports it)
 - Affiliate/referral system
 - Push notifications
 - Internationalization (multiple languages)
@@ -310,9 +335,9 @@ This section compares the planned technology stack against what is currently imp
 | | Next.js 16+ | Implemented | App Router with TypeScript |
 | | shadcn/ui | Implemented | Full component library installed (70+ components) |
 | | Tailwind CSS | Implemented | With dark mode support |
-| **Backend/API** | Next.js API Routes | Implemented | 30+ API routes functional |
-| | OAuth SDKs | Implemented | All 5 providers via Supabase Auth |
-| **Database** | Supabase PostgreSQL | Implemented | 13 tables in production |
+| **Backend/API** | Next.js API Routes | Implemented | 40+ API routes functional |
+| | OAuth SDKs | Implemented | All 5 providers via Supabase Auth + SocioScheduler platform OAuth |
+| **Database** | Supabase PostgreSQL | Implemented | 15+ tables in production (core + extensions) |
 | | Supabase Storage | Implemented | Used for avatars + branding images |
 | | Supabase Auth | Implemented | Email + all 5 OAuth providers |
 | | Row Level Security | Implemented | Policies on key tables |
@@ -328,13 +353,14 @@ This section compares the planned technology stack against what is currently imp
 | | Anthropic | Implemented | Configurable via admin dashboard |
 | | n8n/Webhook System | Implemented | 8 events, HMAC signing, fire-and-forget |
 | **Social Media** | MuseSocial Module | Implemented | 10 platforms, 2 tiers, AI post generation |
+| | SocioScheduler | Implemented | OAuth, tiers, analytics, calendar, brand prefs, Quick Generate |
 | **Operations** | Resend (Emails) | Implemented | Templates + test sending + admin editor + scheduled reports |
 | | Sentry (Monitoring) | Implemented | Server + browser errors via tunnel route |
 | | Plausible (Analytics) | Implemented | Script integrated |
-| | Upstash/BullMQ (Queues) | Implemented | 4 job types, admin dashboard |
+| | Upstash/BullMQ (Queues) | Implemented | 10 job types, admin dashboard |
 | | Upstash Redis Rate Limiting | Implemented | Sliding window with in-memory fallback |
-| **Testing** | Playwright E2E | Implemented | 46 tests across 7 files |
-| **Monetization** | Stripe Billing | Implemented | Subscriptions + portal working |
+| **Testing** | Playwright E2E | Implemented | 92 tests across 7 files |
+| **Monetization** | Stripe Billing | Implemented | Subscriptions + portal + SocioScheduler tier resolution |
 
 ### Summary
 
@@ -345,8 +371,8 @@ This section compares the planned technology stack against what is currently imp
 | Database/Storage | 4/4 | 0 | 0 |
 | Authentication | 7/7 | 0 | 0 |
 | AI & Automation | 4/4 | 0 | 0 |
-| Social Media | 1/1 | 0 | 0 |
-| Operations | 4/4 | 0 | 0 |
+| Social Media | 2/2 | 0 | 0 |
+| Operations | 5/5 | 0 | 0 |
 | Testing | 1/1 | 0 | 0 |
 | Monetization | 1/1 | 0 | 0 |
 
@@ -375,6 +401,7 @@ MuseKit exists to eliminate that barrier. With a production-ready foundation, fo
 3. **Flexible** - Customize everything; no vendor lock-in
 4. **Well-documented** - Clear guides for setup and customization
 5. **Maintainable** - Clean architecture that grows with your product
+6. **Extensible** - Database extension pattern for building products on top
 
 ---
 
@@ -391,10 +418,10 @@ If you're interested in using MuseKit for your project:
 
 ## Questions?
 
-This is an actively developed project. The core MVP features are complete and production-ready. Post-MVP features are being added based on real-world usage and feedback.
+This is an actively developed project. The core MVP features are complete and production-ready. Post-MVP features are being added based on real-world usage and feedback. SocioScheduler is the first product built on the template, proving the extension model works.
 
 For the latest status and roadmap, refer to the Master Plan document.
 
 ---
 
-*Last Updated: February 7, 2026*
+*Last Updated: February 9, 2026*

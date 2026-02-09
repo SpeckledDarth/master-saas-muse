@@ -4,7 +4,7 @@ This checklist guides you through setting up a new project from the Master SaaS 
 
 **Estimated time: 15-30 minutes**
 
-**Template Status: MVP COMPLETE + Full Feature Set (February 2026)**
+**Template Status: MVP COMPLETE + Full Feature Set + SocioScheduler Extension (February 2026)**
 
 ---
 
@@ -75,6 +75,20 @@ Run the SQL from `docs/SETUP_GUIDE.md` in Supabase SQL Editor:
 - [ ] Create RLS policies
 
 > **New Table:** The `admin_notes` table is used by the Customer Service Tools in the admin Users page. See `docs/SETUP_GUIDE.md` for the SQL.
+
+---
+
+## Step 4b: Create SocioScheduler Extension Tables (Optional, 3 min)
+
+If using the SocioScheduler extension for AI social media scheduling:
+
+- [ ] Run `migrations/extensions/001_socioschedule_tables.sql` in Supabase SQL Editor
+- [ ] Run `migrations/extensions/002_engagement_metrics_placeholder.sql`
+- [ ] Verify `brand_preferences` table was created
+- [ ] Verify `alert_logs` table was created
+- [ ] Verify `social_posts` has `trend_source` and `niche_triggered` columns
+
+> **Note:** These tables are specific to SocioScheduler and should NOT be included in other Muse clones unless they also use social scheduling features.
 
 ---
 
@@ -151,6 +165,21 @@ Stripe is the **single source of truth** for pricing. Your website automatically
 
 > **Note:** The Free tier is hardcoded (no Stripe product needed) since free users don't go through checkout.
 
+### Configure SocioScheduler Tiers (Optional)
+
+If using SocioScheduler, create additional Stripe products with tier metadata:
+
+- [ ] Create **Socio Starter** product with metadata: `socio_tier` = `socio_starter`
+- [ ] Create **Socio Basic** product with metadata: `socio_tier` = `socio_basic`
+- [ ] Create **Socio Premium** product with metadata: `socio_tier` = `socio_premium`
+
+These tiers map to post/AI generation limits:
+| Tier | Posts/Day | AI Generations/Day |
+|------|-----------|-------------------|
+| Starter | 5 | 3 |
+| Basic | 20 | 15 |
+| Premium | 100 | 50 |
+
 ---
 
 ## Step 7: Configure Email (Resend) (3 min)
@@ -223,7 +252,7 @@ Skip this if you only need email/password authentication. Configure only the pro
 
 ## Step 9b: Configure Upstash Redis (Optional, 3 min)
 
-Required for background job processing (email sending, webhook retries, scheduled reports) and production-grade rate limiting.
+Required for background job processing (email sending, webhook retries, scheduled reports, social post delivery, engagement data collection) and production-grade rate limiting.
 
 - [ ] Go to [Upstash Console](https://console.upstash.com)
 - [ ] Create a new Redis database
@@ -257,7 +286,7 @@ Required for background job processing (email sending, webhook retries, schedule
 
 ## Step 12: Configure Your SaaS (Setup Dashboard)
 
-This is the key step that makes each clone unique! Go to `/admin/setup` and configure. The setup is organized into 8 focused sub-pages with a sidebar navigation:
+This is the key step that makes each clone unique! Go to `/admin/setup` and configure. The setup is organized into 11 focused sub-pages with a sidebar navigation:
 
 ### Branding Sub-Page
 - [ ] **App Name** - Your SaaS product name (e.g., "ExtrusionCalc Pro")
@@ -357,6 +386,8 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] Select tier (Universal or Power)
 - [ ] Enable desired platforms (up to 10)
 - [ ] Configure platform API credentials in the Platform API Keys section
+- [ ] Configure niche guidance entries for AI prompt customization
+- [ ] Set engagement pull interval and lookback window (defaults to 24 hours each)
 - [ ] Verify dependency warnings appear if AI is disabled or no platforms enabled
 
 ---
@@ -403,7 +434,7 @@ npx playwright test
 
 Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with NPS), email templates, help widget, admin metrics, responsive design, and API endpoints.
 
-**Test suite: 46 tests across 7 test files**
+**Test suite: 92 tests across 7 test files (e2e-full: 46, blog: 9, feedback: 9, waitlist: 10, email-templates: 10, musesocial: 8)**
 
 ---
 
@@ -444,6 +475,11 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - [ ] Integrations page loads at `/admin/setup/integrations` with collapsible groups
 - [ ] MuseSocial setup page loads at `/admin/setup/musesocial`
 - [ ] Social dashboard loads at `/dashboard/social` (if MuseSocial enabled)
+- [ ] Social overview shows usage progress bar and Quick Generate button (if SocioScheduler)
+- [ ] Social calendar shows month-grid with platform tooltips (if SocioScheduler)
+- [ ] Social engagement page loads with charts (if SocioScheduler)
+- [ ] Brand preferences page loads at `/dashboard/social/brand` (if SocioScheduler)
+- [ ] Upgrade banner appears at 80%+ usage across social dashboard pages
 
 ---
 
@@ -474,6 +510,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 | `ANTHROPIC_API_KEY` | Anthropic API key (alternative AI provider) |
 | `UPSTASH_REDIS_REST_URL` | Upstash Redis URL (queue + rate limiting) |
 | `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis auth token |
+| `SOCIO_DEBUG_MODE` | Set to `true` for SocioScheduler beta debug mode |
 
 ---
 
@@ -517,7 +554,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - **Waitlist** management with CSV export
 - **Feedback** management with status filters and NPS badges
 - **Customer Service Tools** (subscription status, user detail, invoices, admin notes)
-- **Queue Dashboard** (monitor background jobs, 4 job types: email, webhook-retry, report, token-rotation)
+- **Queue Dashboard** (monitor background jobs, 10 job types: email, webhook-retry, report, metrics-report, metrics-alert, token-rotation, social-post, social-health-check, social-trend-monitor, social-engagement-pull)
 - **SSO/SAML Management** (enterprise single sign-on)
 - **Scheduled Metrics Reports** (weekly/monthly KPI email summaries)
 - **Database Backup Configuration** (notification preferences, frequency, retention)
@@ -527,6 +564,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - Customer portal for subscription management
 - Webhook handling for subscription events
 - Feature gating based on plan
+- SocioScheduler per-user tier resolution via subscription metadata
 
 ### Email (Resend)
 - Welcome email on signup
@@ -577,6 +615,21 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - Social KPI cards on admin metrics dashboard
 - BullMQ retry logic for post delivery failures
 - n8n workflow templates for automation
+- Admin-configurable niche guidance and engagement pull settings
+
+### SocioScheduler Extension
+- AI social media scheduling for solopreneurs and gig workers
+- Database extension pattern (tables in `migrations/extensions/`, core schema untouched)
+- OAuth flows for Facebook, LinkedIn, Twitter/X with PKCE
+- Per-user Stripe tier resolution (Starter/Basic/Premium)
+- 7-page social dashboard (overview, calendar, engagement, queue, posts, brand, onboarding)
+- Brand preference system (tone, niche, location, audience, goals, frequency)
+- 15 admin-editable niche-specific AI prompts with default fallback
+- Quick Generate dialog for on-demand AI content
+- Engagement analytics with Recharts charts
+- Calendar view with month-grid and per-platform tooltips
+- Reusable upgrade banner at 80%+ usage
+- Beta debug mode via `SOCIO_DEBUG_MODE=true`
 
 ### Centralized API Keys & Integrations
 - Admin setup page at `/admin/setup/integrations` for Tech Stack keys
@@ -597,17 +650,17 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - Plausible analytics (privacy-friendly)
 - Sentry error tracking (server + browser)
 - Structured logging utility
-- 46 Playwright E2E tests across 7 test files
+- 92 Playwright E2E tests across 7 test files
 
 ### Feature Completion Status
 
 | Feature | Status |
 |---------|--------|
 | SSO/SAML Enterprise Auth | Complete |
-| Queue Infrastructure (BullMQ + Upstash) | Complete |
+| Queue Infrastructure (BullMQ + Upstash, 10 Job Types) | Complete |
 | Rate Limiting (Upstash Redis) | Complete |
 | Customer Service Tools | Complete |
-| Admin Setup UX (8 Sub-Pages) | Complete |
+| Admin Setup UX (11 Sub-Pages) | Complete |
 | Metrics Dashboard (10 KPIs + NPS) | Complete |
 | Help Widget (Support Chatbot) | Complete |
 | NPS Score Tracking | Complete |
@@ -618,6 +671,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 | Metrics Alerts & Reports | Complete |
 | MuseSocial Module (10 platforms, 2 tiers) | Complete |
 | Centralized API Keys & Integrations | Complete |
+| SocioScheduler Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
 
 ---
 
@@ -637,7 +691,10 @@ Before launching with live customer data:
 - [ ] Configure alert thresholds for churn rate and user growth
 - [ ] Review and customize legal pages
 - [ ] Enable cookie consent banner if required
+- [ ] If using SocioScheduler: verify Stripe tier products have correct metadata
+- [ ] If using SocioScheduler: verify extension tables exist in database
+- [ ] If using SocioScheduler: configure niche guidance entries in admin setup
 
 ---
 
-*Last Updated: February 6, 2026*
+*Last Updated: February 9, 2026*

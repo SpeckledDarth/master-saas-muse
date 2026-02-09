@@ -2,7 +2,7 @@
 
 This guide walks you through creating a new SaaS from the Master SaaS Muse Template.
 
-**Template Status: MVP COMPLETE + Full Feature Set + MuseSocial Module (February 2026)**
+**Template Status: MVP COMPLETE + Full Feature Set + MuseSocial Module + SocioScheduler Extension (February 2026)**
 
 ---
 
@@ -13,9 +13,10 @@ This guide walks you through creating a new SaaS from the Master SaaS Muse Templ
 3. [Environment Variables](#environment-variables)
 4. [Project Structure](#project-structure)
 5. [Database Tables](#database-tables)
-6. [Supabase Configuration](#supabase-configuration)
-7. [Stripe Configuration](#stripe-configuration)
-8. [Key Commands](#key-commands)
+6. [SocioScheduler Extension Tables](#socioschedule-extension-tables)
+7. [Supabase Configuration](#supabase-configuration)
+8. [Stripe Configuration](#stripe-configuration)
+9. [Key Commands](#key-commands)
 
 ---
 
@@ -45,12 +46,14 @@ nano .env.local
 ### 3. Set Up Supabase
 - Create new Supabase project
 - Run SQL from [Database Tables](#database-tables) section
+- If using SocioScheduler, also run [SocioScheduler Extension Tables](#socioschedule-extension-tables)
 - Copy credentials to `.env.local`
 
 ### 4. Set Up Stripe
 - Create products in Stripe Dashboard
 - Copy API keys to `.env.local`
 - Set up webhook endpoint
+- If using SocioScheduler, add tier metadata to products (see [Stripe Configuration](#stripe-configuration))
 
 ### 5. Deploy to Vercel
 ```bash
@@ -178,6 +181,11 @@ UPSTASH_REDIS_REST_TOKEN=AX...
 # ===================
 NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 SESSION_SECRET=your-session-secret
+
+# ===================
+# SOCIOSCHEDULE (Optional)
+# ===================
+# SOCIO_DEBUG_MODE=true  # Enable beta debug mode with mock data
 ```
 
 ---
@@ -229,20 +237,32 @@ master-saas-muse/
 │   │   │   ├── setup/
 │   │   │   │   ├── layout.tsx
 │   │   │   │   ├── branding/page.tsx
+│   │   │   │   ├── compliance/page.tsx
 │   │   │   │   ├── content/page.tsx
-│   │   │   │   ├── pages/page.tsx
-│   │   │   │   ├── pricing/page.tsx
-│   │   │   │   ├── social/page.tsx
 │   │   │   │   ├── features/page.tsx
 │   │   │   │   ├── integrations/page.tsx
-│   │   │   │   └── musesocial/page.tsx
+│   │   │   │   ├── musesocial/page.tsx
+│   │   │   │   ├── pages/page.tsx
+│   │   │   │   ├── pricing/page.tsx
+│   │   │   │   ├── security/page.tsx
+│   │   │   │   ├── social/page.tsx
+│   │   │   │   └── support/page.tsx
 │   │   │   ├── team/page.tsx
 │   │   │   ├── users/page.tsx
 │   │   │   └── waitlist/page.tsx
+│   │   ├── dashboard/
+│   │   │   └── social/
+│   │   │       ├── overview/page.tsx
+│   │   │       ├── calendar/page.tsx
+│   │   │       ├── engagement/page.tsx
+│   │   │       ├── queue/page.tsx
+│   │   │       ├── posts/page.tsx
+│   │   │       ├── brand/page.tsx
+│   │   │       └── onboarding/page.tsx
 │   │   ├── api/
 │   │   │   ├── admin/ (setup, stats, metrics, posts, users, users/[userId], notes, team, invitations, email-templates, webhooks, sso, notifications, queue, integrations)
 │   │   │   ├── ai/ (chat, providers)
-│   │   │   ├── social/ (accounts, posts, generate-post, health)
+│   │   │   ├── social/ (accounts, posts, generate-post, health, connect, callback/[platform], tier, brand-preferences, debug)
 │   │   │   ├── auth/sso/check/
 │   │   │   ├── stripe/ (checkout, portal, products, subscription, webhook)
 │   │   │   ├── email/send/
@@ -272,6 +292,7 @@ master-saas-muse/
 │   │   ├── feedback-widget.tsx
 │   │   ├── help-widget.tsx
 │   │   ├── notification-bell.tsx
+│   │   ├── social-upgrade-banner.tsx
 │   │   └── waitlist-form.tsx
 │   ├── lib/
 │   │   ├── supabase/ (client, server, admin)
@@ -280,8 +301,8 @@ master-saas-muse/
 │   │   ├── ai/ (provider - xAI, OpenAI, Anthropic)
 │   │   ├── webhooks/ (dispatcher - HMAC, retry, fire-and-forget)
 │   │   ├── sso/ (provider - SAML SSO management)
-│   │   ├── queue/ (index - BullMQ job queue with 4 job types)
-│   │   ├── social/ (client, rate-limits, n8n-templates/)
+│   │   ├── queue/ (index - BullMQ job queue with 10 job types, types)
+│   │   ├── social/ (client, rate-limits, user-tier, debug, n8n-templates/)
 │   │   ├── config/ (secrets, ensure-table - centralized API key management)
 │   │   ├── validation/ (schemas, index)
 │   │   ├── rate-limit/ (index - Upstash Redis sliding window)
@@ -296,6 +317,11 @@ master-saas-muse/
 │   │   └── settings.ts (all settings interfaces)
 │   ├── instrumentation-client.ts (Sentry client)
 │   └── instrumentation.ts (Sentry server + queue worker)
+├── migrations/
+│   ├── core/                          # Core MuseKit tables
+│   └── extensions/                    # SocioScheduler extension tables
+│       ├── 001_socioschedule_tables.sql
+│       └── 002_engagement_metrics_placeholder.sql
 ├── tests/
 │   ├── auth.setup.ts
 │   ├── blog.spec.ts
@@ -521,6 +547,71 @@ CREATE POLICY "Service role full access admin_notes" ON admin_notes
 
 ---
 
+## SocioScheduler Extension Tables
+
+If you're using the SocioScheduler extension, run this SQL **after** the core tables. These tables are specific to SocioScheduler and would NOT exist in other Muse clones.
+
+The migration files are located in `migrations/extensions/`.
+
+```sql
+-- SocioScheduler Extension Tables
+-- Run AFTER core social tables (migrations/core/001_social_tables.sql)
+
+-- Enable UUID generation if not already enabled
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- 1. Extend social_posts with SocioScheduler-specific columns
+ALTER TABLE social_posts ADD COLUMN IF NOT EXISTS trend_source TEXT;
+ALTER TABLE social_posts ADD COLUMN IF NOT EXISTS niche_triggered TEXT;
+
+-- Expanded status values: 'queued' (BullMQ), 'approved' (user approved AI), 'ignored' (user rejected)
+-- Composite index for fast queue views
+CREATE INDEX IF NOT EXISTS idx_social_posts_user_status ON social_posts(user_id, status);
+
+-- 2. Brand Preferences table
+CREATE TABLE IF NOT EXISTS brand_preferences (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  org_id UUID NULL,
+  tone TEXT NOT NULL DEFAULT 'professional',
+  niche TEXT NOT NULL DEFAULT 'other',
+  location TEXT,
+  sample_urls TEXT[] DEFAULT '{}',
+  target_audience TEXT,
+  posting_goals TEXT,
+  preferred_platforms TEXT[] DEFAULT '{}',
+  post_frequency TEXT DEFAULT 'daily',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_brand_preferences_user_id ON brand_preferences(user_id);
+CREATE INDEX IF NOT EXISTS idx_brand_preferences_org_id ON brand_preferences(org_id);
+
+-- 3. Alert Logs table
+CREATE TABLE IF NOT EXISTS alert_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  org_id UUID NULL,
+  trend_text TEXT NOT NULL,
+  suggested_post_id UUID REFERENCES social_posts(id) ON DELETE SET NULL,
+  action_taken TEXT,
+  platform TEXT NOT NULL,
+  source_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_alert_logs_user_created ON alert_logs(user_id, created_at DESC);
+
+-- 4. Triggers (reuses update_updated_at_column() from core migration)
+DROP TRIGGER IF EXISTS brand_preferences_updated_at ON brand_preferences;
+CREATE TRIGGER brand_preferences_updated_at
+  BEFORE UPDATE ON brand_preferences
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+```
+
+---
+
 ## Supabase Configuration
 
 ### Authentication Settings
@@ -567,6 +658,18 @@ Create in Stripe Dashboard:
 - **Pro Plan**: $29/month
 - **Team Plan**: $99/month
 
+### SocioScheduler Tiers (Optional)
+
+If using SocioScheduler, create additional products with these metadata values:
+
+| Product | Metadata Key | Metadata Value | Description |
+|---------|-------------|----------------|-------------|
+| Socio Starter | `socio_tier` | `socio_starter` | 5 posts/day, 3 AI gen/day |
+| Socio Basic | `socio_tier` | `socio_basic` | 20 posts/day, 15 AI gen/day |
+| Socio Premium | `socio_tier` | `socio_premium` | 100 posts/day, 50 AI gen/day |
+
+The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these metadata values to rate limits.
+
 ### Webhook Endpoint
 - URL: `https://your-app.vercel.app/api/stripe/webhook`
 - Events to listen for:
@@ -586,7 +689,7 @@ Create in Stripe Dashboard:
 | `npm run dev` | Start development server (localhost:3000) |
 | `npm run build` | Build for production |
 | `npm run start` | Start production server |
-| `npx playwright test` | Run E2E tests (46 tests across 7 files) |
+| `npx playwright test` | Run E2E tests (92 tests across 7 files) |
 | `git push` | Deploy to Vercel (auto-deploy) |
 
 ---
@@ -615,7 +718,7 @@ Create in Stripe Dashboard:
 | Metrics Dashboard (10 KPIs + NPS + Alerts) | Complete |
 | User Management | Complete |
 | User Impersonation | Complete |
-| Setup Dashboard (8 Sub-Pages: Branding, Content, Pages, Pricing, Social, Features, Integrations, MuseSocial) | Complete |
+| Setup Dashboard (11 Sub-Pages: Branding, Compliance, Content, Features, Integrations, MuseSocial, Pages, Pricing, Security, Social, Support) | Complete |
 | Onboarding Wizard (4-step guided setup) | Complete |
 | Stripe Billing + Feature Gating | Complete |
 | Customer Portal | Complete |
@@ -632,7 +735,7 @@ Create in Stripe Dashboard:
 | Webhook/n8n Automation (8 events, HMAC signing) | Complete |
 | Sentry Error Tracking (Server + Browser) | Complete |
 | Plausible Analytics | Complete |
-| E2E Testing (46 Playwright Tests, 7 Files) | Complete |
+| E2E Testing (92 Playwright Tests, 7 Files) | Complete |
 | SEO/Sitemap | Complete |
 | Row Level Security (RLS) | Complete |
 | Rate Limiting + Security Headers | Complete |
@@ -641,10 +744,10 @@ Create in Stripe Dashboard:
 | Custom Pages System | Complete |
 | Announcement Bar | Complete |
 | SSO/SAML Enterprise Auth | Complete |
-| Queue Infrastructure (BullMQ + Upstash, 4 Job Types) | Complete |
+| Queue Infrastructure (BullMQ + Upstash, 10 Job Types) | Complete |
 | Rate Limiting (Upstash Redis) | Complete |
 | Customer Service Tools | Complete |
-| Admin Setup UX (8 Sub-Pages) | Complete |
+| Admin Setup UX (11 Sub-Pages) | Complete |
 | Legal & Compliance Pages (9 pages + cookie consent) | Complete |
 | Scheduled Metrics Reports | Complete |
 | Metrics Alerts (Churn Rate + User Growth) | Complete |
@@ -652,7 +755,8 @@ Create in Stripe Dashboard:
 | API Token Rotation | Complete |
 | MuseSocial Module (10 platforms, 2 tiers) | Complete |
 | Centralized API Keys & Integrations | Complete |
+| SocioScheduler Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
 
 ---
 
-*Last Updated: February 7, 2026*
+*Last Updated: February 9, 2026*

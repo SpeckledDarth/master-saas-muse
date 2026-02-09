@@ -43,8 +43,9 @@ A complete guide for managing your MuseKit-powered application. Written for team
 20. [Audit Log Viewer](#audit-log-viewer)
 21. [Legal & Compliance Pages](#legal--compliance-pages)
 22. [MuseSocial Module](#musesocial-module)
-23. [Feature Toggles Reference](#feature-toggles-reference)
-24. [Public Pages Your Visitors See](#public-pages-your-visitors-see)
+23. [SocioScheduler Extension](#socioschedule-extension)
+24. [Feature Toggles Reference](#feature-toggles-reference)
+25. [Public Pages Your Visitors See](#public-pages-your-visitors-see)
 
 ---
 
@@ -105,7 +106,7 @@ You only need to complete this once. After that, use the Setup Dashboard for ong
 
 **Where:** `/admin/setup`
 
-The Setup Dashboard is your master control panel for configuring every aspect of your site. It's split into eight focused sub-pages, each accessible from a sidebar navigation menu. Each sub-page handles only its own section, making it faster to load and easier to navigate.
+The Setup Dashboard is your master control panel for configuring every aspect of your site. It's split into 11 focused sub-pages, each accessible from a sidebar navigation menu. Each sub-page handles only its own section, making it faster to load and easier to navigate.
 
 ### Branding
 
@@ -232,6 +233,12 @@ Manage all your third-party service API keys from one centralized page. Keys are
 **Where:** `/admin/setup/musesocial`
 
 Configure the MuseSocial social media management module. See [MuseSocial Module](#musesocial-module) for full details.
+
+This page also includes:
+
+- **Niche Guidance** — Admin-editable entries for AI prompt customization (key/label/guidance triplets). Empty entries are automatically filtered on save.
+- **Engagement Pull Configuration** — Set the interval (1-168 hours) for how often the system fetches engagement metrics from platform APIs, and the lookback window for which posts to check.
+- **API Health Checker** — Configure status monitoring for social platform API connections, with alerts for repeated failures.
 
 ---
 
@@ -454,6 +461,10 @@ Monitor the background job processing system. Jobs are tasks that run behind the
 - **Webhook retry jobs** — Retrying failed webhook deliveries
 - **Report jobs** — Generating and emailing scheduled KPI summary reports
 - **Token rotation jobs** — Automated webhook secret rotation at configured intervals
+- **Social post jobs** — Delivering scheduled social media posts to platforms
+- **Social health check jobs** — Monitoring social platform API connectivity
+- **Social trend monitor jobs** — Tracking trends across platforms (Power tier)
+- **Social engagement pull jobs** — Fetching likes, shares, and comments from platform APIs
 
 **Dashboard shows:**
 - **Redis status** — Whether the job queue is connected (green = connected)
@@ -675,6 +686,24 @@ MuseSocial is a toggleable social media management extension built into MuseKit.
 | AI generations per day | 10 | 100 |
 | Posts per day | 20 | 10,000 |
 
+### Niche Guidance (AI Prompts)
+
+Admins can configure **niche-specific guidance entries** for the AI post generation system:
+
+- Each entry has a **key** (internal identifier), **label** (display name), and **guidance** (instructions for the AI)
+- 15 default niche prompts are provided and can be customized
+- Empty entries are automatically filtered on save
+- If no niche matches or no guidance is configured, a sensible default is used: *"Use a casual, local, authentic small business voice. Sound like a real person talking to their neighbors and community."*
+
+### Engagement Pull Configuration
+
+Configure how often the system collects engagement data (likes, shares, comments) from platform APIs:
+
+- **Pull Interval** (1-168 hours) — How often to fetch engagement metrics
+- **Lookback Window** (1-168 hours) — How far back to look for posts when pulling data
+- Both default to 24 hours if not configured
+- Settings are stored per-organization and used by the BullMQ engagement pull job
+
 ### Platform API Keys
 
 When MuseSocial is enabled, a **Platform API Keys** section appears on the MuseSocial setup page. This works the same way as the main API Keys page:
@@ -721,6 +750,57 @@ Templates are located in `src/lib/social/n8n-templates/`. Set `MUSEKIT_URL` and 
 - **"Rate limit exceeded"** — User hit daily tier cap; upgrade to Power or wait for daily reset
 - **Posts stuck in "scheduled"** — Check BullMQ queue dashboard (`/admin/queue`), verify Redis connection
 - **Token validation fails** — Re-connect the social account with fresh credentials
+
+---
+
+## SocioScheduler Extension
+
+SocioScheduler is a full SaaS product built on top of MuseKit using the database extension pattern. It provides AI-powered social media scheduling targeted at solopreneurs and gig workers.
+
+### What It Adds
+
+SocioScheduler extends MuseSocial with:
+
+- **OAuth Platform Connections** — Users connect Facebook Page, LinkedIn, and Twitter/X accounts via OAuth with PKCE
+- **Per-User Stripe Tiers** — Subscription metadata maps to three tiers (Starter/Basic/Premium) with different post and AI generation limits
+- **Brand Preferences** — Users set their tone, niche, location, target audience, posting goals, preferred platforms, and frequency
+- **AI Post Generation** — Uses 15 niche-specific prompts (admin-editable) combined with brand preferences for solopreneur-friendly content
+- **7-Page Social Dashboard**:
+  - **Overview** — Usage progress bar, posts remaining, Quick Generate dialog
+  - **Calendar** — Month-grid view with platform filters and per-platform count tooltips
+  - **Engagement** — Recharts analytics charts for likes, shares, comments
+  - **Queue** — Manage queued and scheduled posts
+  - **Posts** — Post history and management
+  - **Brand** — Brand preference settings
+  - **Onboarding** — Social-specific onboarding wizard
+
+### Upgrade Banner
+
+A reusable upgrade banner appears across all 5 social dashboard pages when a user reaches 80% of their tier's post limit. The banner:
+- Shows "X posts remaining" with a progress bar
+- Can be dismissed (stays dismissed for the browser session)
+- Links to the upgrade/pricing page
+
+### Quick Generate
+
+On the Overview page, users can generate AI posts on-demand:
+1. Click "Quick Generate"
+2. Select a platform (Facebook, LinkedIn, or Twitter/X)
+3. Enter a topic or leave blank for general content
+4. The AI generates a post using brand preferences and niche guidance
+5. Copy the result to clipboard with one click
+
+### Stripe Tier Limits
+
+| Tier | Posts/Day | AI Generations/Day | Metadata Key | Metadata Value |
+|------|-----------|-------------------|--------------|----------------|
+| Starter | 5 | 3 | `socio_tier` | `socio_starter` |
+| Basic | 20 | 15 | `socio_tier` | `socio_basic` |
+| Premium | 100 | 50 | `socio_tier` | `socio_premium` |
+
+### Debug Mode
+
+For development and testing, set the environment variable `SOCIO_DEBUG_MODE=true` to enable a debug endpoint at `/api/social/debug` that returns mock data without requiring real platform connections.
 
 ---
 
@@ -779,7 +859,7 @@ These are the pages your customers and visitors can access:
 | **Billing** | `/billing` | Subscription management (logged-in users) |
 | **Profile** | `/profile` | User profile settings (logged-in users) |
 | **Custom Pages** | `/p/{slug}` | Up to 4 custom pages you create |
-| **Dashboard Social** | `/dashboard/social` | Social media accounts (when MuseSocial is enabled) |
+| **Social Dashboard** | `/dashboard/social/*` | Social media management (when MuseSocial/SocioScheduler is enabled) |
 
 All pages automatically support dark/light mode and are responsive on mobile devices.
 
@@ -792,14 +872,16 @@ All pages automatically support dark/light mode and are responsive on mobile dev
 - **Test after changes** — After saving, visit your public pages to verify changes look correct
 - **Use the onboarding wizard first** — If this is a new setup, complete the onboarding wizard before diving into the Setup Dashboard
 - **Keep your Stripe Dashboard in sync** — Pricing plans are managed in Stripe, not in MuseKit. If plans look wrong, check Stripe first.
-- **Monitor the Job Queue** — If emails aren't being sent, check the Queue dashboard for failed jobs
+- **Monitor the Job Queue** — If emails aren't being sent or engagement data isn't updating, check the Queue dashboard for failed jobs
 - **Test webhooks** — Use the "Test Webhook" button before relying on webhook integrations
 - **Check the Metrics Dashboard regularly** — Monitor KPIs and set up alert thresholds to catch issues early
 - **Review the Audit Log** — Periodically check the audit log for unexpected admin actions
 - **Backup before major changes** — The platform supports checkpoints, but it's good practice to note your current settings before making sweeping changes
 - **API Keys page first** — After initial setup, configure your required API keys on the Integrations page to ensure all services are connected
 - **MuseSocial setup** — If using social features, enable the module first, then configure platforms and API keys on the same page
+- **SocioScheduler tiers** — Set up Stripe products with metadata key `socio_tier` and values (`socio_starter`, `socio_basic`, `socio_premium`) to enable per-user tier resolution
+- **Engagement pull settings** — Adjust the engagement pull interval based on your API rate limits and how frequently you need updated metrics
 
 ---
 
-*Last Updated: February 7, 2026*
+*Last Updated: February 9, 2026*

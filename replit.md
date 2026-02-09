@@ -31,7 +31,7 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **Marketing Tools**: Waitlist mode, in-app feedback widget, and customizable marketing pages.
 - **Security**: Supabase RLS, Zod validation, rate limiting, and security headers.
 - **Monitoring**: Sentry for error tracking and Plausible for analytics.
-- **Queue Infrastructure**: BullMQ with Upstash Redis for job queues (email, webhook-retry, report), managed via an admin dashboard.
+- **Queue Infrastructure**: BullMQ with Upstash Redis for 10 job types (email, webhook-retry, report, metrics-report, metrics-alert, token-rotation, social-post, social-health-check, social-trend-monitor, social-engagement-pull), managed via an admin dashboard.
 - **Rate Limiting**: Upstash Redis sliding window with in-memory fallback.
 - **In-App Notifications**: Bell icon with unread badges, popover list, and server-side utilities.
 - **User Impersonation**: Admin capability with cookie-based sessions, warning banners, and audit logging.
@@ -40,10 +40,15 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **API Token Rotation**: Automated webhook secret rotation via BullMQ.
 - **MuseSocial Module**: Toggleable social media management extension supporting 10 platforms, featuring AI-powered post generation, scheduling, and health checks. It includes tier-based rate limiting, a conditional onboarding wizard, and integrates n8n workflow templates. Centralized API keys are managed via dedicated admin setup pages.
 - **SocioScheduler Extension**: A SaaS built on MuseKit, providing AI social media scheduling for solopreneurs. It supports Facebook, LinkedIn, and Twitter/X, with brand preference systems, multi-tier pricing, and an approval queue for AI-generated posts. It uses a database extension pattern for its tables (migrations/extensions/). Key features:
-  - Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata (socio_starter/basic/premium) to rate limits
+  - Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `socio_tier` (values: socio_starter/basic/premium) to rate limits
   - OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
   - Engagement analytics dashboard with Recharts charts (`/dashboard/social/engagement`)
-  - Calendar view with month-grid showing scheduled posts (`/dashboard/social/calendar`)
+  - Calendar view with month-grid showing scheduled posts and per-platform count tooltips (`/dashboard/social/calendar`)
+  - 7-page social dashboard: overview, calendar, engagement, queue, posts, brand preferences, onboarding
+  - Quick Generate dialog on Overview page (platform picker + topic input, copy-to-clipboard)
+  - Reusable `SocialUpgradeBanner` component (80%+ usage trigger, sessionStorage dismissal, integrated across 5 pages)
+  - 15 admin-editable niche-specific AI prompts with default fallback voice
+  - Admin-configurable engagement pull settings (intervalHours/lookbackHours, 1-168h range)
   - Structured AI prompt system using all brand preference fields for solopreneur-friendly content
   - Beta debug mode via `SOCIO_DEBUG_MODE=true` env var with mock data at `/api/social/debug`
   - All RLS policies verified, proper empty states on all dashboard pages, no secrets exposed
