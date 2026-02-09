@@ -107,6 +107,12 @@ export default function PricingPage() {
 
   const hasStripeProducts = stripeProducts.length > 0 && !stripeError
 
+  const sortedStripeProducts = [...stripeProducts].sort((a, b) => {
+    const orderA = parseInt(a.metadata.sort_order || '999', 10)
+    const orderB = parseInt(b.metadata.sort_order || '999', 10)
+    return orderA - orderB
+  })
+
   const getStripePrice = (product: StripeProduct, interval: 'month' | 'year'): StripePrice | undefined => {
     return product.prices.find(p => p.recurring?.interval === interval)
   }
@@ -157,99 +163,106 @@ export default function PricingPage() {
       </div>
 
       {hasStripeProducts ? (
-        <div className={`grid gap-8 max-w-5xl mx-auto ${stripeProducts.length >= 2 ? 'md:grid-cols-3' : stripeProducts.length === 1 ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
-          {pricing?.showFreePlan !== false && (
-            <Card data-testid="card-plan-free">
-              <CardHeader>
-                <div className="flex items-center justify-between gap-2">
-                  <CardTitle>{pricing?.freePlanName || 'Free'}</CardTitle>
-                </div>
-                <CardDescription>
-                  {pricing?.freePlanDescription || 'Perfect for getting started'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">$0</span>
-                  <span className="text-muted-foreground">/forever</span>
-                </div>
-                <ul className="space-y-3">
-                  {(pricing?.freePlanFeatures || ['Basic features', 'Up to 100 items', 'Community support']).map((feature: string, i: number) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  className="w-full" 
-                  variant="outline"
-                  onClick={() => router.push('/signup')}
-                  data-testid="button-subscribe-free"
-                >
-                  Get Started Free
-                </Button>
-              </CardFooter>
-            </Card>
-          )}
-          {stripeProducts.map((product, index) => {
-            const price = getStripePrice(product, billingInterval)
-            const isPopular = product.metadata.popular === 'true' || (pricing?.showFreePlan !== false ? index === 0 : index === 1)
-
-            return (
-              <Card 
-                key={product.id} 
-                className={isPopular ? 'border-primary shadow-lg' : ''}
-                data-testid={`card-plan-${product.id}`}
-              >
-                <CardHeader>
-                  <div className="flex items-center justify-between gap-2">
-                    <CardTitle>{product.name}</CardTitle>
-                    {isPopular && <Badge>Popular</Badge>}
-                  </div>
-                  <CardDescription>
-                    {product.description || 'Get started with this plan'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="mb-6">
-                    {price ? (
-                      <>
-                        <span className="text-4xl font-bold">{formatStripePrice(price.unit_amount, price.currency)}</span>
-                        <span className="text-muted-foreground">/{billingInterval}</span>
-                      </>
-                    ) : (
-                      <span className="text-4xl font-bold">Contact Us</span>
-                    )}
-                  </div>
-                  {product.metadata.features && (
+        (() => {
+          const totalCards = sortedStripeProducts.length + (pricing?.showFreePlan !== false ? 1 : 0)
+          const layout = pricing?.cardLayout || 'auto'
+          const colsClass = layout === '2' ? 'md:grid-cols-2' : layout === '3' ? 'md:grid-cols-3' : layout === '4' ? 'md:grid-cols-4' : totalCards <= 2 ? 'md:grid-cols-2' : totalCards === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'
+          return (
+            <div className={`grid gap-8 max-w-6xl mx-auto ${colsClass}`}>
+              {pricing?.showFreePlan !== false && (
+                <Card data-testid="card-plan-free">
+                  <CardHeader>
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle>{pricing?.freePlanName || 'Free'}</CardTitle>
+                    </div>
+                    <CardDescription className="whitespace-pre-line">
+                      {pricing?.freePlanDescription || 'Perfect for getting started'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="mb-6">
+                      <span className="text-4xl font-bold">$0</span>
+                      <span className="text-muted-foreground">/forever</span>
+                    </div>
                     <ul className="space-y-3">
-                      {product.metadata.features.split(',').map((feature, i) => (
+                      {(pricing?.freePlanFeatures || ['Basic features', 'Up to 100 items', 'Community support']).map((feature: string, i: number) => (
                         <li key={i} className="flex items-center gap-2">
                           <Check className="h-4 w-4 text-green-500" />
-                          <span className="text-sm">{feature.trim()}</span>
+                          <span className="text-sm">{feature}</span>
                         </li>
                       ))}
                     </ul>
-                  )}
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    className="w-full" 
-                    variant={isPopular ? 'default' : 'outline'}
-                    onClick={() => price && handleSubscribe(price.id, product.id)}
-                    disabled={!price || isSubscribing === product.id}
-                    data-testid={`button-subscribe-${product.id}`}
+                  </CardContent>
+                  <CardFooter>
+                    <Button 
+                      className="w-full" 
+                      variant="outline"
+                      onClick={() => router.push('/signup')}
+                      data-testid="button-subscribe-free"
+                    >
+                      Get Started Free
+                    </Button>
+                  </CardFooter>
+                </Card>
+              )}
+              {sortedStripeProducts.map((product) => {
+                const price = getStripePrice(product, billingInterval)
+                const isPopular = product.metadata.popular === 'true'
+
+                return (
+                  <Card 
+                    key={product.id} 
+                    className={isPopular ? 'border-primary shadow-lg' : ''}
+                    data-testid={`card-plan-${product.id}`}
                   >
-                    {isSubscribing === product.id ? 'Loading...' : price ? 'Subscribe' : 'Contact Sales'}
-                  </Button>
-                </CardFooter>
-              </Card>
-            )
-          })}
-        </div>
+                    <CardHeader>
+                      <div className="flex items-center justify-between gap-2">
+                        <CardTitle>{product.name}</CardTitle>
+                        {isPopular && <Badge>Popular</Badge>}
+                      </div>
+                      <CardDescription className="whitespace-pre-line">
+                        {product.description || 'Get started with this plan'}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="mb-6">
+                        {price ? (
+                          <>
+                            <span className="text-4xl font-bold">{formatStripePrice(price.unit_amount, price.currency)}</span>
+                            <span className="text-muted-foreground">/{billingInterval}</span>
+                          </>
+                        ) : (
+                          <span className="text-4xl font-bold">Contact Us</span>
+                        )}
+                      </div>
+                      {product.metadata.features && (
+                        <ul className="space-y-3">
+                          {product.metadata.features.split(',').map((feature, i) => (
+                            <li key={i} className="flex items-center gap-2">
+                              <Check className="h-4 w-4 text-green-500" />
+                              <span className="text-sm">{feature.trim()}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </CardContent>
+                    <CardFooter>
+                      <Button 
+                        className="w-full" 
+                        variant={isPopular ? 'default' : 'outline'}
+                        onClick={() => price && handleSubscribe(price.id, product.id)}
+                        disabled={!price || isSubscribing === product.id}
+                        data-testid={`button-subscribe-${product.id}`}
+                      >
+                        {isSubscribing === product.id ? 'Loading...' : price ? 'Subscribe' : 'Contact Sales'}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                )
+              })}
+            </div>
+          )
+        })()
       ) : (
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {(pricing?.plans || []).map((plan) => {

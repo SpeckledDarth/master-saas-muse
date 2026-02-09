@@ -49,6 +49,7 @@ export interface PricingSettings {
   freePlanName?: string
   freePlanDescription?: string
   freePlanFeatures?: string[]
+  cardLayout?: 'auto' | '2' | '3' | '4'
 }
 
 export interface SocialLinks {

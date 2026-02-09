@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { DollarSign, Loader2, Save, Check } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DollarSign, Loader2, Save, Check, LayoutGrid } from 'lucide-react'
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
 import { SaveButton, InfoTooltip } from '../components'
 
@@ -50,13 +51,15 @@ export default function PricingPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="freePlanDescription">Description</Label>
-                  <Input
+                  <Textarea
                     id="freePlanDescription"
                     value={settings.pricing?.freePlanDescription ?? ''}
                     onChange={e => updatePricing('freePlanDescription', e.target.value)}
-                    placeholder="Perfect for getting started"
+                    placeholder="Perfect for getting started&#10;Add more details on a new line"
+                    rows={3}
                     data-testid="input-free-plan-description"
                   />
+                  <p className="text-xs text-muted-foreground">Supports multiple lines for marketing content</p>
                 </div>
               </div>
 
@@ -109,10 +112,46 @@ export default function PricingPage() {
             <p className="font-medium">How it works:</p>
             <ol className="list-decimal list-inside space-y-1">
               <li>Create or edit products in Stripe Dashboard</li>
-              <li>Set product names, prices, and descriptions</li>
-              <li>Add features in the product metadata (key: features, value: JSON array)</li>
+              <li>Set product names, prices, and multi-line descriptions</li>
+              <li>Add features in the product metadata (key: <code className="text-xs bg-muted px-1 rounded">features</code>, value: comma-separated list)</li>
+              <li>Set display order with metadata key <code className="text-xs bg-muted px-1 rounded">sort_order</code> (e.g. 1, 2, 3)</li>
+              <li>Mark the featured plan with metadata key <code className="text-xs bg-muted px-1 rounded">popular</code> set to <code className="text-xs bg-muted px-1 rounded">true</code></li>
               <li>Your pricing page will automatically display the updates</li>
             </ol>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <LayoutGrid className="h-5 w-5" />
+            Card Layout <InfoTooltip text="Control how pricing cards are arranged on your pricing page. Auto will choose the best layout based on the number of plans." />
+          </CardTitle>
+          <CardDescription>
+            Choose how pricing cards are displayed on the page
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Cards Per Row</Label>
+            <Select
+              value={settings.pricing?.cardLayout ?? 'auto'}
+              onValueChange={value => updatePricing('cardLayout', value as 'auto' | '2' | '3' | '4')}
+            >
+              <SelectTrigger data-testid="select-card-layout" className="w-full">
+                <SelectValue placeholder="Select layout" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="auto">Auto (based on plan count)</SelectItem>
+                <SelectItem value="2">2 per row</SelectItem>
+                <SelectItem value="3">3 per row</SelectItem>
+                <SelectItem value="4">4 per row</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Auto mode shows 2 columns for 2 plans, 3 columns for 3 plans, and 4 columns for 4+ plans
+            </p>
           </div>
         </CardContent>
       </Card>
