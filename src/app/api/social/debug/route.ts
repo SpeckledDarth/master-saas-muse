@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { isDebugMode, getMockTrends, getMockAlert, getMockEngagementData } from '@/lib/social/debug'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 async function getAuthenticatedUser() {
   const cookieStore = await cookies()
@@ -32,6 +33,15 @@ export async function GET(request: NextRequest) {
   const user = await getAuthenticatedUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const rateLimitResult = await checkRateLimit(user.id, {
+    limit: 30,
+    windowMs: 60 * 1000,
+    identifier: `social:debug:${user.id}`,
+  })
+  if (!rateLimitResult.success) {
+    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
   }
 
   const { searchParams } = new URL(request.url)

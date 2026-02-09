@@ -62,6 +62,7 @@ export default function SocialCalendarPage() {
   const [loading, setLoading] = useState(true)
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [platformFilter, setPlatformFilter] = useState<string | null>(null)
   const { toast } = useToast()
 
   const currentYear = currentDate.getFullYear()
@@ -88,9 +89,19 @@ export default function SocialCalendarPage() {
     fetchPosts()
   }, [fetchPosts])
 
+  const scheduledPosts = useMemo(() => posts.filter(p => p.scheduled_at), [posts])
+
+  const availablePlatforms = useMemo(() => {
+    const platforms = new Set(scheduledPosts.map(p => p.platform))
+    return Array.from(platforms).sort()
+  }, [scheduledPosts])
+
   const postsByDate = useMemo(() => {
+    const filtered = platformFilter
+      ? posts.filter(p => p.platform === platformFilter)
+      : posts
     const map: Record<string, CalendarPost[]> = {}
-    for (const post of posts) {
+    for (const post of filtered) {
       if (!post.scheduled_at) continue
       const date = new Date(post.scheduled_at)
       const key = toDateKey(date)
@@ -98,9 +109,7 @@ export default function SocialCalendarPage() {
       map[key].push(post)
     }
     return map
-  }, [posts])
-
-  const scheduledPosts = useMemo(() => posts.filter(p => p.scheduled_at), [posts])
+  }, [posts, platformFilter])
 
   const calendarDays = useMemo(() => {
     const daysInMonth = getDaysInMonth(currentYear, currentMonth)
@@ -171,6 +180,30 @@ export default function SocialCalendarPage() {
           View your scheduled social media posts on a calendar
         </p>
       </div>
+
+      {scheduledPosts.length > 0 && (
+        <div className="flex items-center gap-2 flex-wrap" data-testid="filter-platforms">
+          <Button
+            variant={platformFilter === null ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setPlatformFilter(null)}
+            data-testid="button-filter-all"
+          >
+            All
+          </Button>
+          {availablePlatforms.map(platform => (
+            <Button
+              key={platform}
+              variant={platformFilter === platform ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setPlatformFilter(platformFilter === platform ? null : platform)}
+              data-testid={`button-filter-${platform}`}
+            >
+              {PLATFORM_NAMES[platform] || platform}
+            </Button>
+          ))}
+        </div>
+      )}
 
       {scheduledPosts.length === 0 ? (
         <Card>

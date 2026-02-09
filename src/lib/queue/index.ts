@@ -1,6 +1,6 @@
 import { Queue, Worker, Job, QueueEvents } from 'bullmq'
 import { getIORedisConnection, createNewIORedisConnection } from '@/lib/redis/connection'
-import type { QueueJobData, EmailJobData, WebhookRetryJobData, ReportJobData, MetricsReportJobData, MetricsAlertJobData, TokenRotationJobData, SocialPostJobData, SocialHealthCheckJobData, SocialTrendMonitorJobData, QueueMetrics, JobStatus } from './types'
+import type { QueueJobData, EmailJobData, WebhookRetryJobData, ReportJobData, MetricsReportJobData, MetricsAlertJobData, TokenRotationJobData, SocialPostJobData, SocialHealthCheckJobData, SocialTrendMonitorJobData, SocialEngagementPullJobData, QueueMetrics, JobStatus } from './types'
 import type { SocialPlatform } from '@/types/settings'
 
 const QUEUE_NAME = 'musekit-jobs'
@@ -325,6 +325,74 @@ async function processSocialTrendMonitorJob(job: Job<SocialTrendMonitorJobData>)
   console.log(`[Queue] Trend monitoring completed for ${job.data.platform}`)
 }
 
+async function processSocialEngagementPullJob(job: Job<SocialEngagementPullJobData>): Promise<void> {
+  const lookbackMs = (job.data.lookbackHours || 48) * 60 * 60 * 1000
+  const since = new Date(Date.now() - lookbackMs).toISOString()
+
+  console.log(`[Queue] Pulling engagement metrics for ${job.data.platform} (user ${job.data.userId}) since ${since}`)
+
+  try {
+    const { getPlatformClient } = await import('@/lib/social/client')
+    const { createClient } = await import('@supabase/supabase-js')
+    const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+
+    const { data: account } = await admin
+      .from('social_accounts')
+      .select('access_token_encrypted')
+      .eq('user_id', job.data.userId)
+      .eq('platform', job.data.platform)
+      .eq('is_valid', true)
+      .single()
+
+    if (!account?.access_token_encrypted) {
+      console.warn(`[Queue] No valid ${job.data.platform} account for user ${job.data.userId}, skipping engagement pull`)
+      return
+    }
+
+    const { data: posts } = await admin
+      .from('social_posts')
+      .select('id, platform_post_id')
+      .eq('user_id', job.data.userId)
+      .eq('platform', job.data.platform)
+      .eq('status', 'posted')
+      .not('platform_post_id', 'is', null)
+      .gte('posted_at', since)
+      .limit(50)
+
+    if (!posts || posts.length === 0) {
+      console.log(`[Queue] No recent posted content to pull metrics for`)
+      return
+    }
+
+    const client = getPlatformClient(job.data.platform as SocialPlatform)
+    let updated = 0
+
+    for (const post of posts) {
+      try {
+        const metrics = await client.getPostEngagement(account.access_token_encrypted, post.platform_post_id)
+        if (metrics && Object.keys(metrics).length > 0) {
+          await admin
+            .from('social_posts')
+            .update({
+              engagement_data: metrics,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', post.id)
+          updated++
+        }
+      } catch (err) {
+        console.warn(`[Queue] Failed to pull metrics for post ${post.id}:`, (err as Error).message)
+      }
+    }
+
+    await job.updateProgress(100)
+    console.log(`[Queue] Engagement pull completed: ${updated}/${posts.length} posts updated`)
+  } catch (err) {
+    console.error(`[Queue] Engagement pull job failed:`, (err as Error).message)
+    throw err
+  }
+}
+
 async function processJob(job: Job<QueueJobData>): Promise<void> {
   console.log(`[Queue] Processing job ${job.id}: ${job.data.type}`)
 
@@ -347,6 +415,8 @@ async function processJob(job: Job<QueueJobData>): Promise<void> {
       return processSocialHealthCheckJob(job as Job<SocialHealthCheckJobData>)
     case 'social-trend-monitor':
       return processSocialTrendMonitorJob(job as Job<SocialTrendMonitorJobData>)
+    case 'social-engagement-pull':
+      return processSocialEngagementPullJob(job as Job<SocialEngagementPullJobData>)
     default:
       throw new Error(`Unknown job type: ${(job.data as QueueJobData).type}`)
   }
@@ -483,6 +553,21 @@ export async function addSocialTrendMonitorJob(data: Omit<SocialTrendMonitorJobD
 
   const job = await q.add('social-trend-monitor', { type: 'social-trend-monitor' as const, ...data }, {
     priority: 5,
+  })
+
+  return job.id || null
+}
+
+export async function addSocialEngagementPullJob(data: Omit<SocialEngagementPullJobData, 'type'>): Promise<string | null> {
+  const q = getQueue()
+  if (!q) return null
+
+  const jobId = `engagement-pull:${data.userId}:${data.platform}`
+
+  const job = await q.add('social-engagement-pull', { type: 'social-engagement-pull' as const, ...data }, {
+    jobId,
+    priority: 5,
+    repeat: { every: 24 * 60 * 60 * 1000, key: jobId },
   })
 
   return job.id || null

@@ -1,4 +1,4 @@
-export type JobType = 'email' | 'webhook-retry' | 'report' | 'metrics-report' | 'metrics-alert' | 'token-rotation' | 'social-post' | 'social-health-check' | 'social-trend-monitor'
+export type JobType = 'email' | 'webhook-retry' | 'report' | 'metrics-report' | 'metrics-alert' | 'token-rotation' | 'social-post' | 'social-health-check' | 'social-trend-monitor' | 'social-engagement-pull'
 
 export interface EmailJobData {
   type: 'email'
@@ -74,7 +74,14 @@ export interface SocialTrendMonitorJobData {
   userId: string
 }
 
-export type QueueJobData = EmailJobData | WebhookRetryJobData | ReportJobData | MetricsReportJobData | MetricsAlertJobData | TokenRotationJobData | SocialPostJobData | SocialHealthCheckJobData | SocialTrendMonitorJobData
+export interface SocialEngagementPullJobData {
+  type: 'social-engagement-pull'
+  userId: string
+  platform: string
+  lookbackHours: number
+}
+
+export type QueueJobData = EmailJobData | WebhookRetryJobData | ReportJobData | MetricsReportJobData | MetricsAlertJobData | TokenRotationJobData | SocialPostJobData | SocialHealthCheckJobData | SocialTrendMonitorJobData | SocialEngagementPullJobData
 
 export interface JobStatus {
   id: string

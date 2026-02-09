@@ -127,6 +127,30 @@ function buildSocialPrompt(
   prompt += `- Write like a real person, not a marketing bot\n`
   prompt += `- Be specific and concrete, avoid generic platitudes\n\n`
 
+  const nicheGuidance: Record<string, string> = {
+    plumbing: 'Keep it casual and local. Talk like a neighbor who happens to fix pipes. Mention common household problems people relate to.',
+    hvac: 'Keep it casual and local. Talk like the trusted tech who keeps homes comfortable. Reference seasonal concerns.',
+    electrical: 'Keep it casual and local. Emphasize safety and reliability. Reference common home electrical concerns.',
+    landscaping: 'Keep it visual and seasonal. Talk about curb appeal and outdoor living. Reference local weather and seasons.',
+    cleaning: 'Keep it friendly and relatable. Talk about the relief of coming home to a clean space. Reference busy schedules.',
+    'real_estate': 'Be market-savvy but approachable. Share local insights and neighborhood knowledge. Reference market trends without jargon.',
+    'real estate': 'Be market-savvy but approachable. Share local insights and neighborhood knowledge. Reference market trends without jargon.',
+    rideshare: 'Keep it real and relatable. Talk about the hustle, tips for riders, and city life. Be down-to-earth.',
+    freelance: 'Be authentic about the freelance life. Share lessons learned and wins. Connect with other independents.',
+    photography: 'Be visual and passionate. Talk about capturing moments and telling stories. Share behind-the-scenes insights.',
+    fitness: 'Be motivating without being preachy. Share practical tips and real results. Keep it encouraging.',
+    food: 'Be warm and inviting. Talk about flavors, community, and the story behind the food. Make people hungry.',
+    beauty: 'Be confident and inclusive. Share tips, transformations, and self-care moments. Celebrate individuality.',
+    tutoring: 'Be encouraging and knowledgeable. Share study tips, success stories, and learning moments. Keep it supportive.',
+    pet_care: 'Be warm and playful. Talk about the bond between pets and their people. Share practical care tips.',
+  }
+
+  const nicheLower = niche.toLowerCase().replace(/[-_\s]+/g, '_')
+  const nicheHint = nicheGuidance[nicheLower] || nicheGuidance[niche.toLowerCase()] || ''
+  if (nicheHint) {
+    prompt += `NICHE VOICE:\n- ${nicheHint}\n\n`
+  }
+
   if (niche || audience || goals) {
     prompt += `BUSINESS CONTEXT:\n`
     if (niche) {
