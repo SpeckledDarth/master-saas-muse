@@ -3,6 +3,7 @@ import { getUncachableStripeClient } from '@/lib/stripe/client';
 import { stripeService } from '@/lib/stripe/service';
 import { queueSubscriptionEmail, sendSubscriptionCancelledEmail } from '@/lib/email';
 import { dispatchWebhook } from '@/lib/webhooks/dispatcher';
+import { productRegistry } from '@/lib/products/registry';
 import Stripe from 'stripe';
 
 export const runtime = 'nodejs';
@@ -18,6 +19,47 @@ async function getCustomerEmail(stripe: Stripe, customerId: string): Promise<{ e
   } catch {
     return null;
   }
+}
+
+async function resolveProductFromSubscription(
+  stripe: Stripe,
+  subscription: Stripe.Subscription
+): Promise<{ productSlug: string; tierId: string } | null> {
+  const metaProductSlug = (subscription as any).metadata?.muse_product;
+  
+  const item = subscription.items.data[0];
+  if (!item?.price) return null;
+  
+  let stripeProductId: string | null = null;
+  const product = item.price.product;
+  if (typeof product === 'string') {
+    stripeProductId = product;
+  } else if (typeof product === 'object' && product && !product.deleted) {
+    stripeProductId = product.id;
+  }
+  
+  if (!stripeProductId) return null;
+  
+  const museProduct = await productRegistry.getProductByStripeId(stripeProductId);
+  if (!museProduct) {
+    if (metaProductSlug) {
+      const productBySlug = await productRegistry.getProduct(metaProductSlug);
+      if (productBySlug) {
+        const fullProduct = await stripe.products.retrieve(stripeProductId);
+        const metadataValue = fullProduct.metadata?.[productBySlug.metadataKey];
+        const tierDef = productBySlug.tierDefinitions.find(t => t.stripeMetadataValue === metadataValue);
+        return { productSlug: metaProductSlug, tierId: tierDef?.id || productBySlug.tierDefinitions[0]?.id || 'free' };
+      }
+    }
+    return null;
+  }
+  
+  const fullProduct = await stripe.products.retrieve(stripeProductId);
+  const metadataValue = fullProduct.metadata?.[museProduct.metadataKey];
+  const tierDef = museProduct.tierDefinitions.find(t => t.stripeMetadataValue === metadataValue);
+  const tierId = tierDef?.id || museProduct.tierDefinitions[0]?.id || 'free';
+  
+  return { productSlug: museProduct.slug, tierId };
 }
 
 export async function POST(request: NextRequest) {
@@ -50,6 +92,24 @@ export async function POST(request: NextRequest) {
           );
           await stripeService.syncSubscriptionToDatabase(subscription);
           console.log('Subscription synced to database:', subscription.id);
+
+          const productInfo = await resolveProductFromSubscription(stripe, subscription);
+          if (productInfo) {
+            const userId = (subscription as any).metadata?.muse_user_id || session.client_reference_id;
+            if (userId) {
+              await productRegistry.upsertSubscription({
+                userId,
+                productSlug: productInfo.productSlug,
+                stripeSubscriptionId: subscription.id,
+                stripePriceId: subscription.items.data[0]?.price?.id,
+                tierId: productInfo.tierId,
+                status: 'active',
+                currentPeriodEnd: new Date((subscription as unknown as { current_period_end: number }).current_period_end * 1000).toISOString(),
+                cancelAtPeriodEnd: false,
+              });
+              console.log(`Product subscription synced: ${productInfo.productSlug} tier=${productInfo.tierId}`);
+            }
+          }
 
           if (session.customer && session.mode === 'subscription') {
             const customerData = await getCustomerEmail(stripe, session.customer as string);
@@ -91,6 +151,23 @@ export async function POST(request: NextRequest) {
         console.log('Subscription updated:', subscription.id);
         await stripeService.syncSubscriptionToDatabase(subscription);
 
+        const productInfo = await resolveProductFromSubscription(stripe, subscription);
+        if (productInfo) {
+          const userId = (subscription as any).metadata?.muse_user_id;
+          if (userId) {
+            await productRegistry.upsertSubscription({
+              userId,
+              productSlug: productInfo.productSlug,
+              stripeSubscriptionId: subscription.id,
+              stripePriceId: subscription.items.data[0]?.price?.id,
+              tierId: productInfo.tierId,
+              status: stripeService.mapStripeStatus(subscription.status),
+              currentPeriodEnd: new Date((subscription as unknown as { current_period_end: number }).current_period_end * 1000).toISOString(),
+              cancelAtPeriodEnd: (subscription as any).cancel_at_period_end || false,
+            });
+          }
+        }
+
         if ((subscription as any).cancel_at_period_end && subscription.customer) {
           const customerData = await getCustomerEmail(stripe, subscription.customer as string);
           if (customerData?.email) {
@@ -129,6 +206,9 @@ export async function POST(request: NextRequest) {
           ? subscription.customer 
           : subscription.customer.id;
         await stripeService.clearSubscriptionFromDatabase(customerId);
+
+        await productRegistry.clearSubscriptionByStripeId(subscription.id);
+        console.log(`Product subscription cleared for stripe sub: ${subscription.id}`);
 
         dispatchWebhook('subscription.cancelled', {
           subscriptionId: subscription.id,

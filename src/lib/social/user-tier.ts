@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
-import { stripeService } from '@/lib/stripe/service'
-import { isActiveSubscription } from '@/lib/stripe/feature-gate'
-import type { TierDefinition } from '@/lib/social/types'
-import { DEFAULT_TIER_DEFINITIONS } from '@/lib/social/types'
+import { getUserProductTier } from '@/lib/products'
+import { DEFAULT_TIER_DEFINITIONS } from './types'
+import type { TierDefinition } from './types'
 
 function buildStripeMetadataMap(tierDefinitions: TierDefinition[]): Record<string, string> {
   const map: Record<string, string> = {}
@@ -38,8 +37,21 @@ export async function getUserSocialTier(
   fallbackTier: string = 'tier_1'
 ): Promise<{ tier: string; source: 'subscription' | 'admin' }> {
   try {
-    const sub = await stripeService.getSubscriptionInfo(userId)
+    const result = await getUserProductTier(userId, 'socio-scheduler')
+    if (result.source !== 'default') {
+      return {
+        tier: result.tier,
+        source: result.source === 'subscription' ? 'subscription' : 'admin',
+      }
+    }
+  } catch {
+  }
 
+  try {
+    const { stripeService } = await import('@/lib/stripe/service')
+    const { isActiveSubscription } = await import('@/lib/stripe/feature-gate')
+
+    const sub = await stripeService.getSubscriptionInfo(userId)
     if (!isActiveSubscription(sub.status)) {
       return { tier: fallbackTier, source: 'admin' }
     }
@@ -57,19 +69,16 @@ export async function getUserSocialTier(
         if (typeof product === 'object' && !product.deleted && product.metadata?.muse_tier) {
           const tierDefinitions = await loadTierDefinitions()
           const metadataMap = buildStripeMetadataMap(tierDefinitions)
-          const mappedTierId = metadataMap[product.metadata.muse_tier]
-          if (mappedTierId) {
-            return { tier: mappedTierId, source: 'subscription' }
+          const mappedTier = metadataMap[product.metadata.muse_tier]
+          if (mappedTier) {
+            return { tier: mappedTier, source: 'subscription' }
           }
         }
-      } catch (err) {
-        console.error('Error resolving social tier from price:', err)
+      } catch {
       }
     }
-
-    return { tier: fallbackTier, source: 'admin' }
-  } catch (err) {
-    console.error('Error getting user social tier:', err)
-    return { tier: fallbackTier, source: 'admin' }
+  } catch {
   }
+
+  return { tier: fallbackTier, source: 'admin' }
 }

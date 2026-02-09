@@ -1,4 +1,6 @@
 import { stripeService, SubscriptionInfo } from './service';
+import { productRegistry } from '@/lib/products/registry'
+import type { ProductTierDefinition } from '@/lib/products/types'
 
 export type SubscriptionTier = 'free' | 'pro' | 'team';
 
@@ -90,4 +92,54 @@ export async function checkUserAccess(
     userTier,
     requiredTier,
   };
+}
+
+export async function checkProductFeature(
+  userId: string,
+  productSlug: string,
+  featureKey: string
+): Promise<{ hasAccess: boolean; currentValue: number | boolean; limit: number | boolean }> {
+  try {
+    const sub = await productRegistry.getUserSubscription(userId, productSlug)
+    const product = await productRegistry.getProduct(productSlug)
+    
+    if (!product) {
+      return { hasAccess: false, currentValue: false, limit: false }
+    }
+
+    const tierId = sub?.tierId || 'free'
+    const tierDef = product.tierDefinitions.find((t: ProductTierDefinition) => t.id === tierId)
+    const limits = tierDef?.limits || {}
+    const limit = limits[featureKey]
+
+    if (limit === undefined) {
+      return { hasAccess: true, currentValue: true, limit: true }
+    }
+
+    if (typeof limit === 'boolean') {
+      return { hasAccess: limit, currentValue: limit, limit }
+    }
+
+    return { hasAccess: true, currentValue: 0, limit }
+  } catch {
+    return { hasAccess: false, currentValue: false, limit: false }
+  }
+}
+
+export async function getProductTierLimits(
+  userId: string,
+  productSlug: string
+): Promise<Record<string, number | boolean>> {
+  try {
+    const sub = await productRegistry.getUserSubscription(userId, productSlug)
+    const product = await productRegistry.getProduct(productSlug)
+    
+    if (!product) return {}
+
+    const tierId = sub?.tierId || 'free'
+    const tierDef = product.tierDefinitions.find((t: ProductTierDefinition) => t.id === tierId)
+    return tierDef?.limits || {}
+  } catch {
+    return {}
+  }
 }

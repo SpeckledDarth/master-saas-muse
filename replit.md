@@ -38,6 +38,7 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **Metrics & Reporting**: Admin dashboard for KPIs (ARPU, LTV, Churn Rate, NPS), scheduled reports, and alerts.
 - **Database Backup Configuration**: Admin UI for setting backup notification preferences.
 - **API Token Rotation**: Automated webhook secret rotation via BullMQ.
+- **Product Registry**: Multi-product support via `muse_products` table and `muse_product_subscriptions` table. Each SaaS product registers with its own Stripe product ID, metadata key, and tier definitions. Admin UI at `/admin/setup/products`. Generic tier resolution via `getUserProductTier(userId, productSlug)` in `src/lib/products/tier-resolver.ts`. Product-scoped checkout (productSlug param) and webhook routing. Feature gating via `checkProductFeature` and `getProductTierLimits` in `src/lib/stripe/feature-gate.ts`. See `docs/ADDING_A_PRODUCT.md` for the full guide.
 
 ### SocioScheduler (Product Layer)
 SocioScheduler is a standalone SaaS product built ON TOP of MuseKit (not a toggleable module within it). MuseKit core has zero awareness of social features -- the dependency is one-way: social code imports from MuseKit core, never the reverse.
@@ -51,7 +52,7 @@ SocioScheduler is a standalone SaaS product built ON TOP of MuseKit (not a toggl
 
 **Key Features:**
 - AI social media scheduling for solopreneurs (Facebook, LinkedIn, Twitter/X)
-- Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `muse_tier` (values: tier_1/tier_2/tier_3, admin-configurable) to rate limits. Tier definitions stored in admin settings as `tierDefinitions`
+- Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) uses the product registry (`getUserProductTier(userId, 'socio-scheduler')`) with legacy fallback to direct Stripe metadata lookup. Tier definitions stored in product registry as `tierDefinitions`
 - OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
 - Engagement analytics dashboard with Recharts charts (`/dashboard/social/engagement`)
 - Calendar view with month-grid showing scheduled posts (`/dashboard/social/calendar`)

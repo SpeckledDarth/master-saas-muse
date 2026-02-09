@@ -134,7 +134,87 @@ export class StripeService {
     }
   }
 
-  private mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionInfo['status'] {
+  async getSubscriptionForProduct(userId: string, stripeProductId: string): Promise<SubscriptionInfo> {
+    const freeResult: SubscriptionInfo = {
+      status: 'free',
+      tier: 'free',
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+      subscriptionId: null,
+      priceId: null,
+    };
+
+    try {
+      const allSubs = await this.getAllSubscriptions(userId);
+      const match = allSubs.find(s => s.productId === stripeProductId);
+      if (!match) return freeResult;
+
+      return {
+        status: match.status,
+        tier: 'pro',
+        currentPeriodEnd: match.currentPeriodEnd,
+        cancelAtPeriodEnd: match.cancelAtPeriodEnd,
+        subscriptionId: match.subscriptionId,
+        priceId: match.priceId,
+      };
+    } catch (error) {
+      console.error('Error fetching product subscription:', error);
+      return freeResult;
+    }
+  }
+
+  async getAllSubscriptions(userId: string): Promise<Array<{
+    subscriptionId: string;
+    priceId: string | null;
+    productId: string | null;
+    status: SubscriptionInfo['status'];
+    currentPeriodEnd: string | null;
+    cancelAtPeriodEnd: boolean;
+  }>> {
+    const supabase = await createClient();
+    
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', userId)
+      .single();
+    
+    if (!profile?.stripe_customer_id) return [];
+
+    const stripe = await getUncachableStripeClient();
+    
+    try {
+      const subscriptions = await stripe.subscriptions.list({
+        customer: profile.stripe_customer_id,
+        status: 'all',
+        expand: ['data.items.data.price.product'],
+      });
+
+      return subscriptions.data
+        .filter(sub => ['active', 'trialing', 'past_due'].includes(sub.status))
+        .map(sub => {
+          const item = sub.items.data[0];
+          const price = item?.price;
+          const product = price?.product;
+          const productId = typeof product === 'string' ? product : 
+            (typeof product === 'object' && product && !product.deleted) ? product.id : null;
+
+          return {
+            subscriptionId: sub.id,
+            priceId: price?.id || null,
+            productId,
+            status: this.mapStripeStatus(sub.status),
+            currentPeriodEnd: new Date((sub as unknown as { current_period_end: number }).current_period_end * 1000).toISOString(),
+            cancelAtPeriodEnd: (sub as unknown as { cancel_at_period_end: boolean }).cancel_at_period_end,
+          };
+        });
+    } catch (error) {
+      console.error('Error fetching all subscriptions:', error);
+      return [];
+    }
+  }
+
+  public mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionInfo['status'] {
     switch (status) {
       case 'active':
         return 'active';
