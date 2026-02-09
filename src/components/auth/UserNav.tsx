@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { User } from '@supabase/supabase-js'
-import { Shield } from 'lucide-react'
+import { Shield, CalendarDays } from 'lucide-react'
 
 export function UserNav() {
   const [user, setUser] = useState<User | null>(null)
@@ -144,6 +144,12 @@ export function UserNav() {
             </Link>
           </DropdownMenuItem>
         )}
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard/social/overview" data-testid="link-socioscheduler" className="flex items-center">
+            <CalendarDays className="mr-2 h-4 w-4" />
+            SocioScheduler
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/profile" data-testid="link-profile">Profile</Link>
         </DropdownMenuItem>
