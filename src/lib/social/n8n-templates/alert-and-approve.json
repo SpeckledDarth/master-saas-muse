@@ -1,0 +1,64 @@
+{
+  "name": "SocioScheduler Alert & Approve via Email",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "socioscheduler-alert",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [200, 300],
+      "typeVersion": 2,
+      "webhookId": "socioscheduler-alert"
+    },
+    {
+      "parameters": {
+        "url": "={{$env.MUSEKIT_URL}}/api/email/send",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "={{$json.body.user_email}}"
+            },
+            {
+              "name": "subject",
+              "value": "SocioScheduler: Trending topic detected - {{$json.body.trend_text}}"
+            },
+            {
+              "name": "html",
+              "value": "<h2>Trending Topic Detected</h2><p>We found a trending topic relevant to your niche on <strong>{{$json.body.platform}}</strong>:</p><blockquote>{{$json.body.trend_text}}</blockquote><p>We've drafted a post for you:</p><blockquote>{{$json.body.suggested_content}}</blockquote><p><a href='{{$env.MUSEKIT_URL}}/dashboard/social/queue'>Review & Approve in Dashboard</a></p><p>Or take quick action:</p><ul><li><a href='{{$env.MUSEKIT_URL}}/api/social/posts/{{$json.body.post_id}}/approve'>Approve & Post Now</a></li><li><a href='{{$env.MUSEKIT_URL}}/dashboard/social/queue'>Edit Before Posting</a></li></ul>"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Cookie",
+              "value": "={{$env.MUSEKIT_SESSION_COOKIE}}"
+            }
+          ]
+        }
+      },
+      "name": "Send Alert Email via Resend",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [440, 300],
+      "typeVersion": 4.2
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [{ "node": "Send Alert Email via Resend", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

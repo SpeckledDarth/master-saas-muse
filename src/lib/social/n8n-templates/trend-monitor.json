@@ -1,0 +1,216 @@
+{
+  "name": "SocioScheduler Trend Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "name": "Every 6 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [200, 300],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "url": "={{$env.MUSEKIT_URL}}/api/social/brand-preferences",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Cookie",
+              "value": "={{$env.MUSEKIT_SESSION_COOKIE}}"
+            }
+          ]
+        }
+      },
+      "name": "Get Brand Preferences",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [420, 300],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "https://api.x.com/2/tweets/search/recent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{$json.preferences.niche}} -is:retweet lang:en"
+            },
+            {
+              "name": "max_results",
+              "value": "10"
+            },
+            {
+              "name": "tweet.fields",
+              "value": "public_metrics,created_at"
+            }
+          ]
+        }
+      },
+      "name": "Search X Trends",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [640, 200],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v19.0/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{$json.preferences.niche}} {{$json.preferences.location}}"
+            },
+            {
+              "name": "type",
+              "value": "post"
+            }
+          ]
+        }
+      },
+      "name": "Search Facebook Mentions",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [640, 400],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "={{$env.MUSEKIT_URL}}/api/social/generate-post",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "platform",
+              "value": "={{$json.platform}}"
+            },
+            {
+              "name": "topic",
+              "value": "={{$json.trend_text}}"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Cookie",
+              "value": "={{$env.MUSEKIT_SESSION_COOKIE}}"
+            }
+          ]
+        }
+      },
+      "name": "Generate AI Post from Trend",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [860, 300],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "={{$env.MUSEKIT_URL}}/api/social/alert-log",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "trend_text",
+              "value": "={{$json.trend_text}}"
+            },
+            {
+              "name": "platform",
+              "value": "={{$json.platform}}"
+            },
+            {
+              "name": "suggested_post_id",
+              "value": "={{$json.post_id}}"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Cookie",
+              "value": "={{$env.MUSEKIT_SESSION_COOKIE}}"
+            }
+          ]
+        }
+      },
+      "name": "Log Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1080, 300],
+      "typeVersion": 4.2
+    }
+  ],
+  "connections": {
+    "Every 6 Hours": {
+      "main": [
+        [{ "node": "Get Brand Preferences", "type": "main", "index": 0 }]
+      ]
+    },
+    "Get Brand Preferences": {
+      "main": [
+        [
+          { "node": "Search X Trends", "type": "main", "index": 0 },
+          { "node": "Search Facebook Mentions", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Search X Trends": {
+      "main": [
+        [{ "node": "Generate AI Post from Trend", "type": "main", "index": 0 }]
+      ]
+    },
+    "Search Facebook Mentions": {
+      "main": [
+        [{ "node": "Generate AI Post from Trend", "type": "main", "index": 0 }]
+      ]
+    },
+    "Generate AI Post from Trend": {
+      "main": [
+        [{ "node": "Log Alert", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

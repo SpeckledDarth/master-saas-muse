@@ -48,17 +48,84 @@ const PLATFORM_LIMITS: Record<string, number> = {
   twitter: 280,
   linkedin: 3000,
   instagram: 2200,
+  facebook: 63206,
+  youtube: 5000,
+  tiktok: 2200,
+  reddit: 40000,
+  pinterest: 500,
+  snapchat: 250,
+  discord: 2000,
 }
 
-function buildSocialPrompt(platform: string, topic: string, brandVoice: string, style: string, includeHashtags: boolean, maxLength: number): string {
+interface BrandPreferences {
+  tone: string
+  niche: string
+  location: string | null
+  target_audience: string | null
+  posting_goals: string | null
+  sample_urls: string[]
+}
+
+async function getUserBrandPreferences(userId: string): Promise<BrandPreferences | null> {
+  try {
+    const admin = getSupabaseAdmin()
+    const { data, error } = await admin
+      .from('brand_preferences')
+      .select('tone, niche, location, target_audience, posting_goals, sample_urls')
+      .eq('user_id', userId)
+      .single()
+    if (error || !data) return null
+    return data as BrandPreferences
+  } catch {
+    return null
+  }
+}
+
+function buildSocialPrompt(
+  platform: string,
+  topic: string,
+  brandVoice: string,
+  style: string,
+  includeHashtags: boolean,
+  maxLength: number,
+  brandPrefs?: BrandPreferences | null
+): string {
   const platformNames: Record<string, string> = {
     twitter: 'Twitter/X',
     linkedin: 'LinkedIn',
     instagram: 'Instagram',
+    facebook: 'Facebook',
+    youtube: 'YouTube',
+    tiktok: 'TikTok',
+    reddit: 'Reddit',
+    pinterest: 'Pinterest',
+    snapchat: 'Snapchat',
+    discord: 'Discord',
   }
 
   let prompt = `You are a social media content expert. Generate a single ${platformNames[platform] || platform} post about the following topic.\n\n`
   prompt += `Topic: ${topic}\n\n`
+
+  if (brandPrefs) {
+    prompt += `Brand Context:\n`
+    if (brandPrefs.niche && brandPrefs.niche !== 'other') {
+      prompt += `- Business niche: ${brandPrefs.niche}\n`
+    }
+    if (brandPrefs.tone) {
+      prompt += `- Brand tone: ${brandPrefs.tone}\n`
+    }
+    if (brandPrefs.target_audience) {
+      prompt += `- Target audience: ${brandPrefs.target_audience}\n`
+    }
+    if (brandPrefs.location) {
+      prompt += `- Location/market: ${brandPrefs.location}\n`
+    }
+    if (brandPrefs.posting_goals) {
+      prompt += `- Posting goals: ${brandPrefs.posting_goals}\n`
+    }
+    prompt += `\n`
+  }
+
   prompt += `Requirements:\n`
   prompt += `- Platform: ${platformNames[platform] || platform}\n`
   prompt += `- Maximum length: ${maxLength} characters\n`
@@ -84,6 +151,14 @@ function buildSocialPrompt(platform: string, topic: string, brandVoice: string, 
   } else if (platform === 'instagram') {
     prompt += `- Write an engaging caption\n`
     prompt += `- Consider using emojis sparingly for visual appeal\n`
+  } else if (platform === 'facebook') {
+    prompt += `- Write for a Facebook Page audience\n`
+    prompt += `- Conversational and engaging tone\n`
+    prompt += `- Encourage comments and shares\n`
+  } else if (platform === 'reddit') {
+    prompt += `- Write in a genuine, community-appropriate tone\n`
+    prompt += `- Avoid sounding promotional or sales-y\n`
+    prompt += `- Be informative and add value to the discussion\n`
   }
 
   prompt += `\nRespond with ONLY the post content, nothing else. No quotes, no explanations, no prefixes like "Here's your post:".`
@@ -152,16 +227,19 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  if (!platform || !['twitter', 'linkedin', 'instagram'].includes(platform)) {
-    return NextResponse.json({ error: 'Invalid platform. Must be twitter, linkedin, or instagram.' }, { status: 400 })
+  const validPlatforms = ['twitter', 'linkedin', 'instagram', 'facebook', 'youtube', 'tiktok', 'reddit', 'pinterest', 'snapchat', 'discord']
+  if (!platform || !validPlatforms.includes(platform)) {
+    return NextResponse.json({ error: `Invalid platform. Must be one of: ${validPlatforms.join(', ')}` }, { status: 400 })
   }
 
   if (!topic || typeof topic !== 'string' || topic.trim().length === 0) {
     return NextResponse.json({ error: 'Topic is required' }, { status: 400 })
   }
 
-  const effectiveBrandVoice = brandVoice || socialModule.posting?.defaultBrandVoice || ''
-  const effectiveStyle = style || 'professional'
+  const brandPrefs = await getUserBrandPreferences(user.id)
+
+  const effectiveBrandVoice = brandVoice || brandPrefs?.tone || socialModule.posting?.defaultBrandVoice || ''
+  const effectiveStyle = style || (brandPrefs?.tone ? brandPrefs.tone : 'professional')
   const effectiveIncludeHashtags = includeHashtags !== false
   const effectiveMaxLength = maxLength || PLATFORM_LIMITS[platform] || 280
 
@@ -171,7 +249,8 @@ export async function POST(request: NextRequest) {
     effectiveBrandVoice,
     effectiveStyle,
     effectiveIncludeHashtags,
-    effectiveMaxLength
+    effectiveMaxLength,
+    brandPrefs
   )
 
   try {

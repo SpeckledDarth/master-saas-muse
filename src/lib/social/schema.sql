@@ -2,7 +2,7 @@
 create table if not exists social_accounts (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users(id) on delete cascade not null,
-  platform text not null check (platform in ('twitter', 'linkedin', 'instagram')),
+  platform text not null,
   platform_user_id text,
   platform_username text,
   display_name text,

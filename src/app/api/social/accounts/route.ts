@@ -2,8 +2,9 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-import { defaultSettings } from '@/types/settings'
+import { defaultSettings, type SocialModuleTier } from '@/types/settings'
 import { getPlatformClient, type SocialPlatform } from '@/lib/social/client'
+import { checkPlatformLimit } from '@/lib/social/rate-limits'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -36,7 +37,7 @@ async function isModuleEnabled(): Promise<boolean> {
   return data?.settings?.features?.socialModuleEnabled ?? false
 }
 
-const VALID_PLATFORMS: SocialPlatform[] = ['twitter', 'linkedin', 'instagram']
+const VALID_PLATFORMS: SocialPlatform[] = ['twitter', 'linkedin', 'instagram', 'facebook', 'youtube', 'tiktok', 'reddit', 'pinterest', 'snapchat', 'discord']
 
 export async function GET() {
   const user = await getAuthenticatedUser()
@@ -97,11 +98,30 @@ export async function POST(request: NextRequest) {
   const { platform, accessToken, refreshToken } = body
 
   if (!platform || !VALID_PLATFORMS.includes(platform as SocialPlatform)) {
-    return NextResponse.json({ error: 'Invalid platform. Must be one of: twitter, linkedin, instagram' }, { status: 400 })
+    return NextResponse.json({ error: `Invalid platform. Must be one of: ${VALID_PLATFORMS.join(', ')}` }, { status: 400 })
   }
 
   if (!accessToken) {
     return NextResponse.json({ error: 'Access token is required' }, { status: 400 })
+  }
+
+  const admin = getSupabaseAdmin()
+  const settingsRes = await admin.from('organization_settings').select('settings').eq('app_id', 'default').single()
+  const tier: SocialModuleTier = settingsRes.data?.settings?.features?.socialModuleTier ?? 'starter'
+
+  const { data: existingAccounts } = await admin
+    .from('social_accounts')
+    .select('id, platform')
+    .eq('user_id', user.id)
+
+  const uniquePlatforms = new Set((existingAccounts || []).map((a: { platform: string }) => a.platform))
+  if (!uniquePlatforms.has(platform)) {
+    const platformCheck = checkPlatformLimit(uniquePlatforms.size, tier)
+    if (!platformCheck.allowed) {
+      return NextResponse.json({
+        error: `Platform limit reached. Your ${tier} plan allows ${platformCheck.maxPlatforms} platforms. Upgrade for more.`
+      }, { status: 429 })
+    }
   }
 
   const client = getPlatformClient(platform as SocialPlatform)
@@ -114,7 +134,6 @@ export async function POST(request: NextRequest) {
   const profile = await client.getUserProfile(accessToken)
 
   try {
-    const admin = getSupabaseAdmin()
     const { data, error } = await admin
       .from('social_accounts')
       .upsert({

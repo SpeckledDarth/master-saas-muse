@@ -490,16 +490,29 @@ export default function MuseSocialPage() {
                     <SelectValue placeholder="Select tier" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="universal" data-testid="option-tier-universal">Universal</SelectItem>
-                    <SelectItem value="power" data-testid="option-tier-power">Power</SelectItem>
+                    <SelectItem value="starter" data-testid="option-tier-starter">Starter ($19/mo)</SelectItem>
+                    <SelectItem value="basic" data-testid="option-tier-basic">Basic ($39/mo)</SelectItem>
+                    <SelectItem value="premium" data-testid="option-tier-premium">Premium ($69/mo)</SelectItem>
+                    <SelectItem value="universal" data-testid="option-tier-universal">Universal (Legacy)</SelectItem>
+                    <SelectItem value="power" data-testid="option-tier-power">Power (Legacy)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="text-sm text-muted-foreground">
-                {socialModule.tier === 'universal' ? (
-                  <p data-testid="text-tier-description">Auto-post changelogs, basic brand monitoring, share buttons</p>
-                ) : (
-                  <p data-testid="text-tier-description">Full scheduling, trend analysis, AI content generation, analytics, mention automation</p>
+                {socialModule.tier === 'starter' && (
+                  <p data-testid="text-tier-description">15 posts/month, 5 AI generations/day, 2 platforms. Great for side-hustlers and gig workers.</p>
+                )}
+                {socialModule.tier === 'basic' && (
+                  <p data-testid="text-tier-description">30 posts/month, 10 AI generations/day, 3 platforms, basic analytics. For solopreneurs and small businesses.</p>
+                )}
+                {socialModule.tier === 'premium' && (
+                  <p data-testid="text-tier-description">Unlimited posts, 100 AI generations/day, 10 platforms, approval queue, advanced alerts. For power users.</p>
+                )}
+                {socialModule.tier === 'universal' && (
+                  <p data-testid="text-tier-description">Legacy tier: 20 posts/day, 10 AI generations/day.</p>
+                )}
+                {socialModule.tier === 'power' && (
+                  <p data-testid="text-tier-description">Legacy tier: Unlimited posts, 100 AI generations/day.</p>
                 )}
               </div>
             </CardContent>

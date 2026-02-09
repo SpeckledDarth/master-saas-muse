@@ -1,0 +1,28 @@
+-- SocioScheduler Extension: Engagement Metrics (Post-MVP)
+-- 
+-- For MVP, engagement data is stored in social_posts.engagement_data (JSONB).
+-- This table provides a normalized structure for advanced analytics when needed.
+-- 
+-- DO NOT RUN THIS MIGRATION IN MVP. It is a placeholder for future use.
+--
+
+-- CREATE TABLE IF NOT EXISTS engagement_metrics (
+--   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+--   post_id UUID NOT NULL REFERENCES social_posts(id) ON DELETE CASCADE,
+--   platform TEXT NOT NULL,
+--   metric_type TEXT NOT NULL,  -- 'likes', 'shares', 'comments', 'impressions', 'clicks', 'reach'
+--   value INTEGER DEFAULT 0,
+--   recorded_at TIMESTAMPTZ DEFAULT NOW(),
+--   created_at TIMESTAMPTZ DEFAULT NOW()
+-- );
+-- 
+-- CREATE INDEX idx_engagement_metrics_post_id ON engagement_metrics(post_id);
+-- CREATE INDEX idx_engagement_metrics_platform ON engagement_metrics(platform);
+-- CREATE INDEX idx_engagement_metrics_recorded_at ON engagement_metrics(recorded_at);
+-- 
+-- ALTER TABLE engagement_metrics ENABLE ROW LEVEL SECURITY;
+-- 
+-- CREATE POLICY "Users can view own engagement metrics" ON engagement_metrics
+--   FOR SELECT USING (
+--     post_id IN (SELECT id FROM social_posts WHERE user_id = auth.uid())
+--   );

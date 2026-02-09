@@ -11,7 +11,7 @@ export const n8nTemplates = [
     id: "ai-generate-and-schedule",
     name: "AI Generate and Schedule Social Posts",
     description:
-      "Uses AI to generate social media posts daily at 9am and schedules them for publishing.",
+      "Uses AI to generate social media posts daily at 9am using your brand preferences, then schedules them for publishing.",
     filename: "ai-generate-and-schedule.json",
     category: "ai",
   },
@@ -22,6 +22,22 @@ export const n8nTemplates = [
       "Monitors engagement metrics hourly and sends Slack or email alerts when posts have low engagement.",
     filename: "engagement-monitor.json",
     category: "monitoring",
+  },
+  {
+    id: "trend-monitor",
+    name: "Trend Monitor & AI Post Generator",
+    description:
+      "Scans X/Twitter and Facebook every 6 hours for trends matching your niche, generates AI posts from trending topics, and logs alerts.",
+    filename: "trend-monitor.json",
+    category: "automation",
+  },
+  {
+    id: "alert-and-approve",
+    name: "Alert & Approve via Email",
+    description:
+      "Sends email notifications via Resend when a trending topic is detected, with quick approve/edit links back to your dashboard.",
+    filename: "alert-and-approve.json",
+    category: "notification",
   },
 ] as const;
 

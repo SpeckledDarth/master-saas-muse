@@ -357,7 +357,7 @@ export interface MetricsSettings {
   }
 }
 
-export type SocialModuleTier = 'universal' | 'power'
+export type SocialModuleTier = 'starter' | 'basic' | 'premium' | 'universal' | 'power'
 
 export type SocialPlatform = 'twitter' | 'linkedin' | 'instagram' | 'youtube' | 'facebook' | 'tiktok' | 'reddit' | 'pinterest' | 'snapchat' | 'discord'
 
@@ -369,6 +369,8 @@ export interface SocialAccountConfig {
 export interface TierLimits {
   dailyAiGenerations: number
   dailyPosts: number
+  monthlyPosts?: number
+  maxPlatforms?: number
 }
 
 export interface SocialModuleSettings {
@@ -1159,8 +1161,11 @@ We regularly review and update our security practices. This page reflects our cu
     monthlyReportEnabled: false,
   },
   socialModule: {
-    tier: 'universal',
+    tier: 'starter',
     tierLimits: {
+      starter: { dailyAiGenerations: 5, dailyPosts: 1, monthlyPosts: 15, maxPlatforms: 2 },
+      basic: { dailyAiGenerations: 10, dailyPosts: 2, monthlyPosts: 30, maxPlatforms: 3 },
+      premium: { dailyAiGenerations: 100, dailyPosts: 10000, monthlyPosts: 999999, maxPlatforms: 10 },
       universal: { dailyAiGenerations: 10, dailyPosts: 20 },
       power: { dailyAiGenerations: 100, dailyPosts: 10000 },
     },
