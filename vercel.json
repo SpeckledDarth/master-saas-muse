@@ -5,7 +5,7 @@
   "crons": [
     {
       "path": "/api/social/cron/process-scheduled",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 * * * *"
     },
     {
       "path": "/api/social/cron/pull-engagement",
