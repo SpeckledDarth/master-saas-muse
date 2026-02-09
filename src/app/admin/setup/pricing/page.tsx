@@ -108,16 +108,41 @@ export default function PricingPage() {
             </Button>
           </div>
           
-          <div className="text-sm text-muted-foreground space-y-2">
+          <div className="text-sm space-y-4">
             <p className="font-medium">How it works:</p>
-            <ol className="list-decimal list-inside space-y-1">
+            <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
               <li>Create or edit products in Stripe Dashboard</li>
               <li>Set product names, prices, and multi-line descriptions</li>
-              <li>Add features in the product metadata (key: <code className="text-xs bg-muted px-1 rounded">features</code>, value: comma-separated list)</li>
-              <li>Set display order with metadata key <code className="text-xs bg-muted px-1 rounded">sort_order</code> (e.g. 1, 2, 3)</li>
-              <li>Mark the featured plan with metadata key <code className="text-xs bg-muted px-1 rounded">popular</code> set to <code className="text-xs bg-muted px-1 rounded">true</code></li>
               <li>Your pricing page will automatically display the updates</li>
             </ol>
+
+            <div className="border rounded-md p-4 space-y-3">
+              <p className="font-medium">Stripe Product Metadata Keys</p>
+              <p className="text-xs text-muted-foreground">Add these as metadata key/value pairs on each Stripe product to control how cards appear on your pricing page.</p>
+              <div className="grid gap-3">
+                <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+                  <code className="text-xs bg-muted px-2 py-1 rounded font-mono flex-shrink-0">features</code>
+                  <div>
+                    <p className="text-sm">Comma-separated list of features shown with checkmarks</p>
+                    <p className="text-xs text-muted-foreground mt-1">Example: <code className="bg-muted px-1 rounded">Unlimited posts, Priority support, API access</code></p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+                  <code className="text-xs bg-muted px-2 py-1 rounded font-mono flex-shrink-0">sort_order</code>
+                  <div>
+                    <p className="text-sm">Controls the left-to-right display order of cards</p>
+                    <p className="text-xs text-muted-foreground mt-1">Example: <code className="bg-muted px-1 rounded">1</code>, <code className="bg-muted px-1 rounded">2</code>, <code className="bg-muted px-1 rounded">3</code> (lowest number appears first)</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+                  <code className="text-xs bg-muted px-2 py-1 rounded font-mono flex-shrink-0">popular</code>
+                  <div>
+                    <p className="text-sm">Highlights the card with a border and &ldquo;Popular&rdquo; badge</p>
+                    <p className="text-xs text-muted-foreground mt-1">Set to <code className="bg-muted px-1 rounded">true</code> on exactly one product to highlight it</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
