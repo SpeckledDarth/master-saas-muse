@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-import { defaultSettings, type SocialModuleTier } from '@/types/settings'
+import { defaultSettings } from '@/types/settings'
 import { getPlatformClient, type SocialPlatform } from '@/lib/social/client'
 import { checkPlatformLimit } from '@/lib/social/rate-limits'
 import { getUserSocialTier } from '@/lib/social/user-tier'
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 
   const admin = getSupabaseAdmin()
   const settingsRes = await admin.from('organization_settings').select('settings').eq('app_id', 'default').single()
-  const adminTier: SocialModuleTier = settingsRes.data?.settings?.features?.socialModuleTier ?? 'starter'
+  const adminTier: string = settingsRes.data?.settings?.socialModule?.tier ?? 'tier_1'
   const { tier } = await getUserSocialTier(user.id, adminTier)
 
   const { data: existingAccounts } = await admin

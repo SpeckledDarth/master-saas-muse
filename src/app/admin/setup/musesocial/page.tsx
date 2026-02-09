@@ -16,8 +16,8 @@ import {
   AlertTriangle, KeyRound, ChevronDown, ChevronRight, CircleDot,
   ExternalLink, Loader2, Pencil, Check, X, Eye, EyeOff, Trash2, Plus, BookOpen
 } from 'lucide-react'
-import { defaultSettings } from '@/types/settings'
-import type { SocialModuleTier, NicheGuidanceEntry } from '@/types/settings'
+import { defaultSettings, DEFAULT_TIER_DEFINITIONS } from '@/types/settings'
+import type { NicheGuidanceEntry, TierDefinition } from '@/types/settings'
 
 interface IntegrationKey {
   id: string
@@ -474,123 +474,193 @@ export default function MuseSocialPage() {
         <>
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">Tier Selection <InfoTooltip text="Determines which social features your users can access and their daily usage limits." /></CardTitle>
+              <CardTitle className="flex items-center gap-2">Tier Configuration <InfoTooltip text="Define your subscription tiers, their Stripe metadata values, and usage limits. Add as many tiers as your SaaS needs. The Stripe Metadata Value must match the muse_tier value on your Stripe products." /></CardTitle>
               <CardDescription>
-                Choose the feature tier for your social module
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Module Tier</Label>
-                <Select
-                  value={socialModule.tier}
-                  onValueChange={(value) => updateSocialModule('tier', value as SocialModuleTier)}
-                >
-                  <SelectTrigger data-testid="select-social-tier">
-                    <SelectValue placeholder="Select tier" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="starter" data-testid="option-tier-starter">Starter ($19/mo)</SelectItem>
-                    <SelectItem value="basic" data-testid="option-tier-basic">Basic ($39/mo)</SelectItem>
-                    <SelectItem value="premium" data-testid="option-tier-premium">Premium ($69/mo)</SelectItem>
-                    <SelectItem value="universal" data-testid="option-tier-universal">Universal (Legacy)</SelectItem>
-                    <SelectItem value="power" data-testid="option-tier-power">Power (Legacy)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {socialModule.tier === 'starter' && (
-                  <p data-testid="text-tier-description">15 posts/month, 5 AI generations/day, 2 platforms. Great for side-hustlers and gig workers.</p>
-                )}
-                {socialModule.tier === 'basic' && (
-                  <p data-testid="text-tier-description">30 posts/month, 10 AI generations/day, 3 platforms, basic analytics. For solopreneurs and small businesses.</p>
-                )}
-                {socialModule.tier === 'premium' && (
-                  <p data-testid="text-tier-description">Unlimited posts, 100 AI generations/day, 10 platforms, approval queue, advanced alerts. For power users.</p>
-                )}
-                {socialModule.tier === 'universal' && (
-                  <p data-testid="text-tier-description">Legacy tier: 20 posts/day, 10 AI generations/day.</p>
-                )}
-                {socialModule.tier === 'power' && (
-                  <p data-testid="text-tier-description">Legacy tier: Unlimited posts, 100 AI generations/day.</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">Tier Rate Limits <InfoTooltip text="Set daily caps per user to control API costs. Higher limits mean more API calls to social platforms." /></CardTitle>
-              <CardDescription>
-                Configure daily usage caps for each tier. These limits apply per user per day.
+                Define subscription tiers with display names, Stripe metadata mappings, and rate limits. Each tier gets an auto-generated ID.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <h4 className="font-medium text-sm">Universal Tier</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="universal-ai">AI Generations / Day</Label>
-                    <Input
-                      id="universal-ai"
-                      type="number"
-                      min={1}
-                      value={socialModule.tierLimits?.universal?.dailyAiGenerations ?? 10}
-                      onChange={(e) => updateSocialModule('tierLimits', {
-                        ...socialModule.tierLimits,
-                        universal: { ...socialModule.tierLimits?.universal, dailyAiGenerations: parseInt(e.target.value) || 1 },
-                      })}
-                      data-testid="input-universal-ai-limit"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="universal-posts">Posts / Day</Label>
-                    <Input
-                      id="universal-posts"
-                      type="number"
-                      min={1}
-                      value={socialModule.tierLimits?.universal?.dailyPosts ?? 20}
-                      onChange={(e) => updateSocialModule('tierLimits', {
-                        ...socialModule.tierLimits,
-                        universal: { ...socialModule.tierLimits?.universal, dailyPosts: parseInt(e.target.value) || 1 },
-                      })}
-                      data-testid="input-universal-post-limit"
-                    />
-                  </div>
-                </div>
+              <div className="space-y-2">
+                <Label>Default Tier</Label>
+                <Select
+                  value={socialModule.tier}
+                  onValueChange={(value) => updateSocialModule('tier', value)}
+                >
+                  <SelectTrigger data-testid="select-social-tier">
+                    <SelectValue placeholder="Select default tier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(socialModule.tierDefinitions || DEFAULT_TIER_DEFINITIONS).map((td: TierDefinition) => (
+                      <SelectItem key={td.id} value={td.id} data-testid={`option-tier-${td.id}`}>
+                        {td.displayName} ({td.id})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Users without a paid subscription fall back to this tier.</p>
               </div>
+
               <div className="space-y-4">
-                <h4 className="font-medium text-sm">Power Tier</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="power-ai">AI Generations / Day</Label>
-                    <Input
-                      id="power-ai"
-                      type="number"
-                      min={1}
-                      value={socialModule.tierLimits?.power?.dailyAiGenerations ?? 100}
-                      onChange={(e) => updateSocialModule('tierLimits', {
-                        ...socialModule.tierLimits,
-                        power: { ...socialModule.tierLimits?.power, dailyAiGenerations: parseInt(e.target.value) || 1 },
-                      })}
-                      data-testid="input-power-ai-limit"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="power-posts">Posts / Day</Label>
-                    <Input
-                      id="power-posts"
-                      type="number"
-                      min={1}
-                      value={socialModule.tierLimits?.power?.dailyPosts ?? 10000}
-                      onChange={(e) => updateSocialModule('tierLimits', {
-                        ...socialModule.tierLimits,
-                        power: { ...socialModule.tierLimits?.power, dailyPosts: parseInt(e.target.value) || 1 },
-                      })}
-                      data-testid="input-power-post-limit"
-                    />
-                  </div>
-                </div>
+                {(socialModule.tierDefinitions || DEFAULT_TIER_DEFINITIONS).map((td: TierDefinition, idx: number) => {
+                  const defs = socialModule.tierDefinitions || DEFAULT_TIER_DEFINITIONS
+                  return (
+                    <div key={td.id} className="border rounded-md p-4 space-y-4">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{td.id}</Badge>
+                          <span className="font-medium text-sm">{td.displayName}</span>
+                        </div>
+                        {defs.length > 1 && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              const updated = defs.filter((_: TierDefinition, i: number) => i !== idx)
+                              updateSocialModule('tierDefinitions', updated)
+                              const newLimits = { ...socialModule.tierLimits }
+                              delete newLimits[td.id]
+                              updateSocialModule('tierLimits', newLimits)
+                              if (socialModule.tier === td.id && updated.length > 0) {
+                                updateSocialModule('tier', updated[0].id)
+                              }
+                            }}
+                            data-testid={`button-remove-tier-${td.id}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Display Name</Label>
+                          <Input
+                            value={td.displayName}
+                            onChange={(e) => {
+                              const updated = [...defs]
+                              updated[idx] = { ...td, displayName: e.target.value }
+                              updateSocialModule('tierDefinitions', updated)
+                            }}
+                            data-testid={`input-tier-name-${td.id}`}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Stripe Metadata Value</Label>
+                          <Input
+                            value={td.stripeMetadataValue}
+                            onChange={(e) => {
+                              const updated = [...defs]
+                              updated[idx] = { ...td, stripeMetadataValue: e.target.value }
+                              updateSocialModule('tierDefinitions', updated)
+                            }}
+                            data-testid={`input-tier-stripe-${td.id}`}
+                          />
+                          <p className="text-xs text-muted-foreground">Set muse_tier to this value on your Stripe product.</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                        <div className="space-y-2">
+                          <Label>AI / Day</Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            value={td.limits.dailyAiGenerations}
+                            onChange={(e) => {
+                              const updated = [...defs]
+                              updated[idx] = { ...td, limits: { ...td.limits, dailyAiGenerations: parseInt(e.target.value) || 1 } }
+                              updateSocialModule('tierDefinitions', updated)
+                              updateSocialModule('tierLimits', {
+                                ...socialModule.tierLimits,
+                                [td.id]: updated[idx].limits,
+                              })
+                            }}
+                            data-testid={`input-tier-ai-${td.id}`}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Posts / Day</Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            value={td.limits.dailyPosts}
+                            onChange={(e) => {
+                              const updated = [...defs]
+                              updated[idx] = { ...td, limits: { ...td.limits, dailyPosts: parseInt(e.target.value) || 1 } }
+                              updateSocialModule('tierDefinitions', updated)
+                              updateSocialModule('tierLimits', {
+                                ...socialModule.tierLimits,
+                                [td.id]: updated[idx].limits,
+                              })
+                            }}
+                            data-testid={`input-tier-posts-${td.id}`}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Posts / Month</Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            value={td.limits.monthlyPosts ?? 999999}
+                            onChange={(e) => {
+                              const updated = [...defs]
+                              updated[idx] = { ...td, limits: { ...td.limits, monthlyPosts: parseInt(e.target.value) || 1 } }
+                              updateSocialModule('tierDefinitions', updated)
+                              updateSocialModule('tierLimits', {
+                                ...socialModule.tierLimits,
+                                [td.id]: updated[idx].limits,
+                              })
+                            }}
+                            data-testid={`input-tier-monthly-${td.id}`}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Max Platforms</Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={10}
+                            value={td.limits.maxPlatforms ?? 10}
+                            onChange={(e) => {
+                              const updated = [...defs]
+                              updated[idx] = { ...td, limits: { ...td.limits, maxPlatforms: parseInt(e.target.value) || 1 } }
+                              updateSocialModule('tierDefinitions', updated)
+                              updateSocialModule('tierLimits', {
+                                ...socialModule.tierLimits,
+                                [td.id]: updated[idx].limits,
+                              })
+                            }}
+                            data-testid={`input-tier-platforms-${td.id}`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const defs = socialModule.tierDefinitions || DEFAULT_TIER_DEFINITIONS
+                    const nextNum = defs.length + 1
+                    const newId = `tier_${nextNum}`
+                    const newTier: TierDefinition = {
+                      id: newId,
+                      displayName: `Tier ${nextNum}`,
+                      stripeMetadataValue: newId,
+                      limits: { dailyAiGenerations: 10, dailyPosts: 5, monthlyPosts: 100, maxPlatforms: 3 },
+                    }
+                    updateSocialModule('tierDefinitions', [...defs, newTier])
+                    updateSocialModule('tierLimits', {
+                      ...socialModule.tierLimits,
+                      [newId]: newTier.limits,
+                    })
+                  }}
+                  data-testid="button-add-tier"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Tier
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -902,10 +972,9 @@ export default function MuseSocialPage() {
             </CardContent>
           </Card>
 
-          {socialModule.tier === 'power' && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">Monitoring <InfoTooltip text="Track brand mentions and trends across platforms automatically. Available only on the Power tier." /></CardTitle>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">Monitoring <InfoTooltip text="Track brand mentions and trends across platforms automatically." /></CardTitle>
                 <CardDescription>
                   Configure social media monitoring and automation
                 </CardDescription>
@@ -949,7 +1018,6 @@ export default function MuseSocialPage() {
                 </div>
               </CardContent>
             </Card>
-          )}
 
           <Card>
             <CardHeader>

@@ -169,9 +169,11 @@ Stripe is the **single source of truth** for pricing. Your website automatically
 
 If using SocioScheduler, create additional Stripe products with tier metadata:
 
-- [ ] Create **Socio Starter** product with metadata: `muse_tier` = `muse_starter`
-- [ ] Create **Socio Basic** product with metadata: `muse_tier` = `muse_basic`
-- [ ] Create **Socio Premium** product with metadata: `muse_tier` = `muse_premium`
+- [ ] Create **Socio Starter** product with metadata: `muse_tier` = `tier_1`
+- [ ] Create **Socio Basic** product with metadata: `muse_tier` = `tier_2`
+- [ ] Create **Socio Premium** product with metadata: `muse_tier` = `tier_3`
+
+> **Note:** Tier definitions are admin-configurable from the MuseSocial setup page. The default 3 tiers (tier_1/Starter, tier_2/Basic, tier_3/Premium) ship out of the box. Admins can add, remove, or edit tiers and their limits from the dashboard.
 
 These tiers map to post/AI generation limits:
 | Tier | Posts/Day | AI Generations/Day |

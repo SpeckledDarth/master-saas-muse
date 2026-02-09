@@ -762,7 +762,7 @@ SocioScheduler is a full SaaS product built on top of MuseKit using the database
 SocioScheduler extends MuseSocial with:
 
 - **OAuth Platform Connections** — Users connect Facebook Page, LinkedIn, and Twitter/X accounts via OAuth with PKCE
-- **Per-User Stripe Tiers** — Subscription metadata maps to three tiers (Starter/Basic/Premium) with different post and AI generation limits
+- **Per-User Stripe Tiers** — Subscription metadata maps to admin-configurable tiers (default: Starter/Basic/Premium) with different post and AI generation limits. Tier definitions, display names, Stripe metadata values, and rate limits are all editable from the admin dashboard's MuseSocial setup page
 - **Brand Preferences** — Users set their tone, niche, location, target audience, posting goals, preferred platforms, and frequency
 - **AI Post Generation** — Uses 15 niche-specific prompts (admin-editable) combined with brand preferences for solopreneur-friendly content
 - **7-Page Social Dashboard**:
@@ -792,11 +792,25 @@ On the Overview page, users can generate AI posts on-demand:
 
 ### Stripe Tier Limits
 
+Tier definitions are admin-configurable from the MuseSocial setup page (`/admin/setup/musesocial`). You can add, remove, or edit tiers — the system is not locked to 3. Default tiers ship out of the box:
+
 | Tier | Posts/Day | AI Generations/Day | Metadata Key | Metadata Value |
 |------|-----------|-------------------|--------------|----------------|
-| Starter | 5 | 3 | `muse_tier` | `muse_starter` |
-| Basic | 20 | 15 | `muse_tier` | `muse_basic` |
-| Premium | 100 | 50 | `muse_tier` | `muse_premium` |
+| Starter (tier_1) | 5 | 3 | `muse_tier` | `tier_1` |
+| Basic (tier_2) | 20 | 15 | `muse_tier` | `tier_2` |
+| Premium (tier_3) | 100 | 50 | `muse_tier` | `tier_3` |
+
+### Configuring Tiers
+
+To customize tiers from the admin dashboard:
+
+1. Navigate to **Admin > Setup > MuseSocial**
+2. Scroll to the **Tier Definitions** section
+3. Edit display names, Stripe metadata values, and rate limits per tier
+4. Add new tiers or remove existing ones as needed
+5. Click **Save Changes**
+
+Each tier uses the `TierDefinition` interface: `{ id, displayName, stripeMetadataValue, limits }`. The default fallback tier is `tier_1`.
 
 ### Debug Mode
 
@@ -879,7 +893,7 @@ All pages automatically support dark/light mode and are responsive on mobile dev
 - **Backup before major changes** — The platform supports checkpoints, but it's good practice to note your current settings before making sweeping changes
 - **API Keys page first** — After initial setup, configure your required API keys on the Integrations page to ensure all services are connected
 - **MuseSocial setup** — If using social features, enable the module first, then configure platforms and API keys on the same page
-- **SocioScheduler tiers** — Set up Stripe products with metadata key `muse_tier` and values (`muse_starter`, `muse_basic`, `muse_premium`) to enable per-user tier resolution
+- **SocioScheduler tiers** — Set up Stripe products with metadata key `muse_tier` and values (`tier_1`, `tier_2`, `tier_3`) to enable per-user tier resolution. Tier definitions are admin-configurable from the MuseSocial setup page
 - **Engagement pull settings** — Adjust the engagement pull interval based on your API rate limits and how frequently you need updated metrics
 
 ---

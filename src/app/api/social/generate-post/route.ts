@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'AI features are not enabled. Enable AI in Features settings to generate posts.' }, { status: 403 })
   }
 
-  const adminTier = socialModule.tier || 'starter'
+  const adminTier = socialModule.tier || 'tier_1'
   const configuredTierLimits = socialModule.tierLimits
   const { tier } = await getUserSocialTier(user.id, adminTier)
   const limits = getLimitsForTier(tier, configuredTierLimits)

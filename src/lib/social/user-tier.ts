@@ -1,23 +1,42 @@
+import { createClient } from '@supabase/supabase-js'
 import { stripeService } from '@/lib/stripe/service'
 import { isActiveSubscription } from '@/lib/stripe/feature-gate'
-import type { SocialModuleTier } from '@/types/settings'
+import type { TierDefinition } from '@/types/settings'
+import { DEFAULT_TIER_DEFINITIONS } from '@/types/settings'
 
-const MUSE_TIER_MAP: Record<string, SocialModuleTier> = {
-  muse_starter: 'starter',
-  muse_basic: 'basic',
-  muse_premium: 'premium',
+function buildStripeMetadataMap(tierDefinitions: TierDefinition[]): Record<string, string> {
+  const map: Record<string, string> = {}
+  for (const tier of tierDefinitions) {
+    map[tier.stripeMetadataValue] = tier.id
+  }
+  return map
 }
 
-const PRICE_AMOUNT_MAP: Record<number, SocialModuleTier> = {
-  1900: 'starter',
-  3900: 'basic',
-  6900: 'premium',
+async function loadTierDefinitions(): Promise<TierDefinition[]> {
+  try {
+    const admin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+    const { data } = await admin
+      .from('organization_settings')
+      .select('settings')
+      .eq('app_id', 'default')
+      .single()
+
+    const defs = data?.settings?.socialModule?.tierDefinitions
+    if (Array.isArray(defs) && defs.length > 0) {
+      return defs
+    }
+  } catch {
+  }
+  return DEFAULT_TIER_DEFINITIONS
 }
 
 export async function getUserSocialTier(
   userId: string,
-  fallbackTier: SocialModuleTier = 'starter'
-): Promise<{ tier: SocialModuleTier; source: 'subscription' | 'admin' }> {
+  fallbackTier: string = 'tier_1'
+): Promise<{ tier: string; source: 'subscription' | 'admin' }> {
   try {
     const sub = await stripeService.getSubscriptionInfo(userId)
 
@@ -36,16 +55,12 @@ export async function getUserSocialTier(
 
         const product = price.product
         if (typeof product === 'object' && !product.deleted && product.metadata?.muse_tier) {
-          const mapped = MUSE_TIER_MAP[product.metadata.muse_tier]
-          if (mapped) {
-            return { tier: mapped, source: 'subscription' }
+          const tierDefinitions = await loadTierDefinitions()
+          const metadataMap = buildStripeMetadataMap(tierDefinitions)
+          const mappedTierId = metadataMap[product.metadata.muse_tier]
+          if (mappedTierId) {
+            return { tier: mappedTierId, source: 'subscription' }
           }
-        }
-
-        const amount = price.unit_amount || 0
-        const amountTier = PRICE_AMOUNT_MAP[amount]
-        if (amountTier) {
-          return { tier: amountTier, source: 'subscription' }
         }
       } catch (err) {
         console.error('Error resolving social tier from price:', err)

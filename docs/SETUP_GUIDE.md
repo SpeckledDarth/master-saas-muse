@@ -664,11 +664,11 @@ If using SocioScheduler, create additional products with these metadata values:
 
 | Product | Metadata Key | Metadata Value | Description |
 |---------|-------------|----------------|-------------|
-| Socio Starter | `muse_tier` | `muse_starter` | 5 posts/day, 3 AI gen/day |
-| Socio Basic | `muse_tier` | `muse_basic` | 20 posts/day, 15 AI gen/day |
-| Socio Premium | `muse_tier` | `muse_premium` | 100 posts/day, 50 AI gen/day |
+| Socio Starter | `muse_tier` | `tier_1` | 5 posts/day, 3 AI gen/day |
+| Socio Basic | `muse_tier` | `tier_2` | 20 posts/day, 15 AI gen/day |
+| Socio Premium | `muse_tier` | `tier_3` | 100 posts/day, 50 AI gen/day |
 
-The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these metadata values to rate limits.
+The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these metadata values to rate limits. Tier definitions (display names, metadata values, and rate limits) are admin-configurable from the MuseSocial setup page (`/admin/setup/musesocial`). Admins can add or remove tiers as needed.
 
 ### Webhook Endpoint
 - URL: `https://your-app.vercel.app/api/stripe/webhook`

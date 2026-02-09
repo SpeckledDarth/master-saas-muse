@@ -6,7 +6,7 @@ import { defaultSettings } from '@/types/settings'
 import { addSocialPostJob } from '@/lib/queue'
 import { checkSocialRateLimit, getLimitsForTier } from '@/lib/social/rate-limits'
 import { getUserSocialTier } from '@/lib/social/user-tier'
-import type { SocialModuleTier, TierLimits } from '@/types/settings'
+import type { TierLimits } from '@/types/settings'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -33,13 +33,13 @@ async function getAuthenticatedUser() {
   return user
 }
 
-async function getModuleConfig(): Promise<{ enabled: boolean; tier: SocialModuleTier; configuredTierLimits?: Record<SocialModuleTier, TierLimits> }> {
+async function getModuleConfig(): Promise<{ enabled: boolean; tier: string; configuredTierLimits?: Record<string, TierLimits> }> {
   const admin = getSupabaseAdmin()
   const { data } = await admin.from('organization_settings').select('settings').eq('app_id', 'default').single()
   const settings = data?.settings || defaultSettings
   return {
     enabled: settings.features?.socialModuleEnabled ?? false,
-    tier: settings.socialModule?.tier || 'universal',
+    tier: settings.socialModule?.tier || 'tier_1',
     configuredTierLimits: settings.socialModule?.tierLimits,
   }
 }

@@ -1,56 +1,35 @@
 import { checkRateLimit } from '@/lib/rate-limit'
 import type { RateLimitResult } from '@/lib/rate-limit'
-import type { SocialModuleTier, TierLimits } from '@/types/settings'
+import type { TierLimits, TierDefinition } from '@/types/settings'
+import { DEFAULT_TIER_DEFINITIONS } from '@/types/settings'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const MONTH_MS = 30 * DAY_MS
 
-export const DEFAULT_STARTER_LIMITS: TierLimits = {
+function buildDefaultTierLimits(): Record<string, TierLimits> {
+  const map: Record<string, TierLimits> = {}
+  for (const def of DEFAULT_TIER_DEFINITIONS) {
+    map[def.id] = def.limits
+  }
+  return map
+}
+
+const FALLBACK_LIMITS: TierLimits = {
   dailyAiGenerations: 5,
   dailyPosts: 1,
   monthlyPosts: 15,
   maxPlatforms: 2,
 }
 
-export const DEFAULT_BASIC_LIMITS: TierLimits = {
-  dailyAiGenerations: 10,
-  dailyPosts: 2,
-  monthlyPosts: 30,
-  maxPlatforms: 3,
-}
-
-export const DEFAULT_PREMIUM_LIMITS: TierLimits = {
-  dailyAiGenerations: 100,
-  dailyPosts: 10000,
-  monthlyPosts: 999999,
-  maxPlatforms: 10,
-}
-
-export const DEFAULT_UNIVERSAL_LIMITS: TierLimits = {
-  dailyAiGenerations: 10,
-  dailyPosts: 20,
-}
-
-export const DEFAULT_POWER_LIMITS: TierLimits = {
-  dailyAiGenerations: 100,
-  dailyPosts: 10000,
-}
-
-export const DEFAULT_TIER_LIMITS: Record<SocialModuleTier, TierLimits> = {
-  starter: DEFAULT_STARTER_LIMITS,
-  basic: DEFAULT_BASIC_LIMITS,
-  premium: DEFAULT_PREMIUM_LIMITS,
-  universal: DEFAULT_UNIVERSAL_LIMITS,
-  power: DEFAULT_POWER_LIMITS,
-}
+export const DEFAULT_TIER_LIMITS: Record<string, TierLimits> = buildDefaultTierLimits()
 
 export async function checkSocialRateLimit(
   userId: string,
   action: 'generate' | 'post',
-  tier: SocialModuleTier,
-  tierLimits?: Record<SocialModuleTier, TierLimits>
+  tier: string,
+  tierLimits?: Record<string, TierLimits>
 ): Promise<RateLimitResult> {
-  const limits = tierLimits?.[tier] || DEFAULT_TIER_LIMITS[tier]
+  const limits = tierLimits?.[tier] || DEFAULT_TIER_LIMITS[tier] || FALLBACK_LIMITS
   const dailyLimit = action === 'generate' ? limits.dailyAiGenerations : limits.dailyPosts
 
   const dailyResult = await checkRateLimit(userId, {
@@ -80,10 +59,10 @@ export async function checkSocialRateLimit(
 
 export function checkPlatformLimit(
   connectedCount: number,
-  tier: SocialModuleTier,
-  tierLimits?: Record<SocialModuleTier, TierLimits>
+  tier: string,
+  tierLimits?: Record<string, TierLimits>
 ): { allowed: boolean; maxPlatforms: number } {
-  const limits = tierLimits?.[tier] || DEFAULT_TIER_LIMITS[tier]
+  const limits = tierLimits?.[tier] || DEFAULT_TIER_LIMITS[tier] || FALLBACK_LIMITS
   const max = limits.maxPlatforms ?? 10
   return {
     allowed: connectedCount < max,
@@ -92,8 +71,8 @@ export function checkPlatformLimit(
 }
 
 export function getLimitsForTier(
-  tier: SocialModuleTier,
-  tierLimits?: Record<SocialModuleTier, TierLimits>
+  tier: string,
+  tierLimits?: Record<string, TierLimits>
 ): TierLimits {
-  return tierLimits?.[tier] || DEFAULT_TIER_LIMITS[tier]
+  return tierLimits?.[tier] || DEFAULT_TIER_LIMITS[tier] || FALLBACK_LIMITS
 }

@@ -40,7 +40,7 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **API Token Rotation**: Automated webhook secret rotation via BullMQ.
 - **MuseSocial Module**: Toggleable social media management extension supporting 10 platforms, featuring AI-powered post generation, scheduling, and health checks. It includes tier-based rate limiting, a conditional onboarding wizard, and integrates n8n workflow templates. Centralized API keys are managed via dedicated admin setup pages.
 - **SocioScheduler Extension**: A SaaS built on MuseKit, providing AI social media scheduling for solopreneurs. It supports Facebook, LinkedIn, and Twitter/X, with brand preference systems, multi-tier pricing, and an approval queue for AI-generated posts. It uses a database extension pattern for its tables (migrations/extensions/). Key features:
-  - Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `muse_tier` (values: muse_starter/basic/premium) to rate limits
+  - Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `muse_tier` (values: tier_1/tier_2/tier_3, admin-configurable) to rate limits. Tier definitions (display names, metadata values, limits) are stored in admin settings as `tierDefinitions` and editable from the MuseSocial setup page
   - OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
   - Engagement analytics dashboard with Recharts charts (`/dashboard/social/engagement`)
   - Calendar view with month-grid showing scheduled posts and per-platform count tooltips (`/dashboard/social/calendar`)

@@ -905,7 +905,7 @@ SocioScheduler is a SaaS product built **on top of** MuseKit using the database 
 
 **Deliverables**:
 - [x] Database extension pattern: core tables in `migrations/core/`, SocioScheduler-specific in `migrations/extensions/`
-- [x] Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `muse_tier` (values: muse_starter/basic/premium) to rate limits
+- [x] Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `muse_tier` (values: tier_1/tier_2/tier_3, admin-configurable) to rate limits
 - [x] OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
 - [x] Social dashboard with 7 pages: overview, calendar, engagement, queue, posts, brand preferences, onboarding
 - [x] Social overview dashboard with usage progress bar, "X posts remaining" line, and Quick Generate dialog
@@ -928,12 +928,14 @@ SocioScheduler is a SaaS product built **on top of** MuseKit using the database 
 - Extended `social_posts` with: `trend_source`, `niche_triggered` columns, plus expanded status values (`queued`, `approved`, `ignored`)
 - Composite index on `social_posts(user_id, status)` for fast queue views
 
-**Stripe Tier Mapping** (metadata key: `muse_tier`):
+**Stripe Tier Mapping** (metadata key: `muse_tier`, admin-configurable via MuseSocial setup page):
 | Tier | Metadata Value | Posts/Day | AI Generations/Day |
 |------|---------------|-----------|-------------------|
-| Starter | `muse_starter` | 5 | 3 |
-| Basic | `muse_basic` | 20 | 15 |
-| Premium | `muse_premium` | 100 | 50 |
+| Starter (tier_1) | `tier_1` | 5 | 3 |
+| Basic (tier_2) | `tier_2` | 20 | 15 |
+| Premium (tier_3) | `tier_3` | 100 | 50 |
+
+> **Note:** Tier definitions are dynamic and admin-configurable. Display names, Stripe metadata values, and rate limits can all be edited from the admin dashboard's MuseSocial setup page. Admins can add or remove tiers as needed — the system is not locked to 3. Default fallback tier is `tier_1`.
 
 **Key Files**:
 ```

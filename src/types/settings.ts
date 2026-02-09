@@ -358,7 +358,7 @@ export interface MetricsSettings {
   }
 }
 
-export type SocialModuleTier = 'starter' | 'basic' | 'premium' | 'universal' | 'power'
+export type SocialModuleTier = string
 
 export type SocialPlatform = 'twitter' | 'linkedin' | 'instagram' | 'youtube' | 'facebook' | 'tiktok' | 'reddit' | 'pinterest' | 'snapchat' | 'discord'
 
@@ -374,6 +374,34 @@ export interface TierLimits {
   maxPlatforms?: number
 }
 
+export interface TierDefinition {
+  id: string
+  displayName: string
+  stripeMetadataValue: string
+  limits: TierLimits
+}
+
+export const DEFAULT_TIER_DEFINITIONS: TierDefinition[] = [
+  {
+    id: 'tier_1',
+    displayName: 'Starter',
+    stripeMetadataValue: 'tier_1',
+    limits: { dailyAiGenerations: 5, dailyPosts: 1, monthlyPosts: 15, maxPlatforms: 2 },
+  },
+  {
+    id: 'tier_2',
+    displayName: 'Basic',
+    stripeMetadataValue: 'tier_2',
+    limits: { dailyAiGenerations: 10, dailyPosts: 2, monthlyPosts: 30, maxPlatforms: 3 },
+  },
+  {
+    id: 'tier_3',
+    displayName: 'Premium',
+    stripeMetadataValue: 'tier_3',
+    limits: { dailyAiGenerations: 100, dailyPosts: 10000, monthlyPosts: 999999, maxPlatforms: 10 },
+  },
+]
+
 export interface NicheGuidanceEntry {
   key: string
   label: string
@@ -382,7 +410,8 @@ export interface NicheGuidanceEntry {
 
 export interface SocialModuleSettings {
   tier: SocialModuleTier
-  tierLimits: Record<SocialModuleTier, TierLimits>
+  tierLimits: Record<string, TierLimits>
+  tierDefinitions?: TierDefinition[]
   platforms: Record<SocialPlatform, SocialAccountConfig>
   nicheGuidance?: NicheGuidanceEntry[]
   posting: {
@@ -1173,13 +1202,12 @@ We regularly review and update our security practices. This page reflects our cu
     monthlyReportEnabled: false,
   },
   socialModule: {
-    tier: 'starter',
+    tier: 'tier_1',
+    tierDefinitions: DEFAULT_TIER_DEFINITIONS,
     tierLimits: {
-      starter: { dailyAiGenerations: 5, dailyPosts: 1, monthlyPosts: 15, maxPlatforms: 2 },
-      basic: { dailyAiGenerations: 10, dailyPosts: 2, monthlyPosts: 30, maxPlatforms: 3 },
-      premium: { dailyAiGenerations: 100, dailyPosts: 10000, monthlyPosts: 999999, maxPlatforms: 10 },
-      universal: { dailyAiGenerations: 10, dailyPosts: 20 },
-      power: { dailyAiGenerations: 100, dailyPosts: 10000 },
+      tier_1: { dailyAiGenerations: 5, dailyPosts: 1, monthlyPosts: 15, maxPlatforms: 2 },
+      tier_2: { dailyAiGenerations: 10, dailyPosts: 2, monthlyPosts: 30, maxPlatforms: 3 },
+      tier_3: { dailyAiGenerations: 100, dailyPosts: 10000, monthlyPosts: 999999, maxPlatforms: 10 },
     },
     platforms: {
       twitter: { enabled: false, apiKeyConfigured: false },
