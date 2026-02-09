@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { defaultSettings } from '@/types/settings'
 import { addSocialPostJob } from '@/lib/queue'
 import { checkSocialRateLimit, getLimitsForTier } from '@/lib/social/rate-limits'
+import { getUserSocialTier } from '@/lib/social/user-tier'
 import type { SocialModuleTier, TierLimits } from '@/types/settings'
 
 function getSupabaseAdmin() {
@@ -105,11 +106,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { enabled, tier, configuredTierLimits } = await getModuleConfig()
-  if (!enabled) {
+  const moduleConfig = await getModuleConfig()
+  if (!moduleConfig.enabled) {
     return NextResponse.json({ error: 'Social module is not enabled' }, { status: 403 })
   }
 
+  const { configuredTierLimits } = moduleConfig
+  const { tier } = await getUserSocialTier(user.id, moduleConfig.tier)
   const limits = getLimitsForTier(tier, configuredTierLimits)
   const rateLimitResult = await checkSocialRateLimit(user.id, 'post', tier, configuredTierLimits)
 

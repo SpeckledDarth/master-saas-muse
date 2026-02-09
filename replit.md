@@ -39,7 +39,14 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **Database Backup Configuration**: Admin UI for setting backup notification preferences.
 - **API Token Rotation**: Automated webhook secret rotation via BullMQ.
 - **MuseSocial Module**: Toggleable social media management extension supporting 10 platforms, featuring AI-powered post generation, scheduling, and health checks. It includes tier-based rate limiting, a conditional onboarding wizard, and integrates n8n workflow templates. Centralized API keys are managed via dedicated admin setup pages.
-- **SocioScheduler Extension**: A SaaS built on MuseKit, providing AI social media scheduling for solopreneurs. It supports Facebook, LinkedIn, and Twitter/X, with brand preference systems, multi-tier pricing, and an approval queue for AI-generated posts. It uses a database extension pattern for its tables.
+- **SocioScheduler Extension**: A SaaS built on MuseKit, providing AI social media scheduling for solopreneurs. It supports Facebook, LinkedIn, and Twitter/X, with brand preference systems, multi-tier pricing, and an approval queue for AI-generated posts. It uses a database extension pattern for its tables (migrations/extensions/). Key features:
+  - Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata (socio_starter/basic/premium) to rate limits
+  - OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
+  - Engagement analytics dashboard with Recharts charts (`/dashboard/social/engagement`)
+  - Calendar view with month-grid showing scheduled posts (`/dashboard/social/calendar`)
+  - Structured AI prompt system using all brand preference fields for solopreneur-friendly content
+  - Beta debug mode via `SOCIO_DEBUG_MODE=true` env var with mock data at `/api/social/debug`
+  - All RLS policies verified, proper empty states on all dashboard pages, no secrets exposed
 
 **System Design Choices:**
 The architecture uses a unified frontend/backend with Next.js API routes, modular component-based development, RLS and application-level logic for access control, and clear separation of concerns for third-party services. It employs a fire-and-forget webhook delivery pattern and pluggable abstraction layers for AI providers.

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -40,8 +40,9 @@ const PLATFORMS = [
 const TONE_OPTIONS = ['Professional', 'Casual', 'Friendly', 'Authoritative', 'Humorous', 'Educational']
 const FREQUENCY_OPTIONS = ['Once daily', 'Twice daily', 'Three times daily', 'Once every other day', 'Three times a week', 'Weekly']
 
-export default function SocialOnboardingPage() {
+function OnboardingContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
   const [currentStep, setCurrentStep] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -61,6 +62,19 @@ export default function SocialOnboardingPage() {
     requireApproval: true,
     autoHashtags: true,
   })
+
+  useEffect(() => {
+    const connected = searchParams.get('connected')
+    const error = searchParams.get('error')
+
+    if (connected) {
+      toast({ title: 'Connected', description: `${connected} account connected successfully.` })
+      fetchConnectedAccounts()
+    }
+    if (error) {
+      toast({ title: 'Connection failed', description: decodeURIComponent(error), variant: 'destructive' })
+    }
+  }, [searchParams])
 
   useEffect(() => {
     fetchConnectedAccounts()
@@ -96,17 +110,17 @@ export default function SocialOnboardingPage() {
   async function connectPlatform(platform: string) {
     setLoading(true)
     try {
-      const res = await fetch('/api/social/accounts', {
+      const res = await fetch('/api/social/connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ platform }),
       })
+      const data = await res.json()
+      if (data.authUrl) {
+        window.location.href = data.authUrl
+        return
+      }
       if (!res.ok) {
-        const data = await res.json()
-        if (data.authUrl) {
-          window.location.href = data.authUrl
-          return
-        }
         throw new Error(data.error || 'Connection failed')
       }
       setConnectedPlatforms(prev => [...prev, platform])
@@ -483,5 +497,13 @@ export default function SocialOnboardingPage() {
         </Card>
       )}
     </div>
+  )
+}
+
+export default function SocialOnboardingPage() {
+  return (
+    <Suspense fallback={<div className="container max-w-2xl mx-auto py-8 px-4"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></div>}>
+      <OnboardingContent />
+    </Suspense>
   )
 }

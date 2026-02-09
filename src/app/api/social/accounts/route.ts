@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { defaultSettings, type SocialModuleTier } from '@/types/settings'
 import { getPlatformClient, type SocialPlatform } from '@/lib/social/client'
 import { checkPlatformLimit } from '@/lib/social/rate-limits'
+import { getUserSocialTier } from '@/lib/social/user-tier'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -107,7 +108,8 @@ export async function POST(request: NextRequest) {
 
   const admin = getSupabaseAdmin()
   const settingsRes = await admin.from('organization_settings').select('settings').eq('app_id', 'default').single()
-  const tier: SocialModuleTier = settingsRes.data?.settings?.features?.socialModuleTier ?? 'starter'
+  const adminTier: SocialModuleTier = settingsRes.data?.settings?.features?.socialModuleTier ?? 'starter'
+  const { tier } = await getUserSocialTier(user.id, adminTier)
 
   const { data: existingAccounts } = await admin
     .from('social_accounts')

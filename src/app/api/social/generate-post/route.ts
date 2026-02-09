@@ -6,6 +6,7 @@ import { defaultSettings } from '@/types/settings'
 import { chatCompletion, type ChatMessage } from '@/lib/ai/provider'
 import type { AISettings } from '@/types/settings'
 import { checkSocialRateLimit, getLimitsForTier } from '@/lib/social/rate-limits'
+import { getUserSocialTier } from '@/lib/social/user-tier'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -103,65 +104,79 @@ function buildSocialPrompt(
     discord: 'Discord',
   }
 
-  let prompt = `You are a social media content expert. Generate a single ${platformNames[platform] || platform} post about the following topic.\n\n`
-  prompt += `Topic: ${topic}\n\n`
+  const platName = platformNames[platform] || platform
+  const tone = brandPrefs?.tone || style || 'professional'
+  const niche = brandPrefs?.niche || ''
+  const audience = brandPrefs?.target_audience || ''
+  const location = brandPrefs?.location || ''
+  const goals = brandPrefs?.posting_goals || ''
 
-  if (brandPrefs) {
-    prompt += `Brand Context:\n`
-    if (brandPrefs.niche && brandPrefs.niche !== 'other') {
-      prompt += `- Business niche: ${brandPrefs.niche}\n`
+  let prompt = `You are a social media strategist for a ${niche || 'small business'} professional`
+  if (location) {
+    prompt += ` based in ${location}`
+  }
+  prompt += `. Your job is to write posts that drive real business results.\n\n`
+
+  prompt += `TASK: Generate a single ${platName} post about "${topic}"\n\n`
+
+  prompt += `VOICE & STYLE:\n`
+  prompt += `- Tone: ${tone}\n`
+  if (brandVoice && brandVoice !== tone) {
+    prompt += `- Brand voice: ${brandVoice}\n`
+  }
+  prompt += `- Write like a real person, not a marketing bot\n`
+  prompt += `- Be specific and concrete, avoid generic platitudes\n\n`
+
+  if (niche || audience || goals) {
+    prompt += `BUSINESS CONTEXT:\n`
+    if (niche) {
+      prompt += `- Industry: ${niche}\n`
     }
-    if (brandPrefs.tone) {
-      prompt += `- Brand tone: ${brandPrefs.tone}\n`
+    if (audience) {
+      prompt += `- Target audience: ${audience}\n`
     }
-    if (brandPrefs.target_audience) {
-      prompt += `- Target audience: ${brandPrefs.target_audience}\n`
+    if (goals) {
+      prompt += `- Goal of this post: ${goals}\n`
     }
-    if (brandPrefs.location) {
-      prompt += `- Location/market: ${brandPrefs.location}\n`
-    }
-    if (brandPrefs.posting_goals) {
-      prompt += `- Posting goals: ${brandPrefs.posting_goals}\n`
+    if (location) {
+      prompt += `- Serving: ${location} area\n`
     }
     prompt += `\n`
   }
 
-  prompt += `Requirements:\n`
-  prompt += `- Platform: ${platformNames[platform] || platform}\n`
-  prompt += `- Maximum length: ${maxLength} characters\n`
-  prompt += `- Style: ${style}\n`
-
-  if (brandVoice) {
-    prompt += `- Brand voice: ${brandVoice}\n`
-  }
+  prompt += `PLATFORM RULES:\n`
+  prompt += `- Platform: ${platName}\n`
+  prompt += `- Maximum: ${maxLength} characters\n`
 
   if (includeHashtags) {
-    prompt += `- Include 2-4 relevant hashtags\n`
+    prompt += `- Include 2-4 relevant hashtags naturally at the end\n`
   } else {
-    prompt += `- Do NOT include hashtags\n`
+    prompt += `- Do NOT include any hashtags\n`
   }
 
   if (platform === 'twitter') {
-    prompt += `- Keep it concise and punchy, within 280 characters\n`
-    prompt += `- Optimize for engagement (likes, retweets)\n`
+    prompt += `- Lead with a hook that stops the scroll\n`
+    prompt += `- Keep it punchy and under 280 characters\n`
+    prompt += `- Optimize for retweets and replies\n`
   } else if (platform === 'linkedin') {
-    prompt += `- Use a professional tone appropriate for LinkedIn\n`
-    prompt += `- Consider adding a hook in the first line\n`
-    prompt += `- Use line breaks for readability\n`
+    prompt += `- Start with a strong opening hook (first line matters most)\n`
+    prompt += `- Use short paragraphs and line breaks for readability\n`
+    prompt += `- End with a question or call-to-action to drive comments\n`
+    prompt += `- Professional but authentic, not corporate-speak\n`
   } else if (platform === 'instagram') {
-    prompt += `- Write an engaging caption\n`
-    prompt += `- Consider using emojis sparingly for visual appeal\n`
+    prompt += `- Write an engaging caption that tells a micro-story\n`
+    prompt += `- Front-load the hook before the "more" truncation\n`
   } else if (platform === 'facebook') {
-    prompt += `- Write for a Facebook Page audience\n`
-    prompt += `- Conversational and engaging tone\n`
-    prompt += `- Encourage comments and shares\n`
+    prompt += `- Write for a Facebook Page audience (customers and community)\n`
+    prompt += `- Conversational tone that invites comments and shares\n`
+    prompt += `- Include a clear call-to-action (call us, visit, book, etc.)\n`
   } else if (platform === 'reddit') {
-    prompt += `- Write in a genuine, community-appropriate tone\n`
-    prompt += `- Avoid sounding promotional or sales-y\n`
-    prompt += `- Be informative and add value to the discussion\n`
+    prompt += `- Write genuinely, as a community member sharing knowledge\n`
+    prompt += `- Never sound promotional or sales-oriented\n`
+    prompt += `- Add real value to the discussion\n`
   }
 
-  prompt += `\nRespond with ONLY the post content, nothing else. No quotes, no explanations, no prefixes like "Here's your post:".`
+  prompt += `\nOUTPUT: Respond with ONLY the post text. No quotes, no explanations, no labels, no prefixes.`
 
   return prompt
 }
@@ -182,8 +197,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'AI features are not enabled. Enable AI in Features settings to generate posts.' }, { status: 403 })
   }
 
-  const tier = socialModule.tier || 'universal'
+  const adminTier = socialModule.tier || 'starter'
   const configuredTierLimits = socialModule.tierLimits
+  const { tier } = await getUserSocialTier(user.id, adminTier)
   const limits = getLimitsForTier(tier, configuredTierLimits)
   const rateLimitResult = await checkSocialRateLimit(user.id, 'generate', tier, configuredTierLimits)
 

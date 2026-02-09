@@ -59,7 +59,7 @@ export async function checkSocialRateLimit(
     identifier: `social:${action}:daily:${userId}`,
   })
 
-  if (!dailyResult.allowed) {
+  if (!dailyResult.success) {
     return dailyResult
   }
 
@@ -70,7 +70,7 @@ export async function checkSocialRateLimit(
       identifier: `social:post:monthly:${userId}`,
     })
 
-    if (!monthlyResult.allowed) {
+    if (!monthlyResult.success) {
       return monthlyResult
     }
   }
