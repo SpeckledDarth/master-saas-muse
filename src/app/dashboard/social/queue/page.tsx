@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { Loader2, Check, X as XIcon, Edit2, Send, Clock, Sparkles, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
 
 interface QueuePost {
   id: string
@@ -124,6 +125,8 @@ export default function ApprovalQueuePage() {
   }
 
   return (
+    <>
+    <SocialUpgradeBanner />
     <div className="container max-w-3xl mx-auto py-8 px-4 space-y-6">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Approval Queue</h1>
@@ -247,5 +250,6 @@ export default function ApprovalQueuePage() {
         </div>
       )}
     </div>
+    </>
   )
 }

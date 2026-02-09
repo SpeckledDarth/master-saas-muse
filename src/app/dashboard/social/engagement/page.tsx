@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, BarChart3, TrendingUp, Users, Sparkles } from 'lucide-react'
+import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
 import {
   BarChart,
   Bar,
@@ -141,6 +142,8 @@ export default function EngagementAnalyticsPage() {
     .sort((a, b) => b.avg - a.avg)
 
   return (
+    <>
+    <SocialUpgradeBanner />
     <div className="container max-w-5xl mx-auto py-8 px-4 space-y-6">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Engagement Analytics</h1>
@@ -275,5 +278,6 @@ export default function EngagementAnalyticsPage() {
         </Card>
       </div>
     </div>
+    </>
   )
 }

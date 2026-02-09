@@ -399,6 +399,10 @@ export interface SocialModuleSettings {
     alertOnRepeatedFailures: boolean
     failureThreshold: number
   }
+  engagementPull?: {
+    intervalHours: number
+    lookbackHours: number
+  }
 }
 
 export interface PricingPageSettings {
@@ -1218,6 +1222,10 @@ We regularly review and update our security practices. This page reflects our cu
       enabled: true,
       alertOnRepeatedFailures: true,
       failureThreshold: 3,
+    },
+    engagementPull: {
+      intervalHours: 24,
+      lookbackHours: 24,
     },
   },
 }

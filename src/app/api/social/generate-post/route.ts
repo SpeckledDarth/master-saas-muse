@@ -137,9 +137,8 @@ function buildSocialPrompt(
     return entryKey === nicheLower || (e.label && e.label.toLowerCase() === niche.toLowerCase())
   })
   const nicheHint = matchedEntry?.guidance || ''
-  if (nicheHint) {
-    prompt += `NICHE VOICE:\n- ${nicheHint}\n\n`
-  }
+  const DEFAULT_NICHE_FALLBACK = 'Use a casual, local, authentic small business voice. Sound like a real person talking to their neighbors and community — not a corporation.'
+  prompt += `NICHE VOICE:\n- ${nicheHint || DEFAULT_NICHE_FALLBACK}\n\n`
 
   if (niche || audience || goals) {
     prompt += `BUSINESS CONTEXT:\n`

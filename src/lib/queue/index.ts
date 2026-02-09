@@ -360,7 +360,8 @@ async function processSocialEngagementPullJob(job: Job<SocialEngagementPullJobDa
       .limit(50)
 
     if (!posts || posts.length === 0) {
-      console.log(`[Queue] No recent posted content to pull metrics for`)
+      console.info(`[Queue] No recent posted content for ${job.data.platform} (user ${job.data.userId}) — skipping engagement pull`)
+      await job.updateProgress(100)
       return
     }
 
@@ -565,18 +566,28 @@ export async function addSocialTrendMonitorJob(data: Omit<SocialTrendMonitorJobD
   return job.id || null
 }
 
-export async function addSocialEngagementPullJob(data: Omit<SocialEngagementPullJobData, 'type'>): Promise<string | null> {
+export async function addSocialEngagementPullJob(
+  data: Omit<SocialEngagementPullJobData, 'type'>,
+  config?: { intervalHours?: number; lookbackHours?: number }
+): Promise<string | null> {
   const q = getQueue()
   if (!q) return null
 
+  const intervalHours = config?.intervalHours || 24
+  const lookbackHours = config?.lookbackHours || data.lookbackHours || 24
+
   const jobId = `engagement-pull:${data.userId}:${data.platform}`
 
-  const job = await q.add('social-engagement-pull', { type: 'social-engagement-pull' as const, ...data }, {
+  const job = await q.add('social-engagement-pull', {
+    type: 'social-engagement-pull' as const,
+    ...data,
+    lookbackHours,
+  }, {
     jobId,
     priority: 5,
     attempts: 3,
     backoff: { type: 'exponential', delay: 60000 },
-    repeat: { every: 24 * 60 * 60 * 1000, key: jobId },
+    repeat: { every: intervalHours * 60 * 60 * 1000, key: jobId },
   })
 
   return job.id || null

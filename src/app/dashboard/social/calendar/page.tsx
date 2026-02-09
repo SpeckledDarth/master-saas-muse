@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Loader2, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
 
 interface CalendarPost {
   id: string
@@ -174,6 +175,8 @@ export default function SocialCalendarPage() {
   }
 
   return (
+    <>
+    <SocialUpgradeBanner />
     <div className="container max-w-4xl mx-auto py-8 px-4 space-y-6">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Post Calendar</h1>
@@ -313,7 +316,23 @@ export default function SocialCalendarPage() {
                   return (
                     <Tooltip key={index}>
                       <TooltipTrigger asChild>{dayCell}</TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-[220px] space-y-1 text-xs">
+                      <TooltipContent side="top" className="max-w-[240px] space-y-1.5 text-xs">
+                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 pb-1 border-b border-border/50">
+                          {Object.entries(
+                            dayPosts.reduce<Record<string, number>>((acc, p) => {
+                              acc[p.platform] = (acc[p.platform] || 0) + 1
+                              return acc
+                            }, {})
+                          ).map(([platform, count]) => (
+                            <div key={platform} className="flex items-center gap-1">
+                              <span
+                                className="block h-1.5 w-1.5 flex-shrink-0 rounded-full"
+                                style={{ backgroundColor: PLATFORM_COLORS[platform] || 'hsl(var(--muted-foreground))' }}
+                              />
+                              <span>{count} {PLATFORM_NAMES[platform] || platform}</span>
+                            </div>
+                          ))}
+                        </div>
                         {dayPosts.slice(0, 3).map(post => (
                           <div key={post.id} className="flex items-start gap-1.5">
                             <span
@@ -398,5 +417,6 @@ export default function SocialCalendarPage() {
         </>
       )}
     </div>
+    </>
   )
 }

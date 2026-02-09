@@ -1000,6 +1000,59 @@ export default function MuseSocialPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">Engagement Pull <InfoTooltip text="Controls how often the system fetches engagement metrics (likes, shares, comments) from platform APIs for your published posts." /></CardTitle>
+              <CardDescription>
+                Configure the automated engagement metrics collection schedule
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="engagement-interval">Pull Interval (hours)</Label>
+                <Input
+                  id="engagement-interval"
+                  type="number"
+                  min={1}
+                  max={168}
+                  value={socialModule.engagementPull?.intervalHours ?? 24}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10) || 24
+                    updateSocialModule('engagementPull', {
+                      ...(socialModule.engagementPull || { intervalHours: 24, lookbackHours: 24 }),
+                      intervalHours: Math.max(1, Math.min(168, val)),
+                    })
+                  }}
+                  data-testid="input-engagement-interval"
+                />
+                <p className="text-xs text-muted-foreground">
+                  How often to fetch engagement metrics from platform APIs (1-168 hours)
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="engagement-lookback">Lookback Window (hours)</Label>
+                <Input
+                  id="engagement-lookback"
+                  type="number"
+                  min={1}
+                  max={168}
+                  value={socialModule.engagementPull?.lookbackHours ?? 24}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10) || 24
+                    updateSocialModule('engagementPull', {
+                      ...(socialModule.engagementPull || { intervalHours: 24, lookbackHours: 24 }),
+                      lookbackHours: Math.max(1, Math.min(168, val)),
+                    })
+                  }}
+                  data-testid="input-engagement-lookback"
+                />
+                <p className="text-xs text-muted-foreground">
+                  How far back to look for posts when pulling engagement data (1-168 hours)
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </>
       )}
 
