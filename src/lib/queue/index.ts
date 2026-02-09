@@ -242,6 +242,8 @@ async function processSocialPostJob(job: Job<SocialPostJobData>): Promise<void> 
     const { createClient } = await import('@supabase/supabase-js')
     const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
+    const { decryptToken } = await import('@/lib/social/crypto')
+
     const { data: account } = await admin
       .from('social_accounts')
       .select('access_token_encrypted')
@@ -255,8 +257,9 @@ async function processSocialPostJob(job: Job<SocialPostJobData>): Promise<void> 
       throw new Error(`No valid ${job.data.platform} account for user ${job.data.userId}`)
     }
 
+    const accessToken = decryptToken(account.access_token_encrypted)
     const client = getPlatformClient(job.data.platform as SocialPlatform)
-    const result = await client.createPost(account.access_token_encrypted, job.data.content, job.data.mediaUrls)
+    const result = await client.createPost(accessToken, job.data.content, job.data.mediaUrls)
 
     if (result) {
       await admin.from('social_posts').update({
@@ -333,6 +336,7 @@ async function processSocialEngagementPullJob(job: Job<SocialEngagementPullJobDa
 
   try {
     const { getPlatformClient } = await import('@/lib/social/client')
+    const { decryptToken } = await import('@/lib/social/crypto')
     const { createClient } = await import('@supabase/supabase-js')
     const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -348,6 +352,8 @@ async function processSocialEngagementPullJob(job: Job<SocialEngagementPullJobDa
       console.warn(`[Queue] No valid ${job.data.platform} account for user ${job.data.userId}, skipping engagement pull`)
       return
     }
+
+    const accessToken = decryptToken(account.access_token_encrypted)
 
     const { data: posts } = await admin
       .from('social_posts')
@@ -370,7 +376,7 @@ async function processSocialEngagementPullJob(job: Job<SocialEngagementPullJobDa
 
     for (const post of posts) {
       try {
-        const metrics = await client.getPostEngagement(account.access_token_encrypted, post.platform_post_id)
+        const metrics = await client.getPostEngagement(accessToken, post.platform_post_id)
         if (metrics && Object.keys(metrics).length > 0) {
           await admin
             .from('social_posts')

@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { getPlatformClient, type SocialPlatform } from '@/lib/social/client'
+import { decryptToken } from '@/lib/social/crypto'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -67,7 +68,8 @@ export async function POST() {
     const results = await Promise.all(
       accounts.map(async (account) => {
         const client = getPlatformClient(account.platform as SocialPlatform)
-        const validation = await client.validateToken(account.access_token_encrypted || '')
+        const token = account.access_token_encrypted ? decryptToken(account.access_token_encrypted) : ''
+        const validation = await client.validateToken(token)
 
         await admin
           .from('social_accounts')

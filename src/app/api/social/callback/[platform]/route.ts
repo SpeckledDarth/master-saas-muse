@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { getConfigValue } from '@/lib/config/secrets'
 import { getPlatformClient, type SocialPlatform } from '@/lib/social/client'
+import { encryptToken } from '@/lib/social/crypto'
 import { verifyState } from '@/app/api/social/connect/route'
 
 function getSupabaseAdmin() {
@@ -234,8 +235,8 @@ export async function GET(
         platform_user_id: profile?.id || null,
         platform_username: profile?.username || null,
         display_name: profile?.displayName || null,
-        access_token_encrypted: accessToken,
-        refresh_token_encrypted: refreshToken || null,
+        access_token_encrypted: encryptToken(accessToken),
+        refresh_token_encrypted: refreshToken ? encryptToken(refreshToken) : null,
         is_valid: true,
         last_validated_at: new Date().toISOString(),
         last_error: null,
