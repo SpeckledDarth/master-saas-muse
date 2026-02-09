@@ -13,6 +13,39 @@ Preferred communication style: Simple, everyday language.
 - **Cognitive load**: Minimize decisions. Ask simple yes/no questions. Avoid jargon unless it affects a decision.
 - **Git Sync Responsibility**: Agent ensures Replit and GitHub repo stay in sync. Before ending sessions or after significant changes, agent verifies sync status and asks user to run push commands if needed. User executes git commands when requested.
 
+## Deployment Model: Option B (Separate Deployments)
+**Decision Date**: February 2026
+
+Each SaaS product built on MuseKit gets its own independent deployment:
+- Own repo (forked from MuseKit)
+- Own Supabase project (database, auth, storage)
+- Own Stripe account (clean P&L)
+- Own Vercel deployment
+- Own domain
+
+**Why**: Clean P&L per product, independent scaling, zero cross-pollination risk, ability to sell or shut down any product independently. Infrastructure cost per SaaS is negligible ($0-1/mo on free tiers, ~$50-75/mo at scale).
+
+**MuseKit stays as the shared template**. Products fork from it. Core improvements flow back via git merges.
+
+**Future**: A "MuseKit HQ" franchise dashboard can be built to combine metrics across all deployed products into a single portfolio view.
+
+See `docs/ARCHITECTURE.md` for detailed boundary rules and merge-conflict prevention guidelines.
+
+## Merge-Friendly Architecture Rules
+These rules minimize git merge conflicts when pulling MuseKit core updates into product repos:
+
+1. **Add, don't modify** core files. Extend via new files instead of editing existing ones.
+2. **Product database tables** go in `migrations/extensions/`, never `migrations/core/`.
+3. **Product pages** go in clearly scoped directories (e.g., `/dashboard/social/`, `/api/social/`).
+4. **Product types** go in `src/lib/<product>/`, never in `src/types/settings.ts` or other core type files.
+5. **Product queue jobs** should be defined in `src/lib/<product>/` and registered via a plugin pattern, not hardcoded into `src/lib/queue/types.ts`.
+6. **If you must touch a core file**, keep changes minimal, isolated, and well-commented with `// PRODUCT: <name>`.
+
+**Known Separation Issues (to clean up before forking)**:
+- `src/lib/queue/types.ts` contains social job types (should be in `src/lib/social/`)
+- `src/lib/queue/index.ts` imports from `@/lib/social/` (core should not import from product code)
+- These work fine in the combined repo but should be refactored to a plugin pattern before creating a clean MuseKit template
+
 ## System Architecture
 The project utilizes Next.js 16+ (App Router), React 18+, and TypeScript, with Tailwind CSS, shadcn/ui, and next-themes for styling. TanStack Query manages server state. Supabase provides PostgreSQL, authentication, RLS, and storage, supporting multi-tenancy. Deployment is exclusively on Vercel.
 
@@ -31,7 +64,7 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **Marketing Tools**: Waitlist mode, in-app feedback widget, and customizable marketing pages.
 - **Security**: Supabase RLS, Zod validation, rate limiting, and security headers.
 - **Monitoring**: Sentry for error tracking and Plausible for analytics.
-- **Queue Infrastructure**: BullMQ with Upstash Redis for job types (email, webhook-retry, report, metrics-report, metrics-alert, token-rotation, plus social job types for SocioScheduler), managed via an admin dashboard.
+- **Queue Infrastructure**: BullMQ with Upstash Redis for core job types (email, webhook-retry, report, metrics-report, metrics-alert, token-rotation), managed via an admin dashboard. Product-specific jobs (social-post, social-health-check, etc.) are currently in queue types but should be refactored to a plugin pattern.
 - **Rate Limiting**: Upstash Redis sliding window with in-memory fallback.
 - **In-App Notifications**: Bell icon with unread badges, popover list, and server-side utilities.
 - **User Impersonation**: Admin capability with cookie-based sessions, warning banners, and audit logging.
