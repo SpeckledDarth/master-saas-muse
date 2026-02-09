@@ -41,10 +41,11 @@ These rules minimize git merge conflicts when pulling MuseKit core updates into 
 5. **Product queue jobs** should be defined in `src/lib/<product>/` and registered via a plugin pattern, not hardcoded into `src/lib/queue/types.ts`.
 6. **If you must touch a core file**, keep changes minimal, isolated, and well-commented with `// PRODUCT: <name>`.
 
-**Known Separation Issues (to clean up before forking)**:
-- `src/lib/queue/types.ts` contains social job types (should be in `src/lib/social/`)
-- `src/lib/queue/index.ts` imports from `@/lib/social/` (core should not import from product code)
-- These work fine in the combined repo but should be refactored to a plugin pattern before creating a clean MuseKit template
+**Resolved Separation Issues (February 2026)**:
+- Social job types moved from `src/lib/queue/types.ts` to `src/lib/social/queue-jobs.ts` (re-exported for backward compat)
+- Social job processors moved from `src/lib/queue/index.ts` to `src/lib/social/queue-jobs.ts`
+- Core queue delegates social jobs via dynamic import: `const { processSocialJob } = await import('@/lib/social/queue-jobs')`
+- Old monolithic cron at `/api/cron/social` replaced with scoped endpoints at `/api/social/cron/process-scheduled` and `/api/social/cron/pull-engagement`
 
 ## System Architecture
 The project utilizes Next.js 16+ (App Router), React 18+, and TypeScript, with Tailwind CSS, shadcn/ui, and next-themes for styling. TanStack Query manages server state. Supabase provides PostgreSQL, authentication, RLS, and storage, supporting multi-tenancy. Deployment is exclusively on Vercel.
@@ -64,7 +65,7 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **Marketing Tools**: Waitlist mode, in-app feedback widget, and customizable marketing pages.
 - **Security**: Supabase RLS, Zod validation, rate limiting, and security headers.
 - **Monitoring**: Sentry for error tracking and Plausible for analytics.
-- **Queue Infrastructure**: BullMQ with Upstash Redis for core job types (email, webhook-retry, report, metrics-report, metrics-alert, token-rotation), managed via an admin dashboard. Product-specific jobs (social-post, social-health-check, etc.) are currently in queue types but should be refactored to a plugin pattern.
+- **Queue Infrastructure**: BullMQ with Upstash Redis for core job types (email, webhook-retry, report, metrics-report, metrics-alert, token-rotation), managed via an admin dashboard. Product-specific jobs use a plugin pattern: social job types and processors live in `src/lib/social/queue-jobs.ts`, re-exported through `src/lib/queue/types.ts` for backward compatibility. Core queue delegates to product plugins via dynamic import.
 - **Rate Limiting**: Upstash Redis sliding window with in-memory fallback.
 - **In-App Notifications**: Bell icon with unread badges, popover list, and server-side utilities.
 - **User Impersonation**: Admin capability with cookie-based sessions, warning banners, and audit logging.
@@ -87,11 +88,15 @@ SocioScheduler is a standalone SaaS product built ON TOP of MuseKit (not a toggl
 - AI social media scheduling for solopreneurs (Facebook, LinkedIn, Twitter/X)
 - Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) uses the product registry (`getUserProductTier(userId, 'socio-scheduler')`) with legacy fallback to direct Stripe metadata lookup. Tier definitions stored in product registry as `tierDefinitions`
 - OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
+- Token encryption at rest via AES-256-GCM (`src/lib/social/crypto.ts`), key in `SOCIAL_ENCRYPTION_KEY` secret
+- Scheduled post processing via Vercel cron (`/api/social/cron/process-scheduled`, every 5 min)
+- Engagement data pull via Vercel cron (`/api/social/cron/pull-engagement`, every 6 hours)
 - Engagement analytics dashboard with Recharts charts (`/dashboard/social/engagement`)
 - Calendar view with month-grid showing scheduled posts (`/dashboard/social/calendar`)
 - 7-page social dashboard: overview, calendar, engagement, queue, posts, brand preferences, onboarding
 - Quick Generate dialog, SocialUpgradeBanner component, 15 niche-specific AI prompts
 - Admin-configurable engagement pull settings (intervalHours/lookbackHours, 1-168h range)
+- Queue job plugin pattern: social types/processors in `src/lib/social/queue-jobs.ts`, core delegates via dynamic import
 - Beta debug mode via `MUSE_DEBUG_MODE=true` env var with mock data at `/api/social/debug`
 - All RLS policies verified, proper empty states on all dashboard pages, no secrets exposed
 

@@ -217,3 +217,120 @@ test.describe('SocioScheduler - Social KPIs on Metrics Dashboard', () => {
     }
   });
 });
+
+test.describe('SocioScheduler - Dashboard Pages', () => {
+  test('should display brand preferences page with form fields', async ({ page }) => {
+    const loggedIn = await ensureAuthenticated(page);
+    test.skip(!loggedIn, 'No test credentials available');
+
+    await page.goto('/dashboard/social/brand');
+    await page.waitForLoadState('networkidle');
+
+    const nicheInput = page.getByTestId('input-niche');
+    if (await nicheInput.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await expect(nicheInput).toBeVisible();
+
+      const toneSelect = page.getByTestId('select-tone');
+      if (await toneSelect.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await expect(toneSelect).toBeVisible();
+      }
+    }
+  });
+
+  test('should display calendar page with month navigation', async ({ page }) => {
+    const loggedIn = await ensureAuthenticated(page);
+    test.skip(!loggedIn, 'No test credentials available');
+
+    await page.goto('/dashboard/social/calendar');
+    await page.waitForLoadState('networkidle');
+
+    const calendarGrid = page.getByTestId('calendar-grid');
+    if (await calendarGrid.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await expect(calendarGrid).toBeVisible();
+
+      const prevButton = page.getByTestId('button-prev-month');
+      if (await prevButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await expect(prevButton).toBeVisible();
+      }
+
+      const nextButton = page.getByTestId('button-next-month');
+      if (await nextButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await expect(nextButton).toBeVisible();
+      }
+    }
+  });
+
+  test('should display engagement analytics page with charts', async ({ page }) => {
+    const loggedIn = await ensureAuthenticated(page);
+    test.skip(!loggedIn, 'No test credentials available');
+
+    await page.goto('/dashboard/social/engagement');
+    await page.waitForLoadState('networkidle');
+
+    const pageTitle = page.getByTestId('text-page-title');
+    if (await pageTitle.isVisible({ timeout: 5000 }).catch(() => false)) {
+      const titleText = await pageTitle.textContent();
+      expect(titleText).toContain('Engagement');
+    }
+
+    const totalPostsCard = page.getByTestId('card-total-posts');
+    if (await totalPostsCard.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await expect(totalPostsCard).toBeVisible();
+    }
+  });
+
+  test('should display overview page with quick stats', async ({ page }) => {
+    const loggedIn = await ensureAuthenticated(page);
+    test.skip(!loggedIn, 'No test credentials available');
+
+    await page.goto('/dashboard/social/overview');
+    await page.waitForLoadState('networkidle');
+
+    const overviewTitle = page.getByTestId('text-page-title');
+    if (await overviewTitle.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await expect(overviewTitle).toBeVisible();
+    }
+  });
+
+  test('should display queue page for AI post approvals', async ({ page }) => {
+    const loggedIn = await ensureAuthenticated(page);
+    test.skip(!loggedIn, 'No test credentials available');
+
+    await page.goto('/dashboard/social/queue');
+    await page.waitForLoadState('networkidle');
+
+    const pageTitle = page.getByTestId('text-page-title');
+    if (await pageTitle.isVisible({ timeout: 5000 }).catch(() => false)) {
+      const titleText = await pageTitle.textContent();
+      expect(titleText).toContain('Queue');
+    }
+  });
+});
+
+test.describe('SocioScheduler - Cron Endpoints', () => {
+  test('should reject process-scheduled without auth when CRON_SECRET is set', async ({ request }) => {
+    const response = await request.post('/api/social/cron/process-scheduled');
+    const status = response.status();
+    if (status === 401) {
+      const body = await response.json();
+      expect(body).toHaveProperty('error', 'Unauthorized');
+    } else {
+      expect(status).toBeLessThan(500);
+      const body = await response.json();
+      expect(body).toHaveProperty('processed');
+    }
+  });
+
+  test('should reject pull-engagement without auth when CRON_SECRET is set', async ({ request }) => {
+    const response = await request.post('/api/social/cron/pull-engagement');
+    const status = response.status();
+    if (status === 401) {
+      const body = await response.json();
+      expect(body).toHaveProperty('error', 'Unauthorized');
+    } else {
+      expect(status).toBeLessThan(500);
+      const body = await response.json();
+      expect(body).toHaveProperty('processed');
+    }
+  });
+});

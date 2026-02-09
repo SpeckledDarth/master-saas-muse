@@ -1,4 +1,10 @@
-export type JobType = 'email' | 'webhook-retry' | 'report' | 'metrics-report' | 'metrics-alert' | 'token-rotation' | 'social-post' | 'social-health-check' | 'social-trend-monitor' | 'social-engagement-pull'
+export type CoreJobType = 'email' | 'webhook-retry' | 'report' | 'metrics-report' | 'metrics-alert' | 'token-rotation'
+
+// PRODUCT: SocioScheduler - social job types re-exported from product module
+import type { SocialJobType, SocialPostJobData, SocialHealthCheckJobData, SocialTrendMonitorJobData, SocialEngagementPullJobData, SocialJobData } from '@/lib/social/queue-jobs'
+export type { SocialPostJobData, SocialHealthCheckJobData, SocialTrendMonitorJobData, SocialEngagementPullJobData, SocialJobData }
+
+export type JobType = CoreJobType | SocialJobType
 
 export interface EmailJobData {
   type: 'email'
@@ -50,38 +56,7 @@ export interface TokenRotationJobData {
   requestedBy: string
 }
 
-export interface SocialPostJobData {
-  type: 'social-post'
-  postId: string
-  userId: string
-  platform: string
-  content: string
-  mediaUrls?: string[]
-  scheduledAt?: string
-}
-
-export interface SocialHealthCheckJobData {
-  type: 'social-health-check'
-  platforms: string[]
-  alertEmail?: string
-  failureThreshold: number
-}
-
-export interface SocialTrendMonitorJobData {
-  type: 'social-trend-monitor'
-  platform: string
-  keywords: string[]
-  userId: string
-}
-
-export interface SocialEngagementPullJobData {
-  type: 'social-engagement-pull'
-  userId: string
-  platform: string
-  lookbackHours: number
-}
-
-export type QueueJobData = EmailJobData | WebhookRetryJobData | ReportJobData | MetricsReportJobData | MetricsAlertJobData | TokenRotationJobData | SocialPostJobData | SocialHealthCheckJobData | SocialTrendMonitorJobData | SocialEngagementPullJobData
+export type QueueJobData = EmailJobData | WebhookRetryJobData | ReportJobData | MetricsReportJobData | MetricsAlertJobData | TokenRotationJobData | SocialJobData
 
 export interface JobStatus {
   id: string

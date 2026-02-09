@@ -4,8 +4,12 @@
   "framework": "nextjs",
   "crons": [
     {
-      "path": "/api/cron/social",
-      "schedule": "0 0 * * *"
+      "path": "/api/social/cron/process-scheduled",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/social/cron/pull-engagement",
+      "schedule": "0 */6 * * *"
     }
   ]
 }
