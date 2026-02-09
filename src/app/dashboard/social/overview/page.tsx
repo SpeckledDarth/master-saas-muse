@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
+import { Progress } from '@/components/ui/progress'
 import {
   Loader2,
   FileText,
@@ -17,6 +18,7 @@ import {
   Clock,
   Palette,
   Bell,
+  TrendingUp,
 } from 'lucide-react'
 
 interface SocialPost {
@@ -80,6 +82,7 @@ export default function SocialOverviewPage() {
   const [aiGensToday, setAiGensToday] = useState(0)
   const [connectedPlatforms, setConnectedPlatforms] = useState(0)
   const [tierName, setTierName] = useState('Starter')
+  const [monthlyPostLimit, setMonthlyPostLimit] = useState<number | null>(null)
   const { toast } = useToast()
 
   const fetchData = useCallback(async () => {
@@ -103,6 +106,9 @@ export default function SocialOverviewPage() {
     if (results[2].status === 'fulfilled') {
       const tierInfo: TierInfo = results[2].value
       setTierName(TIER_DISPLAY[tierInfo.tier] || tierInfo.tier)
+      if (tierInfo.limits?.monthlyPosts && tierInfo.limits.monthlyPosts < 999999) {
+        setMonthlyPostLimit(tierInfo.limits.monthlyPosts)
+      }
     }
 
     setLoading(false)
@@ -170,6 +176,39 @@ export default function SocialOverviewPage() {
           </CardContent>
         </Card>
       </div>
+
+      {monthlyPostLimit !== null && (
+        <Card data-testid="card-usage-this-month">
+          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <CardTitle className="text-base">Usage This Month</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm text-muted-foreground">Posts used</span>
+              <span className="text-sm font-medium" data-testid="text-usage-count">
+                {postsThisMonth} / {monthlyPostLimit}
+              </span>
+            </div>
+            <Progress
+              value={Math.min((postsThisMonth / monthlyPostLimit) * 100, 100)}
+              data-testid="progress-usage"
+            />
+            {postsThisMonth >= monthlyPostLimit * 0.8 && (
+              <div className="flex items-center justify-between gap-2 pt-1">
+                <p className="text-xs text-muted-foreground">
+                  {postsThisMonth >= monthlyPostLimit
+                    ? 'You\u2019ve reached your monthly limit.'
+                    : `You\u2019re at ${Math.round((postsThisMonth / monthlyPostLimit) * 100)}% of your limit.`}
+                </p>
+                <Button variant="outline" size="sm" asChild data-testid="button-upgrade-cta">
+                  <Link href="/pricing">Upgrade</Link>
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <Card data-testid="card-alerts">
         <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">

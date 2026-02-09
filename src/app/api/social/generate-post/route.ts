@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { defaultSettings } from '@/types/settings'
 import { chatCompletion, type ChatMessage } from '@/lib/ai/provider'
-import type { AISettings } from '@/types/settings'
+import type { AISettings, NicheGuidanceEntry } from '@/types/settings'
 import { checkSocialRateLimit, getLimitsForTier } from '@/lib/social/rate-limits'
 import { getUserSocialTier } from '@/lib/social/user-tier'
 
@@ -37,11 +37,13 @@ async function getSettings() {
   const admin = getSupabaseAdmin()
   const { data } = await admin.from('organization_settings').select('settings').eq('app_id', 'default').single()
   const settings = data?.settings || defaultSettings
+  const socialModule = { ...defaultSettings.socialModule!, ...(settings.socialModule || {}) }
   return {
     socialEnabled: settings.features?.socialModuleEnabled ?? false,
     aiEnabled: settings.features?.aiEnabled ?? false,
     aiSettings: { ...defaultSettings.ai!, ...(settings.ai || {}) } as AISettings,
-    socialModule: { ...defaultSettings.socialModule!, ...(settings.socialModule || {}) },
+    socialModule,
+    nicheGuidance: (socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || []) as NicheGuidanceEntry[],
   }
 }
 
@@ -89,7 +91,8 @@ function buildSocialPrompt(
   style: string,
   includeHashtags: boolean,
   maxLength: number,
-  brandPrefs?: BrandPreferences | null
+  brandPrefs?: BrandPreferences | null,
+  nicheGuidanceEntries?: NicheGuidanceEntry[]
 ): string {
   const platformNames: Record<string, string> = {
     twitter: 'Twitter/X',
@@ -127,26 +130,13 @@ function buildSocialPrompt(
   prompt += `- Write like a real person, not a marketing bot\n`
   prompt += `- Be specific and concrete, avoid generic platitudes\n\n`
 
-  const nicheGuidance: Record<string, string> = {
-    plumbing: 'Keep it casual and local. Talk like a neighbor who happens to fix pipes. Mention common household problems people relate to.',
-    hvac: 'Keep it casual and local. Talk like the trusted tech who keeps homes comfortable. Reference seasonal concerns.',
-    electrical: 'Keep it casual and local. Emphasize safety and reliability. Reference common home electrical concerns.',
-    landscaping: 'Keep it visual and seasonal. Talk about curb appeal and outdoor living. Reference local weather and seasons.',
-    cleaning: 'Keep it friendly and relatable. Talk about the relief of coming home to a clean space. Reference busy schedules.',
-    'real_estate': 'Be market-savvy but approachable. Share local insights and neighborhood knowledge. Reference market trends without jargon.',
-    'real estate': 'Be market-savvy but approachable. Share local insights and neighborhood knowledge. Reference market trends without jargon.',
-    rideshare: 'Keep it real and relatable. Talk about the hustle, tips for riders, and city life. Be down-to-earth.',
-    freelance: 'Be authentic about the freelance life. Share lessons learned and wins. Connect with other independents.',
-    photography: 'Be visual and passionate. Talk about capturing moments and telling stories. Share behind-the-scenes insights.',
-    fitness: 'Be motivating without being preachy. Share practical tips and real results. Keep it encouraging.',
-    food: 'Be warm and inviting. Talk about flavors, community, and the story behind the food. Make people hungry.',
-    beauty: 'Be confident and inclusive. Share tips, transformations, and self-care moments. Celebrate individuality.',
-    tutoring: 'Be encouraging and knowledgeable. Share study tips, success stories, and learning moments. Keep it supportive.',
-    pet_care: 'Be warm and playful. Talk about the bond between pets and their people. Share practical care tips.',
-  }
-
   const nicheLower = niche.toLowerCase().replace(/[-_\s]+/g, '_')
-  const nicheHint = nicheGuidance[nicheLower] || nicheGuidance[niche.toLowerCase()] || ''
+  const entries = nicheGuidanceEntries || []
+  const matchedEntry = entries.find(e => {
+    const entryKey = e.key.toLowerCase().replace(/[-_\s]+/g, '_')
+    return entryKey === nicheLower || (e.label && e.label.toLowerCase() === niche.toLowerCase())
+  })
+  const nicheHint = matchedEntry?.guidance || ''
   if (nicheHint) {
     prompt += `NICHE VOICE:\n- ${nicheHint}\n\n`
   }
@@ -211,7 +201,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { socialEnabled, aiEnabled, aiSettings, socialModule } = await getSettings()
+  const { socialEnabled, aiEnabled, aiSettings, socialModule, nicheGuidance } = await getSettings()
 
   if (!socialEnabled) {
     return NextResponse.json({ error: 'Social module is not enabled' }, { status: 403 })
@@ -290,7 +280,8 @@ export async function POST(request: NextRequest) {
     effectiveStyle,
     effectiveIncludeHashtags,
     effectiveMaxLength,
-    brandPrefs
+    brandPrefs,
+    nicheGuidance
   )
 
   try {

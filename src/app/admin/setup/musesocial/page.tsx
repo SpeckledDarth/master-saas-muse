@@ -14,10 +14,10 @@ import { Button } from '@/components/ui/button'
 import {
   Share2, Twitter, Linkedin, Instagram, Youtube, Facebook, Music, MessageSquare, Image, Camera, Gamepad2,
   AlertTriangle, KeyRound, ChevronDown, ChevronRight, CircleDot,
-  ExternalLink, Loader2, Pencil, Check, X, Eye, EyeOff, Trash2
+  ExternalLink, Loader2, Pencil, Check, X, Eye, EyeOff, Trash2, Plus, BookOpen
 } from 'lucide-react'
 import { defaultSettings } from '@/types/settings'
-import type { SocialModuleTier } from '@/types/settings'
+import type { SocialModuleTier, NicheGuidanceEntry } from '@/types/settings'
 
 interface IntegrationKey {
   id: string
@@ -828,6 +828,80 @@ export default function MuseSocialPage() {
             </CardContent>
           </Card>
 
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Niche Guidance
+                <InfoTooltip text="AI-generated posts use niche-specific voice guidance to sound authentic. Add, edit, or remove niches without code changes." />
+              </CardTitle>
+              <CardDescription>
+                Customize AI voice guidance for each industry niche
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-xs text-muted-foreground">
+                When a user sets their niche in Brand Preferences, the AI uses the matching guidance below to write posts that sound authentic for their industry.
+              </p>
+              <div className="space-y-3">
+                {(socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || []).map((entry: NicheGuidanceEntry, index: number) => (
+                  <div key={entry.key + index} className="border rounded-md p-3 space-y-2" data-testid={`niche-entry-${entry.key}`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="grid grid-cols-2 gap-2 flex-1">
+                        <Input
+                          value={entry.label}
+                          onChange={(e) => {
+                            const updated = [...(socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || [])]
+                            updated[index] = { ...updated[index], label: e.target.value, key: e.target.value.toLowerCase().replace(/[\s&]+/g, '_') }
+                            updateSocialModule('nicheGuidance', updated)
+                          }}
+                          placeholder="Niche name (e.g., Plumbing)"
+                          data-testid={`input-niche-label-${index}`}
+                        />
+                        <code className="text-xs text-muted-foreground self-center font-mono px-2">{entry.key}</code>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          const updated = [...(socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || [])]
+                          updated.splice(index, 1)
+                          updateSocialModule('nicheGuidance', updated)
+                        }}
+                        data-testid={`button-remove-niche-${index}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <Textarea
+                      value={entry.guidance}
+                      onChange={(e) => {
+                        const updated = [...(socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || [])]
+                        updated[index] = { ...updated[index], guidance: e.target.value }
+                        updateSocialModule('nicheGuidance', updated)
+                      }}
+                      rows={2}
+                      placeholder="Voice guidance for AI when writing posts in this niche..."
+                      data-testid={`input-niche-guidance-${index}`}
+                    />
+                  </div>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const current = [...(socialModule.nicheGuidance || defaultSettings.socialModule!.nicheGuidance || [])]
+                  current.push({ key: '', label: '', guidance: '' })
+                  updateSocialModule('nicheGuidance', current)
+                }}
+                data-testid="button-add-niche"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Niche
+              </Button>
+            </CardContent>
+          </Card>
+
           {socialModule.tier === 'power' && (
             <Card>
               <CardHeader>
@@ -933,7 +1007,14 @@ export default function MuseSocialPage() {
         <SaveButton
           saving={saving}
           saved={saved}
-          onClick={handleSave}
+          onClick={() => {
+            const guidance = socialModule.nicheGuidance || []
+            const filtered = guidance.filter((e: NicheGuidanceEntry) => e.key.trim() && e.label.trim() && e.guidance.trim())
+            if (filtered.length !== guidance.length) {
+              updateSocialModule('nicheGuidance', filtered)
+            }
+            handleSave()
+          }}
           testId="button-save-musesocial"
         />
       </div>

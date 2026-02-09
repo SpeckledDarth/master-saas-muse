@@ -326,7 +326,7 @@ async function processSocialTrendMonitorJob(job: Job<SocialTrendMonitorJobData>)
 }
 
 async function processSocialEngagementPullJob(job: Job<SocialEngagementPullJobData>): Promise<void> {
-  const lookbackMs = (job.data.lookbackHours || 48) * 60 * 60 * 1000
+  const lookbackMs = (job.data.lookbackHours || 24) * 60 * 60 * 1000
   const since = new Date(Date.now() - lookbackMs).toISOString()
 
   console.log(`[Queue] Pulling engagement metrics for ${job.data.platform} (user ${job.data.userId}) since ${since}`)
@@ -389,6 +389,13 @@ async function processSocialEngagementPullJob(job: Job<SocialEngagementPullJobDa
     console.log(`[Queue] Engagement pull completed: ${updated}/${posts.length} posts updated`)
   } catch (err) {
     console.error(`[Queue] Engagement pull job failed:`, (err as Error).message)
+    try {
+      const Sentry = await import('@sentry/nextjs')
+      Sentry.captureException(err, {
+        tags: { queue: 'social-engagement-pull', platform: job.data.platform },
+        extra: { userId: job.data.userId, jobId: job.id, attemptsMade: job.attemptsMade },
+      })
+    } catch {}
     throw err
   }
 }
@@ -567,6 +574,8 @@ export async function addSocialEngagementPullJob(data: Omit<SocialEngagementPull
   const job = await q.add('social-engagement-pull', { type: 'social-engagement-pull' as const, ...data }, {
     jobId,
     priority: 5,
+    attempts: 3,
+    backoff: { type: 'exponential', delay: 60000 },
     repeat: { every: 24 * 60 * 60 * 1000, key: jobId },
   })
 

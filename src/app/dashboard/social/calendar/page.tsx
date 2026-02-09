@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Loader2, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -250,6 +251,7 @@ export default function SocialCalendarPage() {
               </div>
             </CardHeader>
             <CardContent>
+              <TooltipProvider delayDuration={300}>
               <div className="grid grid-cols-7 gap-px" data-testid="calendar-grid">
                 {DAYS_OF_WEEK.map(day => (
                   <div
@@ -269,9 +271,8 @@ export default function SocialCalendarPage() {
 
                   const uniquePlatforms = [...new Set(dayPosts.map(p => p.platform))]
 
-                  return (
+                  const dayCell = (
                     <button
-                      key={index}
                       onClick={() => setSelectedDate(dateKey)}
                       className={`
                         relative min-h-[60px] p-1 text-left rounded-md transition-colors
@@ -304,8 +305,33 @@ export default function SocialCalendarPage() {
                       )}
                     </button>
                   )
+
+                  if (dayPosts.length === 0) {
+                    return <div key={index}>{dayCell}</div>
+                  }
+
+                  return (
+                    <Tooltip key={index}>
+                      <TooltipTrigger asChild>{dayCell}</TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-[220px] space-y-1 text-xs">
+                        {dayPosts.slice(0, 3).map(post => (
+                          <div key={post.id} className="flex items-start gap-1.5">
+                            <span
+                              className="mt-1 block h-1.5 w-1.5 flex-shrink-0 rounded-full"
+                              style={{ backgroundColor: PLATFORM_COLORS[post.platform] || 'hsl(var(--muted-foreground))' }}
+                            />
+                            <span className="line-clamp-1">{post.content}</span>
+                          </div>
+                        ))}
+                        {dayPosts.length > 3 && (
+                          <p className="text-muted-foreground">+{dayPosts.length - 3} more</p>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  )
                 })}
               </div>
+              </TooltipProvider>
             </CardContent>
           </Card>
 

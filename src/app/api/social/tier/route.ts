@@ -35,6 +35,6 @@ export async function GET() {
     return NextResponse.json({ tier, limits })
   } catch (error) {
     console.error('Error fetching tier:', error)
-    return NextResponse.json({ tier: 'starter', limits: DEFAULT_TIER_LIMITS.starter })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
