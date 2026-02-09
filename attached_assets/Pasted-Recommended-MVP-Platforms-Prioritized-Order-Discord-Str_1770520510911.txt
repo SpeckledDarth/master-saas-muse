@@ -1,0 +1,69 @@
+Recommended MVP Platforms (Prioritized Order)
+
+Discord — Strongest starter choice (lowest difficulty, fastest to go live).
+0.5 days coding, no approval for <100 servers.
+Posting via bot token → simple text/messages/embeds (no media required).
+Why for MVP: Test full loop end-to-end quickly. Giggers often use Discord communities for leads (e.g., local gig channels). Low risk, great for dogfooding.
+Plan: Fill stubs first, test on your own server.
+
+Reddit — Second priority (medium-low difficulty, instant approval).
+1 day coding, no review needed.
+Text/images/links to subreddits (user specifies).
+Why: Strong for niche communities (e.g., r/sidehustle, r/forhire, local subs). Good for giggers posting service offers or responding to "need help" threads. Rate limits generous for low volume.
+Plan: Implement submit + read scopes; test on small subs.
+
+X (Twitter) — Third, but high value (medium difficulty, free tier viable).
+1 day coding.
+Free tier: ~500 posts/month (from recent 2026 data), but sufficient for MVP (16–17/day). Rate limits tight (e.g., 17 req/24h per user/app on posting), but we can queue carefully.
+Why: Real-time trends/hashtags perfect for our agents (e.g., monitor "#magicianneeded" or local gig keywords). Viral potential for side-hustlers.
+Plan: Register app for Free tier → fill post + search endpoints. Monitor quotas during beta.
+
+
+Deprioritize for MVP (Add Post-Beta):
+
+FB & LinkedIn: Medium-High difficulty + review delays (days–weeks). High value (local gigs, professional solos), but not worth stalling launch.
+Instagram/YouTube/TikTok/Pinterest: High difficulty (media-only, strict reviews, quotas).
+Snapchat: Not feasible for organic posting.
+
+This 3-platform MVP (Discord + Reddit + X) lets us launch in 1–2 weeks: prove agents → gen → post → alerts → engagement tracking. Beta users can test real posting, we dogfood on your accounts, and gather feedback to prioritize next integrations (e.g., FB if giggers demand local).
+Immediate Next Actions for You (in Replit)
+
+Clone & Setup:
+Clone MuseKit repo in Replit.
+Toggle MuseSocial on.
+Set up Starter tier limits (no-code via dashboard if possible, or env vars).
+
+Start with Discord:
+Create Discord app/bot → get token.
+Fill stubbed methods: validateToken (check token format), createPost (send message/embed to channel), getPostEngagement (basic reactions/counts if available).
+Test posting to a test server/channel.
+
+Then Reddit:
+Create Reddit app → get ID/Secret.
+Fill post method (submit to subreddit).
+
+X Prep:
+Register dev app (Free tier) → get keys.
+Fill post endpoint (v2 /2/tweets).
+
+
+Once any one is live (e.g., Discord in 1 day), we can test the full n8n loop (trend pull → Grok → queue → post).
+Refined Tech Checklist (Updated for MVP)
+
+Must-Haves (Week 1):
+Supabase: Add table/fields for brand prefs (niche, location, tone, samples URL).
+Onboarding: Customize wizard to default platforms (Discord/Reddit/X or whatever live first).
+n8n Agents:
+Trend/Mention monitor (cron 6h): Pull from live platforms (e.g., Reddit search, X trends API, Discord channel scan if bot).
+Gen → Queue → Post workflow.
+
+Gating: Enforce Starter (2 platforms, 15 posts/mo) via BullMQ counters.
+
+Nice-to-Haves (Week 2):
+Alerts/Resend emails with Approve/Edit/Ignore links (webhook back to app).
+Basic engagement pull (for stats).
+
+MuseKit Improvements Needed (Quick Fixes):
+Add prefs fields if missing.
+Extend n8n templates for new triggers (e.g., mention detection).
+Config for limited platforms in setup dashboard.

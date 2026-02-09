@@ -1,0 +1,184 @@
+# SocioScheduler Business Plan
+
+_Date: February 7, 2026_ _Version: 1.2 Draft_ _Overview_: This is a standalone plan for SocioScheduler, a passive AI-powered social media scheduler SaaS. It stands on its own as a profitable product targeting $1K–$2K MRR ASAP, while dogfooding MuseKit. The structure is designed to be cloned for future SaaS launches: rewrite product-specific sections (e.g., personas, USPs, marketing), keep infrastructure assumptions (e.g., MuseKit features) the same. Updates in v1.2: Added section 11 for lessons learned and duplication notes, as a placeholder to track inaugural process insights and guide future clones.
+
+## 1. Vision & Strategy
+
+**Vision Statement**: SocioScheduler enables busy solopreneurs, small business owners, and side-hustlers to maintain a consistent, engaging social presence without ongoing effort, turning social media into a passive lead-gen tool. By launch + 2 months, it will generate $1K–$2K in stable MRR, proving the model for quick, passive revenue while hardening MuseKit for future clones.
+
+**Core Strategy**:
+
+- **Product Focus**: True "set it and forget it" automation via AI agents — users connect once, provide brand prefs, then get auto-trend monitoring, content gen, scheduling/posting, and alerts.
+- **Market Entry**: Niche on underserved non-tech users (e.g., plumbers, realtors, gig workers like magicians or dog trainers) who need simple social boosts for local/part-time leads, avoiding direct fights with giants like Buffer.
+- **Growth Approach**: Bootstrapped, organic-first (X/IndieHackers, FB groups, self-dogfooding for promotion). Stabilize at $1K–$2K MRR, then shift focus to cloning new products.
+- **Passivity Principle**: Maximize automation (n8n/BullMQ/Grok) to require <5 hours/mo founder time post-launch.
+- **Milestones**: MVP launch in 1–3 weeks; beta signups (100+); $1K MRR in Month 1–2; organic growth via self-posting.
+
+## 2. Business Plan
+
+### 2.1 Customer Personas & Market Segmentation
+
+**Market Size**: Global social media management tools market ~$15B (2026 est.), with underserved segment for small/local biz and gig workers (10M+ US solos/SMBs per Census data; gig economy blending into side-hustles for 44% of pros per Canva 2025 report). Focus: Users who post inconsistently due to time constraints, including part-timers seeking low-tech, FB-like simplicity.
+
+**Primary Segments**:
+
+- **Online Solopreneurs/Creators** (40% target): Coaches, freelancers, podcasters. Pain: Burnout from manual posting. Tech-savvy: Medium.
+- **Offline Small Businesses** (30% target): Plumbers, realtors, trainers, local shops. Pain: Need leads but hate social tech. Tech-savvy: Low.
+- **Side-Hustlers/Gig Workers** (30% target): Magicians, dog trainers, vending renters, landlords, house flippers, cleaners, moonlight electricians. Pain: Casual lead-gen without full business commitment; want tools as easy as scrolling FB/Pinterest. Tech-savvy: Very low.
+
+**Key Personas**:
+
+- **Realtor Rita** (45, solo agent): Posts market tips sporadically; wants auto-reactions to local trends (e.g., "housing boom mentions") for leads. Budget: $30–$70/mo.
+- **Plumber Paul** (52, small owner): Zero social game; needs simple setup to share service tips/respond to weather events. Budget: $20–$50/mo; values zero maintenance.
+- **Coach Carla** (32, online solopreneur): Consistent but time-poor; wants brand-aligned auto-posts on viral challenges. Budget: $40–$80/mo.
+- **Gig Gary** (38, moonlighting electrician/magician): Scans FB for jobs but misses opportunities; wants auto-posts on "electrician needed" mentions without tech hassle. Budget: $20–$50/mo.
+
+### 2.2 Competitor Analysis
+
+Focus: Direct/indirect players in AI schedulers for small users. Analyzed via 2026 reviews (e.g., G2, Capterra, X threads on "best passive scheduler for small biz/side hustles").
+
+|Competitor|Strengths|Weaknesses|Our Opportunity|
+|---|---|---|---|
+|Buffer|Affordable ($6/channel), simple UI, reliable posting.|Semi-manual (needs curation), weak trend agents, no deep passivity for non-techies/giggers.|Out-automate with n8n agents for true hands-off; target giggers with FB-ease.|
+|SocialBee|High passivity via queues/recycling, $29+.|Limited real-time trends/mentions, more for creators than local SMBs/giggers.|Add dynamic AI gen + local integrations (e.g., Google Business); low barrier for part-timers.|
+|Hootsuite|Strong monitoring, OwlyGPT AI.|Pricey ($99+), complex for solos, manual-heavy.|Undercut on cost/simplicity for low-tech segments like gig workers.|
+|PostEverywhere|AI gen + scheduling, $19+.|Feature-bloat, glitches in automation per reviews.|Leverage MuseKit stability for reliable agents; focus on underserved giggers.|
+|Sintra AI|Workflow automation, $49+.|Geared to marketers, steep setup.|Zero-setup onboarding + offline/gig focus.|
+
+**Key Gaps**: No tool nails extreme passivity for non-digital SMBs or casual giggers (e.g., auto-posting "gig availability" on FB mentions). We differentiate via agents + low barrier.
+
+### 2.3 Detailed USPs
+
+- **Extreme Passivity**: n8n/BullMQ agents handle trend/mention monitoring → AI gen → scheduling/posting without weekly logins (vs. competitors' queues needing tweaks).
+- **Low/No-Tech Barrier**: One-time onboarding (OAuth + simple brand form); no dashboards to babysit — alerts via email; as easy as scrolling FB/Pinterest (ideal for plumbers/realtors/giggers).
+- **Brand-Aligned AI**: Grok-tuned content gen based on user samples/tone, ensuring on-point posts (e.g., professional for realtors, casual for trainers, fun for magicians).
+- **Affordable for Solos/SMBs/Giggers**: Starts at $19/mo; includes basics competitors charge extra for (analytics, agents).
+- **Local Biz & Gig Optimization**: Early Google Business/FB tie-in for reviews/mentions; dynamic responses to niche trends (e.g., local events or "gig needed" queries).
+- **Stability & Simplicity**: Built on MuseKit — no bloat, high reliability via queues/retries/Sentry.
+
+### 2.4 Pricing & Packaging
+
+Tiers mapped to MuseSocial limits (configurable no-code); free 14-day trial. Annual discounts (20%) for retention.
+
+|Tier|Price|Features|Target|
+|---|---|---|---|
+|Starter|$19/mo|15 posts/mo, 5 AI gens/day, 2 platforms (e.g., FB/LinkedIn), basic alerts.|Giggers/side-hustlers (e.g., Gary the Magician).|
+|Basic|$39/mo|30 posts/mo, 10 AI gens/day, 3 platforms, basic analytics/alerts.|Entry solos/SMBs (e.g., Paul the Plumber).|
+|Premium|$69/mo|Unlimited posts/gens, 10 platforms, custom agents, approval queue, advanced alerts.|Power users (e.g., Rita/Carla).|
+
+**Rationale**: Undercuts premiums (e.g., Hootsuite $99+); Starter tier draws giggers; encourages upgrades via limits. Stripe via MuseKit for easy gating.
+
+### 2.5 Financial Projections & Model
+
+**Assumptions**:
+
+- **Market Context**: SaaS growth at ~13–19% CAGR through 2028 (Gartner/IndieHackers 2026 reports), but micro-SaaS ramps conservatively ($1K–$10K MRR in Year 1 for similar tools like Post Bridge/Robopost per X shares).
+- **User Growth**: 100 beta signups Month 1 (X/IndieHackers/FB groups), 20% conversion to paid. Monthly new: 20–30 early (organic/self-posts), slowing to 8–10 by Year 3 (niche saturation). Churn: 15–20% MoM (conservative for low-tech users).
+- **Pricing & Revenue**: Tiers mix (Starter 30%, Basic 50%, Premium 20%) → $35–$40 ARPU/mo. Annual for 20% of users.
+- **Expenses**: $100/mo start (AI/APIs); rises to $500/mo by Year 3 (10–15% of revenue). No team/ads.
+- **Growth Rate**: 15% MoM early, tapering to 5–8% (conservative; no viral assumptions despite gig potential).
+- **Profitability**: 80–90% margins (typical micro-SaaS).
+
+**Proforma Summary** (Aggregated quarterly; modeled with compounding):
+
+|Period|New Users|Total Paying Users (EOM)|MRR (EOM)|ARR|Expenses|Net Profit (Monthly Avg)|Cumulative Profit|
+|---|---|---|---|---|---|---|---|
+|**Month 1 (Beta Launch)**|100 signups, 20 paid|20|$700|$8,400|$100|$600|$600|
+|**Month 2**|25|42 (18% churn)|$1,500|$18,000|$150|$1,350|$1,950|
+|**Month 3**|25|60|$2,100|$25,200|$200|$1,900|$3,850|
+|**Q1 Total**|-|-|-|-|$450|$3,850|$3,850|
+|**Q2 (Stabilize)**|20/mo avg|85|$3,000|$36,000|$300/mo avg|$2,700/mo|+$8,100 (Q2)|
+|**Q3**|15/mo avg|105|$3,700|$44,400|$350/mo|$3,350/mo|+$10,050 (Q3)|
+|**Q4**|15/mo avg|120|$4,200|$50,400|$400/mo|$3,800/mo|+$11,400 (Q4)|
+|**Year 1 Total**|~240 new|120|$4,200 MRR|$50,400 ARR|~$3,600|$33,400|$33,400|
+|**Year 2**|10/mo avg growth (slowing)|180 (EOM)|$6,300|$75,600|$5,000|$50,600|$84,000 (cumulative)|
+|**Year 3**|8/mo avg (mature niche)|220 (EOM)|$7,700|$92,400|$6,000|$68,400|$152,400 (cumulative)|
+
+**Notes**: Hits $1.5K MRR by Month 2 (ASAP goal). Conservative ramp to ~$90K ARR by Year 3; high margins enable passivity.
+
+### 2.6 Success Metrics & KPIs
+
+- **Activation**: 70% connect accounts in Week 1.
+- **Retention**: 80% MoM (via passivity).
+- **MRR/Churn**: $1K by Month 1; <15% churn.
+- **User Feedback**: NPS >7 via MuseKit widget.
+- **Dogfooding**: 50% of promo posts generated by tool itself.
+
+## 3. Product Requirements & Feature Spec (PRD)
+
+**MVP Scope**: Leverage MuseSocial for OAuth/posting/scheduling; add custom agents/onboarding.
+
+- **Onboarding**: Wizard — connect 2–3 platforms (default FB/LinkedIn for giggers), upload brand samples/tone, set prefs (frequency, approvals); FB-simple UX.
+- **Core Loop**: Agents monitor trends/mentions (n8n cron); Grok gen content; queue/post via BullMQ.
+- **Dashboard**: User-facing: Post queue preview, basic engagement charts, alerts.
+- **Out of Scope**: Advanced images, 10+ platforms (post-MVP).
+- **Success**: Users post 5x/week passively; 90% satisfaction.
+
+## 4. Technical Specifications (Tech Spec)
+
+**Architecture**: Clone MuseKit; toggle MuseSocial.
+
+- **Frontend**: Next.js dashboard — add brand form, queue viewer.
+- **Backend**: Supabase DB for prefs; n8n agents for monitoring (X/FB API trends); Grok for gen; BullMQ for queues/retries.
+- **Integrations**: Prioritize X/LinkedIn/Instagram/FB (prove SDKs; FB for giggers).
+- **Limits**: Config via MuseSocial tiers; no-code adjustments.
+- **Timeline**: 1–2 weeks build (extend MuseSocial stubs as needed).
+
+## 5. Launch Plan & Timeline
+
+- **Pre-Launch (Week 1)**: Waitlist site (MuseKit tool); tease on X/FB groups.
+- **Beta Launch (Week 2–3)**: 100 users; free trial; feedback loops.
+- **Full Launch (Month 1)**: ProductHunt, Reddit (r/sidehustle); aim 20 paid.
+- **Milestones**: Day 1: Domain/branding; Week 4: $500 MRR.
+
+## 6. Marketing & Growth Plan
+
+- **Channels**: Organic X/LinkedIn (auto-posts via tool); IndieHackers/Reddit (r/solopreneur, r/sidehustle); FB groups (side hustle communities).
+- **Tactics**: Dogfood — use SocioScheduler to post "passive tips for giggers" threads; content: AI-gen blogs on "FB leads for magicians."
+- **Growth Loops**: Watermark posts → signups; alerts on high-engagement → user shares.
+- **Budget**: $0; scale via agents.
+
+## 7. Sales Plan
+
+- **B2C Focus**: Self-serve signup/trial → Stripe upgrade. Target solos/giggers via organic.
+- **Light B2B**: Email outreach to tiny agencies (5–10 users); bundle Premium for teams.
+- **Conversion**: 20% trial-to-paid; upsell via email sequences (Resend).
+
+## 8. Operations & Support Plan
+
+- **Passive Ops**: AI chatbot (MuseKit) for 90% support; alerts via Resend; monitor via Sentry/Plausible.
+- **Maintenance**: <5 hours/mo — agent-handled updates, queue fixes.
+- **Team**: Solo founder; outsource nothing.
+
+## 9. Risk Register
+
+|Risk|Probability|Impact|Mitigation|
+|---|---|---|---|
+|API Changes (e.g., X limits)|Medium|High|Fallbacks in BullMQ; start with 3 platforms.|
+|Low Adoption (esp. giggers)|High|Medium|Beta feedback; simplify onboarding; target FB/Reddit communities.|
+|AI Quality Issues|Medium|Medium|Prompt tuning; approval queue for Premium.|
+|Competition Surge|Low|Medium|Niche on passivity/giggers; monitor X for trends.|
+
+## 10. Iteration & Feedback Loops
+
+- **Collection**: In-app NPS/feedback (MuseKit); X semantic searches for user mentions.
+- **Process**: Weekly reviews (Month 1); iterate agents/onboarding based on data.
+- **Pivot Threshold**: If <50% activation, rethink low-tech features for giggers.
+
+## 11. Lessons Learned & Duplication Notes
+
+**Lessons Learned** (Placeholder — Update post-launch/milestones):
+
+- Inaugural build may feel clunky due to MuseSocial SDK proving; track bugs here for MuseKit fixes (e.g., "FB integration needed tweaks for gig mentions").
+- Gig segment adoption: Monitor if it drives >30% signups; if low, refine FB onboarding.
+- Process Insights: Planning took X threads; aim <1 week for future clones by reusing this template.
+
+**Duplication Guidelines** (For Future Muses):
+
+- **Core Reuse**: Keep sections 3–5, 7–10 intact (MuseKit-based tech/ops).
+- **Rewrite for New Product**: Update 1 (vision), 2.1 (personas/segments), 2.2 (competitors if niche changes), 2.3 (USPs), 2.4 (pricing tweaks), 2.5 (proforma assumptions), 6 (marketing channels/voice).
+- **Timeline**: Use this as base; adjust milestones for clone speed (e.g., 1 week build post-MuseKit hardening).
+- **Tracking**: Add project-specific lessons here during build/launch to refine the model.
+- Wireframing: Visily outperformed Mokkup for our flows (smoother AI response, better form handling). Key accelerator: Detailed, context-rich prompts from Grok → standardize this. Example: Include user persona hints, exact components, mobile constraints, and benefit-oriented copy in prompts.
+	- The key insight: Prompt engineering is the secret sauce when using tools like Visily. The AI doesn't "think" like a designer; it needs rich context (persona hints, layout constraints, color cues, component lists, mobile-first, benefit-oriented copy) to generate something close to what we want on the first or second try. Your quick success with the prompts proves it — without them, you'd likely spend way more time regenerating or manually adjusting.
+- DB refinements: Extend MuseSocial social_posts for queues; tone as text for customs; numbered SQL migrations; fallback wise; add /migrations/extensions/ to MuseKit.

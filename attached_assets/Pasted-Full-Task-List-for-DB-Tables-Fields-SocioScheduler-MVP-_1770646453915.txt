@@ -1,0 +1,73 @@
+Full Task List for DB Tables/Fields (SocioScheduler MVP)
+Add these via a single migration script (e.g., 001_socioscheduler_tables.sql) — run once post-clone in Supabase editor/Replit. Use SQL for consistency (no Prisma). Include indexes/FKs for performance, enums/text for flexibility (per our refinements). Drop/create if testing.
+
+Extend Existing MuseSocial Tables (Leverage What's There)
+social_posts (Already in MuseSocial — extend for queue/alert tie-ins):
+Add columns:
+status text DEFAULT 'queued' (options: 'queued', 'scheduled', 'posted', 'failed', 'approved', 'ignored' — text for custom flexibility, no enum).
+generated_by_ai boolean DEFAULT true (flag Grok-suggested posts).
+trend_source text NULL (e.g., 'x_hashtag', 'fb_mention', 'local_query' — for alert context).
+niche_triggered text NULL (link to user's niche for gig relevance, e.g., 'magician').
+
+Add index: ON (user_id, status) — for fast queue views (e.g., SELECT WHERE status = 'queued').
+FK: Ensure user_id/org_id if not already (RLS on top).
+
+Why: Combines queue/posts/alert actions into one table — no parallel. Aligns with passivity (BullMQ handles queuing, DB persists).
+
+New Table: brand_preferences
+Purpose: Store onboarding inputs for Grok (tone, niche, location, samples). One row per user/org.
+Columns:
+id uuid PRIMARY KEY DEFAULT uuid_generate_v4().
+user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE.
+org_id uuid NULL REFERENCES organizations(id) (if multi-user).
+tone text NOT NULL DEFAULT 'professional' (freeform text for customs, e.g., 'witty' — no enum).
+niche text NOT NULL DEFAULT 'other' (e.g., 'magician', 'plumber' — text for admin-defined options).
+location text NULL (e.g., 'New York, NY' or lat/long string).
+sample_urls text[] NULL DEFAULT '{}' (array of URLs for uploaded samples).
+created_at timestamptz DEFAULT now().
+updated_at timestamptz DEFAULT now().
+
+Indexes: ON user_id (unique), ON org_id.
+RLS: Policy for row-level access (e.g., SELECT/UPDATE WHERE user_id = auth.uid() OR org_id IN user's orgs).
+Trigger: Update updated_at on changes.
+
+New Table: alert_logs
+Purpose: Track trends/mentions/alerts for dashboard feed, audits, and engagement ties (e.g., log Grok suggestions/actions).
+Columns:
+id uuid PRIMARY KEY DEFAULT uuid_generate_v4().
+user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE.
+org_id uuid NULL REFERENCES organizations(id).
+trend_text text NOT NULL (e.g., '#AIBusiness booming in NYC').
+suggested_post_id uuid NULL REFERENCES social_posts(id) (link to generated post).
+action_taken text NULL (e.g., 'approved', 'edited', 'ignored' — text for flexibility).
+platform text NOT NULL (e.g., 'x', 'fb' — matches connected accounts).
+created_at timestamptz DEFAULT now().
+
+Indexes: ON user_id, created_at DESC (for recent alerts feed).
+RLS: Same as above.
+
+New Table/View: engagement_metrics (Optional for MVP Basic Stats)
+Purpose: Store/pull basic engagement (likes, retweets, mentions) from platforms — for dashboard stats (aggregate via views if possible).
+If table:
+id uuid PRIMARY KEY DEFAULT uuid_generate_v4().
+post_id uuid NOT NULL REFERENCES social_posts(id) ON DELETE CASCADE.
+likes integer DEFAULT 0.
+retweets_shares integer DEFAULT 0.
+replies integer DEFAULT 0.
+mentions integer DEFAULT 0 (gig-specific leads).
+updated_at timestamptz DEFAULT now().
+
+Alternative: Use a view querying social_posts + platform pulls (n8n cron updates counts).
+Indexes: ON post_id.
+RLS: Tied to user/org.
+Why optional: If MuseSocial has engagement pull stubbed, implement basic for X/Reddit first; use for "Engagement this week" chart.
+
+
+Implementation Notes
+
+Run All at Once: Yes—bundle into one migration SQL file (e.g., CREATE TABLE IF NOT EXISTS ...; ALTER TABLE social_posts ADD COLUMN IF NOT EXISTS ...;). Test in a dev Supabase project first.
+Enums vs. Text: Per refinements, favor text for flexibility (tone, status, action_taken) — admins can define via dashboard later.
+Business Model Readiness: Yes, this covers MVP (onboarding prefs → agents use for gen → posts/queues → alerts/logs → stats). No more needed now (e.g., advanced logs post-MVP). If we pivot (e.g., add TikTok video fields), migrate then.
+Replit Workflow: Load this SQL in Replit → run against Supabase (use Supabase JS if scripting; else editor).
+
+This is comprehensive for SocioScheduler—add once, build on top.

@@ -1,0 +1,58 @@
+MuseKit is the cloneable foundation (auth, billing, admin, etc.), and we don't want to pollute its shared schema with SocioScheduler-specific fields (e.g., brand tone, niche, location prefs, post queues) that won't apply to future Muses. Commingling could make clones messier and harder to maintain, especially if each Muse has unique data needs.
+Let's break this down based on our goals (quick cloning, passivity, portfolio scaling) and Supabase best practices (drawing from multi-tenant SaaS patterns like RLS, schemas, and separate DBs).
+Quick Recap of the Problem
+
+MuseKit DB Role: Handles core, reusable stuff (users, organizations, subscriptions, metrics, API keys, etc.) — 13 tables per your overview, with RLS for security.
+Muse-Specific Needs: For SocioScheduler, we'll add things like:
+Brand prefs table (user_id, tone, niche, location, sample_urls).
+Post queues (via BullMQ/Supabase for persistence if needed).
+Engagement data (mentions, trends — could be logs or views).
+
+If we comingle (add these to MuseKit's DB schema), it works for one Muse but complicates clones (e.g., next Muse for realtors might need MLS fields instead).
+Two DBs could isolate, but adds complexity (cross-DB queries, auth sync, costs).
+
+My Recommendation: Single DB per Clone, with Modular Schema Extensions
+I think one Supabase DB per Muse clone is the way to go, but designed modularly to keep MuseKit "pure" and cloneable. This avoids two DBs' overhead while preventing commingling pollution. Here's why and how:
+Why Single DB (No Separate Muse DB)?
+
+Simplicity & Speed: Supabase excels at single-DB setups with RLS for isolation (e.g., tenant_id on tables). Two DBs mean extra setup (e.g., foreign data wrappers for cross-queries, duplicate auth), higher costs (~$25/mo extra per Muse), and more points of failure. For our bootstrapped portfolio model, one DB keeps cloning fast (duplicate project in Supabase dashboard → run migrations).
+Scalability: Each Muse is its own app/instance (cloned code + DB), so single-tenant per Muse naturally isolates (no multi-tenant risks like one user seeing another's data across Muses). This matches patterns from Supabase docs and SaaS starters like MakerKit (one DB with extensions).
+Avoids Hallucinations/Glitches: Sticking to one DB reduces sync issues; we can use Supabase's realtime/edges for all features without hacks.
+
+How to Structure It (Modular Schema to Avoid Commingling)
+Use schema extensions via migrations — keep MuseKit's core tables untouched, add Muse-specific tables in the same DB. This way, cloning MuseKit gives a clean base, and each Muse runs its own migration to add custom stuff.
+
+Core MuseKit Schema (Unchanged, Cloneable):
+Existing 13 tables (users, organizations, subscriptions, metrics, etc.).
+RLS policies for multi-tenancy within a Muse (e.g., org_id filtering).
+
+Muse-Specific Extensions (Added via Post-Clone Migrations):
+New tables for SocioScheduler:
+brand_preferences (id, user_id FK, tone enum['professional', 'casual', 'fun', 'creative', 'authoritative'], niche text, location text, sample_urls array[text]).
+post_queues (id, user_id FK, content text, image_url text, platform enum['x', 'linkedin', 'fb'], status enum['scheduled', 'posted', 'pending'], scheduled_at timestamp).
+alert_logs (id, user_id FK, trend_text text, suggested_post text, action_taken enum['approve', 'edit', 'ignore'], created_at timestamp).
+
+RLS on new tables: Tie to user_id/org_id for isolation.
+Views/Functions: E.g., a view joining core users + brand prefs for easy queries.
+
+Migration Process for Clones:
+Clone MuseKit repo → Run base migrations (core tables).
+Add Muse-specific migration script (e.g., prisma migrate or raw SQL in Replit): Create new tables, enums, indexes.
+Result: Each Muse DB starts identical to MuseKit but extends cleanly.
+
+
+This is inspired by Supabase's multi-tenant guides (e.g., shared DB with RLS/extensions) and SaaS starters like MakerKit (add custom tables post-clone). It keeps MuseKit 100% cloneable (no custom fields baked in) while allowing per-Muse flexibility.
+Pros vs. Two DBs
+
+Pros of Single DB Modular: Simpler queries (no cross-DB joins), lower costs (one $25/mo Supabase project per Muse), easier realtime (one DB listens), faster cloning (duplicate project → migrate).
+When Two DBs Might Make Sense: If future Muses scale hugely (e.g., massive data volumes), separate Muse DB for app data (with MuseKit DB for auth/billing). But for our $1K–$3K/mo small wins, overkill—adds complexity like syncing user_ids via edges or external auth.
+
+Rules to Align On (Proposed)
+To keep this consistent across Muses:
+
+Single DB per Muse Clone: Core MuseKit + extensions.
+No Commingling in Core: Never add Muse-specific fields to MuseKit tables (e.g., don't tack 'niche' onto users table).
+Modular Extensions: Use migrations for new tables/views (raw SQL or Supabase Studio).
+RLS Everywhere: Apply to all tables (core + custom) for security.
+Documentation: In each Muse's README/PRD, list added tables (for easy cloning diffs).
+Fallback: If a Muse needs wildly different data (e.g., massive logs), revisit two DBs then.
