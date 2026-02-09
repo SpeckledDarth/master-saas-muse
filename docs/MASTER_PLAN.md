@@ -905,7 +905,7 @@ SocioScheduler is a SaaS product built **on top of** MuseKit using the database 
 
 **Deliverables**:
 - [x] Database extension pattern: core tables in `migrations/core/`, SocioScheduler-specific in `migrations/extensions/`
-- [x] Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `socio_tier` (values: socio_starter/basic/premium) to rate limits
+- [x] Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `muse_tier` (values: muse_starter/basic/premium) to rate limits
 - [x] OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
 - [x] Social dashboard with 7 pages: overview, calendar, engagement, queue, posts, brand preferences, onboarding
 - [x] Social overview dashboard with usage progress bar, "X posts remaining" line, and Quick Generate dialog
@@ -917,7 +917,7 @@ SocioScheduler is a SaaS product built **on top of** MuseKit using the database 
 - [x] Quick Generate dialog on Overview (platform picker + topic input, copy-to-clipboard)
 - [x] Reusable `SocialUpgradeBanner` component integrated across 5 dashboard pages (80%+ usage trigger, sessionStorage dismissal)
 - [x] Admin-configurable BullMQ engagement pull settings (intervalHours/lookbackHours, 1-168h range)
-- [x] Beta debug mode via `SOCIO_DEBUG_MODE=true` env var with mock data at `/api/social/debug`
+- [x] Beta debug mode via `MUSE_DEBUG_MODE=true` env var with mock data at `/api/social/debug`
 - [x] BullMQ "no posts" case logs at info level (not error) for clean log output
 - [x] All RLS policies verified, proper empty states on all dashboard pages, no secrets exposed
 - [x] Admin-configurable niche guidance entries with validation (empty entries filtered on save)
@@ -928,12 +928,12 @@ SocioScheduler is a SaaS product built **on top of** MuseKit using the database 
 - Extended `social_posts` with: `trend_source`, `niche_triggered` columns, plus expanded status values (`queued`, `approved`, `ignored`)
 - Composite index on `social_posts(user_id, status)` for fast queue views
 
-**Stripe Tier Mapping** (metadata key: `socio_tier`):
+**Stripe Tier Mapping** (metadata key: `muse_tier`):
 | Tier | Metadata Value | Posts/Day | AI Generations/Day |
 |------|---------------|-----------|-------------------|
-| Starter | `socio_starter` | 5 | 3 |
-| Basic | `socio_basic` | 20 | 15 |
-| Premium | `socio_premium` | 100 | 50 |
+| Starter | `muse_starter` | 5 | 3 |
+| Basic | `muse_basic` | 20 | 15 |
+| Premium | `muse_premium` | 100 | 50 |
 
 **Key Files**:
 ```
@@ -1170,7 +1170,7 @@ When creating a new muse from this template:
 - `SESSION_SECRET`
 
 ### SocioScheduler (Optional)
-- `SOCIO_DEBUG_MODE` - Set to `true` to enable beta debug mode with mock data
+- `MUSE_DEBUG_MODE` - Set to `true` to enable beta debug mode with mock data
 
 ---
 

@@ -2,10 +2,10 @@ import { stripeService } from '@/lib/stripe/service'
 import { isActiveSubscription } from '@/lib/stripe/feature-gate'
 import type { SocialModuleTier } from '@/types/settings'
 
-const SOCIO_TIER_MAP: Record<string, SocialModuleTier> = {
-  socio_starter: 'starter',
-  socio_basic: 'basic',
-  socio_premium: 'premium',
+const MUSE_TIER_MAP: Record<string, SocialModuleTier> = {
+  muse_starter: 'starter',
+  muse_basic: 'basic',
+  muse_premium: 'premium',
 }
 
 const PRICE_AMOUNT_MAP: Record<number, SocialModuleTier> = {
@@ -35,8 +35,8 @@ export async function getUserSocialTier(
         })
 
         const product = price.product
-        if (typeof product === 'object' && !product.deleted && product.metadata?.socio_tier) {
-          const mapped = SOCIO_TIER_MAP[product.metadata.socio_tier]
+        if (typeof product === 'object' && !product.deleted && product.metadata?.muse_tier) {
+          const mapped = MUSE_TIER_MAP[product.metadata.muse_tier]
           if (mapped) {
             return { tier: mapped, source: 'subscription' }
           }

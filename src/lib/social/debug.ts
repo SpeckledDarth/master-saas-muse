@@ -1,7 +1,7 @@
 import type { SocialPlatform, SocialPost } from './client'
 
 export function isDebugMode(): boolean {
-  return process.env.SOCIO_DEBUG_MODE === 'true'
+  return process.env.MUSE_DEBUG_MODE === 'true'
 }
 
 export interface MockTrend {

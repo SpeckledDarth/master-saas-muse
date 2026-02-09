@@ -40,7 +40,7 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **API Token Rotation**: Automated webhook secret rotation via BullMQ.
 - **MuseSocial Module**: Toggleable social media management extension supporting 10 platforms, featuring AI-powered post generation, scheduling, and health checks. It includes tier-based rate limiting, a conditional onboarding wizard, and integrates n8n workflow templates. Centralized API keys are managed via dedicated admin setup pages.
 - **SocioScheduler Extension**: A SaaS built on MuseKit, providing AI social media scheduling for solopreneurs. It supports Facebook, LinkedIn, and Twitter/X, with brand preference systems, multi-tier pricing, and an approval queue for AI-generated posts. It uses a database extension pattern for its tables (migrations/extensions/). Key features:
-  - Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `socio_tier` (values: socio_starter/basic/premium) to rate limits
+  - Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `muse_tier` (values: muse_starter/basic/premium) to rate limits
   - OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
   - Engagement analytics dashboard with Recharts charts (`/dashboard/social/engagement`)
   - Calendar view with month-grid showing scheduled posts and per-platform count tooltips (`/dashboard/social/calendar`)
@@ -50,7 +50,7 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
   - 15 admin-editable niche-specific AI prompts with default fallback voice
   - Admin-configurable engagement pull settings (intervalHours/lookbackHours, 1-168h range)
   - Structured AI prompt system using all brand preference fields for solopreneur-friendly content
-  - Beta debug mode via `SOCIO_DEBUG_MODE=true` env var with mock data at `/api/social/debug`
+  - Beta debug mode via `MUSE_DEBUG_MODE=true` env var with mock data at `/api/social/debug`
   - All RLS policies verified, proper empty states on all dashboard pages, no secrets exposed
 
 **System Design Choices:**

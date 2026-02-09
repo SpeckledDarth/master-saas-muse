@@ -794,13 +794,13 @@ On the Overview page, users can generate AI posts on-demand:
 
 | Tier | Posts/Day | AI Generations/Day | Metadata Key | Metadata Value |
 |------|-----------|-------------------|--------------|----------------|
-| Starter | 5 | 3 | `socio_tier` | `socio_starter` |
-| Basic | 20 | 15 | `socio_tier` | `socio_basic` |
-| Premium | 100 | 50 | `socio_tier` | `socio_premium` |
+| Starter | 5 | 3 | `muse_tier` | `muse_starter` |
+| Basic | 20 | 15 | `muse_tier` | `muse_basic` |
+| Premium | 100 | 50 | `muse_tier` | `muse_premium` |
 
 ### Debug Mode
 
-For development and testing, set the environment variable `SOCIO_DEBUG_MODE=true` to enable a debug endpoint at `/api/social/debug` that returns mock data without requiring real platform connections.
+For development and testing, set the environment variable `MUSE_DEBUG_MODE=true` to enable a debug endpoint at `/api/social/debug` that returns mock data without requiring real platform connections.
 
 ---
 
@@ -879,7 +879,7 @@ All pages automatically support dark/light mode and are responsive on mobile dev
 - **Backup before major changes** — The platform supports checkpoints, but it's good practice to note your current settings before making sweeping changes
 - **API Keys page first** — After initial setup, configure your required API keys on the Integrations page to ensure all services are connected
 - **MuseSocial setup** — If using social features, enable the module first, then configure platforms and API keys on the same page
-- **SocioScheduler tiers** — Set up Stripe products with metadata key `socio_tier` and values (`socio_starter`, `socio_basic`, `socio_premium`) to enable per-user tier resolution
+- **SocioScheduler tiers** — Set up Stripe products with metadata key `muse_tier` and values (`muse_starter`, `muse_basic`, `muse_premium`) to enable per-user tier resolution
 - **Engagement pull settings** — Adjust the engagement pull interval based on your API rate limits and how frequently you need updated metrics
 
 ---

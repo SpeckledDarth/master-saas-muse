@@ -169,9 +169,9 @@ Stripe is the **single source of truth** for pricing. Your website automatically
 
 If using SocioScheduler, create additional Stripe products with tier metadata:
 
-- [ ] Create **Socio Starter** product with metadata: `socio_tier` = `socio_starter`
-- [ ] Create **Socio Basic** product with metadata: `socio_tier` = `socio_basic`
-- [ ] Create **Socio Premium** product with metadata: `socio_tier` = `socio_premium`
+- [ ] Create **Socio Starter** product with metadata: `muse_tier` = `muse_starter`
+- [ ] Create **Socio Basic** product with metadata: `muse_tier` = `muse_basic`
+- [ ] Create **Socio Premium** product with metadata: `muse_tier` = `muse_premium`
 
 These tiers map to post/AI generation limits:
 | Tier | Posts/Day | AI Generations/Day |
@@ -510,7 +510,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 | `ANTHROPIC_API_KEY` | Anthropic API key (alternative AI provider) |
 | `UPSTASH_REDIS_REST_URL` | Upstash Redis URL (queue + rate limiting) |
 | `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis auth token |
-| `SOCIO_DEBUG_MODE` | Set to `true` for SocioScheduler beta debug mode |
+| `MUSE_DEBUG_MODE` | Set to `true` for SocioScheduler beta debug mode |
 
 ---
 
@@ -629,7 +629,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - Engagement analytics with Recharts charts
 - Calendar view with month-grid and per-platform tooltips
 - Reusable upgrade banner at 80%+ usage
-- Beta debug mode via `SOCIO_DEBUG_MODE=true`
+- Beta debug mode via `MUSE_DEBUG_MODE=true`
 
 ### Centralized API Keys & Integrations
 - Admin setup page at `/admin/setup/integrations` for Tech Stack keys

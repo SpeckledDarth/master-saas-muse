@@ -25,7 +25,7 @@ async function getAuthenticatedUser() {
 export async function GET(request: NextRequest) {
   if (!isDebugMode()) {
     return NextResponse.json(
-      { error: 'Debug mode is not enabled. Set SOCIO_DEBUG_MODE=true to use this endpoint.' },
+      { error: 'Debug mode is not enabled. Set MUSE_DEBUG_MODE=true to use this endpoint.' },
       { status: 403 }
     )
   }

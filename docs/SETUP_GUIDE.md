@@ -185,7 +185,7 @@ SESSION_SECRET=your-session-secret
 # ===================
 # SOCIOSCHEDULE (Optional)
 # ===================
-# SOCIO_DEBUG_MODE=true  # Enable beta debug mode with mock data
+# MUSE_DEBUG_MODE=true  # Enable beta debug mode with mock data
 ```
 
 ---
@@ -664,9 +664,9 @@ If using SocioScheduler, create additional products with these metadata values:
 
 | Product | Metadata Key | Metadata Value | Description |
 |---------|-------------|----------------|-------------|
-| Socio Starter | `socio_tier` | `socio_starter` | 5 posts/day, 3 AI gen/day |
-| Socio Basic | `socio_tier` | `socio_basic` | 20 posts/day, 15 AI gen/day |
-| Socio Premium | `socio_tier` | `socio_premium` | 100 posts/day, 50 AI gen/day |
+| Socio Starter | `muse_tier` | `muse_starter` | 5 posts/day, 3 AI gen/day |
+| Socio Basic | `muse_tier` | `muse_basic` | 20 posts/day, 15 AI gen/day |
+| Socio Premium | `muse_tier` | `muse_premium` | 100 posts/day, 50 AI gen/day |
 
 The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these metadata values to rate limits.
 

@@ -167,7 +167,7 @@ function OnboardingContent() {
   return (
     <div className="container max-w-2xl mx-auto py-8 px-4 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold" data-testid="text-page-title">Get Started with SocioScheduler</h1>
+        <h1 className="text-2xl font-bold" data-testid="text-page-title">Get Started with Social Scheduling</h1>
         <p className="text-muted-foreground mt-1">Set up your social media posting in a few quick steps.</p>
       </div>
 
