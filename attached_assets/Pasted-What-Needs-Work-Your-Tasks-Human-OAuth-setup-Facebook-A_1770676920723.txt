@@ -1,0 +1,19 @@
+What Needs Work:
+
+Your Tasks (Human / OAuth setup):
+
+Facebook App - Create at developers.facebook.com, set redirect URI to yourdomain.com/api/social/callback/facebook, add FACEBOOK_APP_ID and FACEBOOK_APP_SECRET
+LinkedIn App - Create at linkedin.com/developers, set redirect URI, add LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET
+Twitter/X App - Create at developer.twitter.com, set redirect URI, add TWITTER_CLIENT_ID and TWITTER_CLIENT_SECRET
+Stripe Product - Register a "SocioScheduler" product in Stripe with tier metadata (or use the product registry admin page to set it up)
+My Tasks (Code / Dev work):
+
+Database tables - The migration file migrations/extensions/001_socioschedule_tables.sql exists but tables may not be created in Supabase yet. Need to verify and run if needed.
+Actual posting to platforms - The OAuth connect flow is built, but the code to actually publish a post to Facebook/LinkedIn/Twitter appears to be stubbed. This is the big missing piece.
+Token encryption - SOCIAL_ENCRYPTION_KEY is referenced for encrypting OAuth tokens at rest. Needs to be generated and set.
+Queue processor cleanup - Social job types (social-post, social-health-check) are in core queue files. Per our architecture rules, these should be refactored to a plugin pattern before forking.
+Engagement data pull - The engagement page reads from engagement_data on posts, but there's no automated job pulling real engagement metrics from the platforms yet.
+Test coverage - tests/socioscheduler.spec.ts exists but should be validated/expanded for the actual flows.
+My recommendation for next steps: Focus on the things that make SocioScheduler actually work end-to-end. That means verifying the database tables are live, then building out the actual "publish post to platform" functionality, and generating your encryption key. The OAuth flows and callbacks are already coded - they just need your platform credentials to come alive.
+
+Want me to put together a task list for the dev work I can tackle? And are you ready to start setting up those OAuth apps on your end?
