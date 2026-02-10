@@ -75,21 +75,12 @@ export default function SocialCalendarPage() {
   const fetchPosts = useCallback(async () => {
     try {
       const res = await fetch('/api/social/posts?limit=200')
-      if (res.status === 403) {
-        setPosts([])
-        setLoading(false)
-        return
-      }
+      if (!res.ok) { setPosts([]); setLoading(false); return }
       let data
       try { data = await res.json() } catch { data = {} }
-      if (!res.ok && !data.posts) {
-        setError('Could not load calendar data. Please try again.')
-        setLoading(false)
-        return
-      }
       setPosts(data.posts || [])
     } catch {
-      setError('Could not load calendar data. Please try again.')
+      setPosts([])
     } finally {
       setLoading(false)
     }

@@ -103,16 +103,12 @@ export default function SocialPostsPage() {
         setLoading(false)
         return
       }
+      if (!res.ok) { setPosts([]); setLoading(false); return }
       let data
       try { data = await res.json() } catch { data = {} }
-      if (!res.ok && !data.posts) {
-        setError('Could not load posts. Please try again.')
-        setLoading(false)
-        return
-      }
       setPosts(data.posts || [])
     } catch {
-      setError('Could not load posts. Please try again.')
+      setPosts([])
     } finally {
       setLoading(false)
     }

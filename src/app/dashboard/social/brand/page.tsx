@@ -64,17 +64,9 @@ export default function BrandPreferencesPage() {
   const fetchPreferences = useCallback(async () => {
     try {
       const res = await fetch('/api/social/brand-preferences')
-      if (res.status === 403) {
-        setLoading(false)
-        return
-      }
+      if (!res.ok) { setLoading(false); return }
       let data
       try { data = await res.json() } catch { data = {} }
-      if (!res.ok && !data.preferences) {
-        setError('Could not load brand preferences. Please try again.')
-        setLoading(false)
-        return
-      }
       if (data.preferences) {
         setPrefs({
           ...DEFAULT_PREFS,
@@ -85,7 +77,7 @@ export default function BrandPreferencesPage() {
         setHasExisting(true)
       }
     } catch {
-      setError('Could not load brand preferences. Please try again.')
+      // silently show empty form
     } finally {
       setLoading(false)
     }

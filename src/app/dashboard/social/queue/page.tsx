@@ -48,21 +48,12 @@ export default function ApprovalQueuePage() {
   const fetchQueue = useCallback(async () => {
     try {
       const res = await fetch('/api/social/posts?status=draft&limit=50')
-      if (res.status === 403) {
-        setPosts([])
-        setLoading(false)
-        return
-      }
+      if (!res.ok) { setPosts([]); setLoading(false); return }
       let data
       try { data = await res.json() } catch { data = {} }
-      if (!res.ok && !data.posts) {
-        setError('Could not load approval queue. Please try again.')
-        setLoading(false)
-        return
-      }
       setPosts(data.posts || [])
     } catch {
-      setError('Could not load approval queue. Please try again.')
+      setPosts([])
     } finally {
       setLoading(false)
     }

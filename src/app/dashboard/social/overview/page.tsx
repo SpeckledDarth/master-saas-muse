@@ -83,7 +83,6 @@ function isToday(dateStr: string): boolean {
 
 export default function SocialOverviewPage() {
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [postsThisMonth, setPostsThisMonth] = useState(0)
   const [aiGensToday, setAiGensToday] = useState(0)
   const [connectedPlatforms, setConnectedPlatforms] = useState(0)
@@ -99,48 +98,37 @@ export default function SocialOverviewPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const results = await Promise.allSettled([
-        fetch('/api/social/posts?limit=200').then(r => {
-          if (r.status === 403) return { posts: [] }
-          if (!r.ok) return r.json().then(d => d.posts ? d : Promise.reject(new Error('Server error'))).catch(() => Promise.reject(new Error('Server error')))
-          return r.json()
-        }),
-        fetch('/api/social/accounts').then(r => {
-          if (r.status === 403) return { accounts: [] }
-          if (!r.ok) return r.json().then(d => d.accounts ? d : Promise.reject(new Error('Server error'))).catch(() => Promise.reject(new Error('Server error')))
-          return r.json()
-        }),
-        fetch('/api/social/tier').then(r => r.ok ? r.json() : Promise.reject()),
+      const safeFetch = async (url: string, fallback: Record<string, unknown>) => {
+        try {
+          const r = await fetch(url)
+          if (!r.ok) return fallback
+          try { return await r.json() } catch { return fallback }
+        } catch { return fallback }
+      }
+
+      const [postsData, accountsData, tierData] = await Promise.all([
+        safeFetch('/api/social/posts?limit=200', { posts: [] }),
+        safeFetch('/api/social/accounts', { accounts: [] }),
+        safeFetch('/api/social/tier', {}),
       ])
 
-      const criticalFailed = results[0].status === 'rejected' && results[1].status === 'rejected'
-      if (criticalFailed) {
-        setError('Could not load dashboard data. Please try again.')
-        setLoading(false)
-        return
-      }
+      const posts: SocialPost[] = postsData.posts || []
+      setTotalPosts(posts.length)
+      setPostsThisMonth(posts.filter((p: SocialPost) => isCurrentMonth(p.created_at)).length)
+      setAiGensToday(posts.filter((p: SocialPost) => p.ai_generated && isToday(p.created_at)).length)
 
-      if (results[0].status === 'fulfilled') {
-        const posts: SocialPost[] = results[0].value.posts || []
-        setTotalPosts(posts.length)
-        setPostsThisMonth(posts.filter(p => isCurrentMonth(p.created_at)).length)
-        setAiGensToday(posts.filter(p => p.ai_generated && isToday(p.created_at)).length)
-      }
+      const accounts: SocialAccount[] = accountsData.accounts || []
+      setConnectedPlatforms(accounts.length)
 
-      if (results[1].status === 'fulfilled') {
-        const accounts: SocialAccount[] = results[1].value.accounts || []
-        setConnectedPlatforms(accounts.length)
-      }
-
-      if (results[2].status === 'fulfilled') {
-        const tierInfo: TierInfo = results[2].value
+      if (tierData.tier) {
+        const tierInfo = tierData as TierInfo
         setTierName(TIER_DISPLAY[tierInfo.tier] || tierInfo.tier)
         if (tierInfo.limits?.monthlyPosts && tierInfo.limits.monthlyPosts < 999999) {
           setMonthlyPostLimit(tierInfo.limits.monthlyPosts)
         }
       }
     } catch {
-      setError('Could not load dashboard data. Please try again.')
+      console.error('[SocialOverview] Unexpected error loading dashboard data')
     } finally {
       setLoading(false)
     }
@@ -181,23 +169,6 @@ export default function SocialOverviewPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]" data-testid="loading-spinner">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="container max-w-4xl mx-auto py-8 px-4">
-        <Card data-testid="error-state-overview">
-          <CardContent className="py-12 text-center">
-            <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium">Something went wrong</h3>
-            <p className="text-muted-foreground mt-1">{error}</p>
-            <Button className="mt-4" onClick={() => { setError(null); setLoading(true); fetchData() }} data-testid="button-retry-overview">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
       </div>
     )
   }
