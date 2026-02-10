@@ -29,7 +29,12 @@ async function getAuthenticatedUser() {
 }
 
 export async function GET() {
-  const user = await getAuthenticatedUser()
+  let user
+  try {
+    user = await getAuthenticatedUser()
+  } catch {
+    return NextResponse.json({ error: 'Auth error' }, { status: 401 })
+  }
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -63,7 +68,12 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getAuthenticatedUser()
+  let user
+  try {
+    user = await getAuthenticatedUser()
+  } catch {
+    return NextResponse.json({ error: 'Auth error' }, { status: 401 })
+  }
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }

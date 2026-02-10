@@ -46,12 +46,21 @@ async function getModuleConfig(): Promise<{ enabled: boolean; tier: string; conf
 const VALID_PLATFORMS = ['twitter', 'linkedin', 'instagram'] as const
 
 export async function GET(request: NextRequest) {
-  const user = await getAuthenticatedUser()
+  let user
+  try {
+    user = await getAuthenticatedUser()
+  } catch {
+    return NextResponse.json({ error: 'Auth error' }, { status: 401 })
+  }
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { enabled } = await getModuleConfig()
+  let enabled = false
+  try {
+    const config = await getModuleConfig()
+    enabled = config.enabled
+  } catch {}
   if (!enabled) {
     return NextResponse.json({ error: 'Social module is not enabled' }, { status: 403 })
   }
@@ -100,12 +109,20 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getAuthenticatedUser()
+  let user
+  try {
+    user = await getAuthenticatedUser()
+  } catch {
+    return NextResponse.json({ error: 'Auth error' }, { status: 401 })
+  }
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const moduleConfig = await getModuleConfig()
+  let moduleConfig: { enabled: boolean; tier: string; configuredTierLimits?: Record<string, any> } = { enabled: false, tier: 'tier_1' }
+  try {
+    moduleConfig = await getModuleConfig()
+  } catch {}
   if (!moduleConfig.enabled) {
     return NextResponse.json({ error: 'Social module is not enabled' }, { status: 403 })
   }

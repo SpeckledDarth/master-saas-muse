@@ -68,7 +68,8 @@ export default function BrandPreferencesPage() {
         setLoading(false)
         return
       }
-      const data = await res.json()
+      let data
+      try { data = await res.json() } catch { data = {} }
       if (!res.ok && !data.preferences) {
         setError('Could not load brand preferences. Please try again.')
         setLoading(false)

@@ -40,12 +40,20 @@ async function isModuleEnabled(): Promise<boolean> {
 const VALID_PLATFORMS: SocialPlatform[] = ['twitter', 'linkedin', 'instagram', 'facebook', 'youtube', 'tiktok', 'reddit', 'pinterest', 'snapchat', 'discord']
 
 export async function GET() {
-  const user = await getAuthenticatedUser()
+  let user
+  try {
+    user = await getAuthenticatedUser()
+  } catch {
+    return NextResponse.json({ error: 'Auth error' }, { status: 401 })
+  }
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const enabled = await isModuleEnabled()
+  let enabled = false
+  try {
+    enabled = await isModuleEnabled()
+  } catch {}
   if (!enabled) {
     return NextResponse.json({ error: 'Social module is not enabled' }, { status: 403 })
   }
@@ -78,12 +86,20 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getAuthenticatedUser()
+  let user
+  try {
+    user = await getAuthenticatedUser()
+  } catch {
+    return NextResponse.json({ error: 'Auth error' }, { status: 401 })
+  }
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const enabled = await isModuleEnabled()
+  let enabled = false
+  try {
+    enabled = await isModuleEnabled()
+  } catch {}
   if (!enabled) {
     return NextResponse.json({ error: 'Social module is not enabled' }, { status: 403 })
   }

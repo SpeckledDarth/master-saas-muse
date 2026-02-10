@@ -53,7 +53,8 @@ export default function ApprovalQueuePage() {
         setLoading(false)
         return
       }
-      const data = await res.json()
+      let data
+      try { data = await res.json() } catch { data = {} }
       if (!res.ok && !data.posts) {
         setError('Could not load approval queue. Please try again.')
         setLoading(false)
