@@ -100,13 +100,21 @@ export default function SocialOverviewPage() {
   const fetchData = useCallback(async () => {
     try {
       const results = await Promise.allSettled([
-        fetch('/api/social/posts?limit=200').then(r => r.ok ? r.json() : Promise.reject()),
-        fetch('/api/social/accounts').then(r => r.ok ? r.json() : Promise.reject()),
+        fetch('/api/social/posts?limit=200').then(r => {
+          if (r.status === 403) return { posts: [] }
+          if (!r.ok) return r.json().then(d => d.posts ? d : Promise.reject(new Error('Server error'))).catch(() => Promise.reject(new Error('Server error')))
+          return r.json()
+        }),
+        fetch('/api/social/accounts').then(r => {
+          if (r.status === 403) return { accounts: [] }
+          if (!r.ok) return r.json().then(d => d.accounts ? d : Promise.reject(new Error('Server error'))).catch(() => Promise.reject(new Error('Server error')))
+          return r.json()
+        }),
         fetch('/api/social/tier').then(r => r.ok ? r.json() : Promise.reject()),
       ])
 
-      const allFailed = results.every(r => r.status === 'rejected')
-      if (allFailed) {
+      const criticalFailed = results[0].status === 'rejected' && results[1].status === 'rejected'
+      if (criticalFailed) {
         setError('Could not load dashboard data. Please try again.')
         setLoading(false)
         return

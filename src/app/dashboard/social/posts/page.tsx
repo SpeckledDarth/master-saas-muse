@@ -103,15 +103,19 @@ export default function SocialPostsPage() {
         setLoading(false)
         return
       }
-      if (!res.ok) throw new Error('Failed to fetch posts')
       const data = await res.json()
+      if (!res.ok && !data.posts) {
+        setError('Could not load posts. Please try again.')
+        setLoading(false)
+        return
+      }
       setPosts(data.posts || [])
     } catch {
       setError('Could not load posts. Please try again.')
     } finally {
       setLoading(false)
     }
-  }, [activeTab, toast])
+  }, [activeTab])
 
   useEffect(() => {
     setLoading(true)
