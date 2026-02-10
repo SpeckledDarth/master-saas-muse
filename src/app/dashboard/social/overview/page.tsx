@@ -222,6 +222,33 @@ export default function SocialOverviewPage() {
             </div>
           </CardContent>
         </Card>
+
+        <Card data-testid="card-quick-links-empty">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: 'Onboarding', href: '/dashboard/social/onboarding', icon: Sparkles },
+                ...QUICK_LINKS,
+                { label: 'All Posts', href: '/dashboard/social/posts', icon: FileText },
+              ].map(link => {
+                const Icon = link.icon
+                return (
+                  <Button
+                    key={link.href}
+                    variant="outline"
+                    asChild
+                    data-testid={`link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    <Link href={link.href} className="flex flex-col items-center gap-2 h-auto py-4">
+                      <Icon className="h-5 w-5 text-muted-foreground" />
+                      <span className="text-sm">{link.label}</span>
+                    </Link>
+                  </Button>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
       </div>
       </>
     )
