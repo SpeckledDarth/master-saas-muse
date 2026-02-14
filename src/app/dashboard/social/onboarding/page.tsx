@@ -489,7 +489,7 @@ function OnboardingContent() {
             </div>
             <CardTitle className="text-xl" data-testid="text-step-title">You&apos;re All Set!</CardTitle>
             <CardDescription className="text-base" data-testid="text-motivational-message">
-              SocioScheduler will start working for you. Your social media presence is about to grow.
+              PassivePost will start working for you. Your social media presence is about to grow.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

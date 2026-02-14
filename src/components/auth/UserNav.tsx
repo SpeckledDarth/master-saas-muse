@@ -145,9 +145,9 @@ export function UserNav() {
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/social/overview" data-testid="link-socioscheduler" className="flex items-center">
+          <Link href="/dashboard/social/overview" data-testid="link-passivepost" className="flex items-center">
             <CalendarDays className="mr-2 h-4 w-4" />
-            SocioScheduler
+            PassivePost
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

@@ -75,19 +75,19 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **API Token Rotation**: Automated webhook secret rotation via BullMQ.
 - **Product Registry**: Multi-product support via `muse_products` table and `muse_product_subscriptions` table. Each SaaS product registers with its own Stripe product ID, metadata key, and tier definitions. Admin UI at `/admin/setup/products`. Generic tier resolution via `getUserProductTier(userId, productSlug)` in `src/lib/products/tier-resolver.ts`. Product-scoped checkout (productSlug param) and webhook routing. Feature gating via `checkProductFeature` and `getProductTierLimits` in `src/lib/stripe/feature-gate.ts`. See `docs/ADDING_A_PRODUCT.md` for the full guide.
 
-### SocioScheduler (Product Layer)
-SocioScheduler is a standalone SaaS product built ON TOP of MuseKit (not a toggleable module within it). MuseKit core has zero awareness of social features -- the dependency is one-way: social code imports from MuseKit core, never the reverse.
+### PassivePost (Product Layer)
+PassivePost (passivepost.com) is a standalone SaaS product built ON TOP of MuseKit (not a toggleable module within it). MuseKit core has zero awareness of social features -- the dependency is one-way: social code imports from MuseKit core, never the reverse.
 
 **Architecture Separation:**
 - Social types live in `src/lib/social/types.ts` (not in `src/types/settings.ts`)
 - Social settings use `defaultSocialModuleSettings` from `src/lib/social/types.ts`
-- Social admin page (`/admin/setup/socioscheduler`) is SocioScheduler-specific, not a MuseKit feature
-- Database tables in `migrations/extensions/` are SocioScheduler-specific
-- The `socialModuleEnabled` flag in features is SocioScheduler-specific (not part of MuseKit core FeatureToggles)
+- Social admin page (`/admin/setup/passivepost`) is PassivePost-specific, not a MuseKit feature
+- Database tables in `migrations/extensions/` are PassivePost-specific
+- The `socialModuleEnabled` flag in features is PassivePost-specific (not part of MuseKit core FeatureToggles)
 
 **Key Features:**
 - AI social media scheduling for solopreneurs (Facebook, LinkedIn, Twitter/X)
-- Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) uses the product registry (`getUserProductTier(userId, 'socio-scheduler')`) with legacy fallback to direct Stripe metadata lookup. Tier definitions stored in product registry as `tierDefinitions`
+- Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) uses the product registry (`getUserProductTier(userId, 'passive-post')`) with legacy fallback to direct Stripe metadata lookup. Tier definitions stored in product registry as `tierDefinitions`
 - OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
 - Token encryption at rest via AES-256-GCM (`src/lib/social/crypto.ts`), key in `SOCIAL_ENCRYPTION_KEY` secret
 - Automatic OAuth token refresh for LinkedIn and Twitter (`src/lib/social/token-refresh.ts`), integrated into post publishing flow

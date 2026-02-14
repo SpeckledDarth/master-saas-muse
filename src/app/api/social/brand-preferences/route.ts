@@ -51,7 +51,7 @@ export async function GET() {
       if (error.code === '42P01' || error.message?.includes('does not exist')) {
         return NextResponse.json({
           preferences: null,
-          note: 'Brand preferences table not yet created. Run migrations/extensions/001_socioschedule_tables.sql'
+          note: 'Brand preferences table not yet created. Run migrations/extensions/001_passivepost_tables.sql'
         })
       }
       if (error.code === 'PGRST116') {
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
     if (result.error) {
       if (result.error.code === '42P01' || result.error.message?.includes('does not exist')) {
         return NextResponse.json({
-          error: 'Brand preferences table not yet created. Run migrations/extensions/001_socioschedule_tables.sql'
+          error: 'Brand preferences table not yet created. Run migrations/extensions/001_passivepost_tables.sql'
         }, { status: 500 })
       }
       return NextResponse.json({ error: result.error.message }, { status: 500 })

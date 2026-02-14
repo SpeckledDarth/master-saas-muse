@@ -315,7 +315,7 @@ export default function SocialAccountsPage() {
               OAuth integration is not yet configured. To connect your{' '}
               {PLATFORMS.find(p => p.id === selectedPlatform)?.name} account,
               an administrator needs to set up the OAuth credentials in the admin panel
-              under Setup &gt; SocioScheduler.
+              under Setup &gt; PassivePost.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">

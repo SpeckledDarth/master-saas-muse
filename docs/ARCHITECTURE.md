@@ -41,7 +41,7 @@ MuseKit is the **reusable template**, not a deployed product itself.
 
 1. **MuseKit repo** contains the clean, product-agnostic SaaS template
 2. To build a new SaaS, **fork/clone MuseKit** into a new repo
-3. Build product-specific features on top (like SocioScheduler)
+3. Build product-specific features on top (like PassivePost)
 4. Deploy independently with its own Supabase, Stripe, domain
 5. When MuseKit core gets improvements, **pull updates via git merge**
 
@@ -112,7 +112,7 @@ BAD:  Adding social job types directly to src/lib/queue/types.ts
 
 Sometimes you genuinely need to modify a core file (e.g., adding a nav item). In that case:
 - Keep changes **minimal and isolated**
-- Add a comment: `// PRODUCT: SocioScheduler`
+- Add a comment: `// PRODUCT: PassivePost`
 - Document the change in this file under "Known Core File Modifications"
 
 ---
@@ -148,11 +148,11 @@ Core MuseKit files are everything that is NOT product-specific:
 
 Product-specific files live in isolated directories:
 
-- `src/lib/social/` - SocioScheduler business logic
-- `src/app/dashboard/social/` - SocioScheduler UI pages
-- `src/app/api/social/` - SocioScheduler API routes
-- `src/app/admin/setup/socioscheduler/` - SocioScheduler admin config
-- `migrations/extensions/` - SocioScheduler database tables
+- `src/lib/social/` - PassivePost business logic
+- `src/app/dashboard/social/` - PassivePost UI pages
+- `src/app/api/social/` - PassivePost API routes
+- `src/app/admin/setup/passivepost/` - PassivePost admin config
+- `migrations/extensions/` - PassivePost database tables
 
 ---
 
@@ -174,7 +174,7 @@ These work fine in the current combined repo but should be cleaned up before cre
 
 ### 3. Admin Setup Nav (src/app/admin/setup/layout.tsx)
 
-**Status**: The "Social" tab (line 15) refers to the generic social links configuration page (Twitter/LinkedIn/GitHub URLs for the company footer), NOT SocioScheduler. This is core MuseKit functionality. No issue here.
+**Status**: The "Social" tab (line 15) refers to the generic social links configuration page (Twitter/LinkedIn/GitHub URLs for the company footer), NOT PassivePost. This is core MuseKit functionality. No issue here.
 
 ---
 
@@ -203,7 +203,7 @@ Before creating the clean MuseKit template:
 - [ ] Refactor queue types to plugin pattern
 - [ ] Remove social imports from core queue processor
 - [ ] Verify no other core files import from product directories
-- [ ] Remove SocioScheduler-specific pages/routes
+- [ ] Remove PassivePost-specific pages/routes
 - [ ] Remove `migrations/extensions/` social tables
 - [ ] Remove `src/lib/social/` directory
 - [ ] Test that MuseKit runs clean without any product code

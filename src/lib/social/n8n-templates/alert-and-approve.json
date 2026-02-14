@@ -1,17 +1,17 @@
 {
-  "name": "SocioScheduler Alert & Approve via Email",
+  "name": "PassivePost Alert & Approve via Email",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "socioscheduler-alert",
+        "path": "passivepost-alert",
         "options": {}
       },
       "name": "Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
       "position": [200, 300],
       "typeVersion": 2,
-      "webhookId": "socioscheduler-alert"
+      "webhookId": "passivepost-alert"
     },
     {
       "parameters": {
@@ -28,7 +28,7 @@
             },
             {
               "name": "subject",
-              "value": "SocioScheduler: Trending topic detected - {{$json.body.trend_text}}"
+              "value": "PassivePost: Trending topic detected - {{$json.body.trend_text}}"
             },
             {
               "name": "html",

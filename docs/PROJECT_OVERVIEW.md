@@ -98,7 +98,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Social links setup
 - Features & integrations (auth toggles, AI, webhooks, security, compliance, support)
 - API Keys & Integrations (centralized key management with collapsible groups, format validation)
-- SocioScheduler configuration (social media module, platform API keys, engagement pull settings)
+- PassivePost configuration (social media module, platform API keys, engagement pull settings)
 
 ### Content Management
 - Blog/changelog system with markdown and live preview
@@ -147,7 +147,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Admin-configurable URL, secret, and per-event toggles
 - Automated API token rotation
 
-### SocioScheduler Module (Social Media Management)
+### PassivePost Module (Social Media Management)
 - Toggleable social media management extension with two tiers: Universal and Power
 - 10 platform support: Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord
 - AI-powered post generation with multimodal image support
@@ -159,7 +159,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Conditional onboarding wizard step, Vercel Cron fallback
 - Dependency warnings when configuration is incomplete
 
-### SocioScheduler Extension (AI Social Media Scheduling)
+### PassivePost Extension (AI Social Media Scheduling)
 - Full SaaS product built on MuseKit using the database extension pattern
 - Targeted at solopreneurs and gig workers for AI-powered social scheduling
 - OAuth flows for Facebook Page, LinkedIn, and Twitter/X with PKCE
@@ -173,7 +173,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Reusable upgrade banner (80%+ usage trigger) across all social dashboard pages
 - Admin-configurable engagement pull schedule (interval and lookback hours)
 - Beta debug mode via environment variable for development/testing
-- Database extension pattern: SocioScheduler tables in `migrations/extensions/`, core MuseKit schema untouched
+- Database extension pattern: PassivePost tables in `migrations/extensions/`, core MuseKit schema untouched
 
 ### Centralized API Keys & Integrations
 - Admin setup page for managing all service API keys from the dashboard
@@ -182,7 +182,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Format validation on save (Stripe sk_ prefix, Supabase URL pattern, OpenAI sk- prefix, Sentry DSN, HTTPS URLs)
 - Summary cards showing total keys and required keys configured
 - Inline edit/reveal/delete with source badges (Dashboard vs Env Var)
-- Social platform API keys feature-gated on SocioScheduler setup page
+- Social platform API keys feature-gated on PassivePost setup page
 - DB-stored keys take priority over environment variables
 
 ### Enterprise Features
@@ -262,7 +262,7 @@ MuseKit supports a clean extension model for building products on top of the tem
 - **Core tables** live in `migrations/core/` and are never modified by extensions
 - **Extension tables** live in `migrations/extensions/` and add product-specific schemas
 - This ensures clean template cloning — extensions can be included or excluded per product
-- SocioScheduler is the first product built using this pattern, proving the model works
+- PassivePost is the first product built using this pattern, proving the model works
 
 ---
 
@@ -306,13 +306,13 @@ MuseKit supports a clean extension model for building products on top of the tem
 | Metrics Alerts (Churn + Growth) | Complete |
 | Database Backup Configuration | Complete |
 | API Token Rotation | Complete |
-| SocioScheduler Module (10 platforms, 2 tiers) | Complete |
+| PassivePost Module (10 platforms, 2 tiers) | Complete |
 | Centralized API Keys & Integrations | Complete |
-| SocioScheduler Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
+| PassivePost Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
 
 ### Planned (Post-MVP / Roadmap)
 
-- **Dynamic Tiers for SocioScheduler** — Allow admins to create unlimited custom tiers from the dashboard (currently Universal and Power)
+- **Dynamic Tiers for PassivePost** — Allow admins to create unlimited custom tiers from the dashboard (currently Universal and Power)
 - **Real Platform API Integration** — 7 newer platform clients (YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord) have stubbed methods ready for real API integration
 - **Approval Queue UI** — UI for reviewing and approving AI-generated posts (data model supports it)
 - Affiliate/referral system
@@ -336,7 +336,7 @@ This section compares the planned technology stack against what is currently imp
 | | shadcn/ui | Implemented | Full component library installed (70+ components) |
 | | Tailwind CSS | Implemented | With dark mode support |
 | **Backend/API** | Next.js API Routes | Implemented | 40+ API routes functional |
-| | OAuth SDKs | Implemented | All 5 providers via Supabase Auth + SocioScheduler platform OAuth |
+| | OAuth SDKs | Implemented | All 5 providers via Supabase Auth + PassivePost platform OAuth |
 | **Database** | Supabase PostgreSQL | Implemented | 15+ tables in production (core + extensions) |
 | | Supabase Storage | Implemented | Used for avatars + branding images |
 | | Supabase Auth | Implemented | Email + all 5 OAuth providers |
@@ -352,15 +352,15 @@ This section compares the planned technology stack against what is currently imp
 | | OpenAI | Implemented | Configurable via admin dashboard |
 | | Anthropic | Implemented | Configurable via admin dashboard |
 | | n8n/Webhook System | Implemented | 8 events, HMAC signing, fire-and-forget |
-| **Social Media** | SocioScheduler Module | Implemented | 10 platforms, 2 tiers, AI post generation |
-| | SocioScheduler | Implemented | OAuth, tiers, analytics, calendar, brand prefs, Quick Generate |
+| **Social Media** | PassivePost Module | Implemented | 10 platforms, 2 tiers, AI post generation |
+| | PassivePost | Implemented | OAuth, tiers, analytics, calendar, brand prefs, Quick Generate |
 | **Operations** | Resend (Emails) | Implemented | Templates + test sending + admin editor + scheduled reports |
 | | Sentry (Monitoring) | Implemented | Server + browser errors via tunnel route |
 | | Plausible (Analytics) | Implemented | Script integrated |
 | | Upstash/BullMQ (Queues) | Implemented | 10 job types, admin dashboard |
 | | Upstash Redis Rate Limiting | Implemented | Sliding window with in-memory fallback |
 | **Testing** | Playwright E2E | Implemented | 92 tests across 7 files |
-| **Monetization** | Stripe Billing | Implemented | Subscriptions + portal + SocioScheduler tier resolution |
+| **Monetization** | Stripe Billing | Implemented | Subscriptions + portal + PassivePost tier resolution |
 
 ### Summary
 
@@ -418,7 +418,7 @@ If you're interested in using MuseKit for your project:
 
 ## Questions?
 
-This is an actively developed project. The core MVP features are complete and production-ready. Post-MVP features are being added based on real-world usage and feedback. SocioScheduler is the first product built on the template, proving the extension model works.
+This is an actively developed project. The core MVP features are complete and production-ready. Post-MVP features are being added based on real-world usage and feedback. PassivePost is the first product built on the template, proving the extension model works.
 
 For the latest status and roadmap, refer to the Master Plan document.
 

@@ -15,7 +15,7 @@ migrations/
 
 ### Core Migrations (`core/`)
 
-These define the foundational tables that every MuseKit clone needs. They include the SocioScheduler module tables (social_accounts, social_posts) and any future shared infrastructure.
+These define the foundational tables that every MuseKit clone needs. They include the PassivePost module tables (social_accounts, social_posts) and any future shared infrastructure.
 
 **Rules:**
 - Never add Muse-specific fields to core tables
@@ -34,10 +34,10 @@ These define tables specific to a particular Muse (SaaS product built on MuseKit
 - Apply RLS policies to all extension tables
 - Document what each migration adds in a comment at the top
 
-**Example for SocioScheduler:**
+**Example for PassivePost:**
 ```
 extensions/
-└── 001_socioschedule_tables.sql   # brand_preferences, alert_logs, social_posts extensions
+└── 001_passivepost_tables.sql   # brand_preferences, alert_logs, social_posts extensions
 ```
 
 **Example for a future Muse (e.g., RealtyMuse):**
@@ -59,7 +59,7 @@ Paste the SQL into the Supabase SQL Editor and execute, or use the Supabase CLI:
 psql $DATABASE_URL -f migrations/core/001_social_tables.sql
 
 # Extension tables (Muse-specific)
-psql $DATABASE_URL -f migrations/extensions/001_socioschedule_tables.sql
+psql $DATABASE_URL -f migrations/extensions/001_passivepost_tables.sql
 ```
 
 ## Key Principles

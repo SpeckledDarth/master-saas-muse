@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ensureAuthenticated } from './auth.setup';
 
-test.describe('SocioScheduler - Admin Setup', () => {
+test.describe('PassivePost - Admin Setup', () => {
   test('should toggle social module on and off in Features tab', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
@@ -27,7 +27,7 @@ test.describe('SocioScheduler - Admin Setup', () => {
     expect(isFinalChecked).toBe(wasChecked);
   });
 
-  test('should display SocioScheduler setup page with configuration sections', async ({ page }) => {
+  test('should display PassivePost setup page with configuration sections', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
 
@@ -47,7 +47,7 @@ test.describe('SocioScheduler - Admin Setup', () => {
     await saveButton.click();
     await page.waitForTimeout(2000);
 
-    await page.goto('/admin/setup/socioscheduler');
+    await page.goto('/admin/setup/passivepost');
     await page.waitForLoadState('networkidle');
 
     const moduleStatus = page.getByTestId('card-module-status');
@@ -65,7 +65,7 @@ test.describe('SocioScheduler - Admin Setup', () => {
   });
 });
 
-test.describe('SocioScheduler - Account Connection', () => {
+test.describe('PassivePost - Account Connection', () => {
   test('should show connected accounts page with platform cards', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
@@ -108,7 +108,7 @@ test.describe('SocioScheduler - Account Connection', () => {
   });
 });
 
-test.describe('SocioScheduler - Post Generation', () => {
+test.describe('PassivePost - Post Generation', () => {
   test('should display posts page with AI generation dialog', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
@@ -157,12 +157,12 @@ test.describe('SocioScheduler - Post Generation', () => {
   });
 });
 
-test.describe('SocioScheduler - Tier Gating', () => {
+test.describe('PassivePost - Tier Gating', () => {
   test('should show monitoring section only for Power tier', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
 
-    await page.goto('/admin/setup/socioscheduler');
+    await page.goto('/admin/setup/passivepost');
     await page.waitForLoadState('networkidle');
 
     const tierSelect = page.getByTestId('select-tier');
@@ -196,7 +196,7 @@ test.describe('SocioScheduler - Tier Gating', () => {
   });
 });
 
-test.describe('SocioScheduler - Social KPIs on Metrics Dashboard', () => {
+test.describe('PassivePost - Social KPIs on Metrics Dashboard', () => {
   test('should show social KPI cards when module is enabled', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
@@ -218,7 +218,7 @@ test.describe('SocioScheduler - Social KPIs on Metrics Dashboard', () => {
   });
 });
 
-test.describe('SocioScheduler - Dashboard Pages', () => {
+test.describe('PassivePost - Dashboard Pages', () => {
   test('should display brand preferences page with form fields', async ({ page }) => {
     const loggedIn = await ensureAuthenticated(page);
     test.skip(!loggedIn, 'No test credentials available');
@@ -307,7 +307,7 @@ test.describe('SocioScheduler - Dashboard Pages', () => {
   });
 });
 
-test.describe('SocioScheduler - Cron Endpoints', () => {
+test.describe('PassivePost - Cron Endpoints', () => {
   test('should reject process-scheduled without auth when CRON_SECRET is set', async ({ request }) => {
     const response = await request.post('/api/social/cron/process-scheduled');
     const status = response.status();

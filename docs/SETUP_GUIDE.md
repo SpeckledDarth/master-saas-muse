@@ -2,7 +2,7 @@
 
 This guide walks you through creating a new SaaS from the Master SaaS Muse Template.
 
-**Template Status: MVP COMPLETE + Full Feature Set + SocioScheduler Module + SocioScheduler Extension (February 2026)**
+**Template Status: MVP COMPLETE + Full Feature Set + PassivePost Module + PassivePost Extension (February 2026)**
 
 ---
 
@@ -13,7 +13,7 @@ This guide walks you through creating a new SaaS from the Master SaaS Muse Templ
 3. [Environment Variables](#environment-variables)
 4. [Project Structure](#project-structure)
 5. [Database Tables](#database-tables)
-6. [SocioScheduler Extension Tables](#socioschedule-extension-tables)
+6. [PassivePost Extension Tables](#passivepost-extension-tables)
 7. [Supabase Configuration](#supabase-configuration)
 8. [Stripe Configuration](#stripe-configuration)
 9. [Key Commands](#key-commands)
@@ -46,14 +46,14 @@ nano .env.local
 ### 3. Set Up Supabase
 - Create new Supabase project
 - Run SQL from [Database Tables](#database-tables) section
-- If using SocioScheduler, also run [SocioScheduler Extension Tables](#socioschedule-extension-tables)
+- If using PassivePost, also run [PassivePost Extension Tables](#passivepost-extension-tables)
 - Copy credentials to `.env.local`
 
 ### 4. Set Up Stripe
 - Create products in Stripe Dashboard
 - Copy API keys to `.env.local`
 - Set up webhook endpoint
-- If using SocioScheduler, add tier metadata to products (see [Stripe Configuration](#stripe-configuration))
+- If using PassivePost, add tier metadata to products (see [Stripe Configuration](#stripe-configuration))
 
 ### 5. Deploy to Vercel
 ```bash
@@ -183,7 +183,7 @@ NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 SESSION_SECRET=your-session-secret
 
 # ===================
-# SOCIOSCHEDULE (Optional)
+# PASSIVEPOST (Optional)
 # ===================
 # MUSE_DEBUG_MODE=true  # Enable beta debug mode with mock data
 ```
@@ -241,7 +241,7 @@ master-saas-muse/
 │   │   │   │   ├── content/page.tsx
 │   │   │   │   ├── features/page.tsx
 │   │   │   │   ├── integrations/page.tsx
-│   │   │   │   ├── socioscheduler/page.tsx
+│   │   │   │   ├── passivepost/page.tsx
 │   │   │   │   ├── pages/page.tsx
 │   │   │   │   ├── pricing/page.tsx
 │   │   │   │   ├── security/page.tsx
@@ -319,8 +319,8 @@ master-saas-muse/
 │   └── instrumentation.ts (Sentry server + queue worker)
 ├── migrations/
 │   ├── core/                          # Core MuseKit tables
-│   └── extensions/                    # SocioScheduler extension tables
-│       ├── 001_socioschedule_tables.sql
+│   └── extensions/                    # PassivePost extension tables
+│       ├── 001_passivepost_tables.sql
 │       └── 002_engagement_metrics_placeholder.sql
 ├── tests/
 │   ├── auth.setup.ts
@@ -547,20 +547,20 @@ CREATE POLICY "Service role full access admin_notes" ON admin_notes
 
 ---
 
-## SocioScheduler Extension Tables
+## PassivePost Extension Tables
 
-If you're using the SocioScheduler extension, run this SQL **after** the core tables. These tables are specific to SocioScheduler and would NOT exist in other Muse clones.
+If you're using the PassivePost extension, run this SQL **after** the core tables. These tables are specific to PassivePost and would NOT exist in other Muse clones.
 
 The migration files are located in `migrations/extensions/`.
 
 ```sql
--- SocioScheduler Extension Tables
+-- PassivePost Extension Tables
 -- Run AFTER core social tables (migrations/core/001_social_tables.sql)
 
 -- Enable UUID generation if not already enabled
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- 1. Extend social_posts with SocioScheduler-specific columns
+-- 1. Extend social_posts with PassivePost-specific columns
 ALTER TABLE social_posts ADD COLUMN IF NOT EXISTS trend_source TEXT;
 ALTER TABLE social_posts ADD COLUMN IF NOT EXISTS niche_triggered TEXT;
 
@@ -658,17 +658,17 @@ Create in Stripe Dashboard:
 - **Pro Plan**: $29/month
 - **Team Plan**: $99/month
 
-### SocioScheduler Tiers (Optional)
+### PassivePost Tiers (Optional)
 
-If using SocioScheduler, create additional products with these metadata values:
+If using PassivePost, create additional products with these metadata values:
 
 | Product | Metadata Key | Metadata Value | Description |
 |---------|-------------|----------------|-------------|
-| Socio Starter | `muse_tier` | `tier_1` | 5 posts/day, 3 AI gen/day |
-| Socio Basic | `muse_tier` | `tier_2` | 20 posts/day, 15 AI gen/day |
-| Socio Premium | `muse_tier` | `tier_3` | 100 posts/day, 50 AI gen/day |
+| Passive Starter | `muse_tier` | `tier_1` | 5 posts/day, 3 AI gen/day |
+| Passive Basic | `muse_tier` | `tier_2` | 20 posts/day, 15 AI gen/day |
+| Passive Premium | `muse_tier` | `tier_3` | 100 posts/day, 50 AI gen/day |
 
-The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these metadata values to rate limits. Tier definitions (display names, metadata values, and rate limits) are admin-configurable from the SocioScheduler setup page (`/admin/setup/socioscheduler`). Admins can add or remove tiers as needed.
+The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these metadata values to rate limits. Tier definitions (display names, metadata values, and rate limits) are admin-configurable from the PassivePost setup page (`/admin/setup/passivepost`). Admins can add or remove tiers as needed.
 
 ### Webhook Endpoint
 - URL: `https://your-app.vercel.app/api/stripe/webhook`
@@ -718,7 +718,7 @@ The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these met
 | Metrics Dashboard (10 KPIs + NPS + Alerts) | Complete |
 | User Management | Complete |
 | User Impersonation | Complete |
-| Setup Dashboard (11 Sub-Pages: Branding, Compliance, Content, Features, Integrations, SocioScheduler, Pages, Pricing, Security, Social, Support) | Complete |
+| Setup Dashboard (11 Sub-Pages: Branding, Compliance, Content, Features, Integrations, PassivePost, Pages, Pricing, Security, Social, Support) | Complete |
 | Onboarding Wizard (4-step guided setup) | Complete |
 | Stripe Billing + Feature Gating | Complete |
 | Customer Portal | Complete |
@@ -753,9 +753,9 @@ The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these met
 | Metrics Alerts (Churn Rate + User Growth) | Complete |
 | Database Backup Configuration | Complete |
 | API Token Rotation | Complete |
-| SocioScheduler Module (10 platforms, 2 tiers) | Complete |
+| PassivePost Module (10 platforms, 2 tiers) | Complete |
 | Centralized API Keys & Integrations | Complete |
-| SocioScheduler Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
+| PassivePost Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
 
 ---
 

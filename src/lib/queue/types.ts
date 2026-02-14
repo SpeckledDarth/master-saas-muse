@@ -1,6 +1,6 @@
 export type CoreJobType = 'email' | 'webhook-retry' | 'report' | 'metrics-report' | 'metrics-alert' | 'token-rotation'
 
-// PRODUCT: SocioScheduler - social job types re-exported from product module
+// PRODUCT: PassivePost - social job types re-exported from product module
 import type { SocialJobType, SocialPostJobData, SocialHealthCheckJobData, SocialTrendMonitorJobData, SocialEngagementPullJobData, SocialJobData } from '@/lib/social/queue-jobs'
 export type { SocialPostJobData, SocialHealthCheckJobData, SocialTrendMonitorJobData, SocialEngagementPullJobData, SocialJobData }
 

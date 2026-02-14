@@ -1,12 +1,12 @@
--- SocioScheduler Extension: Custom tables for AI social media scheduling
+-- PassivePost Extension: Custom tables for AI social media scheduling
 -- Run this migration AFTER core/001_social_tables.sql
--- These tables are specific to SocioScheduler and would NOT exist in other Muse clones.
+-- These tables are specific to PassivePost and would NOT exist in other Muse clones.
 
 -- Enable UUID generation if not already enabled
 create extension if not exists "pgcrypto";
 
 ------------------------------------------------------------------------
--- 1. Extend social_posts with SocioScheduler-specific columns
+-- 1. Extend social_posts with PassivePost-specific columns
 ------------------------------------------------------------------------
 
 -- trend_source: where the post idea came from (e.g., 'x_hashtag', 'fb_mention', 'local_query')

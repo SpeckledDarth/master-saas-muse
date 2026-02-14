@@ -1,7 +1,7 @@
 import { Queue, Worker, Job, QueueEvents } from 'bullmq'
 import { getIORedisConnection, createNewIORedisConnection } from '@/lib/redis/connection'
 import type { QueueJobData, EmailJobData, WebhookRetryJobData, ReportJobData, MetricsReportJobData, MetricsAlertJobData, TokenRotationJobData, QueueMetrics, JobStatus } from './types'
-// PRODUCT: SocioScheduler - social job types imported from product module
+// PRODUCT: PassivePost - social job types imported from product module
 import type { SocialPostJobData, SocialHealthCheckJobData, SocialTrendMonitorJobData, SocialEngagementPullJobData } from '@/lib/social/queue-jobs'
 
 const QUEUE_NAME = 'musekit-jobs'
@@ -235,7 +235,7 @@ async function processTokenRotationJob(job: Job<TokenRotationJobData>): Promise<
   }
 }
 
-// PRODUCT: SocioScheduler - social job processors moved to src/lib/social/queue-jobs.ts
+// PRODUCT: PassivePost - social job processors moved to src/lib/social/queue-jobs.ts
 
 async function processJob(job: Job<QueueJobData>): Promise<void> {
   console.log(`[Queue] Processing job ${job.id}: ${job.data.type}`)
@@ -257,7 +257,7 @@ async function processJob(job: Job<QueueJobData>): Promise<void> {
     case 'social-health-check':
     case 'social-trend-monitor':
     case 'social-engagement-pull': {
-      // PRODUCT: SocioScheduler - delegate to product plugin
+      // PRODUCT: PassivePost - delegate to product plugin
       const { processSocialJob } = await import('@/lib/social/queue-jobs')
       return processSocialJob(job as Job<any>)
     }

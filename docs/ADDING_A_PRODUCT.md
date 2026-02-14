@@ -323,24 +323,24 @@ The `productSlug` gets stored in the Stripe subscription's metadata as `muse_pro
 
 7. **RLS everywhere**: Every table must have Row Level Security enabled with appropriate policies.
 
-## Example: SocioScheduler
+## Example: PassivePost
 
-SocioScheduler is the reference implementation of a product built on MuseKit. Here is how it follows the pattern:
+PassivePost is the reference implementation of a product built on MuseKit. Here is how it follows the pattern:
 
 ### Product Registration
 
-SocioScheduler is registered with slug `socio-scheduler` and uses the metadata key `muse_tier` on its Stripe product. Its tier definitions include `tier_1` (Free), `tier_2` (Pro), and `tier_3` (Team), each with limits like `dailyPosts`, `maxAccounts`, and `aiGenerationsPerDay`.
+PassivePost is registered with slug `passive-post` and uses the metadata key `muse_tier` on its Stripe product. Its tier definitions include `tier_1` (Free), `tier_2` (Pro), and `tier_3` (Team), each with limits like `dailyPosts`, `maxAccounts`, and `aiGenerationsPerDay`.
 
 ### Database Tables
 
 - **Core tables** (in `migrations/core/001_social_tables.sql`): `social_accounts`, `social_posts` — shared social infrastructure
-- **Extension tables** (in `migrations/extensions/001_socioschedule_tables.sql`): `brand_preferences`, `alert_logs`, plus additional columns on `social_posts` (`trend_source`, `niche_triggered`)
+- **Extension tables** (in `migrations/extensions/001_passivepost_tables.sql`): `brand_preferences`, `alert_logs`, plus additional columns on `social_posts` (`trend_source`, `niche_triggered`)
 
 ### Code Structure
 
 ```
 src/lib/social/                  # Business logic
-  types.ts                       # SocioScheduler-specific types & tier definitions
+  types.ts                       # PassivePost-specific types & tier definitions
   user-tier.ts                   # Tier resolution wrapper using getUserProductTier
   client.ts                      # Social platform API clients
   posts.sql                      # SQL queries for post management
@@ -361,13 +361,13 @@ src/app/dashboard/social/        # Dashboard pages
 
 ### Tier Resolution Usage
 
-SocioScheduler wraps `getUserProductTier` in a helper (`src/lib/social/user-tier.ts`):
+PassivePost wraps `getUserProductTier` in a helper (`src/lib/social/user-tier.ts`):
 
 ```typescript
 import { getUserProductTier } from '@/lib/products'
 
 export async function getUserSocialTier(userId: string) {
-  const result = await getUserProductTier(userId, 'socio-scheduler')
+  const result = await getUserProductTier(userId, 'passive-post')
   return {
     tier: result.tier,
     source: result.source === 'subscription' ? 'subscription' : 'admin',

@@ -37,7 +37,7 @@ export async function getUserSocialTier(
   fallbackTier: string = 'tier_1'
 ): Promise<{ tier: string; source: 'subscription' | 'admin' }> {
   try {
-    const result = await getUserProductTier(userId, 'socio-scheduler')
+    const result = await getUserProductTier(userId, 'passive-post')
     if (result.source !== 'default') {
       return {
         tier: result.tier,

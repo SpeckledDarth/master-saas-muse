@@ -1,4 +1,4 @@
--- SocioScheduler Extension: Engagement Metrics (Post-MVP)
+-- PassivePost Extension: Engagement Metrics (Post-MVP)
 -- 
 -- For MVP, engagement data is stored in social_posts.engagement_data (JSONB).
 -- This table provides a normalized structure for advanced analytics when needed.

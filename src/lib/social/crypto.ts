@@ -3,7 +3,7 @@ import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypt
 const ALGORITHM = 'aes-256-gcm'
 const IV_LENGTH = 16
 const TAG_LENGTH = 16
-const SALT = 'socioscheduler-token-salt'
+const SALT = 'passivepost-token-salt'
 
 function getKey(): Buffer {
   const secret = process.env.SOCIAL_ENCRYPTION_KEY

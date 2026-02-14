@@ -4,7 +4,7 @@ This checklist guides you through setting up a new project from the Master SaaS 
 
 **Estimated time: 15-30 minutes**
 
-**Template Status: MVP COMPLETE + Full Feature Set + SocioScheduler Extension (February 2026)**
+**Template Status: MVP COMPLETE + Full Feature Set + PassivePost Extension (February 2026)**
 
 ---
 
@@ -78,17 +78,17 @@ Run the SQL from `docs/SETUP_GUIDE.md` in Supabase SQL Editor:
 
 ---
 
-## Step 4b: Create SocioScheduler Extension Tables (Optional, 3 min)
+## Step 4b: Create PassivePost Extension Tables (Optional, 3 min)
 
-If using the SocioScheduler extension for AI social media scheduling:
+If using the PassivePost extension for AI social media scheduling:
 
-- [ ] Run `migrations/extensions/001_socioschedule_tables.sql` in Supabase SQL Editor
+- [ ] Run `migrations/extensions/001_passivepost_tables.sql` in Supabase SQL Editor
 - [ ] Run `migrations/extensions/002_engagement_metrics_placeholder.sql`
 - [ ] Verify `brand_preferences` table was created
 - [ ] Verify `alert_logs` table was created
 - [ ] Verify `social_posts` has `trend_source` and `niche_triggered` columns
 
-> **Note:** These tables are specific to SocioScheduler and should NOT be included in other Muse clones unless they also use social scheduling features.
+> **Note:** These tables are specific to PassivePost and should NOT be included in other Muse clones unless they also use social scheduling features.
 
 ---
 
@@ -165,15 +165,15 @@ Stripe is the **single source of truth** for pricing. Your website automatically
 
 > **Note:** The Free tier is hardcoded (no Stripe product needed) since free users don't go through checkout.
 
-### Configure SocioScheduler Tiers (Optional)
+### Configure PassivePost Tiers (Optional)
 
-If using SocioScheduler, create additional Stripe products with tier metadata:
+If using PassivePost, create additional Stripe products with tier metadata:
 
-- [ ] Create **Socio Starter** product with metadata: `muse_tier` = `tier_1`
-- [ ] Create **Socio Basic** product with metadata: `muse_tier` = `tier_2`
-- [ ] Create **Socio Premium** product with metadata: `muse_tier` = `tier_3`
+- [ ] Create **Passive Starter** product with metadata: `muse_tier` = `tier_1`
+- [ ] Create **Passive Basic** product with metadata: `muse_tier` = `tier_2`
+- [ ] Create **Passive Premium** product with metadata: `muse_tier` = `tier_3`
 
-> **Note:** Tier definitions are admin-configurable from the SocioScheduler setup page. The default 3 tiers (tier_1/Starter, tier_2/Basic, tier_3/Premium) ship out of the box. Admins can add, remove, or edit tiers and their limits from the dashboard.
+> **Note:** Tier definitions are admin-configurable from the PassivePost setup page. The default 3 tiers (tier_1/Starter, tier_2/Basic, tier_3/Premium) ship out of the box. Admins can add, remove, or edit tiers and their limits from the dashboard.
 
 These tiers map to post/AI generation limits:
 | Tier | Posts/Day | AI Generations/Day |
@@ -382,9 +382,9 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] Keys show source badges (Dashboard vs Env Var)
 - [ ] Format validation runs on save
 
-### SocioScheduler Sub-Page (Social Module)
-- [ ] Navigate to `/admin/setup/socioscheduler`
-- [ ] Toggle SocioScheduler module on/off
+### PassivePost Sub-Page (Social Module)
+- [ ] Navigate to `/admin/setup/passivepost`
+- [ ] Toggle PassivePost module on/off
 - [ ] Select tier (Universal or Power)
 - [ ] Enable desired platforms (up to 10)
 - [ ] Configure platform API credentials in the Platform API Keys section
@@ -436,7 +436,7 @@ npx playwright test
 
 Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with NPS), email templates, help widget, admin metrics, responsive design, and API endpoints.
 
-**Test suite: 92 tests across 7 test files (e2e-full: 46, blog: 9, feedback: 9, waitlist: 10, email-templates: 10, socioscheduler: 8)**
+**Test suite: 92 tests across 7 test files (e2e-full: 46, blog: 9, feedback: 9, waitlist: 10, email-templates: 10, passivepost: 8)**
 
 ---
 
@@ -475,12 +475,12 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - [ ] Legal pages load correctly (privacy, terms, cookie-policy, etc.)
 - [ ] Cookie consent banner appears (if enabled)
 - [ ] Integrations page loads at `/admin/setup/integrations` with collapsible groups
-- [ ] SocioScheduler setup page loads at `/admin/setup/socioscheduler`
-- [ ] Social dashboard loads at `/dashboard/social` (if SocioScheduler enabled)
-- [ ] Social overview shows usage progress bar and Quick Generate button (if SocioScheduler)
-- [ ] Social calendar shows month-grid with platform tooltips (if SocioScheduler)
-- [ ] Social engagement page loads with charts (if SocioScheduler)
-- [ ] Brand preferences page loads at `/dashboard/social/brand` (if SocioScheduler)
+- [ ] PassivePost setup page loads at `/admin/setup/passivepost`
+- [ ] Social dashboard loads at `/dashboard/social` (if PassivePost enabled)
+- [ ] Social overview shows usage progress bar and Quick Generate button (if PassivePost)
+- [ ] Social calendar shows month-grid with platform tooltips (if PassivePost)
+- [ ] Social engagement page loads with charts (if PassivePost)
+- [ ] Brand preferences page loads at `/dashboard/social/brand` (if PassivePost)
 - [ ] Upgrade banner appears at 80%+ usage across social dashboard pages
 
 ---
@@ -512,7 +512,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 | `ANTHROPIC_API_KEY` | Anthropic API key (alternative AI provider) |
 | `UPSTASH_REDIS_REST_URL` | Upstash Redis URL (queue + rate limiting) |
 | `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis auth token |
-| `MUSE_DEBUG_MODE` | Set to `true` for SocioScheduler beta debug mode |
+| `MUSE_DEBUG_MODE` | Set to `true` for PassivePost beta debug mode |
 
 ---
 
@@ -542,7 +542,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - **Metrics Dashboard** (10 KPIs: Total Users, New Users, Active Subscriptions, MRR, ARPU, LTV, Churn Rate, Conversion Rate, Feedback Count, Waitlist Count)
 - **NPS Score** card with color-coded Net Promoter Score
 - **Alert thresholds** for churn rate and user growth with email notifications
-- **Setup Dashboard** (configure branding, pricing, social, features, security, compliance, support, integrations, SocioScheduler)
+- **Setup Dashboard** (configure branding, pricing, social, features, security, compliance, support, integrations, PassivePost)
 - **Centralized API Keys** (collapsible groups, Required/Optional labels, format validation, source badges)
 - User management (view, edit roles, search)
 - **User Impersonation** (view app as any user for debugging, 30-min sessions, audit logged)
@@ -566,7 +566,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - Customer portal for subscription management
 - Webhook handling for subscription events
 - Feature gating based on plan
-- SocioScheduler per-user tier resolution via subscription metadata
+- PassivePost per-user tier resolution via subscription metadata
 
 ### Email (Resend)
 - Welcome email on signup
@@ -606,7 +606,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - 9 legal/compliance pages with dynamic variable replacement
 - Cookie consent banner
 
-### SocioScheduler Module
+### PassivePost Module
 - Toggleable social media management extension
 - 2 tiers: Universal (basic) and Power (advanced)
 - 10 platform support (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord)
@@ -619,7 +619,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - n8n workflow templates for automation
 - Admin-configurable niche guidance and engagement pull settings
 
-### SocioScheduler Extension
+### PassivePost Extension
 - AI social media scheduling for solopreneurs and gig workers
 - Database extension pattern (tables in `migrations/extensions/`, core schema untouched)
 - OAuth flows for Facebook, LinkedIn, Twitter/X with PKCE
@@ -635,7 +635,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 
 ### Centralized API Keys & Integrations
 - Admin setup page at `/admin/setup/integrations` for Tech Stack keys
-- Social platform keys managed on SocioScheduler page
+- Social platform keys managed on PassivePost page
 - Collapsible groups (collapsed by default) with status indicators
 - Required/Optional labels and format validation on save
 - Inline edit/reveal/delete with source badges (Dashboard vs Env Var)
@@ -671,9 +671,9 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 | Audit Log Viewer | Complete |
 | Legal & Compliance Pages | Complete |
 | Metrics Alerts & Reports | Complete |
-| SocioScheduler Module (10 platforms, 2 tiers) | Complete |
+| PassivePost Module (10 platforms, 2 tiers) | Complete |
 | Centralized API Keys & Integrations | Complete |
-| SocioScheduler Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
+| PassivePost Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
 
 ---
 
@@ -693,9 +693,9 @@ Before launching with live customer data:
 - [ ] Configure alert thresholds for churn rate and user growth
 - [ ] Review and customize legal pages
 - [ ] Enable cookie consent banner if required
-- [ ] If using SocioScheduler: verify Stripe tier products have correct metadata
-- [ ] If using SocioScheduler: verify extension tables exist in database
-- [ ] If using SocioScheduler: configure niche guidance entries in admin setup
+- [ ] If using PassivePost: verify Stripe tier products have correct metadata
+- [ ] If using PassivePost: verify extension tables exist in database
+- [ ] If using PassivePost: configure niche guidance entries in admin setup
 
 ---
 

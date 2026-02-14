@@ -451,7 +451,7 @@ export default function ProductsPage() {
                 <Label htmlFor="product-metadata-key">Metadata Key</Label>
                 <Input
                   id="product-metadata-key"
-                  placeholder="e.g., socio_tier"
+                  placeholder="e.g., muse_tier"
                   value={form.metadataKey}
                   onChange={(e) => updateForm('metadataKey', e.target.value)}
                   data-testid="input-product-metadata-key"
