@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Progress } from '@/components/ui/progress'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Switch } from '@/components/ui/switch'
@@ -17,11 +17,15 @@ import {
   Check, Shuffle, Sun, Moon, TrendingUp, ShoppingCart,
   Zap, Heart, Star, Users, User, Clock, Mail,
   ChevronLeft, ChevronRight, BarChart3, ArrowUpRight,
-  ArrowDownRight, Sparkles, Shield, Bell, Search,
-  Settings, Plus, Download, MoreHorizontal, Eye,
-  Calendar, FileText, Rocket, Send, DollarSign
+  ArrowDownRight, Shield, Bell, Search,
+  Plus, Download, MoreHorizontal, Eye,
+  FileText, Rocket, Send, DollarSign,
+  Briefcase, Coffee, Car, Smartphone, Wifi, Activity,
+  BookOpen, Play, MapPin, Phone, CreditCard, Gift,
+  Utensils, Pill, Dumbbell, Monitor, Globe, Layers
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 function hexToHsl(hex: string): [number, number, number] {
   hex = hex.replace('#', '')
@@ -166,65 +170,160 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean): Record<
   }
 }
 
-function StatsPreview() {
-  const stats = [
-    { label: 'Total Revenue', value: '$45,231', change: '+20.1%', positive: true, icon: DollarSign },
-    { label: 'Subscribers', value: '2,350', change: '+180', positive: true, icon: Users },
-    { label: 'Active Now', value: '573', change: '+12%', positive: true, icon: TrendingUp },
-  ]
+function HeroPreview({ shades }: { shades: Record<string, string> }) {
   return (
-    <div className="grid grid-cols-3 gap-4">
-      {stats.map(s => (
-        <Card key={s.label}>
-          <CardHeader className="flex flex-row items-center justify-between gap-1 space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium text-muted-foreground">{s.label}</CardTitle>
-            <s.icon className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold tabular-nums">{s.value}</div>
-            <div className="flex items-center gap-1 mt-1">
-              {s.positive ? (
-                <ArrowUpRight className="w-3 h-3 text-primary" />
-              ) : (
-                <ArrowDownRight className="w-3 h-3 text-destructive" />
-              )}
-              <span className="text-xs text-muted-foreground">{s.change} from last month</span>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <Card className="overflow-hidden border-0">
+      <div
+        className="p-8"
+        style={{
+          background: `linear-gradient(135deg, ${shades['700']}, ${shades['500']}, ${shades['400']})`,
+        }}
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <Zap className="w-5 h-5 text-primary-foreground/90" />
+          <Star className="w-4 h-4 text-primary-foreground/60" />
+        </div>
+        <h3 className="text-2xl font-bold text-primary-foreground mb-2">Increase your revenue by 3x</h3>
+        <p className="text-sm text-primary-foreground/70 mb-6 max-w-xs">
+          Our platform helps you close more deals and scale faster than ever.
+        </p>
+        <Button
+          variant="secondary"
+          data-testid="button-hero-cta"
+        >
+          Start growing
+        </Button>
+      </div>
+    </Card>
   )
 }
 
-function ButtonsAndBadges() {
+function CategoriesPreview() {
+  const categories = [
+    { name: 'Grocery', icon: ShoppingCart },
+    { name: 'Cafe', icon: Coffee },
+    { name: 'Utilities', icon: Wifi },
+    { name: 'Sport', icon: Dumbbell },
+    { name: 'Taxi', icon: Car },
+    { name: 'Health', icon: Pill },
+    { name: 'Telecom', icon: Phone },
+    { name: 'Gadgets', icon: Smartphone },
+  ]
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm">Buttons & Badges</CardTitle>
-        <CardDescription>All component variants</CardDescription>
+      <CardHeader>
+        <CardTitle className="text-sm">Categories</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">Buttons</p>
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm">Primary</Button>
-            <Button size="sm" variant="secondary">Secondary</Button>
-            <Button size="sm" variant="outline">Outline</Button>
-            <Button size="sm" variant="ghost">Ghost</Button>
-            <Button size="sm" variant="destructive">Destructive</Button>
-          </div>
+      <CardContent>
+        <div className="grid grid-cols-4 gap-4">
+          {categories.map(c => (
+            <div key={c.name} className="flex flex-col items-center gap-2">
+              <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center">
+                <c.icon className="w-5 h-5 text-primary" />
+              </div>
+              <span className="text-[10px] text-muted-foreground text-center leading-tight">{c.name}</span>
+            </div>
+          ))}
         </div>
-        <Separator />
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">Badges</p>
-          <div className="flex flex-wrap gap-2">
-            <Badge>Default</Badge>
-            <Badge variant="secondary">Secondary</Badge>
-            <Badge variant="outline">Outline</Badge>
-            <Badge variant="destructive">Destructive</Badge>
+      </CardContent>
+    </Card>
+  )
+}
+
+function BudgetPreview({ shades }: { shades: Record<string, string> }) {
+  const items = [
+    { name: 'Home Renovation', total: '$33,500', spent: '$19,500', remaining: '$14,000', pct: 58 },
+    { name: 'Education & Courses', total: '$40,000', spent: '$19,500', remaining: '$20,500', pct: 49 },
+    { name: 'Health & Wellness', total: '$5,500', spent: '$3,000', remaining: '$2,500', pct: 55 },
+  ]
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm">Budget</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        {items.map(item => (
+          <div key={item.name} className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                <Heart className="w-4 h-4 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium truncate">{item.name}</span>
+                  <span className="text-sm font-bold tabular-nums shrink-0">{item.total}</span>
+                </div>
+              </div>
+            </div>
+            <Progress value={item.pct} className="h-1.5" />
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-muted-foreground tabular-nums">{item.spent}</span>
+              <span className="text-xs text-muted-foreground tabular-nums">{item.remaining}</span>
+            </div>
           </div>
-        </div>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+function NewsletterPreview() {
+  const items = [
+    { name: 'Newsletter', desc: 'Last message sent an hour ago', active: true },
+    { name: 'Existing customers', desc: 'Last message sent 2 weeks ago', active: false },
+    { name: 'Trial users', desc: 'Last message sent 4 days ago', active: false },
+  ]
+  return (
+    <Card>
+      <CardContent className="pt-6 space-y-3">
+        {items.map(item => (
+          <div key={item.name} className="flex items-center gap-3 rounded-lg border p-4">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium">{item.name}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
+            </div>
+            {item.active && (
+              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
+                <Check className="w-3.5 h-3.5 text-primary-foreground" />
+              </div>
+            )}
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+function SchedulePreview({ shades }: { shades: Record<string, string> }) {
+  const events = [
+    { time: '9:15', period: 'AM', title: 'Weekly Team Sync', desc: 'Quick check-in to align priorities and share updates for the week.' },
+    { time: '4:00', period: 'PM', title: 'Client Pitch Rehearsal', desc: 'Run through tomorrow\'s presentation and refine messaging with the team.' },
+    { time: '7:30', period: 'PM', title: 'Product Design Review', desc: 'Collaborative session to go over latest UI/UX proposals and feedback.' },
+  ]
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
+        <CardTitle className="text-sm">Schedule</CardTitle>
+        <Button size="icon" variant="outline" data-testid="button-schedule-add">
+          <Plus className="w-4 h-4" />
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {events.map(e => (
+          <div
+            key={e.time}
+            className="flex gap-4 rounded-lg border p-4"
+          >
+            <div className="shrink-0 text-center">
+              <p className="text-lg font-bold tabular-nums leading-tight" style={{ color: shades['400'] }}>{e.time}</p>
+              <p className="text-[10px] font-medium text-muted-foreground">{e.period}</p>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold">{e.title}</p>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{e.desc}</p>
+            </div>
+          </div>
+        ))}
       </CardContent>
     </Card>
   )
@@ -232,279 +331,292 @@ function ButtonsAndBadges() {
 
 function ProfilePreview() {
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-12 w-12">
-            <AvatarFallback>SJ</AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0 space-y-1">
-            <p className="text-sm font-semibold">Sarah Jones</p>
-            <p className="text-xs text-muted-foreground">sarah@example.com</p>
-          </div>
-          <Badge variant="secondary">Admin</Badge>
-        </div>
-        <Separator className="my-4" />
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bell className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm">Notifications</span>
-            </div>
-            <Switch defaultChecked />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm">Email updates</span>
-            </div>
-            <Switch />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm">Two-factor auth</span>
-            </div>
-            <Switch defaultChecked />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-function TaskListPreview() {
-  return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="overflow-hidden">
+      <div className="relative w-full aspect-[4/3]">
+        <Image
+          src="/images/preview/profile.jpg"
+          alt="Profile"
+          fill
+          className="object-cover"
+          unoptimized
+        />
+      </div>
+      <CardContent className="pt-5 pb-5">
         <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-sm">Tasks</CardTitle>
-          <Badge variant="secondary" className="text-xs">3 remaining</Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {[
-          { label: 'Update landing page copy', done: true },
-          { label: 'Review pull requests', done: true },
-          { label: 'Deploy to production', done: false },
-          { label: 'Write API documentation', done: false },
-          { label: 'Set up monitoring alerts', done: false },
-        ].map(task => (
-          <div key={task.label} className="flex items-center gap-3">
-            <Checkbox checked={task.done} />
-            <span className={cn('text-sm', task.done && 'line-through text-muted-foreground')}>{task.label}</span>
+          <div>
+            <p className="text-lg font-bold">Sarah Jones</p>
+            <p className="text-sm text-muted-foreground">Product designer</p>
           </div>
-        ))}
-      </CardContent>
-    </Card>
-  )
-}
-
-function ProgressPreview() {
-  return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm">Project Progress</CardTitle>
-        <CardDescription>3 of 5 milestones complete</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {[
-          { name: 'Research', progress: 100 },
-          { name: 'Design', progress: 100 },
-          { name: 'Development', progress: 68 },
-          { name: 'Testing', progress: 25 },
-          { name: 'Launch', progress: 0 },
-        ].map(item => (
-          <div key={item.name} className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium">{item.name}</span>
-              <span className="text-xs text-muted-foreground tabular-nums">{item.progress}%</span>
-            </div>
-            <Progress value={item.progress} className="h-1.5" />
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  )
-}
-
-function TeamPreview() {
-  const members = [
-    { name: 'Alex Morgan', role: 'Developer', initials: 'AM' },
-    { name: 'Jamie Chen', role: 'Designer', initials: 'JC' },
-    { name: 'Sam Rivera', role: 'Product Manager', initials: 'SR' },
-    { name: 'Chris Park', role: 'Marketing', initials: 'CP' },
-  ]
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-2 pb-3">
-        <CardTitle className="text-sm">Team Members</CardTitle>
-        <Button size="sm" variant="outline">
-          <Plus className="w-3 h-3 mr-1" />
-          Invite
-        </Button>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {members.map(m => (
-          <div key={m.name} className="flex items-center gap-3">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="text-xs">{m.initials}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{m.name}</p>
-              <p className="text-xs text-muted-foreground">{m.role}</p>
-            </div>
-            <Button size="icon" variant="ghost">
-              <MoreHorizontal className="w-4 h-4" />
-            </Button>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  )
-}
-
-function TabsPreview() {
-  return (
-    <Card>
-      <CardContent className="pt-6">
-        <Tabs defaultValue="overview">
-          <TabsList className="w-full">
-            <TabsTrigger value="overview" className="flex-1">Overview</TabsTrigger>
-            <TabsTrigger value="analytics" className="flex-1">Analytics</TabsTrigger>
-            <TabsTrigger value="reports" className="flex-1">Reports</TabsTrigger>
-          </TabsList>
-          <TabsContent value="overview" className="space-y-3 pt-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg bg-muted p-3">
-                <p className="text-xs text-muted-foreground">Page Views</p>
-                <p className="text-lg font-bold tabular-nums">12,543</p>
-              </div>
-              <div className="rounded-lg bg-muted p-3">
-                <p className="text-xs text-muted-foreground">Bounce Rate</p>
-                <p className="text-lg font-bold tabular-nums">24.3%</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 rounded-lg border p-3">
-              <BarChart3 className="w-4 h-4 text-muted-foreground shrink-0" />
-              <p className="text-xs text-muted-foreground">Traffic is up 12% compared to last week.</p>
-            </div>
-          </TabsContent>
-          <TabsContent value="analytics" className="pt-3">
-            <div className="rounded-lg bg-muted p-3">
-              <p className="text-xs text-muted-foreground">Analytics content here</p>
-            </div>
-          </TabsContent>
-          <TabsContent value="reports" className="pt-3">
-            <div className="rounded-lg bg-muted p-3">
-              <p className="text-xs text-muted-foreground">Reports content here</p>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
-  )
-}
-
-function NotificationsPreview() {
-  const notifications = [
-    { title: 'New sign-up', desc: 'A new user registered 2 minutes ago', icon: User, time: '2m' },
-    { title: 'Payment received', desc: 'Invoice #1234 has been paid', icon: Zap, time: '1h' },
-    { title: 'Deploy complete', desc: 'v2.4.1 deployed to production', icon: Rocket, time: '3h' },
-    { title: 'Comment added', desc: 'Jamie left feedback on your design', icon: FileText, time: '5h' },
-  ]
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-2 pb-3">
-        <CardTitle className="text-sm">Notifications</CardTitle>
-        <Badge>4 new</Badge>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {notifications.map(n => (
-          <div key={n.title} className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5">
-              <n.icon className="w-4 h-4 text-muted-foreground" />
-            </div>
-            <div className="flex-1 min-w-0 space-y-0.5">
-              <p className="text-sm font-medium truncate">{n.title}</p>
-              <p className="text-xs text-muted-foreground truncate">{n.desc}</p>
-            </div>
-            <span className="text-xs text-muted-foreground shrink-0">{n.time}</span>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  )
-}
-
-function FormPreview() {
-  return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm">Quick Send</CardTitle>
-        <CardDescription>Send a message to your team</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="space-y-1.5">
-          <Label className="text-xs">To</Label>
-          <Input placeholder="team@company.com" className="h-9" />
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs">Subject</Label>
-          <Input placeholder="Weekly update" className="h-9" />
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox id="urgent" />
-          <Label htmlFor="urgent" className="text-xs font-normal">Mark as urgent</Label>
+          <Badge variant="outline" className="text-xs">Online</Badge>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between gap-2">
-        <Button variant="outline" size="sm">Save draft</Button>
-        <Button size="sm">
-          <Send className="w-3 h-3 mr-1.5" />
-          Send
-        </Button>
-      </CardFooter>
+    </Card>
+  )
+}
+
+function RevenueChartPreview({ shades }: { shades: Record<string, string> }) {
+  const w = 400, h = 160, px = 0, py = 10
+  const dataIncome = [40, 55, 45, 65, 50, 75, 60, 80, 70, 85, 75, 90]
+  const dataExpenses = [30, 35, 40, 35, 45, 40, 50, 45, 55, 50, 60, 55]
+  const dataSavings = [10, 20, 5, 30, 5, 35, 10, 35, 15, 35, 15, 35]
+
+  const toPath = (data: number[]) => {
+    const max = 100
+    const stepX = (w - px * 2) / (data.length - 1)
+    return data.map((d, i) => {
+      const x = px + i * stepX
+      const y = py + (h - py * 2) * (1 - d / max)
+      return `${i === 0 ? 'M' : 'L'}${x},${y}`
+    }).join(' ')
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
+        <div>
+          <CardTitle className="text-sm">Revenue</CardTitle>
+          <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-2xl font-bold tabular-nums">$213,000</span>
+            <Badge variant="secondary" className="text-xs">+19%</Badge>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: shades['400'] }} />
+            <span className="text-xs text-muted-foreground">Income</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: shades['600'] }} />
+            <span className="text-xs text-muted-foreground">Expenses</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: shades['200'] }} />
+            <span className="text-xs text-muted-foreground">Savings</span>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-lg bg-muted p-4">
+          <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height: 140 }}>
+            <path d={toPath(dataSavings)} fill="none" stroke={shades['200']} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d={toPath(dataExpenses)} fill="none" stroke={shades['600']} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d={toPath(dataIncome)} fill="none" stroke={shades['400']} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+      </CardContent>
     </Card>
   )
 }
 
 function PricingPreview() {
   const plans = [
-    { name: 'Free', price: '$0', desc: 'For personal projects', features: ['1 project', '100MB storage', 'Community support'], featured: false },
-    { name: 'Pro', price: '$19', desc: 'For growing teams', features: ['Unlimited projects', '10GB storage', 'Priority support'], featured: true },
-    { name: 'Enterprise', price: '$99', desc: 'For large orgs', features: ['Custom limits', '100GB storage', 'Dedicated support'], featured: false },
+    { name: 'Individual', price: '$0', period: '/month', desc: 'Perfect for freelancers and solo creators.', features: ['1 project', '100MB storage', 'Community support'], featured: false },
+    { name: 'Team', price: '$99', period: '/month', desc: 'Ideal for growing teams and startups.', features: ['Unlimited projects', '10GB storage', 'Priority support'], featured: true },
+    { name: 'Enterprise', price: '$199', period: '/month', desc: 'Designed for scaling organizations.', features: ['Custom limits', '100GB storage', 'Dedicated support'], featured: false },
   ]
   return (
-    <div className="grid grid-cols-3 gap-4">
-      {plans.map(plan => (
-        <Card key={plan.name} className={cn(plan.featured && 'border-primary')}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">{plan.name}</CardTitle>
-            <CardDescription className="text-xs">{plan.desc}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div>
-              <span className="text-2xl font-bold tabular-nums">{plan.price}</span>
-              <span className="text-xs text-muted-foreground">/month</span>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm">Pricing plans</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-3 gap-4">
+          {plans.map(plan => (
+            <div key={plan.name} className={cn('rounded-lg border p-5 space-y-4', plan.featured && 'border-primary')}>
+              <div>
+                <p className="text-sm font-semibold">{plan.name}</p>
+                <p className="text-xs text-muted-foreground mt-1">{plan.desc}</p>
+              </div>
+              <div>
+                <span className="text-3xl font-bold tabular-nums">{plan.price}</span>
+                <span className="text-xs text-muted-foreground">{plan.period}</span>
+              </div>
+              <div className="space-y-2">
+                {plan.features.map(f => (
+                  <div key={f} className="flex items-center gap-2">
+                    <Check className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span className="text-xs">{f}</span>
+                  </div>
+                ))}
+              </div>
+              <Button className="w-full" size="sm" variant={plan.featured ? 'default' : 'outline'} data-testid={`button-pricing-${plan.name.toLowerCase()}`}>
+                {plan.featured ? 'Get started' : 'Contact us'}
+              </Button>
             </div>
-            <div className="space-y-2">
-              {plan.features.map(f => (
-                <div key={f} className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-primary" />
-                  <span className="text-xs">{f}</span>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function TicketsPreview() {
+  const tickets = [
+    { name: 'Amy P.', status: 'Open', time: '23 min', initials: 'AP' },
+    { name: 'Sarah A.', status: 'Closed', time: '1 hour', initials: 'SA' },
+    { name: 'Jessica P.', status: 'Processing', time: '45 min', initials: 'JP' },
+    { name: 'James A.', status: 'Open', time: '2 days', initials: 'JA' },
+  ]
+  const statusVariant = (s: string) => {
+    if (s === 'Open') return 'default' as const
+    if (s === 'Closed') return 'secondary' as const
+    return 'outline' as const
+  }
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm">Tickets</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {tickets.map(t => (
+          <div key={t.name} className="flex items-center gap-3">
+            <Avatar className="h-9 w-9">
+              <AvatarFallback className="text-xs">{t.initials}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium">{t.name}</p>
+            </div>
+            <Badge variant={statusVariant(t.status)} className="text-[10px]">{t.status}</Badge>
+            <span className="text-xs text-muted-foreground tabular-nums shrink-0">{t.time}</span>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+function ContinueWatchingPreview() {
+  const courses = [
+    { title: 'Front End Dev.', desc: 'Design principles and tools for creating intuitive user interfaces.', img: '/images/preview/course-1.jpg', author: 'Richard C.' },
+    { title: 'UI/UX Design', desc: 'Build responsive web pages using HTML, CSS, and JavaScript.', img: '/images/preview/course-2.jpg', author: 'Sarah M.' },
+    { title: 'Sound Design', desc: 'Create and mix custom audio for games and film projects.', img: '/images/preview/course-3.jpg', author: 'James L.' },
+  ]
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm">Continue Watching</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-3 gap-4">
+          {courses.map(c => (
+            <div key={c.title} className="space-y-2">
+              <div className="group relative aspect-[16/10] rounded-lg overflow-hidden">
+                <Image src={c.img} alt={c.title} fill className="object-cover" unoptimized />
+                <div className="absolute inset-0 bg-background/30 backdrop-blur-sm flex items-center justify-center invisible group-hover:visible transition-all">
+                  <Play className="w-8 h-8 text-foreground" />
                 </div>
-              ))}
+              </div>
+              <p className="text-xs font-semibold leading-tight">{c.title}</p>
+              <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{c.desc}</p>
+              <p className="text-[10px] text-muted-foreground">{c.author}</p>
             </div>
-          </CardContent>
-          <CardFooter>
-            <Button className="w-full" size="sm" variant={plan.featured ? 'default' : 'outline'}>
-              {plan.featured ? 'Get Started' : 'Learn More'}
-            </Button>
-          </CardFooter>
-        </Card>
-      ))}
-    </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function EmailStatsPreview() {
+  return (
+    <Card>
+      <CardContent className="pt-6">
+        <div className="grid grid-cols-3 gap-6">
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground">Total Subscribers</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-bold tabular-nums">71,842</span>
+              <span className="text-[10px] text-muted-foreground tabular-nums">+10.2%</span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground">Avg. Open Rate</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-bold tabular-nums">58.16%</span>
+              <Badge variant="secondary" className="text-[10px]">+14.6%</Badge>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground">Avg. Click Rate</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-bold tabular-nums">24.57%</span>
+              <Badge variant="secondary" className="text-[10px]">+4.6%</Badge>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function FeatureCardsPreview() {
+  const features = [
+    { title: 'Manage team access', desc: 'Control permissions and approve content across your organization.', icon: Users },
+    { title: 'Notification settings', desc: 'Choose the alerts you receive and detailed reports in your inbox.', icon: Bell },
+    { title: 'Download reports', desc: 'Export your analytics and detailed reports in multiple formats.', icon: Download },
+  ]
+  return (
+    <Card>
+      <CardContent className="pt-6">
+        <div className="grid grid-cols-3 gap-4">
+          {features.map(f => (
+            <div key={f.title} className="rounded-lg border p-5 space-y-3">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <f.icon className="w-5 h-5 text-primary" />
+              </div>
+              <p className="text-sm font-semibold">{f.title}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function ButtonShowcase() {
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-6">
+          <span className="text-xs text-muted-foreground w-16">Default</span>
+          <span className="text-xs text-muted-foreground w-16">Hover</span>
+          <span className="text-xs text-muted-foreground w-16">Active</span>
+          <span className="text-xs text-muted-foreground w-16">Disabled</span>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-1">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Primary</p>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Button size="sm" data-testid="button-primary-default">Primary</Button>
+            <Button size="sm" data-testid="button-primary-hover">Primary</Button>
+            <Button size="sm" data-testid="button-primary-active">Primary</Button>
+            <Button size="sm" disabled data-testid="button-primary-disabled">Primary</Button>
+          </div>
+        </div>
+        <Separator />
+        <div className="space-y-1">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Secondary</p>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Button size="sm" variant="secondary" data-testid="button-secondary-default">Secondary</Button>
+            <Button size="sm" variant="secondary" data-testid="button-secondary-hover">Secondary</Button>
+            <Button size="sm" variant="secondary" data-testid="button-secondary-active">Secondary</Button>
+            <Button size="sm" variant="secondary" disabled data-testid="button-secondary-disabled">Secondary</Button>
+          </div>
+        </div>
+        <Separator />
+        <div className="space-y-1">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Tertiary</p>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Button size="sm" variant="outline" data-testid="button-tertiary-default">Tertiary</Button>
+            <Button size="sm" variant="outline" data-testid="button-tertiary-hover">Tertiary</Button>
+            <Button size="sm" variant="outline" data-testid="button-tertiary-active">Tertiary</Button>
+            <Button size="sm" variant="outline" disabled data-testid="button-tertiary-disabled">Tertiary</Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -521,8 +633,8 @@ function CalendarPreview() {
   const events = [8, 22]
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-2 pb-3">
-        <CardTitle className="text-sm">July 2025</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
+        <CardTitle className="text-sm">July</CardTitle>
         <div className="flex gap-1">
           <Button size="icon" variant="ghost" data-testid="button-calendar-prev">
             <ChevronLeft className="w-4 h-4" />
@@ -533,9 +645,9 @@ function CalendarPreview() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-7 gap-1 text-center">
+        <div className="grid grid-cols-7 gap-1.5 text-center">
           {days.map(d => (
-            <span key={d} className="text-[10px] font-medium py-1 text-muted-foreground">{d}</span>
+            <span key={d} className="text-[10px] font-medium py-1.5 text-muted-foreground">{d}</span>
           ))}
           {dates.flat().map((d, i) => {
             if (!d) return <span key={i} />
@@ -545,7 +657,7 @@ function CalendarPreview() {
               <div key={i} className="flex flex-col items-center">
                 <span
                   className={cn(
-                    'text-xs w-7 h-7 flex items-center justify-center rounded-md tabular-nums',
+                    'text-xs w-8 h-8 flex items-center justify-center rounded-md tabular-nums',
                     isToday && 'bg-primary text-primary-foreground font-semibold',
                     hasEvent && !isToday && 'bg-secondary font-medium',
                   )}
@@ -562,34 +674,66 @@ function CalendarPreview() {
   )
 }
 
-function ActivityPreview() {
-  const items = [
-    { action: 'Created new project', user: 'Sarah J.', time: 'Just now', initials: 'SJ' },
-    { action: 'Merged pull request #42', user: 'Alex M.', time: '30 min ago', initials: 'AM' },
-    { action: 'Deployed v2.4.0', user: 'Jamie C.', time: '2 hours ago', initials: 'JC' },
-    { action: 'Updated billing info', user: 'Chris P.', time: 'Yesterday', initials: 'CP' },
-  ]
+function BookCardPreview({ shades }: { shades: Record<string, string> }) {
+  return (
+    <Card className="overflow-hidden">
+      <div className="relative aspect-[3/4]">
+        <Image src="/images/preview/book.jpg" alt="Book" fill className="object-cover" unoptimized />
+        <div
+          className="absolute inset-0"
+          style={{ background: `linear-gradient(to top, ${shades['950']}ee, ${shades['950']}33, transparent)` }}
+        />
+        <div className="absolute bottom-0 left-0 right-0 p-5">
+          <Badge variant="secondary" className="mb-2 text-[10px]">MUST CO. OF NIT</Badge>
+          <p className="text-lg font-bold leading-tight text-primary-foreground">Design Principles Handbook</p>
+          <Button size="sm" variant="outline" className="mt-3" data-testid="button-book-continue">
+            Continue reading
+          </Button>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function StatsDonutPreview({ shades }: { shades: Record<string, string> }) {
+  const size = 120
+  const strokeWidth = 14
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+  const value = 0.72
+
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm">Recent Activity</CardTitle>
+      <CardHeader>
+        <CardTitle className="text-sm">Stats</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {items.map((item, i) => (
-            <div key={i} className="flex gap-3">
-              <div className="flex flex-col items-center">
-                <Avatar className="h-7 w-7">
-                  <AvatarFallback className="text-[10px]">{item.initials}</AvatarFallback>
-                </Avatar>
-                {i < items.length - 1 && <div className="w-px flex-1 bg-border mt-1" />}
-              </div>
-              <div className="flex-1 min-w-0 pb-4">
-                <p className="text-sm">{item.action}</p>
-                <p className="text-xs text-muted-foreground">{item.user} &middot; {item.time}</p>
-              </div>
-            </div>
-          ))}
+      <CardContent className="flex items-center justify-center">
+        <div className="relative">
+          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke={shades['800']}
+              strokeWidth={strokeWidth}
+            />
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke={shades['400']}
+              strokeWidth={strokeWidth}
+              strokeDasharray={circumference}
+              strokeDashoffset={circumference * (1 - value)}
+              strokeLinecap="round"
+              transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-xl font-bold tabular-nums">1.7K</span>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -666,24 +810,26 @@ export default function PalettePage() {
 
       <div className="flex flex-wrap gap-2">
         {presetPalettes.map(p => (
-          <button
+          <Button
             key={p.name}
+            variant="outline"
+            size="sm"
             onClick={() => applyPreset(p.color)}
-            className="flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium hover-elevate transition-colors cursor-pointer border"
             data-testid={`preset-palette-${p.name.toLowerCase()}`}
           >
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.color }} />
+            <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
             {p.name}
-          </button>
+          </Button>
         ))}
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={randomize}
-          className="flex items-center gap-2 px-3 py-2 rounded-md border text-xs font-medium hover-elevate transition-colors cursor-pointer"
           data-testid="button-palette-randomize"
         >
           <Shuffle className="w-3 h-3" />
           Random
-        </button>
+        </Button>
       </div>
 
       <div>
@@ -693,10 +839,13 @@ export default function PalettePage() {
             const textColor = getContrastText(hex)
             const isCopied = copiedShade === shade
             return (
-              <button
+              <div
                 key={shade}
                 onClick={() => copyHex(shade, hex)}
-                className="flex-1 flex flex-col items-center justify-center py-5 px-1 transition-all hover:scale-y-110 hover:z-10 relative cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => e.key === 'Enter' && copyHex(shade, hex)}
+                className="flex-1 flex flex-col items-center justify-center py-5 px-1 transition-colors hover:opacity-80 relative cursor-pointer"
                 style={{ backgroundColor: hex, color: textColor }}
                 title={`${shade}: ${hex} (click to copy)`}
                 data-testid={`palette-swatch-${shade}`}
@@ -705,42 +854,54 @@ export default function PalettePage() {
                 <span className="text-[9px] font-mono opacity-50 mt-1">
                   {isCopied ? <Check className="w-3 h-3" /> : hex.toUpperCase()}
                 </span>
-              </button>
+              </div>
             )
           })}
         </div>
       </div>
 
       <div
-        className="rounded-xl p-6 transition-colors duration-300"
+        className="rounded-xl p-8 transition-colors duration-300"
         style={cssOverrides as React.CSSProperties}
       >
+        <p className="text-xs font-medium text-muted-foreground mb-6 uppercase tracking-wider">Examples</p>
         <div className="space-y-6">
-          <StatsPreview />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            <ButtonsAndBadges />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <HeroPreview shades={shades} />
+            <CategoriesPreview />
+            <BudgetPreview shades={shades} />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <NewsletterPreview />
+            <SchedulePreview shades={shades} />
             <ProfilePreview />
-            <TaskListPreview />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            <ProgressPreview />
-            <TeamPreview />
-            <TabsPreview />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <RevenueChartPreview shades={shades} />
+            <PricingPreview />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            <NotificationsPreview />
-            <FormPreview />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <TicketsPreview />
+            <ContinueWatchingPreview />
+          </div>
+
+          <EmailStatsPreview />
+
+          <FeatureCardsPreview />
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <ButtonShowcase />
             <CalendarPreview />
+            <div className="grid grid-cols-2 gap-6">
+              <BookCardPreview shades={shades} />
+              <StatsDonutPreview shades={shades} />
+            </div>
           </div>
 
-          <PricingPreview />
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <ActivityPreview />
-          </div>
         </div>
       </div>
     </div>
