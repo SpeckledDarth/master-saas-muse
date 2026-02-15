@@ -124,50 +124,46 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean): Record<
 
   if (dark) {
     return {
-      '--background': '0 0% 9%',
-      'backgroundColor': '#171717',
-      'color': shades['50'],
+      '--background': hexToHslString(shades['950']),
       '--foreground': hexToHslString(shades['50']),
-      '--card': hexToHslString(shades['900']),
+      '--card': '0 0% 9%',
       '--card-foreground': hexToHslString(shades['50']),
       '--card-border': hexToHslString(shades['700']),
       '--primary': hexToHslString(shades['400']),
       '--primary-foreground': hexToHslString(shades['950']),
       '--secondary': hexToHslString(shade850),
       '--secondary-foreground': hexToHslString(shades['100']),
-      '--muted': hexToHslString(shade850),
+      '--muted': '0 0% 13%',
       '--muted-foreground': hexToHslString(shades['300']),
-      '--accent': hexToHslString(shades['800']),
+      '--accent': '0 0% 15%',
       '--accent-foreground': hexToHslString(shades['100']),
       '--destructive': '0 62.8% 30.6%',
       '--destructive-foreground': hexToHslString(shades['50']),
-      '--border': hexToHslString(shade750),
-      '--input': hexToHslString(shades['700']),
+      '--border': '0 0% 18%',
+      '--input': '0 0% 18%',
       '--ring': hexToHslString(shades['400']),
       '--badge-outline': hexToHslString(shades['600']),
       'colorScheme': 'dark',
     }
   }
   return {
-    '--background': '0 0% 96%',
-    'backgroundColor': '#f5f5f5',
-    'color': shades['900'],
+    '--background': hexToHslString(shades['50']),
     '--foreground': hexToHslString(shades['900']),
     '--card': '0 0% 100%',
     '--card-foreground': hexToHslString(shades['900']),
-    '--card-border': hexToHslString(shades['200']),
+    '--card-border': '0 0% 88%',
     '--primary': hexToHslString(shades['600']),
     '--primary-foreground': '0 0% 100%',
-    '--secondary': hexToHslString(shades['100']),
+    '--secondary': '0 0% 95%',
     '--secondary-foreground': hexToHslString(shades['800']),
-    '--muted': hexToHslString(shades['100']),
+    '--muted': '0 0% 95%',
     '--muted-foreground': hexToHslString(shades['500']),
-    '--accent': hexToHslString(shades['50']),
+    '--accent': '0 0% 96%',
     '--accent-foreground': hexToHslString(shades['800']),
     '--destructive': '0 84.2% 60.2%',
     '--destructive-foreground': '0 0% 100%',
-    '--border': hexToHslString(shades['200']),
-    '--input': hexToHslString(shades['200']),
+    '--border': '0 0% 90%',
+    '--input': '0 0% 90%',
     '--ring': hexToHslString(shades['600']),
     '--badge-outline': hexToHslString(shades['200']),
     'colorScheme': 'light',
@@ -176,13 +172,13 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean): Record<
 
 function HeroPreview({ shades }: { shades: Record<string, string> }) {
   return (
-    <Card className="overflow-hidden border-0">
-      <div
-        className="p-8"
-        style={{
-          background: `linear-gradient(135deg, ${shades['600']}, ${shades['500']}, ${shades['400']})`,
-        }}
-      >
+    <Card
+      className="overflow-hidden border-0"
+      style={{
+        background: `linear-gradient(135deg, ${shades['600']}, ${shades['500']}, ${shades['400']})`,
+      }}
+    >
+      <div className="p-8">
         <div className="flex items-center gap-2 mb-4">
           <Zap className="w-5 h-5" style={{ color: shades['100'] }} />
           <Star className="w-4 h-4" style={{ color: `${shades['200']}99` }} />
@@ -222,10 +218,7 @@ function CategoriesPreview({ shades }: { shades: Record<string, string> }) {
         <div className="grid grid-cols-4 gap-4">
           {categories.map(c => (
             <div key={c.name} className="flex flex-col items-center gap-2">
-              <div
-                className="w-11 h-11 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: `${shades[c.shade]}20` }}
-              >
+              <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center">
                 <c.icon className="w-5 h-5" style={{ color: shades[c.shade] }} />
               </div>
               <span className="text-[10px] text-muted-foreground text-center leading-tight">{c.name}</span>
@@ -252,10 +245,7 @@ function BudgetPreview({ shades }: { shades: Record<string, string> }) {
         {items.map(item => (
           <div key={item.name} className="space-y-2">
             <div className="flex items-center gap-2">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                style={{ backgroundColor: `${shades[item.shade]}20` }}
-              >
+              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
                 <item.icon className="w-4 h-4" style={{ color: shades[item.shade] }} />
               </div>
               <div className="flex-1 min-w-0">
@@ -482,8 +472,8 @@ function TicketsPreview({ shades }: { shades: Record<string, string> }) {
           <div key={t.name} className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
               <AvatarFallback
-                className="text-xs"
-                style={{ backgroundColor: `${shades[t.shade]}25`, color: shades[t.shade] }}
+                className="text-xs bg-muted"
+                style={{ color: shades[t.shade] }}
               >{t.initials}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
@@ -574,10 +564,7 @@ function FeatureCardsPreview({ shades }: { shades: Record<string, string> }) {
         <div className="grid grid-cols-3 gap-4">
           {features.map(f => (
             <div key={f.title} className="rounded-lg border p-5 space-y-3">
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: `${shades[f.shade]}20` }}
-              >
+              <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
                 <f.icon className="w-5 h-5" style={{ color: shades[f.shade] }} />
               </div>
               <p className="text-sm font-semibold">{f.title}</p>
