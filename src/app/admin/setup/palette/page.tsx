@@ -176,15 +176,15 @@ function HeroPreview({ shades }: { shades: Record<string, string> }) {
       <div
         className="p-8"
         style={{
-          background: `linear-gradient(135deg, ${shades['700']}, ${shades['500']}, ${shades['400']})`,
+          background: `linear-gradient(135deg, ${shades['600']}, ${shades['500']}, ${shades['400']})`,
         }}
       >
         <div className="flex items-center gap-2 mb-4">
-          <Zap className="w-5 h-5 text-primary-foreground/90" />
-          <Star className="w-4 h-4 text-primary-foreground/60" />
+          <Zap className="w-5 h-5" style={{ color: shades['100'] }} />
+          <Star className="w-4 h-4" style={{ color: `${shades['200']}99` }} />
         </div>
-        <h3 className="text-2xl font-bold text-primary-foreground mb-2">Increase your revenue by 3x</h3>
-        <p className="text-sm text-primary-foreground/70 mb-6 max-w-xs">
+        <h3 className="text-2xl font-bold mb-2" style={{ color: shades['50'] }}>Increase your revenue by 3x</h3>
+        <p className="text-sm mb-6 max-w-xs" style={{ color: `${shades['100']}bb` }}>
           Our platform helps you close more deals and scale faster than ever.
         </p>
         <Button
