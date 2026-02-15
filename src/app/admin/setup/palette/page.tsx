@@ -90,6 +90,15 @@ function hexToHslString(hex: string): string {
   return `${h} ${s}% ${l}%`
 }
 
+function interpolateHex(hex1: string, hex2: string, t: number): string {
+  const [h1, s1, l1] = hexToHsl(hex1)
+  const [h2, s2, l2] = hexToHsl(hex2)
+  const h = Math.round(h1 + (h2 - h1) * t)
+  const s = Math.round(s1 + (s2 - s1) * t)
+  const l = Math.round(l1 + (l2 - l1) * t)
+  return hslToHex(h, s, l)
+}
+
 const presetPalettes = [
   { name: 'Indigo', color: '#6366f1' },
   { name: 'Blue', color: '#3b82f6' },
@@ -106,27 +115,30 @@ const presetPalettes = [
 const shadeKeys = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950']
 
 function getCssOverrides(shades: Record<string, string>, dark: boolean): Record<string, string> {
+  const shade850 = interpolateHex(shades['800'], shades['900'], 0.5)
+  const shade750 = interpolateHex(shades['700'], shades['800'], 0.5)
+
   if (dark) {
     return {
       '--background': hexToHslString(shades['950']),
-      '--foreground': hexToHslString(shades['100']),
+      '--foreground': hexToHslString(shades['50']),
       '--card': hexToHslString(shades['900']),
-      '--card-foreground': hexToHslString(shades['100']),
-      '--card-border': hexToHslString(shades['800']),
+      '--card-foreground': hexToHslString(shades['50']),
+      '--card-border': hexToHslString(shades['700']),
       '--primary': hexToHslString(shades['400']),
       '--primary-foreground': hexToHslString(shades['950']),
-      '--secondary': hexToHslString(shades['800']),
-      '--secondary-foreground': hexToHslString(shades['200']),
-      '--muted': hexToHslString(shades['800']),
-      '--muted-foreground': hexToHslString(shades['400']),
+      '--secondary': hexToHslString(shade850),
+      '--secondary-foreground': hexToHslString(shades['100']),
+      '--muted': hexToHslString(shade850),
+      '--muted-foreground': hexToHslString(shades['300']),
       '--accent': hexToHslString(shades['800']),
-      '--accent-foreground': hexToHslString(shades['200']),
+      '--accent-foreground': hexToHslString(shades['100']),
       '--destructive': '0 62.8% 30.6%',
-      '--destructive-foreground': hexToHslString(shades['100']),
-      '--border': hexToHslString(shades['800']),
-      '--input': hexToHslString(shades['800']),
+      '--destructive-foreground': hexToHslString(shades['50']),
+      '--border': hexToHslString(shade750),
+      '--input': hexToHslString(shades['700']),
       '--ring': hexToHslString(shades['400']),
-      '--badge-outline': hexToHslString(shades['700']),
+      '--badge-outline': hexToHslString(shades['600']),
       'colorScheme': 'dark',
     }
   }
@@ -135,14 +147,14 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean): Record<
     '--foreground': hexToHslString(shades['900']),
     '--card': '0 0% 100%',
     '--card-foreground': hexToHslString(shades['900']),
-    '--card-border': hexToHslString(shades['100']),
+    '--card-border': hexToHslString(shades['200']),
     '--primary': hexToHslString(shades['600']),
     '--primary-foreground': '0 0% 100%',
     '--secondary': hexToHslString(shades['100']),
     '--secondary-foreground': hexToHslString(shades['800']),
     '--muted': hexToHslString(shades['100']),
     '--muted-foreground': hexToHslString(shades['500']),
-    '--accent': hexToHslString(shades['100']),
+    '--accent': hexToHslString(shades['50']),
     '--accent-foreground': hexToHslString(shades['800']),
     '--destructive': '0 84.2% 60.2%',
     '--destructive-foreground': '0 0% 100%',
