@@ -124,7 +124,7 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean): Record<
 
   if (dark) {
     return {
-      '--background': hexToHslString(shades['950']),
+      '--background': '0 0% 9%',
       '--foreground': hexToHslString(shades['50']),
       '--card': hexToHslString(shades['900']),
       '--card-foreground': hexToHslString(shades['50']),
@@ -147,7 +147,7 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean): Record<
     }
   }
   return {
-    '--background': hexToHslString(shades['50']),
+    '--background': '0 0% 96%',
     '--foreground': hexToHslString(shades['900']),
     '--card': '0 0% 100%',
     '--card-foreground': hexToHslString(shades['900']),
@@ -198,16 +198,16 @@ function HeroPreview({ shades }: { shades: Record<string, string> }) {
   )
 }
 
-function CategoriesPreview() {
+function CategoriesPreview({ shades }: { shades: Record<string, string> }) {
   const categories = [
-    { name: 'Grocery', icon: ShoppingCart },
-    { name: 'Cafe', icon: Coffee },
-    { name: 'Utilities', icon: Wifi },
-    { name: 'Sport', icon: Dumbbell },
-    { name: 'Taxi', icon: Car },
-    { name: 'Health', icon: Pill },
-    { name: 'Telecom', icon: Phone },
-    { name: 'Gadgets', icon: Smartphone },
+    { name: 'Grocery', icon: ShoppingCart, shade: '400' },
+    { name: 'Cafe', icon: Coffee, shade: '500' },
+    { name: 'Utilities', icon: Wifi, shade: '600' },
+    { name: 'Sport', icon: Dumbbell, shade: '300' },
+    { name: 'Taxi', icon: Car, shade: '700' },
+    { name: 'Health', icon: Pill, shade: '500' },
+    { name: 'Telecom', icon: Phone, shade: '400' },
+    { name: 'Gadgets', icon: Smartphone, shade: '600' },
   ]
   return (
     <Card>
@@ -218,8 +218,11 @@ function CategoriesPreview() {
         <div className="grid grid-cols-4 gap-4">
           {categories.map(c => (
             <div key={c.name} className="flex flex-col items-center gap-2">
-              <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center">
-                <c.icon className="w-5 h-5 text-primary" />
+              <div
+                className="w-11 h-11 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: `${shades[c.shade]}20` }}
+              >
+                <c.icon className="w-5 h-5" style={{ color: shades[c.shade] }} />
               </div>
               <span className="text-[10px] text-muted-foreground text-center leading-tight">{c.name}</span>
             </div>
@@ -232,9 +235,9 @@ function CategoriesPreview() {
 
 function BudgetPreview({ shades }: { shades: Record<string, string> }) {
   const items = [
-    { name: 'Home Renovation', total: '$33,500', spent: '$19,500', remaining: '$14,000', pct: 58 },
-    { name: 'Education & Courses', total: '$40,000', spent: '$19,500', remaining: '$20,500', pct: 49 },
-    { name: 'Health & Wellness', total: '$5,500', spent: '$3,000', remaining: '$2,500', pct: 55 },
+    { name: 'Home Renovation', total: '$33,500', spent: '$19,500', remaining: '$14,000', pct: 58, icon: Briefcase, shade: '500' },
+    { name: 'Education & Courses', total: '$40,000', spent: '$19,500', remaining: '$20,500', pct: 49, icon: BookOpen, shade: '400' },
+    { name: 'Health & Wellness', total: '$5,500', spent: '$3,000', remaining: '$2,500', pct: 55, icon: Heart, shade: '600' },
   ]
   return (
     <Card>
@@ -245,8 +248,11 @@ function BudgetPreview({ shades }: { shades: Record<string, string> }) {
         {items.map(item => (
           <div key={item.name} className="space-y-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                <Heart className="w-4 h-4 text-primary" />
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                style={{ backgroundColor: `${shades[item.shade]}20` }}
+              >
+                <item.icon className="w-4 h-4" style={{ color: shades[item.shade] }} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
@@ -296,9 +302,9 @@ function NewsletterPreview() {
 
 function SchedulePreview({ shades }: { shades: Record<string, string> }) {
   const events = [
-    { time: '9:15', period: 'AM', title: 'Weekly Team Sync', desc: 'Quick check-in to align priorities and share updates for the week.' },
-    { time: '4:00', period: 'PM', title: 'Client Pitch Rehearsal', desc: 'Run through tomorrow\'s presentation and refine messaging with the team.' },
-    { time: '7:30', period: 'PM', title: 'Product Design Review', desc: 'Collaborative session to go over latest UI/UX proposals and feedback.' },
+    { time: '9:15', period: 'AM', title: 'Weekly Team Sync', desc: 'Quick check-in to align priorities and share updates for the week.', shade: '400' },
+    { time: '4:00', period: 'PM', title: 'Client Pitch Rehearsal', desc: 'Run through tomorrow\'s presentation and refine messaging with the team.', shade: '600' },
+    { time: '7:30', period: 'PM', title: 'Product Design Review', desc: 'Collaborative session to go over latest UI/UX proposals and feedback.', shade: '300' },
   ]
   return (
     <Card>
@@ -315,7 +321,7 @@ function SchedulePreview({ shades }: { shades: Record<string, string> }) {
             className="flex gap-4 rounded-lg border p-4"
           >
             <div className="shrink-0 text-center">
-              <p className="text-lg font-bold tabular-nums leading-tight" style={{ color: shades['400'] }}>{e.time}</p>
+              <p className="text-lg font-bold tabular-nums leading-tight" style={{ color: shades[e.shade] }}>{e.time}</p>
               <p className="text-[10px] font-medium text-muted-foreground">{e.period}</p>
             </div>
             <div className="flex-1 min-w-0">
@@ -337,7 +343,7 @@ function ProfilePreview() {
           src="/images/preview/profile.jpg"
           alt="Profile"
           fill
-          className="object-cover"
+          className="object-cover object-top"
           unoptimized
         />
       </div>
@@ -450,12 +456,12 @@ function PricingPreview() {
   )
 }
 
-function TicketsPreview() {
+function TicketsPreview({ shades }: { shades: Record<string, string> }) {
   const tickets = [
-    { name: 'Amy P.', status: 'Open', time: '23 min', initials: 'AP' },
-    { name: 'Sarah A.', status: 'Closed', time: '1 hour', initials: 'SA' },
-    { name: 'Jessica P.', status: 'Processing', time: '45 min', initials: 'JP' },
-    { name: 'James A.', status: 'Open', time: '2 days', initials: 'JA' },
+    { name: 'Amy P.', status: 'Open', time: '23 min', initials: 'AP', shade: '400' },
+    { name: 'Sarah A.', status: 'Closed', time: '1 hour', initials: 'SA', shade: '600' },
+    { name: 'Jessica P.', status: 'Processing', time: '45 min', initials: 'JP', shade: '500' },
+    { name: 'James A.', status: 'Open', time: '2 days', initials: 'JA', shade: '300' },
   ]
   const statusVariant = (s: string) => {
     if (s === 'Open') return 'default' as const
@@ -471,7 +477,10 @@ function TicketsPreview() {
         {tickets.map(t => (
           <div key={t.name} className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
-              <AvatarFallback className="text-xs">{t.initials}</AvatarFallback>
+              <AvatarFallback
+                className="text-xs"
+                style={{ backgroundColor: `${shades[t.shade]}25`, color: shades[t.shade] }}
+              >{t.initials}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium">{t.name}</p>
@@ -549,11 +558,11 @@ function EmailStatsPreview() {
   )
 }
 
-function FeatureCardsPreview() {
+function FeatureCardsPreview({ shades }: { shades: Record<string, string> }) {
   const features = [
-    { title: 'Manage team access', desc: 'Control permissions and approve content across your organization.', icon: Users },
-    { title: 'Notification settings', desc: 'Choose the alerts you receive and detailed reports in your inbox.', icon: Bell },
-    { title: 'Download reports', desc: 'Export your analytics and detailed reports in multiple formats.', icon: Download },
+    { title: 'Manage team access', desc: 'Control permissions and approve content across your organization.', icon: Users, shade: '500' },
+    { title: 'Notification settings', desc: 'Choose the alerts you receive and detailed reports in your inbox.', icon: Bell, shade: '400' },
+    { title: 'Download reports', desc: 'Export your analytics and detailed reports in multiple formats.', icon: Download, shade: '600' },
   ]
   return (
     <Card>
@@ -561,8 +570,11 @@ function FeatureCardsPreview() {
         <div className="grid grid-cols-3 gap-4">
           {features.map(f => (
             <div key={f.title} className="rounded-lg border p-5 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <f.icon className="w-5 h-5 text-primary" />
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: `${shades[f.shade]}20` }}
+              >
+                <f.icon className="w-5 h-5" style={{ color: shades[f.shade] }} />
               </div>
               <p className="text-sm font-semibold">{f.title}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
@@ -691,6 +703,60 @@ function BookCardPreview({ shades }: { shades: Record<string, string> }) {
           </Button>
         </div>
       </div>
+    </Card>
+  )
+}
+
+function BarChartPreview({ shades }: { shades: Record<string, string> }) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+  const series = [
+    { label: 'Income', shade: '400', values: [65, 80, 55, 90, 70, 85] },
+    { label: 'Expenses', shade: '600', values: [45, 50, 40, 55, 50, 60] },
+    { label: 'Savings', shade: '200', values: [20, 30, 15, 35, 20, 25] },
+  ]
+  const maxVal = 100
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
+        <div>
+          <CardTitle className="text-sm">Revenue</CardTitle>
+          <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-2xl font-bold tabular-nums" data-testid="text-barchart-revenue">$213,000</span>
+            <Badge variant="secondary" className="text-xs" data-testid="badge-barchart-growth">+16%</Badge>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 flex-wrap">
+          {series.map(s => (
+            <div key={s.label} className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: shades[s.shade] }} />
+              <span className="text-xs text-muted-foreground">{s.label}</span>
+            </div>
+          ))}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-lg bg-muted p-4" data-testid="chart-bar-container">
+          <div className="flex items-end gap-3 h-[140px]">
+            {months.map((month, mi) => (
+              <div key={month} className="flex-1 flex flex-col items-center gap-1">
+                <div className="flex items-end gap-0.5 w-full h-[120px]">
+                  {series.map(s => (
+                    <div
+                      key={s.label}
+                      className="flex-1 rounded-t-sm transition-all"
+                      style={{
+                        backgroundColor: shades[s.shade],
+                        height: `${(s.values[mi] / maxVal) * 100}%`,
+                      }}
+                    />
+                  ))}
+                </div>
+                <span className="text-[9px] text-muted-foreground">{month}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CardContent>
     </Card>
   )
 }
@@ -869,7 +935,7 @@ export default function PalettePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <HeroPreview shades={shades} />
-            <CategoriesPreview />
+            <CategoriesPreview shades={shades} />
             <BudgetPreview shades={shades} />
           </div>
 
@@ -884,14 +950,16 @@ export default function PalettePage() {
             <PricingPreview />
           </div>
 
+          <BarChartPreview shades={shades} />
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <TicketsPreview />
+            <TicketsPreview shades={shades} />
             <ContinueWatchingPreview />
           </div>
 
           <EmailStatsPreview />
 
-          <FeatureCardsPreview />
+          <FeatureCardsPreview shades={shades} />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <ButtonShowcase />
