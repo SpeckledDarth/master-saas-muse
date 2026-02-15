@@ -30,6 +30,10 @@ export interface BrandingSettings {
   heroPatternUrl?: string | null
   heroPatternOpacity?: number
   heroFloatingImageUrl?: string | null
+  headingFont?: string
+  bodyFont?: string
+  headingGradient?: boolean
+  logoDarkUrl?: string | null
 }
 
 export interface PricingPlan {

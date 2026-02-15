@@ -7,18 +7,43 @@ import { Palette, FileText, BookOpen, DollarSign, Globe, Settings, Save, Check, 
 import { SetupSettingsProvider, useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
-const coreSections = [
-  { id: 'branding', label: 'Branding', icon: Palette, href: '/admin/setup/branding' },
-  { id: 'content', label: 'Content', icon: FileText, href: '/admin/setup/content' },
-  { id: 'pages', label: 'Pages', icon: BookOpen, href: '/admin/setup/pages' },
-  { id: 'pricing', label: 'Pricing', icon: DollarSign, href: '/admin/setup/pricing' },
-  { id: 'social', label: 'Social', icon: Globe, href: '/admin/setup/social' },
-  { id: 'features', label: 'Features', icon: Settings, href: '/admin/setup/features' },
-  { id: 'compliance', label: 'Compliance', icon: Scale, href: '/admin/setup/compliance' },
-  { id: 'support', label: 'Support', icon: MessageCircle, href: '/admin/setup/support' },
-  { id: 'security', label: 'Security', icon: Shield, href: '/admin/setup/security' },
-  { id: 'integrations', label: 'Integrations', icon: KeyRound, href: '/admin/setup/integrations' },
-  { id: 'products', label: 'Products', icon: Package, href: '/admin/setup/products' },
+const sectionGroups = [
+  {
+    label: 'Brand Identity',
+    items: [
+      { id: 'branding', label: 'Branding', icon: Palette, href: '/admin/setup/branding' },
+    ],
+  },
+  {
+    label: 'Content',
+    items: [
+      { id: 'content', label: 'Homepage', icon: FileText, href: '/admin/setup/content' },
+      { id: 'pages', label: 'Pages', icon: BookOpen, href: '/admin/setup/pages' },
+    ],
+  },
+  {
+    label: 'Business',
+    items: [
+      { id: 'pricing', label: 'Pricing', icon: DollarSign, href: '/admin/setup/pricing' },
+      { id: 'products', label: 'Products', icon: Package, href: '/admin/setup/products' },
+    ],
+  },
+  {
+    label: 'Platform',
+    items: [
+      { id: 'features', label: 'Features', icon: Settings, href: '/admin/setup/features' },
+      { id: 'social', label: 'Social Links', icon: Globe, href: '/admin/setup/social' },
+      { id: 'support', label: 'Support', icon: MessageCircle, href: '/admin/setup/support' },
+      { id: 'integrations', label: 'Integrations', icon: KeyRound, href: '/admin/setup/integrations' },
+    ],
+  },
+  {
+    label: 'Legal & Security',
+    items: [
+      { id: 'compliance', label: 'Compliance', icon: Scale, href: '/admin/setup/compliance' },
+      { id: 'security', label: 'Security', icon: Shield, href: '/admin/setup/security' },
+    ],
+  },
 ]
 
 function SetupLayoutInner({ children }: { children: React.ReactNode }) {
@@ -34,7 +59,7 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-5xl">
+    <div className="py-8 px-6">
       <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-setup-title">Setup Dashboard</h1>
@@ -57,23 +82,33 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
       </div>
 
       <div className="flex gap-6">
-        <nav className="w-48 shrink-0">
-          <div className="space-y-1 sticky top-20">
-            {coreSections.map((section) => {
-              const isActive = pathname === section.href || (pathname === '/admin/setup' && section.id === 'branding')
-              return (
-                <Link key={section.id} href={section.href}>
-                  <Button
-                    variant={isActive ? 'secondary' : 'ghost'}
-                    className="w-full justify-start"
-                    data-testid={`tab-${section.id}`}
-                  >
-                    <section.icon className="h-4 w-4 mr-2" />
-                    {section.label}
-                  </Button>
-                </Link>
-              )
-            })}
+        <nav className="w-52 shrink-0">
+          <div className="space-y-5 sticky top-20">
+            {sectionGroups.map((group) => (
+              <div key={group.label}>
+                <div className="px-2 mb-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider" data-testid={`nav-group-${group.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                  {group.label}
+                </div>
+                <div className="space-y-0.5">
+                  {group.items.map((section) => {
+                    const isActive = pathname === section.href || (pathname === '/admin/setup' && section.id === 'branding')
+                    return (
+                      <Link key={section.id} href={section.href}>
+                        <Button
+                          variant={isActive ? 'secondary' : 'ghost'}
+                          size="sm"
+                          className="w-full justify-start"
+                          data-testid={`tab-${section.id}`}
+                        >
+                          <section.icon className="h-4 w-4 mr-2" />
+                          {section.label}
+                        </Button>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </nav>
 

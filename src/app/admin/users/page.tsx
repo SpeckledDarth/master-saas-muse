@@ -350,7 +350,7 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="py-8 px-6">
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

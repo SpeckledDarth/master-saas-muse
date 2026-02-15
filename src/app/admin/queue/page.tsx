@@ -152,7 +152,7 @@ export default function QueueDashboard() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="py-8 px-6">
       <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-queue-title">Job Queue</h1>

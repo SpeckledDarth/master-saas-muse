@@ -34,9 +34,9 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto space-y-12">
         <section>
           <Card>
-            <CardContent className="p-8">
-              <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2" data-testid="text-our-story">
-                <Heart className="h-6 w-6 text-primary" />
+            <CardContent className="p-4 md:p-8">
+              <h2 className="text-xl md:text-2xl font-semibold mb-4 flex items-center gap-2" data-testid="text-our-story">
+                <Heart className="h-6 w-6 text-primary flex-shrink-0" />
                 Our Story
               </h2>
               <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap" data-testid="text-about-story">
@@ -48,9 +48,9 @@ export default function AboutPage() {
 
         <section>
           <Card>
-            <CardContent className="p-8">
-              <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2" data-testid="text-our-mission">
-                <Target className="h-6 w-6 text-primary" />
+            <CardContent className="p-4 md:p-8">
+              <h2 className="text-xl md:text-2xl font-semibold mb-4 flex items-center gap-2" data-testid="text-our-mission">
+                <Target className="h-6 w-6 text-primary flex-shrink-0" />
                 Our Mission
               </h2>
               <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap" data-testid="text-about-mission">
@@ -65,7 +65,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-semibold mb-6 text-center" data-testid="text-our-values">
               Our Values
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {about.values.map((value, index) => (
                 <Card key={index} className="text-center hover-elevate">
                   <CardContent className="p-6">
@@ -82,7 +82,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-semibold mb-6 text-center" data-testid="text-team-headline">
               {about.teamHeadline || 'Meet Our Team'}
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {about.team.map((member) => (
                 <Card key={member.id} className="text-center hover-elevate">
                   <CardContent className="p-6">
@@ -119,8 +119,8 @@ export default function AboutPage() {
 
         <section className="text-center">
           <Card>
-            <CardContent className="p-8">
-              <h2 className="text-2xl font-semibold mb-4" data-testid="text-contact-cta">
+            <CardContent className="p-4 md:p-8">
+              <h2 className="text-xl md:text-2xl font-semibold mb-4" data-testid="text-contact-cta">
                 Want to learn more?
               </h2>
               <p className="text-muted-foreground mb-4">

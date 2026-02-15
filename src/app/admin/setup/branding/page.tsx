@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Palette } from 'lucide-react'
 import { ImageUpload } from '@/components/admin/image-upload'
+import { ColorPaletteBuilder } from '@/components/admin/color-palette-builder'
+import { FontPicker } from '@/components/admin/font-picker'
 
 export default function BrandingPage() {
   const { settings, saving, saved, handleSave, setSettings, updateBranding, updateContent, addNavItem, updateNavItem, removeNavItem } = useSetupSettingsContext()
@@ -82,14 +84,22 @@ export default function BrandingPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-3 gap-6">
             <ImageUpload
-              label="Logo"
+              label="Logo (Light Mode)"
               value={settings.branding.logoUrl}
               onChange={url => updateBranding('logoUrl', url)}
               folder="logos"
               aspectRatio="1/1"
               testId="logo-upload"
+            />
+            <ImageUpload
+              label="Logo (Dark Mode)"
+              value={settings.branding.logoDarkUrl ?? null}
+              onChange={url => updateBranding('logoDarkUrl', url)}
+              folder="logos"
+              aspectRatio="1/1"
+              testId="logo-dark-upload"
             />
             <ImageUpload
               label="Hero Image"
@@ -100,6 +110,9 @@ export default function BrandingPage() {
               testId="hero-upload"
             />
           </div>
+          <p className="text-xs text-muted-foreground">
+            Upload separate logos for light and dark modes. If only the light mode logo is set, it will be used for both.
+          </p>
 
           {settings.branding.logoUrl && (
             <div className="p-4 rounded-lg border bg-muted/30 space-y-4">
@@ -445,68 +458,26 @@ export default function BrandingPage() {
             <p className="text-xs text-muted-foreground">Adjust where the focal point of your image is positioned (0% = left/top, 100% = right/bottom)</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="primaryColor">Primary Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="primaryColor"
-                  type="color"
-                  value={settings.branding.primaryColor}
-                  onChange={e => updateBranding('primaryColor', e.target.value)}
-                  className="w-16 h-10 p-1 cursor-pointer"
-                  data-testid="input-primary-color"
-                />
-                <Input
-                  value={settings.branding.primaryColor}
-                  onChange={e => updateBranding('primaryColor', e.target.value)}
-                  placeholder="#6366f1"
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="accentColor">Accent Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="accentColor"
-                  type="color"
-                  value={settings.branding.accentColor}
-                  onChange={e => updateBranding('accentColor', e.target.value)}
-                  className="w-16 h-10 p-1 cursor-pointer"
-                  data-testid="input-accent-color"
-                />
-                <Input
-                  value={settings.branding.accentColor}
-                  onChange={e => updateBranding('accentColor', e.target.value)}
-                  placeholder="#8b5cf6"
-                  className="flex-1"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 rounded-lg border" style={{
-            background: `linear-gradient(135deg, ${settings.branding.primaryColor}20, ${settings.branding.accentColor}20)`
-          }}>
-            <p className="text-sm text-muted-foreground mb-2">Color Preview</p>
-            <div className="flex gap-4">
-              <div 
-                className="w-24 h-12 rounded-md flex items-center justify-center text-white text-sm font-medium"
-                style={{ backgroundColor: settings.branding.primaryColor }}
-              >
-                Primary
-              </div>
-              <div 
-                className="w-24 h-12 rounded-md flex items-center justify-center text-white text-sm font-medium"
-                style={{ backgroundColor: settings.branding.accentColor }}
-              >
-                Accent
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
+
+      <ColorPaletteBuilder
+        primaryColor={settings.branding.primaryColor}
+        accentColor={settings.branding.accentColor}
+        onPrimaryChange={(color) => updateBranding('primaryColor', color)}
+        onAccentChange={(color) => updateBranding('accentColor', color)}
+      />
+
+      <FontPicker
+        headingFont={settings.branding.headingFont || 'system'}
+        bodyFont={settings.branding.bodyFont || 'system'}
+        headingGradient={settings.branding.headingGradient ?? false}
+        primaryColor={settings.branding.primaryColor}
+        accentColor={settings.branding.accentColor}
+        onHeadingFontChange={(font) => updateBranding('headingFont', font)}
+        onBodyFontChange={(font) => updateBranding('bodyFont', font)}
+        onHeadingGradientChange={(enabled) => updateBranding('headingGradient', enabled)}
+      />
 
       <Card>
         <CardHeader>

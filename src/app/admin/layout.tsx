@@ -90,7 +90,7 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen">
       <nav className="border-b bg-card">
-        <div className="container mx-auto px-4">
+        <div className="px-6">
           <div className="flex items-center gap-6 h-14">
             <Button 
               variant={pathname === '/admin' ? 'secondary' : 'ghost'} 

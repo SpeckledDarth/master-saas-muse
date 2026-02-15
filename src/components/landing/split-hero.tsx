@@ -60,8 +60,8 @@ export function SplitHero({
           style={{ gap: `${gapPx}px` }}
           data-gap={gap}
         >
-          <div className="space-y-6 max-w-lg">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+          <div className="space-y-6 max-w-lg text-center md:text-left">
+            <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold leading-tight">
               {animatedWords.length > 0 ? (
                 <AnimatedWords words={animatedWords} className="text-primary" />
               ) : (
@@ -76,7 +76,7 @@ export function SplitHero({
             )}
             
             {(primaryButtonText || secondaryButtonText) && (
-              <div className="flex flex-wrap gap-4 pt-4">
+              <div className="flex flex-wrap gap-4 pt-4 justify-center md:justify-start">
                 {primaryButtonText && primaryButtonLink && (
                   <Button size="lg" asChild data-testid="button-split-hero-primary">
                     <Link href={primaryButtonLink}>
@@ -98,7 +98,7 @@ export function SplitHero({
           
           <div>
             <div 
-              className="relative rounded-xl overflow-hidden shadow-2xl"
+              className="relative rounded-xl overflow-hidden shadow-2xl w-full max-w-[90vw] md:max-w-none mx-auto max-h-[250px] md:max-h-none"
               style={{ height: `${imageHeight}px`, width: 'auto', aspectRatio: '4/3' }}
             >
               {imageUrl ? (

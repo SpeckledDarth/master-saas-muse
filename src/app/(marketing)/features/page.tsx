@@ -21,8 +21,8 @@ export default function FeaturesPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4" data-testid="text-features-title">
+      <div className="text-center mb-8 md:mb-12">
+        <h1 className="text-3xl md:text-4xl font-bold mb-4" data-testid="text-features-title">
           Features
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto" data-testid="text-features-subtitle">
@@ -30,7 +30,7 @@ export default function FeaturesPage() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         <Card className="hover-elevate" data-testid="card-feature-speed">
           <CardHeader>
             <Zap className="h-10 w-10 text-foreground mb-2" />

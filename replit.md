@@ -52,7 +52,13 @@ These rules minimize git merge conflicts when pulling MuseKit core updates into 
 The project utilizes Next.js 16+ (App Router), React 18+, and TypeScript, with Tailwind CSS, shadcn/ui, and next-themes for styling. TanStack Query manages server state. Supabase provides PostgreSQL, authentication, RLS, and storage, supporting multi-tenancy. Deployment is exclusively on Vercel.
 
 **UI/UX Decisions:**
-The UI emphasizes dynamic branding, configurable navigation, customizable sections (hero, logo marquee, animated counters, testimonial carousels), dark/light mode, and a comprehensive admin dashboard for metrics, user management, and detailed setup configurations.
+The UI emphasizes dynamic branding, configurable navigation, customizable sections (hero, logo marquee, animated counters, testimonial carousels), dark/light mode, and a comprehensive admin dashboard for metrics, user management, and detailed setup configurations. Admin dashboard uses full-width layout (px-6 padding, no container constraints). Setup navigation is organized into task-based groups (Brand Identity, Content, Business, Platform, Legal & Security) with visual group labels. All marketing/public pages are fully responsive with mobile hamburger menu in the header.
+
+**Branding Features:**
+- Coolors-style color palette builder (`src/components/admin/color-palette-builder.tsx`): Pick base colors, auto-generates Tailwind shade scales (50-950), includes preset palettes, randomize, copy-to-clipboard swatches, and live light/dark mode preview
+- Font picker (`src/components/admin/font-picker.tsx`): 20 curated Google Fonts (sans-serif, serif, mono), separate heading/body font selection, gradient text option for headings, live preview with dynamic Google Fonts loading
+- Light/dark mode logo variants: `logoDarkUrl` field in BrandingSettings, header swaps logos based on resolved theme via `next-themes`, separate upload slots in branding admin
+- Logo container supports wide wordmark-style logos (8:1 aspect ratio max, up from 4:1)
 
 **Technical Implementations:**
 - **Authentication**: Supports email/password and multiple OAuth providers, protected routes, and profile management. Includes SSO/SAML enterprise authentication with an admin dashboard.

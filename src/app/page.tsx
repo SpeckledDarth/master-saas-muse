@@ -58,10 +58,10 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen">
-        <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden bg-muted/50">
+        <section className="relative min-h-[400px] md:min-h-[600px] flex items-center justify-center overflow-hidden bg-muted/50">
           <div className="relative z-10 container mx-auto px-4 text-center">
-            <div className="h-16 w-64 mx-auto mb-6 bg-muted animate-pulse rounded" />
-            <div className="h-8 w-96 mx-auto mb-8 bg-muted animate-pulse rounded" />
+            <div className="h-12 md:h-16 w-48 md:w-64 mx-auto mb-6 bg-muted animate-pulse rounded" />
+            <div className="h-6 md:h-8 w-64 md:w-96 mx-auto mb-8 bg-muted animate-pulse rounded" />
             <div className="flex gap-4 justify-center">
               <div className="h-12 w-36 bg-muted animate-pulse rounded" />
               <div className="h-12 w-36 bg-muted animate-pulse rounded" />
@@ -173,7 +173,7 @@ export default function HomePage() {
       }
       
       return (
-        <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden" data-testid="section-hero-video">
+        <section className="relative min-h-[400px] md:min-h-[600px] flex items-center justify-center overflow-hidden" data-testid="section-hero-video">
           <div className="absolute inset-0">
             {isYoutube || isVimeo ? (
               <iframe
@@ -203,7 +203,7 @@ export default function HomePage() {
 
     if (heroStyle === 'pattern') {
       return (
-        <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden" data-testid="section-hero-pattern">
+        <section className="relative min-h-[400px] md:min-h-[600px] flex items-center justify-center overflow-hidden" data-testid="section-hero-pattern">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background to-accent/30" />
           {heroPatternUrl && (
             <div 
@@ -223,12 +223,12 @@ export default function HomePage() {
       const floatingGap = settings?.content?.floatingHeroGap ?? 8
       const floatingImageHeight = settings?.content?.floatingHeroImageHeight ?? 400
       return (
-        <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden" data-testid="section-hero-floating">
+        <section className="relative min-h-[400px] md:min-h-[600px] flex items-center justify-center overflow-hidden" data-testid="section-hero-floating">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/30" />
           <div className="relative z-10 container mx-auto px-4 flex justify-center">
             <div className="grid grid-cols-1 md:grid-cols-[auto_auto] items-center" style={{ gap: `${floatingGap * 4}px` }}>
-              <div className="text-left space-y-6 max-w-lg">
-                <h1 className="text-4xl md:text-6xl font-bold">
+              <div className="text-center md:text-left space-y-6 max-w-lg">
+                <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold">
                   {heroAnimatedWords.length > 0 ? (
                     <AnimatedWords words={heroAnimatedWords} className="text-primary" />
                   ) : (
@@ -238,7 +238,7 @@ export default function HomePage() {
                 <p className="text-xl md:text-2xl text-muted-foreground">
                   <AppTagline />
                 </p>
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                   <Button size="lg" asChild data-testid="button-get-started">
                     <Link href="/signup">
                       Get Started Free
@@ -253,7 +253,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="relative">
-                <div className="relative animate-float" style={{ height: `${floatingImageHeight}px`, aspectRatio: '4/3' }}>
+                <div className="relative animate-float w-full max-w-[90vw] md:max-w-none" style={{ height: `${floatingImageHeight}px`, aspectRatio: '4/3' }}>
                   <Image
                     src={heroFloatingImageUrl}
                     alt="Product mockup"
@@ -272,7 +272,7 @@ export default function HomePage() {
 
     return (
       <section 
-        className="relative min-h-[600px] flex items-center justify-center overflow-hidden"
+        className="relative min-h-[400px] md:min-h-[600px] flex items-center justify-center overflow-hidden"
         data-testid="section-hero"
       >
         {heroImageUrl && (
@@ -318,9 +318,9 @@ export default function HomePage() {
       )}
 
       {featuresEnabled && (content?.featureCards?.length ?? 0) > 0 && (
-        <section className={`py-20 ${getSectionBg('features') || 'bg-muted/50'}`} data-testid="section-features">
+        <section className={`py-12 md:py-20 ${getSectionBg('features') || 'bg-muted/50'}`} data-testid="section-features">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">
               {content?.featuresHeadline || 'Everything you need'}
             </h2>
             {content?.featuresSubheadline && (
@@ -328,7 +328,7 @@ export default function HomePage() {
                 {content.featuresSubheadline}
               </p>
             )}
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {content?.featureCards?.map((card) => (
                 <FeatureCard
                   key={card.id}
@@ -349,12 +349,12 @@ export default function HomePage() {
             headline={content?.testimonialsHeadline}
           />
         ) : (
-          <section className={`py-20 ${getSectionBg('testimonials')}`} data-testid="section-testimonials">
+          <section className={`py-12 md:py-20 ${getSectionBg('testimonials')}`} data-testid="section-testimonials">
             <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
                 {content?.testimonialsHeadline || 'What our customers say'}
               </h2>
-              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
                 {content?.testimonials?.map((testimonial) => (
                   <TestimonialCard
                     key={testimonial.id}
@@ -387,9 +387,9 @@ export default function HomePage() {
       )}
 
       {faqEnabled && (content?.faqItems?.length ?? 0) > 0 && (
-        <section className={`py-20 ${getSectionBg('faq') || 'bg-muted/50'}`} data-testid="section-faq">
+        <section className={`py-12 md:py-20 ${getSectionBg('faq') || 'bg-muted/50'}`} data-testid="section-faq">
           <div className="container mx-auto px-4 max-w-3xl">
-            <h2 className="text-3xl font-bold text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
               {content?.faqHeadline || 'Frequently asked questions'}
             </h2>
             <div className="space-y-4">
@@ -406,9 +406,9 @@ export default function HomePage() {
       )}
 
       {ctaEnabled && (
-        <section className={`py-20 ${getSectionBg('cta')}`} data-testid="section-cta">
+        <section className={`py-12 md:py-20 ${getSectionBg('cta')}`} data-testid="section-cta">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6">
               {content?.cta?.headline || 'Ready to get started?'}
             </h2>
             <p className="text-muted-foreground mb-8 max-w-xl mx-auto">

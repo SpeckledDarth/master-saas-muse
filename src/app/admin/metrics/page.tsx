@@ -82,7 +82,7 @@ export default function MetricsPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto py-8 px-4">
+      <div className="py-8 px-6">
         <Card>
           <CardContent className="flex items-center justify-center min-h-[200px]">
             <p className="text-muted-foreground" data-testid="text-metrics-error">{error}</p>
@@ -144,7 +144,7 @@ export default function MetricsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-6">
+    <div className="py-8 px-6 space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-metrics-title">Metrics Dashboard</h1>

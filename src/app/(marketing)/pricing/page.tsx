@@ -95,7 +95,7 @@ export default function PricingPage() {
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
           <p className="text-muted-foreground mb-12 flex items-center justify-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading pricing plans...
@@ -166,7 +166,7 @@ export default function PricingPage() {
         (() => {
           const totalCards = sortedStripeProducts.length + (pricing?.showFreePlan !== false ? 1 : 0)
           const layout = pricing?.cardLayout || 'auto'
-          const colsClass = layout === '2' ? 'md:grid-cols-2' : layout === '3' ? 'md:grid-cols-3' : layout === '4' ? 'md:grid-cols-4' : totalCards <= 2 ? 'md:grid-cols-2' : totalCards === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'
+          const colsClass = layout === '2' ? 'md:grid-cols-2' : layout === '3' ? 'md:grid-cols-2 lg:grid-cols-3' : layout === '4' ? 'md:grid-cols-2 lg:grid-cols-4' : totalCards <= 2 ? 'md:grid-cols-2' : totalCards === 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'
           return (
             <div className={`grid gap-8 max-w-6xl mx-auto ${colsClass}`}>
               {pricing?.showFreePlan !== false && (
@@ -264,7 +264,7 @@ export default function PricingPage() {
           )
         })()
       ) : (
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
           {(pricing?.plans || []).map((plan) => {
             const displayPrice = billingInterval === 'year' 
               ? Math.round(plan.price * 12 * 0.8) 

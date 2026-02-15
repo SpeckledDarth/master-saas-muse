@@ -6,12 +6,17 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { NotificationBell } from '@/components/notification-bell'
 import { UserNav } from '@/components/auth/UserNav'
 import { useSettings } from '@/hooks/use-settings'
+import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { Menu } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet'
 
 export function Header() {
   const { settings, loading } = useSettings()
   const branding = settings?.branding
+  const { resolvedTheme } = useTheme()
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -85,12 +90,13 @@ export function Header() {
               )}
               style={{ 
                 height: effectiveLogoHeight,
+                maxWidth: effectiveLogoHeight * 8,
               }}
             >
               <Image 
-                src={branding.logoUrl} 
+                src={(resolvedTheme === 'dark' && branding.logoDarkUrl) ? branding.logoDarkUrl : branding.logoUrl} 
                 alt={branding.appName || 'Logo'}
-                width={effectiveLogoHeight * 4}
+                width={effectiveLogoHeight * 8}
                 height={effectiveLogoHeight}
                 className={cn(
                   "h-full w-auto object-contain transition-all duration-200",
@@ -148,6 +154,66 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden" data-testid="button-mobile-menu">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[280px] p-0">
+              <div className="flex flex-col h-full">
+                <div className="p-4 border-b">
+                  <Link href="/" className="flex items-center space-x-2" data-testid="link-mobile-home">
+                    {branding?.logoUrl ? (
+                      <Image
+                        src={(resolvedTheme === 'dark' && branding.logoDarkUrl) ? branding.logoDarkUrl : branding.logoUrl}
+                        alt={branding.appName || 'Logo'}
+                        width={120}
+                        height={32}
+                        className="h-8 w-auto object-contain"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="font-bold text-lg">{branding?.appName || 'App'}</span>
+                    )}
+                  </Link>
+                </div>
+                <nav className="flex-1 p-4 space-y-1">
+                  {settings?.navigation?.items?.filter(item => item.enabled).map(item => (
+                    <SheetClose asChild key={item.id}>
+                      <Link
+                        href={item.href}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover-elevate"
+                        data-testid={`link-mobile-nav-${item.id}`}
+                      >
+                        {item.label}
+                        {item.badge && (
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                            item.badge === 'new' ? 'bg-green-500/20 text-green-600 dark:text-green-400' :
+                            item.badge === 'beta' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' :
+                            'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                          }`}>
+                            {item.badge === 'new' ? 'New' : item.badge === 'beta' ? 'Beta' : 'Soon'}
+                          </span>
+                        )}
+                      </Link>
+                    </SheetClose>
+                  ))}
+                  {settings?.pages?.customPages?.filter(p => p.enabled && p.name && p.slug).map(page => (
+                    <SheetClose asChild key={page.id}>
+                      <Link
+                        href={`/p/${page.slug}`}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover-elevate"
+                        data-testid={`link-mobile-custom-${page.slug}`}
+                      >
+                        {page.name}
+                      </Link>
+                    </SheetClose>
+                  ))}
+                </nav>
+              </div>
+            </SheetContent>
+          </Sheet>
           <NotificationBell />
           <ThemeToggle />
           <UserNav />
