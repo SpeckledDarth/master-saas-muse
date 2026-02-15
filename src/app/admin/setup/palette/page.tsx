@@ -927,7 +927,7 @@ export default function PalettePage() {
       </div>
 
       <div
-        className="rounded-xl p-8 transition-colors duration-300"
+        className="rounded-xl p-8 transition-colors duration-300 bg-background text-foreground"
         style={cssOverrides as React.CSSProperties}
       >
         <p className="text-xs font-medium text-muted-foreground mb-6 uppercase tracking-wider">Examples</p>
