@@ -10,8 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Palette } from 'lucide-react'
 import { ImageUpload } from '@/components/admin/image-upload'
-import { ColorPaletteBuilder } from '@/components/admin/color-palette-builder'
 import { FontPicker } from '@/components/admin/font-picker'
+import Link from 'next/link'
+import { Paintbrush } from 'lucide-react'
 
 export default function BrandingPage() {
   const { settings, saving, saved, handleSave, setSettings, updateBranding, updateContent, addNavItem, updateNavItem, removeNavItem } = useSetupSettingsContext()
@@ -84,7 +85,7 @@ export default function BrandingPage() {
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             <ImageUpload
               label="Logo (Light Mode)"
               value={settings.branding.logoUrl}
@@ -102,6 +103,14 @@ export default function BrandingPage() {
               testId="logo-dark-upload"
             />
             <ImageUpload
+              label="Icon (Mobile)"
+              value={settings.branding.logoIconUrl ?? null}
+              onChange={url => updateBranding('logoIconUrl', url)}
+              folder="logos"
+              aspectRatio="1/1"
+              testId="logo-icon-upload"
+            />
+            <ImageUpload
               label="Hero Image"
               value={settings.branding.heroImageUrl}
               onChange={url => updateBranding('heroImageUrl', url)}
@@ -111,7 +120,7 @@ export default function BrandingPage() {
             />
           </div>
           <p className="text-xs text-muted-foreground">
-            Upload separate logos for light and dark modes. If only the light mode logo is set, it will be used for both.
+            Upload separate logos for light and dark modes. The icon is shown on mobile screens instead of the full wordmark. If only the light mode logo is set, it will be used for both.
           </p>
 
           {settings.branding.logoUrl && (
@@ -461,12 +470,24 @@ export default function BrandingPage() {
         </CardContent>
       </Card>
 
-      <ColorPaletteBuilder
-        primaryColor={settings.branding.primaryColor}
-        accentColor={settings.branding.accentColor}
-        onPrimaryChange={(color) => updateBranding('primaryColor', color)}
-        onAccentChange={(color) => updateBranding('accentColor', color)}
-      />
+      <Card>
+        <CardContent className="flex items-center justify-between py-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-md" style={{ backgroundColor: settings.branding.primaryColor }}>
+              <Paintbrush className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-medium">Color Palette</p>
+              <p className="text-xs text-muted-foreground">Pick your brand color and preview it across real UI components</p>
+            </div>
+          </div>
+          <Link href="/admin/setup/palette">
+            <Button variant="outline" size="sm" data-testid="link-palette-page">
+              Open Palette Builder
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
 
       <FontPicker
         headingFont={settings.branding.headingFont || 'system'}
@@ -478,162 +499,6 @@ export default function BrandingPage() {
         onBodyFontChange={(font) => updateBranding('bodyFont', font)}
         onHeadingGradientChange={(enabled) => updateBranding('headingGradient', enabled)}
       />
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Palette className="h-5 w-5" />
-            Light Mode Theme <InfoTooltip text="Fine-tune the color palette visitors see in light mode. Changes apply across all pages." />
-          </CardTitle>
-          <CardDescription>Customize colors for light mode</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Background</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={settings.branding.lightTheme?.background || '#ffffff'}
-                  onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, background: e.target.value })}
-                  className="w-16 h-10 p-1 cursor-pointer"
-                />
-                <Input
-                  value={settings.branding.lightTheme?.background || '#ffffff'}
-                  onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, background: e.target.value })}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Text Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={settings.branding.lightTheme?.foreground || '#0a0a0a'}
-                  onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, foreground: e.target.value })}
-                  className="w-16 h-10 p-1 cursor-pointer"
-                />
-                <Input
-                  value={settings.branding.lightTheme?.foreground || '#0a0a0a'}
-                  onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, foreground: e.target.value })}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Card Background</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={settings.branding.lightTheme?.card || '#ffffff'}
-                  onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, card: e.target.value })}
-                  className="w-16 h-10 p-1 cursor-pointer"
-                />
-                <Input
-                  value={settings.branding.lightTheme?.card || '#ffffff'}
-                  onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, card: e.target.value })}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Border Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={settings.branding.lightTheme?.border || '#e5e5e5'}
-                  onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, border: e.target.value })}
-                  className="w-16 h-10 p-1 cursor-pointer"
-                />
-                <Input
-                  value={settings.branding.lightTheme?.border || '#e5e5e5'}
-                  onChange={e => updateBranding('lightTheme', { ...settings.branding.lightTheme, border: e.target.value })}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Palette className="h-5 w-5" />
-            Dark Mode Theme <InfoTooltip text="Fine-tune the color palette visitors see in dark mode. Defaults work well for most apps." />
-          </CardTitle>
-          <CardDescription>Customize colors for dark mode</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Background</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={settings.branding.darkTheme?.background || '#09090b'}
-                  onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, background: e.target.value })}
-                  className="w-16 h-10 p-1 cursor-pointer"
-                />
-                <Input
-                  value={settings.branding.darkTheme?.background || '#09090b'}
-                  onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, background: e.target.value })}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Text Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={settings.branding.darkTheme?.foreground || '#fafafa'}
-                  onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, foreground: e.target.value })}
-                  className="w-16 h-10 p-1 cursor-pointer"
-                />
-                <Input
-                  value={settings.branding.darkTheme?.foreground || '#fafafa'}
-                  onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, foreground: e.target.value })}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Card Background</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={settings.branding.darkTheme?.card || '#0a0a1a'}
-                  onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, card: e.target.value })}
-                  className="w-16 h-10 p-1 cursor-pointer"
-                />
-                <Input
-                  value={settings.branding.darkTheme?.card || '#0a0a1a'}
-                  onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, card: e.target.value })}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Border Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={settings.branding.darkTheme?.border || '#2a2a3e'}
-                  onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, border: e.target.value })}
-                  className="w-16 h-10 p-1 cursor-pointer"
-                />
-                <Input
-                  value={settings.branding.darkTheme?.border || '#2a2a3e'}
-                  onChange={e => updateBranding('darkTheme', { ...settings.branding.darkTheme, border: e.target.value })}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       <Card>
         <CardHeader>

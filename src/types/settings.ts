@@ -34,6 +34,7 @@ export interface BrandingSettings {
   bodyFont?: string
   headingGradient?: boolean
   logoDarkUrl?: string | null
+  logoIconUrl?: string | null
 }
 
 export interface PricingPlan {

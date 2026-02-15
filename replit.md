@@ -55,9 +55,12 @@ The project utilizes Next.js 16+ (App Router), React 18+, and TypeScript, with T
 The UI emphasizes dynamic branding, configurable navigation, customizable sections (hero, logo marquee, animated counters, testimonial carousels), dark/light mode, and a comprehensive admin dashboard for metrics, user management, and detailed setup configurations. Admin dashboard uses full-width layout (px-6 padding, no container constraints). Setup navigation is organized into task-based groups (Brand Identity, Content, Business, Platform, Legal & Security) with visual group labels. All marketing/public pages are fully responsive with mobile hamburger menu in the header.
 
 **Branding Features:**
-- Coolors-style color palette builder (`src/components/admin/color-palette-builder.tsx`): Pick base colors, auto-generates Tailwind shade scales (50-950), includes preset palettes, randomize, copy-to-clipboard swatches, and live light/dark mode preview
+- Dedicated Color Palette page (`/admin/setup/palette`, `src/app/admin/setup/palette/page.tsx`): Coolors.co-inspired full page with single base color input, auto-generated Tailwind shade scale (50-950), Light/Dark toggle, 10 preset palettes, randomize. Features 16 live UI preview components (hero, categories, budget, newsletter, schedule, profile, revenue chart, pricing plans, tickets, courses, stats, feature cards, button states, calendar, book card, donut chart) all dynamically colored from the shade scale. Shade roles auto-assigned: light mode uses 50-100 for backgrounds and 600-900 for text, dark mode uses 900-950 for backgrounds and 100-300 for text.
+- Old inline color palette builder still exists (`src/components/admin/color-palette-builder.tsx`) but removed from branding page in favor of the dedicated palette page
+- Light/dark theme fine-tuning controls removed from branding page (automated by palette shade assignment)
 - Font picker (`src/components/admin/font-picker.tsx`): 20 curated Google Fonts (sans-serif, serif, mono), separate heading/body font selection, gradient text option for headings, live preview with dynamic Google Fonts loading
 - Light/dark mode logo variants: `logoDarkUrl` field in BrandingSettings, header swaps logos based on resolved theme via `next-themes`, separate upload slots in branding admin
+- Mobile icon logo variant: `logoIconUrl` field in BrandingSettings, header shows compact icon on mobile (`md:hidden`), full wordmark on desktop (`hidden md:block`), separate upload slot in branding admin
 - Logo container supports wide wordmark-style logos (8:1 aspect ratio max, up from 4:1)
 
 **Technical Implementations:**

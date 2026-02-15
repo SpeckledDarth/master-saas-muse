@@ -83,28 +83,52 @@ export function Header() {
           data-testid="link-home"
         >
           {branding?.logoUrl ? (
-            <div 
-              className={cn(
-                "relative transition-all duration-200 flex-shrink-0",
-                logoHoverEffect && "group-hover:scale-110"
+            <>
+              {branding.logoIconUrl && (
+                <div 
+                  className={cn(
+                    "relative transition-all duration-200 flex-shrink-0 md:hidden",
+                    logoHoverEffect && "group-hover:scale-110"
+                  )}
+                  style={{ height: Math.min(effectiveLogoHeight, 36) }}
+                >
+                  <Image 
+                    src={branding.logoIconUrl} 
+                    alt={branding.appName || 'Logo'}
+                    width={Math.min(effectiveLogoHeight, 36)}
+                    height={Math.min(effectiveLogoHeight, 36)}
+                    className={cn(
+                      "h-full w-auto object-contain transition-all duration-200",
+                      logoHoverEffect && "group-hover:drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]"
+                    )}
+                    unoptimized
+                  />
+                </div>
               )}
-              style={{ 
-                height: effectiveLogoHeight,
-                maxWidth: effectiveLogoHeight * 8,
-              }}
-            >
-              <Image 
-                src={(resolvedTheme === 'dark' && branding.logoDarkUrl) ? branding.logoDarkUrl : branding.logoUrl} 
-                alt={branding.appName || 'Logo'}
-                width={effectiveLogoHeight * 8}
-                height={effectiveLogoHeight}
+              <div 
                 className={cn(
-                  "h-full w-auto object-contain transition-all duration-200",
-                  logoHoverEffect && "group-hover:drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]"
+                  "relative transition-all duration-200 flex-shrink-0",
+                  logoHoverEffect && "group-hover:scale-110",
+                  branding.logoIconUrl ? "hidden md:block" : ""
                 )}
-                unoptimized
-              />
-            </div>
+                style={{ 
+                  height: effectiveLogoHeight,
+                  maxWidth: effectiveLogoHeight * 8,
+                }}
+              >
+                <Image 
+                  src={(resolvedTheme === 'dark' && branding.logoDarkUrl) ? branding.logoDarkUrl : branding.logoUrl} 
+                  alt={branding.appName || 'Logo'}
+                  width={effectiveLogoHeight * 8}
+                  height={effectiveLogoHeight}
+                  className={cn(
+                    "h-full w-auto object-contain transition-all duration-200",
+                    logoHoverEffect && "group-hover:drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]"
+                  )}
+                  unoptimized
+                />
+              </div>
+            </>
           ) : (
             <span 
               className={cn(
