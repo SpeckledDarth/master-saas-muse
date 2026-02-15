@@ -94,16 +94,20 @@ const shadeKeys = ['50', '100', '200', '300', '400', '500', '600', '700', '800',
 interface ThemeColors {
   bg: string
   surface: string
+  surfaceAlt: string
   border: string
   text: string
   textSecondary: string
+  textTertiary: string
   accent: string
+  accentSoft: string
   btnPrimary: string
   btnPrimaryText: string
   softBadgeBg: string
   softBadgeText: string
   progressTrack: string
   progressBar: string
+  shadow: string
 }
 
 function getThemeColors(shades: Record<string, string>, dark: boolean): ThemeColors {
@@ -111,39 +115,51 @@ function getThemeColors(shades: Record<string, string>, dark: boolean): ThemeCol
     return {
       bg: shades['950'],
       surface: shades['900'],
-      border: shades['800'],
-      text: shades['50'],
+      surfaceAlt: shades['800'],
+      border: `${shades['700']}40`,
+      text: shades['100'],
       textSecondary: shades['300'],
+      textTertiary: shades['400'],
       accent: shades['400'],
+      accentSoft: `${shades['400']}18`,
       btnPrimary: shades['500'],
       btnPrimaryText: getContrastText(shades['500']),
-      softBadgeBg: shades['800'],
-      softBadgeText: shades['200'],
-      progressTrack: shades['800'],
+      softBadgeBg: `${shades['400']}20`,
+      softBadgeText: shades['300'],
+      progressTrack: `${shades['500']}20`,
       progressBar: shades['400'],
+      shadow: 'none',
     }
   }
   return {
     bg: shades['50'],
     surface: '#ffffff',
-    border: shades['100'],
+    surfaceAlt: shades['50'],
+    border: `${shades['200']}60`,
     text: shades['900'],
-    textSecondary: shades['600'],
+    textSecondary: shades['500'],
+    textTertiary: shades['400'],
     accent: shades['500'],
+    accentSoft: `${shades['500']}10`,
     btnPrimary: shades['500'],
     btnPrimaryText: getContrastText(shades['500']),
-    softBadgeBg: shades['100'],
-    softBadgeText: shades['700'],
-    progressTrack: shades['100'],
+    softBadgeBg: `${shades['500']}10`,
+    softBadgeText: shades['600'],
+    progressTrack: `${shades['500']}12`,
     progressBar: shades['500'],
+    shadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03)',
   }
 }
 
 function PreviewPanel({ children, theme, className = '' }: { children: React.ReactNode, theme: ThemeColors, className?: string }) {
   return (
     <div
-      className={cn('rounded-lg overflow-hidden', className)}
-      style={{ backgroundColor: theme.surface, border: `1px solid ${theme.border}` }}
+      className={cn('rounded-2xl overflow-hidden transition-all duration-200', className)}
+      style={{
+        backgroundColor: theme.surface,
+        boxShadow: theme.shadow,
+        border: `1px solid ${theme.border}`,
+      }}
     >
       {children}
     </div>
@@ -153,18 +169,20 @@ function PreviewPanel({ children, theme, className = '' }: { children: React.Rea
 function HeroCard({ shades }: { shades: Record<string, string> }) {
   return (
     <div
-      className="rounded-lg p-6 flex flex-col gap-3"
-      style={{ background: `linear-gradient(135deg, ${shades['700']}, ${shades['500']})` }}
+      className="rounded-2xl p-7 flex flex-col gap-4"
+      style={{ background: `linear-gradient(135deg, ${shades['600']}, ${shades['500']}, ${shades['400']})` }}
     >
-      <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
+      <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
         <TrendingUp className="w-5 h-5" style={{ color: '#ffffff' }} />
       </div>
-      <p className="text-lg font-bold" style={{ color: '#ffffff' }}>Increase your revenue by 3x</p>
-      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>
-        Track and optimize your business performance with real-time analytics and smart insights.
-      </p>
+      <div className="space-y-2">
+        <p className="text-lg font-semibold tracking-tight" style={{ color: '#ffffff' }}>Increase your revenue by 3x</p>
+        <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          Track and optimize your business performance with real-time analytics and smart insights.
+        </p>
+      </div>
       <button
-        className="mt-2 self-start px-4 py-2 rounded-md text-xs font-semibold"
+        className="mt-1 self-start px-5 py-2.5 rounded-xl text-xs font-medium tracking-wide"
         style={{ backgroundColor: '#ffffff', color: shades['700'] }}
       >
         Get Started
@@ -185,15 +203,15 @@ function CategoriesCard({ shades, theme }: { shades: Record<string, string>, the
     { name: 'Gadgets', icon: Gamepad2 },
   ]
   return (
-    <div className="p-4">
-      <p className="text-sm font-semibold mb-3" style={{ color: theme.text }}>Categories</p>
-      <div className="grid grid-cols-4 gap-3">
+    <div className="p-5">
+      <p className="text-sm font-semibold mb-4 tracking-tight" style={{ color: theme.text }}>Categories</p>
+      <div className="grid grid-cols-4 gap-4">
         {categories.map(c => (
-          <div key={c.name} className="flex flex-col items-center gap-1.5">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: shades['100'] }}>
-              <c.icon className="w-4 h-4" style={{ color: shades['500'] }} />
+          <div key={c.name} className="flex flex-col items-center gap-2">
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ backgroundColor: theme.accentSoft }}>
+              <c.icon className="w-4 h-4" style={{ color: theme.accent }} />
             </div>
-            <span className="text-[10px]" style={{ color: theme.textSecondary }}>{c.name}</span>
+            <span className="text-[10px] font-medium" style={{ color: theme.textSecondary }}>{c.name}</span>
           </div>
         ))}
       </div>
@@ -208,20 +226,20 @@ function BudgetCards({ shades, theme }: { shades: Record<string, string>, theme:
     { name: 'Health', amount: '$5,500', progress: 85, icon: Heart },
   ]
   return (
-    <div className="p-4 space-y-3">
-      <p className="text-sm font-semibold" style={{ color: theme.text }}>Budget</p>
+    <div className="p-5 space-y-4">
+      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Budget</p>
       {items.map(item => (
-        <div key={item.name} className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: shades['100'] }}>
-            <item.icon className="w-4 h-4" style={{ color: shades['500'] }} />
+        <div key={item.name} className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: theme.accentSoft }}>
+            <item.icon className="w-4 h-4" style={{ color: theme.accent }} />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-medium truncate" style={{ color: theme.text }}>{item.name}</span>
-              <span className="text-xs font-semibold shrink-0" style={{ color: theme.text }}>{item.amount}</span>
+              <span className="text-xs font-semibold shrink-0 tabular-nums" style={{ color: theme.text }}>{item.amount}</span>
             </div>
-            <div className="h-1.5 rounded-full mt-1.5 overflow-hidden" style={{ backgroundColor: theme.progressTrack }}>
-              <div className="h-full rounded-full" style={{ width: `${item.progress}%`, backgroundColor: theme.progressBar }} />
+            <div className="h-1 rounded-full mt-2 overflow-hidden" style={{ backgroundColor: theme.progressTrack }}>
+              <div className="h-full rounded-full transition-all" style={{ width: `${item.progress}%`, backgroundColor: theme.progressBar }} />
             </div>
           </div>
         </div>
@@ -237,21 +255,21 @@ function NewsletterList({ shades, theme }: { shades: Record<string, string>, the
     { name: 'Trial users', count: '356', checked: false },
   ]
   return (
-    <div className="p-4 space-y-3">
-      <p className="text-sm font-semibold" style={{ color: theme.text }}>Audience Lists</p>
+    <div className="p-5 space-y-4">
+      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Audience Lists</p>
       {items.map(item => (
-        <div key={item.name} className="flex items-center gap-3">
+        <div key={item.name} className="flex items-center gap-3.5">
           <div
-            className="w-5 h-5 rounded flex items-center justify-center shrink-0"
+            className="w-5 h-5 rounded-md flex items-center justify-center shrink-0 transition-colors"
             style={{
-              backgroundColor: item.checked ? shades['500'] : 'transparent',
-              border: item.checked ? 'none' : `2px solid ${theme.border}`,
+              backgroundColor: item.checked ? theme.accent : 'transparent',
+              border: item.checked ? 'none' : `1.5px solid ${theme.textTertiary}`,
             }}
           >
             {item.checked && <Check className="w-3 h-3" style={{ color: '#ffffff' }} />}
           </div>
-          <span className="text-xs flex-1" style={{ color: theme.text }}>{item.name}</span>
-          <span className="text-[10px] font-medium" style={{ color: theme.textSecondary }}>{item.count}</span>
+          <span className="text-xs flex-1 font-medium" style={{ color: theme.text }}>{item.name}</span>
+          <span className="text-[11px] tabular-nums" style={{ color: theme.textTertiary }}>{item.count}</span>
         </div>
       ))}
     </div>
@@ -265,19 +283,19 @@ function ScheduleCard({ shades, theme }: { shades: Record<string, string>, theme
     { time: '7:30 PM', title: 'Client call', desc: 'Project update' },
   ]
   return (
-    <div className="p-4 space-y-3">
-      <p className="text-sm font-semibold" style={{ color: theme.text }}>Schedule</p>
+    <div className="p-5 space-y-4">
+      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Schedule</p>
       {slots.map(slot => (
-        <div key={slot.time} className="flex items-center gap-3">
+        <div key={slot.time} className="flex items-center gap-3.5">
           <span
-            className="text-[10px] font-semibold px-2 py-1 rounded shrink-0"
-            style={{ backgroundColor: shades['500'], color: getContrastText(shades['500']) }}
+            className="text-[10px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 tabular-nums"
+            style={{ backgroundColor: theme.accent, color: getContrastText(shades['500']) }}
           >
             {slot.time}
           </span>
           <div className="min-w-0">
-            <p className="text-xs font-medium truncate" style={{ color: theme.textSecondary }}>{slot.title}</p>
-            <p className="text-[10px] truncate" style={{ color: theme.textSecondary, opacity: 0.7 }}>{slot.desc}</p>
+            <p className="text-xs font-medium truncate" style={{ color: theme.text }}>{slot.title}</p>
+            <p className="text-[10px] truncate" style={{ color: theme.textTertiary }}>{slot.desc}</p>
           </div>
         </div>
       ))}
@@ -287,15 +305,17 @@ function ScheduleCard({ shades, theme }: { shades: Record<string, string>, theme
 
 function ProfileCard({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
   return (
-    <div className="p-4 flex flex-col items-center gap-2">
-      <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: shades['200'] }}>
-        <User className="w-8 h-8" style={{ color: shades['500'] }} />
+    <div className="p-6 flex flex-col items-center gap-3">
+      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: theme.accentSoft }}>
+        <User className="w-7 h-7" style={{ color: theme.accent }} />
       </div>
-      <p className="text-sm font-semibold" style={{ color: theme.text }}>Sarah Jones</p>
-      <p className="text-[11px]" style={{ color: theme.textSecondary }}>Product designer</p>
+      <div className="text-center space-y-0.5">
+        <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Sarah Jones</p>
+        <p className="text-[11px]" style={{ color: theme.textSecondary }}>Product designer</p>
+      </div>
       <span
-        className="text-[10px] font-medium px-2.5 py-0.5 rounded-full"
-        style={{ backgroundColor: shades['100'], color: shades['500'] }}
+        className="text-[10px] font-medium px-3 py-1 rounded-full"
+        style={{ backgroundColor: theme.softBadgeBg, color: theme.accent }}
       >
         Online
       </span>
@@ -305,25 +325,28 @@ function ProfileCard({ shades, theme }: { shades: Record<string, string>, theme:
 
 function RevenueChart({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
   const bars = [
-    { h: 40, shade: '300' }, { h: 65, shade: '400' }, { h: 85, shade: '500' },
-    { h: 55, shade: '600' }, { h: 70, shade: '700' }, { h: 50, shade: '400' },
-    { h: 90, shade: '500' },
+    { h: 40, opacity: 0.35 }, { h: 65, opacity: 0.5 }, { h: 85, opacity: 0.7 },
+    { h: 55, opacity: 0.55 }, { h: 70, opacity: 0.65 }, { h: 50, opacity: 0.45 },
+    { h: 90, opacity: 1 },
   ]
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']
   return (
-    <div className="p-4 space-y-3">
+    <div className="p-5 space-y-4">
       <div>
-        <p className="text-sm font-semibold" style={{ color: theme.text }}>Revenue</p>
-        <div className="flex items-baseline gap-2">
-          <span className="text-lg font-bold" style={{ color: theme.text }}>$213,000</span>
+        <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Revenue</p>
+        <div className="flex items-baseline gap-2 mt-0.5">
+          <span className="text-xl font-bold tabular-nums tracking-tight" style={{ color: theme.text }}>$213,000</span>
           <span className="text-[10px] font-semibold" style={{ color: '#22c55e' }}>+20%</span>
         </div>
       </div>
-      <div className="flex items-end gap-1.5" style={{ height: 100 }}>
+      <div className="flex items-end gap-2" style={{ height: 100 }}>
         {bars.map((bar, i) => (
-          <div key={i} className="flex-1 flex flex-col items-center gap-1">
-            <div className="w-full rounded-sm" style={{ height: bar.h, backgroundColor: shades[bar.shade] }} />
-            <span className="text-[8px]" style={{ color: theme.textSecondary }}>{months[i]}</span>
+          <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+            <div
+              className="w-full rounded-md transition-all"
+              style={{ height: bar.h, backgroundColor: theme.accent, opacity: bar.opacity }}
+            />
+            <span className="text-[9px] font-medium" style={{ color: theme.textTertiary }}>{months[i]}</span>
           </div>
         ))}
       </div>
@@ -334,26 +357,25 @@ function RevenueChart({ shades, theme }: { shades: Record<string, string>, theme
 function PricingPlans({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
   const plans = [
     { name: 'Individual', price: '$0', icon: User, desc: 'For personal use' },
-    { name: 'Team', price: '$99', icon: Users, desc: 'For small teams' },
+    { name: 'Team', price: '$99', icon: Users, desc: 'For small teams', featured: true },
     { name: 'Enterprise', price: '$199', icon: Shield, desc: 'For large orgs' },
   ]
   return (
-    <div className="p-4 space-y-3">
-      <p className="text-sm font-semibold" style={{ color: theme.text }}>Pricing</p>
-      <div className="grid grid-cols-3 gap-2">
-        {plans.map((plan, i) => (
+    <div className="p-5 space-y-4">
+      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Pricing</p>
+      <div className="grid grid-cols-3 gap-2.5">
+        {plans.map(plan => (
           <div
             key={plan.name}
-            className="rounded-md p-3 flex flex-col items-center gap-1.5 text-center"
+            className="rounded-xl p-3.5 flex flex-col items-center gap-2 text-center transition-all"
             style={{
-              backgroundColor: i === 1 ? shades['500'] : theme.bg,
-              border: i !== 1 ? `1px solid ${theme.border}` : 'none',
+              backgroundColor: plan.featured ? theme.accent : theme.surfaceAlt,
             }}
           >
-            <plan.icon className="w-4 h-4" style={{ color: i === 1 ? '#ffffff' : shades['500'] }} />
-            <span className="text-[10px] font-semibold" style={{ color: i === 1 ? '#ffffff' : theme.text }}>{plan.name}</span>
-            <span className="text-sm font-bold" style={{ color: i === 1 ? '#ffffff' : theme.text }}>{plan.price}</span>
-            <span className="text-[9px]" style={{ color: i === 1 ? 'rgba(255,255,255,0.7)' : theme.textSecondary }}>/month</span>
+            <plan.icon className="w-4 h-4" style={{ color: plan.featured ? '#ffffff' : theme.accent }} />
+            <span className="text-[10px] font-semibold" style={{ color: plan.featured ? '#ffffff' : theme.text }}>{plan.name}</span>
+            <span className="text-base font-bold tabular-nums" style={{ color: plan.featured ? '#ffffff' : theme.text }}>{plan.price}</span>
+            <span className="text-[9px]" style={{ color: plan.featured ? 'rgba(255,255,255,0.65)' : theme.textTertiary }}>/month</span>
           </div>
         ))}
       </div>
@@ -363,52 +385,61 @@ function PricingPlans({ shades, theme }: { shades: Record<string, string>, theme
 
 function TicketsList({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
   const tickets = [
-    { name: 'Alex Morgan', issue: 'Login issue', status: 'Open', badgeBg: shades['100'], badgeText: shades['600'] },
-    { name: 'Jamie Lee', issue: 'Payment failed', status: 'Processing', badgeBg: shades['200'], badgeText: shades['700'] },
-    { name: 'Chris Park', issue: 'Bug report', status: 'Closed', badgeBg: shades['300'], badgeText: shades['800'] },
-    { name: 'Sam Rivera', issue: 'Feature request', status: 'Open', badgeBg: shades['100'], badgeText: shades['600'] },
+    { name: 'Alex Morgan', issue: 'Login issue', status: 'Open' },
+    { name: 'Jamie Lee', issue: 'Payment failed', status: 'Processing' },
+    { name: 'Chris Park', issue: 'Bug report', status: 'Closed' },
+    { name: 'Sam Rivera', issue: 'Feature request', status: 'Open' },
   ]
+  const statusColors: Record<string, { bg: string, text: string }> = {
+    'Open': { bg: theme.softBadgeBg, text: theme.accent },
+    'Processing': { bg: `${shades['300']}20`, text: shades['400'] },
+    'Closed': { bg: theme.surfaceAlt, text: theme.textTertiary },
+  }
   return (
-    <div className="p-4 space-y-3">
-      <p className="text-sm font-semibold" style={{ color: theme.text }}>Tickets</p>
-      {tickets.map((t, i) => (
-        <div key={i} className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-full shrink-0" style={{ backgroundColor: shades[String(300 + i * 100) as string] || shades['500'] }} />
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium truncate" style={{ color: theme.text }}>{t.name}</p>
-            <p className="text-[10px] truncate" style={{ color: theme.textSecondary }}>{t.issue}</p>
+    <div className="p-5 space-y-4">
+      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Tickets</p>
+      {tickets.map((t, i) => {
+        const sc = statusColors[t.status] || statusColors['Open']
+        return (
+          <div key={i} className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center"
+              style={{ backgroundColor: `${shades[String(300 + i * 100) as string] || shades['500']}30` }}>
+              <User className="w-3.5 h-3.5" style={{ color: shades[String(300 + i * 100) as string] || shades['500'] }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium truncate" style={{ color: theme.text }}>{t.name}</p>
+              <p className="text-[10px] truncate" style={{ color: theme.textTertiary }}>{t.issue}</p>
+            </div>
+            <span className="text-[9px] font-medium px-2.5 py-1 rounded-full shrink-0"
+              style={{ backgroundColor: sc.bg, color: sc.text }}>
+              {t.status}
+            </span>
           </div>
-          <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full shrink-0" style={{ backgroundColor: t.badgeBg, color: t.badgeText }}>
-            {t.status}
-          </span>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
 
 function CourseCards({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
   const courses = [
-    { title: 'Design Systems', badge: 'UI/UX', progress: 72, bgShade: '100' },
-    { title: 'React Advanced', badge: 'Front End Dev', progress: 45, bgShade: '200' },
-    { title: 'Audio Mixing', badge: 'Sound Effects', progress: 30, bgShade: '100' },
+    { title: 'Design Systems', badge: 'UI/UX', progress: 72 },
+    { title: 'React Advanced', badge: 'Front End Dev', progress: 45 },
+    { title: 'Audio Mixing', badge: 'Sound Effects', progress: 30 },
   ]
   return (
-    <div className="p-4 space-y-3">
-      <p className="text-sm font-semibold" style={{ color: theme.text }}>Courses</p>
-      {courses.map(c => (
-        <div key={c.title} className="rounded-md overflow-hidden" style={{ border: `1px solid ${theme.border}` }}>
-          <div className="h-16" style={{ backgroundColor: shades[c.bgShade] }} />
-          <div className="p-2.5 space-y-2" style={{ backgroundColor: theme.surface }}>
-            <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded" style={{ backgroundColor: theme.softBadgeBg, color: theme.softBadgeText }}>{c.badge}</span>
+    <div className="p-5 space-y-4">
+      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Courses</p>
+      {courses.map((c, i) => (
+        <div key={c.title} className="rounded-xl overflow-hidden" style={{ backgroundColor: theme.surfaceAlt }}>
+          <div className="h-14 rounded-t-xl" style={{ background: `linear-gradient(135deg, ${shades[String(200 + i * 100)]}50, ${shades[String(300 + i * 100)]}40)` }} />
+          <div className="p-3 space-y-2.5">
+            <span className="text-[9px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: theme.softBadgeBg, color: theme.softBadgeText }}>{c.badge}</span>
             <p className="text-xs font-medium" style={{ color: theme.text }}>{c.title}</p>
             <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: theme.progressTrack }}>
               <div className="h-full rounded-full" style={{ width: `${c.progress}%`, backgroundColor: theme.progressBar }} />
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: shades['300'] }} />
-              <span className="text-[9px]" style={{ color: theme.textSecondary }}>{c.progress}% complete</span>
-            </div>
+            <span className="text-[9px] tabular-nums" style={{ color: theme.textTertiary }}>{c.progress}% complete</span>
           </div>
         </div>
       ))}
@@ -423,20 +454,20 @@ function StatsRow({ shades, theme }: { shades: Record<string, string>, theme: Th
     { label: 'Avg. Click Rate', value: '24.57%', change: '-4.05%', positive: false },
   ]
   return (
-    <div className="p-4 space-y-3">
-      <p className="text-sm font-semibold" style={{ color: theme.text }}>Metrics</p>
-      <div className="grid grid-cols-3 gap-2">
+    <div className="p-5 space-y-4">
+      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Metrics</p>
+      <div className="grid grid-cols-3 gap-2.5">
         {stats.map(s => (
-          <div key={s.label} className="rounded-md p-2.5" style={{ backgroundColor: theme.bg, border: `1px solid ${theme.border}` }}>
-            <p className="text-[9px] mb-1" style={{ color: theme.textSecondary }}>{s.label}</p>
-            <p className="text-sm font-bold" style={{ color: theme.text }}>{s.value}</p>
-            <div className="flex items-center gap-0.5 mt-1">
+          <div key={s.label} className="rounded-xl p-3" style={{ backgroundColor: theme.surfaceAlt }}>
+            <p className="text-[9px] font-medium mb-1.5" style={{ color: theme.textTertiary }}>{s.label}</p>
+            <p className="text-sm font-bold tabular-nums" style={{ color: theme.text }}>{s.value}</p>
+            <div className="flex items-center gap-0.5 mt-1.5">
               {s.positive ? (
                 <ArrowUpRight className="w-3 h-3" style={{ color: '#22c55e' }} />
               ) : (
                 <ArrowDownRight className="w-3 h-3" style={{ color: '#ef4444' }} />
               )}
-              <span className="text-[10px] font-semibold" style={{ color: s.positive ? '#22c55e' : '#ef4444' }}>{s.change}</span>
+              <span className="text-[10px] font-semibold tabular-nums" style={{ color: s.positive ? '#22c55e' : '#ef4444' }}>{s.change}</span>
             </div>
           </div>
         ))}
@@ -445,24 +476,24 @@ function StatsRow({ shades, theme }: { shades: Record<string, string>, theme: Th
   )
 }
 
-function FeatureCards({ shades }: { shades: Record<string, string> }) {
+function FeatureCards({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
   const features = [
     { title: 'Analytics', desc: 'Track key metrics in real-time', icon: BarChart3 },
     { title: 'Security', desc: 'Enterprise-grade protection', icon: Shield },
     { title: 'Integrations', desc: 'Connect with 100+ tools', icon: Sparkles },
   ]
   return (
-    <div className="p-4 space-y-3">
-      <div className="grid grid-cols-3 gap-2">
+    <div className="p-5">
+      <div className="grid grid-cols-3 gap-2.5">
         {features.map(f => (
           <div
             key={f.title}
-            className="rounded-md p-3 flex flex-col gap-2"
-            style={{ background: `linear-gradient(135deg, ${shades['400']}, ${shades['500']})` }}
+            className="rounded-xl p-3.5 flex flex-col gap-2.5"
+            style={{ background: `linear-gradient(145deg, ${shades['500']}, ${shades['400']})` }}
           >
-            <Heart className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.8)' }} />
-            <p className="text-xs font-semibold" style={{ color: '#ffffff' }}>{f.title}</p>
-            <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{f.desc}</p>
+            <f.icon className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.85)' }} />
+            <p className="text-[11px] font-semibold" style={{ color: '#ffffff' }}>{f.title}</p>
+            <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>{f.desc}</p>
           </div>
         ))}
       </div>
@@ -473,31 +504,31 @@ function FeatureCards({ shades }: { shades: Record<string, string> }) {
 function ButtonStates({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
   const states = ['Default', 'Hover', 'Active', 'Disabled']
   const variants = [
-    { name: 'Primary', bg: shades['500'], text: getContrastText(shades['500']) },
-    { name: 'Secondary', bg: shades['200'], text: shades['800'] },
-    { name: 'Tertiary', bg: shades['100'], text: shades['700'] },
+    { name: 'Primary', bg: theme.accent, text: getContrastText(shades['500']) },
+    { name: 'Secondary', bg: theme.accentSoft, text: theme.accent },
+    { name: 'Tertiary', bg: theme.surfaceAlt, text: theme.textSecondary },
   ]
   return (
-    <div className="p-4 space-y-3">
-      <p className="text-sm font-semibold" style={{ color: theme.text }}>Button States</p>
-      <div className="space-y-2">
-        <div className="grid grid-cols-5 gap-1">
+    <div className="p-5 space-y-4">
+      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Button States</p>
+      <div className="space-y-2.5">
+        <div className="grid grid-cols-5 gap-1.5">
           <div />
           {states.map(s => (
-            <span key={s} className="text-[9px] text-center font-medium" style={{ color: theme.textSecondary }}>{s}</span>
+            <span key={s} className="text-[9px] text-center font-medium" style={{ color: theme.textTertiary }}>{s}</span>
           ))}
         </div>
         {variants.map(v => (
-          <div key={v.name} className="grid grid-cols-5 gap-1 items-center">
+          <div key={v.name} className="grid grid-cols-5 gap-1.5 items-center">
             <span className="text-[10px] font-medium" style={{ color: theme.textSecondary }}>{v.name}</span>
             {states.map((s, i) => (
               <div
                 key={s}
-                className="text-[9px] font-medium text-center py-1.5 rounded"
+                className="text-[9px] font-medium text-center py-2 rounded-lg"
                 style={{
                   backgroundColor: v.bg,
                   color: v.text,
-                  opacity: i === 3 ? 0.4 : i === 1 ? 0.85 : i === 2 ? 0.75 : 1,
+                  opacity: i === 3 ? 0.35 : i === 1 ? 0.85 : i === 2 ? 0.7 : 1,
                 }}
               >
                 Button
@@ -522,17 +553,21 @@ function CalendarCard({ shades, theme }: { shades: Record<string, string>, theme
   const today = 15
   const selected = [8, 22]
   return (
-    <div className="p-4 space-y-3">
+    <div className="p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold" style={{ color: theme.text }}>July 2025</p>
-        <div className="flex gap-1">
-          <ChevronLeft className="w-4 h-4" style={{ color: theme.textSecondary }} />
-          <ChevronRight className="w-4 h-4" style={{ color: theme.textSecondary }} />
+        <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>July 2025</p>
+        <div className="flex gap-1.5">
+          <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: theme.surfaceAlt }}>
+            <ChevronLeft className="w-3.5 h-3.5" style={{ color: theme.textSecondary }} />
+          </div>
+          <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: theme.surfaceAlt }}>
+            <ChevronRight className="w-3.5 h-3.5" style={{ color: theme.textSecondary }} />
+          </div>
         </div>
       </div>
-      <div className="grid grid-cols-7 gap-0.5 text-center">
+      <div className="grid grid-cols-7 gap-1 text-center">
         {days.map(d => (
-          <span key={d} className="text-[9px] font-medium py-1" style={{ color: theme.textSecondary }}>{d}</span>
+          <span key={d} className="text-[9px] font-medium py-1.5" style={{ color: theme.textTertiary }}>{d}</span>
         ))}
         {dates.flat().map((d, i) => {
           if (!d) return <span key={i} />
@@ -541,11 +576,11 @@ function CalendarCard({ shades, theme }: { shades: Record<string, string>, theme
           return (
             <span
               key={i}
-              className="text-[10px] py-1 rounded"
+              className="text-[10px] py-1.5 rounded-lg tabular-nums"
               style={{
-                backgroundColor: isToday ? shades['500'] : isSelected ? shades['100'] : 'transparent',
-                color: isToday ? getContrastText(shades['500']) : isSelected ? shades['700'] : theme.text,
-                fontWeight: isToday ? 700 : 400,
+                backgroundColor: isToday ? theme.accent : isSelected ? theme.accentSoft : 'transparent',
+                color: isToday ? getContrastText(shades['500']) : isSelected ? theme.accent : theme.text,
+                fontWeight: isToday || isSelected ? 600 : 400,
               }}
             >
               {d}
@@ -560,15 +595,15 @@ function CalendarCard({ shades, theme }: { shades: Record<string, string>, theme
 function BookCard({ shades }: { shades: Record<string, string> }) {
   return (
     <div
-      className="rounded-lg p-5 flex flex-col gap-3 justify-between"
-      style={{ background: `linear-gradient(135deg, ${shades['400']}, ${shades['600']})`, minHeight: 180 }}
+      className="rounded-2xl p-6 flex flex-col gap-4 justify-between"
+      style={{ background: `linear-gradient(145deg, ${shades['500']}, ${shades['600']})`, minHeight: 180 }}
     >
-      <span className="text-[9px] font-bold tracking-widest" style={{ color: 'rgba(255,255,255,0.6)' }}>
+      <span className="text-[9px] font-semibold tracking-[0.2em] uppercase" style={{ color: 'rgba(255,255,255,0.5)' }}>
         PAGE 22 OF 197
       </span>
-      <div>
-        <p className="text-base font-bold" style={{ color: '#ffffff' }}>Design Principles Handbook</p>
-        <p className="text-[10px] mt-2 font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
+      <div className="space-y-2">
+        <p className="text-base font-semibold tracking-tight" style={{ color: '#ffffff' }}>Design Principles Handbook</p>
+        <p className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Continue reading &rarr;
         </p>
       </div>
@@ -578,17 +613,17 @@ function BookCard({ shades }: { shades: Record<string, string> }) {
 
 function DonutChart({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
   const segments = [
-    { label: 'Views', shade: '300', pct: 50 },
-    { label: 'Clicks', shade: '400', pct: 30 },
-    { label: 'Sales', shade: '500', pct: 20 },
+    { label: 'Views', pct: 50, color: `${shades['400']}80` },
+    { label: 'Clicks', pct: 30, color: shades['400'] },
+    { label: 'Sales', pct: 20, color: shades['600'] },
   ]
   let offset = 0
-  const r = 40
+  const r = 38
   const c = 2 * Math.PI * r
   return (
-    <div className="p-4 space-y-3">
-      <p className="text-sm font-semibold" style={{ color: theme.text }}>Overview</p>
-      <div className="flex items-center gap-4">
+    <div className="p-5 space-y-4">
+      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Overview</p>
+      <div className="flex items-center gap-5">
         <div className="relative" style={{ width: 100, height: 100 }}>
           <svg viewBox="0 0 100 100" className="w-full h-full" style={{ transform: 'rotate(-90deg)' }}>
             {segments.map(seg => {
@@ -599,10 +634,11 @@ function DonutChart({ shades, theme }: { shades: Record<string, string>, theme: 
                   key={seg.label}
                   cx="50" cy="50" r={r}
                   fill="none"
-                  stroke={shades[seg.shade]}
-                  strokeWidth="12"
+                  stroke={seg.color}
+                  strokeWidth="10"
                   strokeDasharray={`${dash} ${gap}`}
                   strokeDashoffset={-offset}
+                  strokeLinecap="round"
                 />
               )
               offset += dash
@@ -610,16 +646,16 @@ function DonutChart({ shades, theme }: { shades: Record<string, string>, theme: 
             })}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-sm font-bold" style={{ color: theme.text }}>1.7K</span>
-            <span className="text-[8px]" style={{ color: theme.textSecondary }}>Total</span>
+            <span className="text-base font-bold tabular-nums" style={{ color: theme.text }}>1.7K</span>
+            <span className="text-[9px] font-medium" style={{ color: theme.textTertiary }}>Total</span>
           </div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {segments.map(seg => (
-            <div key={seg.label} className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: shades[seg.shade] }} />
-              <span className="text-[10px]" style={{ color: theme.textSecondary }}>{seg.label}</span>
-              <span className="text-[10px] font-semibold" style={{ color: theme.text }}>{seg.pct}%</span>
+            <div key={seg.label} className="flex items-center gap-2.5">
+              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: seg.color }} />
+              <span className="text-[11px]" style={{ color: theme.textSecondary }}>{seg.label}</span>
+              <span className="text-[11px] font-semibold tabular-nums" style={{ color: theme.text }}>{seg.pct}%</span>
             </div>
           ))}
         </div>
@@ -664,16 +700,16 @@ export default function PalettePage() {
   }, [])
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+    <div className="space-y-8">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
         <div className="space-y-2">
-          <Label>Base Color</Label>
+          <Label className="text-xs font-medium">Base Color</Label>
           <div className="flex gap-2">
             <Input
               type="color"
               value={localColor.startsWith('#') && localColor.length === 7 ? localColor : '#6366f1'}
               onChange={e => handleColorChange(e.target.value)}
-              className="w-14 h-10 p-1 cursor-pointer"
+              className="w-14 h-10 p-1 cursor-pointer rounded-xl"
               data-testid="input-palette-color-picker"
             />
             <Input
@@ -690,28 +726,29 @@ export default function PalettePage() {
           size="sm"
           onClick={() => setDarkMode(!darkMode)}
           data-testid="button-toggle-dark-mode"
-          className="mt-6"
         >
           {darkMode ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
           {darkMode ? 'Light' : 'Dark'}
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-2">
         {presetPalettes.map(p => (
           <button
             key={p.name}
             onClick={() => applyPreset(p.color)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs font-medium hover-elevate transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium hover-elevate transition-colors cursor-pointer"
+            style={{ backgroundColor: `${p.color}10`, color: p.color }}
             data-testid={`preset-palette-${p.name.toLowerCase()}`}
           >
-            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: p.color }} />
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.color }} />
             {p.name}
           </button>
         ))}
         <button
           onClick={randomize}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs font-medium hover-elevate transition-colors cursor-pointer"
+          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium hover-elevate transition-colors cursor-pointer"
+          style={{ backgroundColor: 'rgba(0,0,0,0.04)' }}
           data-testid="button-palette-randomize"
         >
           <Shuffle className="w-3 h-3" />
@@ -720,7 +757,7 @@ export default function PalettePage() {
       </div>
 
       <div>
-        <div className="flex rounded-md overflow-hidden border">
+        <div className="flex rounded-2xl overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           {shadeKeys.map(shade => {
             const hex = shades[shade]
             const textColor = getContrastText(hex)
@@ -729,13 +766,13 @@ export default function PalettePage() {
               <button
                 key={shade}
                 onClick={() => copyHex(shade, hex)}
-                className="flex-1 flex flex-col items-center justify-center py-4 px-1 transition-transform hover:scale-y-110 hover:z-10 relative cursor-pointer"
+                className="flex-1 flex flex-col items-center justify-center py-5 px-1 transition-all hover:scale-y-110 hover:z-10 relative cursor-pointer"
                 style={{ backgroundColor: hex, color: textColor }}
                 title={`${shade}: ${hex} (click to copy)`}
                 data-testid={`palette-swatch-${shade}`}
               >
-                <span className="text-[11px] font-bold opacity-80">{shade}</span>
-                <span className="text-[9px] font-mono opacity-60 mt-0.5">
+                <span className="text-[11px] font-semibold opacity-75">{shade}</span>
+                <span className="text-[9px] font-mono opacity-50 mt-1">
                   {isCopied ? <Check className="w-3 h-3" /> : hex.toUpperCase()}
                 </span>
               </button>
@@ -745,10 +782,10 @@ export default function PalettePage() {
       </div>
 
       <div
-        className="rounded-xl p-4 transition-colors duration-300"
+        className="rounded-2xl p-5 transition-colors duration-300"
         style={{ backgroundColor: theme.bg }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           <PreviewPanel theme={theme}>
             <HeroCard shades={shades} />
           </PreviewPanel>
@@ -794,7 +831,7 @@ export default function PalettePage() {
           </PreviewPanel>
 
           <PreviewPanel theme={theme}>
-            <FeatureCards shades={shades} />
+            <FeatureCards shades={shades} theme={theme} />
           </PreviewPanel>
 
           <PreviewPanel theme={theme}>
