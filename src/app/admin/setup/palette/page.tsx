@@ -125,6 +125,8 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean): Record<
   if (dark) {
     return {
       '--background': '0 0% 9%',
+      'backgroundColor': '#171717',
+      'color': shades['50'],
       '--foreground': hexToHslString(shades['50']),
       '--card': hexToHslString(shades['900']),
       '--card-foreground': hexToHslString(shades['50']),
@@ -148,6 +150,8 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean): Record<
   }
   return {
     '--background': '0 0% 96%',
+    'backgroundColor': '#f5f5f5',
+    'color': shades['900'],
     '--foreground': hexToHslString(shades['900']),
     '--card': '0 0% 100%',
     '--card-foreground': hexToHslString(shades['900']),
