@@ -5,12 +5,21 @@ import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Progress } from '@/components/ui/progress'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Switch } from '@/components/ui/switch'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Separator } from '@/components/ui/separator'
 import {
-  Copy, Check, Shuffle, Sun, Moon, TrendingUp, ShoppingCart, Coffee,
-  Zap, Dumbbell, Car, Cross, Phone, Gamepad2, Home, GraduationCap,
-  Heart, Star, Users, User, Clock, Mail, ChevronLeft, ChevronRight,
-  BookOpen, Eye, MousePointer, DollarSign, BarChart3, ArrowUpRight,
-  ArrowDownRight, Sparkles, Rocket, Shield
+  Check, Shuffle, Sun, Moon, TrendingUp, ShoppingCart,
+  Zap, Heart, Star, Users, User, Clock, Mail,
+  ChevronLeft, ChevronRight, BarChart3, ArrowUpRight,
+  ArrowDownRight, Sparkles, Shield, Bell, Search,
+  Settings, Plus, Download, MoreHorizontal, Eye,
+  Calendar, FileText, Rocket, Send, DollarSign
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -76,6 +85,11 @@ function getContrastText(hex: string): string {
   return luminance > 0.55 ? '#000000' : '#ffffff'
 }
 
+function hexToHslString(hex: string): string {
+  const [h, s, l] = hexToHsl(hex)
+  return `${h} ${s}% ${l}%`
+}
+
 const presetPalettes = [
   { name: 'Indigo', color: '#6366f1' },
   { name: 'Blue', color: '#3b82f6' },
@@ -91,457 +105,398 @@ const presetPalettes = [
 
 const shadeKeys = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950']
 
-interface ThemeColors {
-  bg: string
-  surface: string
-  surfaceAlt: string
-  border: string
-  text: string
-  textSecondary: string
-  textTertiary: string
-  accent: string
-  accentSoft: string
-  btnPrimary: string
-  btnPrimaryText: string
-  softBadgeBg: string
-  softBadgeText: string
-  progressTrack: string
-  progressBar: string
-  shadow: string
-}
-
-function getThemeColors(shades: Record<string, string>, dark: boolean): ThemeColors {
+function getCssOverrides(shades: Record<string, string>, dark: boolean): Record<string, string> {
   if (dark) {
     return {
-      bg: shades['950'],
-      surface: shades['900'],
-      surfaceAlt: shades['800'],
-      border: `${shades['700']}40`,
-      text: shades['100'],
-      textSecondary: shades['300'],
-      textTertiary: shades['400'],
-      accent: shades['400'],
-      accentSoft: `${shades['400']}18`,
-      btnPrimary: shades['500'],
-      btnPrimaryText: getContrastText(shades['500']),
-      softBadgeBg: `${shades['400']}20`,
-      softBadgeText: shades['300'],
-      progressTrack: `${shades['500']}20`,
-      progressBar: shades['400'],
-      shadow: 'none',
+      '--background': hexToHslString(shades['950']),
+      '--foreground': hexToHslString(shades['100']),
+      '--card': hexToHslString(shades['900']),
+      '--card-foreground': hexToHslString(shades['100']),
+      '--card-border': hexToHslString(shades['800']),
+      '--primary': hexToHslString(shades['400']),
+      '--primary-foreground': hexToHslString(shades['950']),
+      '--secondary': hexToHslString(shades['800']),
+      '--secondary-foreground': hexToHslString(shades['200']),
+      '--muted': hexToHslString(shades['800']),
+      '--muted-foreground': hexToHslString(shades['400']),
+      '--accent': hexToHslString(shades['800']),
+      '--accent-foreground': hexToHslString(shades['200']),
+      '--destructive': '0 62.8% 30.6%',
+      '--destructive-foreground': hexToHslString(shades['100']),
+      '--border': hexToHslString(shades['800']),
+      '--input': hexToHslString(shades['800']),
+      '--ring': hexToHslString(shades['400']),
+      '--badge-outline': hexToHslString(shades['700']),
+      'colorScheme': 'dark',
     }
   }
   return {
-    bg: shades['50'],
-    surface: '#ffffff',
-    surfaceAlt: shades['50'],
-    border: `${shades['200']}60`,
-    text: shades['900'],
-    textSecondary: shades['500'],
-    textTertiary: shades['400'],
-    accent: shades['500'],
-    accentSoft: `${shades['500']}10`,
-    btnPrimary: shades['500'],
-    btnPrimaryText: getContrastText(shades['500']),
-    softBadgeBg: `${shades['500']}10`,
-    softBadgeText: shades['600'],
-    progressTrack: `${shades['500']}12`,
-    progressBar: shades['500'],
-    shadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03)',
+    '--background': hexToHslString(shades['50']),
+    '--foreground': hexToHslString(shades['900']),
+    '--card': '0 0% 100%',
+    '--card-foreground': hexToHslString(shades['900']),
+    '--card-border': hexToHslString(shades['100']),
+    '--primary': hexToHslString(shades['600']),
+    '--primary-foreground': '0 0% 100%',
+    '--secondary': hexToHslString(shades['100']),
+    '--secondary-foreground': hexToHslString(shades['800']),
+    '--muted': hexToHslString(shades['100']),
+    '--muted-foreground': hexToHslString(shades['500']),
+    '--accent': hexToHslString(shades['100']),
+    '--accent-foreground': hexToHslString(shades['800']),
+    '--destructive': '0 84.2% 60.2%',
+    '--destructive-foreground': '0 0% 100%',
+    '--border': hexToHslString(shades['200']),
+    '--input': hexToHslString(shades['200']),
+    '--ring': hexToHslString(shades['600']),
+    '--badge-outline': hexToHslString(shades['200']),
+    'colorScheme': 'light',
   }
 }
 
-function PreviewPanel({ children, theme, className = '' }: { children: React.ReactNode, theme: ThemeColors, className?: string }) {
-  return (
-    <div
-      className={cn('rounded-2xl overflow-hidden transition-all duration-200', className)}
-      style={{
-        backgroundColor: theme.surface,
-        boxShadow: theme.shadow,
-        border: `1px solid ${theme.border}`,
-      }}
-    >
-      {children}
-    </div>
-  )
-}
-
-function HeroCard({ shades }: { shades: Record<string, string> }) {
-  return (
-    <div
-      className="rounded-2xl p-7 flex flex-col gap-4"
-      style={{ background: `linear-gradient(135deg, ${shades['600']}, ${shades['500']}, ${shades['400']})` }}
-    >
-      <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
-        <TrendingUp className="w-5 h-5" style={{ color: '#ffffff' }} />
-      </div>
-      <div className="space-y-2">
-        <p className="text-lg font-semibold tracking-tight" style={{ color: '#ffffff' }}>Increase your revenue by 3x</p>
-        <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
-          Track and optimize your business performance with real-time analytics and smart insights.
-        </p>
-      </div>
-      <button
-        className="mt-1 self-start px-5 py-2.5 rounded-xl text-xs font-medium tracking-wide"
-        style={{ backgroundColor: '#ffffff', color: shades['700'] }}
-      >
-        Get Started
-      </button>
-    </div>
-  )
-}
-
-function CategoriesCard({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  const categories = [
-    { name: 'Grocery', icon: ShoppingCart },
-    { name: 'Cafe', icon: Coffee },
-    { name: 'Utilities', icon: Zap },
-    { name: 'Sport', icon: Dumbbell },
-    { name: 'Taxi', icon: Car },
-    { name: 'Pharmacies', icon: Cross },
-    { name: 'Telecom', icon: Phone },
-    { name: 'Gadgets', icon: Gamepad2 },
-  ]
-  return (
-    <div className="p-5">
-      <p className="text-sm font-semibold mb-4 tracking-tight" style={{ color: theme.text }}>Categories</p>
-      <div className="grid grid-cols-4 gap-4">
-        {categories.map(c => (
-          <div key={c.name} className="flex flex-col items-center gap-2">
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ backgroundColor: theme.accentSoft }}>
-              <c.icon className="w-4 h-4" style={{ color: theme.accent }} />
-            </div>
-            <span className="text-[10px] font-medium" style={{ color: theme.textSecondary }}>{c.name}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function BudgetCards({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  const items = [
-    { name: 'Home Renovation', amount: '$10,000', progress: 65, icon: Home },
-    { name: 'Education', amount: '$40,000', progress: 40, icon: GraduationCap },
-    { name: 'Health', amount: '$5,500', progress: 85, icon: Heart },
-  ]
-  return (
-    <div className="p-5 space-y-4">
-      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Budget</p>
-      {items.map(item => (
-        <div key={item.name} className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: theme.accentSoft }}>
-            <item.icon className="w-4 h-4" style={{ color: theme.accent }} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-medium truncate" style={{ color: theme.text }}>{item.name}</span>
-              <span className="text-xs font-semibold shrink-0 tabular-nums" style={{ color: theme.text }}>{item.amount}</span>
-            </div>
-            <div className="h-1 rounded-full mt-2 overflow-hidden" style={{ backgroundColor: theme.progressTrack }}>
-              <div className="h-full rounded-full transition-all" style={{ width: `${item.progress}%`, backgroundColor: theme.progressBar }} />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function NewsletterList({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  const items = [
-    { name: 'Newsletter', count: '1,248', checked: true },
-    { name: 'Existing customers', count: '842', checked: false },
-    { name: 'Trial users', count: '356', checked: false },
-  ]
-  return (
-    <div className="p-5 space-y-4">
-      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Audience Lists</p>
-      {items.map(item => (
-        <div key={item.name} className="flex items-center gap-3.5">
-          <div
-            className="w-5 h-5 rounded-md flex items-center justify-center shrink-0 transition-colors"
-            style={{
-              backgroundColor: item.checked ? theme.accent : 'transparent',
-              border: item.checked ? 'none' : `1.5px solid ${theme.textTertiary}`,
-            }}
-          >
-            {item.checked && <Check className="w-3 h-3" style={{ color: '#ffffff' }} />}
-          </div>
-          <span className="text-xs flex-1 font-medium" style={{ color: theme.text }}>{item.name}</span>
-          <span className="text-[11px] tabular-nums" style={{ color: theme.textTertiary }}>{item.count}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function ScheduleCard({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  const slots = [
-    { time: '9:15 AM', title: 'Morning standup', desc: 'Team sync' },
-    { time: '4:00 PM', title: 'Design review', desc: 'UI feedback' },
-    { time: '7:30 PM', title: 'Client call', desc: 'Project update' },
-  ]
-  return (
-    <div className="p-5 space-y-4">
-      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Schedule</p>
-      {slots.map(slot => (
-        <div key={slot.time} className="flex items-center gap-3.5">
-          <span
-            className="text-[10px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 tabular-nums"
-            style={{ backgroundColor: theme.accent, color: getContrastText(shades['500']) }}
-          >
-            {slot.time}
-          </span>
-          <div className="min-w-0">
-            <p className="text-xs font-medium truncate" style={{ color: theme.text }}>{slot.title}</p>
-            <p className="text-[10px] truncate" style={{ color: theme.textTertiary }}>{slot.desc}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function ProfileCard({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  return (
-    <div className="p-6 flex flex-col items-center gap-3">
-      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: theme.accentSoft }}>
-        <User className="w-7 h-7" style={{ color: theme.accent }} />
-      </div>
-      <div className="text-center space-y-0.5">
-        <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Sarah Jones</p>
-        <p className="text-[11px]" style={{ color: theme.textSecondary }}>Product designer</p>
-      </div>
-      <span
-        className="text-[10px] font-medium px-3 py-1 rounded-full"
-        style={{ backgroundColor: theme.softBadgeBg, color: theme.accent }}
-      >
-        Online
-      </span>
-    </div>
-  )
-}
-
-function RevenueChart({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  const bars = [
-    { h: 40, opacity: 0.35 }, { h: 65, opacity: 0.5 }, { h: 85, opacity: 0.7 },
-    { h: 55, opacity: 0.55 }, { h: 70, opacity: 0.65 }, { h: 50, opacity: 0.45 },
-    { h: 90, opacity: 1 },
-  ]
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']
-  return (
-    <div className="p-5 space-y-4">
-      <div>
-        <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Revenue</p>
-        <div className="flex items-baseline gap-2 mt-0.5">
-          <span className="text-xl font-bold tabular-nums tracking-tight" style={{ color: theme.text }}>$213,000</span>
-          <span className="text-[10px] font-semibold" style={{ color: '#22c55e' }}>+20%</span>
-        </div>
-      </div>
-      <div className="flex items-end gap-2" style={{ height: 100 }}>
-        {bars.map((bar, i) => (
-          <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-            <div
-              className="w-full rounded-md transition-all"
-              style={{ height: bar.h, backgroundColor: theme.accent, opacity: bar.opacity }}
-            />
-            <span className="text-[9px] font-medium" style={{ color: theme.textTertiary }}>{months[i]}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function PricingPlans({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  const plans = [
-    { name: 'Individual', price: '$0', icon: User, desc: 'For personal use' },
-    { name: 'Team', price: '$99', icon: Users, desc: 'For small teams', featured: true },
-    { name: 'Enterprise', price: '$199', icon: Shield, desc: 'For large orgs' },
-  ]
-  return (
-    <div className="p-5 space-y-4">
-      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Pricing</p>
-      <div className="grid grid-cols-3 gap-2.5">
-        {plans.map(plan => (
-          <div
-            key={plan.name}
-            className="rounded-xl p-3.5 flex flex-col items-center gap-2 text-center transition-all"
-            style={{
-              backgroundColor: plan.featured ? theme.accent : theme.surfaceAlt,
-            }}
-          >
-            <plan.icon className="w-4 h-4" style={{ color: plan.featured ? '#ffffff' : theme.accent }} />
-            <span className="text-[10px] font-semibold" style={{ color: plan.featured ? '#ffffff' : theme.text }}>{plan.name}</span>
-            <span className="text-base font-bold tabular-nums" style={{ color: plan.featured ? '#ffffff' : theme.text }}>{plan.price}</span>
-            <span className="text-[9px]" style={{ color: plan.featured ? 'rgba(255,255,255,0.65)' : theme.textTertiary }}>/month</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function TicketsList({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  const tickets = [
-    { name: 'Alex Morgan', issue: 'Login issue', status: 'Open' },
-    { name: 'Jamie Lee', issue: 'Payment failed', status: 'Processing' },
-    { name: 'Chris Park', issue: 'Bug report', status: 'Closed' },
-    { name: 'Sam Rivera', issue: 'Feature request', status: 'Open' },
-  ]
-  const statusColors: Record<string, { bg: string, text: string }> = {
-    'Open': { bg: theme.softBadgeBg, text: theme.accent },
-    'Processing': { bg: `${shades['300']}20`, text: shades['400'] },
-    'Closed': { bg: theme.surfaceAlt, text: theme.textTertiary },
-  }
-  return (
-    <div className="p-5 space-y-4">
-      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Tickets</p>
-      {tickets.map((t, i) => {
-        const sc = statusColors[t.status] || statusColors['Open']
-        return (
-          <div key={i} className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center"
-              style={{ backgroundColor: `${shades[String(300 + i * 100) as string] || shades['500']}30` }}>
-              <User className="w-3.5 h-3.5" style={{ color: shades[String(300 + i * 100) as string] || shades['500'] }} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium truncate" style={{ color: theme.text }}>{t.name}</p>
-              <p className="text-[10px] truncate" style={{ color: theme.textTertiary }}>{t.issue}</p>
-            </div>
-            <span className="text-[9px] font-medium px-2.5 py-1 rounded-full shrink-0"
-              style={{ backgroundColor: sc.bg, color: sc.text }}>
-              {t.status}
-            </span>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-function CourseCards({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  const courses = [
-    { title: 'Design Systems', badge: 'UI/UX', progress: 72 },
-    { title: 'React Advanced', badge: 'Front End Dev', progress: 45 },
-    { title: 'Audio Mixing', badge: 'Sound Effects', progress: 30 },
-  ]
-  return (
-    <div className="p-5 space-y-4">
-      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Courses</p>
-      {courses.map((c, i) => (
-        <div key={c.title} className="rounded-xl overflow-hidden" style={{ backgroundColor: theme.surfaceAlt }}>
-          <div className="h-14 rounded-t-xl" style={{ background: `linear-gradient(135deg, ${shades[String(200 + i * 100)]}50, ${shades[String(300 + i * 100)]}40)` }} />
-          <div className="p-3 space-y-2.5">
-            <span className="text-[9px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: theme.softBadgeBg, color: theme.softBadgeText }}>{c.badge}</span>
-            <p className="text-xs font-medium" style={{ color: theme.text }}>{c.title}</p>
-            <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: theme.progressTrack }}>
-              <div className="h-full rounded-full" style={{ width: `${c.progress}%`, backgroundColor: theme.progressBar }} />
-            </div>
-            <span className="text-[9px] tabular-nums" style={{ color: theme.textTertiary }}>{c.progress}% complete</span>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function StatsRow({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
+function StatsPreview() {
   const stats = [
-    { label: 'Total Subscribers', value: '71,842', change: '+12%', positive: true },
-    { label: 'Avg. Open Rate', value: '58.16%', change: '+2.02%', positive: true },
-    { label: 'Avg. Click Rate', value: '24.57%', change: '-4.05%', positive: false },
+    { label: 'Total Revenue', value: '$45,231', change: '+20.1%', positive: true, icon: DollarSign },
+    { label: 'Subscribers', value: '2,350', change: '+180', positive: true, icon: Users },
+    { label: 'Active Now', value: '573', change: '+12%', positive: true, icon: TrendingUp },
   ]
   return (
-    <div className="p-5 space-y-4">
-      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Metrics</p>
-      <div className="grid grid-cols-3 gap-2.5">
-        {stats.map(s => (
-          <div key={s.label} className="rounded-xl p-3" style={{ backgroundColor: theme.surfaceAlt }}>
-            <p className="text-[9px] font-medium mb-1.5" style={{ color: theme.textTertiary }}>{s.label}</p>
-            <p className="text-sm font-bold tabular-nums" style={{ color: theme.text }}>{s.value}</p>
-            <div className="flex items-center gap-0.5 mt-1.5">
+    <div className="grid grid-cols-3 gap-4">
+      {stats.map(s => (
+        <Card key={s.label}>
+          <CardHeader className="flex flex-row items-center justify-between gap-1 space-y-0 pb-2">
+            <CardTitle className="text-xs font-medium text-muted-foreground">{s.label}</CardTitle>
+            <s.icon className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl font-bold tabular-nums">{s.value}</div>
+            <div className="flex items-center gap-1 mt-1">
               {s.positive ? (
-                <ArrowUpRight className="w-3 h-3" style={{ color: '#22c55e' }} />
+                <ArrowUpRight className="w-3 h-3 text-primary" />
               ) : (
-                <ArrowDownRight className="w-3 h-3" style={{ color: '#ef4444' }} />
+                <ArrowDownRight className="w-3 h-3 text-destructive" />
               )}
-              <span className="text-[10px] font-semibold tabular-nums" style={{ color: s.positive ? '#22c55e' : '#ef4444' }}>{s.change}</span>
+              <span className="text-xs text-muted-foreground">{s.change} from last month</span>
             </div>
-          </div>
-        ))}
-      </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   )
 }
 
-function FeatureCards({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  const features = [
-    { title: 'Analytics', desc: 'Track key metrics in real-time', icon: BarChart3 },
-    { title: 'Security', desc: 'Enterprise-grade protection', icon: Shield },
-    { title: 'Integrations', desc: 'Connect with 100+ tools', icon: Sparkles },
-  ]
+function ButtonsAndBadges() {
   return (
-    <div className="p-5">
-      <div className="grid grid-cols-3 gap-2.5">
-        {features.map(f => (
-          <div
-            key={f.title}
-            className="rounded-xl p-3.5 flex flex-col gap-2.5"
-            style={{ background: `linear-gradient(145deg, ${shades['500']}, ${shades['400']})` }}
-          >
-            <f.icon className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.85)' }} />
-            <p className="text-[11px] font-semibold" style={{ color: '#ffffff' }}>{f.title}</p>
-            <p className="text-[9px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>{f.desc}</p>
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm">Buttons & Badges</CardTitle>
+        <CardDescription>All component variants</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">Buttons</p>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm">Primary</Button>
+            <Button size="sm" variant="secondary">Secondary</Button>
+            <Button size="sm" variant="outline">Outline</Button>
+            <Button size="sm" variant="ghost">Ghost</Button>
+            <Button size="sm" variant="destructive">Destructive</Button>
           </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function ButtonStates({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  const states = ['Default', 'Hover', 'Active', 'Disabled']
-  const variants = [
-    { name: 'Primary', bg: theme.accent, text: getContrastText(shades['500']) },
-    { name: 'Secondary', bg: theme.accentSoft, text: theme.accent },
-    { name: 'Tertiary', bg: theme.surfaceAlt, text: theme.textSecondary },
-  ]
-  return (
-    <div className="p-5 space-y-4">
-      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Button States</p>
-      <div className="space-y-2.5">
-        <div className="grid grid-cols-5 gap-1.5">
-          <div />
-          {states.map(s => (
-            <span key={s} className="text-[9px] text-center font-medium" style={{ color: theme.textTertiary }}>{s}</span>
-          ))}
         </div>
-        {variants.map(v => (
-          <div key={v.name} className="grid grid-cols-5 gap-1.5 items-center">
-            <span className="text-[10px] font-medium" style={{ color: theme.textSecondary }}>{v.name}</span>
-            {states.map((s, i) => (
-              <div
-                key={s}
-                className="text-[9px] font-medium text-center py-2 rounded-lg"
-                style={{
-                  backgroundColor: v.bg,
-                  color: v.text,
-                  opacity: i === 3 ? 0.35 : i === 1 ? 0.85 : i === 2 ? 0.7 : 1,
-                }}
-              >
-                Button
-              </div>
-            ))}
+        <Separator />
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">Badges</p>
+          <div className="flex flex-wrap gap-2">
+            <Badge>Default</Badge>
+            <Badge variant="secondary">Secondary</Badge>
+            <Badge variant="outline">Outline</Badge>
+            <Badge variant="destructive">Destructive</Badge>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function ProfilePreview() {
+  return (
+    <Card>
+      <CardContent className="pt-6">
+        <div className="flex items-center gap-4">
+          <Avatar className="h-12 w-12">
+            <AvatarFallback>SJ</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0 space-y-1">
+            <p className="text-sm font-semibold">Sarah Jones</p>
+            <p className="text-xs text-muted-foreground">sarah@example.com</p>
+          </div>
+          <Badge variant="secondary">Admin</Badge>
+        </div>
+        <Separator className="my-4" />
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm">Notifications</span>
+            </div>
+            <Switch defaultChecked />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm">Email updates</span>
+            </div>
+            <Switch />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm">Two-factor auth</span>
+            </div>
+            <Switch defaultChecked />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function TaskListPreview() {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="text-sm">Tasks</CardTitle>
+          <Badge variant="secondary" className="text-xs">3 remaining</Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {[
+          { label: 'Update landing page copy', done: true },
+          { label: 'Review pull requests', done: true },
+          { label: 'Deploy to production', done: false },
+          { label: 'Write API documentation', done: false },
+          { label: 'Set up monitoring alerts', done: false },
+        ].map(task => (
+          <div key={task.label} className="flex items-center gap-3">
+            <Checkbox checked={task.done} />
+            <span className={cn('text-sm', task.done && 'line-through text-muted-foreground')}>{task.label}</span>
           </div>
         ))}
-      </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function ProgressPreview() {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm">Project Progress</CardTitle>
+        <CardDescription>3 of 5 milestones complete</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {[
+          { name: 'Research', progress: 100 },
+          { name: 'Design', progress: 100 },
+          { name: 'Development', progress: 68 },
+          { name: 'Testing', progress: 25 },
+          { name: 'Launch', progress: 0 },
+        ].map(item => (
+          <div key={item.name} className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium">{item.name}</span>
+              <span className="text-xs text-muted-foreground tabular-nums">{item.progress}%</span>
+            </div>
+            <Progress value={item.progress} className="h-1.5" />
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+function TeamPreview() {
+  const members = [
+    { name: 'Alex Morgan', role: 'Developer', initials: 'AM' },
+    { name: 'Jamie Chen', role: 'Designer', initials: 'JC' },
+    { name: 'Sam Rivera', role: 'Product Manager', initials: 'SR' },
+    { name: 'Chris Park', role: 'Marketing', initials: 'CP' },
+  ]
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-2 pb-3">
+        <CardTitle className="text-sm">Team Members</CardTitle>
+        <Button size="sm" variant="outline">
+          <Plus className="w-3 h-3 mr-1" />
+          Invite
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {members.map(m => (
+          <div key={m.name} className="flex items-center gap-3">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="text-xs">{m.initials}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{m.name}</p>
+              <p className="text-xs text-muted-foreground">{m.role}</p>
+            </div>
+            <Button size="icon" variant="ghost">
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+function TabsPreview() {
+  return (
+    <Card>
+      <CardContent className="pt-6">
+        <Tabs defaultValue="overview">
+          <TabsList className="w-full">
+            <TabsTrigger value="overview" className="flex-1">Overview</TabsTrigger>
+            <TabsTrigger value="analytics" className="flex-1">Analytics</TabsTrigger>
+            <TabsTrigger value="reports" className="flex-1">Reports</TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview" className="space-y-3 pt-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-lg bg-muted p-3">
+                <p className="text-xs text-muted-foreground">Page Views</p>
+                <p className="text-lg font-bold tabular-nums">12,543</p>
+              </div>
+              <div className="rounded-lg bg-muted p-3">
+                <p className="text-xs text-muted-foreground">Bounce Rate</p>
+                <p className="text-lg font-bold tabular-nums">24.3%</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 rounded-lg border p-3">
+              <BarChart3 className="w-4 h-4 text-muted-foreground shrink-0" />
+              <p className="text-xs text-muted-foreground">Traffic is up 12% compared to last week.</p>
+            </div>
+          </TabsContent>
+          <TabsContent value="analytics" className="pt-3">
+            <div className="rounded-lg bg-muted p-3">
+              <p className="text-xs text-muted-foreground">Analytics content here</p>
+            </div>
+          </TabsContent>
+          <TabsContent value="reports" className="pt-3">
+            <div className="rounded-lg bg-muted p-3">
+              <p className="text-xs text-muted-foreground">Reports content here</p>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
+  )
+}
+
+function NotificationsPreview() {
+  const notifications = [
+    { title: 'New sign-up', desc: 'A new user registered 2 minutes ago', icon: User, time: '2m' },
+    { title: 'Payment received', desc: 'Invoice #1234 has been paid', icon: Zap, time: '1h' },
+    { title: 'Deploy complete', desc: 'v2.4.1 deployed to production', icon: Rocket, time: '3h' },
+    { title: 'Comment added', desc: 'Jamie left feedback on your design', icon: FileText, time: '5h' },
+  ]
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-2 pb-3">
+        <CardTitle className="text-sm">Notifications</CardTitle>
+        <Badge>4 new</Badge>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {notifications.map(n => (
+          <div key={n.title} className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5">
+              <n.icon className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <div className="flex-1 min-w-0 space-y-0.5">
+              <p className="text-sm font-medium truncate">{n.title}</p>
+              <p className="text-xs text-muted-foreground truncate">{n.desc}</p>
+            </div>
+            <span className="text-xs text-muted-foreground shrink-0">{n.time}</span>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+function FormPreview() {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm">Quick Send</CardTitle>
+        <CardDescription>Send a message to your team</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="space-y-1.5">
+          <Label className="text-xs">To</Label>
+          <Input placeholder="team@company.com" className="h-9" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">Subject</Label>
+          <Input placeholder="Weekly update" className="h-9" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Checkbox id="urgent" />
+          <Label htmlFor="urgent" className="text-xs font-normal">Mark as urgent</Label>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between gap-2">
+        <Button variant="outline" size="sm">Save draft</Button>
+        <Button size="sm">
+          <Send className="w-3 h-3 mr-1.5" />
+          Send
+        </Button>
+      </CardFooter>
+    </Card>
+  )
+}
+
+function PricingPreview() {
+  const plans = [
+    { name: 'Free', price: '$0', desc: 'For personal projects', features: ['1 project', '100MB storage', 'Community support'], featured: false },
+    { name: 'Pro', price: '$19', desc: 'For growing teams', features: ['Unlimited projects', '10GB storage', 'Priority support'], featured: true },
+    { name: 'Enterprise', price: '$99', desc: 'For large orgs', features: ['Custom limits', '100GB storage', 'Dedicated support'], featured: false },
+  ]
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {plans.map(plan => (
+        <Card key={plan.name} className={cn(plan.featured && 'border-primary')}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">{plan.name}</CardTitle>
+            <CardDescription className="text-xs">{plan.desc}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <span className="text-2xl font-bold tabular-nums">{plan.price}</span>
+              <span className="text-xs text-muted-foreground">/month</span>
+            </div>
+            <div className="space-y-2">
+              {plan.features.map(f => (
+                <div key={f} className="flex items-center gap-2">
+                  <Check className="w-3 h-3 text-primary" />
+                  <span className="text-xs">{f}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button className="w-full" size="sm" variant={plan.featured ? 'default' : 'outline'}>
+              {plan.featured ? 'Get Started' : 'Learn More'}
+            </Button>
+          </CardFooter>
+        </Card>
+      ))}
     </div>
   )
 }
 
-function CalendarCard({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
+function CalendarPreview() {
   const days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
   const dates = [
     [null, null, 1, 2, 3, 4, 5],
@@ -551,116 +506,81 @@ function CalendarCard({ shades, theme }: { shades: Record<string, string>, theme
     [27, 28, 29, 30, 31, null, null],
   ]
   const today = 15
-  const selected = [8, 22]
+  const events = [8, 22]
   return (
-    <div className="p-5 space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>July 2025</p>
-        <div className="flex gap-1.5">
-          <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: theme.surfaceAlt }}>
-            <ChevronLeft className="w-3.5 h-3.5" style={{ color: theme.textSecondary }} />
-          </div>
-          <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: theme.surfaceAlt }}>
-            <ChevronRight className="w-3.5 h-3.5" style={{ color: theme.textSecondary }} />
-          </div>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-2 pb-3">
+        <CardTitle className="text-sm">July 2025</CardTitle>
+        <div className="flex gap-1">
+          <Button size="icon" variant="ghost" data-testid="button-calendar-prev">
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <Button size="icon" variant="ghost" data-testid="button-calendar-next">
+            <ChevronRight className="w-4 h-4" />
+          </Button>
         </div>
-      </div>
-      <div className="grid grid-cols-7 gap-1 text-center">
-        {days.map(d => (
-          <span key={d} className="text-[9px] font-medium py-1.5" style={{ color: theme.textTertiary }}>{d}</span>
-        ))}
-        {dates.flat().map((d, i) => {
-          if (!d) return <span key={i} />
-          const isToday = d === today
-          const isSelected = selected.includes(d)
-          return (
-            <span
-              key={i}
-              className="text-[10px] py-1.5 rounded-lg tabular-nums"
-              style={{
-                backgroundColor: isToday ? theme.accent : isSelected ? theme.accentSoft : 'transparent',
-                color: isToday ? getContrastText(shades['500']) : isSelected ? theme.accent : theme.text,
-                fontWeight: isToday || isSelected ? 600 : 400,
-              }}
-            >
-              {d}
-            </span>
-          )
-        })}
-      </div>
-    </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-7 gap-1 text-center">
+          {days.map(d => (
+            <span key={d} className="text-[10px] font-medium py-1 text-muted-foreground">{d}</span>
+          ))}
+          {dates.flat().map((d, i) => {
+            if (!d) return <span key={i} />
+            const isToday = d === today
+            const hasEvent = events.includes(d)
+            return (
+              <div key={i} className="flex flex-col items-center">
+                <span
+                  className={cn(
+                    'text-xs w-7 h-7 flex items-center justify-center rounded-md tabular-nums',
+                    isToday && 'bg-primary text-primary-foreground font-semibold',
+                    hasEvent && !isToday && 'bg-secondary font-medium',
+                  )}
+                >
+                  {d}
+                </span>
+                {hasEvent && <div className="w-1 h-1 rounded-full bg-primary mt-0.5" />}
+              </div>
+            )
+          })}
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
-function BookCard({ shades }: { shades: Record<string, string> }) {
-  return (
-    <div
-      className="rounded-2xl p-6 flex flex-col gap-4 justify-between"
-      style={{ background: `linear-gradient(145deg, ${shades['500']}, ${shades['600']})`, minHeight: 180 }}
-    >
-      <span className="text-[9px] font-semibold tracking-[0.2em] uppercase" style={{ color: 'rgba(255,255,255,0.5)' }}>
-        PAGE 22 OF 197
-      </span>
-      <div className="space-y-2">
-        <p className="text-base font-semibold tracking-tight" style={{ color: '#ffffff' }}>Design Principles Handbook</p>
-        <p className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
-          Continue reading &rarr;
-        </p>
-      </div>
-    </div>
-  )
-}
-
-function DonutChart({ shades, theme }: { shades: Record<string, string>, theme: ThemeColors }) {
-  const segments = [
-    { label: 'Views', pct: 50, color: `${shades['400']}80` },
-    { label: 'Clicks', pct: 30, color: shades['400'] },
-    { label: 'Sales', pct: 20, color: shades['600'] },
+function ActivityPreview() {
+  const items = [
+    { action: 'Created new project', user: 'Sarah J.', time: 'Just now', initials: 'SJ' },
+    { action: 'Merged pull request #42', user: 'Alex M.', time: '30 min ago', initials: 'AM' },
+    { action: 'Deployed v2.4.0', user: 'Jamie C.', time: '2 hours ago', initials: 'JC' },
+    { action: 'Updated billing info', user: 'Chris P.', time: 'Yesterday', initials: 'CP' },
   ]
-  let offset = 0
-  const r = 38
-  const c = 2 * Math.PI * r
   return (
-    <div className="p-5 space-y-4">
-      <p className="text-sm font-semibold tracking-tight" style={{ color: theme.text }}>Overview</p>
-      <div className="flex items-center gap-5">
-        <div className="relative" style={{ width: 100, height: 100 }}>
-          <svg viewBox="0 0 100 100" className="w-full h-full" style={{ transform: 'rotate(-90deg)' }}>
-            {segments.map(seg => {
-              const dash = (seg.pct / 100) * c
-              const gap = c - dash
-              const el = (
-                <circle
-                  key={seg.label}
-                  cx="50" cy="50" r={r}
-                  fill="none"
-                  stroke={seg.color}
-                  strokeWidth="10"
-                  strokeDasharray={`${dash} ${gap}`}
-                  strokeDashoffset={-offset}
-                  strokeLinecap="round"
-                />
-              )
-              offset += dash
-              return el
-            })}
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-base font-bold tabular-nums" style={{ color: theme.text }}>1.7K</span>
-            <span className="text-[9px] font-medium" style={{ color: theme.textTertiary }}>Total</span>
-          </div>
-        </div>
-        <div className="space-y-3">
-          {segments.map(seg => (
-            <div key={seg.label} className="flex items-center gap-2.5">
-              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: seg.color }} />
-              <span className="text-[11px]" style={{ color: theme.textSecondary }}>{seg.label}</span>
-              <span className="text-[11px] font-semibold tabular-nums" style={{ color: theme.text }}>{seg.pct}%</span>
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm">Recent Activity</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {items.map((item, i) => (
+            <div key={i} className="flex gap-3">
+              <div className="flex flex-col items-center">
+                <Avatar className="h-7 w-7">
+                  <AvatarFallback className="text-[10px]">{item.initials}</AvatarFallback>
+                </Avatar>
+                {i < items.length - 1 && <div className="w-px flex-1 bg-border mt-1" />}
+              </div>
+              <div className="flex-1 min-w-0 pb-4">
+                <p className="text-sm">{item.action}</p>
+                <p className="text-xs text-muted-foreground">{item.user} &middot; {item.time}</p>
+              </div>
             </div>
           ))}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -671,7 +591,7 @@ export default function PalettePage() {
   const [copiedShade, setCopiedShade] = useState<string | null>(null)
 
   const shades = useMemo(() => generateShadeScale(localColor), [localColor])
-  const theme = useMemo(() => getThemeColors(shades, darkMode), [shades, darkMode])
+  const cssOverrides = useMemo(() => getCssOverrides(shades, darkMode), [shades, darkMode])
 
   const handleColorChange = useCallback((hex: string) => {
     setLocalColor(hex)
@@ -709,7 +629,7 @@ export default function PalettePage() {
               type="color"
               value={localColor.startsWith('#') && localColor.length === 7 ? localColor : '#6366f1'}
               onChange={e => handleColorChange(e.target.value)}
-              className="w-14 h-10 p-1 cursor-pointer rounded-xl"
+              className="w-14 h-10 p-1 cursor-pointer"
               data-testid="input-palette-color-picker"
             />
             <Input
@@ -737,8 +657,7 @@ export default function PalettePage() {
           <button
             key={p.name}
             onClick={() => applyPreset(p.color)}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium hover-elevate transition-colors cursor-pointer"
-            style={{ backgroundColor: `${p.color}10`, color: p.color }}
+            className="flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium hover-elevate transition-colors cursor-pointer border"
             data-testid={`preset-palette-${p.name.toLowerCase()}`}
           >
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.color }} />
@@ -747,8 +666,7 @@ export default function PalettePage() {
         ))}
         <button
           onClick={randomize}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium hover-elevate transition-colors cursor-pointer"
-          style={{ backgroundColor: 'rgba(0,0,0,0.04)' }}
+          className="flex items-center gap-2 px-3 py-2 rounded-md border text-xs font-medium hover-elevate transition-colors cursor-pointer"
           data-testid="button-palette-randomize"
         >
           <Shuffle className="w-3 h-3" />
@@ -757,7 +675,7 @@ export default function PalettePage() {
       </div>
 
       <div>
-        <div className="flex rounded-2xl overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+        <div className="flex rounded-lg overflow-hidden border">
           {shadeKeys.map(shade => {
             const hex = shades[shade]
             const textColor = getContrastText(hex)
@@ -782,73 +700,35 @@ export default function PalettePage() {
       </div>
 
       <div
-        className="rounded-2xl p-5 transition-colors duration-300"
-        style={{ backgroundColor: theme.bg }}
+        className="rounded-xl p-6 transition-colors duration-300"
+        style={cssOverrides as React.CSSProperties}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          <PreviewPanel theme={theme}>
-            <HeroCard shades={shades} />
-          </PreviewPanel>
+        <div className="space-y-6">
+          <StatsPreview />
 
-          <PreviewPanel theme={theme}>
-            <CategoriesCard shades={shades} theme={theme} />
-          </PreviewPanel>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            <ButtonsAndBadges />
+            <ProfilePreview />
+            <TaskListPreview />
+          </div>
 
-          <PreviewPanel theme={theme}>
-            <BudgetCards shades={shades} theme={theme} />
-          </PreviewPanel>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            <ProgressPreview />
+            <TeamPreview />
+            <TabsPreview />
+          </div>
 
-          <PreviewPanel theme={theme}>
-            <NewsletterList shades={shades} theme={theme} />
-          </PreviewPanel>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            <NotificationsPreview />
+            <FormPreview />
+            <CalendarPreview />
+          </div>
 
-          <PreviewPanel theme={theme}>
-            <ScheduleCard shades={shades} theme={theme} />
-          </PreviewPanel>
+          <PricingPreview />
 
-          <PreviewPanel theme={theme}>
-            <ProfileCard shades={shades} theme={theme} />
-          </PreviewPanel>
-
-          <PreviewPanel theme={theme}>
-            <RevenueChart shades={shades} theme={theme} />
-          </PreviewPanel>
-
-          <PreviewPanel theme={theme}>
-            <PricingPlans shades={shades} theme={theme} />
-          </PreviewPanel>
-
-          <PreviewPanel theme={theme}>
-            <TicketsList shades={shades} theme={theme} />
-          </PreviewPanel>
-
-          <PreviewPanel theme={theme}>
-            <CourseCards shades={shades} theme={theme} />
-          </PreviewPanel>
-
-          <PreviewPanel theme={theme}>
-            <StatsRow shades={shades} theme={theme} />
-          </PreviewPanel>
-
-          <PreviewPanel theme={theme}>
-            <FeatureCards shades={shades} theme={theme} />
-          </PreviewPanel>
-
-          <PreviewPanel theme={theme}>
-            <ButtonStates shades={shades} theme={theme} />
-          </PreviewPanel>
-
-          <PreviewPanel theme={theme}>
-            <CalendarCard shades={shades} theme={theme} />
-          </PreviewPanel>
-
-          <PreviewPanel theme={theme}>
-            <BookCard shades={shades} />
-          </PreviewPanel>
-
-          <PreviewPanel theme={theme}>
-            <DonutChart shades={shades} theme={theme} />
-          </PreviewPanel>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <ActivityPreview />
+          </div>
         </div>
       </div>
     </div>
