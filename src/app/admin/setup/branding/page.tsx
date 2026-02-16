@@ -180,7 +180,7 @@ export default function BrandingPage() {
             <Label>Hero Layout Style</Label>
             <Select
               value={settings.content?.heroStyle ?? 'fullWidth'}
-              onValueChange={value => updateContent('heroStyle', value as 'fullWidth' | 'split' | 'video' | 'pattern' | 'floating')}
+              onValueChange={value => updateContent('heroStyle', value as 'fullWidth' | 'split' | 'video' | 'pattern' | 'floating' | 'collage')}
             >
               <SelectTrigger data-testid="select-hero-style">
                 <SelectValue />
@@ -191,6 +191,7 @@ export default function BrandingPage() {
                 <SelectItem value="video">Video Background</SelectItem>
                 <SelectItem value="pattern">Pattern/Texture Overlay</SelectItem>
                 <SelectItem value="floating">Gradient + Floating Mockup</SelectItem>
+                <SelectItem value="collage">Photo Collage (Overlapping Images)</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">Choose how the hero section is displayed</p>
@@ -394,6 +395,53 @@ export default function BrandingPage() {
                   Adjust the floating image height (200px = small, 700px = large)
                 </p>
               </div>
+            </div>
+          )}
+
+          {settings.content?.heroStyle === 'collage' && (
+            <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+              <p className="text-sm font-medium">Photo Collage Settings</p>
+              <p className="text-xs text-muted-foreground">
+                Add 3-5 image URLs. They will overlap on desktop and display as a 2x2 grid on mobile.
+              </p>
+              {(settings.content?.heroCollageImages ?? []).map((url, index) => (
+                <div key={index} className="flex gap-2 items-center">
+                  <Input
+                    value={url}
+                    onChange={e => {
+                      const images = [...(settings.content?.heroCollageImages ?? [])]
+                      images[index] = e.target.value
+                      updateContent('heroCollageImages', images)
+                    }}
+                    placeholder={`Image URL ${index + 1}`}
+                    data-testid={`input-collage-image-${index}`}
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => {
+                      const images = (settings.content?.heroCollageImages ?? []).filter((_, i) => i !== index)
+                      updateContent('heroCollageImages', images)
+                    }}
+                    data-testid={`button-remove-collage-image-${index}`}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
+              {(settings.content?.heroCollageImages?.length ?? 0) < 5 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const images = [...(settings.content?.heroCollageImages ?? []), '']
+                    updateContent('heroCollageImages', images)
+                  }}
+                  data-testid="button-add-collage-image"
+                >
+                  <Plus className="h-4 w-4 mr-1" /> Add Image
+                </Button>
+              )}
             </div>
           )}
 

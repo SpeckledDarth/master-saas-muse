@@ -1237,6 +1237,560 @@ export default function ContentPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
+              <CardTitle className="flex items-center gap-2">Founder Letter <InfoTooltip text="A personal letter from the founder builds emotional connection and trust with visitors." /></CardTitle>
+              <CardDescription>Personal narrative section with portrait and optional signature</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-founder-letter" />
+              <Switch
+                checked={settings.content?.founderLetterEnabled ?? false}
+                onCheckedChange={checked => updateContent('founderLetterEnabled', checked)}
+                data-testid="switch-founder-letter-enabled"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        {(settings.content?.founderLetterEnabled ?? false) && (
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Headline</Label>
+              <Input
+                value={settings.content?.founderLetter?.headline ?? ''}
+                onChange={e => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), headline: e.target.value })}
+                placeholder="A Letter from Our Founder"
+                data-testid="input-founder-headline"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Letter Body</Label>
+              <Textarea
+                value={settings.content?.founderLetter?.body ?? ''}
+                onChange={e => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), body: e.target.value })}
+                placeholder="Write your personal message to visitors..."
+                rows={6}
+                data-testid="input-founder-body"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Founder Name</Label>
+                <Input
+                  value={settings.content?.founderLetter?.founderName ?? ''}
+                  onChange={e => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), founderName: e.target.value })}
+                  placeholder="Jane Smith"
+                  data-testid="input-founder-name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Founder Title</Label>
+                <Input
+                  value={settings.content?.founderLetter?.founderTitle ?? ''}
+                  onChange={e => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), founderTitle: e.target.value })}
+                  placeholder="CEO & Co-Founder"
+                  data-testid="input-founder-title"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Founder Portrait URL (optional)</Label>
+              <Input
+                value={settings.content?.founderLetter?.founderImageUrl ?? ''}
+                onChange={e => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), founderImageUrl: e.target.value })}
+                placeholder="https://example.com/founder-photo.jpg"
+                data-testid="input-founder-image"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Signature Image URL (optional)</Label>
+              <Input
+                value={settings.content?.founderLetter?.signatureImageUrl ?? ''}
+                onChange={e => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), signatureImageUrl: e.target.value })}
+                placeholder="https://example.com/signature.png"
+                data-testid="input-founder-signature"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Background Banner Image URL (optional)</Label>
+              <Input
+                value={settings.content?.founderLetter?.backgroundImageUrl ?? ''}
+                onChange={e => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), backgroundImageUrl: e.target.value })}
+                placeholder="https://example.com/banner.jpg"
+                data-testid="input-founder-background"
+              />
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">Comparison Bars <InfoTooltip text="Animated horizontal bars that visually compare your product against alternatives or benchmarks." /></CardTitle>
+              <CardDescription>Animated comparison visualization with highlighted items</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-comparison-bars" />
+              <Switch
+                checked={settings.content?.comparisonBarsEnabled ?? false}
+                onCheckedChange={checked => updateContent('comparisonBarsEnabled', checked)}
+                data-testid="switch-comparison-bars-enabled"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        {(settings.content?.comparisonBarsEnabled ?? false) && (
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Headline</Label>
+                <Input
+                  value={settings.content?.comparisonBars?.headline ?? ''}
+                  onChange={e => updateContent('comparisonBars', { ...(settings.content?.comparisonBars || { headline: '', items: [] }), headline: e.target.value })}
+                  placeholder="Why choose us?"
+                  data-testid="input-comparison-headline"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Subheadline (optional)</Label>
+                <Input
+                  value={settings.content?.comparisonBars?.subheadline ?? ''}
+                  onChange={e => updateContent('comparisonBars', { ...(settings.content?.comparisonBars || { headline: '', items: [] }), subheadline: e.target.value })}
+                  placeholder="See how we stack up"
+                  data-testid="input-comparison-subheadline"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>CTA Button Text (optional)</Label>
+                <Input
+                  value={settings.content?.comparisonBars?.ctaText ?? ''}
+                  onChange={e => updateContent('comparisonBars', { ...(settings.content?.comparisonBars || { headline: '', items: [] }), ctaText: e.target.value })}
+                  placeholder="Get Started"
+                  data-testid="input-comparison-cta-text"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>CTA Button Link (optional)</Label>
+                <Input
+                  value={settings.content?.comparisonBars?.ctaLink ?? ''}
+                  onChange={e => updateContent('comparisonBars', { ...(settings.content?.comparisonBars || { headline: '', items: [] }), ctaLink: e.target.value })}
+                  placeholder="/signup"
+                  data-testid="input-comparison-cta-link"
+                />
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>Comparison Items</Label>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const current = settings.content?.comparisonBars || { headline: '', items: [] }
+                    updateContent('comparisonBars', {
+                      ...current,
+                      items: [...current.items, { id: `bar-${Date.now()}`, label: '', value: '', barPercent: 50, highlighted: false }]
+                    })
+                  }}
+                  data-testid="button-add-comparison-item"
+                >
+                  <Plus className="h-4 w-4 mr-1" /> Add Item
+                </Button>
+              </div>
+              {(settings.content?.comparisonBars?.items ?? []).map((item, index) => (
+                <div key={item.id} className="p-3 border rounded-lg bg-muted/30 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Item {index + 1}</span>
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs">Highlighted</Label>
+                      <Switch
+                        checked={item.highlighted ?? false}
+                        onCheckedChange={checked => {
+                          const current = settings.content?.comparisonBars || { headline: '', items: [] }
+                          const items = [...current.items]
+                          items[index] = { ...items[index], highlighted: checked }
+                          updateContent('comparisonBars', { ...current, items })
+                        }}
+                        data-testid={`switch-comparison-highlighted-${index}`}
+                      />
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => {
+                          const current = settings.content?.comparisonBars || { headline: '', items: [] }
+                          updateContent('comparisonBars', { ...current, items: current.items.filter((_, i) => i !== index) })
+                        }}
+                        data-testid={`button-remove-comparison-item-${index}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Input
+                      value={item.label}
+                      onChange={e => {
+                        const current = settings.content?.comparisonBars || { headline: '', items: [] }
+                        const items = [...current.items]
+                        items[index] = { ...items[index], label: e.target.value }
+                        updateContent('comparisonBars', { ...current, items })
+                      }}
+                      placeholder="Label (e.g., Speed)"
+                      data-testid={`input-comparison-label-${index}`}
+                    />
+                    <Input
+                      value={item.value}
+                      onChange={e => {
+                        const current = settings.content?.comparisonBars || { headline: '', items: [] }
+                        const items = [...current.items]
+                        items[index] = { ...items[index], value: e.target.value }
+                        updateContent('comparisonBars', { ...current, items })
+                      }}
+                      placeholder="Value (e.g., 10x faster)"
+                      data-testid={`input-comparison-value-${index}`}
+                    />
+                    <div className="space-y-1">
+                      <Input
+                        type="range"
+                        min="5"
+                        max="100"
+                        value={item.barPercent}
+                        onChange={e => {
+                          const current = settings.content?.comparisonBars || { headline: '', items: [] }
+                          const items = [...current.items]
+                          items[index] = { ...items[index], barPercent: parseInt(e.target.value) }
+                          updateContent('comparisonBars', { ...current, items })
+                        }}
+                        className="cursor-pointer"
+                        data-testid={`input-comparison-percent-${index}`}
+                      />
+                      <span className="text-xs text-muted-foreground">{item.barPercent}%</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">Product Screenshot Showcase <InfoTooltip text="Display a prominent screenshot of your product layered over a background image or gradient." /></CardTitle>
+              <CardDescription>Showcase your app with a featured screenshot</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-product-showcase" />
+              <Switch
+                checked={settings.content?.productShowcaseEnabled ?? false}
+                onCheckedChange={checked => updateContent('productShowcaseEnabled', checked)}
+                data-testid="switch-product-showcase-enabled"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        {(settings.content?.productShowcaseEnabled ?? false) && (
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Headline</Label>
+                <Input
+                  value={settings.content?.productShowcase?.headline ?? ''}
+                  onChange={e => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), headline: e.target.value })}
+                  placeholder="See it in action"
+                  data-testid="input-showcase-headline"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Subheadline (optional)</Label>
+                <Input
+                  value={settings.content?.productShowcase?.subheadline ?? ''}
+                  onChange={e => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), subheadline: e.target.value })}
+                  placeholder="A clean, intuitive interface"
+                  data-testid="input-showcase-subheadline"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Screenshot URL</Label>
+              <Input
+                value={settings.content?.productShowcase?.screenshotUrl ?? ''}
+                onChange={e => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), screenshotUrl: e.target.value })}
+                placeholder="https://example.com/app-screenshot.png"
+                data-testid="input-showcase-screenshot"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Background Image URL (optional)</Label>
+              <Input
+                value={settings.content?.productShowcase?.backgroundImageUrl ?? ''}
+                onChange={e => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), backgroundImageUrl: e.target.value })}
+                placeholder="https://example.com/background.jpg"
+                data-testid="input-showcase-background"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={settings.content?.productShowcase?.backgroundGradient ?? true}
+                onCheckedChange={checked => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), backgroundGradient: checked })}
+                data-testid="switch-showcase-gradient"
+              />
+              <Label>Use gradient background (when no background image)</Label>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">Bottom Hero CTA <InfoTooltip text="A closing call-to-action section at the bottom of the page with the same visual weight as the top hero." /></CardTitle>
+              <CardDescription>Closing hero section to drive conversions</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-bottom-hero" />
+              <Switch
+                checked={settings.content?.bottomHeroCtaEnabled ?? false}
+                onCheckedChange={checked => updateContent('bottomHeroCtaEnabled', checked)}
+                data-testid="switch-bottom-hero-enabled"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        {(settings.content?.bottomHeroCtaEnabled ?? false) && (
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Headline</Label>
+                <Input
+                  value={settings.content?.bottomHeroCta?.headline ?? ''}
+                  onChange={e => updateContent('bottomHeroCta', { ...(settings.content?.bottomHeroCta || { headline: '', subheadline: '', buttonText: '', buttonLink: '' }), headline: e.target.value })}
+                  placeholder="Ready to get started?"
+                  data-testid="input-bottom-hero-headline"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Subheadline</Label>
+                <Input
+                  value={settings.content?.bottomHeroCta?.subheadline ?? ''}
+                  onChange={e => updateContent('bottomHeroCta', { ...(settings.content?.bottomHeroCta || { headline: '', subheadline: '', buttonText: '', buttonLink: '' }), subheadline: e.target.value })}
+                  placeholder="Join thousands of satisfied users"
+                  data-testid="input-bottom-hero-subheadline"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Tagline (optional, small text above headline)</Label>
+              <Input
+                value={settings.content?.bottomHeroCta?.tagline ?? ''}
+                onChange={e => updateContent('bottomHeroCta', { ...(settings.content?.bottomHeroCta || { headline: '', subheadline: '', buttonText: '', buttonLink: '' }), tagline: e.target.value })}
+                placeholder="START YOUR JOURNEY"
+                data-testid="input-bottom-hero-tagline"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Button Text</Label>
+                <Input
+                  value={settings.content?.bottomHeroCta?.buttonText ?? ''}
+                  onChange={e => updateContent('bottomHeroCta', { ...(settings.content?.bottomHeroCta || { headline: '', subheadline: '', buttonText: '', buttonLink: '' }), buttonText: e.target.value })}
+                  placeholder="Start Free Trial"
+                  data-testid="input-bottom-hero-button-text"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Button Link</Label>
+                <Input
+                  value={settings.content?.bottomHeroCta?.buttonLink ?? ''}
+                  onChange={e => updateContent('bottomHeroCta', { ...(settings.content?.bottomHeroCta || { headline: '', subheadline: '', buttonText: '', buttonLink: '' }), buttonLink: e.target.value })}
+                  placeholder="/signup"
+                  data-testid="input-bottom-hero-button-link"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Background Image URL (optional)</Label>
+              <Input
+                value={settings.content?.bottomHeroCta?.backgroundImageUrl ?? ''}
+                onChange={e => updateContent('bottomHeroCta', { ...(settings.content?.bottomHeroCta || { headline: '', subheadline: '', buttonText: '', buttonLink: '' }), backgroundImageUrl: e.target.value })}
+                placeholder="https://example.com/cta-background.jpg"
+                data-testid="input-bottom-hero-background"
+              />
+              <p className="text-xs text-muted-foreground">Uses a gradient wash to ensure text readability over the image</p>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">Feature Sub-Pages <InfoTooltip text="Create dedicated pages for each major feature with their own URL, hero, and content blocks." /></CardTitle>
+              <CardDescription>Dynamic feature detail pages at /features/[slug]</CardDescription>
+            </div>
+            <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-feature-subpages" />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>Feature Pages</Label>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                const pages = [...(settings.content?.featureSubPages || [])]
+                pages.push({
+                  id: `fp-${Date.now()}`,
+                  slug: '',
+                  title: 'New Feature',
+                  navLabel: 'New Feature',
+                  heroHeadline: '',
+                  heroSubheadline: '',
+                  blocks: [],
+                })
+                updateContent('featureSubPages', pages)
+              }}
+              data-testid="button-add-feature-page"
+            >
+              <Plus className="h-4 w-4 mr-1" /> Add Feature Page
+            </Button>
+          </div>
+          {(settings.content?.featureSubPages || []).map((page, index) => (
+            <div key={page.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">{page.title || `Feature Page ${index + 1}`}</span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => {
+                    const pages = (settings.content?.featureSubPages || []).filter((_, i) => i !== index)
+                    updateContent('featureSubPages', pages)
+                  }}
+                  data-testid={`button-remove-feature-page-${index}`}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">URL Slug</Label>
+                  <Input
+                    value={page.slug}
+                    onChange={e => {
+                      const pages = [...(settings.content?.featureSubPages || [])]
+                      pages[index] = { ...pages[index], slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') }
+                      updateContent('featureSubPages', pages)
+                    }}
+                    placeholder="sourcing"
+                    data-testid={`input-feature-page-slug-${index}`}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Page Title</Label>
+                  <Input
+                    value={page.title}
+                    onChange={e => {
+                      const pages = [...(settings.content?.featureSubPages || [])]
+                      pages[index] = { ...pages[index], title: e.target.value }
+                      updateContent('featureSubPages', pages)
+                    }}
+                    placeholder="Smart Sourcing"
+                    data-testid={`input-feature-page-title-${index}`}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Nav Label</Label>
+                  <Input
+                    value={page.navLabel}
+                    onChange={e => {
+                      const pages = [...(settings.content?.featureSubPages || [])]
+                      pages[index] = { ...pages[index], navLabel: e.target.value }
+                      updateContent('featureSubPages', pages)
+                    }}
+                    placeholder="Sourcing"
+                    data-testid={`input-feature-page-nav-${index}`}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Hero Headline</Label>
+                  <Input
+                    value={page.heroHeadline}
+                    onChange={e => {
+                      const pages = [...(settings.content?.featureSubPages || [])]
+                      pages[index] = { ...pages[index], heroHeadline: e.target.value }
+                      updateContent('featureSubPages', pages)
+                    }}
+                    placeholder="Feature headline"
+                    data-testid={`input-feature-page-hero-headline-${index}`}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Hero Subheadline</Label>
+                  <Input
+                    value={page.heroSubheadline}
+                    onChange={e => {
+                      const pages = [...(settings.content?.featureSubPages || [])]
+                      pages[index] = { ...pages[index], heroSubheadline: e.target.value }
+                      updateContent('featureSubPages', pages)
+                    }}
+                    placeholder="Feature description"
+                    data-testid={`input-feature-page-hero-sub-${index}`}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Hero Image URL (optional)</Label>
+                  <Input
+                    value={page.heroImageUrl ?? ''}
+                    onChange={e => {
+                      const pages = [...(settings.content?.featureSubPages || [])]
+                      pages[index] = { ...pages[index], heroImageUrl: e.target.value }
+                      updateContent('featureSubPages', pages)
+                    }}
+                    placeholder="https://..."
+                    data-testid={`input-feature-page-hero-image-${index}`}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Hero Background URL (optional)</Label>
+                  <Input
+                    value={page.heroBackgroundImageUrl ?? ''}
+                    onChange={e => {
+                      const pages = [...(settings.content?.featureSubPages || [])]
+                      pages[index] = { ...pages[index], heroBackgroundImageUrl: e.target.value }
+                      updateContent('featureSubPages', pages)
+                    }}
+                    placeholder="https://..."
+                    data-testid={`input-feature-page-hero-bg-${index}`}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Visit /features/{page.slug || '[slug]'} to see this page. Content blocks can be added via the Image + Text Blocks pattern.
+              </p>
+            </div>
+          ))}
+          {(settings.content?.featureSubPages?.length ?? 0) === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No feature pages yet. Click "Add Feature Page" to create one.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
               <CardTitle className="flex items-center gap-2">Section Backgrounds <InfoTooltip text="Customize the visual style of each homepage section. Use contrast to draw attention to key areas." /></CardTitle>
               <CardDescription>Customize background styles for each section</CardDescription>
             </div>
