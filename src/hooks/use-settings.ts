@@ -135,6 +135,25 @@ function applyTheme(theme: { background: string; foreground: string; card: strin
   }
 }
 
+function loadGoogleFont(fontName: string) {
+  if (fontName === 'system' || typeof document === 'undefined') return
+  const id = `gfont-${fontName.replace(/\s+/g, '-')}`
+  if (document.getElementById(id)) return
+  const link = document.createElement('link')
+  link.id = id
+  link.rel = 'stylesheet'
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700&display=swap`
+  document.head.appendChild(link)
+}
+
+function getFontFamily(value: string): string {
+  if (!value || value === 'system') return ''
+  const serifFonts = ['Lora', 'Playfair Display', 'Merriweather', 'Source Serif 4', 'Crimson Pro', 'DM Serif Display']
+  const monoFonts = ['JetBrains Mono', 'Fira Code']
+  const fallback = serifFonts.includes(value) ? ', serif' : monoFonts.includes(value) ? ', monospace' : ', sans-serif'
+  return `"${value}"${fallback}`
+}
+
 export function useThemeFromSettings(settings: SiteSettings | null) {
   // Apply all theme colors - both brand colors and theme-specific colors
   useEffect(() => {
@@ -163,6 +182,32 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
     const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
     applyTheme(theme)
   }, [settings?.branding])
+  
+  // Apply fonts from settings to the live site
+  useEffect(() => {
+    if (!settings) return
+    const root = document.documentElement
+    
+    const headingFont = settings.branding.headingFont
+    const bodyFont = settings.branding.bodyFont
+    
+    if (headingFont && headingFont !== 'system') {
+      loadGoogleFont(headingFont)
+      root.style.setProperty('--font-heading', getFontFamily(headingFont))
+    } else {
+      root.style.removeProperty('--font-heading')
+    }
+    
+    if (bodyFont && bodyFont !== 'system') {
+      loadGoogleFont(bodyFont)
+      const family = getFontFamily(bodyFont)
+      root.style.setProperty('--font-body', family)
+      root.style.fontFamily = family
+    } else {
+      root.style.removeProperty('--font-body')
+      root.style.removeProperty('font-family')
+    }
+  }, [settings?.branding.headingFont, settings?.branding.bodyFont])
   
   // Watch for light/dark mode changes and re-apply the correct theme
   useEffect(() => {

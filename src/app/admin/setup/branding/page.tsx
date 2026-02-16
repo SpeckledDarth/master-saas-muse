@@ -15,7 +15,7 @@ import Link from 'next/link'
 import { Paintbrush } from 'lucide-react'
 
 export default function BrandingPage() {
-  const { settings, saving, saved, handleSave, setSettings, updateBranding, updateContent, addNavItem, updateNavItem, removeNavItem } = useSetupSettingsContext()
+  const { settings, saving, saved, handleSave, setSettings, updateBranding, updateContent, addNavItem, updateNavItem, removeNavItem, updateHeaderStyle, updateFooterStyle } = useSetupSettingsContext()
 
   return (
     <div className="space-y-6">
@@ -749,6 +749,182 @@ export default function BrandingPage() {
                 No navigation links configured. Click "Add Link" to get started.
               </p>
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">Header Styling <InfoTooltip text="Customize the appearance of the top navigation header including background color, text color, and behavior." /></CardTitle>
+          <CardDescription>
+            Control the look and behavior of your site header
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Background Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="color"
+                  value={settings.navigation?.headerStyle?.bgColor || '#ffffff'}
+                  onChange={e => updateHeaderStyle('bgColor', e.target.value)}
+                  className="w-12 h-9 p-1 cursor-pointer"
+                  data-testid="input-header-bg-color"
+                />
+                <Input
+                  value={settings.navigation?.headerStyle?.bgColor || ''}
+                  onChange={e => updateHeaderStyle('bgColor', e.target.value)}
+                  placeholder="Default (theme)"
+                  className="flex-1"
+                  data-testid="input-header-bg-color-text"
+                />
+                {settings.navigation?.headerStyle?.bgColor && (
+                  <Button variant="ghost" size="sm" onClick={() => updateHeaderStyle('bgColor', undefined)} data-testid="button-clear-header-bg">
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Text Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="color"
+                  value={settings.navigation?.headerStyle?.textColor || '#000000'}
+                  onChange={e => updateHeaderStyle('textColor', e.target.value)}
+                  className="w-12 h-9 p-1 cursor-pointer"
+                  data-testid="input-header-text-color"
+                />
+                <Input
+                  value={settings.navigation?.headerStyle?.textColor || ''}
+                  onChange={e => updateHeaderStyle('textColor', e.target.value)}
+                  placeholder="Default (theme)"
+                  className="flex-1"
+                  data-testid="input-header-text-color-text"
+                />
+                {settings.navigation?.headerStyle?.textColor && (
+                  <Button variant="ghost" size="sm" onClick={() => updateHeaderStyle('textColor', undefined)} data-testid="button-clear-header-text">
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Background Opacity: {settings.navigation?.headerStyle?.bgOpacity ?? 95}%</Label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={settings.navigation?.headerStyle?.bgOpacity ?? 95}
+              onChange={e => updateHeaderStyle('bgOpacity', parseInt(e.target.value))}
+              className="w-full"
+              data-testid="input-header-bg-opacity"
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <Label>Sticky Header</Label>
+              <Switch
+                checked={settings.navigation?.headerStyle?.sticky !== false}
+                onCheckedChange={checked => updateHeaderStyle('sticky', checked)}
+                data-testid="switch-header-sticky"
+              />
+            </div>
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <Label>Transparent</Label>
+              <Switch
+                checked={settings.navigation?.headerStyle?.transparent ?? false}
+                onCheckedChange={checked => updateHeaderStyle('transparent', checked)}
+                data-testid="switch-header-transparent"
+              />
+            </div>
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <Label>Bottom Border</Label>
+              <Switch
+                checked={settings.navigation?.headerStyle?.borderBottom !== false}
+                onCheckedChange={checked => updateHeaderStyle('borderBottom', checked)}
+                data-testid="switch-header-border"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">Footer Styling <InfoTooltip text="Customize the appearance of your site footer including background color, text color, and layout style." /></CardTitle>
+          <CardDescription>
+            Control the look of your site footer
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Background Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="color"
+                  value={settings.navigation?.footerStyle?.bgColor || '#f5f5f5'}
+                  onChange={e => updateFooterStyle('bgColor', e.target.value)}
+                  className="w-12 h-9 p-1 cursor-pointer"
+                  data-testid="input-footer-bg-color"
+                />
+                <Input
+                  value={settings.navigation?.footerStyle?.bgColor || ''}
+                  onChange={e => updateFooterStyle('bgColor', e.target.value)}
+                  placeholder="Default (theme)"
+                  className="flex-1"
+                  data-testid="input-footer-bg-color-text"
+                />
+                {settings.navigation?.footerStyle?.bgColor && (
+                  <Button variant="ghost" size="sm" onClick={() => updateFooterStyle('bgColor', undefined)} data-testid="button-clear-footer-bg">
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Text Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="color"
+                  value={settings.navigation?.footerStyle?.textColor || '#666666'}
+                  onChange={e => updateFooterStyle('textColor', e.target.value)}
+                  className="w-12 h-9 p-1 cursor-pointer"
+                  data-testid="input-footer-text-color"
+                />
+                <Input
+                  value={settings.navigation?.footerStyle?.textColor || ''}
+                  onChange={e => updateFooterStyle('textColor', e.target.value)}
+                  placeholder="Default (theme)"
+                  className="flex-1"
+                  data-testid="input-footer-text-color-text"
+                />
+                {settings.navigation?.footerStyle?.textColor && (
+                  <Button variant="ghost" size="sm" onClick={() => updateFooterStyle('textColor', undefined)} data-testid="button-clear-footer-text">
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Footer Layout</Label>
+            <Select
+              value={settings.navigation?.footerStyle?.layout || 'default'}
+              onValueChange={value => updateFooterStyle('layout', value as 'default' | 'minimal' | 'centered')}
+            >
+              <SelectTrigger data-testid="select-footer-layout">
+                <SelectValue placeholder="Layout style" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">Default (4-column grid)</SelectItem>
+                <SelectItem value="minimal">Minimal (single row)</SelectItem>
+                <SelectItem value="centered">Centered (stacked)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>

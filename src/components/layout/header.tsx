@@ -41,7 +41,8 @@ export function Header() {
   const brandNameGradient = branding?.brandNameGradient ?? false
   const brandNameAnimated = branding?.brandNameAnimated ?? false
 
-  // Don't show anything while loading to prevent flash
+  const headerStyle = settings?.navigation?.headerStyle
+
   if (loading || !settings) {
     return (
       <header className="sticky top-0 z-50 w-full border-b bg-transparent h-14">
@@ -50,25 +51,45 @@ export function Header() {
     )
   }
 
-  // Calculate dynamic header height based on logo size (with min/max bounds)
-  // Allow up to 120px logo height, header will grow to accommodate
   const effectiveLogoHeight = Math.min(logoHeight, 120)
-  const baseHeaderHeight = Math.max(56, effectiveLogoHeight + 24) // Logo + 24px padding
-  const scrolledHeaderHeight = Math.max(48, effectiveLogoHeight + 12) // Shrinks padding when scrolled
+  const baseHeaderHeight = Math.max(56, effectiveLogoHeight + 24)
+  const scrolledHeaderHeight = Math.max(48, effectiveLogoHeight + 12)
   const currentHeaderHeight = scrolled ? scrolledHeaderHeight : baseHeaderHeight
 
-  // When animation is enabled but not yet triggered, use clip-path to hide content
   const isAnimating = brandNameAnimated && !mounted
+
+  const isSticky = headerStyle?.sticky !== false
+  const isTransparent = headerStyle?.transparent ?? false
+  const showBorder = headerStyle?.borderBottom !== false
+  const customBg = headerStyle?.bgColor
+  const customTextColor = headerStyle?.textColor
+  const bgOpacity = headerStyle?.bgOpacity ?? (isTransparent ? 0 : 95)
+
+  const headerBgStyle: React.CSSProperties = {}
+  if (customBg) {
+    headerBgStyle.backgroundColor = scrolled 
+      ? `color-mix(in srgb, ${customBg} ${Math.min(bgOpacity + 20, 100)}%, transparent)` 
+      : `color-mix(in srgb, ${customBg} ${bgOpacity}%, transparent)`
+  }
+  if (customTextColor) {
+    headerBgStyle.color = customTextColor
+  }
 
   return (
     <header 
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300",
-        scrolled 
-          ? "border-b bg-background/80 backdrop-blur-lg shadow-sm" 
-          : "border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        "top-0 z-50 w-full transition-all duration-300",
+        isSticky ? "sticky" : "relative",
+        !customBg && (scrolled 
+          ? "bg-background/80 backdrop-blur-lg shadow-sm" 
+          : isTransparent 
+            ? "bg-transparent backdrop-blur" 
+            : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"),
+        customBg && "backdrop-blur-lg",
+        showBorder && "border-b"
       )}
       style={{
+        ...headerBgStyle,
         clipPath: isAnimating ? 'inset(0 0 100% 0)' : 'inset(0 0 0 0)',
         transition: 'clip-path 0.7s ease-out, background-color 0.3s ease'
       }}
@@ -150,7 +171,10 @@ export function Header() {
             <Link
               key={item.id}
               href={item.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all hover:after:w-full"
+              className={cn(
+                "text-sm transition-colors flex items-center gap-1.5 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all hover:after:w-full",
+                customTextColor ? "opacity-80 hover:opacity-100" : "text-muted-foreground hover:text-foreground"
+              )}
               data-testid={`link-nav-${item.id}`}
             >
               {item.label}
@@ -169,7 +193,10 @@ export function Header() {
             <Link
               key={page.id}
               href={`/p/${page.slug}`}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all hover:after:w-full"
+              className={cn(
+                "text-sm transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all hover:after:w-full",
+                customTextColor ? "opacity-80 hover:opacity-100" : "text-muted-foreground hover:text-foreground"
+              )}
               data-testid={`link-custom-${page.slug}`}
             >
               {page.name}

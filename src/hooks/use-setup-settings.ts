@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { SiteSettings, defaultSettings } from '@/types/settings'
-import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem, AISettings, WebhookSettings, ComplianceSettings, SupportSettings, SecuritySettings } from '@/types/settings'
+import type { FeatureCard, Testimonial, FAQItem, CTAContent, TeamMember, NavItem, AISettings, WebhookSettings, ComplianceSettings, SupportSettings, SecuritySettings, HeaderStyle, FooterStyle } from '@/types/settings'
 
 interface UseSetupSettingsReturn {
   loading: boolean
@@ -36,6 +36,8 @@ interface UseSetupSettingsReturn {
   addNavItem: () => void
   updateNavItem: (id: string, field: keyof NavItem, value: string | boolean | null) => void
   removeNavItem: (id: string) => void
+  updateHeaderStyle: <K extends keyof HeaderStyle>(key: K, value: HeaderStyle[K]) => void
+  updateFooterStyle: <K extends keyof FooterStyle>(key: K, value: FooterStyle[K]) => void
 
   addFeatureCard: () => void
   updateFeatureCard: (id: string, field: keyof FeatureCard, value: string) => void
@@ -197,6 +199,26 @@ export function useSetupSettings(): UseSetupSettingsReturn {
     updateNavigation(currentItems.filter(item => item.id !== id))
   }
 
+  function updateHeaderStyle<K extends keyof HeaderStyle>(key: K, value: HeaderStyle[K]) {
+    setSettings(prev => ({
+      ...prev,
+      navigation: {
+        ...prev.navigation,
+        headerStyle: { ...(prev.navigation?.headerStyle || {}), [key]: value }
+      }
+    }))
+  }
+
+  function updateFooterStyle<K extends keyof FooterStyle>(key: K, value: FooterStyle[K]) {
+    setSettings(prev => ({
+      ...prev,
+      navigation: {
+        ...prev.navigation,
+        footerStyle: { ...(prev.navigation?.footerStyle || {}), [key]: value }
+      }
+    }))
+  }
+
   function updateContent<K extends keyof SiteSettings['content']>(key: K, value: SiteSettings['content'][K]) {
     setSettings(prev => ({ ...prev, content: { ...defaultSettings.content, ...prev.content, [key]: value } }))
   }
@@ -311,7 +333,7 @@ export function useSetupSettings(): UseSetupSettingsReturn {
     updateBranding, updateSocial, updateFeatures, updateAI, updateWebhooks, updateWebhookEvent,
     updatePricing, updateContent, updateCTA, updateAbout, updateContact, updateLegal,
     updatePricingPage, updateFAQPage, updateCustomPage, updatePlan, updateNavigation,
-    addNavItem, updateNavItem, removeNavItem,
+    addNavItem, updateNavItem, removeNavItem, updateHeaderStyle, updateFooterStyle,
     addFeatureCard, updateFeatureCard, removeFeatureCard,
     addTestimonial, updateTestimonial, removeTestimonial,
     addFAQItem, updateFAQItem, removeFAQItem,

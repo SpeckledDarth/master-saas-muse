@@ -131,8 +131,25 @@ export interface NavItem {
   children?: NavItem[]
 }
 
+export interface HeaderStyle {
+  bgColor?: string
+  bgOpacity?: number
+  textColor?: string
+  sticky?: boolean
+  transparent?: boolean
+  borderBottom?: boolean
+}
+
+export interface FooterStyle {
+  bgColor?: string
+  textColor?: string
+  layout?: 'default' | 'minimal' | 'centered'
+}
+
 export interface NavigationSettings {
   items: NavItem[]
+  headerStyle?: HeaderStyle
+  footerStyle?: FooterStyle
 }
 
 export interface AnnouncementBar {

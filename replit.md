@@ -69,3 +69,8 @@ Reusable marketing page building blocks in `src/components/landing/`, all toggle
 - **Feature Sub-Page System**: Dynamic route at `/features/[slug]` renders feature detail pages from `featureSubPages` array in content settings. Each page has hero (with optional background image + screenshot), alternating image/text blocks via `ImageTextSection`, and a closing `BottomHeroCta`. Designed for Wone-style feature navigation (e.g., /features/sourcing, /features/evaluation).
 
 All components use palette-derived semantic colors (primary, muted-foreground, background/accent gradients) and support both light and dark modes automatically.
+
+## Header & Footer Styling (February 2026)
+- **Header Styling**: Configurable via `NavigationSettings.headerStyle` (`HeaderStyle` interface in `src/types/settings.ts`). Controls: background color, text color, background opacity, sticky/relative positioning, transparent mode, and bottom border toggle. Applied in `src/components/layout/header.tsx`. Custom colors use `color-mix` for opacity blending and adapt on scroll.
+- **Footer Styling**: Configurable via `NavigationSettings.footerStyle` (`FooterStyle` interface in `src/types/settings.ts`). Controls: background color, text color, and layout mode (default 4-column grid, minimal single-row, or centered stacked). Applied in `src/components/layout/footer.tsx`.
+- **Admin UI**: Both are managed on the Branding setup page (`src/app/admin/setup/branding/page.tsx`) with color pickers, opacity sliders, toggles, and layout selectors.
