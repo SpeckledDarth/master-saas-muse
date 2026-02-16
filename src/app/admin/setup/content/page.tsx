@@ -1291,33 +1291,33 @@ export default function ContentPage() {
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>Founder Portrait URL (optional)</Label>
-              <Input
-                value={settings.content?.founderLetter?.founderImageUrl ?? ''}
-                onChange={e => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), founderImageUrl: e.target.value })}
-                placeholder="https://example.com/founder-photo.jpg"
-                data-testid="input-founder-image"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Signature Image URL (optional)</Label>
-              <Input
-                value={settings.content?.founderLetter?.signatureImageUrl ?? ''}
-                onChange={e => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), signatureImageUrl: e.target.value })}
-                placeholder="https://example.com/signature.png"
-                data-testid="input-founder-signature"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Background Banner Image URL (optional)</Label>
-              <Input
-                value={settings.content?.founderLetter?.backgroundImageUrl ?? ''}
-                onChange={e => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), backgroundImageUrl: e.target.value })}
-                placeholder="https://example.com/banner.jpg"
-                data-testid="input-founder-background"
-              />
-            </div>
+            <ImageUpload
+              label="Founder Portrait (optional)"
+              value={settings.content?.founderLetter?.founderImageUrl || null}
+              onChange={url => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), founderImageUrl: url || '' })}
+              bucket="branding"
+              folder="founder"
+              aspectRatio="1/1"
+              testId="founder-portrait"
+            />
+            <ImageUpload
+              label="Signature Image (optional, PNG recommended)"
+              value={settings.content?.founderLetter?.signatureImageUrl || null}
+              onChange={url => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), signatureImageUrl: url || '' })}
+              bucket="branding"
+              folder="founder"
+              aspectRatio="3/1"
+              testId="founder-signature"
+            />
+            <ImageUpload
+              label="Background Banner Image (optional)"
+              value={settings.content?.founderLetter?.backgroundImageUrl || null}
+              onChange={url => updateContent('founderLetter', { ...(settings.content?.founderLetter || { headline: '', body: '', founderName: '', founderTitle: '' }), backgroundImageUrl: url || '' })}
+              bucket="branding"
+              folder="founder"
+              aspectRatio="21/9"
+              testId="founder-background"
+            />
           </CardContent>
         )}
       </Card>
