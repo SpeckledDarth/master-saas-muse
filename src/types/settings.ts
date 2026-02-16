@@ -196,6 +196,63 @@ export interface ImageTextBlock {
   imagePositionY?: number
 }
 
+export interface FounderLetterSettings {
+  headline: string
+  body: string
+  founderName: string
+  founderTitle: string
+  founderImageUrl?: string
+  signatureImageUrl?: string
+  backgroundImageUrl?: string
+}
+
+export interface ComparisonItem {
+  id: string
+  label: string
+  value: string
+  barPercent: number
+  highlighted?: boolean
+}
+
+export interface ComparisonBarsSettings {
+  headline: string
+  subheadline?: string
+  items: ComparisonItem[]
+  ctaText?: string
+  ctaLink?: string
+}
+
+export interface BottomHeroCtaSettings {
+  headline: string
+  subheadline: string
+  tagline?: string
+  buttonText: string
+  buttonLink: string
+  backgroundImageUrl?: string
+}
+
+export interface ProductShowcaseSettings {
+  headline: string
+  subheadline?: string
+  screenshotUrl: string
+  backgroundImageUrl?: string
+  backgroundGradient?: boolean
+}
+
+export interface FeatureSubPage {
+  id: string
+  slug: string
+  title: string
+  navLabel: string
+  heroHeadline: string
+  heroSubheadline: string
+  heroImageUrl?: string
+  heroBackgroundImageUrl?: string
+  blocks: ImageTextBlock[]
+  ctaText?: string
+  ctaLink?: string
+}
+
 export interface ContentSettings {
   featuresEnabled: boolean
   featuresHeadline: string
@@ -222,7 +279,7 @@ export interface ContentSettings {
   testimonialStyle?: 'cards' | 'carousel'
   imageTextEnabled?: boolean
   imageTextBlocks?: ImageTextBlock[]
-  heroStyle?: 'fullWidth' | 'split' | 'video' | 'pattern' | 'floating'
+  heroStyle?: 'fullWidth' | 'split' | 'video' | 'pattern' | 'floating' | 'collage'
   splitHeroImagePosition?: 'left' | 'right'
   splitHeroImageUrl?: string
   splitHeroBackground?: 'transparent' | 'muted' | 'gradient' | 'accent'
@@ -241,6 +298,16 @@ export interface ContentSettings {
   customerStoriesEnabled?: boolean
   customerStoriesHeadline?: string
   customerStories?: CustomerStory[]
+  founderLetterEnabled?: boolean
+  founderLetter?: FounderLetterSettings
+  comparisonBarsEnabled?: boolean
+  comparisonBars?: ComparisonBarsSettings
+  bottomHeroCtaEnabled?: boolean
+  bottomHeroCta?: BottomHeroCtaSettings
+  productShowcaseEnabled?: boolean
+  productShowcase?: ProductShowcaseSettings
+  featureSubPages?: FeatureSubPage[]
+  heroCollageImages?: string[]
 }
 
 export interface TeamMember {
@@ -650,6 +717,41 @@ export const defaultSettings: SiteSettings = {
     splitHeroBackground: 'transparent',
     splitHeroGap: 12,
     floatingHeroGap: 8,
+    founderLetterEnabled: false,
+    founderLetter: {
+      headline: 'An open letter from our founder',
+      body: 'We started this company with a simple belief: technology should amplify human potential, not replace it.\n\nOur mission is to build tools that save you time on repetitive work so you can focus on what matters most — building relationships, creating value, and growing your business.\n\nJoin us in building this future.',
+      founderName: 'Your Name',
+      founderTitle: 'Founder & CEO',
+    },
+    comparisonBarsEnabled: false,
+    comparisonBars: {
+      headline: 'Faster than traditional methods',
+      subheadline: 'See how we compare to the old way of doing things.',
+      items: [
+        { id: '1', label: 'Traditional approach', value: '30+ days', barPercent: 95 },
+        { id: '2', label: 'With competitors', value: '10-15 days', barPercent: 50 },
+        { id: '3', label: 'With our platform', value: '~30 seconds', barPercent: 3, highlighted: true },
+      ],
+      ctaText: 'Get early access',
+      ctaLink: '/signup',
+    },
+    bottomHeroCtaEnabled: false,
+    bottomHeroCta: {
+      headline: 'Ready to get started?',
+      subheadline: 'Make it easier than ever.',
+      buttonText: 'Get Started Free',
+      buttonLink: '/signup',
+      tagline: 'Your own personal assistant. Completely automated.',
+    },
+    productShowcaseEnabled: false,
+    productShowcase: {
+      headline: 'See it in action',
+      subheadline: 'A powerful platform designed for simplicity.',
+      screenshotUrl: '',
+    },
+    featureSubPages: [],
+    heroCollageImages: [],
   },
   pages: {
     about: {

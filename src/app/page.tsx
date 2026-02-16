@@ -18,6 +18,10 @@ import { SplitHero } from '@/components/landing/split-hero'
 import { AnnouncementBar } from '@/components/landing/announcement-bar'
 import { AnimatedWords } from '@/components/landing/animated-words'
 import { CustomerStories } from '@/components/landing/customer-stories'
+import { FounderLetter } from '@/components/landing/founder-letter'
+import { ComparisonBars } from '@/components/landing/comparison-bars'
+import { BottomHeroCta } from '@/components/landing/bottom-hero-cta'
+import { ProductShowcase } from '@/components/landing/product-showcase'
 
 const iconMap: Record<string, React.ReactNode> = {
   Zap: <Zap className="h-5 w-5 text-primary" />,
@@ -83,6 +87,10 @@ export default function HomePage() {
 
   const customerStoriesEnabled = content?.customerStoriesEnabled ?? false
   const heroAnimatedWords = content?.heroAnimatedWords || []
+  const founderLetterEnabled = content?.founderLetterEnabled ?? false
+  const comparisonBarsEnabled = content?.comparisonBarsEnabled ?? false
+  const bottomHeroCtaEnabled = content?.bottomHeroCtaEnabled ?? false
+  const productShowcaseEnabled = content?.productShowcaseEnabled ?? false
 
   const getSectionBg = (section: 'features' | 'testimonials' | 'faq' | 'cta' | 'customerStories') => {
     const style = content?.sectionBackgrounds?.[section] ?? 'default'
@@ -270,6 +278,93 @@ export default function HomePage() {
       )
     }
 
+    if (heroStyle === 'collage' && (content?.heroCollageImages?.length ?? 0) > 0) {
+      const collageImages = content?.heroCollageImages || []
+      return (
+        <section
+          className="relative min-h-[500px] md:min-h-[700px] flex items-center overflow-hidden"
+          data-testid="section-hero-collage"
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20" />
+
+          <div className="absolute right-0 top-0 bottom-0 w-1/2 hidden lg:block">
+            <div className="relative h-full w-full">
+              {collageImages.slice(0, 5).map((url, i) => {
+                const positions = [
+                  { top: '5%', left: '5%', width: '55%', height: '45%', zIndex: 3 },
+                  { top: '10%', left: '50%', width: '45%', height: '40%', zIndex: 2 },
+                  { top: '48%', left: '0%', width: '40%', height: '50%', zIndex: 4 },
+                  { top: '42%', left: '35%', width: '42%', height: '48%', zIndex: 5 },
+                  { top: '55%', left: '65%', width: '32%', height: '40%', zIndex: 1 },
+                ]
+                const pos = positions[i]
+                return (
+                  <div
+                    key={i}
+                    className="absolute rounded-lg overflow-hidden shadow-xl"
+                    style={{
+                      top: pos.top,
+                      left: pos.left,
+                      width: pos.width,
+                      height: pos.height,
+                      zIndex: pos.zIndex,
+                    }}
+                  >
+                    <Image
+                      src={url}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      unoptimized
+                      data-testid={`img-hero-collage-${i}`}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="relative z-10 container mx-auto px-4">
+            <div className="max-w-lg">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                {heroAnimatedWords.length > 0 ? (
+                  <AnimatedWords words={heroAnimatedWords} className="text-primary" />
+                ) : (
+                  <AppName />
+                )}
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground mb-8">
+                <AppTagline />
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <Button size="lg" asChild data-testid="button-get-started">
+                  <Link href="/signup">
+                    Get Started Free
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild data-testid="button-view-pricing">
+                  <Link href="/pricing">
+                    View Pricing
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:hidden mt-8 px-4">
+            <div className="grid grid-cols-2 gap-3">
+              {collageImages.slice(0, 4).map((url, i) => (
+                <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-lg">
+                  <Image src={url} alt="" fill className="object-cover" unoptimized data-testid={`img-hero-collage-mobile-${i}`} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
     return (
       <section 
         className="relative min-h-[400px] md:min-h-[600px] flex items-center justify-center overflow-hidden"
@@ -372,6 +467,10 @@ export default function HomePage() {
         )
       )}
 
+      {productShowcaseEnabled && content?.productShowcase?.screenshotUrl && (
+        <ProductShowcase settings={content.productShowcase} />
+      )}
+
       {imageTextEnabled && (content?.imageTextBlocks?.length ?? 0) > 0 && (
         <ImageTextSection blocks={content?.imageTextBlocks || []} />
       )}
@@ -384,6 +483,14 @@ export default function HomePage() {
           headline={content?.customerStoriesHeadline}
           className={getSectionBg('customerStories')}
         />
+      )}
+
+      {founderLetterEnabled && content?.founderLetter && (
+        <FounderLetter settings={content.founderLetter} />
+      )}
+
+      {comparisonBarsEnabled && content?.comparisonBars && (
+        <ComparisonBars settings={content.comparisonBars} />
       )}
 
       {faqEnabled && (content?.faqItems?.length ?? 0) > 0 && (
@@ -422,6 +529,10 @@ export default function HomePage() {
             </Button>
           </div>
         </section>
+      )}
+
+      {bottomHeroCtaEnabled && content?.bottomHeroCta && (
+        <BottomHeroCta settings={content.bottomHeroCta} />
       )}
     </div>
   )

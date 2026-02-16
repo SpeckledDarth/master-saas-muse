@@ -57,3 +57,15 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **Sentry**: Error tracking and monitoring.
 - **xAI/OpenAI/Anthropic**: AI chat completion providers.
 - **Upstash Redis**: For BullMQ queue infrastructure and rate limiting.
+
+## Landing Page Components (February 2026)
+Reusable marketing page building blocks in `src/components/landing/`, all toggleable via `ContentSettings` in `src/types/settings.ts`:
+
+- **Founder Letter** (`founder-letter.tsx`): Long-form narrative section with portrait/avatar, optional signature image, and background banner photo. Configurable via `founderLetterEnabled` + `founderLetter` settings.
+- **Comparison Bars** (`comparison-bars.tsx`): Animated horizontal bars with IntersectionObserver entrance animation. Highlighted items use `bg-primary`. Configurable via `comparisonBarsEnabled` + `comparisonBars` settings.
+- **Product Screenshot Showcase** (`product-showcase.tsx`): App screenshot with shadow/border, layered over optional background image or gradient. Configurable via `productShowcaseEnabled` + `productShowcase` settings.
+- **Bottom Hero CTA** (`bottom-hero-cta.tsx`): Closing hero section mirroring top hero visual weight. Supports background image with gradient wash or gradient-only. Configurable via `bottomHeroCtaEnabled` + `bottomHeroCta` settings.
+- **Photo Collage Hero**: New `heroStyle: 'collage'` option in page.tsx. Left-aligned text with 3-5 overlapping images on the right (desktop), 2x2 grid (mobile). Uses `heroCollageImages` array in content settings.
+- **Feature Sub-Page System**: Dynamic route at `/features/[slug]` renders feature detail pages from `featureSubPages` array in content settings. Each page has hero (with optional background image + screenshot), alternating image/text blocks via `ImageTextSection`, and a closing `BottomHeroCta`. Designed for Wone-style feature navigation (e.g., /features/sourcing, /features/evaluation).
+
+All components use palette-derived semantic colors (primary, muted-foreground, background/accent gradients) and support both light and dark modes automatically.
