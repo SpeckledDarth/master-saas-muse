@@ -203,6 +203,7 @@ export function useSetupSettings(): UseSetupSettingsReturn {
     setSettings(prev => ({
       ...prev,
       navigation: {
+        items: prev.navigation?.items ?? [],
         ...prev.navigation,
         headerStyle: { ...(prev.navigation?.headerStyle || {}), [key]: value }
       }
@@ -213,6 +214,7 @@ export function useSetupSettings(): UseSetupSettingsReturn {
     setSettings(prev => ({
       ...prev,
       navigation: {
+        items: prev.navigation?.items ?? [],
         ...prev.navigation,
         footerStyle: { ...(prev.navigation?.footerStyle || {}), [key]: value }
       }
