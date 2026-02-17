@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 interface Metric {
   id: string
-  value: number
+  value: number | string
   suffix?: string
   prefix?: string
   label: string
@@ -18,7 +18,8 @@ interface AnimatedCounterProps {
   headline?: string
 }
 
-function Counter({ value, suffix = '', prefix = '' }: { value: number; suffix?: string; prefix?: string }) {
+function Counter({ value: rawValue, suffix = '', prefix = '' }: { value: number | string; suffix?: string; prefix?: string }) {
+  const value = typeof rawValue === 'string' ? (parseFloat(rawValue) || 0) : (rawValue || 0)
   const [count, setCount] = useState(0)
   const [hasAnimated, setHasAnimated] = useState(false)
   const ref = useRef<HTMLSpanElement>(null)
