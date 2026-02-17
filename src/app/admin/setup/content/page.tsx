@@ -1545,7 +1545,6 @@ export default function ContentPage() {
               bucket="branding"
               folder="showcase"
               aspectRatio="16/9"
-              maxWidth={360}
               testId="showcase-screenshot"
             />
             <ImageUpload

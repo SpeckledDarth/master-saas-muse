@@ -118,16 +118,16 @@ export function ImageUpload({
                   type="button"
                   variant="destructive"
                   size="icon"
-                  className="absolute -top-1 -right-1 h-6 w-6 rounded-full"
+                  className="absolute -top-1 -right-1 rounded-full scale-75"
                   onClick={handleRemove}
                   data-testid={`${testId}-remove`}
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
             ) : (
               <div
-                className="w-full h-full rounded-full border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors cursor-pointer flex items-center justify-center bg-muted"
+                className="w-full h-full rounded-full border-2 border-dashed border-muted-foreground/25 transition-colors cursor-pointer flex items-center justify-center bg-muted hover-elevate"
                 onClick={() => fileInputRef.current?.click()}
                 data-testid={`${testId}-dropzone`}
               >
@@ -202,16 +202,16 @@ export function ImageUpload({
               type="button"
               variant="destructive"
               size="icon"
-              className="absolute top-1 right-1 h-6 w-6"
+              className="absolute top-1 right-1 scale-75"
               onClick={handleRemove}
               data-testid={`${testId}-remove`}
             >
-              <X className="h-3 w-3" />
+              <X className="h-4 w-4" />
             </Button>
           </div>
         ) : (
           <div
-            className="relative rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors cursor-pointer"
+            className="relative rounded-lg border-2 border-dashed border-muted-foreground/25 transition-colors cursor-pointer hover-elevate"
             style={{ aspectRatio }}
             onClick={() => fileInputRef.current?.click()}
             data-testid={`${testId}-dropzone`}
