@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface Metric {
   id: string
@@ -21,60 +21,69 @@ interface AnimatedCounterProps {
 function Counter({ value: rawValue, suffix = '', prefix = '' }: { value: number | string; suffix?: string; prefix?: string }) {
   const numValue = typeof rawValue === 'string' ? (parseFloat(rawValue) || 0) : (Number(rawValue) || 0)
   const [count, setCount] = useState(0)
-  const [hasAnimated, setHasAnimated] = useState(false)
+  const startedRef = useRef(false)
   const ref = useRef<HTMLSpanElement>(null)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
-
-  const startAnimation = useCallback(() => {
-    if (hasAnimated || numValue === 0) return
-    setHasAnimated(true)
-    const duration = 2000
-    const steps = 60
-    const increment = numValue / steps
-    let current = 0
-    timerRef.current = setInterval(() => {
-      current += increment
-      if (current >= numValue) {
-        setCount(numValue)
-        if (timerRef.current) clearInterval(timerRef.current)
-      } else {
-        setCount(Math.floor(current))
-      }
-    }, duration / steps)
-  }, [numValue, hasAnimated])
 
   useEffect(() => {
+    if (startedRef.current || numValue === 0) return
+
+    const animate = () => {
+      if (startedRef.current) return
+      startedRef.current = true
+      const duration = 2000
+      const steps = 60
+      const increment = numValue / steps
+      let current = 0
+      const timer = setInterval(() => {
+        current += increment
+        if (current >= numValue) {
+          setCount(numValue)
+          clearInterval(timer)
+        } else {
+          setCount(Math.floor(current))
+        }
+      }, duration / steps)
+    }
+
     const el = ref.current
-    if (!el) return
+    if (!el) {
+      animate()
+      return
+    }
 
     if (typeof IntersectionObserver === 'undefined') {
-      startAnimation()
+      animate()
       return
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) {
-          startAnimation()
+          animate()
           observer.disconnect()
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0 }
     )
 
     observer.observe(el)
 
+    const fallbackTimer = setTimeout(() => {
+      if (!startedRef.current) {
+        animate()
+        observer.disconnect()
+      }
+    }, 2000)
+
     return () => {
       observer.disconnect()
-      if (timerRef.current) clearInterval(timerRef.current)
+      clearTimeout(fallbackTimer)
     }
-  }, [startAnimation])
-
-  const displayValue = numValue === 0 ? 0 : count
+  }, [numValue])
 
   return (
     <span ref={ref} className="tabular-nums">
-      {prefix}{displayValue.toLocaleString()}{suffix}
+      {prefix}{count.toLocaleString()}{suffix}
     </span>
   )
 }
