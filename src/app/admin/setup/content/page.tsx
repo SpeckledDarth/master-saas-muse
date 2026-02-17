@@ -577,7 +577,7 @@ export default function ContentPage() {
                   const metrics = settings.content?.metrics || []
                   updateContent('metrics', [
                     ...metrics,
-                    { id: `metric-${Date.now()}`, value: 100, suffix: '+', label: 'New Metric' }
+                    { id: `metric-${Date.now()}`, value: '100', suffix: '+', label: 'New Metric' }
                   ])
                 }}
                 data-testid="button-add-metric"
@@ -604,50 +604,64 @@ export default function ContentPage() {
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    <Input
-                      value={metric.prefix || ''}
-                      onChange={e => {
-                        const metrics = [...(settings.content?.metrics || [])]
-                        metrics[index] = { ...metrics[index], prefix: e.target.value }
-                        updateContent('metrics', metrics)
-                      }}
-                      placeholder="Prefix ($)"
-                      className="text-center"
-                      data-testid={`input-metric-prefix-${index}`}
-                    />
-                    <Input
-                      type="text"
-                      value={metric.value}
-                      onChange={e => {
-                        const metrics = [...(settings.content?.metrics || [])]
-                        metrics[index] = { ...metrics[index], value: e.target.value }
-                        updateContent('metrics', metrics)
-                      }}
-                      placeholder="Value (e.g. 340)"
-                      data-testid={`input-metric-value-${index}`}
-                    />
-                    <Input
-                      value={metric.suffix || ''}
-                      onChange={e => {
-                        const metrics = [...(settings.content?.metrics || [])]
-                        metrics[index] = { ...metrics[index], suffix: e.target.value }
-                        updateContent('metrics', metrics)
-                      }}
-                      placeholder="Suffix (+, %, K)"
-                      className="text-center"
-                      data-testid={`input-metric-suffix-${index}`}
-                    />
-                    <Input
-                      value={metric.label}
-                      onChange={e => {
-                        const metrics = [...(settings.content?.metrics || [])]
-                        metrics[index] = { ...metrics[index], label: e.target.value }
-                        updateContent('metrics', metrics)
-                      }}
-                      placeholder="Label"
-                      data-testid={`input-metric-label-${index}`}
-                    />
+                  <div className="space-y-2">
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">Label (text below the number)</Label>
+                      <Input
+                        value={metric.label}
+                        onChange={e => {
+                          const metrics = [...(settings.content?.metrics || [])]
+                          metrics[index] = { ...metrics[index], label: e.target.value }
+                          updateContent('metrics', metrics)
+                        }}
+                        placeholder="e.g. Happy Customers, Uptime, Support"
+                        data-testid={`input-metric-label-${index}`}
+                      />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <Label className="text-xs text-muted-foreground mb-1 block">Number</Label>
+                        <Input
+                          type="text"
+                          value={metric.value}
+                          onChange={e => {
+                            const metrics = [...(settings.content?.metrics || [])]
+                            metrics[index] = { ...metrics[index], value: e.target.value }
+                            updateContent('metrics', metrics)
+                          }}
+                          placeholder="e.g. 340"
+                          data-testid={`input-metric-value-${index}`}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground mb-1 block">Suffix (after number)</Label>
+                        <Input
+                          value={metric.suffix || ''}
+                          onChange={e => {
+                            const metrics = [...(settings.content?.metrics || [])]
+                            metrics[index] = { ...metrics[index], suffix: e.target.value }
+                            updateContent('metrics', metrics)
+                          }}
+                          placeholder="e.g. +, %, K, /7"
+                          className="text-center"
+                          data-testid={`input-metric-suffix-${index}`}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground mb-1 block">Prefix (before number)</Label>
+                        <Input
+                          value={metric.prefix || ''}
+                          onChange={e => {
+                            const metrics = [...(settings.content?.metrics || [])]
+                            metrics[index] = { ...metrics[index], prefix: e.target.value }
+                            updateContent('metrics', metrics)
+                          }}
+                          placeholder="e.g. $"
+                          className="text-center"
+                          data-testid={`input-metric-prefix-${index}`}
+                        />
+                      </div>
+                    </div>
                   </div>
                   <div className="pt-2 border-t">
                     <ImageUpload

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 
 interface Metric {
   id: string
@@ -18,40 +18,51 @@ interface AnimatedCounterProps {
   headline?: string
 }
 
+function parseNumericValue(raw: number | string): number {
+  if (typeof raw === 'number') return raw
+  const cleaned = String(raw).replace(/,/g, '')
+  const parsed = parseFloat(cleaned)
+  return isNaN(parsed) ? 0 : parsed
+}
+
 function Counter({ value: rawValue, suffix = '', prefix = '' }: { value: number | string; suffix?: string; prefix?: string }) {
-  const numValue = typeof rawValue === 'string' ? (parseFloat(rawValue) || 0) : (Number(rawValue) || 0)
-  const [count, setCount] = useState(0)
+  const numValue = parseNumericValue(rawValue)
+  const [count, setCount] = useState(numValue)
   const startedRef = useRef(false)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const ref = useRef<HTMLSpanElement>(null)
 
-  useEffect(() => {
+  const animate = useCallback(() => {
     if (startedRef.current || numValue === 0) return
+    startedRef.current = true
+    setCount(0)
+    const duration = 2000
+    const steps = 60
+    const increment = numValue / steps
+    let current = 0
+    intervalRef.current = setInterval(() => {
+      current += increment
+      if (current >= numValue) {
+        setCount(numValue)
+        if (intervalRef.current) clearInterval(intervalRef.current)
+        intervalRef.current = null
+      } else {
+        setCount(Math.floor(current))
+      }
+    }, duration / steps)
+  }, [numValue])
 
-    const animate = () => {
-      if (startedRef.current) return
-      startedRef.current = true
-      const duration = 2000
-      const steps = 60
-      const increment = numValue / steps
-      let current = 0
-      const timer = setInterval(() => {
-        current += increment
-        if (current >= numValue) {
-          setCount(numValue)
-          clearInterval(timer)
-        } else {
-          setCount(Math.floor(current))
-        }
-      }, duration / steps)
-    }
-
-    const el = ref.current
-    if (!el) {
-      animate()
+  useEffect(() => {
+    if (numValue === 0) {
+      setCount(0)
       return
     }
 
-    if (typeof IntersectionObserver === 'undefined') {
+    setCount(numValue)
+    startedRef.current = false
+
+    const el = ref.current
+    if (!el || typeof IntersectionObserver === 'undefined') {
       animate()
       return
     }
@@ -78,8 +89,12 @@ function Counter({ value: rawValue, suffix = '', prefix = '' }: { value: number 
     return () => {
       observer.disconnect()
       clearTimeout(fallbackTimer)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
     }
-  }, [numValue])
+  }, [numValue, animate])
 
   return (
     <span ref={ref} className="tabular-nums">
