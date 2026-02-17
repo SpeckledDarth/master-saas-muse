@@ -116,9 +116,16 @@ export function AnimatedCounterSection({ metrics, headline }: AnimatedCounterPro
             {headline}
           </h2>
         )}
-        <div className={`grid gap-8 ${metrics.length === 2 ? 'md:grid-cols-2' : metrics.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'} max-w-4xl mx-auto`}>
+        <div className={`grid gap-8 sm:gap-10 ${
+          metrics.length === 1 ? 'grid-cols-1 max-w-xs' :
+          metrics.length === 2 ? 'grid-cols-2 max-w-2xl' :
+          metrics.length === 3 ? 'grid-cols-1 sm:grid-cols-3 max-w-4xl' :
+          metrics.length === 4 ? 'grid-cols-2 md:grid-cols-4 max-w-5xl' :
+          metrics.length <= 6 ? 'grid-cols-2 md:grid-cols-3 max-w-5xl' :
+          'grid-cols-2 md:grid-cols-4 max-w-6xl'
+        } mx-auto`}>
           {metrics.map((metric) => (
-            <div key={metric.id} className="text-center" data-testid={`metric-${metric.id}`}>
+            <div key={metric.id} className="text-center min-w-0" data-testid={`metric-${metric.id}`}>
               {metric.iconUrl && (
                 <div className="flex justify-center mb-3">
                   <img
@@ -129,7 +136,7 @@ export function AnimatedCounterSection({ metrics, headline }: AnimatedCounterPro
                   />
                 </div>
               )}
-              <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2 break-words">
                 <Counter value={metric.value} suffix={metric.suffix} prefix={metric.prefix} />
               </div>
               <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider">

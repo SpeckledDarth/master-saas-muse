@@ -605,8 +605,17 @@ export default function ContentPage() {
                     </Button>
                   </div>
                   <div className="space-y-2">
+                    <div className="rounded-md bg-primary/5 p-3 text-center mb-2" data-testid={`metric-preview-${index}`}>
+                      <div className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Preview</div>
+                      <div className="text-2xl font-bold text-primary">
+                        {metric.prefix || ''}{metric.value || '0'}{metric.suffix || ''}
+                      </div>
+                      <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mt-1">
+                        {metric.label || 'Label'}
+                      </div>
+                    </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground mb-1 block">Label (text below the number)</Label>
+                      <Label className="text-xs text-muted-foreground mb-1 block">Label (small text below the number)</Label>
                       <Input
                         value={metric.label}
                         onChange={e => {
@@ -620,7 +629,7 @@ export default function ContentPage() {
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       <div>
-                        <Label className="text-xs text-muted-foreground mb-1 block">Number</Label>
+                        <Label className="text-xs text-muted-foreground mb-1 block">Number (the big value)</Label>
                         <Input
                           type="text"
                           value={metric.value}
@@ -642,7 +651,7 @@ export default function ContentPage() {
                             metrics[index] = { ...metrics[index], suffix: e.target.value }
                             updateContent('metrics', metrics)
                           }}
-                          placeholder="e.g. +, %, K, /7"
+                          placeholder="e.g. +, %, K"
                           className="text-center"
                           data-testid={`input-metric-suffix-${index}`}
                         />
