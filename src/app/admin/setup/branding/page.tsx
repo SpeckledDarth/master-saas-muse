@@ -916,7 +916,7 @@ export default function BrandingPage() {
             <ImageUpload
               label="Footer Background Image"
               value={settings.navigation?.footerStyle?.bgImage || null}
-              onChange={(url) => updateFooterStyle('bgImage', url)}
+              onChange={(url) => updateFooterStyle('bgImage', url || undefined)}
               folder="footer"
               testId="upload-footer-bg-image"
             />
