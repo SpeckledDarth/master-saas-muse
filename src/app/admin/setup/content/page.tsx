@@ -1209,32 +1209,32 @@ export default function ContentPage() {
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label className="text-xs">Person Photo URL</Label>
-                      <Input
-                        value={story.personPhotoUrl || ''}
-                        onChange={e => {
-                          const stories = [...(settings.content?.customerStories || [])]
-                          stories[index] = { ...stories[index], personPhotoUrl: e.target.value }
-                          updateContent('customerStories', stories)
-                        }}
-                        placeholder="https://..."
-                        data-testid={`input-story-photo-${index}`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs">Background Image URL</Label>
-                      <Input
-                        value={story.backgroundImageUrl || ''}
-                        onChange={e => {
-                          const stories = [...(settings.content?.customerStories || [])]
-                          stories[index] = { ...stories[index], backgroundImageUrl: e.target.value }
-                          updateContent('customerStories', stories)
-                        }}
-                        placeholder="https://..."
-                        data-testid={`input-story-bg-${index}`}
-                      />
-                    </div>
+                    <ImageUpload
+                      label="Person Photo"
+                      variant="avatar"
+                      value={story.personPhotoUrl || null}
+                      onChange={url => {
+                        const stories = [...(settings.content?.customerStories || [])]
+                        stories[index] = { ...stories[index], personPhotoUrl: url || '' }
+                        updateContent('customerStories', stories)
+                      }}
+                      bucket="branding"
+                      folder="stories"
+                      testId={`story-photo-${index}`}
+                    />
+                    <ImageUpload
+                      label="Background Image"
+                      value={story.backgroundImageUrl || null}
+                      onChange={url => {
+                        const stories = [...(settings.content?.customerStories || [])]
+                        stories[index] = { ...stories[index], backgroundImageUrl: url || '' }
+                        updateContent('customerStories', stories)
+                      }}
+                      bucket="branding"
+                      folder="stories"
+                      aspectRatio="16/9"
+                      testId={`story-bg-${index}`}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs">Story Link (optional)</Label>
@@ -1538,24 +1538,25 @@ export default function ContentPage() {
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>Screenshot URL</Label>
-              <Input
-                value={settings.content?.productShowcase?.screenshotUrl ?? ''}
-                onChange={e => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), screenshotUrl: e.target.value })}
-                placeholder="https://example.com/app-screenshot.png"
-                data-testid="input-showcase-screenshot"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Background Image URL (optional)</Label>
-              <Input
-                value={settings.content?.productShowcase?.backgroundImageUrl ?? ''}
-                onChange={e => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), backgroundImageUrl: e.target.value })}
-                placeholder="https://example.com/background.jpg"
-                data-testid="input-showcase-background"
-              />
-            </div>
+            <ImageUpload
+              label="Screenshot"
+              value={settings.content?.productShowcase?.screenshotUrl || null}
+              onChange={url => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), screenshotUrl: url || '' })}
+              bucket="branding"
+              folder="showcase"
+              aspectRatio="16/9"
+              maxWidth={360}
+              testId="showcase-screenshot"
+            />
+            <ImageUpload
+              label="Background Image (optional)"
+              value={settings.content?.productShowcase?.backgroundImageUrl || null}
+              onChange={url => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), backgroundImageUrl: url || '' })}
+              bucket="branding"
+              folder="showcase"
+              aspectRatio="21/9"
+              testId="showcase-background"
+            />
             <div className="flex items-center gap-2">
               <Switch
                 checked={settings.content?.productShowcase?.backgroundGradient ?? true}
@@ -1636,16 +1637,16 @@ export default function ContentPage() {
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>Background Image URL (optional)</Label>
-              <Input
-                value={settings.content?.bottomHeroCta?.backgroundImageUrl ?? ''}
-                onChange={e => updateContent('bottomHeroCta', { ...(settings.content?.bottomHeroCta || { headline: '', subheadline: '', buttonText: '', buttonLink: '' }), backgroundImageUrl: e.target.value })}
-                placeholder="https://example.com/cta-background.jpg"
-                data-testid="input-bottom-hero-background"
-              />
-              <p className="text-xs text-muted-foreground">Uses a gradient wash to ensure text readability over the image</p>
-            </div>
+            <ImageUpload
+              label="Background Image (optional)"
+              value={settings.content?.bottomHeroCta?.backgroundImageUrl || null}
+              onChange={url => updateContent('bottomHeroCta', { ...(settings.content?.bottomHeroCta || { headline: '', subheadline: '', buttonText: '', buttonLink: '' }), backgroundImageUrl: url || '' })}
+              bucket="branding"
+              folder="cta"
+              aspectRatio="21/9"
+              testId="bottom-hero-background"
+            />
+            <p className="text-xs text-muted-foreground">Uses a gradient wash to ensure text readability over the image</p>
           </CardContent>
         )}
       </Card>
