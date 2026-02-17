@@ -617,14 +617,14 @@ export default function ContentPage() {
                       data-testid={`input-metric-prefix-${index}`}
                     />
                     <Input
-                      type="number"
+                      type="text"
                       value={metric.value}
                       onChange={e => {
                         const metrics = [...(settings.content?.metrics || [])]
-                        metrics[index] = { ...metrics[index], value: parseInt(e.target.value) || 0 }
+                        metrics[index] = { ...metrics[index], value: e.target.value }
                         updateContent('metrics', metrics)
                       }}
-                      placeholder="Value"
+                      placeholder="Value (e.g. 340)"
                       data-testid={`input-metric-value-${index}`}
                     />
                     <Input

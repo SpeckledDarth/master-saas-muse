@@ -192,7 +192,7 @@ export interface ProcessStep {
 
 export interface Metric {
   id: string
-  value: number
+  value: number | string
   suffix?: string
   prefix?: string
   label: string
