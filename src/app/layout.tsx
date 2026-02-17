@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
 })
 
 export const metadata: Metadata = {
@@ -46,7 +47,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={inter.variable}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

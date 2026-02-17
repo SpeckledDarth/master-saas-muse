@@ -202,10 +202,8 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
       loadGoogleFont(bodyFont)
       const family = getFontFamily(bodyFont)
       root.style.setProperty('--font-body', family)
-      root.style.fontFamily = family
     } else {
       root.style.removeProperty('--font-body')
-      root.style.removeProperty('font-family')
     }
   }, [settings?.branding.headingFont, settings?.branding.bodyFont])
   

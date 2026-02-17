@@ -85,8 +85,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body, var(--font-inter, ui-sans-serif, system-ui, sans-serif));
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1, h2, h3, h4, h5, h6,
+  [data-slot="card-title"] {
     font-family: var(--font-heading, inherit);
   }
 }
