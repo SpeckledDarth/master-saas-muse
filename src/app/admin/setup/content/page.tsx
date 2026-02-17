@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react'
 import { ImageUpload } from '@/components/admin/image-upload'
 
 export default function ContentPage() {
@@ -1904,6 +1904,205 @@ export default function ContentPage() {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between gap-2">
+            Image Collage
+            <Switch
+              checked={settings.content?.imageCollageEnabled ?? false}
+              onCheckedChange={v => updateContent('imageCollageEnabled', v)}
+              data-testid="switch-image-collage"
+            />
+          </CardTitle>
+          <CardDescription>Fan-style overlapping image layout with hover animations</CardDescription>
+        </CardHeader>
+        {settings.content?.imageCollageEnabled && (
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Headline</Label>
+              <Input
+                value={settings.content?.imageCollageHeadline || ''}
+                onChange={e => updateContent('imageCollageHeadline', e.target.value)}
+                placeholder="Our team in action"
+                data-testid="input-image-collage-headline"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Subheadline</Label>
+              <Input
+                value={settings.content?.imageCollageSubheadline || ''}
+                onChange={e => updateContent('imageCollageSubheadline', e.target.value)}
+                placeholder="See what we're building together"
+                data-testid="input-image-collage-subheadline"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Images (up to 5)</Label>
+              <p className="text-xs text-muted-foreground">Upload portrait-oriented images for the best effect. They will fan out with alternating rotations.</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {(settings.content?.imageCollageImages || []).map((url, i) => (
+                  <div key={i} className="relative">
+                    <ImageUpload
+                      label={`Image ${i + 1}`}
+                      value={url}
+                      onChange={(newUrl) => {
+                        if (newUrl) {
+                          const images = [...(settings.content?.imageCollageImages || [])]
+                          images[i] = newUrl
+                          updateContent('imageCollageImages', images)
+                        } else {
+                          const images = (settings.content?.imageCollageImages || []).filter((_, idx) => idx !== i)
+                          updateContent('imageCollageImages', images)
+                        }
+                      }}
+                      folder="collage"
+                      aspectRatio="3/4"
+                      testId={`upload-collage-image-${i}`}
+                    />
+                  </div>
+                ))}
+                {(settings.content?.imageCollageImages?.length ?? 0) < 5 && (
+                  <ImageUpload
+                    label="Add Image"
+                    value={null}
+                    onChange={(url) => {
+                      if (url) {
+                        const images = [...(settings.content?.imageCollageImages || []), url]
+                        updateContent('imageCollageImages', images)
+                      }
+                    }}
+                    folder="collage"
+                    aspectRatio="3/4"
+                    testId="upload-collage-image-new"
+                  />
+                )}
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">Section Order <InfoTooltip text="Control the order in which sections appear on your homepage. Use the arrows to move sections up or down." /></CardTitle>
+          <CardDescription>Use the arrows to reorder how sections appear on your homepage</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {(() => {
+            const allSections = [
+              { id: 'trustedBy', label: 'Trusted By / Logo Marquee', desc: 'Partner logos' },
+              { id: 'metrics', label: 'Metrics / Counters', desc: 'Animated number stats' },
+              { id: 'features', label: 'Features', desc: `${(settings.content?.featureCards?.length ?? 0)} cards configured` },
+              { id: 'testimonials', label: 'Testimonials', desc: `${(settings.content?.testimonials?.length ?? 0)} testimonials` },
+              { id: 'productShowcase', label: 'Product Showcase', desc: 'App screenshot display' },
+              { id: 'imageText', label: 'Image + Text Blocks', desc: `${(settings.content?.imageTextBlocks?.length ?? 0)} blocks` },
+              { id: 'process', label: 'Process Steps', desc: 'How it works flow' },
+              { id: 'customerStories', label: 'Customer Stories', desc: 'Case studies' },
+              { id: 'imageCollage', label: 'Image Collage', desc: 'Fan-style photo layout' },
+              { id: 'founderLetter', label: 'Founder Letter', desc: 'Personal narrative' },
+              { id: 'comparisonBars', label: 'Comparison Bars', desc: 'Animated comparison' },
+              { id: 'faq', label: 'FAQ', desc: `${(settings.content?.faqItems?.length ?? 0)} questions` },
+              { id: 'cta', label: 'Call to Action', desc: 'Closing CTA section' },
+              { id: 'bottomHeroCta', label: 'Bottom Hero CTA', desc: 'Full-width closing hero' },
+            ]
+            const defaultOrder = allSections.map(s => s.id)
+            const storedOrder = settings.content?.sectionOrder?.length ? settings.content.sectionOrder : defaultOrder
+            const missingSections = defaultOrder.filter(s => !storedOrder.includes(s))
+            const currentOrder = [...storedOrder, ...missingSections]
+            const orderedSections = currentOrder.map(id => allSections.find(s => s.id === id)).filter(Boolean) as typeof allSections
+
+            const moveSection = (index: number, direction: 'up' | 'down') => {
+              const newOrder = [...currentOrder]
+              const targetIndex = direction === 'up' ? index - 1 : index + 1
+              if (targetIndex < 0 || targetIndex >= newOrder.length) return
+              ;[newOrder[index], newOrder[targetIndex]] = [newOrder[targetIndex], newOrder[index]]
+              updateContent('sectionOrder', newOrder)
+            }
+
+            return orderedSections.map((section, index) => (
+              <div key={section.id} className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">
+                <span className="text-sm font-mono text-muted-foreground w-6 text-center">{index + 1}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{section.label}</p>
+                  <p className="text-xs text-muted-foreground">{section.desc}</p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    disabled={index === 0}
+                    onClick={() => moveSection(index, 'up')}
+                    data-testid={`button-section-up-${section.id}`}
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    disabled={index === orderedSections.length - 1}
+                    onClick={() => moveSection(index, 'down')}
+                    data-testid={`button-section-down-${section.id}`}
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))
+          })()}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">Section Background Colors <InfoTooltip text="Override the background color for individual homepage sections. Leave empty to use the default theme background." /></CardTitle>
+          <CardDescription>Customize background colors for each section individually</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { key: 'features', label: 'Features' },
+              { key: 'testimonials', label: 'Testimonials' },
+              { key: 'faq', label: 'FAQ' },
+              { key: 'cta', label: 'Call to Action' },
+              { key: 'customerStories', label: 'Customer Stories' },
+              { key: 'founderLetter', label: 'Founder Letter' },
+              { key: 'comparisonBars', label: 'Comparison Bars' },
+              { key: 'productShowcase', label: 'Product Showcase' },
+              { key: 'bottomHeroCta', label: 'Bottom Hero CTA' },
+              { key: 'imageCollage', label: 'Image Collage' },
+            ].map(({ key, label }) => (
+              <div key={key} className="flex items-center gap-2">
+                <Input
+                  type="color"
+                  value={settings.content?.sectionColors?.[key as keyof typeof settings.content.sectionColors] || '#ffffff'}
+                  onChange={e => {
+                    const current = settings.content?.sectionColors || {}
+                    updateContent('sectionColors', { ...current, [key]: e.target.value })
+                  }}
+                  className="w-10 h-9 p-1 cursor-pointer flex-shrink-0"
+                  data-testid={`input-section-color-${key}`}
+                />
+                <span className="text-sm flex-1">{label}</span>
+                {settings.content?.sectionColors?.[key as keyof typeof settings.content.sectionColors] && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const current = { ...settings.content?.sectionColors }
+                      delete current[key as keyof typeof current]
+                      updateContent('sectionColors', Object.keys(current).length ? current : undefined)
+                    }}
+                    data-testid={`button-clear-section-color-${key}`}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>

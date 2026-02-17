@@ -7,6 +7,15 @@ import { cn } from "@/lib/utils"
 import { SiX, SiLinkedin, SiGithub } from "react-icons/si"
 import { Globe } from "lucide-react"
 
+function getContrastColor(hex: string): string {
+  const cleaned = hex.replace('#', '')
+  const r = parseInt(cleaned.substring(0, 2), 16)
+  const g = parseInt(cleaned.substring(2, 4), 16)
+  const b = parseInt(cleaned.substring(4, 6), 16)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  return luminance > 0.5 ? '#1a1a1a' : '#ffffff'
+}
+
 export function Footer() {
   const { settings, loading } = useSettings()
   
@@ -25,23 +34,39 @@ export function Footer() {
   const footerStyle = settings?.navigation?.footerStyle
   const layout = footerStyle?.layout ?? 'default'
 
+  const brandingPrimary = settings?.branding?.primaryColor
+  const effectiveBgColor = footerStyle?.bgColor || brandingPrimary
+  const effectiveTextColor = footerStyle?.bgImage ? '#ffffff' : (footerStyle?.textColor || (brandingPrimary ? getContrastColor(brandingPrimary) : undefined))
+
   const footerBgStyle: React.CSSProperties = {}
-  if (footerStyle?.bgColor) {
-    footerBgStyle.backgroundColor = footerStyle.bgColor
+  if (effectiveBgColor) {
+    footerBgStyle.backgroundColor = effectiveBgColor
   }
-  if (footerStyle?.textColor) {
-    footerBgStyle.color = footerStyle.textColor
+  if (effectiveTextColor) {
+    footerBgStyle.color = effectiveTextColor
   }
 
   return (
     <footer 
       className={cn(
-        "border-t",
-        !footerStyle?.bgColor && "bg-muted/40"
+        "border-t relative overflow-hidden",
+        !effectiveBgColor && "bg-muted/40"
       )}
       style={footerBgStyle}
     >
-      <div className="container py-8 md:py-12">
+      {footerStyle?.bgImage && (
+        <div className="absolute inset-0">
+          <Image
+            src={footerStyle.bgImage}
+            alt=""
+            fill
+            className="object-cover"
+            unoptimized
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
+        </div>
+      )}
+      <div className={cn("container py-8 md:py-12", footerStyle?.bgImage && "relative z-10")}>
         <div className={cn(
           layout === 'centered' ? "flex flex-col items-center text-center gap-6" :
           layout === 'minimal' ? "flex flex-col md:flex-row items-center justify-between gap-4" :

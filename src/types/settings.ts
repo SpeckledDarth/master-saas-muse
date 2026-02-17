@@ -144,6 +144,7 @@ export interface FooterStyle {
   bgColor?: string
   textColor?: string
   layout?: 'default' | 'minimal' | 'centered'
+  bgImage?: string
 }
 
 export interface NavigationSettings {
@@ -311,6 +312,19 @@ export interface ContentSettings {
     cta?: 'default' | 'muted' | 'gradient' | 'mesh'
     customerStories?: 'default' | 'muted' | 'gradient' | 'mesh'
   }
+  sectionColors?: {
+    features?: string
+    testimonials?: string
+    faq?: string
+    cta?: string
+    customerStories?: string
+    founderLetter?: string
+    comparisonBars?: string
+    productShowcase?: string
+    bottomHeroCta?: string
+    imageCollage?: string
+  }
+  sectionOrder?: string[]
   heroAnimatedWords?: string[]
   customerStoriesEnabled?: boolean
   customerStoriesHeadline?: string
@@ -325,6 +339,10 @@ export interface ContentSettings {
   productShowcase?: ProductShowcaseSettings
   featureSubPages?: FeatureSubPage[]
   heroCollageImages?: string[]
+  imageCollageEnabled?: boolean
+  imageCollageImages?: string[]
+  imageCollageHeadline?: string
+  imageCollageSubheadline?: string
 }
 
 export interface TeamMember {

@@ -13,6 +13,15 @@ import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet'
 
+function getContrastColor(hex: string): string {
+  const cleaned = hex.replace('#', '')
+  const r = parseInt(cleaned.substring(0, 2), 16)
+  const g = parseInt(cleaned.substring(2, 4), 16)
+  const b = parseInt(cleaned.substring(4, 6), 16)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  return luminance > 0.5 ? '#1a1a1a' : '#ffffff'
+}
+
 export function Header() {
   const { settings, loading } = useSettings()
   const branding = settings?.branding
@@ -61,8 +70,9 @@ export function Header() {
   const isSticky = headerStyle?.sticky !== false
   const isTransparent = headerStyle?.transparent ?? false
   const showBorder = headerStyle?.borderBottom !== false
-  const customBg = headerStyle?.bgColor
-  const customTextColor = headerStyle?.textColor
+  const brandingPrimary = settings?.branding?.primaryColor
+  const customBg = headerStyle?.bgColor || brandingPrimary || undefined
+  const customTextColor = headerStyle?.textColor || (brandingPrimary ? getContrastColor(brandingPrimary) : undefined)
   const bgOpacity = headerStyle?.bgOpacity ?? (isTransparent ? 0 : 95)
 
   const headerBgStyle: React.CSSProperties = {}

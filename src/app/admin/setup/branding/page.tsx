@@ -763,7 +763,7 @@ export default function BrandingPage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Background Color</Label>
+              <Label>Background Color Override</Label>
               <div className="flex items-center gap-2">
                 <Input
                   type="color"
@@ -775,7 +775,7 @@ export default function BrandingPage() {
                 <Input
                   value={settings.navigation?.headerStyle?.bgColor || ''}
                   onChange={e => updateHeaderStyle('bgColor', e.target.value)}
-                  placeholder="Default (theme)"
+                  placeholder="Default (branding primary)"
                   className="flex-1"
                   data-testid="input-header-bg-color-text"
                 />
@@ -787,7 +787,7 @@ export default function BrandingPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Text Color</Label>
+              <Label>Text Color Override</Label>
               <div className="flex items-center gap-2">
                 <Input
                   type="color"
@@ -799,7 +799,7 @@ export default function BrandingPage() {
                 <Input
                   value={settings.navigation?.headerStyle?.textColor || ''}
                   onChange={e => updateHeaderStyle('textColor', e.target.value)}
-                  placeholder="Default (theme)"
+                  placeholder="Default (branding primary)"
                   className="flex-1"
                   data-testid="input-header-text-color-text"
                 />
@@ -862,7 +862,7 @@ export default function BrandingPage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Background Color</Label>
+              <Label>Background Color Override</Label>
               <div className="flex items-center gap-2">
                 <Input
                   type="color"
@@ -874,7 +874,7 @@ export default function BrandingPage() {
                 <Input
                   value={settings.navigation?.footerStyle?.bgColor || ''}
                   onChange={e => updateFooterStyle('bgColor', e.target.value)}
-                  placeholder="Default (theme)"
+                  placeholder="Default (branding primary)"
                   className="flex-1"
                   data-testid="input-footer-bg-color-text"
                 />
@@ -886,7 +886,7 @@ export default function BrandingPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Text Color</Label>
+              <Label>Text Color Override</Label>
               <div className="flex items-center gap-2">
                 <Input
                   type="color"
@@ -898,7 +898,7 @@ export default function BrandingPage() {
                 <Input
                   value={settings.navigation?.footerStyle?.textColor || ''}
                   onChange={e => updateFooterStyle('textColor', e.target.value)}
-                  placeholder="Default (theme)"
+                  placeholder="Default (branding primary)"
                   className="flex-1"
                   data-testid="input-footer-text-color-text"
                 />
@@ -909,6 +909,17 @@ export default function BrandingPage() {
                 )}
               </div>
             </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Footer Background Image</Label>
+            <p className="text-xs text-muted-foreground">Upload an image for the footer background. A dark overlay will be applied automatically for readability.</p>
+            <ImageUpload
+              label="Footer Background Image"
+              value={settings.navigation?.footerStyle?.bgImage || null}
+              onChange={(url) => updateFooterStyle('bgImage', url)}
+              folder="footer"
+              testId="upload-footer-bg-image"
+            />
           </div>
           <div className="space-y-2">
             <Label>Footer Layout</Label>

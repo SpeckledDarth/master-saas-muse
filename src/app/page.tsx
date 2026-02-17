@@ -22,6 +22,7 @@ import { FounderLetter } from '@/components/landing/founder-letter'
 import { ComparisonBars } from '@/components/landing/comparison-bars'
 import { BottomHeroCta } from '@/components/landing/bottom-hero-cta'
 import { ProductShowcase } from '@/components/landing/product-showcase'
+import { ImageCollageSection } from '@/components/landing/image-collage-section'
 
 const iconMap: Record<string, React.ReactNode> = {
   Zap: <Zap className="h-5 w-5 text-primary" />,
@@ -91,6 +92,7 @@ export default function HomePage() {
   const comparisonBarsEnabled = content?.comparisonBarsEnabled ?? false
   const bottomHeroCtaEnabled = content?.bottomHeroCtaEnabled ?? false
   const productShowcaseEnabled = content?.productShowcaseEnabled ?? false
+  const imageCollageEnabled = content?.imageCollageEnabled ?? false
 
   const getSectionBg = (section: 'features' | 'testimonials' | 'faq' | 'cta' | 'customerStories') => {
     const style = content?.sectionBackgrounds?.[section] ?? 'default'
@@ -98,6 +100,21 @@ export default function HomePage() {
     if (style === 'gradient') return 'bg-gradient-to-br from-primary/5 via-background to-accent/5'
     if (style === 'mesh') return 'bg-mesh'
     return ''
+  }
+
+  const DEFAULT_SECTION_ORDER = [
+    'trustedBy', 'metrics', 'features', 'testimonials', 'productShowcase',
+    'imageText', 'process', 'customerStories', 'imageCollage', 'founderLetter',
+    'comparisonBars', 'faq', 'cta', 'bottomHeroCta'
+  ]
+
+  const storedOrder = content?.sectionOrder?.length ? content.sectionOrder : DEFAULT_SECTION_ORDER
+  const missingSections = DEFAULT_SECTION_ORDER.filter(s => !storedOrder.includes(s))
+  const sectionOrder = [...storedOrder, ...missingSections]
+
+  const getSectionColor = (section: string): React.CSSProperties => {
+    const color = content?.sectionColors?.[section as keyof typeof content.sectionColors]
+    return color ? { backgroundColor: color } : {}
   }
 
   const renderHeroContent = (isDark: boolean) => (
@@ -403,137 +420,150 @@ export default function HomePage() {
       <AnnouncementBar />
       {renderHero()}
 
-      {trustedByEnabled && <LogoMarquee />}
-
-      {metricsEnabled && (content?.metrics?.length ?? 0) > 0 && (
-        <AnimatedCounterSection 
-          metrics={content?.metrics || []}
-          headline={content?.metricsHeadline}
-        />
-      )}
-
-      {featuresEnabled && (content?.featureCards?.length ?? 0) > 0 && (
-        <section className={`py-12 md:py-20 ${getSectionBg('features') || 'bg-muted/50'}`} data-testid="section-features">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">
-              {content?.featuresHeadline || 'Everything you need'}
-            </h2>
-            {content?.featuresSubheadline && (
-              <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
-                {content.featuresSubheadline}
-              </p>
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {content?.featureCards?.map((card) => (
-                <FeatureCard
-                  key={card.id}
-                  icon={card.icon}
-                  title={card.title}
-                  description={card.description}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {testimonialsEnabled && (content?.testimonials?.length ?? 0) > 0 && (
-        testimonialStyle === 'carousel' ? (
-          <TestimonialCarousel 
-            testimonials={content?.testimonials || []}
-            headline={content?.testimonialsHeadline}
-          />
-        ) : (
-          <section className={`py-12 md:py-20 ${getSectionBg('testimonials')}`} data-testid="section-testimonials">
-            <div className="container mx-auto px-4">
-              <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
-                {content?.testimonialsHeadline || 'What our customers say'}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
-                {content?.testimonials?.map((testimonial) => (
-                  <TestimonialCard
-                    key={testimonial.id}
-                    name={testimonial.name}
-                    role={testimonial.role}
-                    company={testimonial.company}
-                    quote={testimonial.quote}
-                    avatarUrl={testimonial.avatarUrl}
-                    companyLogoUrl={testimonial.companyLogoUrl}
-                  />
-                ))}
+      {sectionOrder.map(sectionId => {
+        switch (sectionId) {
+          case 'trustedBy':
+            return trustedByEnabled ? <div key="trustedBy" style={getSectionColor('trustedBy')}><LogoMarquee /></div> : null
+          
+          case 'metrics':
+            return metricsEnabled && (content?.metrics?.length ?? 0) > 0 ? (
+              <div key="metrics" style={getSectionColor('metrics')}>
+                <AnimatedCounterSection metrics={content?.metrics || []} headline={content?.metricsHeadline} />
               </div>
-            </div>
-          </section>
-        )
-      )}
+            ) : null
+          
+          case 'features':
+            return featuresEnabled && (content?.featureCards?.length ?? 0) > 0 ? (
+              <section key="features" className={`py-12 md:py-20 ${!content?.sectionColors?.features ? (getSectionBg('features') || 'bg-muted/50') : ''}`} style={getSectionColor('features')} data-testid="section-features">
+                <div className="container mx-auto px-4">
+                  <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">
+                    {content?.featuresHeadline || 'Everything you need'}
+                  </h2>
+                  {content?.featuresSubheadline && (
+                    <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+                      {content.featuresSubheadline}
+                    </p>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    {content?.featureCards?.map((card) => (
+                      <FeatureCard key={card.id} icon={card.icon} title={card.title} description={card.description} />
+                    ))}
+                  </div>
+                </div>
+              </section>
+            ) : null
 
-      {productShowcaseEnabled && content?.productShowcase?.screenshotUrl && (
-        <ProductShowcase settings={content.productShowcase} />
-      )}
+          case 'testimonials':
+            if (!testimonialsEnabled || (content?.testimonials?.length ?? 0) === 0) return null
+            return testimonialStyle === 'carousel' ? (
+              <div key="testimonials" style={getSectionColor('testimonials')}>
+                <TestimonialCarousel testimonials={content?.testimonials || []} headline={content?.testimonialsHeadline} />
+              </div>
+            ) : (
+              <section key="testimonials" className={`py-12 md:py-20 ${!content?.sectionColors?.testimonials ? getSectionBg('testimonials') : ''}`} style={getSectionColor('testimonials')} data-testid="section-testimonials">
+                <div className="container mx-auto px-4">
+                  <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
+                    {content?.testimonialsHeadline || 'What our customers say'}
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
+                    {content?.testimonials?.map((testimonial) => (
+                      <TestimonialCard key={testimonial.id} name={testimonial.name} role={testimonial.role} company={testimonial.company} quote={testimonial.quote} avatarUrl={testimonial.avatarUrl} companyLogoUrl={testimonial.companyLogoUrl} />
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )
 
-      {imageTextEnabled && (content?.imageTextBlocks?.length ?? 0) > 0 && (
-        <ImageTextSection blocks={content?.imageTextBlocks || []} />
-      )}
+          case 'productShowcase':
+            return productShowcaseEnabled && content?.productShowcase?.screenshotUrl ? (
+              <div key="productShowcase" style={getSectionColor('productShowcase')}>
+                <ProductShowcase settings={content.productShowcase} />
+              </div>
+            ) : null
 
-      {processEnabled && <ProcessSteps />}
+          case 'imageText':
+            return imageTextEnabled && (content?.imageTextBlocks?.length ?? 0) > 0 ? (
+              <div key="imageText"><ImageTextSection blocks={content?.imageTextBlocks || []} /></div>
+            ) : null
 
-      {customerStoriesEnabled && (content?.customerStories?.length ?? 0) > 0 && (
-        <CustomerStories 
-          stories={content?.customerStories}
-          headline={content?.customerStoriesHeadline}
-          className={getSectionBg('customerStories')}
-        />
-      )}
+          case 'process':
+            return processEnabled ? <div key="process"><ProcessSteps /></div> : null
 
-      {founderLetterEnabled && content?.founderLetter && (
-        <FounderLetter settings={content.founderLetter} />
-      )}
+          case 'customerStories':
+            return customerStoriesEnabled && (content?.customerStories?.length ?? 0) > 0 ? (
+              <div key="customerStories" style={getSectionColor('customerStories')}>
+                <CustomerStories stories={content?.customerStories} headline={content?.customerStoriesHeadline} className={!content?.sectionColors?.customerStories ? getSectionBg('customerStories') : ''} />
+              </div>
+            ) : null
 
-      {comparisonBarsEnabled && content?.comparisonBars && (
-        <ComparisonBars settings={content.comparisonBars} />
-      )}
+          case 'imageCollage':
+            return imageCollageEnabled && (content?.imageCollageImages?.length ?? 0) > 0 ? (
+              <div key="imageCollage" style={getSectionColor('imageCollage')}>
+                <ImageCollageSection images={content?.imageCollageImages || []} headline={content?.imageCollageHeadline} subheadline={content?.imageCollageSubheadline} />
+              </div>
+            ) : null
 
-      {faqEnabled && (content?.faqItems?.length ?? 0) > 0 && (
-        <section className={`py-12 md:py-20 ${getSectionBg('faq') || 'bg-muted/50'}`} data-testid="section-faq">
-          <div className="container mx-auto px-4 max-w-3xl">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
-              {content?.faqHeadline || 'Frequently asked questions'}
-            </h2>
-            <div className="space-y-4">
-              {content?.faqItems?.map((faq) => (
-                <FAQItem
-                  key={faq.id}
-                  question={faq.question}
-                  answer={faq.answer}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+          case 'founderLetter':
+            return founderLetterEnabled && content?.founderLetter ? (
+              <div key="founderLetter" style={getSectionColor('founderLetter')}>
+                <FounderLetter settings={content.founderLetter} />
+              </div>
+            ) : null
 
-      {ctaEnabled && (
-        <section className={`py-12 md:py-20 ${getSectionBg('cta')}`} data-testid="section-cta">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6">
-              {content?.cta?.headline || 'Ready to get started?'}
-            </h2>
-            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-              {content?.cta?.description || 'Join thousands of users who trust us with their business.'}
-            </p>
-            <Button size="lg" asChild data-testid="button-start-free-trial">
-              <Link href={content?.cta?.buttonLink || '/signup'}>
-                {content?.cta?.buttonText || 'Start Your Free Trial'}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
-        </section>
-      )}
+          case 'comparisonBars':
+            return comparisonBarsEnabled && content?.comparisonBars ? (
+              <div key="comparisonBars" style={getSectionColor('comparisonBars')}>
+                <ComparisonBars settings={content.comparisonBars} />
+              </div>
+            ) : null
 
-      {bottomHeroCtaEnabled && content?.bottomHeroCta && (
-        <BottomHeroCta settings={content.bottomHeroCta} />
-      )}
+          case 'faq':
+            return faqEnabled && (content?.faqItems?.length ?? 0) > 0 ? (
+              <section key="faq" className={`py-12 md:py-20 ${!content?.sectionColors?.faq ? (getSectionBg('faq') || 'bg-muted/50') : ''}`} style={getSectionColor('faq')} data-testid="section-faq">
+                <div className="container mx-auto px-4 max-w-3xl">
+                  <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
+                    {content?.faqHeadline || 'Frequently asked questions'}
+                  </h2>
+                  <div className="space-y-4">
+                    {content?.faqItems?.map((faq) => (
+                      <FAQItem key={faq.id} question={faq.question} answer={faq.answer} />
+                    ))}
+                  </div>
+                </div>
+              </section>
+            ) : null
+
+          case 'cta':
+            return ctaEnabled ? (
+              <section key="cta" className={`py-12 md:py-20 ${!content?.sectionColors?.cta ? getSectionBg('cta') : ''}`} style={getSectionColor('cta')} data-testid="section-cta">
+                <div className="container mx-auto px-4 text-center">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-6">
+                    {content?.cta?.headline || 'Ready to get started?'}
+                  </h2>
+                  <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+                    {content?.cta?.description || 'Join thousands of users who trust us with their business.'}
+                  </p>
+                  <Button size="lg" asChild data-testid="button-start-free-trial">
+                    <Link href={content?.cta?.buttonLink || '/signup'}>
+                      {content?.cta?.buttonText || 'Start Your Free Trial'}
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                </div>
+              </section>
+            ) : null
+
+          case 'bottomHeroCta':
+            return bottomHeroCtaEnabled && content?.bottomHeroCta ? (
+              <div key="bottomHeroCta" style={getSectionColor('bottomHeroCta')}>
+                <BottomHeroCta settings={content.bottomHeroCta} />
+              </div>
+            ) : null
+
+          default:
+            return null
+        }
+      })}
     </div>
   )
 }
