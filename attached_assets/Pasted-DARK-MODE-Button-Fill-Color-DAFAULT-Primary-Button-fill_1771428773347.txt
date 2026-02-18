@@ -1,0 +1,59 @@
+DARK MODE: 
+
+Button Fill Color:
+
+- DAFAULT Primary - Button fill color: 400
+- DAFAULT Secondary - Button fill Color: 900
+- DAFAULT Tertiary - Button fill color: Transparent - No Fill
+  
+- HOVER Primary - Button fill color: 300
+- HOVER Secondary - Button fill Color: 800
+- HOVER Tertiary - Button fill color: 900
+  
+- ACTIVE Primary - Button fill color: 200
+- ACTIVE Secondary - Button fill Color: 700
+- ACTIVE Tertiary - Button fill color: 900
+  
+- DISABLED Primary - Button fill color:  Same as DEFAULT Primary at 50% Transparency.
+- DISABLED Secondary - Button fill color: Same as DEFAULT Secondary at 50% Transparency.
+- DISABLED Tertiary - Button fill color: Same as DEFAULT Tertiary at 50% Transparency.
+
+--
+
+Button Border Color:
+
+- DEFAULT Primary - Button border color: None
+- DEFAULT Secondary - Button border Color: None
+- DEFAULT Tertiary - Button border color: 400
+  
+- HOVER Primary - Button border color: None
+- HOVER Secondary - Button border Color: None
+- HOVER Tertiary - Button border color: 400
+  
+- ACTIVE Primary - Button border color: None
+- ACTIVE Secondary - Button border Color: None
+- ACTIVE Tertiary - Button border color: 400
+  
+- DISABLED Primary - Button Border color:  Same as DEFAULT Primary at 50% Transparency.
+- DISABLED Secondary - Button Border Color: Same as DEFAULT Secondary at 50% Transparency.
+- DISABLED Tertiary - Button Border color: Same as DEFAULT Tertiary at 50% Transparency.
+
+--
+
+Button Text Color:
+
+- DEFAULT Primary - Button text color: #000000
+- DEFAULT Secondary - Button text Color: 100
+- DEFAULT Tertiary - Button text color: 400
+  
+- HOVER Primary - Button text color: #000000
+- HOVER Secondary - Button text Color: 100
+- HOVER Tertiary - Button text color: 400
+  
+- ACTIVE: Primary - Button text color: #000000
+- ACTIVE: Secondary - Button text Color: 100
+- ACTIVE: Tertiary - Button text color: 400
+  
+- DISABLED Primary - Button color:  Same as DEFAULT Primary at 50% Transparency.
+- DISABLED Secondary - Button Color: Same as DEFAULT Secondary at 50% Transparency.
+- DISABLED Tertiary - Button color: Same as DEFAULT Tertiary at 50% Transparency.
