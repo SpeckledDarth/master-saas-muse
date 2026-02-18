@@ -443,6 +443,21 @@ export default function ContentPage() {
               data-testid="switch-logo-marquee-grayscale"
             />
           </div>
+
+          <div className="space-y-2">
+            <Label>Logo Height: {settings.content?.logoMarqueeHeight ?? 32}px</Label>
+            <input
+              type="range"
+              min={20}
+              max={80}
+              step={4}
+              value={settings.content?.logoMarqueeHeight ?? 32}
+              onChange={e => updateContent('logoMarqueeHeight', parseInt(e.target.value))}
+              className="w-full"
+              data-testid="input-logo-marquee-height"
+            />
+            <p className="text-sm text-muted-foreground">Adjust the height of logos in the scrolling marquee</p>
+          </div>
           
           <div className="space-y-3">
             <div className="flex items-center justify-between">

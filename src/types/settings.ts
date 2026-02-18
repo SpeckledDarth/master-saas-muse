@@ -301,6 +301,7 @@ export interface ContentSettings {
   trustedByHeadline?: string
   trustedLogos?: TrustedLogo[]
   logoMarqueeGrayscale?: boolean
+  logoMarqueeHeight?: number
   metricsEnabled?: boolean
   metricsHeadline?: string
   metrics?: Metric[]
