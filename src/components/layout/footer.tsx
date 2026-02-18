@@ -90,7 +90,7 @@ export function Footer() {
                 {loading ? 'Loading...' : branding.appName}
               </span>
             </Link>
-            <p className={cn("mt-2 text-sm", footerStyle?.textColor ? "opacity-70" : "text-muted-foreground")}>
+            <p className={cn("mt-2 text-sm", effectiveTextColor ? "opacity-70" : "text-muted-foreground")}>
               {branding.tagline}
             </p>
             
@@ -101,7 +101,7 @@ export function Footer() {
                     href={social.twitter} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className={cn("transition-colors", footerStyle?.textColor ? "opacity-70 hover:opacity-100" : "text-muted-foreground hover:text-foreground")}
+                    className={cn("transition-colors", effectiveTextColor ? "opacity-70 hover:opacity-100" : "text-muted-foreground hover:text-foreground")}
                     data-testid="link-social-twitter"
                   >
                     <SiX className="h-5 w-5" />
@@ -112,7 +112,7 @@ export function Footer() {
                     href={social.linkedin} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className={cn("transition-colors", footerStyle?.textColor ? "opacity-70 hover:opacity-100" : "text-muted-foreground hover:text-foreground")}
+                    className={cn("transition-colors", effectiveTextColor ? "opacity-70 hover:opacity-100" : "text-muted-foreground hover:text-foreground")}
                     data-testid="link-social-linkedin"
                   >
                     <SiLinkedin className="h-5 w-5" />
@@ -123,7 +123,7 @@ export function Footer() {
                     href={social.github} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className={cn("transition-colors", footerStyle?.textColor ? "opacity-70 hover:opacity-100" : "text-muted-foreground hover:text-foreground")}
+                    className={cn("transition-colors", effectiveTextColor ? "opacity-70 hover:opacity-100" : "text-muted-foreground hover:text-foreground")}
                     data-testid="link-social-github"
                   >
                     <SiGithub className="h-5 w-5" />
@@ -134,7 +134,7 @@ export function Footer() {
                     href={social.website} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className={cn("transition-colors", footerStyle?.textColor ? "opacity-70 hover:opacity-100" : "text-muted-foreground hover:text-foreground")}
+                    className={cn("transition-colors", effectiveTextColor ? "opacity-70 hover:opacity-100" : "text-muted-foreground hover:text-foreground")}
                     data-testid="link-social-website"
                   >
                     <Globe className="h-5 w-5" />
@@ -147,14 +147,14 @@ export function Footer() {
           {layout !== 'minimal' && (<>
             <div>
               <h4 className="font-medium mb-3">Product</h4>
-              <ul className={cn("space-y-2 text-sm", footerStyle?.textColor ? "opacity-70" : "text-muted-foreground")}>
-                <li><Link href="/pricing" className={cn("transition-colors", footerStyle?.textColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-pricing">Pricing</Link></li>
-                <li><Link href="/faq" className={cn("transition-colors", footerStyle?.textColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-faq">FAQ</Link></li>
+              <ul className={cn("space-y-2 text-sm", effectiveTextColor ? "opacity-70" : "text-muted-foreground")}>
+                <li><Link href="/pricing" className={cn("transition-colors", effectiveTextColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-pricing">Pricing</Link></li>
+                <li><Link href="/faq" className={cn("transition-colors", effectiveTextColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-faq">FAQ</Link></li>
                 {settings?.pages?.customPages?.filter(p => p.enabled && p.name && p.slug).map(page => (
                   <li key={page.id}>
                     <Link 
                       href={`/p/${page.slug}`} 
-                      className={cn("transition-colors", footerStyle?.textColor ? "hover:opacity-100" : "hover:text-foreground")}
+                      className={cn("transition-colors", effectiveTextColor ? "hover:opacity-100" : "hover:text-foreground")}
                       data-testid={`link-footer-custom-${page.slug}`}
                     >
                       {page.name}
@@ -166,27 +166,27 @@ export function Footer() {
 
             <div>
               <h4 className="font-medium mb-3">Company</h4>
-              <ul className={cn("space-y-2 text-sm", footerStyle?.textColor ? "opacity-70" : "text-muted-foreground")}>
-                <li><Link href="/about" className={cn("transition-colors", footerStyle?.textColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-about">About</Link></li>
-                <li><Link href="/contact" className={cn("transition-colors", footerStyle?.textColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-contact">Contact</Link></li>
+              <ul className={cn("space-y-2 text-sm", effectiveTextColor ? "opacity-70" : "text-muted-foreground")}>
+                <li><Link href="/about" className={cn("transition-colors", effectiveTextColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-about">About</Link></li>
+                <li><Link href="/contact" className={cn("transition-colors", effectiveTextColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-contact">Contact</Link></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-medium mb-3">Legal</h4>
-              <ul className={cn("space-y-2 text-sm", footerStyle?.textColor ? "opacity-70" : "text-muted-foreground")}>
-                <li><Link href="/privacy" className={cn("transition-colors", footerStyle?.textColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-privacy">Privacy</Link></li>
-                <li><Link href="/terms" className={cn("transition-colors", footerStyle?.textColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-terms">Terms</Link></li>
+              <ul className={cn("space-y-2 text-sm", effectiveTextColor ? "opacity-70" : "text-muted-foreground")}>
+                <li><Link href="/privacy" className={cn("transition-colors", effectiveTextColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-privacy">Privacy</Link></li>
+                <li><Link href="/terms" className={cn("transition-colors", effectiveTextColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-terms">Terms</Link></li>
               </ul>
             </div>
           </>)}
         </div>
 
-        <div className={cn("mt-8 pt-8 border-t text-center text-sm", footerStyle?.textColor ? "opacity-60" : "text-muted-foreground")}>
+        <div className={cn("mt-8 pt-8 border-t text-center text-sm", effectiveTextColor ? "opacity-60" : "text-muted-foreground")} style={effectiveTextColor ? { borderColor: `${effectiveTextColor}33` } : undefined}>
           <p>&copy; {new Date().getFullYear()} {branding.companyName}. All rights reserved.</p>
           {branding.supportEmail && (
             <p className="mt-1">
-              <a href={`mailto:${branding.supportEmail}`} className={cn("transition-colors", footerStyle?.textColor ? "hover:opacity-100" : "hover:text-foreground")}>
+              <a href={`mailto:${branding.supportEmail}`} className={cn("transition-colors", effectiveTextColor ? "hover:opacity-100" : "hover:text-foreground")}>
                 {branding.supportEmail}
               </a>
             </p>
