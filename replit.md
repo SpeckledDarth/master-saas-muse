@@ -69,6 +69,15 @@ Reusable marketing page building blocks in `src/components/landing/`, all toggle
 - **Feature Sub-Page System**: Dynamic route at `/features/[slug]` renders feature detail pages from `featureSubPages` array in content settings. Each page has hero (with optional background image + screenshot), alternating image/text blocks via `ImageTextSection`, and a closing `BottomHeroCta`. Designed for Wone-style feature navigation (e.g., /features/sourcing, /features/evaluation).
 
 All components use palette-derived semantic colors (primary, muted-foreground, background/accent gradients) and support both light and dark modes automatically.
+- **Image Collage Section** (`image-collage-section.tsx`): Fan-style overlapping portrait images (up to 5) with CSS rotation, hover-to-straighten animation, and scale effects. Configurable via `imageCollageEnabled`, `imageCollageImages`, `imageCollageHeadline`, `imageCollageSubheadline` in ContentSettings.
+
+## 950-Scale Card Color Model (February 2026)
+Standard color formulas for all card-like components across palette previews and landing pages:
+- **Card background**: `bg-white/90` (90% opacity white) in both light and dark modes, with `border-gray-500/50`
+- **Card text**: H1/titles use `text-black dark:text-white`, body text uses `opacity-70`
+- **Icon color**: `text-primary-800 dark:text-primary-200` (deep/rich shade for contrast against light/dark icon backgrounds)
+- **Icon backgrounds**: Randomized from `bg-primary-100/200/300` (light) and `bg-primary-700/800/900` (dark) — each icon in a group gets a different shade from the set, cycling via index % 3
+- **Avatar fallbacks**: Same pattern as icon backgrounds — randomized bg shade with contrasting text color (800 light, 200 dark)
 
 ## Header & Footer Styling (February 2026)
 - **Header Styling**: Configurable via `NavigationSettings.headerStyle` (`HeaderStyle` interface in `src/types/settings.ts`). Controls: background color, text color, background opacity, sticky/relative positioning, transparent mode, and bottom border toggle. Applied in `src/components/layout/header.tsx`. Custom colors use `color-mix` for opacity blending and adapt on scroll.

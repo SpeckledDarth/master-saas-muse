@@ -234,16 +234,18 @@ function HeroPreview({ shades }: { shades: Record<string, string> }) {
   )
 }
 
-function CategoriesPreview({ shades }: { shades: Record<string, string> }) {
+function CategoriesPreview({ shades, isDark }: { shades: Record<string, string>; isDark?: boolean }) {
+  const bgShades = isDark ? ['700', '800', '900'] : ['100', '200', '300']
+  const iconColor = isDark ? shades['200'] : shades['800']
   const categories = [
-    { name: 'Grocery', icon: ShoppingCart, shade: '400' },
-    { name: 'Cafe', icon: Coffee, shade: '500' },
-    { name: 'Utilities', icon: Wifi, shade: '600' },
-    { name: 'Sport', icon: Dumbbell, shade: '300' },
-    { name: 'Taxi', icon: Car, shade: '700' },
-    { name: 'Health', icon: Pill, shade: '500' },
-    { name: 'Telecom', icon: Phone, shade: '400' },
-    { name: 'Gadgets', icon: Smartphone, shade: '600' },
+    { name: 'Grocery', icon: ShoppingCart, bgIdx: 0 },
+    { name: 'Cafe', icon: Coffee, bgIdx: 1 },
+    { name: 'Utilities', icon: Wifi, bgIdx: 2 },
+    { name: 'Sport', icon: Dumbbell, bgIdx: 0 },
+    { name: 'Taxi', icon: Car, bgIdx: 1 },
+    { name: 'Health', icon: Pill, bgIdx: 2 },
+    { name: 'Telecom', icon: Phone, bgIdx: 0 },
+    { name: 'Gadgets', icon: Smartphone, bgIdx: 1 },
   ]
   return (
     <Card>
@@ -254,10 +256,13 @@ function CategoriesPreview({ shades }: { shades: Record<string, string> }) {
         <div className="grid grid-cols-4 gap-4">
           {categories.map(c => (
             <div key={c.name} className="flex flex-col items-center gap-2">
-              <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center">
-                <c.icon className="w-5 h-5" style={{ color: shades[c.shade] }} />
+              <div
+                className="w-11 h-11 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: shades[bgShades[c.bgIdx]] }}
+              >
+                <c.icon className="w-5 h-5" style={{ color: iconColor }} />
               </div>
-              <span className="text-[10px] text-muted-foreground text-center leading-tight">{c.name}</span>
+              <span className="text-[10px] text-center leading-tight">{c.name}</span>
             </div>
           ))}
         </div>
@@ -266,11 +271,13 @@ function CategoriesPreview({ shades }: { shades: Record<string, string> }) {
   )
 }
 
-function BudgetPreview({ shades }: { shades: Record<string, string> }) {
+function BudgetPreview({ shades, isDark }: { shades: Record<string, string>; isDark?: boolean }) {
+  const bgShades = isDark ? ['700', '800', '900'] : ['100', '200', '300']
+  const iconColor = isDark ? shades['200'] : shades['800']
   const items = [
-    { name: 'Home Renovation', total: '$33,500', spent: '$19,500', remaining: '$14,000', pct: 58, icon: Briefcase, shade: '500' },
-    { name: 'Education & Courses', total: '$40,000', spent: '$19,500', remaining: '$20,500', pct: 49, icon: BookOpen, shade: '400' },
-    { name: 'Health & Wellness', total: '$5,500', spent: '$3,000', remaining: '$2,500', pct: 55, icon: Heart, shade: '600' },
+    { name: 'Home Renovation', total: '$33,500', spent: '$19,500', remaining: '$14,000', pct: 58, icon: Briefcase, bgIdx: 0 },
+    { name: 'Education & Courses', total: '$40,000', spent: '$19,500', remaining: '$20,500', pct: 49, icon: BookOpen, bgIdx: 1 },
+    { name: 'Health & Wellness', total: '$5,500', spent: '$3,000', remaining: '$2,500', pct: 55, icon: Heart, bgIdx: 2 },
   ]
   return (
     <Card>
@@ -281,8 +288,8 @@ function BudgetPreview({ shades }: { shades: Record<string, string> }) {
         {items.map(item => (
           <div key={item.name} className="space-y-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                <item.icon className="w-4 h-4" style={{ color: shades[item.shade] }} />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: shades[bgShades[item.bgIdx]] }}>
+                <item.icon className="w-4 h-4" style={{ color: iconColor }} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
@@ -486,12 +493,14 @@ function PricingPreview() {
   )
 }
 
-function TicketsPreview({ shades }: { shades: Record<string, string> }) {
+function TicketsPreview({ shades, isDark }: { shades: Record<string, string>; isDark?: boolean }) {
+  const bgShades = isDark ? ['700', '800', '900'] : ['100', '200', '300']
+  const textColor = isDark ? shades['200'] : shades['800']
   const tickets = [
-    { name: 'Amy P.', status: 'Open', time: '23 min', initials: 'AP', shade: '400' },
-    { name: 'Sarah A.', status: 'Closed', time: '1 hour', initials: 'SA', shade: '600' },
-    { name: 'Jessica P.', status: 'Processing', time: '45 min', initials: 'JP', shade: '500' },
-    { name: 'James A.', status: 'Open', time: '2 days', initials: 'JA', shade: '300' },
+    { name: 'Amy P.', status: 'Open', time: '23 min', initials: 'AP', bgIdx: 0 },
+    { name: 'Sarah A.', status: 'Closed', time: '1 hour', initials: 'SA', bgIdx: 1 },
+    { name: 'Jessica P.', status: 'Processing', time: '45 min', initials: 'JP', bgIdx: 2 },
+    { name: 'James A.', status: 'Open', time: '2 days', initials: 'JA', bgIdx: 0 },
   ]
   const statusVariant = (s: string) => {
     if (s === 'Open') return 'default' as const
@@ -508,8 +517,8 @@ function TicketsPreview({ shades }: { shades: Record<string, string> }) {
           <div key={t.name} className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
               <AvatarFallback
-                className="text-xs bg-muted"
-                style={{ color: shades[t.shade] }}
+                className="text-xs"
+                style={{ backgroundColor: shades[bgShades[t.bgIdx]], color: textColor }}
               >{t.initials}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
@@ -588,11 +597,13 @@ function EmailStatsPreview() {
   )
 }
 
-function FeatureCardsPreview({ shades }: { shades: Record<string, string> }) {
+function FeatureCardsPreview({ shades, isDark }: { shades: Record<string, string>; isDark?: boolean }) {
+  const bgShades = isDark ? ['700', '800', '900'] : ['100', '200', '300']
+  const iconColor = isDark ? shades['200'] : shades['800']
   const features = [
-    { title: 'Manage team access', desc: 'Control permissions and approve content across your organization.', icon: Users, shade: '500' },
-    { title: 'Notification settings', desc: 'Choose the alerts you receive and detailed reports in your inbox.', icon: Bell, shade: '400' },
-    { title: 'Download reports', desc: 'Export your analytics and detailed reports in multiple formats.', icon: Download, shade: '600' },
+    { title: 'Manage team access', desc: 'Control permissions and approve content across your organization.', icon: Users, bgIdx: 0 },
+    { title: 'Notification settings', desc: 'Choose the alerts you receive and detailed reports in your inbox.', icon: Bell, bgIdx: 1 },
+    { title: 'Download reports', desc: 'Export your analytics and detailed reports in multiple formats.', icon: Download, bgIdx: 2 },
   ]
   return (
     <Card>
@@ -600,8 +611,8 @@ function FeatureCardsPreview({ shades }: { shades: Record<string, string> }) {
         <div className="grid grid-cols-3 gap-4">
           {features.map(f => (
             <div key={f.title} className="rounded-lg border p-5 space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                <f.icon className="w-5 h-5" style={{ color: shades[f.shade] }} />
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: shades[bgShades[f.bgIdx]] }}>
+                <f.icon className="w-5 h-5" style={{ color: iconColor }} />
               </div>
               <p className="text-sm font-semibold">{f.title}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
@@ -1003,8 +1014,8 @@ export default function PalettePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <HeroPreview shades={shades} />
-            <CategoriesPreview shades={shades} />
-            <BudgetPreview shades={shades} />
+            <CategoriesPreview shades={shades} isDark={darkMode} />
+            <BudgetPreview shades={shades} isDark={darkMode} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1021,13 +1032,13 @@ export default function PalettePage() {
           <BarChartPreview shades={shades} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <TicketsPreview shades={shades} />
+            <TicketsPreview shades={shades} isDark={darkMode} />
             <ContinueWatchingPreview />
           </div>
 
           <EmailStatsPreview />
 
-          <FeatureCardsPreview shades={shades} />
+          <FeatureCardsPreview shades={shades} isDark={darkMode} />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <ButtonShowcase />

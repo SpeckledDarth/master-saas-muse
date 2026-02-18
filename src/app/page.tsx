@@ -25,18 +25,18 @@ import { ProductShowcase } from '@/components/landing/product-showcase'
 import { ImageCollageSection } from '@/components/landing/image-collage-section'
 
 const iconMap: Record<string, React.ReactNode> = {
-  Zap: <Zap className="h-5 w-5 text-black dark:text-white" />,
-  Shield: <Shield className="h-5 w-5 text-black dark:text-white" />,
-  Sparkles: <Sparkles className="h-5 w-5 text-black dark:text-white" />,
-  Users: <Users className="h-5 w-5 text-black dark:text-white" />,
-  BarChart: <BarChart className="h-5 w-5 text-black dark:text-white" />,
-  Lock: <Lock className="h-5 w-5 text-black dark:text-white" />,
-  Rocket: <Rocket className="h-5 w-5 text-black dark:text-white" />,
-  Heart: <Heart className="h-5 w-5 text-black dark:text-white" />,
-  Star: <Star className="h-5 w-5 text-black dark:text-white" />,
-  Target: <Target className="h-5 w-5 text-black dark:text-white" />,
-  Award: <Award className="h-5 w-5 text-black dark:text-white" />,
-  Lightbulb: <Lightbulb className="h-5 w-5 text-black dark:text-white" />,
+  Zap: <Zap className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
+  Shield: <Shield className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
+  Sparkles: <Sparkles className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
+  Users: <Users className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
+  BarChart: <BarChart className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
+  Lock: <Lock className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
+  Rocket: <Rocket className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
+  Heart: <Heart className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
+  Star: <Star className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
+  Target: <Target className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
+  Award: <Award className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
+  Lightbulb: <Lightbulb className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
 }
 
 export default function HomePage() {
@@ -445,8 +445,8 @@ export default function HomePage() {
                     </p>
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                    {content?.featureCards?.map((card) => (
-                      <FeatureCard key={card.id} icon={card.icon} title={card.title} description={card.description} />
+                    {content?.featureCards?.map((card, idx) => (
+                      <FeatureCard key={card.id} icon={card.icon} title={card.title} description={card.description} index={idx} />
                     ))}
                   </div>
                 </div>
@@ -568,14 +568,17 @@ export default function HomePage() {
   )
 }
 
-function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+function FeatureCard({ icon, title, description, index = 0 }: { icon: string; title: string; description: string; index?: number }) {
+  const lightBgs = ['bg-primary-100', 'bg-primary-200', 'bg-primary-300']
+  const darkBgs = ['dark:bg-primary-700', 'dark:bg-primary-800', 'dark:bg-primary-900']
+  const bgIdx = index % 3
   return (
-    <div className="p-6 rounded-lg border border-gray-500/50 bg-primary-100 text-primary-900 dark:bg-primary-800 dark:text-primary-100" data-testid={`card-feature-${title.toLowerCase().replace(/\s+/g, '-')}`}>
-      <div className="w-10 h-10 rounded-full bg-primary-200 dark:bg-primary-700 flex items-center justify-center mb-4">
-        {iconMap[icon] || <Zap className="h-5 w-5 text-black dark:text-white" />}
+    <div className="p-6 rounded-lg border border-gray-500/50 bg-white/90 text-black dark:text-white" data-testid={`card-feature-${title.toLowerCase().replace(/\s+/g, '-')}`}>
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-4 ${lightBgs[bgIdx]} ${darkBgs[bgIdx]}`}>
+        {iconMap[icon] || <Zap className="h-5 w-5 text-primary-800 dark:text-primary-200" />}
       </div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-primary-900/70 dark:text-primary-100/70">{description}</p>
+      <p className="opacity-70">{description}</p>
     </div>
   )
 }
@@ -584,7 +587,7 @@ function TestimonialCard({ name, role, company, quote, avatarUrl, companyLogoUrl
   const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
   
   return (
-    <div className="p-6 rounded-lg border border-gray-500/50 bg-white/75 text-black dark:text-white relative" data-testid={`card-testimonial-${name.toLowerCase().replace(/\s+/g, '-')}`}>
+    <div className="p-6 rounded-lg border border-gray-500/50 bg-white/90 text-black dark:text-white relative" data-testid={`card-testimonial-${name.toLowerCase().replace(/\s+/g, '-')}`}>
       <Quote className="absolute top-4 right-4 h-8 w-8 text-primary-200 dark:text-primary-800" />
       <p className="text-black/70 dark:text-white/70 mb-6 italic leading-relaxed">&quot;{quote}&quot;</p>
       <div className="flex items-center gap-4">

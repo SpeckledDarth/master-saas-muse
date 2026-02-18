@@ -57,7 +57,7 @@ export function TestimonialCarousel({
         </h2>
         
         <div className="max-w-4xl mx-auto relative">
-          <div className="bg-white/75 rounded-xl p-8 md:p-12 shadow-sm border border-gray-500/50 text-black dark:text-white relative overflow-hidden">
+          <div className="bg-white/90 rounded-xl p-8 md:p-12 shadow-sm border border-gray-500/50 text-black dark:text-white relative overflow-hidden">
             <Quote className="absolute top-6 left-6 h-12 w-12 text-primary-200 dark:text-primary-800" />
             
             <div className="relative z-10 text-center">
