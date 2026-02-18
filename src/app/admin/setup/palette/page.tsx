@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ColorInput } from '@/components/admin/color-input'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -22,7 +23,7 @@ import {
   FileText, Rocket, Send, DollarSign,
   Briefcase, Coffee, Car, Smartphone, Wifi, Activity,
   BookOpen, Play, MapPin, Phone, CreditCard, Gift,
-  Utensils, Pill, Dumbbell, Monitor, Globe, Layers, RotateCcw
+  Utensils, Pill, Dumbbell, Monitor, Globe, Layers
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
@@ -821,54 +822,6 @@ function StatsDonutPreview({ shades }: { shades: Record<string, string> }) {
   )
 }
 
-function ColorOverrideInput({
-  label,
-  value,
-  defaultValue,
-  onChange,
-  onReset,
-  testId,
-}: {
-  label: string
-  value: string
-  defaultValue: string
-  onChange: (hex: string) => void
-  onReset: () => void
-  testId: string
-}) {
-  const isOverridden = value.toLowerCase() !== defaultValue.toLowerCase()
-  return (
-    <div className="space-y-1">
-      <Label className="text-[10px] text-muted-foreground">{label}</Label>
-      <div className="flex items-center gap-1.5">
-        <Input
-          type="color"
-          value={value.startsWith('#') && value.length === 7 ? value : '#000000'}
-          onChange={e => onChange(e.target.value)}
-          className="w-8 h-8 p-0.5 cursor-pointer rounded"
-          data-testid={`${testId}-picker`}
-        />
-        <Input
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          className="w-[5.5rem] font-mono text-[11px] h-8"
-          data-testid={`${testId}-hex`}
-        />
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn("shrink-0", !isOverridden && "opacity-30 pointer-events-none")}
-          onClick={onReset}
-          title="Reset to default"
-          data-testid={`${testId}-reset`}
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-        </Button>
-      </div>
-    </div>
-  )
-}
-
 export default function PalettePage() {
   const { settings, updateBranding } = useSetupSettingsContext()
   const [localColor, setLocalColor] = useState(settings.branding.primaryColor || '#6366f1')
@@ -918,24 +871,15 @@ export default function PalettePage() {
   return (
     <div className="space-y-8">
       <div className="flex items-end justify-between gap-4 flex-wrap">
-        <div className="space-y-2">
-          <Label className="text-xs font-medium">Base Color</Label>
-          <div className="flex gap-2">
-            <Input
-              type="color"
-              value={localColor.startsWith('#') && localColor.length === 7 ? localColor : '#6366f1'}
-              onChange={e => handleColorChange(e.target.value)}
-              className="w-14 h-10 p-1 cursor-pointer"
-              data-testid="input-palette-color-picker"
-            />
-            <Input
-              value={localColor}
-              onChange={e => handleColorChange(e.target.value)}
-              placeholder="#6366f1"
-              className="w-32 font-mono text-sm"
-              data-testid="input-palette-hex"
-            />
-          </div>
+        <div className="space-y-2 max-w-xs">
+          <ColorInput
+            label="Base Color"
+            value={localColor}
+            onChange={handleColorChange}
+            defaultValue="#6366f1"
+            placeholder="#6366f1"
+            testId="input-palette-color"
+          />
         </div>
         <Button
           variant="outline"
@@ -1002,38 +946,38 @@ export default function PalettePage() {
 
       <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
         <div className="flex items-end gap-4">
-          <ColorOverrideInput
+          <ColorInput
             label="Site Background (Light)"
             value={bgOverrides.siteBgLight || defaults.siteBgLight}
-            defaultValue={defaults.siteBgLight}
             onChange={hex => setBgOverrides(prev => ({ ...prev, siteBgLight: hex }))}
-            onReset={() => setBgOverrides(prev => ({ ...prev, siteBgLight: null }))}
+            onClear={() => setBgOverrides(prev => ({ ...prev, siteBgLight: null }))}
+            defaultValue={defaults.siteBgLight}
             testId="override-site-bg-light"
           />
-          <ColorOverrideInput
+          <ColorInput
             label="Site Background (Dark)"
             value={bgOverrides.siteBgDark || defaults.siteBgDark}
-            defaultValue={defaults.siteBgDark}
             onChange={hex => setBgOverrides(prev => ({ ...prev, siteBgDark: hex }))}
-            onReset={() => setBgOverrides(prev => ({ ...prev, siteBgDark: null }))}
+            onClear={() => setBgOverrides(prev => ({ ...prev, siteBgDark: null }))}
+            defaultValue={defaults.siteBgDark}
             testId="override-site-bg-dark"
           />
         </div>
         <div className="flex items-end gap-4">
-          <ColorOverrideInput
+          <ColorInput
             label="Card Background (Light)"
             value={bgOverrides.cardBgLight || defaults.cardBgLight}
-            defaultValue={defaults.cardBgLight}
             onChange={hex => setBgOverrides(prev => ({ ...prev, cardBgLight: hex }))}
-            onReset={() => setBgOverrides(prev => ({ ...prev, cardBgLight: null }))}
+            onClear={() => setBgOverrides(prev => ({ ...prev, cardBgLight: null }))}
+            defaultValue={defaults.cardBgLight}
             testId="override-card-bg-light"
           />
-          <ColorOverrideInput
+          <ColorInput
             label="Card Background (Dark)"
             value={bgOverrides.cardBgDark || defaults.cardBgDark}
-            defaultValue={defaults.cardBgDark}
             onChange={hex => setBgOverrides(prev => ({ ...prev, cardBgDark: hex }))}
-            onReset={() => setBgOverrides(prev => ({ ...prev, cardBgDark: null }))}
+            onClear={() => setBgOverrides(prev => ({ ...prev, cardBgDark: null }))}
+            defaultValue={defaults.cardBgDark}
             testId="override-card-bg-dark"
           />
         </div>

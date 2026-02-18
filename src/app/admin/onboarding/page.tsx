@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
 import { Check, ChevronRight, Palette, CreditCard, Globe, Sparkles } from 'lucide-react'
+import { ColorInput } from '@/components/admin/color-input'
 
 const STEPS = [
   {
@@ -236,42 +237,20 @@ export default function OnboardingPage() {
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="primaryColor">Primary Color</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="primaryColor"
-                        type="color"
-                        value={branding.primaryColor}
-                        onChange={(e) => setBranding({ ...branding, primaryColor: e.target.value })}
-                        className="w-12 h-10 p-1"
-                        data-testid="input-primary-color"
-                      />
-                      <Input
-                        value={branding.primaryColor}
-                        onChange={(e) => setBranding({ ...branding, primaryColor: e.target.value })}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="accentColor">Accent Color</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="accentColor"
-                        type="color"
-                        value={branding.accentColor}
-                        onChange={(e) => setBranding({ ...branding, accentColor: e.target.value })}
-                        className="w-12 h-10 p-1"
-                        data-testid="input-accent-color"
-                      />
-                      <Input
-                        value={branding.accentColor}
-                        onChange={(e) => setBranding({ ...branding, accentColor: e.target.value })}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
+                  <ColorInput
+                    label="Primary Color"
+                    value={branding.primaryColor}
+                    onChange={hex => setBranding({ ...branding, primaryColor: hex })}
+                    defaultValue="#6366f1"
+                    testId="input-primary-color"
+                  />
+                  <ColorInput
+                    label="Accent Color"
+                    value={branding.accentColor}
+                    onChange={hex => setBranding({ ...branding, accentColor: hex })}
+                    defaultValue="#f59e0b"
+                    testId="input-accent-color"
+                  />
                 </div>
               </div>
             )}

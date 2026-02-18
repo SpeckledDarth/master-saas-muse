@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Palette } from 'lucide-react'
 import { ImageUpload } from '@/components/admin/image-upload'
+import { ColorInput } from '@/components/admin/color-input'
 import { FontPicker } from '@/components/admin/font-picker'
 import Link from 'next/link'
 import { Paintbrush } from 'lucide-react'
@@ -576,52 +577,26 @@ export default function BrandingPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Background Color</Label>
-                <div className="flex gap-2">
-                  <Input
-                    type="color"
-                    value={settings.announcement?.backgroundColor ?? '#7c3aed'}
-                    onChange={e => setSettings(prev => ({
-                      ...prev,
-                      announcement: { ...prev.announcement!, backgroundColor: e.target.value }
-                    }))}
-                    className="w-12 h-9 p-1"
-                    data-testid="input-announcement-bg-color"
-                  />
-                  <Input
-                    value={settings.announcement?.backgroundColor ?? '#7c3aed'}
-                    onChange={e => setSettings(prev => ({
-                      ...prev,
-                      announcement: { ...prev.announcement!, backgroundColor: e.target.value }
-                    }))}
-                    className="flex-1"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Text Color</Label>
-                <div className="flex gap-2">
-                  <Input
-                    type="color"
-                    value={settings.announcement?.textColor ?? '#ffffff'}
-                    onChange={e => setSettings(prev => ({
-                      ...prev,
-                      announcement: { ...prev.announcement!, textColor: e.target.value }
-                    }))}
-                    className="w-12 h-9 p-1"
-                    data-testid="input-announcement-text-color"
-                  />
-                  <Input
-                    value={settings.announcement?.textColor ?? '#ffffff'}
-                    onChange={e => setSettings(prev => ({
-                      ...prev,
-                      announcement: { ...prev.announcement!, textColor: e.target.value }
-                    }))}
-                    className="flex-1"
-                  />
-                </div>
-              </div>
+              <ColorInput
+                label="Background Color"
+                value={settings.announcement?.backgroundColor ?? '#7c3aed'}
+                onChange={hex => setSettings(prev => ({
+                  ...prev,
+                  announcement: { ...prev.announcement!, backgroundColor: hex }
+                }))}
+                defaultValue="#7c3aed"
+                testId="input-announcement-bg-color"
+              />
+              <ColorInput
+                label="Text Color"
+                value={settings.announcement?.textColor ?? '#ffffff'}
+                onChange={hex => setSettings(prev => ({
+                  ...prev,
+                  announcement: { ...prev.announcement!, textColor: hex }
+                }))}
+                defaultValue="#ffffff"
+                testId="input-announcement-text-color"
+              />
             </div>
             <div className="flex items-center gap-2">
               <Switch
@@ -727,54 +702,24 @@ export default function BrandingPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Background Color Override</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="color"
-                  value={settings.navigation?.headerStyle?.bgColor || '#ffffff'}
-                  onChange={e => updateHeaderStyle('bgColor', e.target.value)}
-                  className="w-12 h-9 p-1 cursor-pointer"
-                  data-testid="input-header-bg-color"
-                />
-                <Input
-                  value={settings.navigation?.headerStyle?.bgColor || ''}
-                  onChange={e => updateHeaderStyle('bgColor', e.target.value)}
-                  placeholder="Default (branding primary)"
-                  className="flex-1"
-                  data-testid="input-header-bg-color-text"
-                />
-                {settings.navigation?.headerStyle?.bgColor && (
-                  <Button variant="ghost" size="sm" onClick={() => updateHeaderStyle('bgColor', undefined)} data-testid="button-clear-header-bg">
-                    Clear
-                  </Button>
-                )}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Text Color Override</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="color"
-                  value={settings.navigation?.headerStyle?.textColor || '#000000'}
-                  onChange={e => updateHeaderStyle('textColor', e.target.value)}
-                  className="w-12 h-9 p-1 cursor-pointer"
-                  data-testid="input-header-text-color"
-                />
-                <Input
-                  value={settings.navigation?.headerStyle?.textColor || ''}
-                  onChange={e => updateHeaderStyle('textColor', e.target.value)}
-                  placeholder="Default (branding primary)"
-                  className="flex-1"
-                  data-testid="input-header-text-color-text"
-                />
-                {settings.navigation?.headerStyle?.textColor && (
-                  <Button variant="ghost" size="sm" onClick={() => updateHeaderStyle('textColor', undefined)} data-testid="button-clear-header-text">
-                    Clear
-                  </Button>
-                )}
-              </div>
-            </div>
+            <ColorInput
+              label="Background Color Override"
+              value={settings.navigation?.headerStyle?.bgColor || ''}
+              onChange={hex => updateHeaderStyle('bgColor', hex)}
+              onClear={() => updateHeaderStyle('bgColor', undefined)}
+              defaultValue="#ffffff"
+              placeholder="Default (branding primary)"
+              testId="input-header-bg-color"
+            />
+            <ColorInput
+              label="Text Color Override"
+              value={settings.navigation?.headerStyle?.textColor || ''}
+              onChange={hex => updateHeaderStyle('textColor', hex)}
+              onClear={() => updateHeaderStyle('textColor', undefined)}
+              defaultValue="#000000"
+              placeholder="Default (auto contrast)"
+              testId="input-header-text-color"
+            />
           </div>
           <div className="space-y-2">
             <Label>Background Opacity: {settings.navigation?.headerStyle?.bgOpacity ?? 95}%</Label>
@@ -826,54 +771,24 @@ export default function BrandingPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Background Color Override</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="color"
-                  value={settings.navigation?.footerStyle?.bgColor || '#f5f5f5'}
-                  onChange={e => updateFooterStyle('bgColor', e.target.value)}
-                  className="w-12 h-9 p-1 cursor-pointer"
-                  data-testid="input-footer-bg-color"
-                />
-                <Input
-                  value={settings.navigation?.footerStyle?.bgColor || ''}
-                  onChange={e => updateFooterStyle('bgColor', e.target.value)}
-                  placeholder="Default (branding primary)"
-                  className="flex-1"
-                  data-testid="input-footer-bg-color-text"
-                />
-                {settings.navigation?.footerStyle?.bgColor && (
-                  <Button variant="ghost" size="sm" onClick={() => updateFooterStyle('bgColor', undefined)} data-testid="button-clear-footer-bg">
-                    Clear
-                  </Button>
-                )}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Text Color Override</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="color"
-                  value={settings.navigation?.footerStyle?.textColor || '#666666'}
-                  onChange={e => updateFooterStyle('textColor', e.target.value)}
-                  className="w-12 h-9 p-1 cursor-pointer"
-                  data-testid="input-footer-text-color"
-                />
-                <Input
-                  value={settings.navigation?.footerStyle?.textColor || ''}
-                  onChange={e => updateFooterStyle('textColor', e.target.value)}
-                  placeholder="Default (branding primary)"
-                  className="flex-1"
-                  data-testid="input-footer-text-color-text"
-                />
-                {settings.navigation?.footerStyle?.textColor && (
-                  <Button variant="ghost" size="sm" onClick={() => updateFooterStyle('textColor', undefined)} data-testid="button-clear-footer-text">
-                    Clear
-                  </Button>
-                )}
-              </div>
-            </div>
+            <ColorInput
+              label="Background Color Override"
+              value={settings.navigation?.footerStyle?.bgColor || ''}
+              onChange={hex => updateFooterStyle('bgColor', hex)}
+              onClear={() => updateFooterStyle('bgColor', undefined)}
+              defaultValue="#f5f5f5"
+              placeholder="Default (branding primary)"
+              testId="input-footer-bg-color"
+            />
+            <ColorInput
+              label="Text Color Override"
+              value={settings.navigation?.footerStyle?.textColor || ''}
+              onChange={hex => updateFooterStyle('textColor', hex)}
+              onClear={() => updateFooterStyle('textColor', undefined)}
+              defaultValue="#666666"
+              placeholder="Default (auto contrast)"
+              testId="input-footer-text-color"
+            />
           </div>
           <div className="space-y-2">
             <Label>Footer Background Image</Label>

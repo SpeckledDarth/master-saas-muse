@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MessageCircle } from 'lucide-react'
+import { ColorInput } from '@/components/admin/color-input'
 
 export default function SupportPage() {
   const { settings, saving, saved, handleSave, updateSupport } = useSetupSettingsContext()
@@ -57,14 +58,12 @@ export default function SupportPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="widget-color">Widget Color</Label>
-                <Input
-                  id="widget-color"
-                  type="color"
+                <ColorInput
+                  label="Widget Color"
                   value={settings.support?.widgetColor ?? '#6366f1'}
-                  onChange={(e) => updateSupport('widgetColor', e.target.value)}
-                  data-testid="input-widget-color"
-                  className="h-10"
+                  onChange={hex => updateSupport('widgetColor', hex)}
+                  defaultValue="#6366f1"
+                  testId="input-widget-color"
                 />
                 <p className="text-xs text-muted-foreground">Choose the primary color for the widget</p>
               </div>

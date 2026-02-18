@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react'
 import { ImageUpload } from '@/components/admin/image-upload'
+import { ColorInput } from '@/components/admin/color-input'
 
 export default function ContentPage() {
   const {
@@ -2064,33 +2065,22 @@ export default function ContentPage() {
               { key: 'bottomHeroCta', label: 'Bottom Hero CTA' },
               { key: 'imageCollage', label: 'Image Collage' },
             ].map(({ key, label }) => (
-              <div key={key} className="flex items-center gap-2">
-                <Input
-                  type="color"
-                  value={settings.content?.sectionColors?.[key as keyof typeof settings.content.sectionColors] || '#ffffff'}
-                  onChange={e => {
-                    const current = settings.content?.sectionColors || {}
-                    updateContent('sectionColors', { ...current, [key]: e.target.value })
-                  }}
-                  className="w-10 h-9 p-1 cursor-pointer flex-shrink-0"
-                  data-testid={`input-section-color-${key}`}
-                />
-                <span className="text-sm flex-1">{label}</span>
-                {settings.content?.sectionColors?.[key as keyof typeof settings.content.sectionColors] && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      const current = { ...settings.content?.sectionColors }
-                      delete current[key as keyof typeof current]
-                      updateContent('sectionColors', Object.keys(current).length ? current : undefined)
-                    }}
-                    data-testid={`button-clear-section-color-${key}`}
-                  >
-                    Clear
-                  </Button>
-                )}
-              </div>
+              <ColorInput
+                key={key}
+                label={label}
+                value={settings.content?.sectionColors?.[key as keyof typeof settings.content.sectionColors] || ''}
+                onChange={hex => {
+                  const current = settings.content?.sectionColors || {}
+                  updateContent('sectionColors', { ...current, [key]: hex })
+                }}
+                onClear={() => {
+                  const current = { ...settings.content?.sectionColors }
+                  delete current[key as keyof typeof current]
+                  updateContent('sectionColors', Object.keys(current).length ? current : undefined)
+                }}
+                placeholder="Default (theme)"
+                testId={`input-section-color-${key}`}
+              />
             ))}
           </div>
         </CardContent>
