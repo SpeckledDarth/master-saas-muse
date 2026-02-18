@@ -66,7 +66,7 @@ export function Footer() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
         </div>
       )}
-      <div className={cn("container py-8 md:py-12", footerStyle?.bgImage && "relative z-10")}>
+      <div className={cn("container mx-auto px-4 md:px-8 py-8 md:py-12", footerStyle?.bgImage && "relative z-10")}>
         <div className={cn(
           layout === 'centered' ? "flex flex-col items-center text-center gap-6" :
           layout === 'minimal' ? "flex flex-col md:flex-row items-center justify-between gap-4" :
