@@ -103,7 +103,9 @@ export async function GET(request: NextRequest) {
     content: { ...defaultSettings.content, ...data?.settings?.content },
     announcement: { ...defaultSettings.announcement, ...data?.settings?.announcement },
     navigation: { 
-      items: data?.settings?.navigation?.items || defaultSettings.navigation?.items || []
+      items: data?.settings?.navigation?.items || defaultSettings.navigation?.items || [],
+      headerStyle: data?.settings?.navigation?.headerStyle || {},
+      footerStyle: data?.settings?.navigation?.footerStyle || {},
     },
     pages: {
       about: { ...defaultSettings.pages.about, ...dbPages.about },
@@ -186,7 +188,9 @@ export async function POST(request: NextRequest) {
     content: { ...defaultSettings.content, ...currentSettings.content, ...settings.content },
     announcement: { ...defaultSettings.announcement, ...currentSettings.announcement, ...settings.announcement },
     navigation: { 
-      items: settings.navigation?.items || currentSettings.navigation?.items || defaultSettings.navigation?.items || []
+      items: settings.navigation?.items || currentSettings.navigation?.items || defaultSettings.navigation?.items || [],
+      headerStyle: { ...(currentSettings.navigation?.headerStyle || {}), ...(settings.navigation?.headerStyle || {}) },
+      footerStyle: { ...(currentSettings.navigation?.footerStyle || {}), ...(settings.navigation?.footerStyle || {}) },
     },
     pages: {
       about: { ...defaultSettings.pages.about, ...currentPages.about, ...incomingPages.about },

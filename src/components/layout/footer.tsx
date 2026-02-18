@@ -61,6 +61,7 @@ export function Footer() {
             alt=""
             fill
             className="object-cover"
+            style={{ objectPosition: `${footerStyle.bgImagePositionX ?? 50}% ${footerStyle.bgImagePositionY ?? 50}%` }}
             unoptimized
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />

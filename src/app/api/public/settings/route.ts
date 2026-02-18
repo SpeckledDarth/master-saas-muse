@@ -48,6 +48,8 @@ export async function GET() {
       announcement: { ...defaultSettings.announcement, ...(s.announcement || {}) },
       navigation: {
         items: s.navigation?.items || defaultSettings.navigation?.items || [],
+        headerStyle: s.navigation?.headerStyle || {},
+        footerStyle: s.navigation?.footerStyle || {},
       },
       pages: {
         about: { ...defaultSettings.pages.about, ...(dbPages as any).about },

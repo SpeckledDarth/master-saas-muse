@@ -800,6 +800,34 @@ export default function BrandingPage() {
               folder="footer"
               testId="upload-footer-bg-image"
             />
+            {settings.navigation?.footerStyle?.bgImage && (
+              <div className="space-y-3 pt-2">
+                <div>
+                  <Label>Horizontal Position: {settings.navigation?.footerStyle?.bgImagePositionX ?? 50}%</Label>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={settings.navigation?.footerStyle?.bgImagePositionX ?? 50}
+                    onChange={e => updateFooterStyle('bgImagePositionX', parseInt(e.target.value))}
+                    className="w-full"
+                    data-testid="input-footer-bg-position-x"
+                  />
+                </div>
+                <div>
+                  <Label>Vertical Position: {settings.navigation?.footerStyle?.bgImagePositionY ?? 50}%</Label>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={settings.navigation?.footerStyle?.bgImagePositionY ?? 50}
+                    onChange={e => updateFooterStyle('bgImagePositionY', parseInt(e.target.value))}
+                    className="w-full"
+                    data-testid="input-footer-bg-position-y"
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Footer Layout</Label>

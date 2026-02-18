@@ -148,6 +148,8 @@ export interface FooterStyle {
   textColor?: string
   layout?: 'default' | 'minimal' | 'centered'
   bgImage?: string
+  bgImagePositionX?: number
+  bgImagePositionY?: number
 }
 
 export interface NavigationSettings {
