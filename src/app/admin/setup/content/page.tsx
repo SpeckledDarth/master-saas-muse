@@ -431,6 +431,18 @@ export default function ContentPage() {
               data-testid="input-trusted-by-headline"
             />
           </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label>Grayscale Logos</Label>
+              <p className="text-sm text-muted-foreground">Show logos in grayscale (color on hover). Turn off to always show full color.</p>
+            </div>
+            <Switch
+              checked={settings.content?.logoMarqueeGrayscale !== false}
+              onCheckedChange={checked => updateContent('logoMarqueeGrayscale', checked)}
+              data-testid="switch-logo-marquee-grayscale"
+            />
+          </div>
           
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -2064,6 +2076,7 @@ export default function ContentPage() {
               { key: 'productShowcase', label: 'Product Showcase' },
               { key: 'bottomHeroCta', label: 'Bottom Hero CTA' },
               { key: 'imageCollage', label: 'Image Collage' },
+              { key: 'trustedBy', label: 'Logo Marquee' },
             ].map(({ key, label }) => (
               <ColorInput
                 key={key}

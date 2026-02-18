@@ -300,6 +300,7 @@ export interface ContentSettings {
   trustedByEnabled?: boolean
   trustedByHeadline?: string
   trustedLogos?: TrustedLogo[]
+  logoMarqueeGrayscale?: boolean
   metricsEnabled?: boolean
   metricsHeadline?: string
   metrics?: Metric[]
@@ -336,6 +337,7 @@ export interface ContentSettings {
     productShowcase?: string
     bottomHeroCta?: string
     imageCollage?: string
+    trustedBy?: string
   }
   sectionOrder?: string[]
   heroAnimatedWords?: string[]
