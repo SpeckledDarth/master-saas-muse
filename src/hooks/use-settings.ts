@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useTheme } from 'next-themes'
 import { SiteSettings, defaultSettings } from '@/types/settings'
 
 export function useSettings() {
@@ -210,12 +211,14 @@ function getFontFamily(value: string): string {
 }
 
 export function useThemeFromSettings(settings: SiteSettings | null) {
+  const { resolvedTheme } = useTheme()
+  
   // Apply all theme colors - both brand colors and theme-specific colors
   useEffect(() => {
     if (!settings) return
     
     const root = document.documentElement
-    const isDark = root.classList.contains('dark')
+    const isDark = resolvedTheme === 'dark'
     
     // Apply brand colors (primary/accent) + full 950 shade scale
     if (settings.branding.primaryColor) {
@@ -227,10 +230,16 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
       applyShadeScale(root, 'primary', settings.branding.primaryColor)
     }
     if (settings.branding.accentColor) {
-      const hsl = hexToHSL(settings.branding.accentColor)
-      if (hsl) {
-        root.style.setProperty('--accent', hsl)
-        root.style.setProperty('--accent-foreground', getContrastForeground(settings.branding.accentColor))
+      const accentScale = generateShadeScaleHsl(settings.branding.accentColor)
+      // --accent is used for hover/focus backgrounds (dropdown items, menus)
+      // Use a very muted shade so hovers are subtle, not the full brand color
+      const mutedAccent = isDark ? accentScale['800'] : accentScale['100']
+      if (mutedAccent) {
+        root.style.setProperty('--accent', mutedAccent)
+      }
+      const accentFg = isDark ? accentScale['100'] : accentScale['900']
+      if (accentFg) {
+        root.style.setProperty('--accent-foreground', accentFg)
       }
       applyShadeScale(root, 'accent', settings.branding.accentColor)
     }
@@ -238,7 +247,25 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
     // Apply theme colors (background/foreground/card/border) based on current mode
     const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
     applyTheme(theme)
-  }, [settings?.branding])
+    
+    // Apply site background overrides (take precedence over theme backgrounds)
+    const siteBgOverride = isDark ? settings.branding.siteBgDarkOverride : settings.branding.siteBgLightOverride
+    if (siteBgOverride) {
+      const hsl = hexToHSL(siteBgOverride)
+      if (hsl) {
+        root.style.setProperty('--background', hsl)
+        root.style.setProperty('--popover', hsl)
+      }
+    } else if (settings.branding.primaryColor) {
+      // Auto-derive site background from 950-scale: shade 50 for light, shade 950 for dark
+      const scale = generateShadeScaleHsl(settings.branding.primaryColor)
+      const bgShade = isDark ? scale['950'] : scale['50']
+      if (bgShade) {
+        root.style.setProperty('--background', bgShade)
+        root.style.setProperty('--popover', bgShade)
+      }
+    }
+  }, [settings?.branding, resolvedTheme])
   
   // Apply fonts from settings to the live site
   useEffect(() => {

@@ -837,17 +837,13 @@ export default function PalettePage() {
   const [darkMode, setDarkMode] = useState(false)
   const [copiedShade, setCopiedShade] = useState<string | null>(null)
   const [bgOverrides, setBgOverrides] = useState<BgOverrides>({
-    siteBgLight: null,
-    siteBgDark: null,
+    siteBgLight: settings.branding.siteBgLightOverride || null,
+    siteBgDark: settings.branding.siteBgDarkOverride || null,
   })
 
   const shades = useMemo(() => generateShadeScale(localColor), [localColor])
   const defaults = useMemo(() => getDefaultBgs(shades), [shades])
   const cssOverrides = useMemo(() => getCssOverrides(shades, darkMode, bgOverrides), [shades, darkMode, bgOverrides])
-
-  useEffect(() => {
-    setBgOverrides({ siteBgLight: null, siteBgDark: null })
-  }, [localColor])
 
   const handleColorChange = useCallback((hex: string) => {
     setLocalColor(hex)
@@ -956,16 +952,28 @@ export default function PalettePage() {
           <ColorInput
             label="Site Background (Light)"
             value={bgOverrides.siteBgLight || defaults.siteBgLight}
-            onChange={hex => setBgOverrides(prev => ({ ...prev, siteBgLight: hex }))}
-            onClear={() => setBgOverrides(prev => ({ ...prev, siteBgLight: null }))}
+            onChange={hex => {
+              setBgOverrides(prev => ({ ...prev, siteBgLight: hex }))
+              updateBranding('siteBgLightOverride', hex)
+            }}
+            onClear={() => {
+              setBgOverrides(prev => ({ ...prev, siteBgLight: null }))
+              updateBranding('siteBgLightOverride', null)
+            }}
             defaultValue={defaults.siteBgLight}
             testId="override-site-bg-light"
           />
           <ColorInput
             label="Site Background (Dark)"
             value={bgOverrides.siteBgDark || defaults.siteBgDark}
-            onChange={hex => setBgOverrides(prev => ({ ...prev, siteBgDark: hex }))}
-            onClear={() => setBgOverrides(prev => ({ ...prev, siteBgDark: null }))}
+            onChange={hex => {
+              setBgOverrides(prev => ({ ...prev, siteBgDark: hex }))
+              updateBranding('siteBgDarkOverride', hex)
+            }}
+            onClear={() => {
+              setBgOverrides(prev => ({ ...prev, siteBgDark: null }))
+              updateBranding('siteBgDarkOverride', null)
+            }}
             defaultValue={defaults.siteBgDark}
             testId="override-site-bg-dark"
           />

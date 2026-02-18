@@ -35,6 +35,8 @@ export interface BrandingSettings {
   headingGradient?: boolean
   logoDarkUrl?: string | null
   logoIconUrl?: string | null
+  siteBgLightOverride?: string | null
+  siteBgDarkOverride?: string | null
 }
 
 export interface PricingPlan {
@@ -591,6 +593,8 @@ export const defaultSettings: SiteSettings = {
     supportEmail: 'support@example.com',
     lightTheme: defaultLightTheme,
     darkTheme: defaultDarkTheme,
+    siteBgLightOverride: null,
+    siteBgDarkOverride: null,
   },
   pricing: {
     currency: 'USD',
