@@ -253,7 +253,7 @@ function CategoriesPreview({ shades, isDark }: { shades: Record<string, string>;
       <CardContent>
         <div className="grid grid-cols-4 gap-4">
           {categories.map(c => (
-            <div key={c.name} className="flex flex-col items-center gap-2">
+            <div key={c.name} className="flex flex-col items-center gap-2 cursor-pointer hover-elevate active-elevate-2 rounded-lg p-1">
               <div
                 className="w-11 h-11 rounded-full flex items-center justify-center"
                 style={{ backgroundColor: shades[bgShades[c.bgIdx]] }}
@@ -308,24 +308,33 @@ function BudgetPreview({ shades, isDark }: { shades: Record<string, string>; isD
   )
 }
 
-function NewsletterPreview() {
+function NewsletterPreview({ shades, isDark }: { shades: Record<string, string>; isDark?: boolean }) {
   const items = [
     { name: 'Newsletter', desc: 'Last message sent an hour ago', active: true },
     { name: 'Existing customers', desc: 'Last message sent 2 weeks ago', active: false },
     { name: 'Trial users', desc: 'Last message sent 4 days ago', active: false },
   ]
+  const activeBorderColor = isDark ? shades['400'] : shades['600']
+  const activeTextColor = isDark ? shades['300'] : shades['700']
   return (
     <Card>
       <CardContent className="pt-6 space-y-3">
         {items.map(item => (
-          <div key={item.name} className="flex items-center gap-3 rounded-lg border p-4">
+          <div
+            key={item.name}
+            className={cn(
+              "flex items-center gap-3 rounded-xl border-2 p-4 cursor-pointer hover-elevate active-elevate-2",
+              item.active ? 'border-current' : 'border-border'
+            )}
+            style={item.active ? { borderColor: activeBorderColor } : undefined}
+          >
             <div className="flex-1 min-w-0">
-              <p className="text-[15px] font-medium">{item.name}</p>
-              <p className="text-[15px] text-muted-foreground mt-0.5">{item.desc}</p>
+              <p className="text-[15px] font-medium" style={item.active ? { color: activeTextColor } : undefined}>{item.name}</p>
+              <p className="text-[15px] text-muted-foreground mt-0.5" style={item.active ? { color: activeTextColor, opacity: 0.7 } : undefined}>{item.desc}</p>
             </div>
             {item.active && (
-              <div className="w-6 h-6 rounded-full bg-primary-600 dark:bg-primary-400 flex items-center justify-center shrink-0">
-                <Check className="w-3.5 h-3.5 text-white dark:text-black" />
+              <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: isDark ? shades['400'] : shades['600'] }}>
+                <Check className="w-4 h-4" style={{ color: isDark ? shades['950'] : '#fff' }} />
               </div>
             )}
           </div>
@@ -335,12 +344,14 @@ function NewsletterPreview() {
   )
 }
 
-function SchedulePreview({ shades }: { shades: Record<string, string> }) {
+function SchedulePreview({ shades, isDark }: { shades: Record<string, string>; isDark?: boolean }) {
   const events = [
-    { time: '9:15', period: 'AM', title: 'Weekly Team Sync', desc: 'Quick check-in to align priorities and share updates for the week.', shade: '400' },
-    { time: '4:00', period: 'PM', title: 'Client Pitch Rehearsal', desc: 'Run through tomorrow\'s presentation and refine messaging with the team.', shade: '600' },
-    { time: '7:30', period: 'PM', title: 'Product Design Review', desc: 'Collaborative session to go over latest UI/UX proposals and feedback.', shade: '300' },
+    { time: '9:15', period: 'AM', title: 'Weekly Team Sync', desc: 'Quick check-in to align priorities and share updates for the week.', shade: isDark ? '700' : '400' },
+    { time: '4:00', period: 'PM', title: 'Client Pitch Rehearsal', desc: 'Run through tomorrow\'s presentation and refine messaging with the team.', shade: isDark ? '800' : '500' },
+    { time: '7:30', period: 'PM', title: 'Product Design Review', desc: 'Collaborative session to go over latest UI/UX proposals and feedback.', shade: isDark ? '900' : '300' },
   ]
+  const textColor = isDark ? shades['50'] : shades['950']
+  const subtextColor = isDark ? shades['200'] : shades['950']
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2">
@@ -353,15 +364,16 @@ function SchedulePreview({ shades }: { shades: Record<string, string> }) {
         {events.map(e => (
           <div
             key={e.time}
-            className="flex gap-4 rounded-lg border p-4"
+            className="flex gap-4 rounded-xl p-4 cursor-pointer hover-elevate active-elevate-2"
+            style={{ backgroundColor: shades[e.shade] }}
           >
             <div className="shrink-0 text-center">
-              <p className="text-[30px] font-bold tabular-nums leading-tight" style={{ color: shades[e.shade] }}>{e.time}</p>
-              <p className="text-[15px] font-medium text-muted-foreground">{e.period}</p>
+              <p className="text-[30px] font-bold tabular-nums leading-tight" style={{ color: textColor }}>{e.time}</p>
+              <p className="text-[15px] font-medium" style={{ color: subtextColor, opacity: 0.7 }}>{e.period}</p>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[15px] font-semibold">{e.title}</p>
-              <p className="text-[15px] text-muted-foreground mt-1 leading-relaxed">{e.desc}</p>
+              <p className="text-[15px] font-semibold" style={{ color: textColor }}>{e.title}</p>
+              <p className="text-[15px] mt-1 leading-relaxed" style={{ color: subtextColor, opacity: 0.8 }}>{e.desc}</p>
             </div>
           </div>
         ))}
@@ -370,9 +382,10 @@ function SchedulePreview({ shades }: { shades: Record<string, string> }) {
   )
 }
 
-function ProfilePreview() {
+function ProfilePreview({ shades, isDark }: { shades: Record<string, string>; isDark?: boolean }) {
+  const borderColor = isDark ? shades['400'] : shades['600']
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden border-2" style={{ borderColor }}>
       <div className="relative w-full aspect-[4/3]">
         <Image
           src="/images/preview/profile.jpg"
@@ -388,7 +401,7 @@ function ProfilePreview() {
             <p className="text-[30px] font-bold leading-tight">Sarah Jones</p>
             <p className="text-[15px] text-muted-foreground">Product designer</p>
           </div>
-          <Badge variant="outline" className="text-xs">Online</Badge>
+          <Badge variant="default" className="text-xs">Online</Badge>
         </div>
       </CardContent>
     </Card>
@@ -463,7 +476,7 @@ function PricingPreview() {
       <CardContent>
         <div className="grid grid-cols-3 gap-4">
           {plans.map(plan => (
-            <div key={plan.name} className={cn('rounded-lg border p-5 space-y-4', plan.featured && 'border-primary-600 dark:border-primary-400')}>
+            <div key={plan.name} className={cn('rounded-xl border-2 p-5 space-y-4 cursor-pointer hover-elevate active-elevate-2', plan.featured ? 'border-primary-600 dark:border-primary-400' : 'border-border')}>
               <div>
                 <p className="text-[30px] font-semibold leading-tight">{plan.name}</p>
                 <p className="text-[15px] text-muted-foreground mt-1">{plan.desc}</p>
@@ -512,7 +525,7 @@ function TicketsPreview({ shades, isDark }: { shades: Record<string, string>; is
       </CardHeader>
       <CardContent className="space-y-3">
         {tickets.map(t => (
-          <div key={t.name} className="flex items-center gap-3">
+          <div key={t.name} className="flex items-center gap-3 rounded-xl p-2 cursor-pointer hover-elevate active-elevate-2">
             <Avatar className="h-9 w-9">
               <AvatarFallback
                 className="text-xs"
@@ -545,8 +558,8 @@ function ContinueWatchingPreview() {
       <CardContent>
         <div className="grid grid-cols-3 gap-4">
           {courses.map(c => (
-            <div key={c.title} className="space-y-2">
-              <div className="group relative aspect-[16/10] rounded-lg overflow-hidden">
+            <div key={c.title} className="space-y-2 cursor-pointer hover-elevate active-elevate-2 rounded-xl p-1">
+              <div className="group relative aspect-[16/10] rounded-xl overflow-hidden">
                 <Image src={c.img} alt={c.title} fill className="object-cover" unoptimized />
                 <div className="absolute inset-0 bg-background/30 backdrop-blur-sm flex items-center justify-center invisible group-hover:visible transition-all">
                   <Play className="w-8 h-8 text-foreground" />
@@ -608,7 +621,7 @@ function FeatureCardsPreview({ shades, isDark }: { shades: Record<string, string
       <CardContent className="pt-6">
         <div className="grid grid-cols-3 gap-4">
           {features.map(f => (
-            <div key={f.title} className="rounded-lg border p-5 space-y-3">
+            <div key={f.title} className="rounded-xl border p-5 space-y-3 cursor-pointer hover-elevate active-elevate-2">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: shades[bgShades[f.bgIdx]] }}>
                 <f.icon className="w-5 h-5" style={{ color: iconColor }} />
               </div>
@@ -1005,9 +1018,9 @@ export default function PalettePage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <NewsletterPreview />
-            <SchedulePreview shades={shades} />
-            <ProfilePreview />
+            <NewsletterPreview shades={shades} isDark={darkMode} />
+            <SchedulePreview shades={shades} isDark={darkMode} />
+            <ProfilePreview shades={shades} isDark={darkMode} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

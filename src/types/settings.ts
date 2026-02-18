@@ -37,6 +37,7 @@ export interface BrandingSettings {
   logoIconUrl?: string | null
   siteBgLightOverride?: string | null
   siteBgDarkOverride?: string | null
+  buttonRadius?: 'pill' | 'rounded'
 }
 
 export interface PricingPlan {
