@@ -6,7 +6,11 @@ export interface ProductShowcaseSettings {
   headline: string
   subheadline?: string
   screenshotUrl: string
+  screenshotPositionX?: number
+  screenshotPositionY?: number
   backgroundImageUrl?: string
+  backgroundPositionX?: number
+  backgroundPositionY?: number
   backgroundGradient?: boolean
 }
 
@@ -38,6 +42,7 @@ export function ProductShowcase({ settings, className = '' }: ProductShowcasePro
                 alt=""
                 fill
                 className="object-cover"
+                style={{ objectPosition: `${settings.backgroundPositionX ?? 50}% ${settings.backgroundPositionY ?? 50}%` }}
                 unoptimized
               />
               <div className="absolute inset-0 bg-black/20" />
@@ -55,7 +60,8 @@ export function ProductShowcase({ settings, className = '' }: ProductShowcasePro
                   src={settings.screenshotUrl}
                   alt="Product screenshot"
                   fill
-                  className="object-cover object-top"
+                  className="object-cover"
+                  style={{ objectPosition: `${settings.screenshotPositionX ?? 50}% ${settings.screenshotPositionY ?? 0}%` }}
                   unoptimized
                   data-testid="img-product-screenshot"
                 />

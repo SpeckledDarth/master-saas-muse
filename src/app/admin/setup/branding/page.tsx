@@ -116,6 +116,10 @@ export default function BrandingPage() {
               onChange={url => updateBranding('heroImageUrl', url)}
               folder="heroes"
               aspectRatio="16/9"
+              positionX={settings.branding.heroImagePositionX}
+              positionY={settings.branding.heroImagePositionY}
+              onPositionXChange={x => updateBranding('heroImagePositionX', x)}
+              onPositionYChange={y => updateBranding('heroImagePositionY', y)}
               testId="hero-upload"
             />
           </div>
@@ -474,45 +478,6 @@ export default function BrandingPage() {
               <p className="text-xs text-muted-foreground">How the image scales to fit</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="heroPositionX">Horizontal Position: {settings.branding.heroImagePositionX ?? 50}%</Label>
-                <Input
-                  id="heroPositionX"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={settings.branding.heroImagePositionX ?? 50}
-                  onChange={e => updateBranding('heroImagePositionX', parseInt(e.target.value))}
-                  className="w-full cursor-pointer"
-                  data-testid="input-hero-position-x"
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Left</span>
-                  <span>Center</span>
-                  <span>Right</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="heroPositionY">Vertical Position: {settings.branding.heroImagePositionY ?? 50}%</Label>
-                <Input
-                  id="heroPositionY"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={settings.branding.heroImagePositionY ?? 50}
-                  onChange={e => updateBranding('heroImagePositionY', parseInt(e.target.value))}
-                  className="w-full cursor-pointer"
-                  data-testid="input-hero-position-y"
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Top</span>
-                  <span>Center</span>
-                  <span>Bottom</span>
-                </div>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground">Adjust where the focal point of your image is positioned (0% = left/top, 100% = right/bottom)</p>
           </div>
 
         </CardContent>

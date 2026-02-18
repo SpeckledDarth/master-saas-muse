@@ -16,6 +16,10 @@ interface ImageUploadProps {
   aspectRatio?: string
   maxWidth?: number
   variant?: 'default' | 'avatar'
+  positionX?: number
+  positionY?: number
+  onPositionXChange?: (x: number) => void
+  onPositionYChange?: (y: number) => void
   testId: string
 }
 
@@ -37,6 +41,10 @@ export function ImageUpload({
   aspectRatio = '16/9',
   maxWidth,
   variant = 'default',
+  positionX,
+  positionY,
+  onPositionXChange,
+  onPositionYChange,
   testId,
 }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
@@ -45,6 +53,10 @@ export function ImageUpload({
 
   const isAvatar = variant === 'avatar'
   const resolvedMaxWidth = maxWidth ?? (isAvatar ? 96 : (DEFAULT_MAX_WIDTHS[aspectRatio] ?? 280))
+  const hasPositionControls = onPositionXChange != null || onPositionYChange != null
+  const objectPosition = hasPositionControls
+    ? `${positionX ?? 50}% ${positionY ?? 50}%`
+    : undefined
 
   async function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -97,6 +109,42 @@ export function ImageUpload({
     onChange(null)
   }
 
+  function renderPositionSliders() {
+    if (!hasPositionControls || !value) return null
+    return (
+      <div className="grid grid-cols-2 gap-3" style={{ maxWidth: resolvedMaxWidth }}>
+        {onPositionXChange && (
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Horizontal: {positionX ?? 50}%</Label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={positionX ?? 50}
+              onChange={e => onPositionXChange(parseInt(e.target.value))}
+              className="w-full cursor-pointer accent-primary"
+              data-testid={`${testId}-positionx`}
+            />
+          </div>
+        )}
+        {onPositionYChange && (
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Vertical: {positionY ?? 50}%</Label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={positionY ?? 50}
+              onChange={e => onPositionYChange(parseInt(e.target.value))}
+              className="w-full cursor-pointer accent-primary"
+              data-testid={`${testId}-positiony`}
+            />
+          </div>
+        )}
+      </div>
+    )
+  }
+
   if (isAvatar) {
     return (
       <div className="space-y-2">
@@ -112,6 +160,7 @@ export function ImageUpload({
                   src={value}
                   alt={label}
                   className="w-full h-full object-cover rounded-full border"
+                  style={objectPosition ? { objectPosition } : undefined}
                   data-testid={`${testId}-preview`}
                 />
                 <Button
@@ -176,6 +225,7 @@ export function ImageUpload({
             {error}
           </p>
         )}
+        {renderPositionSliders()}
       </div>
     )
   }
@@ -195,6 +245,7 @@ export function ImageUpload({
                 src={value}
                 alt={label}
                 className="w-full h-full object-cover"
+                style={objectPosition ? { objectPosition } : undefined}
                 data-testid={`${testId}-preview`}
               />
             </div>
@@ -246,6 +297,8 @@ export function ImageUpload({
           {error}
         </p>
       )}
+
+      {renderPositionSliders()}
 
       <div className="flex gap-2" style={{ maxWidth: resolvedMaxWidth }}>
         <Input

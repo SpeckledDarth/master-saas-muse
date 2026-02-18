@@ -12,6 +12,8 @@ export interface BottomHeroCtaSettings {
   buttonText: string
   buttonLink: string
   backgroundImageUrl?: string
+  backgroundPositionX?: number
+  backgroundPositionY?: number
 }
 
 interface BottomHeroCtaProps {
@@ -32,6 +34,7 @@ export function BottomHeroCta({ settings, className = '' }: BottomHeroCtaProps) 
             alt=""
             fill
             className="object-cover"
+            style={{ objectPosition: `${settings.backgroundPositionX ?? 50}% ${settings.backgroundPositionY ?? 50}%` }}
             unoptimized
             data-testid="img-bottom-hero-bg"
           />

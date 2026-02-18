@@ -490,42 +490,20 @@ export default function ContentPage() {
                     bucket="branding"
                     folder="logos"
                     aspectRatio="3/1"
+                    positionX={logo.imagePositionX}
+                    positionY={logo.imagePositionY}
+                    onPositionXChange={x => {
+                      const logos = [...(settings.content?.trustedLogos || [])]
+                      logos[index] = { ...logos[index], imagePositionX: x }
+                      updateContent('trustedLogos', logos)
+                    }}
+                    onPositionYChange={y => {
+                      const logos = [...(settings.content?.trustedLogos || [])]
+                      logos[index] = { ...logos[index], imagePositionY: y }
+                      updateContent('trustedLogos', logos)
+                    }}
                     testId={`logo-image-${index}`}
                   />
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label className="text-xs">Horizontal Position: {logo.imagePositionX ?? 50}%</Label>
-                      <Input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={logo.imagePositionX ?? 50}
-                        onChange={e => {
-                          const logos = [...(settings.content?.trustedLogos || [])]
-                          logos[index] = { ...logos[index], imagePositionX: parseInt(e.target.value) }
-                          updateContent('trustedLogos', logos)
-                        }}
-                        className="cursor-pointer"
-                        data-testid={`input-logo-positionx-${index}`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs">Vertical Position: {logo.imagePositionY ?? 50}%</Label>
-                      <Input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={logo.imagePositionY ?? 50}
-                        onChange={e => {
-                          const logos = [...(settings.content?.trustedLogos || [])]
-                          logos[index] = { ...logos[index], imagePositionY: parseInt(e.target.value) }
-                          updateContent('trustedLogos', logos)
-                        }}
-                        className="cursor-pointer"
-                        data-testid={`input-logo-positiony-${index}`}
-                      />
-                    </div>
-                  </div>
                 </div>
               ))}
             </div>
@@ -684,44 +662,20 @@ export default function ContentPage() {
                       bucket="branding"
                       folder="icons"
                       aspectRatio="1/1"
+                      positionX={metric.iconPositionX}
+                      positionY={metric.iconPositionY}
+                      onPositionXChange={x => {
+                        const metrics = [...(settings.content?.metrics || [])]
+                        metrics[index] = { ...metrics[index], iconPositionX: x }
+                        updateContent('metrics', metrics)
+                      }}
+                      onPositionYChange={y => {
+                        const metrics = [...(settings.content?.metrics || [])]
+                        metrics[index] = { ...metrics[index], iconPositionY: y }
+                        updateContent('metrics', metrics)
+                      }}
                       testId={`metric-icon-${index}`}
                     />
-                    {metric.iconUrl && (
-                      <div className="grid grid-cols-2 gap-3 mt-2">
-                        <div className="space-y-2">
-                          <Label className="text-xs">Horizontal: {metric.iconPositionX ?? 50}%</Label>
-                          <Input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={metric.iconPositionX ?? 50}
-                            onChange={e => {
-                              const metrics = [...(settings.content?.metrics || [])]
-                              metrics[index] = { ...metrics[index], iconPositionX: parseInt(e.target.value) }
-                              updateContent('metrics', metrics)
-                            }}
-                            className="cursor-pointer"
-                            data-testid={`input-metric-iconx-${index}`}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-xs">Vertical: {metric.iconPositionY ?? 50}%</Label>
-                          <Input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={metric.iconPositionY ?? 50}
-                            onChange={e => {
-                              const metrics = [...(settings.content?.metrics || [])]
-                              metrics[index] = { ...metrics[index], iconPositionY: parseInt(e.target.value) }
-                              updateContent('metrics', metrics)
-                            }}
-                            className="cursor-pointer"
-                            data-testid={`input-metric-icony-${index}`}
-                          />
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
@@ -977,55 +931,31 @@ export default function ContentPage() {
                     />
                   </div>
                   
-                  <div className="space-y-2">
-                    <ImageUpload
-                      label="Section Image"
-                      value={block.imageUrl || null}
-                      onChange={url => {
-                        const blocks = [...(settings.content?.imageTextBlocks || [])]
-                        blocks[index] = { ...blocks[index], imageUrl: url || '' }
-                        updateContent('imageTextBlocks', blocks)
-                      }}
-                      bucket="branding"
-                      folder="content"
-                      aspectRatio="4/3"
-                      testId={`block-image-${index}`}
-                    />
-                    <div className="grid grid-cols-2 gap-3 mt-2">
-                      <div className="space-y-2">
-                        <Label className="text-xs">Horizontal: {block.imagePositionX ?? 50}%</Label>
-                        <Input
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={block.imagePositionX ?? 50}
-                          onChange={e => {
-                            const blocks = [...(settings.content?.imageTextBlocks || [])]
-                            blocks[index] = { ...blocks[index], imagePositionX: parseInt(e.target.value) }
-                            updateContent('imageTextBlocks', blocks)
-                          }}
-                          className="cursor-pointer"
-                          data-testid={`input-block-positionx-${index}`}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-xs">Vertical: {block.imagePositionY ?? 50}%</Label>
-                        <Input
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={block.imagePositionY ?? 50}
-                          onChange={e => {
-                            const blocks = [...(settings.content?.imageTextBlocks || [])]
-                            blocks[index] = { ...blocks[index], imagePositionY: parseInt(e.target.value) }
-                            updateContent('imageTextBlocks', blocks)
-                          }}
-                          className="cursor-pointer"
-                          data-testid={`input-block-positiony-${index}`}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <ImageUpload
+                    label="Section Image"
+                    value={block.imageUrl || null}
+                    onChange={url => {
+                      const blocks = [...(settings.content?.imageTextBlocks || [])]
+                      blocks[index] = { ...blocks[index], imageUrl: url || '' }
+                      updateContent('imageTextBlocks', blocks)
+                    }}
+                    bucket="branding"
+                    folder="content"
+                    aspectRatio="4/3"
+                    positionX={block.imagePositionX}
+                    positionY={block.imagePositionY}
+                    onPositionXChange={x => {
+                      const blocks = [...(settings.content?.imageTextBlocks || [])]
+                      blocks[index] = { ...blocks[index], imagePositionX: x }
+                      updateContent('imageTextBlocks', blocks)
+                    }}
+                    onPositionYChange={y => {
+                      const blocks = [...(settings.content?.imageTextBlocks || [])]
+                      blocks[index] = { ...blocks[index], imagePositionY: y }
+                      updateContent('imageTextBlocks', blocks)
+                    }}
+                    testId={`block-image-${index}`}
+                  />
                   
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
@@ -1220,6 +1150,18 @@ export default function ContentPage() {
                       }}
                       bucket="branding"
                       folder="stories"
+                      positionX={story.personPhotoPositionX}
+                      positionY={story.personPhotoPositionY}
+                      onPositionXChange={x => {
+                        const stories = [...(settings.content?.customerStories || [])]
+                        stories[index] = { ...stories[index], personPhotoPositionX: x }
+                        updateContent('customerStories', stories)
+                      }}
+                      onPositionYChange={y => {
+                        const stories = [...(settings.content?.customerStories || [])]
+                        stories[index] = { ...stories[index], personPhotoPositionY: y }
+                        updateContent('customerStories', stories)
+                      }}
                       testId={`story-photo-${index}`}
                     />
                     <ImageUpload
@@ -1233,6 +1175,18 @@ export default function ContentPage() {
                       bucket="branding"
                       folder="stories"
                       aspectRatio="16/9"
+                      positionX={story.backgroundPositionX}
+                      positionY={story.backgroundPositionY}
+                      onPositionXChange={x => {
+                        const stories = [...(settings.content?.customerStories || [])]
+                        stories[index] = { ...stories[index], backgroundPositionX: x }
+                        updateContent('customerStories', stories)
+                      }}
+                      onPositionYChange={y => {
+                        const stories = [...(settings.content?.customerStories || [])]
+                        stories[index] = { ...stories[index], backgroundPositionY: y }
+                        updateContent('customerStories', stories)
+                      }}
                       testId={`story-bg-${index}`}
                     />
                   </div>
@@ -1545,6 +1499,10 @@ export default function ContentPage() {
               bucket="branding"
               folder="showcase"
               aspectRatio="16/9"
+              positionX={settings.content?.productShowcase?.screenshotPositionX}
+              positionY={settings.content?.productShowcase?.screenshotPositionY}
+              onPositionXChange={x => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), screenshotPositionX: x })}
+              onPositionYChange={y => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), screenshotPositionY: y })}
               testId="showcase-screenshot"
             />
             <ImageUpload
@@ -1554,6 +1512,10 @@ export default function ContentPage() {
               bucket="branding"
               folder="showcase"
               aspectRatio="21/9"
+              positionX={settings.content?.productShowcase?.backgroundPositionX}
+              positionY={settings.content?.productShowcase?.backgroundPositionY}
+              onPositionXChange={x => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), backgroundPositionX: x })}
+              onPositionYChange={y => updateContent('productShowcase', { ...(settings.content?.productShowcase || { headline: '', screenshotUrl: '' }), backgroundPositionY: y })}
               testId="showcase-background"
             />
             <div className="flex items-center gap-2">
@@ -1643,6 +1605,10 @@ export default function ContentPage() {
               bucket="branding"
               folder="cta"
               aspectRatio="21/9"
+              positionX={settings.content?.bottomHeroCta?.backgroundPositionX}
+              positionY={settings.content?.bottomHeroCta?.backgroundPositionY}
+              onPositionXChange={x => updateContent('bottomHeroCta', { ...(settings.content?.bottomHeroCta || { headline: '', subheadline: '', buttonText: '', buttonLink: '' }), backgroundPositionX: x })}
+              onPositionYChange={y => updateContent('bottomHeroCta', { ...(settings.content?.bottomHeroCta || { headline: '', subheadline: '', buttonText: '', buttonLink: '' }), backgroundPositionY: y })}
               testId="bottom-hero-background"
             />
             <p className="text-xs text-muted-foreground">Uses a gradient wash to ensure text readability over the image</p>

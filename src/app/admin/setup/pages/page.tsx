@@ -32,36 +32,12 @@ export default function PagesSetupPage() {
             bucket="branding"
             folder="heroes"
             aspectRatio="21/9"
+            positionX={settings.pages?.about?.heroImagePositionX}
+            positionY={settings.pages?.about?.heroImagePositionY}
+            onPositionXChange={x => updateAbout('heroImagePositionX', x)}
+            onPositionYChange={y => updateAbout('heroImagePositionY', y)}
             testId="about-hero-image"
           />
-          <div className={`grid grid-cols-2 gap-4 p-3 rounded-lg ${settings.pages?.about?.heroImageUrl ? 'bg-muted/50' : 'bg-muted/20 opacity-50'}`}>
-            <div className="space-y-2">
-              <Label className="text-xs">Horizontal: {settings.pages?.about?.heroImagePositionX ?? 50}%</Label>
-              <Input
-                type="range"
-                min="0"
-                max="100"
-                value={settings.pages?.about?.heroImagePositionX ?? 50}
-                onChange={e => updateAbout('heroImagePositionX', parseInt(e.target.value))}
-                className="w-full cursor-pointer"
-                disabled={!settings.pages?.about?.heroImageUrl}
-                data-testid="input-about-hero-position-x"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs">Vertical: {settings.pages?.about?.heroImagePositionY ?? 50}%</Label>
-              <Input
-                type="range"
-                min="0"
-                max="100"
-                value={settings.pages?.about?.heroImagePositionY ?? 50}
-                onChange={e => updateAbout('heroImagePositionY', parseInt(e.target.value))}
-                className="w-full cursor-pointer"
-                disabled={!settings.pages?.about?.heroImageUrl}
-                data-testid="input-about-hero-position-y"
-              />
-            </div>
-          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Headline</Label>
@@ -204,36 +180,12 @@ export default function PagesSetupPage() {
             bucket="branding"
             folder="heroes"
             aspectRatio="21/9"
+            positionX={settings.pages?.contact?.heroImagePositionX}
+            positionY={settings.pages?.contact?.heroImagePositionY}
+            onPositionXChange={x => updateContact('heroImagePositionX', x)}
+            onPositionYChange={y => updateContact('heroImagePositionY', y)}
             testId="contact-hero-image"
           />
-          <div className={`grid grid-cols-2 gap-4 p-3 rounded-lg ${settings.pages?.contact?.heroImageUrl ? 'bg-muted/50' : 'bg-muted/20 opacity-50'}`}>
-            <div className="space-y-2">
-              <Label className="text-xs">Horizontal: {settings.pages?.contact?.heroImagePositionX ?? 50}%</Label>
-              <Input
-                type="range"
-                min="0"
-                max="100"
-                value={settings.pages?.contact?.heroImagePositionX ?? 50}
-                onChange={e => updateContact('heroImagePositionX', parseInt(e.target.value))}
-                className="w-full cursor-pointer"
-                disabled={!settings.pages?.contact?.heroImageUrl}
-                data-testid="input-contact-hero-position-x"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs">Vertical: {settings.pages?.contact?.heroImagePositionY ?? 50}%</Label>
-              <Input
-                type="range"
-                min="0"
-                max="100"
-                value={settings.pages?.contact?.heroImagePositionY ?? 50}
-                onChange={e => updateContact('heroImagePositionY', parseInt(e.target.value))}
-                className="w-full cursor-pointer"
-                disabled={!settings.pages?.contact?.heroImageUrl}
-                data-testid="input-contact-hero-position-y"
-              />
-            </div>
-          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Headline</Label>
@@ -385,36 +337,12 @@ export default function PagesSetupPage() {
             bucket="branding"
             folder="heroes"
             aspectRatio="21/9"
+            positionX={settings.pages?.pricing?.heroImagePositionX}
+            positionY={settings.pages?.pricing?.heroImagePositionY}
+            onPositionXChange={x => updatePricingPage('heroImagePositionX', x)}
+            onPositionYChange={y => updatePricingPage('heroImagePositionY', y)}
             testId="pricing-hero-image"
           />
-          <div className={`grid grid-cols-2 gap-4 p-3 rounded-lg ${settings.pages?.pricing?.heroImageUrl ? 'bg-muted/50' : 'bg-muted/20 opacity-50'}`}>
-            <div className="space-y-2">
-              <Label className="text-xs">Horizontal: {settings.pages?.pricing?.heroImagePositionX ?? 50}%</Label>
-              <Input
-                type="range"
-                min="0"
-                max="100"
-                value={settings.pages?.pricing?.heroImagePositionX ?? 50}
-                onChange={e => updatePricingPage('heroImagePositionX', parseInt(e.target.value))}
-                className="w-full cursor-pointer"
-                disabled={!settings.pages?.pricing?.heroImageUrl}
-                data-testid="input-pricing-hero-position-x"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs">Vertical: {settings.pages?.pricing?.heroImagePositionY ?? 50}%</Label>
-              <Input
-                type="range"
-                min="0"
-                max="100"
-                value={settings.pages?.pricing?.heroImagePositionY ?? 50}
-                onChange={e => updatePricingPage('heroImagePositionY', parseInt(e.target.value))}
-                className="w-full cursor-pointer"
-                disabled={!settings.pages?.pricing?.heroImageUrl}
-                data-testid="input-pricing-hero-position-y"
-              />
-            </div>
-          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Headline</Label>
@@ -453,36 +381,12 @@ export default function PagesSetupPage() {
             bucket="branding"
             folder="heroes"
             aspectRatio="21/9"
+            positionX={settings.pages?.faq?.heroImagePositionX}
+            positionY={settings.pages?.faq?.heroImagePositionY}
+            onPositionXChange={x => updateFAQPage('heroImagePositionX', x)}
+            onPositionYChange={y => updateFAQPage('heroImagePositionY', y)}
             testId="faq-hero-image"
           />
-          <div className={`grid grid-cols-2 gap-4 p-3 rounded-lg ${settings.pages?.faq?.heroImageUrl ? 'bg-muted/50' : 'bg-muted/20 opacity-50'}`}>
-            <div className="space-y-2">
-              <Label className="text-xs">Horizontal: {settings.pages?.faq?.heroImagePositionX ?? 50}%</Label>
-              <Input
-                type="range"
-                min="0"
-                max="100"
-                value={settings.pages?.faq?.heroImagePositionX ?? 50}
-                onChange={e => updateFAQPage('heroImagePositionX', parseInt(e.target.value))}
-                className="w-full cursor-pointer"
-                disabled={!settings.pages?.faq?.heroImageUrl}
-                data-testid="input-faq-hero-position-x"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs">Vertical: {settings.pages?.faq?.heroImagePositionY ?? 50}%</Label>
-              <Input
-                type="range"
-                min="0"
-                max="100"
-                value={settings.pages?.faq?.heroImagePositionY ?? 50}
-                onChange={e => updateFAQPage('heroImagePositionY', parseInt(e.target.value))}
-                className="w-full cursor-pointer"
-                disabled={!settings.pages?.faq?.heroImageUrl}
-                data-testid="input-faq-hero-position-y"
-              />
-            </div>
-          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Headline</Label>
@@ -553,36 +457,12 @@ export default function PagesSetupPage() {
                     bucket="branding"
                     folder="heroes"
                     aspectRatio="21/9"
+                    positionX={page.heroImagePositionX}
+                    positionY={page.heroImagePositionY}
+                    onPositionXChange={x => updateCustomPage(page.id, 'heroImagePositionX', x)}
+                    onPositionYChange={y => updateCustomPage(page.id, 'heroImagePositionY', y)}
                     testId={`custom-page-hero-${page.id}`}
                   />
-                  <div className={`grid grid-cols-2 gap-4 p-3 rounded-lg ${page.heroImageUrl ? 'bg-muted/50' : 'bg-muted/20 opacity-50'}`}>
-                    <div className="space-y-2">
-                      <Label className="text-xs">Horizontal: {page.heroImagePositionX ?? 50}%</Label>
-                      <Input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={page.heroImagePositionX ?? 50}
-                        onChange={e => updateCustomPage(page.id, 'heroImagePositionX', parseInt(e.target.value))}
-                        className="w-full cursor-pointer"
-                        disabled={!page.heroImageUrl}
-                        data-testid={`input-custom-page-hero-position-x-${page.id}`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs">Vertical: {page.heroImagePositionY ?? 50}%</Label>
-                      <Input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={page.heroImagePositionY ?? 50}
-                        onChange={e => updateCustomPage(page.id, 'heroImagePositionY', parseInt(e.target.value))}
-                        className="w-full cursor-pointer"
-                        disabled={!page.heroImageUrl}
-                        data-testid={`input-custom-page-hero-position-y-${page.id}`}
-                      />
-                    </div>
-                  </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="text-xs">Headline</Label>

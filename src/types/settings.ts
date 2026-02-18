@@ -170,9 +170,13 @@ export interface CustomerStory {
   personName?: string
   personRole?: string
   personPhotoUrl?: string
+  personPhotoPositionX?: number
+  personPhotoPositionY?: number
   quote?: string
   storyUrl?: string
   backgroundImageUrl?: string
+  backgroundPositionX?: number
+  backgroundPositionY?: number
 }
 
 export interface TrustedLogo {
@@ -247,13 +251,19 @@ export interface BottomHeroCtaSettings {
   buttonText: string
   buttonLink: string
   backgroundImageUrl?: string
+  backgroundPositionX?: number
+  backgroundPositionY?: number
 }
 
 export interface ProductShowcaseSettings {
   headline: string
   subheadline?: string
   screenshotUrl: string
+  screenshotPositionX?: number
+  screenshotPositionY?: number
   backgroundImageUrl?: string
+  backgroundPositionX?: number
+  backgroundPositionY?: number
   backgroundGradient?: boolean
 }
 

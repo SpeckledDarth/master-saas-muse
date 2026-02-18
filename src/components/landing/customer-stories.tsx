@@ -11,9 +11,13 @@ interface CustomerStory {
   personName?: string
   personRole?: string
   personPhotoUrl?: string
+  personPhotoPositionX?: number
+  personPhotoPositionY?: number
   quote?: string
   storyUrl?: string
   backgroundImageUrl?: string
+  backgroundPositionX?: number
+  backgroundPositionY?: number
 }
 
 interface CustomerStoriesProps {
@@ -34,6 +38,7 @@ function StoryCard({ story }: { story: CustomerStory }) {
           alt={story.companyName}
           fill
           className="object-cover"
+          style={{ objectPosition: `${story.backgroundPositionX ?? 50}% ${story.backgroundPositionY ?? 50}%` }}
         />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
@@ -60,6 +65,7 @@ function StoryCard({ story }: { story: CustomerStory }) {
                 alt={story.personName || ''}
                 fill
                 className="object-cover"
+                style={{ objectPosition: `${story.personPhotoPositionX ?? 50}% ${story.personPhotoPositionY ?? 50}%` }}
               />
             </div>
           )}
