@@ -230,19 +230,12 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
       applyShadeScale(root, 'primary', settings.branding.primaryColor)
     }
     if (settings.branding.accentColor) {
-      const accentScale = generateShadeScaleHsl(settings.branding.accentColor)
-      // --accent is used for hover/focus backgrounds (dropdown items, menus)
-      // Use a very muted shade so hovers are subtle, not the full brand color
-      const mutedAccent = isDark ? accentScale['800'] : accentScale['100']
-      if (mutedAccent) {
-        root.style.setProperty('--accent', mutedAccent)
-      }
-      const accentFg = isDark ? accentScale['100'] : accentScale['900']
-      if (accentFg) {
-        root.style.setProperty('--accent-foreground', accentFg)
-      }
       applyShadeScale(root, 'accent', settings.branding.accentColor)
     }
+    // --accent is used for hover/focus backgrounds (dropdown items, menus)
+    // Always use neutral gray so hovers are subtle regardless of brand colors
+    root.style.setProperty('--accent', isDark ? '0 0% 15%' : '0 0% 95%')
+    root.style.setProperty('--accent-foreground', isDark ? '0 0% 90%' : '0 0% 15%')
     
     // Apply theme colors (background/foreground/card/border) based on current mode
     const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
@@ -312,13 +305,10 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
       }
       
       if (settings.branding.accentColor) {
-        const accentScale = generateShadeScaleHsl(settings.branding.accentColor)
-        const mutedAccent = isDark ? accentScale['800'] : accentScale['100']
-        if (mutedAccent) root.style.setProperty('--accent', mutedAccent)
-        const accentFg = isDark ? accentScale['100'] : accentScale['900']
-        if (accentFg) root.style.setProperty('--accent-foreground', accentFg)
         applyShadeScale(root, 'accent', settings.branding.accentColor)
       }
+      root.style.setProperty('--accent', isDark ? '0 0% 15%' : '0 0% 95%')
+      root.style.setProperty('--accent-foreground', isDark ? '0 0% 90%' : '0 0% 15%')
       
       const siteBgOverride = isDark ? settings.branding.siteBgDarkOverride : settings.branding.siteBgLightOverride
       if (siteBgOverride) {

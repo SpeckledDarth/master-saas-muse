@@ -193,25 +193,32 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean, override
   }
 }
 
-function HeroPreview({ shades }: { shades: Record<string, string> }) {
+function HeroPreview({ shades, isDark }: { shades: Record<string, string>; isDark?: boolean }) {
+  const iconBgShades = isDark ? ['700', '800', '900'] : ['100', '200', '300']
+  const iconColor = isDark ? shades['200'] : shades['800']
   return (
-    <Card
-      className="overflow-hidden border-0"
-      style={{
-        background: `linear-gradient(135deg, ${shades['600']}, ${shades['500']}, ${shades['400']})`,
-      }}
-    >
+    <Card>
       <div className="p-8">
         <div className="flex items-center gap-2 mb-4">
-          <Zap className="w-5 h-5" style={{ color: shades['100'] }} />
-          <Star className="w-4 h-4" style={{ color: `${shades['200']}99` }} />
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ backgroundColor: shades[iconBgShades[0]] }}
+          >
+            <Zap className="w-4 h-4" style={{ color: iconColor }} />
+          </div>
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ backgroundColor: shades[iconBgShades[1]] }}
+          >
+            <Star className="w-4 h-4" style={{ color: iconColor }} />
+          </div>
         </div>
-        <h3 className="text-2xl font-bold mb-2" style={{ color: shades['50'] }}>Increase your revenue by 3x</h3>
-        <p className="text-sm mb-6 max-w-xs" style={{ color: `${shades['100']}bb` }}>
+        <h3 className="text-[30px] font-bold mb-2 leading-tight">Increase your revenue by 3x</h3>
+        <p className="text-[15px] mb-6 max-w-xs opacity-70">
           Our platform helps you close more deals and scale faster than ever.
         </p>
         <Button
-          variant="secondary"
+          variant="default"
           data-testid="button-hero-cta"
         >
           Start growing
@@ -237,7 +244,7 @@ function CategoriesPreview({ shades, isDark }: { shades: Record<string, string>;
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Categories</CardTitle>
+        <CardTitle className="text-[30px] leading-tight">Categories</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-4 gap-4">
@@ -249,7 +256,7 @@ function CategoriesPreview({ shades, isDark }: { shades: Record<string, string>;
               >
                 <c.icon className="w-5 h-5" style={{ color: iconColor }} />
               </div>
-              <span className="text-[10px] text-center leading-tight">{c.name}</span>
+              <span className="text-[15px] text-center leading-tight">{c.name}</span>
             </div>
           ))}
         </div>
@@ -269,7 +276,7 @@ function BudgetPreview({ shades, isDark }: { shades: Record<string, string>; isD
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Budget</CardTitle>
+        <CardTitle className="text-[30px] leading-tight">Budget</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         {items.map(item => (
@@ -280,15 +287,15 @@ function BudgetPreview({ shades, isDark }: { shades: Record<string, string>; isD
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium truncate">{item.name}</span>
-                  <span className="text-sm font-bold tabular-nums shrink-0">{item.total}</span>
+                  <span className="text-[15px] font-medium truncate">{item.name}</span>
+                  <span className="text-[15px] font-bold tabular-nums shrink-0">{item.total}</span>
                 </div>
               </div>
             </div>
             <Progress value={item.pct} className="h-1.5" />
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-muted-foreground tabular-nums">{item.spent}</span>
-              <span className="text-xs text-muted-foreground tabular-nums">{item.remaining}</span>
+              <span className="text-[15px] text-muted-foreground tabular-nums">{item.spent}</span>
+              <span className="text-[15px] text-muted-foreground tabular-nums">{item.remaining}</span>
             </div>
           </div>
         ))}
@@ -309,8 +316,8 @@ function NewsletterPreview() {
         {items.map(item => (
           <div key={item.name} className="flex items-center gap-3 rounded-lg border p-4">
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium">{item.name}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
+              <p className="text-[15px] font-medium">{item.name}</p>
+              <p className="text-[15px] text-muted-foreground mt-0.5">{item.desc}</p>
             </div>
             {item.active && (
               <div className="w-6 h-6 rounded-full bg-primary-600 dark:bg-primary-400 flex items-center justify-center shrink-0">
@@ -333,7 +340,7 @@ function SchedulePreview({ shades }: { shades: Record<string, string> }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2">
-        <CardTitle className="text-sm">Schedule</CardTitle>
+        <CardTitle className="text-[30px] leading-tight">Schedule</CardTitle>
         <Button size="icon" variant="outline" data-testid="button-schedule-add">
           <Plus className="w-4 h-4" />
         </Button>
@@ -345,12 +352,12 @@ function SchedulePreview({ shades }: { shades: Record<string, string> }) {
             className="flex gap-4 rounded-lg border p-4"
           >
             <div className="shrink-0 text-center">
-              <p className="text-lg font-bold tabular-nums leading-tight" style={{ color: shades[e.shade] }}>{e.time}</p>
-              <p className="text-[10px] font-medium text-muted-foreground">{e.period}</p>
+              <p className="text-[30px] font-bold tabular-nums leading-tight" style={{ color: shades[e.shade] }}>{e.time}</p>
+              <p className="text-[15px] font-medium text-muted-foreground">{e.period}</p>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold">{e.title}</p>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{e.desc}</p>
+              <p className="text-[15px] font-semibold">{e.title}</p>
+              <p className="text-[15px] text-muted-foreground mt-1 leading-relaxed">{e.desc}</p>
             </div>
           </div>
         ))}
@@ -374,8 +381,8 @@ function ProfilePreview() {
       <CardContent className="pt-5 pb-5">
         <div className="flex items-center justify-between gap-2">
           <div>
-            <p className="text-lg font-bold">Sarah Jones</p>
-            <p className="text-sm text-muted-foreground">Product designer</p>
+            <p className="text-[30px] font-bold leading-tight">Sarah Jones</p>
+            <p className="text-[15px] text-muted-foreground">Product designer</p>
           </div>
           <Badge variant="outline" className="text-xs">Online</Badge>
         </div>
@@ -404,24 +411,24 @@ function RevenueChartPreview({ shades }: { shades: Record<string, string> }) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <div>
-          <CardTitle className="text-sm">Revenue</CardTitle>
+          <CardTitle className="text-[30px] leading-tight">Revenue</CardTitle>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-2xl font-bold tabular-nums">$213,000</span>
+            <span className="text-[30px] font-bold tabular-nums">$213,000</span>
             <Badge variant="secondary" className="text-xs">+19%</Badge>
           </div>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: shades['400'] }} />
-            <span className="text-xs text-muted-foreground">Income</span>
+            <span className="text-[15px] text-muted-foreground">Income</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: shades['600'] }} />
-            <span className="text-xs text-muted-foreground">Expenses</span>
+            <span className="text-[15px] text-muted-foreground">Expenses</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: shades['200'] }} />
-            <span className="text-xs text-muted-foreground">Savings</span>
+            <span className="text-[15px] text-muted-foreground">Savings</span>
           </div>
         </div>
       </CardHeader>
@@ -447,25 +454,25 @@ function PricingPreview() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Pricing plans</CardTitle>
+        <CardTitle className="text-[30px] leading-tight">Pricing plans</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-3 gap-4">
           {plans.map(plan => (
             <div key={plan.name} className={cn('rounded-lg border p-5 space-y-4', plan.featured && 'border-primary-600 dark:border-primary-400')}>
               <div>
-                <p className="text-sm font-semibold">{plan.name}</p>
-                <p className="text-xs text-muted-foreground mt-1">{plan.desc}</p>
+                <p className="text-[30px] font-semibold leading-tight">{plan.name}</p>
+                <p className="text-[15px] text-muted-foreground mt-1">{plan.desc}</p>
               </div>
               <div>
-                <span className="text-3xl font-bold tabular-nums">{plan.price}</span>
-                <span className="text-xs text-muted-foreground">{plan.period}</span>
+                <span className="text-[30px] font-bold tabular-nums">{plan.price}</span>
+                <span className="text-[15px] text-muted-foreground">{plan.period}</span>
               </div>
               <div className="space-y-2">
                 {plan.features.map(f => (
                   <div key={f} className="flex items-center gap-2">
                     <Check className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400 shrink-0" />
-                    <span className="text-xs">{f}</span>
+                    <span className="text-[15px]">{f}</span>
                   </div>
                 ))}
               </div>
@@ -497,7 +504,7 @@ function TicketsPreview({ shades, isDark }: { shades: Record<string, string>; is
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Tickets</CardTitle>
+        <CardTitle className="text-[30px] leading-tight">Tickets</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {tickets.map(t => (
@@ -509,10 +516,10 @@ function TicketsPreview({ shades, isDark }: { shades: Record<string, string>; is
               >{t.initials}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium">{t.name}</p>
+              <p className="text-[15px] font-medium">{t.name}</p>
             </div>
-            <Badge variant={statusVariant(t.status)} className="text-[10px]">{t.status}</Badge>
-            <span className="text-xs text-muted-foreground tabular-nums shrink-0">{t.time}</span>
+            <Badge variant={statusVariant(t.status)} className="text-[15px]">{t.status}</Badge>
+            <span className="text-[15px] text-muted-foreground tabular-nums shrink-0">{t.time}</span>
           </div>
         ))}
       </CardContent>
@@ -529,7 +536,7 @@ function ContinueWatchingPreview() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Continue Watching</CardTitle>
+        <CardTitle className="text-[30px] leading-tight">Continue Watching</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-3 gap-4">
@@ -541,9 +548,9 @@ function ContinueWatchingPreview() {
                   <Play className="w-8 h-8 text-foreground" />
                 </div>
               </div>
-              <p className="text-xs font-semibold leading-tight">{c.title}</p>
-              <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{c.desc}</p>
-              <p className="text-[10px] text-muted-foreground">{c.author}</p>
+              <p className="text-[15px] font-semibold leading-tight">{c.title}</p>
+              <p className="text-[15px] text-muted-foreground leading-snug line-clamp-2">{c.desc}</p>
+              <p className="text-[15px] text-muted-foreground">{c.author}</p>
             </div>
           ))}
         </div>
@@ -558,23 +565,23 @@ function EmailStatsPreview() {
       <CardContent className="pt-6">
         <div className="grid grid-cols-3 gap-6">
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Total Subscribers</p>
+            <p className="text-[15px] text-muted-foreground">Total Subscribers</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold tabular-nums">71,842</span>
-              <span className="text-[10px] text-muted-foreground tabular-nums">+10.2%</span>
+              <span className="text-[30px] font-bold tabular-nums">71,842</span>
+              <span className="text-[15px] text-muted-foreground tabular-nums">+10.2%</span>
             </div>
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Avg. Open Rate</p>
+            <p className="text-[15px] text-muted-foreground">Avg. Open Rate</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold tabular-nums">58.16%</span>
+              <span className="text-[30px] font-bold tabular-nums">58.16%</span>
               <Badge variant="secondary" className="text-[10px]">+14.6%</Badge>
             </div>
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Avg. Click Rate</p>
+            <p className="text-[15px] text-muted-foreground">Avg. Click Rate</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold tabular-nums">24.57%</span>
+              <span className="text-[30px] font-bold tabular-nums">24.57%</span>
               <Badge variant="secondary" className="text-[10px]">+4.6%</Badge>
             </div>
           </div>
@@ -601,8 +608,8 @@ function FeatureCardsPreview({ shades, isDark }: { shades: Record<string, string
               <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: shades[bgShades[f.bgIdx]] }}>
                 <f.icon className="w-5 h-5" style={{ color: iconColor }} />
               </div>
-              <p className="text-sm font-semibold">{f.title}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
+              <p className="text-[30px] font-semibold leading-tight">{f.title}</p>
+              <p className="text-[15px] text-muted-foreground leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -616,15 +623,15 @@ function ButtonShowcase() {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-6">
-          <span className="text-xs text-muted-foreground w-16">Default</span>
-          <span className="text-xs text-muted-foreground w-16">Hover</span>
-          <span className="text-xs text-muted-foreground w-16">Active</span>
-          <span className="text-xs text-muted-foreground w-16">Disabled</span>
+          <span className="text-[15px] text-muted-foreground w-16">Default</span>
+          <span className="text-[15px] text-muted-foreground w-16">Hover</span>
+          <span className="text-[15px] text-muted-foreground w-16">Active</span>
+          <span className="text-[15px] text-muted-foreground w-16">Disabled</span>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
-          <p className="text-xs font-medium text-muted-foreground mb-2">Primary</p>
+          <p className="text-[15px] font-medium text-muted-foreground mb-2">Primary</p>
           <div className="flex items-center gap-3 flex-wrap">
             <Button size="sm" data-testid="button-primary-default">Primary</Button>
             <Button size="sm" data-testid="button-primary-hover">Primary</Button>
@@ -634,7 +641,7 @@ function ButtonShowcase() {
         </div>
         <Separator />
         <div className="space-y-1">
-          <p className="text-xs font-medium text-muted-foreground mb-2">Secondary</p>
+          <p className="text-[15px] font-medium text-muted-foreground mb-2">Secondary</p>
           <div className="flex items-center gap-3 flex-wrap">
             <Button size="sm" variant="secondary" data-testid="button-secondary-default">Secondary</Button>
             <Button size="sm" variant="secondary" data-testid="button-secondary-hover">Secondary</Button>
@@ -644,7 +651,7 @@ function ButtonShowcase() {
         </div>
         <Separator />
         <div className="space-y-1">
-          <p className="text-xs font-medium text-muted-foreground mb-2">Tertiary</p>
+          <p className="text-[15px] font-medium text-muted-foreground mb-2">Tertiary</p>
           <div className="flex items-center gap-3 flex-wrap">
             <Button size="sm" variant="outline" data-testid="button-tertiary-default">Tertiary</Button>
             <Button size="sm" variant="outline" data-testid="button-tertiary-hover">Tertiary</Button>
@@ -671,7 +678,7 @@ function CalendarPreview() {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2">
-        <CardTitle className="text-sm">July</CardTitle>
+        <CardTitle className="text-[30px] leading-tight">July</CardTitle>
         <div className="flex gap-1">
           <Button size="icon" variant="ghost" data-testid="button-calendar-prev">
             <ChevronLeft className="w-4 h-4" />
@@ -684,7 +691,7 @@ function CalendarPreview() {
       <CardContent>
         <div className="grid grid-cols-7 gap-1.5 text-center">
           {days.map(d => (
-            <span key={d} className="text-[10px] font-medium py-1.5 text-muted-foreground">{d}</span>
+            <span key={d} className="text-[15px] font-medium py-1.5 text-muted-foreground">{d}</span>
           ))}
           {dates.flat().map((d, i) => {
             if (!d) return <span key={i} />
@@ -694,7 +701,7 @@ function CalendarPreview() {
               <div key={i} className="flex flex-col items-center">
                 <span
                   className={cn(
-                    'text-xs w-8 h-8 flex items-center justify-center rounded-md tabular-nums',
+                    'text-[15px] w-8 h-8 flex items-center justify-center rounded-md tabular-nums',
                     isToday && 'bg-primary-600 dark:bg-primary-400 text-white dark:text-black font-semibold',
                     hasEvent && !isToday && 'bg-secondary font-medium',
                   )}
@@ -721,8 +728,8 @@ function BookCardPreview({ shades }: { shades: Record<string, string> }) {
           style={{ background: `linear-gradient(to top, ${shades['950']}ee, ${shades['950']}33, transparent)` }}
         />
         <div className="absolute bottom-0 left-0 right-0 p-5">
-          <Badge variant="secondary" className="mb-2 text-[10px]">MUST CO. OF NIT</Badge>
-          <p className="text-lg font-bold leading-tight text-white dark:text-black">Design Principles Handbook</p>
+          <Badge variant="secondary" className="mb-2 text-[15px]">MUST CO. OF NIT</Badge>
+          <p className="text-[30px] font-bold leading-tight text-white dark:text-black">Design Principles Handbook</p>
           <Button size="sm" variant="outline" className="mt-3" data-testid="button-book-continue">
             Continue reading
           </Button>
@@ -744,17 +751,17 @@ function BarChartPreview({ shades }: { shades: Record<string, string> }) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <div>
-          <CardTitle className="text-sm">Revenue</CardTitle>
+          <CardTitle className="text-[30px] leading-tight">Revenue</CardTitle>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-2xl font-bold tabular-nums" data-testid="text-barchart-revenue">$213,000</span>
-            <Badge variant="secondary" className="text-xs" data-testid="badge-barchart-growth">+16%</Badge>
+            <span className="text-[30px] font-bold tabular-nums" data-testid="text-barchart-revenue">$213,000</span>
+            <Badge variant="secondary" className="text-[15px]" data-testid="badge-barchart-growth">+16%</Badge>
           </div>
         </div>
         <div className="flex items-center gap-4 flex-wrap">
           {series.map(s => (
             <div key={s.label} className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: shades[s.shade] }} />
-              <span className="text-xs text-muted-foreground">{s.label}</span>
+              <span className="text-[15px] text-muted-foreground">{s.label}</span>
             </div>
           ))}
         </div>
@@ -776,7 +783,7 @@ function BarChartPreview({ shades }: { shades: Record<string, string> }) {
                     />
                   ))}
                 </div>
-                <span className="text-[9px] text-muted-foreground">{month}</span>
+                <span className="text-[15px] text-muted-foreground">{month}</span>
               </div>
             ))}
           </div>
@@ -796,7 +803,7 @@ function StatsDonutPreview({ shades }: { shades: Record<string, string> }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Stats</CardTitle>
+        <CardTitle className="text-[30px] leading-tight">Stats</CardTitle>
       </CardHeader>
       <CardContent className="flex items-center justify-center">
         <div className="relative">
@@ -823,7 +830,7 @@ function StatsDonutPreview({ shades }: { shades: Record<string, string> }) {
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-xl font-bold tabular-nums">1.7K</span>
+            <span className="text-[30px] font-bold tabular-nums">1.7K</span>
           </div>
         </div>
       </CardContent>
@@ -984,11 +991,11 @@ export default function PalettePage() {
         className="rounded-xl p-8 transition-colors duration-300 bg-background text-foreground"
         style={cssOverrides as React.CSSProperties}
       >
-        <p className="text-xs font-medium text-muted-foreground mb-6 uppercase tracking-wider">Examples</p>
+        <p className="text-[15px] font-medium text-muted-foreground mb-6 uppercase tracking-wider">Examples</p>
         <div className="space-y-6">
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <HeroPreview shades={shades} />
+            <HeroPreview shades={shades} isDark={darkMode} />
             <CategoriesPreview shades={shades} isDark={darkMode} />
             <BudgetPreview shades={shades} isDark={darkMode} />
           </div>
