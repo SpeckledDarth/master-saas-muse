@@ -73,7 +73,7 @@ All components use palette-derived semantic colors (primary, muted-foreground, b
 
 ## 950-Scale Card Color Model (February 2026)
 Standard color formulas for all card-like components across palette previews and landing pages:
-- **Card background**: `bg-white/90` (90% opacity white) in both light and dark modes, with `border-gray-500/50`
+- **Card background**: `bg-white/10` (10% opacity white, barely visible) in both light and dark modes, with `border-gray-500/50`
 - **Card text**: H1/titles use `text-black dark:text-white`, body text uses `opacity-70`
 - **Icon color**: `text-primary-800 dark:text-primary-200` (deep/rich shade for contrast against light/dark icon backgrounds)
 - **Icon backgrounds**: Randomized from `bg-primary-100/200/300` (light) and `bg-primary-700/800/900` (dark) — each icon in a group gets a different shade from the set, cycling via index % 3
