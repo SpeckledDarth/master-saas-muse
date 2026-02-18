@@ -61,9 +61,9 @@ export function SplitHero({
           data-gap={gap}
         >
           <div className="space-y-6 max-w-lg text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold leading-tight text-foreground">
               {animatedWords.length > 0 ? (
-                <AnimatedWords words={animatedWords} className="text-primary" />
+                <AnimatedWords words={animatedWords} />
               ) : (
                 headline
               )}

@@ -119,9 +119,9 @@ export default function HomePage() {
 
   const renderHeroContent = (isDark: boolean) => (
     <div className="relative z-10 container mx-auto px-4 text-center">
-      <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${isDark ? 'text-white' : ''}`}>
+      <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${isDark ? 'text-white' : 'text-foreground'}`}>
         {heroAnimatedWords.length > 0 ? (
-          <AnimatedWords words={heroAnimatedWords} className="text-primary" />
+          <AnimatedWords words={heroAnimatedWords} className={isDark ? 'text-white' : ''} />
         ) : (
           <AppName />
         )}
@@ -253,9 +253,9 @@ export default function HomePage() {
           <div className="relative z-10 container mx-auto px-4 flex justify-center">
             <div className="grid grid-cols-1 md:grid-cols-[auto_auto] items-center" style={{ gap: `${floatingGap * 4}px` }}>
               <div className="text-center md:text-left space-y-6 max-w-lg">
-                <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold">
+                <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold text-foreground">
                   {heroAnimatedWords.length > 0 ? (
-                    <AnimatedWords words={heroAnimatedWords} className="text-primary" />
+                    <AnimatedWords words={heroAnimatedWords} />
                   ) : (
                     <AppName />
                   )}
@@ -343,9 +343,9 @@ export default function HomePage() {
 
           <div className="relative z-10 container mx-auto px-4">
             <div className="max-w-lg">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
                 {heroAnimatedWords.length > 0 ? (
-                  <AnimatedWords words={heroAnimatedWords} className="text-primary" />
+                  <AnimatedWords words={heroAnimatedWords} />
                 ) : (
                   <AppName />
                 )}
