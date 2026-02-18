@@ -122,16 +122,12 @@ const shadeKeys = ['50', '100', '200', '300', '400', '500', '600', '700', '800',
 interface BgOverrides {
   siteBgLight: string | null
   siteBgDark: string | null
-  cardBgLight: string | null
-  cardBgDark: string | null
 }
 
 function getDefaultBgs(shades: Record<string, string>) {
   return {
     siteBgLight: shades['50'],
     siteBgDark: shades['950'],
-    cardBgLight: '#ffffff',
-    cardBgDark: '#171717',
   }
 }
 
@@ -152,18 +148,12 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean, override
   const siteBg = dark
     ? (overrides?.siteBgDark || defaults.siteBgDark)
     : (overrides?.siteBgLight || defaults.siteBgLight)
-  const cardBg = dark
-    ? (overrides?.cardBgDark || defaults.cardBgDark)
-    : (overrides?.cardBgLight || defaults.cardBgLight)
 
   if (dark) {
     return {
       ...scaleVars,
       '--background': hexToHslString(siteBg),
       '--foreground': hexToHslString(shades['50']),
-      '--card': hexToHslString(cardBg),
-      '--card-foreground': hexToHslString(shades['50']),
-      '--card-border': hexToHslString(shades['700']),
       '--primary': hexToHslString(shades['400']),
       '--primary-foreground': hexToHslString(shades['950']),
       '--secondary': hexToHslString(shade850),
@@ -185,9 +175,6 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean, override
     ...scaleVars,
     '--background': hexToHslString(siteBg),
     '--foreground': hexToHslString(shades['900']),
-    '--card': hexToHslString(cardBg),
-    '--card-foreground': hexToHslString(shades['900']),
-    '--card-border': '0 0% 88%',
     '--primary': hexToHslString(shades['600']),
     '--primary-foreground': '0 0% 100%',
     '--secondary': '0 0% 95%',
@@ -852,8 +839,6 @@ export default function PalettePage() {
   const [bgOverrides, setBgOverrides] = useState<BgOverrides>({
     siteBgLight: null,
     siteBgDark: null,
-    cardBgLight: null,
-    cardBgDark: null,
   })
 
   const shades = useMemo(() => generateShadeScale(localColor), [localColor])
@@ -861,7 +846,7 @@ export default function PalettePage() {
   const cssOverrides = useMemo(() => getCssOverrides(shades, darkMode, bgOverrides), [shades, darkMode, bgOverrides])
 
   useEffect(() => {
-    setBgOverrides({ siteBgLight: null, siteBgDark: null, cardBgLight: null, cardBgDark: null })
+    setBgOverrides({ siteBgLight: null, siteBgDark: null })
   }, [localColor])
 
   const handleColorChange = useCallback((hex: string) => {
@@ -983,24 +968,6 @@ export default function PalettePage() {
             onClear={() => setBgOverrides(prev => ({ ...prev, siteBgDark: null }))}
             defaultValue={defaults.siteBgDark}
             testId="override-site-bg-dark"
-          />
-        </div>
-        <div className="flex items-end gap-4">
-          <ColorInput
-            label="Card Background (Light)"
-            value={bgOverrides.cardBgLight || defaults.cardBgLight}
-            onChange={hex => setBgOverrides(prev => ({ ...prev, cardBgLight: hex }))}
-            onClear={() => setBgOverrides(prev => ({ ...prev, cardBgLight: null }))}
-            defaultValue={defaults.cardBgLight}
-            testId="override-card-bg-light"
-          />
-          <ColorInput
-            label="Card Background (Dark)"
-            value={bgOverrides.cardBgDark || defaults.cardBgDark}
-            onChange={hex => setBgOverrides(prev => ({ ...prev, cardBgDark: hex }))}
-            onClear={() => setBgOverrides(prev => ({ ...prev, cardBgDark: null }))}
-            defaultValue={defaults.cardBgDark}
-            testId="override-card-bg-dark"
           />
         </div>
       </div>
