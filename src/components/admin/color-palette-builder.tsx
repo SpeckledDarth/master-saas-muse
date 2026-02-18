@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Copy, Check, RotateCcw, Shuffle } from 'lucide-react'
+import { ColorInput } from '@/components/admin/color-input'
 import { cn } from '@/lib/utils'
 
 function hexToHsl(hex: string): [number, number, number] {
@@ -300,46 +301,22 @@ export function ColorPaletteBuilder({
         </div>
 
         <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="palette-primary">Primary Color</Label>
-            <div className="flex gap-2">
-              <Input
-                id="palette-primary"
-                type="color"
-                value={localPrimary.startsWith('#') && localPrimary.length === 7 ? localPrimary : '#6366f1'}
-                onChange={e => handlePrimaryChange(e.target.value)}
-                className="w-16 h-10 p-1 cursor-pointer"
-                data-testid="input-primary-color"
-              />
-              <Input
-                value={localPrimary}
-                onChange={e => handlePrimaryChange(e.target.value)}
-                placeholder="#6366f1"
-                className="flex-1 font-mono text-sm"
-                data-testid="input-primary-hex"
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="palette-accent">Accent Color</Label>
-            <div className="flex gap-2">
-              <Input
-                id="palette-accent"
-                type="color"
-                value={localAccent.startsWith('#') && localAccent.length === 7 ? localAccent : '#8b5cf6'}
-                onChange={e => handleAccentChange(e.target.value)}
-                className="w-16 h-10 p-1 cursor-pointer"
-                data-testid="input-accent-color"
-              />
-              <Input
-                value={localAccent}
-                onChange={e => handleAccentChange(e.target.value)}
-                placeholder="#8b5cf6"
-                className="flex-1 font-mono text-sm"
-                data-testid="input-accent-hex"
-              />
-            </div>
-          </div>
+          <ColorInput
+            label="Primary Color"
+            value={localPrimary}
+            onChange={handlePrimaryChange}
+            defaultValue="#6366f1"
+            placeholder="#6366f1"
+            testId="input-primary-color"
+          />
+          <ColorInput
+            label="Accent Color"
+            value={localAccent}
+            onChange={handleAccentChange}
+            defaultValue="#8b5cf6"
+            placeholder="#8b5cf6"
+            testId="input-accent-color"
+          />
         </div>
 
         <ShadeStrip shades={primaryShades} label="Primary" baseColor={localPrimary} />
