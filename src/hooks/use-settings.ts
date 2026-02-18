@@ -295,22 +295,57 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
   useEffect(() => {
     if (!settings) return
     
-    const applyCurrentTheme = () => {
+    const applyAllColors = () => {
       const root = document.documentElement
       const isDark = root.classList.contains('dark')
+      
       const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
       applyTheme(theme)
+      
+      if (settings.branding.primaryColor) {
+        const hsl = hexToHSL(settings.branding.primaryColor)
+        if (hsl) {
+          root.style.setProperty('--primary', hsl)
+          root.style.setProperty('--primary-foreground', getContrastForeground(settings.branding.primaryColor))
+        }
+        applyShadeScale(root, 'primary', settings.branding.primaryColor)
+      }
+      
+      if (settings.branding.accentColor) {
+        const accentScale = generateShadeScaleHsl(settings.branding.accentColor)
+        const mutedAccent = isDark ? accentScale['800'] : accentScale['100']
+        if (mutedAccent) root.style.setProperty('--accent', mutedAccent)
+        const accentFg = isDark ? accentScale['100'] : accentScale['900']
+        if (accentFg) root.style.setProperty('--accent-foreground', accentFg)
+        applyShadeScale(root, 'accent', settings.branding.accentColor)
+      }
+      
+      const siteBgOverride = isDark ? settings.branding.siteBgDarkOverride : settings.branding.siteBgLightOverride
+      if (siteBgOverride) {
+        const hsl = hexToHSL(siteBgOverride)
+        if (hsl) {
+          root.style.setProperty('--background', hsl)
+          root.style.setProperty('--popover', hsl)
+        }
+      } else if (settings.branding.primaryColor) {
+        const scale = generateShadeScaleHsl(settings.branding.primaryColor)
+        const bgShade = isDark ? scale['950'] : scale['50']
+        if (bgShade) {
+          root.style.setProperty('--background', bgShade)
+          root.style.setProperty('--popover', bgShade)
+        }
+      }
     }
     
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'class') {
-          applyCurrentTheme()
+          applyAllColors()
         }
       })
     })
     
     observer.observe(document.documentElement, { attributes: true })
     return () => observer.disconnect()
-  }, [settings?.branding.lightTheme, settings?.branding.darkTheme])
+  }, [settings?.branding])
 }
