@@ -40,7 +40,7 @@ export function ProcessSteps() {
                   data-testid={`process-step-${step.id}`}
                 >
                   <div className="flex-shrink-0 relative z-10">
-                    <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xl font-bold shadow-lg">
+                    <div className="w-16 h-16 rounded-full bg-primary-600 text-white dark:bg-primary-400 dark:text-black flex items-center justify-center text-xl font-bold shadow-lg">
                       {step.number || index + 1}
                     </div>
                   </div>

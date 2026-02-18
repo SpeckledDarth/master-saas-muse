@@ -14,7 +14,7 @@ export default function NotFound() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <div className="mb-8">
-          <h1 className="text-9xl font-bold text-primary" data-testid="text-404">
+          <h1 className="text-9xl font-bold text-primary-600 dark:text-primary-400" data-testid="text-404">
             404
           </h1>
           <h2 className="text-2xl font-semibold mt-4 mb-2" data-testid="text-page-not-found">
@@ -51,28 +51,28 @@ export default function NotFound() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link 
               href="/features" 
-              className="text-sm text-primary hover:underline"
+              className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
               data-testid="link-features"
             >
               Features
             </Link>
             <Link 
               href="/pricing" 
-              className="text-sm text-primary hover:underline"
+              className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
               data-testid="link-pricing"
             >
               Pricing
             </Link>
             <Link 
               href="/faq" 
-              className="text-sm text-primary hover:underline"
+              className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
               data-testid="link-faq"
             >
               FAQ
             </Link>
             <Link 
               href="/contact" 
-              className="text-sm text-primary hover:underline"
+              className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
               data-testid="link-contact"
             >
               Contact

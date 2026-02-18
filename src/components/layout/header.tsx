@@ -182,7 +182,7 @@ export function Header() {
               key={item.id}
               href={item.href}
               className={cn(
-                "text-sm transition-colors flex items-center gap-1.5 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all hover:after:w-full",
+                "text-sm transition-colors flex items-center gap-1.5 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary-600 dark:after:bg-primary-400 after:transition-all hover:after:w-full",
                 customTextColor ? "opacity-80 hover:opacity-100" : "text-muted-foreground hover:text-foreground"
               )}
               data-testid={`link-nav-${item.id}`}
@@ -204,7 +204,7 @@ export function Header() {
               key={page.id}
               href={`/p/${page.slug}`}
               className={cn(
-                "text-sm transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all hover:after:w-full",
+                "text-sm transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary-600 dark:after:bg-primary-400 after:transition-all hover:after:w-full",
                 customTextColor ? "opacity-80 hover:opacity-100" : "text-muted-foreground hover:text-foreground"
               )}
               data-testid={`link-custom-${page.slug}`}

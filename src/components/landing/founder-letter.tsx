@@ -78,7 +78,7 @@ export function FounderLetter({ settings, className = '' }: FounderLetterProps) 
                   {settings.founderImageUrl && (
                     <AvatarImage src={settings.founderImageUrl} alt={settings.founderName} />
                   )}
-                  <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                  <AvatarFallback className="bg-primary-100 text-primary-800 dark:bg-primary-800 dark:text-primary-200 font-medium">
                     {initials}
                   </AvatarFallback>
                 </Avatar>

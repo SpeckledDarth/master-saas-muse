@@ -173,7 +173,7 @@ export default function AnalyticsPage() {
               <p className="text-muted-foreground">Total submissions</p>
               <a 
                 href="/admin/feedback" 
-                className="text-primary text-sm hover:underline mt-4 inline-block"
+                className="text-primary-600 dark:text-primary-400 text-sm hover:underline mt-4 inline-block"
               >
                 View all feedback
               </a>

@@ -76,7 +76,7 @@ export default async function BlogPage() {
                           : 'Draft'}
                       </span>
                     </div>
-                    <CardTitle className="text-xl group-hover:text-primary transition-colors flex items-center gap-2">
+                    <CardTitle className="text-xl group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors flex items-center gap-2">
                       {post.title}
                       <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </CardTitle>

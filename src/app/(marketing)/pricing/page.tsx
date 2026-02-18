@@ -212,7 +212,7 @@ export default function PricingPage() {
                 return (
                   <Card 
                     key={product.id} 
-                    className={isPopular ? 'border-primary shadow-lg' : ''}
+                    className={isPopular ? 'border-primary-600 dark:border-primary-400 shadow-lg' : ''}
                     data-testid={`card-plan-${product.id}`}
                   >
                     <CardHeader>
@@ -273,7 +273,7 @@ export default function PricingPage() {
             return (
               <Card 
                 key={plan.id} 
-                className={plan.highlighted ? 'border-primary shadow-lg' : ''}
+                className={plan.highlighted ? 'border-primary-600 dark:border-primary-400 shadow-lg' : ''}
                 data-testid={`card-plan-${plan.id}`}
               >
                 <CardHeader>

@@ -174,7 +174,7 @@ export function BulkImport({ onImported }: { onImported?: () => void }) {
               type="file"
               accept=".csv"
               onChange={handleFileChange}
-              className="text-sm file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-primary-foreground"
+              className="text-sm file:mr-3 file:rounded-md file:border-0 file:bg-primary-600 dark:file:bg-primary-400 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-white dark:file:text-black"
               data-testid="input-csv-file"
             />
             {rows.length > 0 && (

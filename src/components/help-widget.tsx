@@ -155,7 +155,7 @@ export function HelpWidget({
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
                   className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
-                    msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                    msg.role === 'user' ? 'bg-primary-600 text-white dark:bg-primary-400 dark:text-black' : 'bg-muted'
                   }`}
                   data-testid={`text-message-${i}`}
                 >

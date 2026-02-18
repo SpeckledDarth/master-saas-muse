@@ -64,15 +64,15 @@ export function ComparisonBars({ settings, className = '' }: ComparisonBarsProps
             <div key={item.id} className="space-y-2" data-testid={`comparison-item-${item.id}`}>
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm text-muted-foreground">{item.label}</span>
-                <span className={`text-sm font-bold tabular-nums ${item.highlighted ? 'text-primary' : ''}`}>
+                <span className={`text-sm font-bold tabular-nums ${item.highlighted ? 'text-primary-600 dark:text-primary-400' : ''}`}>
                   {item.value}
                 </span>
               </div>
-              <div className="h-3 rounded-full bg-muted overflow-hidden">
+              <div className="h-3 rounded-full bg-primary-100 dark:bg-primary-900 overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-1000 ease-out ${
                     item.highlighted
-                      ? 'bg-primary'
+                      ? 'bg-primary-600 dark:bg-primary-400'
                       : 'bg-muted-foreground/30'
                   }`}
                   style={{

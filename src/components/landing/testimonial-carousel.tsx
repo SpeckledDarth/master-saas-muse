@@ -57,8 +57,8 @@ export function TestimonialCarousel({
         </h2>
         
         <div className="max-w-4xl mx-auto relative">
-          <div className="bg-card rounded-xl p-8 md:p-12 shadow-sm border relative overflow-hidden">
-            <Quote className="absolute top-6 left-6 h-12 w-12 text-primary/10" />
+          <div className="bg-white/75 rounded-xl p-8 md:p-12 shadow-sm border border-gray-500/50 text-black dark:text-white relative overflow-hidden">
+            <Quote className="absolute top-6 left-6 h-12 w-12 text-primary-200 dark:text-primary-800" />
             
             <div className="relative z-10 text-center">
               <p className="text-xl md:text-2xl text-muted-foreground italic leading-relaxed mb-8">
@@ -68,7 +68,7 @@ export function TestimonialCarousel({
               <div className="flex flex-col items-center gap-4">
                 <Avatar className="h-16 w-16">
                   {current.avatarUrl && <AvatarImage src={current.avatarUrl} alt={current.name} />}
-                  <AvatarFallback className="bg-primary/10 text-primary text-lg font-medium">
+                  <AvatarFallback className="bg-primary-100 text-primary-800 dark:bg-primary-800 dark:text-primary-200 text-lg font-medium">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -121,7 +121,7 @@ export function TestimonialCarousel({
                 <button
                   key={index}
                   className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentIndex ? 'bg-primary' : 'bg-muted-foreground/30'
+                    index === currentIndex ? 'bg-primary-600 dark:bg-primary-400' : 'bg-muted-foreground/30'
                   }`}
                   onClick={() => setCurrentIndex(index)}
                   data-testid={`button-testimonial-dot-${index}`}

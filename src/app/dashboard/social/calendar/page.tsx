@@ -305,7 +305,7 @@ export default function SocialCalendarPage() {
                       `}
                       data-testid={`button-day-${dateKey}`}
                     >
-                      <span className={`text-xs font-medium ${isToday ? 'text-primary' : ''}`}>
+                      <span className={`text-xs font-medium ${isToday ? 'text-primary-600 dark:text-primary-400' : ''}`}>
                         {date.getDate()}
                       </span>
                       {uniquePlatforms.length > 0 && (

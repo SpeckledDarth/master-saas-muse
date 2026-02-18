@@ -80,7 +80,7 @@ export default function ResetPasswordPage() {
             </Button>
             <div className="text-sm text-center text-muted-foreground">
               Remember your password?{' '}
-              <Link href="/login" className="text-primary hover:underline" data-testid="link-login">
+              <Link href="/login" className="text-primary-600 dark:text-primary-400 hover:underline" data-testid="link-login">
                 Sign in
               </Link>
             </div>

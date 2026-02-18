@@ -584,9 +584,9 @@ export default function ContentPage() {
                     </Button>
                   </div>
                   <div className="space-y-2">
-                    <div className="rounded-md bg-primary/5 p-3 text-center mb-2" data-testid={`metric-preview-${index}`}>
+                    <div className="rounded-md bg-primary-50 dark:bg-primary-950 p-3 text-center mb-2" data-testid={`metric-preview-${index}`}>
                       <div className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Preview</div>
-                      <div className="text-2xl font-bold text-primary">
+                      <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                         {metric.prefix || ''}{metric.value || '0'}{metric.suffix || ''}
                       </div>
                       <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mt-1">
@@ -755,7 +755,7 @@ export default function ContentPage() {
             <div className="space-y-3">
               {(settings.content?.processSteps || []).map((step, index) => (
                 <div key={step.id} className="flex gap-3 items-start p-3 border rounded-lg bg-muted/30">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm shrink-0">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-600 dark:bg-primary-400 text-white dark:text-black font-bold text-sm shrink-0">
                     {step.number}
                   </div>
                   <div className="flex-1 space-y-2">

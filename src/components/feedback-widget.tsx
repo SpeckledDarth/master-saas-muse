@@ -152,7 +152,7 @@ export function FeedbackWidget() {
                     onClick={() => setNpsScore(npsScore === i ? null : i)}
                     className={`h-7 text-xs rounded-md font-medium transition-colors ${
                       npsScore === i
-                        ? 'bg-primary text-primary-foreground'
+                        ? 'bg-primary-600 text-white dark:bg-primary-400 dark:text-black'
                         : 'bg-muted text-muted-foreground hover-elevate'
                     }`}
                     data-testid={`button-nps-${i}`}

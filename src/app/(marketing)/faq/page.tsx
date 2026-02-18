@@ -58,7 +58,7 @@ export default function FAQPage() {
                 data-testid={`button-faq-${item.id}`}
               >
                 <div className="flex items-start gap-3">
-                  <HelpCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                  <HelpCircle className="h-5 w-5 text-primary-600 dark:text-primary-400 mt-0.5 shrink-0" />
                   <span className="font-medium" data-testid={`text-faq-question-${item.id}`}>
                     {item.question}
                   </span>

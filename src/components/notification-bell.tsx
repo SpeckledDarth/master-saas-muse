@@ -119,7 +119,7 @@ export function NotificationBell() {
                     <p className="text-xs text-muted-foreground truncate" data-testid={`text-notification-message-${n.id}`}>{n.message}</p>
                     <p className="text-xs text-muted-foreground mt-1" data-testid={`text-notification-time-${n.id}`}>{timeAgo(n.created_at)}</p>
                   </div>
-                  {!n.read && <span className="h-2 w-2 rounded-full bg-primary shrink-0 mt-2" data-testid={`indicator-unread-${n.id}`} />}
+                  {!n.read && <span className="h-2 w-2 rounded-full bg-primary-600 dark:bg-primary-400 shrink-0 mt-2" data-testid={`indicator-unread-${n.id}`} />}
                 </button>
               )
             })

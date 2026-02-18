@@ -37,7 +37,7 @@ export default async function ChangelogPage() {
           <div className="space-y-8">
             {posts.map((post) => (
               <Card key={post.id} className="relative">
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-lg" />
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-600 dark:bg-primary-400 rounded-l-lg" />
                 <CardHeader>
                   <div className="flex items-center gap-3 mb-2">
                     <Badge variant="outline">

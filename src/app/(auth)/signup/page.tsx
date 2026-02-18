@@ -111,7 +111,7 @@ function SignupForm() {
             <div className="rounded-md bg-muted p-3">
               <p className="text-sm text-muted-foreground text-center">
                 <strong>No email?</strong> Check your spam folder, or if you already have an account,{' '}
-                <Link href="/login" className="text-primary hover:underline" data-testid="link-login-from-success">
+                <Link href="/login" className="text-primary-600 dark:text-primary-400 hover:underline" data-testid="link-login-from-success">
                   try logging in instead
                 </Link>.
               </p>
@@ -243,7 +243,7 @@ function SignupForm() {
 
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{' '}
-            <Link href="/login" className="text-primary hover:underline" data-testid="link-login">
+            <Link href="/login" className="text-primary-600 dark:text-primary-400 hover:underline" data-testid="link-login">
               Sign in
             </Link>
           </p>

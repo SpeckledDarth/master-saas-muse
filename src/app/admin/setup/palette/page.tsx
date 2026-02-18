@@ -135,10 +135,19 @@ function getDefaultBgs(shades: Record<string, string>) {
   }
 }
 
+function getShadeScaleVars(shades: Record<string, string>): Record<string, string> {
+  const vars: Record<string, string> = {}
+  for (const [shade, hex] of Object.entries(shades)) {
+    vars[`--primary-${shade}`] = hexToHslString(hex)
+  }
+  return vars
+}
+
 function getCssOverrides(shades: Record<string, string>, dark: boolean, overrides?: BgOverrides): Record<string, string> {
   const shade850 = interpolateHex(shades['800'], shades['900'], 0.5)
   const shade750 = interpolateHex(shades['700'], shades['800'], 0.5)
   const defaults = getDefaultBgs(shades)
+  const scaleVars = getShadeScaleVars(shades)
 
   const siteBg = dark
     ? (overrides?.siteBgDark || defaults.siteBgDark)
@@ -149,6 +158,7 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean, override
 
   if (dark) {
     return {
+      ...scaleVars,
       '--background': hexToHslString(siteBg),
       '--foreground': hexToHslString(shades['50']),
       '--card': hexToHslString(cardBg),
@@ -172,6 +182,7 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean, override
     }
   }
   return {
+    ...scaleVars,
     '--background': hexToHslString(siteBg),
     '--foreground': hexToHslString(shades['900']),
     '--card': hexToHslString(cardBg),
@@ -308,8 +319,8 @@ function NewsletterPreview() {
               <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
             </div>
             {item.active && (
-              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
-                <Check className="w-3.5 h-3.5 text-primary-foreground" />
+              <div className="w-6 h-6 rounded-full bg-primary-600 dark:bg-primary-400 flex items-center justify-center shrink-0">
+                <Check className="w-3.5 h-3.5 text-white dark:text-black" />
               </div>
             )}
           </div>
@@ -447,7 +458,7 @@ function PricingPreview() {
       <CardContent>
         <div className="grid grid-cols-3 gap-4">
           {plans.map(plan => (
-            <div key={plan.name} className={cn('rounded-lg border p-5 space-y-4', plan.featured && 'border-primary')}>
+            <div key={plan.name} className={cn('rounded-lg border p-5 space-y-4', plan.featured && 'border-primary-600 dark:border-primary-400')}>
               <div>
                 <p className="text-sm font-semibold">{plan.name}</p>
                 <p className="text-xs text-muted-foreground mt-1">{plan.desc}</p>
@@ -459,7 +470,7 @@ function PricingPreview() {
               <div className="space-y-2">
                 {plan.features.map(f => (
                   <div key={f} className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <Check className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400 shrink-0" />
                     <span className="text-xs">{f}</span>
                   </div>
                 ))}
@@ -686,13 +697,13 @@ function CalendarPreview() {
                 <span
                   className={cn(
                     'text-xs w-8 h-8 flex items-center justify-center rounded-md tabular-nums',
-                    isToday && 'bg-primary text-primary-foreground font-semibold',
+                    isToday && 'bg-primary-600 dark:bg-primary-400 text-white dark:text-black font-semibold',
                     hasEvent && !isToday && 'bg-secondary font-medium',
                   )}
                 >
                   {d}
                 </span>
-                {hasEvent && <div className="w-1 h-1 rounded-full bg-primary mt-0.5" />}
+                {hasEvent && <div className="w-1 h-1 rounded-full bg-primary-600 dark:bg-primary-400 mt-0.5" />}
               </div>
             )
           })}
@@ -713,7 +724,7 @@ function BookCardPreview({ shades }: { shades: Record<string, string> }) {
         />
         <div className="absolute bottom-0 left-0 right-0 p-5">
           <Badge variant="secondary" className="mb-2 text-[10px]">MUST CO. OF NIT</Badge>
-          <p className="text-lg font-bold leading-tight text-primary-foreground">Design Principles Handbook</p>
+          <p className="text-lg font-bold leading-tight text-white dark:text-black">Design Principles Handbook</p>
           <Button size="sm" variant="outline" className="mt-3" data-testid="button-book-continue">
             Continue reading
           </Button>

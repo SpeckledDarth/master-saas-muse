@@ -172,8 +172,8 @@ export default function InvitePage() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Mail className="h-6 w-6 text-primary" />
+          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
+            <Mail className="h-6 w-6 text-primary-600 dark:text-primary-400" />
           </div>
           <CardTitle>You&apos;re Invited!</CardTitle>
           <CardDescription>

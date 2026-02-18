@@ -55,10 +55,10 @@ export function SocialUpgradeBanner() {
 
   return (
     <div
-      className="sticky top-0 z-50 flex items-center justify-between gap-3 bg-primary px-4 py-2"
+      className="sticky top-0 z-50 flex items-center justify-between gap-3 bg-primary-600 dark:bg-primary-400 px-4 py-2"
       data-testid="banner-upgrade"
     >
-      <p className="text-sm text-primary-foreground">{message}</p>
+      <p className="text-sm text-white dark:text-black">{message}</p>
       <div className="flex items-center gap-2 flex-shrink-0">
         <Button variant="secondary" size="sm" asChild data-testid="button-banner-upgrade">
           <Link href="/pricing">
@@ -69,7 +69,7 @@ export function SocialUpgradeBanner() {
         <Button
           variant="ghost"
           size="icon"
-          className="text-primary-foreground"
+          className="text-white dark:text-black"
           onClick={() => {
             setDismissed(true)
             sessionStorage.setItem('social-upgrade-dismissed', 'true')

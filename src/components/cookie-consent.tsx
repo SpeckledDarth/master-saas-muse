@@ -45,7 +45,7 @@ export function CookieConsent({
             {' '}
             <a
               href={cookiePolicyUrl}
-              className="underline text-primary"
+              className="underline text-primary-600 dark:text-primary-400"
               data-testid="link-cookie-policy"
             >
               Learn more

@@ -89,7 +89,7 @@ export default function ContactPage() {
                   <Mail className="h-5 w-5 text-muted-foreground" />
                   <a 
                     href={`mailto:${contact?.email || branding?.supportEmail}`}
-                    className="text-primary hover:underline"
+                    className="text-primary-600 dark:text-primary-400 hover:underline"
                     data-testid="link-email"
                   >
                     {contact?.email || branding?.supportEmail}
@@ -101,7 +101,7 @@ export default function ContactPage() {
                   <Phone className="h-5 w-5 text-muted-foreground" />
                   <a 
                     href={`tel:${contact.phone}`}
-                    className="text-primary hover:underline"
+                    className="text-primary-600 dark:text-primary-400 hover:underline"
                     data-testid="link-phone"
                   >
                     {contact.phone}

@@ -11,20 +11,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground border border-primary-border hover:bg-primary/85 hover:border-primary-border",
+          "bg-primary-600 text-white border-none hover:bg-primary-700 active:bg-primary-800 dark:bg-primary-400 dark:text-black dark:hover:bg-primary-300 dark:active:bg-primary-200",
         destructive:
           "bg-destructive text-destructive-foreground border border-destructive-border hover:opacity-90",
         outline:
-          // Shows the background color of whatever card / sidebar / accent background it is inside of.
-          // Inherits the current text color.
-          " border [border-color:var(--button-outline)] shadow-xs active:shadow-none hover:bg-accent/10",
-        secondary: "border bg-secondary text-secondary-foreground border border-secondary-border hover:bg-secondary/80",
-        // Add a transparent border so that when someone toggles a border on later, it doesn't shift layout/size.
+          "bg-transparent text-primary-600 border border-primary-600 hover:bg-primary-50 active:bg-primary-100 dark:text-primary-400 dark:border-primary-400 dark:hover:bg-primary-900 dark:active:bg-primary-900",
+        secondary:
+          "bg-primary-100 text-primary-900 border-none hover:bg-primary-200 active:bg-primary-300 dark:bg-primary-900 dark:text-primary-100 dark:hover:bg-primary-800 dark:active:bg-primary-700",
         ghost: "border border-transparent hover:bg-accent/10",
       },
-      // Heights are set as "min" heights, because sometimes Ai will place large amount of content
-      // inside buttons. With a min-height they will look appropriate with small amounts of content,
-      // but will expand to fit large amounts of content.
       size: {
         default: "min-h-9 px-4 py-2",
         sm: "min-h-8 rounded-md px-3 text-xs",

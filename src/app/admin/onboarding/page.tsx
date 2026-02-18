@@ -175,9 +175,9 @@ export default function OnboardingPage() {
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
                   completedSteps.includes(step.id)
-                    ? 'bg-primary border-primary text-primary-foreground'
+                    ? 'bg-primary-600 dark:bg-primary-400 border-primary-600 dark:border-primary-400 text-white dark:text-black'
                     : step.id === currentStep
-                    ? 'border-primary text-primary'
+                    ? 'border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400'
                     : 'border-muted text-muted-foreground'
                 }`}
               >
@@ -190,7 +190,7 @@ export default function OnboardingPage() {
               {index < activeSteps.length - 1 && (
                 <div
                   className={`w-12 h-0.5 mx-2 ${
-                    completedSteps.includes(step.id) ? 'bg-primary' : 'bg-muted'
+                    completedSteps.includes(step.id) ? 'bg-primary-600 dark:bg-primary-400' : 'bg-muted'
                   }`}
                 />
               )}
@@ -202,7 +202,7 @@ export default function OnboardingPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {activeSteps[currentStep - 1]?.icon && (
-                <span className="text-primary">
+                <span className="text-primary-600 dark:text-primary-400">
                   {(() => {
                     const Icon = activeSteps[currentStep - 1].icon
                     return <Icon className="h-5 w-5" />

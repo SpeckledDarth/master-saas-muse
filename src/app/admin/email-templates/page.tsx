@@ -464,7 +464,7 @@ export default function EmailTemplatesPage() {
                         onClick={() => insertVariable(v.name)}
                         data-testid={`variable-${v.name.replace(/[{}]/g, '')}`}
                       >
-                        <code className="bg-background px-1.5 py-0.5 rounded text-primary">{v.name}</code>
+                        <code className="bg-background px-1.5 py-0.5 rounded text-primary-600 dark:text-primary-400">{v.name}</code>
                         <span className="text-muted-foreground truncate">{v.description}</span>
                       </div>
                     ))}

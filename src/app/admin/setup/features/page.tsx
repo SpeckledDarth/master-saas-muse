@@ -329,7 +329,7 @@ export default function FeaturesPage() {
               <InfoTooltip text="Choose which AI service powers your app's intelligent features. Set the API key as an environment variable." />
             </CardTitle>
             <CardDescription>
-              Configure which AI provider and model to use. Manage API keys in the <a href="/admin/setup/integrations" className="text-primary underline">Integrations</a> page.
+              Configure which AI provider and model to use. Manage API keys in the <a href="/admin/setup/integrations" className="text-primary-600 dark:text-primary-400 underline">Integrations</a> page.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -357,7 +357,7 @@ export default function FeaturesPage() {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Required env variable: <code className="bg-muted px-1 py-0.5 rounded text-xs">{aiProviders.find(p => p.id === (settings.ai?.provider || 'xai'))?.envKey || 'XAI_API_KEY'}</code> — <a href="/admin/setup/integrations" className="text-primary underline">View in Integrations</a>
+                Required env variable: <code className="bg-muted px-1 py-0.5 rounded text-xs">{aiProviders.find(p => p.id === (settings.ai?.provider || 'xai'))?.envKey || 'XAI_API_KEY'}</code> — <a href="/admin/setup/integrations" className="text-primary-600 dark:text-primary-400 underline">View in Integrations</a>
               </p>
             </div>
 

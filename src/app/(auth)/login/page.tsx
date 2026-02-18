@@ -281,7 +281,7 @@ function LoginForm() {
               <Label htmlFor="password">Password</Label>
               <Link 
                 href="/reset-password" 
-                className="text-xs text-muted-foreground hover:text-primary hover:underline"
+                className="text-xs text-muted-foreground hover:text-primary-600 dark:hover:text-primary-400 hover:underline"
                 data-testid="link-forgot-password"
               >
                 Forgot password?
@@ -359,7 +359,7 @@ function LoginForm() {
 
         <p className="text-center text-sm text-muted-foreground">
           Don't have an account?{' '}
-          <Link href={redirectTo !== '/' ? `/signup?redirectTo=${encodeURIComponent(redirectTo)}` : '/signup'} className="text-primary hover:underline" data-testid="link-signup">
+          <Link href={redirectTo !== '/' ? `/signup?redirectTo=${encodeURIComponent(redirectTo)}` : '/signup'} className="text-primary-600 dark:text-primary-400 hover:underline" data-testid="link-signup">
             Sign up
           </Link>
         </p>

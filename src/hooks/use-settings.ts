@@ -135,6 +135,61 @@ function applyTheme(theme: { background: string; foreground: string; card: strin
   }
 }
 
+function generateShadeScaleHsl(hex: string): Record<string, string> {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  if (!result) return {}
+  
+  let r = parseInt(result[1], 16) / 255
+  let g = parseInt(result[2], 16) / 255
+  let b = parseInt(result[3], 16) / 255
+  
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  let h = 0
+  let s = 0
+
+  if (max !== min) {
+    const d = max - min
+    const l = (max + min) / 2
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break
+      case g: h = ((b - r) / d + 2) / 6; break
+      case b: h = ((r - g) / d + 4) / 6; break
+    }
+  }
+
+  const hDeg = Math.round(h * 360)
+  const sPct = Math.round(s * 100)
+  
+  const lightnesses: Record<string, number> = {
+    '50': 97, '100': 94, '200': 88, '300': 78,
+    '400': 64, '500': 50, '600': 40, '700': 32,
+    '800': 24, '900': 18, '950': 10,
+  }
+  const saturations: Record<string, number> = {
+    '50': Math.max(sPct * 0.3, 5), '100': Math.max(sPct * 0.5, 8), '200': Math.max(sPct * 0.7, 12),
+    '300': Math.max(sPct * 0.85, 18), '400': Math.max(sPct * 0.95, 25), '500': sPct,
+    '600': Math.min(sPct * 1.05, 100), '700': Math.min(sPct * 1.08, 100),
+    '800': Math.min(sPct * 1.05, 100), '900': Math.min(sPct * 0.95, 100),
+    '950': Math.min(sPct * 0.85, 100),
+  }
+
+  const scale: Record<string, string> = {}
+  for (const [shade, lightness] of Object.entries(lightnesses)) {
+    const sat = Math.round(saturations[shade])
+    scale[shade] = `${hDeg} ${sat}% ${lightness}%`
+  }
+  return scale
+}
+
+function applyShadeScale(root: HTMLElement, prefix: string, hex: string) {
+  const scale = generateShadeScaleHsl(hex)
+  for (const [shade, hslVal] of Object.entries(scale)) {
+    root.style.setProperty(`--${prefix}-${shade}`, hslVal)
+  }
+}
+
 function loadGoogleFont(fontName: string) {
   if (fontName === 'system' || typeof document === 'undefined') return
   const id = `gfont-${fontName.replace(/\s+/g, '-')}`
@@ -162,13 +217,14 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
     const root = document.documentElement
     const isDark = root.classList.contains('dark')
     
-    // Apply brand colors (primary/accent)
+    // Apply brand colors (primary/accent) + full 950 shade scale
     if (settings.branding.primaryColor) {
       const hsl = hexToHSL(settings.branding.primaryColor)
       if (hsl) {
         root.style.setProperty('--primary', hsl)
         root.style.setProperty('--primary-foreground', getContrastForeground(settings.branding.primaryColor))
       }
+      applyShadeScale(root, 'primary', settings.branding.primaryColor)
     }
     if (settings.branding.accentColor) {
       const hsl = hexToHSL(settings.branding.accentColor)
@@ -176,6 +232,7 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
         root.style.setProperty('--accent', hsl)
         root.style.setProperty('--accent-foreground', getContrastForeground(settings.branding.accentColor))
       }
+      applyShadeScale(root, 'accent', settings.branding.accentColor)
     }
     
     // Apply theme colors (background/foreground/card/border) based on current mode

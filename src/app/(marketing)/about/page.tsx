@@ -36,7 +36,7 @@ export default function AboutPage() {
           <Card>
             <CardContent className="p-4 md:p-8">
               <h2 className="text-xl md:text-2xl font-semibold mb-4 flex items-center gap-2" data-testid="text-our-story">
-                <Heart className="h-6 w-6 text-primary flex-shrink-0" />
+                <Heart className="h-6 w-6 text-primary-600 dark:text-primary-400 flex-shrink-0" />
                 Our Story
               </h2>
               <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap" data-testid="text-about-story">
@@ -50,7 +50,7 @@ export default function AboutPage() {
           <Card>
             <CardContent className="p-4 md:p-8">
               <h2 className="text-xl md:text-2xl font-semibold mb-4 flex items-center gap-2" data-testid="text-our-mission">
-                <Target className="h-6 w-6 text-primary flex-shrink-0" />
+                <Target className="h-6 w-6 text-primary-600 dark:text-primary-400 flex-shrink-0" />
                 Our Mission
               </h2>
               <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap" data-testid="text-about-mission">
@@ -127,7 +127,7 @@ export default function AboutPage() {
                 Get in touch with our team at{' '}
                 <a 
                   href={`mailto:${branding?.supportEmail || 'support@example.com'}`}
-                  className="text-primary hover:underline"
+                  className="text-primary-600 dark:text-primary-400 hover:underline"
                   data-testid="link-contact-email"
                 >
                   {branding?.supportEmail || 'support@example.com'}

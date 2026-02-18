@@ -21,12 +21,12 @@ export function UpgradeBanner({ feature, requiredTier, showDismiss = true }: Upg
   const tierName = requiredTier === 'team' ? 'Team' : 'Pro'
 
   return (
-    <Card className="border-primary/20 bg-primary/5" data-testid="banner-upgrade">
+    <Card className="border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-950" data-testid="banner-upgrade">
       <CardContent className="py-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Sparkles className="h-5 w-5 text-primary" />
+            <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900">
+              <Sparkles className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
               <p className="font-medium" data-testid="text-upgrade-feature">

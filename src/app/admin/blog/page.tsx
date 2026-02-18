@@ -36,7 +36,7 @@ function MarkdownPreview({ content }: { content: string }) {
       .replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">$1</code>')
       .replace(/^\- (.*$)/gm, '<li class="ml-4">$1</li>')
       .replace(/^\d+\. (.*$)/gm, '<li class="ml-4 list-decimal">$1</li>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary underline" target="_blank" rel="noopener">$1</a>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary-600 dark:text-primary-400 underline" target="_blank" rel="noopener">$1</a>')
       .replace(/\n\n/g, '</p><p class="my-2">')
       .replace(/\n/g, '<br />')
     return `<p class="my-2">${processed}</p>`

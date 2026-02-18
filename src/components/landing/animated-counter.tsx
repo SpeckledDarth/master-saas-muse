@@ -109,7 +109,7 @@ export function AnimatedCounterSection({ metrics, headline }: AnimatedCounterPro
   }
 
   return (
-    <section className="py-16 bg-primary/5" data-testid="section-metrics">
+    <section className="py-16 bg-primary-50 dark:bg-primary-950" data-testid="section-metrics">
       <div className="container mx-auto px-4">
         {headline && (
           <h2 className="text-2xl font-bold text-center mb-12 text-muted-foreground">
@@ -136,7 +136,7 @@ export function AnimatedCounterSection({ metrics, headline }: AnimatedCounterPro
                   />
                 </div>
               )}
-              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2 break-words">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary-600 dark:text-primary-400 mb-2 break-words">
                 <Counter value={metric.value} suffix={metric.suffix} prefix={metric.prefix} />
               </div>
               <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider">

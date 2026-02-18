@@ -107,7 +107,7 @@ export default async function BlogPostPage({ params }: Props) {
             )}
           </header>
 
-          <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-primary hover:prose-a:text-primary/80 prose-img:rounded-lg">
+          <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-primary-600 dark:prose-a:text-primary-400 hover:prose-a:text-primary-500 dark:hover:prose-a:text-primary-300 prose-img:rounded-lg">
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </div>
 

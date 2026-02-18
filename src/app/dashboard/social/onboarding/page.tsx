@@ -210,7 +210,7 @@ function OnboardingContent() {
             <div
               className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
                 currentStep === step.id
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary-600 dark:bg-primary-400 text-white dark:text-black'
                   : currentStep > step.id
                   ? 'bg-muted text-muted-foreground'
                   : 'text-muted-foreground'
@@ -417,7 +417,7 @@ function OnboardingContent() {
                   <div
                     key={freq}
                     className={`p-3 border rounded-md cursor-pointer text-sm hover-elevate ${
-                      postingPrefs.frequency === freq ? 'border-primary bg-primary/5' : ''
+                      postingPrefs.frequency === freq ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-950' : ''
                     }`}
                     onClick={() => setPostingPrefs(prev => ({ ...prev, frequency: freq }))}
                     data-testid={`option-frequency-${freq.toLowerCase().replace(/\s+/g, '-')}`}
@@ -431,7 +431,7 @@ function OnboardingContent() {
             <div className="space-y-3 pt-2">
               <div
                 className={`flex items-center justify-between p-3 border rounded-md cursor-pointer hover-elevate ${
-                  postingPrefs.requireApproval ? 'border-primary bg-primary/5' : ''
+                  postingPrefs.requireApproval ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-950' : ''
                 }`}
                 onClick={() => setPostingPrefs(prev => ({ ...prev, requireApproval: !prev.requireApproval }))}
                 data-testid="toggle-require-approval"
@@ -447,7 +447,7 @@ function OnboardingContent() {
 
               <div
                 className={`flex items-center justify-between p-3 border rounded-md cursor-pointer hover-elevate ${
-                  postingPrefs.autoHashtags ? 'border-primary bg-primary/5' : ''
+                  postingPrefs.autoHashtags ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-950' : ''
                 }`}
                 onClick={() => setPostingPrefs(prev => ({ ...prev, autoHashtags: !prev.autoHashtags }))}
                 data-testid="toggle-auto-hashtags"
@@ -484,8 +484,8 @@ function OnboardingContent() {
       {currentStep === 4 && (
         <Card>
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3">
-              <Sparkles className="h-6 w-6 text-primary" />
+            <div className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900 mb-3">
+              <Sparkles className="h-6 w-6 text-primary-600 dark:text-primary-400" />
             </div>
             <CardTitle className="text-xl" data-testid="text-step-title">You&apos;re All Set!</CardTitle>
             <CardDescription className="text-base" data-testid="text-motivational-message">
