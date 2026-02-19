@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import {
   LayoutDashboard,
@@ -15,6 +16,8 @@ import {
   Sparkles,
   ArrowLeft,
   ExternalLink,
+  LogOut,
+  ChevronUp,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -29,6 +32,17 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar'
 import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 const NAV_ITEMS = [
   {
@@ -64,6 +78,47 @@ function isActive(pathname: string, href: string, exact?: boolean): boolean {
 
 export function SocialSidebar() {
   const pathname = usePathname()
+  const [user, setUser] = useState<User | null>(null)
+  const [tierName, setTierName] = useState('Starter')
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
+
+  if (typeof window !== 'undefined' && !supabaseRef.current) {
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      supabaseRef.current = createClient()
+    }
+  }
+
+  useEffect(() => {
+    const supabase = supabaseRef.current
+    if (!supabase) return
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => { subscription.unsubscribe() }
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/social/tier').then(r => r.ok ? r.json() : null).then(data => {
+      if (data?.tier) {
+        const TIER_DISPLAY: Record<string, string> = { starter: 'Starter', basic: 'Basic', premium: 'Premium', universal: 'Universal', power: 'Power' }
+        setTierName(TIER_DISPLAY[data.tier] || data.tier)
+      }
+    }).catch(() => {})
+  }, [])
+
+  const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'
+  const initials = displayName.slice(0, 2).toUpperCase()
+  const avatarUrl = user?.user_metadata?.avatar_url
+
+  const handleSignOut = async () => {
+    const supabase = supabaseRef.current
+    if (!supabase) return
+    await supabase.auth.signOut()
+    window.location.href = '/'
+  }
 
   return (
     <Sidebar>
@@ -106,40 +161,64 @@ export function SocialSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter className="p-4 space-y-1">
+      <SidebarFooter className="p-4 space-y-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname === '/dashboard/social/onboarding'}
-              data-testid="nav-onboarding"
-            >
-              <Link href="/dashboard/social/onboarding">
-                <Sparkles className="h-4 w-4" />
-                <span>Setup Wizard</span>
+            <SidebarMenuButton asChild data-testid="nav-back-dashboard">
+              <Link href="/dashboard">
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back to Dashboard</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <div className="border-t pt-2 mt-2">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild data-testid="nav-back-dashboard">
-                <Link href="/dashboard">
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Back to Dashboard</span>
+        <div className="border-t pt-3 mt-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex items-center gap-2 w-full rounded-md p-2 text-left text-sm hover-elevate"
+                data-testid="button-sidebar-user-menu"
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={avatarUrl} alt={displayName} />
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs">{initials}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col flex-1 min-w-0">
+                  <span className="text-sm font-medium truncate">{displayName}</span>
+                  <div className="flex items-center gap-1">
+                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{tierName}</Badge>
+                  </div>
+                </div>
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="start" className="w-[--radix-dropdown-menu-trigger-width]">
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{displayName}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/profile" data-testid="link-sidebar-profile">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/billing" data-testid="link-sidebar-billing">Billing</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/" data-testid="link-sidebar-main-site">
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Main Site
                 </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild data-testid="nav-back-main-site">
-                <Link href="/">
-                  <ExternalLink className="h-4 w-4" />
-                  <span>Main Site</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut} data-testid="button-sidebar-signout">
+                <LogOut className="mr-2 h-4 w-4" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </SidebarFooter>
     </Sidebar>

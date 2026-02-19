@@ -4,6 +4,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { SocialSidebar } from '@/components/social/social-sidebar'
 import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
 import { QuickGenerateFab } from '@/components/social/quick-generate-fab'
+import { UserNav } from '@/components/auth/UserNav'
 
 export default function SocialDashboardLayout({
   children,
@@ -11,7 +12,7 @@ export default function SocialDashboardLayout({
   children: React.ReactNode
 }) {
   const style = {
-    '--sidebar-width': '15rem',
+    '--sidebar-width': '16rem',
     '--sidebar-width-icon': '3rem',
   }
 
@@ -21,9 +22,14 @@ export default function SocialDashboardLayout({
         <SocialSidebar />
         <div className="flex flex-col flex-1 min-w-0">
           <SocialUpgradeBanner />
-          <header className="flex items-center gap-2 border-b px-4 py-2 md:hidden">
-            <SidebarTrigger data-testid="button-social-sidebar-toggle" />
-            <span className="text-sm font-medium">PassivePost</span>
+          <header className="flex items-center justify-between gap-2 border-b px-4 py-2">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger data-testid="button-social-sidebar-toggle" className="md:hidden" />
+              <span className="text-sm font-medium md:hidden">PassivePost</span>
+            </div>
+            <div className="ml-auto">
+              <UserNav />
+            </div>
           </header>
           <main className="flex-1 overflow-y-auto">
             {children}

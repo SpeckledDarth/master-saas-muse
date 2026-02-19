@@ -89,27 +89,28 @@ export default function SocialCalendarPage() {
     fetchPosts()
   }, [fetchPosts])
 
-  const scheduledPosts = useMemo(() => posts.filter(p => p.scheduled_at), [posts])
+  const calendarPosts = useMemo(() => posts.filter(p => p.scheduled_at || p.posted_at), [posts])
 
   const availablePlatforms = useMemo(() => {
-    const platforms = new Set(scheduledPosts.map(p => p.platform))
+    const platforms = new Set(calendarPosts.map(p => p.platform))
     return Array.from(platforms).sort()
-  }, [scheduledPosts])
+  }, [calendarPosts])
 
   const postsByDate = useMemo(() => {
     const filtered = platformFilter
-      ? posts.filter(p => p.platform === platformFilter)
-      : posts
+      ? calendarPosts.filter(p => p.platform === platformFilter)
+      : calendarPosts
     const map: Record<string, CalendarPost[]> = {}
     for (const post of filtered) {
-      if (!post.scheduled_at) continue
-      const date = new Date(post.scheduled_at)
+      const dateStr = post.scheduled_at || post.posted_at
+      if (!dateStr) continue
+      const date = new Date(dateStr)
       const key = toDateKey(date)
       if (!map[key]) map[key] = []
       map[key].push(post)
     }
     return map
-  }, [posts, platformFilter])
+  }, [calendarPosts, platformFilter])
 
   const calendarDays = useMemo(() => {
     const daysInMonth = getDaysInMonth(currentYear, currentMonth)
@@ -194,11 +195,11 @@ export default function SocialCalendarPage() {
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Post Calendar</h1>
         <p className="text-muted-foreground mt-1" data-testid="text-page-description">
-          View your scheduled social media posts on a calendar
+          View your scheduled and published posts on your content calendar
         </p>
       </div>
 
-      {scheduledPosts.length > 0 && (
+      {calendarPosts.length > 0 && (
         <div className="flex items-center gap-2 flex-wrap" data-testid="filter-platforms">
           <Button
             variant={platformFilter === null ? 'default' : 'outline'}
@@ -222,13 +223,13 @@ export default function SocialCalendarPage() {
         </div>
       )}
 
-      {scheduledPosts.length === 0 ? (
+      {calendarPosts.length === 0 ? (
         <Card data-testid="empty-state-calendar">
           <CardContent className="py-12 text-center">
             <CalendarDays className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium" data-testid="text-empty-calendar">No scheduled posts</h3>
+            <h3 className="text-lg font-medium" data-testid="text-empty-calendar">No posts yet</h3>
             <p className="text-muted-foreground mt-1">
-              You have no posts with a scheduled date. Create a post with a scheduled time to see it here.
+              Create and schedule posts to see them on your content calendar.
             </p>
             <Button className="mt-4" asChild data-testid="button-create-scheduled-post">
               <Link href="/dashboard/social/posts">Create a Post</Link>

@@ -43,7 +43,7 @@ async function getModuleConfig(): Promise<{ enabled: boolean; tier: string; conf
   }
 }
 
-const VALID_PLATFORMS = ['twitter', 'linkedin', 'instagram'] as const
+const VALID_PLATFORMS = ['twitter', 'linkedin', 'instagram', 'facebook'] as const
 
 export async function GET(request: NextRequest) {
   let user

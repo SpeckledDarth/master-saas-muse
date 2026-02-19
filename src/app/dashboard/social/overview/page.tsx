@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   Loader2,
   FileText,
@@ -15,6 +16,8 @@ import {
   Bell,
   TrendingUp,
 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 interface SocialPost {
   id: string
@@ -28,6 +31,10 @@ interface SocialPost {
 interface SocialAccount {
   id: string
   platform: string
+  platform_username?: string
+  display_name?: string
+  is_valid?: boolean
+  connected_at?: string
 }
 
 interface TierInfo {
@@ -64,14 +71,41 @@ function isToday(dateStr: string): boolean {
   )
 }
 
+function getGreeting(): string {
+  if (typeof window === 'undefined') return 'Welcome back'
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
+}
+
 export default function SocialOverviewPage() {
   const [loading, setLoading] = useState(true)
+  const [greeting, setGreeting] = useState('Welcome back')
   const [postsThisMonth, setPostsThisMonth] = useState(0)
   const [aiGensToday, setAiGensToday] = useState(0)
   const [connectedPlatforms, setConnectedPlatforms] = useState(0)
   const [totalPosts, setTotalPosts] = useState(0)
   const [tierName, setTierName] = useState('Starter')
   const [monthlyPostLimit, setMonthlyPostLimit] = useState<number | null>(null)
+  const [accounts, setAccounts] = useState<SocialAccount[]>([])
+  const [recentPosts, setRecentPosts] = useState<SocialPost[]>([])
+  const [user, setUser] = useState<User | null>(null)
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
+
+  if (typeof window !== 'undefined' && !supabaseRef.current) {
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      supabaseRef.current = createClient()
+    }
+  }
+
+  useEffect(() => {
+    const supabase = supabaseRef.current
+    if (!supabase) return
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+  }, [])
   const fetchData = useCallback(async () => {
     try {
       const safeFetch = async (url: string, fallback: Record<string, unknown>) => {
@@ -98,12 +132,25 @@ export default function SocialOverviewPage() {
         setPostsThisMonth(posts.filter((p: SocialPost) => isCurrentMonth(p.created_at)).length)
         setAiGensToday(posts.filter((p: SocialPost) => p.ai_generated && isToday(p.created_at)).length)
         setConnectedPlatforms(accounts.length)
+        setAccounts(accounts)
+        setRecentPosts(posts.slice(0, 5))
       } else {
         setTotalPosts(64)
         setPostsThisMonth(18)
         setAiGensToday(3)
         setConnectedPlatforms(3)
         setMonthlyPostLimit(50)
+        setAccounts([
+          { id: '1', platform: 'facebook', platform_username: 'acmehomeservices', display_name: 'Acme Home Services', is_valid: true },
+          { id: '2', platform: 'twitter', platform_username: '@AcmeHomeSvc', display_name: 'Acme Home Services', is_valid: true },
+          { id: '3', platform: 'linkedin', platform_username: 'acme-home-services', display_name: 'Acme Home Services LLC', is_valid: true },
+        ])
+        setRecentPosts([
+          { id: 'm1', platform: 'facebook', content: 'Spring is here! Time to check your HVAC filters and schedule that annual tune-up before the summer heat hits.', status: 'posted', ai_generated: false, created_at: new Date(Date.now() - 86400000).toISOString() },
+          { id: 'm2', platform: 'twitter', content: 'Pro tip: Clean your dryer vents at least once a year to prevent fires and improve efficiency. Book your appointment today!', status: 'posted', ai_generated: true, created_at: new Date(Date.now() - 172800000).toISOString() },
+          { id: 'm3', platform: 'linkedin', content: 'We\'re proud to announce our expansion into residential solar panel installation. Green energy for a better tomorrow.', status: 'scheduled', ai_generated: false, created_at: new Date(Date.now() - 259200000).toISOString() },
+          { id: 'm4', platform: 'facebook', content: 'Customer spotlight: The Johnson family saved 30% on their energy bill after our insulation upgrade. Read their story!', status: 'draft', ai_generated: true, created_at: new Date(Date.now() - 345600000).toISOString() },
+        ])
       }
 
       if (tierData.tier) {
@@ -123,6 +170,10 @@ export default function SocialOverviewPage() {
   }, [])
 
   useEffect(() => {
+    setGreeting(getGreeting())
+  }, [])
+
+  useEffect(() => {
     fetchData()
   }, [fetchData])
 
@@ -137,12 +188,22 @@ export default function SocialOverviewPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold" data-testid="text-page-title">Social Dashboard</h1>
-          <p className="text-muted-foreground mt-1" data-testid="text-page-subtitle">
-            Your social media overview at a glance
-          </p>
+      <div className="flex flex-row items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-12 w-12" data-testid="avatar-user-overview">
+            <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.user_metadata?.full_name || ''} />
+            <AvatarFallback className="bg-muted text-muted-foreground text-sm">
+              {(user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'U').slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="text-2xl font-bold" data-testid="text-page-title">
+              {greeting}, {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there'}
+            </h1>
+            <p className="text-muted-foreground mt-0.5" data-testid="text-page-subtitle">
+              Here&apos;s how your social media is performing
+            </p>
+          </div>
         </div>
       </div>
 
@@ -226,39 +287,135 @@ export default function SocialOverviewPage() {
         </Card>
       )}
 
-      <Card data-testid="card-alerts">
-        <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
-          <CardTitle className="text-base">Trend Alerts</CardTitle>
-          <Bell className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3" data-testid="list-trend-alerts">
-            {[
-              { id: '1', platform: 'twitter', topic: '"Spring cleaning tips" trending in your area', time: '2 hours ago', urgent: true },
-              { id: '2', platform: 'facebook', topic: 'Local home improvement week starting Monday', time: '5 hours ago', urgent: false },
-              { id: '3', platform: 'linkedin', topic: '"Small business growth" gaining traction in your niche', time: '1 day ago', urgent: false },
-            ].map(alert => (
-              <div
-                key={alert.id}
-                className="flex items-start gap-3 p-3 rounded-md border"
-                data-testid={`alert-${alert.id}`}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium">{alert.topic}</span>
-                    {alert.urgent && <Badge variant="default" className="text-xs">Hot</Badge>}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{alert.time}</p>
-                </div>
-                <Button variant="outline" size="sm" data-testid={`button-generate-alert-${alert.id}`}>
-                  <Sparkles className="mr-1 h-3 w-3" />
-                  Generate
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card data-testid="card-connected-accounts-list">
+          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
+            <CardTitle className="text-base">Connected Accounts</CardTitle>
+            <Button variant="outline" size="sm" asChild data-testid="button-manage-accounts">
+              <Link href="/dashboard/social">Manage</Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {accounts.length === 0 ? (
+              <div className="text-center py-6">
+                <Link2 className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">No accounts connected yet</p>
+                <Button variant="outline" size="sm" className="mt-3" asChild data-testid="button-connect-account-cta">
+                  <Link href="/dashboard/social">Connect Account</Link>
                 </Button>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            ) : (
+              <div className="space-y-3" data-testid="list-connected-accounts">
+                {accounts.map(account => (
+                  <div
+                    key={account.id}
+                    className="flex items-center gap-3 p-2.5 rounded-md border"
+                    data-testid={`account-${account.id}`}
+                  >
+                    <div className="relative">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+                        <span className="text-xs font-bold uppercase">{account.platform.slice(0, 2)}</span>
+                      </div>
+                      <span
+                        className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background ${account.is_valid !== false ? 'bg-chart-2' : 'bg-destructive'}`}
+                        data-testid={`status-dot-${account.id}`}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{account.display_name || account.platform_username || account.platform}</p>
+                      <p className="text-xs text-muted-foreground truncate">{account.platform_username || account.platform}</p>
+                    </div>
+                    <Badge variant={account.is_valid !== false ? 'secondary' : 'destructive'} className="text-xs shrink-0" data-testid={`badge-account-status-${account.id}`}>
+                      {account.is_valid !== false ? 'Active' : 'Error'}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-alerts">
+          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
+            <CardTitle className="text-base">Trend Alerts</CardTitle>
+            <Bell className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3" data-testid="list-trend-alerts">
+              {[
+                { id: '1', platform: 'twitter', topic: '"Spring cleaning tips" trending in your area', time: '2 hours ago', urgent: true },
+                { id: '2', platform: 'facebook', topic: 'Local home improvement week starting Monday', time: '5 hours ago', urgent: false },
+                { id: '3', platform: 'linkedin', topic: '"Small business growth" gaining traction in your niche', time: '1 day ago', urgent: false },
+              ].map(alert => (
+                <div
+                  key={alert.id}
+                  className="flex items-start gap-3 p-3 rounded-md border"
+                  data-testid={`alert-${alert.id}`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium">{alert.topic}</span>
+                      {alert.urgent && <Badge variant="default" className="text-xs">Hot</Badge>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">{alert.time}</p>
+                  </div>
+                  <Button variant="outline" size="sm" data-testid={`button-generate-alert-${alert.id}`}>
+                    <Sparkles className="mr-1 h-3 w-3" />
+                    Generate
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {recentPosts.length > 0 && (
+        <Card data-testid="card-recent-activity">
+          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
+            <CardTitle className="text-base">Recent Activity</CardTitle>
+            <Button variant="outline" size="sm" asChild data-testid="button-view-all-posts">
+              <Link href="/dashboard/social/posts">View All</Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3" data-testid="list-recent-posts">
+              {recentPosts.map(post => {
+                const PLATFORM_NAMES: Record<string, string> = { twitter: 'Twitter/X', linkedin: 'LinkedIn', facebook: 'Facebook', instagram: 'Instagram' }
+                return (
+                  <div
+                    key={post.id}
+                    className="flex items-start gap-3 p-3 rounded-md border"
+                    data-testid={`recent-post-${post.id}`}
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
+                      <span className="text-[10px] font-bold uppercase">{post.platform.slice(0, 2)}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm line-clamp-2">{post.content}</p>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <Badge variant="outline" className="text-xs" data-testid={`badge-platform-${post.id}`}>{PLATFORM_NAMES[post.platform] || post.platform}</Badge>
+                        <span className="text-xs text-muted-foreground" data-testid={`text-date-${post.id}`}>
+                          {new Date(post.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        </span>
+                        {post.ai_generated && (
+                          <Badge variant="secondary" className="text-xs" data-testid={`badge-ai-${post.id}`}>
+                            <Sparkles className="mr-1 h-2.5 w-2.5" />
+                            AI
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    <Badge variant={post.status === 'posted' ? 'default' : post.status === 'scheduled' ? 'secondary' : 'outline'} className="text-xs shrink-0" data-testid={`badge-status-${post.id}`}>
+                      {post.status}
+                    </Badge>
+                  </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
     </div>
   )

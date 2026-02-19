@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Trash2, Edit, FileText, AlertCircle } from 'lucide-react'
+import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Facebook, Trash2, Edit, FileText, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { PostPreview } from '@/components/social/post-preview'
 import { BulkImport } from '@/components/social/bulk-import'
@@ -59,7 +59,8 @@ function getStatusVariant(status: PostStatus): 'default' | 'secondary' | 'destru
 function PlatformIcon({ platform, className }: { platform: string; className?: string }) {
   if (platform === 'twitter') return <Twitter className={className} />
   if (platform === 'linkedin') return <Linkedin className={className} />
-  return null
+  if (platform === 'facebook') return <Facebook className={className} />
+  return <FileText className={className} />
 }
 
 export default function SocialPostsPage() {
@@ -430,6 +431,7 @@ export default function SocialPostsPage() {
               <SelectContent>
                 <SelectItem value="twitter">Twitter / X</SelectItem>
                 <SelectItem value="linkedin">LinkedIn</SelectItem>
+                <SelectItem value="facebook">Facebook</SelectItem>
               </SelectContent>
             </Select>
           </div>
