@@ -416,7 +416,7 @@ function OnboardingContent() {
                 {FREQUENCY_OPTIONS.map(freq => (
                   <div
                     key={freq}
-                    className={`p-3 border rounded-md cursor-pointer text-sm hover-elevate ${
+                    className={`p-3 border rounded-md cursor-pointer text-sm hover-elevate active-elevate-2 ${
                       postingPrefs.frequency === freq ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-950' : ''
                     }`}
                     onClick={() => setPostingPrefs(prev => ({ ...prev, frequency: freq }))}

@@ -280,7 +280,7 @@ export function ColorPaletteBuilder({
             <button
               key={preset.name}
               onClick={() => applyPreset(preset)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs font-medium hover-elevate transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs font-medium hover-elevate active-elevate-2 transition-colors cursor-pointer"
               data-testid={`preset-${preset.name.toLowerCase()}`}
             >
               <div className="flex">
@@ -292,7 +292,7 @@ export function ColorPaletteBuilder({
           ))}
           <button
             onClick={randomizeColors}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs font-medium hover-elevate transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs font-medium hover-elevate active-elevate-2 transition-colors cursor-pointer"
             data-testid="button-randomize-colors"
           >
             <Shuffle className="w-3 h-3" />

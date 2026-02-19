@@ -326,7 +326,7 @@ function SocialKeyGroup({ group, onSaved }: { group: IntegrationGroup; onSaved: 
     <div data-testid={`group-${group.id}`}>
       <button
         type="button"
-        className="w-full flex items-center gap-3 px-6 py-3 bg-muted/30 border-t text-left hover-elevate"
+        className="w-full flex items-center gap-3 px-6 py-3 bg-muted/30 border-t text-left hover-elevate active-elevate-2"
         onClick={() => setExpanded(!expanded)}
         data-testid={`button-toggle-${group.id}`}
       >

@@ -176,7 +176,7 @@ export function ImageUpload({
               </div>
             ) : (
               <div
-                className="w-full h-full rounded-full border-2 border-dashed border-muted-foreground/25 transition-colors cursor-pointer flex items-center justify-center bg-muted hover-elevate"
+                className="w-full h-full rounded-full border-2 border-dashed border-muted-foreground/25 transition-colors cursor-pointer flex items-center justify-center bg-muted hover-elevate active-elevate-2"
                 onClick={() => fileInputRef.current?.click()}
                 data-testid={`${testId}-dropzone`}
               >

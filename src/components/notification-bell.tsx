@@ -109,7 +109,7 @@ export function NotificationBell() {
               return (
                 <button
                   key={n.id}
-                  className={`w-full text-left p-3 border-b last:border-b-0 hover-elevate flex gap-3 ${!n.read ? 'bg-muted/50' : ''}`}
+                  className={`w-full text-left p-3 border-b last:border-b-0 hover-elevate active-elevate-2 flex gap-3 ${!n.read ? 'bg-muted/50' : ''}`}
                   onClick={() => markRead(n.id, n.link)}
                   data-testid={`notification-item-${n.id}`}
                 >

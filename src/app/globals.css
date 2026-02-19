@@ -164,3 +164,59 @@
 .animate-float {
   animation: float 4s ease-in-out infinite;
 }
+
+@layer utilities {
+  .hover-elevate {
+    transition: background-color 150ms ease, border-color 150ms ease, opacity 150ms ease;
+  }
+  .hover-elevate:hover {
+    background-color: hsl(var(--primary-50));
+    border-color: hsl(var(--primary-400));
+  }
+  .dark .hover-elevate:hover {
+    background-color: hsl(var(--primary-950));
+    border-color: hsl(var(--primary-600));
+  }
+
+  .active-elevate-2 {
+    transition: background-color 150ms ease, border-color 150ms ease, opacity 150ms ease;
+  }
+  .active-elevate-2:active {
+    background-color: hsl(var(--primary-100));
+    border-color: hsl(var(--primary-500));
+  }
+  .dark .active-elevate-2:active {
+    background-color: hsl(var(--primary-900));
+    border-color: hsl(var(--primary-500));
+  }
+
+  .hover-elevate[disabled],
+  .hover-elevate.disabled,
+  .active-elevate-2[disabled],
+  .active-elevate-2.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .toggle-elevate {
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+  .toggle-elevated {
+    background-color: hsl(var(--primary-50));
+    border-color: hsl(var(--primary-400));
+  }
+  .dark .toggle-elevated {
+    background-color: hsl(var(--primary-950));
+    border-color: hsl(var(--primary-600));
+  }
+
+  .no-default-hover-elevate:hover {
+    background-color: inherit;
+    border-color: inherit;
+  }
+  .no-default-active-elevate:active {
+    background-color: inherit;
+    border-color: inherit;
+  }
+}
