@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { PlatformIconCircle } from '@/components/social/platform-icon'
 import { PostDetailDialog, PostDetailData } from '@/components/social/post-detail-dialog'
+import { HelpTooltip } from '@/components/social/help-tooltip'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
@@ -223,7 +224,7 @@ export default function SocialOverviewPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card data-testid="card-posts-this-month">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Posts This Month</CardTitle>
+            <CardTitle className="text-sm font-medium">Posts This Month <HelpTooltip text="The number of posts created across all your connected platforms this calendar month." /></CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -233,7 +234,7 @@ export default function SocialOverviewPage() {
 
         <Card data-testid="card-ai-generations-today">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">AI Generations Today</CardTitle>
+            <CardTitle className="text-sm font-medium">AI Generations Today <HelpTooltip text="How many posts AI has written for you today. This count resets at midnight." /></CardTitle>
             <Sparkles className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -243,7 +244,7 @@ export default function SocialOverviewPage() {
 
         <Card data-testid="card-connected-platforms">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Connected Platforms</CardTitle>
+            <CardTitle className="text-sm font-medium">Connected Platforms <HelpTooltip text="The number of social media accounts you've linked to PassivePost." /></CardTitle>
             <Link2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -253,7 +254,7 @@ export default function SocialOverviewPage() {
 
         <Card data-testid="card-current-tier">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Current Tier</CardTitle>
+            <CardTitle className="text-sm font-medium">Current Tier <HelpTooltip text="Your subscription level. Higher tiers unlock more posts, platforms, and AI generations." /></CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -265,7 +266,7 @@ export default function SocialOverviewPage() {
       {monthlyPostLimit !== null && (
         <Card data-testid="card-usage-this-month">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-            <CardTitle className="text-base">Usage This Month</CardTitle>
+            <CardTitle className="text-base">Usage This Month <HelpTooltip text="Shows how many of your monthly posts you've used and how many remain before your limit resets." /></CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent className="space-y-3">
@@ -303,7 +304,7 @@ export default function SocialOverviewPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card data-testid="card-connected-accounts-list">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
-            <CardTitle className="text-base">Connected Accounts</CardTitle>
+            <CardTitle className="text-base">Connected Accounts <HelpTooltip text="Your linked social media accounts and their current connection status." /></CardTitle>
             <Button variant="outline" size="sm" asChild data-testid="button-manage-accounts">
               <Link href="/dashboard/social">Manage</Link>
             </Button>
@@ -348,7 +349,7 @@ export default function SocialOverviewPage() {
 
         <Card data-testid="card-alerts">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
-            <CardTitle className="text-base">Trend Alerts</CardTitle>
+            <CardTitle className="text-base">Trend Alerts <HelpTooltip text="Topics trending in your niche right now. Click Generate to create a post about a trend." /></CardTitle>
             <Bell className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -383,7 +384,7 @@ export default function SocialOverviewPage() {
 
       <Card data-testid="card-best-times">
         <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
-          <CardTitle className="text-base">Best Times to Post</CardTitle>
+          <CardTitle className="text-base">Best Times to Post <HelpTooltip text="Recommended posting windows based on when your audience is most active on each platform." /></CardTitle>
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>

@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { DEMO_POSTS } from '@/lib/social/demo-data'
 import { PostDetailDialog, PostDetailData } from '@/components/social/post-detail-dialog'
 import { PlatformIconCircle } from '@/components/social/platform-icon'
+import { HelpTooltip } from '@/components/social/help-tooltip'
 
 interface CalendarPost {
   id: string
@@ -221,9 +222,10 @@ export default function SocialCalendarPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold" data-testid="text-page-title">Post Calendar</h1>
+        <h1 className="text-2xl font-bold" data-testid="text-page-title">Post Calendar <HelpTooltip text="See all your scheduled and published posts laid out on a calendar." /></h1>
         <p className="text-muted-foreground mt-1" data-testid="text-page-description">
           View your scheduled and published posts on your content calendar
+          <HelpTooltip text="Switch between month and week views. Click any day to see its posts. Use the platform filter to focus on one network." />
         </p>
         <div className="flex items-center gap-2 mt-3" data-testid="view-toggle">
           <Button

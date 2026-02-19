@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select'
 import { Target, MessageSquare, ArrowRight, Search, Filter, Check } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { HelpTooltip } from '@/components/social/help-tooltip'
 
 interface Lead {
   id: string
@@ -125,9 +126,11 @@ export default function LeadsPage() {
           <h1 className="text-2xl font-bold flex items-center gap-2" data-testid="text-leads-title">
             <Target className="h-6 w-6" />
             Lead Tracker
+            <HelpTooltip text="People who responded to your posts with buying signals like price questions or service inquiries." />
           </h1>
           <p className="text-muted-foreground mt-1" data-testid="text-leads-subtitle">
             High-intent engagement detected from your posts
+            <HelpTooltip text="Each lead shows the type of interest detected (like a price inquiry or service question) and a suggested reply you can send." />
           </p>
         </div>
         <Badge variant="secondary" data-testid="badge-leads-count">
@@ -207,7 +210,7 @@ export default function LeadsPage() {
                   <p className="text-sm">{lead.snippet}</p>
                 </div>
                 <div className="rounded-md bg-muted p-3">
-                  <p className="text-xs text-muted-foreground mb-1 font-medium">Suggested Reply</p>
+                  <p className="text-xs text-muted-foreground mb-1 font-medium">Suggested Reply <HelpTooltip text="AI drafts a reply based on the lead's message and your brand voice. Edit it before sending if you'd like." /></p>
                   <p className="text-sm">{lead.suggestedReply}</p>
                 </div>
                 {lead.status === 'new' && (

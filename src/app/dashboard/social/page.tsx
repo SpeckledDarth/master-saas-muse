@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Loader2, Twitter, Linkedin, Instagram, Youtube, Facebook, Music, MessageSquare, Image, Camera, Gamepad2, Check, X, RefreshCw, Unlink } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { HelpTooltip } from '@/components/social/help-tooltip'
 import {
   Dialog,
   DialogContent,
@@ -187,10 +188,11 @@ export default function SocialAccountsPage() {
       <div className="flex flex-row items-start justify-between gap-4 flex-wrap mb-6">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-social-title">
-            Connected Social Accounts
+            Connected Social Accounts <HelpTooltip text="Link your social media accounts so PassivePost can post on your behalf." />
           </h1>
           <p className="text-muted-foreground mt-1" data-testid="text-social-description">
             Connect your social media accounts to enable posting and monitoring
+            <HelpTooltip text="Use Validate All to check that all connected accounts still have valid access. Disconnect any account you no longer want to use." />
           </p>
         </div>
         {accounts.length > 0 && (

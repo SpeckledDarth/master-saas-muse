@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
 import { Separator } from '@/components/ui/separator'
+import { HelpTooltip } from '@/components/social/help-tooltip'
 import {
   Check,
   ChevronRight,
@@ -232,7 +233,7 @@ function OnboardingContent() {
       {currentStep === 1 && (
         <Card>
           <CardHeader>
-            <CardTitle data-testid="text-step-title">Connect Your Platforms</CardTitle>
+            <CardTitle data-testid="text-step-title">Connect Your Platforms <HelpTooltip text="Link at least one social account to get started. You can always add more later from your dashboard." /></CardTitle>
             <CardDescription>
               Link the social media accounts you want to post to. You can add more later.
             </CardDescription>
@@ -302,7 +303,7 @@ function OnboardingContent() {
       {currentStep === 2 && (
         <Card>
           <CardHeader>
-            <CardTitle data-testid="text-step-title">Define Your Brand Voice</CardTitle>
+            <CardTitle data-testid="text-step-title">Define Your Brand Voice <HelpTooltip text="Tell us about your business so AI-generated posts sound like you and speak to your customers." /></CardTitle>
             <CardDescription>
               This helps our AI generate posts that sound like you.
             </CardDescription>
@@ -404,7 +405,7 @@ function OnboardingContent() {
       {currentStep === 3 && (
         <Card>
           <CardHeader>
-            <CardTitle data-testid="text-step-title">Posting Preferences</CardTitle>
+            <CardTitle data-testid="text-step-title">Posting Preferences <HelpTooltip text="Choose how often to post and whether you want to approve AI-generated posts before they go live." /></CardTitle>
             <CardDescription>
               Choose how often to post and whether you want to review posts before they go live.
             </CardDescription>

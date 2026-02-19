@@ -17,6 +17,7 @@ import { BulkImport } from '@/components/social/bulk-import'
 import { PlatformIconCircle } from '@/components/social/platform-icon'
 import { PostDetailDialog, PostDetailData } from '@/components/social/post-detail-dialog'
 import { DEMO_POSTS } from '@/lib/social/demo-data'
+import { HelpTooltip } from '@/components/social/help-tooltip'
 
 type PostStatus = 'draft' | 'scheduled' | 'posting' | 'posted' | 'failed'
 
@@ -308,7 +309,7 @@ export default function SocialPostsPage() {
     <div className="p-6">
       <div className="flex flex-row items-start justify-between gap-4 flex-wrap mb-6">
         <div>
-          <h1 className="text-2xl font-bold" data-testid="text-posts-title">Social Posts</h1>
+          <h1 className="text-2xl font-bold" data-testid="text-posts-title">Social Posts <HelpTooltip text="Create, schedule, and manage all your social media posts from one place." /></h1>
           <p className="text-muted-foreground mt-1" data-testid="text-posts-description">
             Create, schedule, and manage your social media posts
           </p>
@@ -324,7 +325,7 @@ export default function SocialPostsPage() {
             </DialogTrigger>
           <DialogContent className="sm:max-w-lg" data-testid="dialog-ai-generate">
             <DialogHeader>
-              <DialogTitle data-testid="text-ai-dialog-title">Generate Post with AI</DialogTitle>
+              <DialogTitle data-testid="text-ai-dialog-title">Generate Post with AI <HelpTooltip text="Tell the AI your topic and style, and it writes a post for you." /></DialogTitle>
               <DialogDescription data-testid="text-ai-dialog-description">
                 Describe your topic and style, and AI will generate a post for you.
               </DialogDescription>
@@ -425,7 +426,7 @@ export default function SocialPostsPage() {
 
       <Card className="mb-6" data-testid="card-create-post">
         <CardHeader>
-          <CardTitle className="text-lg">Create Post</CardTitle>
+          <CardTitle className="text-lg">Create Post <HelpTooltip text="Write a new post, choose a platform, and save it as a draft or schedule it for later." /></CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -443,7 +444,7 @@ export default function SocialPostsPage() {
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2 flex-wrap">
-              <Label htmlFor="post-content">Content</Label>
+              <Label htmlFor="post-content">Content <HelpTooltip text="Each platform has a maximum character limit. Stay within it to post successfully." /></Label>
               <span
                 className={`text-xs ${content.length > charLimit ? 'text-destructive' : 'text-muted-foreground'}`}
                 data-testid="text-char-count"
@@ -467,7 +468,7 @@ export default function SocialPostsPage() {
               onCheckedChange={setScheduleEnabled}
               data-testid="switch-schedule"
             />
-            <Label htmlFor="schedule-toggle">Schedule for later</Label>
+            <Label htmlFor="schedule-toggle">Schedule for later <HelpTooltip text="Turn this on to pick a specific date and time for your post to go live automatically." /></Label>
           </div>
           {scheduleEnabled && (
             <div className="space-y-2">

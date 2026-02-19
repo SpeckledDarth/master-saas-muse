@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
+import { HelpTooltip } from '@/components/social/help-tooltip'
 
 interface PostingPreferences {
   auto_approve: boolean
@@ -160,7 +161,7 @@ export default function SocialSettingsPage() {
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between gap-4">
             <div className="space-y-0.5">
-              <Label htmlFor="auto-approve">Auto-Approve AI Posts</Label>
+              <Label htmlFor="auto-approve">Auto-Approve AI Posts <HelpTooltip text="When on, AI posts skip the approval queue and get scheduled automatically." /></Label>
               <p className="text-xs text-muted-foreground">
                 Skip the approval queue and schedule AI-generated posts automatically.
               </p>
@@ -176,7 +177,7 @@ export default function SocialSettingsPage() {
           <Separator />
 
           <div className="space-y-2">
-            <Label htmlFor="default-status">Default Post Status</Label>
+            <Label htmlFor="default-status">Default Post Status <HelpTooltip text="Choose whether new posts start as drafts (you publish manually) or get scheduled right away." /></Label>
             <Select
               value={prefs.default_status}
               onValueChange={v => setPrefs(prev => ({ ...prev, default_status: v }))}
@@ -219,7 +220,7 @@ export default function SocialSettingsPage() {
           <Separator />
 
           <div className="space-y-3">
-            <Label>Quiet Hours</Label>
+            <Label>Quiet Hours <HelpTooltip text="Posts won't be published during these hours, even if they're scheduled. Good for avoiding late-night posts." /></Label>
             <p className="text-xs text-muted-foreground">
               Posts will not be published during these hours.
             </p>
@@ -277,7 +278,7 @@ export default function SocialSettingsPage() {
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between gap-4">
             <div className="space-y-0.5">
-              <Label htmlFor="notif-email">Email Notifications</Label>
+              <Label htmlFor="notif-email">Email Notifications <HelpTooltip text="Get email alerts when posts fail, trends appear, or your weekly summary is ready." /></Label>
               <p className="text-xs text-muted-foreground">
                 Receive email alerts for post failures, trend alerts, and weekly summaries.
               </p>
@@ -294,7 +295,7 @@ export default function SocialSettingsPage() {
 
           <div className="flex items-center justify-between gap-4">
             <div className="space-y-0.5">
-              <Label htmlFor="notif-inapp">In-App Notifications</Label>
+              <Label htmlFor="notif-inapp">In-App Notifications <HelpTooltip text="See alerts inside your dashboard for post status updates, trend alerts, and activity." /></Label>
               <p className="text-xs text-muted-foreground">
                 Show notifications in the dashboard for post status updates and alerts.
               </p>

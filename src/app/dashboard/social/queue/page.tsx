@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { DEMO_POSTS } from '@/lib/social/demo-data'
 import { PlatformIconCircle } from '@/components/social/platform-icon'
 import { PostDetailDialog, PostDetailData } from '@/components/social/post-detail-dialog'
+import { HelpTooltip } from '@/components/social/help-tooltip'
 
 interface QueuePost {
   id: string
@@ -152,7 +153,7 @@ export default function ApprovalQueuePage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold" data-testid="text-page-title">Approval Queue</h1>
+        <h1 className="text-2xl font-bold" data-testid="text-page-title">Approval Queue <HelpTooltip text="AI-generated posts land here for your review before going live. You control what gets published." /></h1>
         <p className="text-muted-foreground mt-1">
           Review AI-generated posts before they go live. Approve, edit, or reject each one.
         </p>
@@ -179,6 +180,7 @@ export default function ApprovalQueuePage() {
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground" data-testid="text-queue-count">
             {posts.length} post{posts.length !== 1 ? 's' : ''} waiting for review
+            <HelpTooltip text="Approve moves a post to your schedule. Reject removes it. Edit lets you tweak the text first." />
           </p>
           {posts.map(post => (
             <Card key={post.id} className="cursor-pointer hover-elevate active-elevate-2" onClick={() => setDetailPost(post as unknown as PostDetailData)}>

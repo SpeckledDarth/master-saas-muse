@@ -17,6 +17,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import { HelpTooltip } from '@/components/social/help-tooltip'
 
 interface SocialPost {
   id: string
@@ -198,7 +199,7 @@ export default function EngagementAnalyticsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card data-testid="card-total-posts">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Posts</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Posts <HelpTooltip text="The total number of posts you've published across all connected platforms." /></CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -208,7 +209,7 @@ export default function EngagementAnalyticsPage() {
 
         <Card data-testid="card-total-engagement">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Engagement</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Engagement <HelpTooltip text="Combined likes, shares, comments, and clicks across all your published posts." /></CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -220,7 +221,7 @@ export default function EngagementAnalyticsPage() {
 
         <Card data-testid="card-ai-generated">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">AI-Generated</CardTitle>
+            <CardTitle className="text-sm font-medium">AI-Generated <HelpTooltip text="The percentage of your posts that were written by AI versus ones you wrote manually." /></CardTitle>
             <Sparkles className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -233,7 +234,7 @@ export default function EngagementAnalyticsPage() {
 
         <Card data-testid="card-avg-engagement">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Engagement</CardTitle>
+            <CardTitle className="text-sm font-medium">Avg Engagement <HelpTooltip text="The average number of interactions (likes, shares, comments) each post receives." /></CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -323,7 +324,7 @@ export default function EngagementAnalyticsPage() {
 
       <Card data-testid="card-ai-vs-manual">
         <CardHeader>
-          <CardTitle className="text-base">AI vs. Manual Performance</CardTitle>
+          <CardTitle className="text-base">AI vs. Manual Performance <HelpTooltip text="Compares how AI-written posts perform against ones you wrote yourself, so you can see which approach gets more engagement." /></CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

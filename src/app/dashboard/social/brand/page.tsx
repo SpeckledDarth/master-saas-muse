@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, Save, Sparkles, Plus, X as XIcon, Palette, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { HelpTooltip } from '@/components/social/help-tooltip'
 
 interface BrandPreferences {
   id?: string
@@ -189,7 +190,7 @@ export default function BrandPreferencesPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="niche">Business Niche</Label>
+            <Label htmlFor="niche">Business Niche <HelpTooltip text="Your industry or trade. AI uses this to write relevant, on-topic posts for your business." /></Label>
             <Input
               id="niche"
               data-testid="input-niche"
@@ -201,7 +202,7 @@ export default function BrandPreferencesPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tone">Brand Tone</Label>
+            <Label htmlFor="tone">Brand Tone <HelpTooltip text="The overall feel of your posts. Professional sounds polished; casual sounds conversational." /></Label>
             <Select
               value={prefs.tone}
               onValueChange={value => setPrefs(prev => ({ ...prev, tone: value }))}
@@ -221,7 +222,7 @@ export default function BrandPreferencesPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="target_audience">Target Audience</Label>
+            <Label htmlFor="target_audience">Target Audience <HelpTooltip text="Who you want to reach. AI tailors language and topics to appeal to this group." /></Label>
             <Input
               id="target_audience"
               data-testid="input-target-audience"
@@ -245,7 +246,7 @@ export default function BrandPreferencesPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="posting_goals">Posting Goals</Label>
+            <Label htmlFor="posting_goals">Posting Goals <HelpTooltip text="What you want social media to do for your business, like generate leads or build awareness." /></Label>
             <Textarea
               id="posting_goals"
               data-testid="input-posting-goals"
@@ -278,7 +279,7 @@ export default function BrandPreferencesPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>Sample Content URLs</Label>
+            <Label>Sample Content URLs <HelpTooltip text="Links to existing content that represents your style. AI studies these for inspiration when writing your posts." /></Label>
             <p className="text-xs text-muted-foreground">
               Share links to content that represents your brand style (blog posts, social profiles, etc.)
             </p>
