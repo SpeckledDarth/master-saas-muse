@@ -5,6 +5,7 @@ import { SocialSidebar } from '@/components/social/social-sidebar'
 import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
 import { QuickGenerateFab } from '@/components/social/quick-generate-fab'
 import { UserNav } from '@/components/auth/UserNav'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export default function SocialDashboardLayout({
   children,
@@ -27,7 +28,8 @@ export default function SocialDashboardLayout({
               <SidebarTrigger data-testid="button-social-sidebar-toggle" className="md:hidden" />
               <span className="text-sm font-medium md:hidden">PassivePost</span>
             </div>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-2">
+              <ThemeToggle />
               <UserNav />
             </div>
           </header>
