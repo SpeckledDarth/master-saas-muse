@@ -10,6 +10,21 @@ MuseKit is a ready-to-use foundation for building software-as-a-service (SaaS) p
 
 Instead of spending months building login systems, payment processing, and admin tools from scratch, MuseKit gives you these out of the box. You clone it, customize it, and launch your product in days instead of months.
 
+### MuseKit vs. PassivePost
+
+MuseKit and PassivePost are **two distinct sides** of this project:
+
+| | **MuseKit** (The Template) | **PassivePost** (The First Product) |
+|---|---|---|
+| **What it is** | A reusable SaaS starter template | An AI social media scheduling tool |
+| **Who uses it** | Developers building new SaaS products | Solopreneurs and gig workers |
+| **Purpose** | Provides auth, billing, admin, email, etc. | Manages social media posts with AI |
+| **Code location** | Everything outside `/social/` directories | Everything inside `/social/` directories |
+| **Database** | `migrations/core/` | `migrations/extensions/` |
+| **Can be removed?** | No — it's the foundation | Yes — delete `/social/` dirs to remove |
+
+PassivePost proves the MuseKit extension model works. For full PassivePost details, see `docs/PASSIVEPOST.md`.
+
 ---
 
 ## The Problem It Solves
@@ -51,7 +66,9 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 
 ---
 
-## Key Features
+## MuseKit Core Features
+
+These features ship with every MuseKit clone. They are the foundation every SaaS product needs.
 
 ### User Management & Authentication
 - Email/password signup with email verification
@@ -65,6 +82,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Monthly/annual billing
 - Customer portal for self-service
 - Feature gating based on plan level
+- Product Registry for multi-product tier resolution
 
 ### Team Collaboration
 - Organizations with multiple members
@@ -91,14 +109,53 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 
 ### Setup Dashboard
 - Split into 11 focused sub-pages with sidebar navigation
-- Branding customization (logo, colors, app name, hero styles)
-- Content management (homepage sections)
+- Branding customization (logo, colors, app name, hero styles, header/footer styling)
+- Content management (homepage sections with ordering and per-section backgrounds)
 - Pages configuration (about, contact, terms, privacy, custom pages)
 - Pricing configuration (Stripe integration)
 - Social links setup
 - Features & integrations (auth toggles, AI, webhooks, security, compliance, support)
 - API Keys & Integrations (centralized key management with collapsible groups, format validation)
-- PassivePost configuration (social media module, platform API keys, engagement pull settings)
+
+### Marketing Pages & Landing Page Components
+- Configurable hero section (full-width, split, video, pattern, floating mockup, photo collage styles)
+- Logo marquee with scrolling partner/client logos
+- Animated counters for key metrics
+- Feature cards with icons and descriptions
+- Testimonial carousel and customer stories
+- Process steps (numbered how-it-works sequence)
+- FAQ section with expandable answers
+- Founder Letter section with portrait and signature
+- Comparison Bars with animated entrance
+- Product Screenshot Showcase with layered backgrounds
+- Bottom Hero CTA (closing call-to-action mirroring hero weight)
+- Image Collage Section (fan-style overlapping images with hover animation)
+- Image + Text alternating blocks
+- Feature Sub-Page System (`/features/[slug]`) for detailed feature pages
+- All sections toggleable via admin Content settings
+- Section ordering configurable from admin dashboard
+- Per-section background colors
+
+### 950-Scale Color Model
+- Primary color palette as single source of truth
+- All interactive states use `--primary-*` CSS variables (50/100/400/500/600/900/950)
+- Automatic adaptation to any configured palette
+- Card backgrounds: `bg-white/10` with `border-gray-500/50`
+- Icon backgrounds: randomized from primary scale shades
+- Avatar fallbacks: same randomized pattern
+
+### Interactive State System
+- `hover-elevate` utility class for hover feedback on clickable non-Button elements
+- `active-elevate-2` utility class for press/click feedback
+- `toggle-elevate` / `toggle-elevated` for toggle state elements
+- All states use primary palette CSS variables for automatic theme adaptation
+- Buttons and Badges handle their own states internally (no additional classes needed)
+
+### Header & Footer Styling
+- Configurable header: background color, text color, opacity, sticky/relative, transparent mode, border toggle
+- Configurable footer: background color, text color, background image, layout mode (4-column, minimal, centered)
+- Both default to branding primary color with auto-computed contrast text
+- Admin UI with color pickers, opacity sliders, and layout selectors
 
 ### Content Management
 - Blog/changelog system with markdown and live preview
@@ -147,34 +204,6 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Admin-configurable URL, secret, and per-event toggles
 - Automated API token rotation
 
-### PassivePost Module (Social Media Management)
-- Toggleable social media management extension with two tiers: Universal and Power
-- 10 platform support: Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord
-- AI-powered post generation with multimodal image support
-- Post scheduling, management, and social API health checker
-- Tier-based rate limiting (Universal: 10 AI generations/day, 20 posts/day; Power: 100 AI generations/day, 10,000 posts/day)
-- Social KPI cards on admin metrics dashboard
-- n8n workflow templates for automation (auto-post-rss, ai-generate-and-schedule, engagement-monitor)
-- BullMQ retry logic (3 attempts, exponential backoff) for post delivery
-- Conditional onboarding wizard step, Vercel Cron fallback
-- Dependency warnings when configuration is incomplete
-
-### PassivePost Extension (AI Social Media Scheduling)
-- Full SaaS product built on MuseKit using the database extension pattern
-- Targeted at solopreneurs and gig workers for AI-powered social scheduling
-- OAuth flows for Facebook Page, LinkedIn, and Twitter/X with PKCE
-- Per-user Stripe tier resolution (Starter/Basic/Premium) mapped from subscription metadata
-- 7-page social dashboard: overview, calendar, engagement analytics, queue, posts, brand preferences, onboarding
-- Brand preference system (tone, niche, location, target audience, posting goals, frequency)
-- AI post generation with 15 admin-editable niche-specific prompts and default fallback voice
-- Quick Generate dialog for on-demand AI content with copy-to-clipboard
-- Engagement analytics dashboard with Recharts charts
-- Calendar view with month-grid and per-platform count tooltips
-- Reusable upgrade banner (80%+ usage trigger) across all social dashboard pages
-- Admin-configurable engagement pull schedule (interval and lookback hours)
-- Beta debug mode via environment variable for development/testing
-- Database extension pattern: PassivePost tables in `migrations/extensions/`, core MuseKit schema untouched
-
 ### Centralized API Keys & Integrations
 - Admin setup page for managing all service API keys from the dashboard
 - Collapsible groups (collapsed by default) with status indicators (green/red/gray dots)
@@ -182,13 +211,12 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Format validation on save (Stripe sk_ prefix, Supabase URL pattern, OpenAI sk- prefix, Sentry DSN, HTTPS URLs)
 - Summary cards showing total keys and required keys configured
 - Inline edit/reveal/delete with source badges (Dashboard vs Env Var)
-- Social platform API keys feature-gated on PassivePost setup page
 - DB-stored keys take priority over environment variables
 
 ### Enterprise Features
 - SSO/SAML single sign-on with domain-based detection
 - Admin-managed identity providers (Okta, Azure AD, Google Workspace)
-- Background job processing with BullMQ and Upstash Redis (10 job types: email, webhook-retry, report, metrics-report, metrics-alert, token-rotation, social-post, social-health-check, social-trend-monitor, social-engagement-pull)
+- Background job processing with BullMQ and Upstash Redis (6 core job types: email, webhook-retry, report, metrics-report, metrics-alert, token-rotation)
 - Production-grade rate limiting with Upstash Redis (in-memory fallback)
 - Customer service tools (subscription tracking, invoices, admin notes)
 - User impersonation with 30-minute sessions and audit logging
@@ -199,11 +227,35 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 - Configurable cookie consent banner
 - MFA and password requirement settings
 
+### Dark / Light Mode
+- Full dark and light mode support across all pages
+- Theme toggle available in headers
+- Semantic color tokens that adapt automatically
+- Six-layer depth system for dark mode
+
 ### Monitoring & Testing
 - Sentry error tracking (server + browser errors)
 - Plausible privacy-friendly analytics
 - 92 Playwright E2E tests across 7 test files
 - Structured logging utility
+
+---
+
+## PassivePost (First Product Extension)
+
+PassivePost is an AI-powered social media scheduling tool built on MuseKit. It demonstrates the database extension pattern and serves as the reference implementation for building products on the template.
+
+Key highlights:
+- 10-page social dashboard with dedicated sidebar
+- 3-tier subscription system (Starter/Basic/Premium) with Stripe integration
+- AI post generation with 15 niche-specific prompt templates
+- 10 platform support (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord)
+- OAuth flows for social platform connections
+- Brand preference system for personalized content
+- Engagement analytics, calendar view, and post queue management
+- 4 BullMQ background job types for social operations
+
+For complete details, see `docs/PASSIVEPOST.md`.
 
 ---
 
@@ -219,7 +271,7 @@ MuseKit provides all of this pre-built, tested, and production-ready. You inheri
 | **Authentication** | Supabase Auth + 5 OAuth Providers | Email/password, Google, GitHub, Apple, Twitter/X OAuth, and Magic Link passwordless |
 | **AI & Automation** | xAI Grok API + n8n | AI capabilities and workflow automation |
 | **Operations** | Resend (Emails) + Sentry (Monitoring) + Plausible (Analytics) + Upstash/BullMQ (Queues) | Transactional emails, error tracking, privacy-friendly metrics, and background job processing |
-| **Queue & Rate Limiting** | Upstash Redis + BullMQ | Background job processing (10 job types) and API rate limiting |
+| **Queue & Rate Limiting** | Upstash Redis + BullMQ | Background job processing (6 core + 4 social job types) and API rate limiting |
 | **Monetization** | Stripe | Subscription billing, payment processing, and customer portal |
 
 ### Authentication & OAuth
@@ -263,12 +315,13 @@ MuseKit supports a clean extension model for building products on top of the tem
 - **Extension tables** live in `migrations/extensions/` and add product-specific schemas
 - This ensures clean template cloning — extensions can be included or excluded per product
 - PassivePost is the first product built using this pattern, proving the model works
+- See `docs/ADDING_A_PRODUCT.md` for how to build your own product on MuseKit
 
 ---
 
 ## Current Status
 
-### Completed
+### MuseKit Core (Complete)
 
 | Feature | Status |
 |---------|--------|
@@ -296,7 +349,7 @@ MuseKit supports a clean extension model for building products on top of the tem
 | Dark/Light Mode | Complete |
 | OAuth Admin Controls | Complete |
 | SSO/SAML Enterprise Auth | Complete |
-| Queue Infrastructure (BullMQ, 10 Job Types) | Complete |
+| Queue Infrastructure (BullMQ, 6 Core Job Types) | Complete |
 | Rate Limiting (Upstash Redis) | Complete |
 | Admin Setup UX (11 Sub-Pages) | Complete |
 | Customer Service Tools | Complete |
@@ -306,20 +359,47 @@ MuseKit supports a clean extension model for building products on top of the tem
 | Metrics Alerts (Churn + Growth) | Complete |
 | Database Backup Configuration | Complete |
 | API Token Rotation | Complete |
-| PassivePost Module (10 platforms, 2 tiers) | Complete |
 | Centralized API Keys & Integrations | Complete |
-| PassivePost Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
+| Landing Page Components (14 reusable sections) | Complete |
+| 950-Scale Color Model | Complete |
+| Header & Footer Styling (admin-configurable) | Complete |
+| Interactive State System (hover-elevate, active-elevate-2) | Complete |
+| Section Ordering & Per-Section Backgrounds | Complete |
+| Feature Sub-Page System (/features/[slug]) | Complete |
+| Product Registry (multi-product tier resolution) | Complete |
+
+### PassivePost Extension (Complete)
+
+| Feature | Status |
+|---------|--------|
+| 10-Page Social Dashboard | Complete |
+| 3-Tier Subscription System (Starter/Basic/Premium) | Complete |
+| AI Post Generation (15 niche prompts) | Complete |
+| OAuth Social Platform Connections | Complete |
+| Brand Preferences System | Complete |
+| Engagement Analytics | Complete |
+| Calendar View | Complete |
+| Post Queue Management | Complete |
+| Quick Generate FAB | Complete |
+| Upgrade Banner (80%+ usage) | Complete |
+| Dark/Light Mode Toggle in Dashboard | Complete |
+| 4 BullMQ Social Job Types | Complete |
+| Admin PassivePost Config Page | Complete |
+| 8 Playwright E2E Tests | Complete |
 
 ### Planned (Post-MVP / Roadmap)
 
-- **Dynamic Tiers for PassivePost** — Allow admins to create unlimited custom tiers from the dashboard (currently Universal and Power)
-- **Real Platform API Integration** — 7 newer platform clients (YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord) have stubbed methods ready for real API integration
-- **Approval Queue UI** — UI for reviewing and approving AI-generated posts (data model supports it)
+**MuseKit Core:**
 - Affiliate/referral system
 - Push notifications
 - Internationalization (multiple languages)
 - A/B testing
 - White-label support
+
+**PassivePost:**
+- Dynamic tiers from admin dashboard
+- Real platform API integration for 7 newer platforms (YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord have stubbed methods)
+- Approval queue UI for reviewing AI-generated posts
 
 ---
 
@@ -334,7 +414,7 @@ This section compares the planned technology stack against what is currently imp
 | **Frontend** | Vercel | Implemented | Production deployment configured |
 | | Next.js 16+ | Implemented | App Router with TypeScript |
 | | shadcn/ui | Implemented | Full component library installed (70+ components) |
-| | Tailwind CSS | Implemented | With dark mode support |
+| | Tailwind CSS | Implemented | With dark mode support and 950-scale color model |
 | **Backend/API** | Next.js API Routes | Implemented | 40+ API routes functional |
 | | OAuth SDKs | Implemented | All 5 providers via Supabase Auth + PassivePost platform OAuth |
 | **Database** | Supabase PostgreSQL | Implemented | 15+ tables in production (core + extensions) |
@@ -352,15 +432,14 @@ This section compares the planned technology stack against what is currently imp
 | | OpenAI | Implemented | Configurable via admin dashboard |
 | | Anthropic | Implemented | Configurable via admin dashboard |
 | | n8n/Webhook System | Implemented | 8 events, HMAC signing, fire-and-forget |
-| **Social Media** | PassivePost Module | Implemented | 10 platforms, 2 tiers, AI post generation |
-| | PassivePost | Implemented | OAuth, tiers, analytics, calendar, brand prefs, Quick Generate |
+| **Social Media** | PassivePost Extension | Implemented | 10 platforms, 3 tiers, 10-page dashboard, AI post generation |
 | **Operations** | Resend (Emails) | Implemented | Templates + test sending + admin editor + scheduled reports |
 | | Sentry (Monitoring) | Implemented | Server + browser errors via tunnel route |
 | | Plausible (Analytics) | Implemented | Script integrated |
-| | Upstash/BullMQ (Queues) | Implemented | 10 job types, admin dashboard |
+| | Upstash/BullMQ (Queues) | Implemented | 10 job types (6 core + 4 social), admin dashboard |
 | | Upstash Redis Rate Limiting | Implemented | Sliding window with in-memory fallback |
 | **Testing** | Playwright E2E | Implemented | 92 tests across 7 files |
-| **Monetization** | Stripe Billing | Implemented | Subscriptions + portal + PassivePost tier resolution |
+| **Monetization** | Stripe Billing | Implemented | Subscriptions + portal + Product Registry tier resolution |
 
 ### Summary
 
@@ -371,7 +450,7 @@ This section compares the planned technology stack against what is currently imp
 | Database/Storage | 4/4 | 0 | 0 |
 | Authentication | 7/7 | 0 | 0 |
 | AI & Automation | 4/4 | 0 | 0 |
-| Social Media | 2/2 | 0 | 0 |
+| Social Media | 1/1 | 0 | 0 |
 | Operations | 5/5 | 0 | 0 |
 | Testing | 1/1 | 0 | 0 |
 | Monetization | 1/1 | 0 | 0 |
@@ -386,7 +465,7 @@ All technology stack components are fully implemented. Future enhancements are f
 
 ### The Vision
 
-Every SaaS idea deserves a fair chance. But too many good ideas die in the "infrastructure swamp"—the months spent building login pages and payment forms before you can even test if anyone wants your product.
+Every SaaS idea deserves a fair chance. But too many good ideas die in the "infrastructure swamp" -- the months spent building login pages and payment forms before you can even test if anyone wants your product.
 
 MuseKit exists to eliminate that barrier. With a production-ready foundation, founders can:
 
@@ -405,14 +484,18 @@ MuseKit exists to eliminate that barrier. With a production-ready foundation, fo
 
 ---
 
-## Getting Started
+## Documentation Guide
 
-If you're interested in using MuseKit for your project:
-
-1. **Review the Setup Guide** - See `docs/SETUP_GUIDE.md` for step-by-step instructions
-2. **Check the Master Plan** - See `docs/MASTER_PLAN.md` for detailed technical specifications
-3. **Use the Checklist** - See `docs/MUSE_CHECKLIST.md` for launch readiness
-4. **Read the Admin Guide** - See `docs/ADMIN_GUIDE.md` for managing the platform
+| Document | Purpose |
+|----------|---------|
+| `docs/PROJECT_OVERVIEW.md` | This file — high-level overview of the entire project |
+| `docs/PASSIVEPOST.md` | Dedicated guide for the PassivePost social media product |
+| `docs/SETUP_GUIDE.md` | Step-by-step setup instructions for new clones |
+| `docs/MUSE_CHECKLIST.md` | Launch readiness checklist |
+| `docs/ADMIN_GUIDE.md` | Day-to-day admin dashboard guide |
+| `docs/MASTER_PLAN.md` | Detailed technical specifications and module breakdown |
+| `docs/ARCHITECTURE.md` | Deployment model, merge rules, and separation boundaries |
+| `docs/ADDING_A_PRODUCT.md` | How to build a new product on MuseKit |
 
 ---
 
@@ -424,4 +507,4 @@ For the latest status and roadmap, refer to the Master Plan document.
 
 ---
 
-*Last Updated: February 9, 2026*
+*Last Updated: February 19, 2026*

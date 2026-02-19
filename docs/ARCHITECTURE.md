@@ -1,5 +1,7 @@
 # MuseKit Architecture: Option B (Separate Deployments)
 
+*Last Updated: February 19, 2026*
+
 **Decision Date**: February 2026
 
 ## Deployment Model
@@ -153,12 +155,122 @@ Product-specific files live in isolated directories:
 - `src/app/api/social/` - PassivePost API routes
 - `src/app/admin/setup/passivepost/` - PassivePost admin config
 - `migrations/extensions/` - PassivePost database tables
+- `docs/PASSIVEPOST.md` - PassivePost product documentation
+
+---
+
+## Landing Page Component Architecture
+
+MuseKit includes 16 reusable landing page components in `src/components/landing/`. These are core MuseKit components, not product-specific.
+
+### Components
+
+| Component | File |
+|-----------|------|
+| Hero | `hero.tsx` |
+| Split Hero | `split-hero.tsx` |
+| Gradient Text | `gradient-text.tsx` |
+| Animated Words | `animated-words.tsx` |
+| Animated Counter | `animated-counter.tsx` |
+| Logo Marquee | `logo-marquee.tsx` |
+| Testimonial Carousel | `testimonial-carousel.tsx` |
+| Customer Stories | `customer-stories.tsx` |
+| Process Steps | `process-steps.tsx` |
+| Founder Letter | `founder-letter.tsx` |
+| Comparison Bars | `comparison-bars.tsx` |
+| Product Showcase | `product-showcase.tsx` |
+| Bottom Hero CTA | `bottom-hero-cta.tsx` |
+| Image Collage Section | `image-collage-section.tsx` |
+| Image Text Section | `image-text-section.tsx` |
+| Announcement Bar | `announcement-bar.tsx` |
+
+### Configuration
+
+All landing page sections are toggleable via the `ContentSettings` interface in `src/types/settings.ts`.
+
+- **Section Ordering**: `ContentSettings.sectionOrder` array controls the display order of sections on the landing page.
+- **Per-Section Background Colors**: `ContentSettings.sectionColors` allows each section to have a custom background color.
+- **Feature Sub-Page System**: Feature sub-pages are served at `/features/[slug]` and configured via the `featureSubPages` array in content settings. Each entry defines a dedicated feature detail page accessible from the main features listing.
+
+---
+
+## 950-Scale Color Model
+
+The primary color palette is a core MuseKit concern, defined as CSS custom properties in `src/app/globals.css`.
+
+### Primary Palette
+
+CSS variables `--primary-*` are defined at 11 scale stops: **50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950**. These provide a full spectrum from lightest tint to deepest shade for the brand's primary color.
+
+### Standard Card Formulas
+
+- Background: `bg-white/10` in both light and dark modes
+- Border: `border-gray-500/50` in both light and dark modes
+
+### Card Text Colors
+
+- Headings (H1): `text-black dark:text-white`
+- Body text: `opacity-70`
+
+### Icon Colors
+
+- Icon foreground: `text-primary-800 dark:text-primary-200`
+- Icon backgrounds (light mode): randomized from primary scale shades `100`, `200`, `300`
+- Icon backgrounds (dark mode): randomized from primary scale shades `700`, `800`, `900`
+
+### Avatar Fallback
+
+Avatar fallback backgrounds use the same randomized pattern as icon backgrounds, selecting from primary scale light shades in light mode and dark shades in dark mode.
+
+---
+
+## Interactive State System
+
+CSS utility classes are defined in `src/app/globals.css` to provide consistent interactive states across the application.
+
+### Utility Classes
+
+| Class | Behavior |
+|-------|----------|
+| `hover-elevate` | Subtle background elevation on hover using the primary palette |
+| `active-elevate-2` | More dramatic elevation on click/press |
+| `toggle-elevate` | Prepares an element for toggle state management |
+| `toggle-elevated` | Applied alongside `toggle-elevate` to indicate the "on" state |
+
+### Theme-Aware Colors
+
+- **Light mode**: `--primary-100`/`--primary-200` backgrounds, `--primary-600` borders
+- **Dark mode**: `--primary-900`/`--primary-800` backgrounds, `--primary-400` borders
+
+### Usage Notes
+
+- **Buttons and Badges** handle their own hover/active states internally. Do not apply `hover-elevate` or `active-elevate-2` to these components.
+- These utilities are applied to **17+ files** across the codebase for all clickable non-Button elements (cards, sidebar items, list rows, toggles, etc.).
+- The classes compose with any background color and respect the current dark/light theme.
+
+---
+
+## Header & Footer Customization
+
+Header and footer styling is configurable through the admin UI and stored in settings.
+
+### Interfaces
+
+- `HeaderStyle` interface in `src/types/settings.ts` defines header appearance options (background color, text color, border, transparency).
+- `FooterStyle` interface in `src/types/settings.ts` defines footer appearance options (background color, text color, layout).
+
+### Configuration
+
+- Header style is set via `NavigationSettings.headerStyle`
+- Footer style is set via `NavigationSettings.footerStyle`
+- Both are configurable through the admin UI at the branding setup page (`/admin/setup/branding`)
+- Defaults to the branding primary color with auto-computed contrast text color for readability
 
 ---
 
 ## Known Separation Issues
 
-These work fine in the current combined repo but should be cleaned up before creating a truly clean MuseKit template for others:
+These work fine in the current combined repo but should be cleaned up before creating a truly clean MuseKit template for others. All issues below are documented for future cleanup.
 
 ### 1. Queue Types (src/lib/queue/types.ts)
 

@@ -329,7 +329,7 @@ PassivePost is the reference implementation of a product built on MuseKit. Here 
 
 ### Product Registration
 
-PassivePost is registered with slug `passive-post` and uses the metadata key `muse_tier` on its Stripe product. Its tier definitions include `tier_1` (Free), `tier_2` (Pro), and `tier_3` (Team), each with limits like `dailyPosts`, `maxAccounts`, and `aiGenerationsPerDay`.
+PassivePost is registered with slug `passive-post` and uses the metadata key `muse_tier` on its Stripe product. Its tier definitions include `tier_1` (Starter), `tier_2` (Basic), and `tier_3` (Premium), each with limits like `dailyPosts`, `dailyAiGenerations`, `monthlyPosts`, and `maxPlatforms`.
 
 ### Database Tables
 
@@ -377,6 +377,8 @@ export async function getUserSocialTier(userId: string) {
 
 This pattern (a thin wrapper around the core tier resolver) is recommended for all products.
 
+For complete PassivePost documentation including all dashboard pages, API routes, OAuth flows, and tier details, see `docs/PASSIVEPOST.md`.
+
 ## File Reference
 
 | File | Purpose |
@@ -393,3 +395,5 @@ This pattern (a thin wrapper around the core tier resolver) is recommended for a
 | `migrations/core/002_product_registry.sql` | Database tables: `muse_products`, `muse_product_subscriptions` |
 | `migrations/extensions/` | Directory for product-specific migration files |
 | `scripts/seed-products.ts` | Example script for seeding Stripe products |
+
+*Last Updated: February 19, 2026*

@@ -42,10 +42,12 @@ A complete guide for managing your MuseKit-powered application. Written for team
 19. [In-App Notifications](#in-app-notifications)
 20. [Audit Log Viewer](#audit-log-viewer)
 21. [Legal & Compliance Pages](#legal--compliance-pages)
-22. [PassivePost Module](#passivepost-module)
-23. [PassivePost Extension](#passivepost-extension)
-24. [Feature Toggles Reference](#feature-toggles-reference)
-25. [Public Pages Your Visitors See](#public-pages-your-visitors-see)
+22. [Landing Page Components](#landing-page-components)
+23. [Header & Footer Styling](#header--footer-styling)
+24. [Section Ordering](#section-ordering)
+25. [PassivePost (Social Media Management)](#passivepost-social-media-management)
+26. [Feature Toggles Reference](#feature-toggles-reference)
+27. [Public Pages Your Visitors See](#public-pages-your-visitors-see)
 
 ---
 
@@ -127,6 +129,10 @@ Controls the visual identity of your site:
 - **Pattern/Texture** — A repeating pattern overlaid on a gradient
 - **Floating Mockup** — A product image that appears to float over a gradient
 
+**Header Styling** — Configure header background color, text color, background opacity, sticky/relative positioning, transparent mode, and bottom border toggle. Colors use color pickers and opacity sliders. Default behavior uses your branding primary color with auto-computed contrast text.
+
+**Footer Styling** — Configure footer background color, text color, optional background image (with automatic dark gradient overlay), and layout mode. Three layout modes: default (4-column grid), minimal (single-row), or centered (stacked). Background image can be uploaded via the image upload component.
+
 **Theme Colors** — Customize colors for both light and dark modes:
 - Primary Color — Your main brand color (buttons, links)
 - Accent Color — Secondary brand color (highlights, badges)
@@ -153,8 +159,10 @@ Controls the homepage sections. Each section can be independently turned on or o
 - **Image + Text Blocks** — Alternating image and text sections for detailed feature explanations.
 - **Section Backgrounds** — Choose a background style (transparent, muted, gradient, mesh) for each section independently.
 
-**Section order on the homepage:**
-Hero > Logo Marquee > Metrics > Features > Testimonials > Process Steps > Customer Stories > Image+Text Blocks > FAQ > CTA
+**Section Ordering** — Homepage sections can be reordered from this page. Use the arrow buttons next to each section to move it up or down. New sections are automatically added to the end of the order. Each section can also have a custom background color via the color picker.
+
+**Default section order:**
+Hero > Logo Marquee > Metrics > Features > Testimonials > Process Steps > Customer Stories > Founder Letter > Comparison Bars > Product Showcase > Bottom Hero CTA > Image Collage > Image + Text Blocks > FAQ > CTA
 
 ### Pages
 
@@ -662,159 +670,43 @@ MuseKit includes a comprehensive set of legal pages that are automatically avail
 
 ---
 
-## PassivePost Module
+## Landing Page Components
 
-PassivePost is a toggleable social media management extension built into MuseKit. When enabled, it adds social posting, scheduling, and AI-powered content generation capabilities.
+The landing page is built from 16 reusable components, all configurable from the Content settings page:
 
-### Enabling PassivePost
+- **Hero** — Main banner with 6 style options (full-width, split, video, pattern, floating mockup, photo collage)
+- **Logo Marquee** — Scrolling partner/client logos
+- **Animated Counters** — Key metrics with counting animation
+- **Feature Cards** — Product feature highlights with icons
+- **Testimonial Carousel** — Customer quotes in a rotating carousel
+- **Customer Stories** — Longer-form testimonials with photos
+- **Process Steps** — Numbered how-it-works sequence
+- **FAQ Section** — Expandable question/answer pairs
+- **Founder Letter** — Long-form narrative with portrait, signature, and background banner
+- **Comparison Bars** — Animated horizontal progress bars with entrance animation
+- **Product Showcase** — App screenshot with shadow/border over background image or gradient
+- **Bottom Hero CTA** — Closing call-to-action section matching hero visual weight
+- **Image Collage** — Fan-style overlapping images (up to 5) with hover animation
+- **Image + Text Blocks** — Alternating image and text sections for detailed features
+- **Gradient Text** — Animated gradient text effect for headlines
+- **Announcement Bar** — Top banner for promotions or important messages
 
-1. Go to **Admin > Setup > PassivePost** (`/admin/setup/passivepost`)
-2. Toggle the module **on**
-3. Select your tier: **Universal** or **Power**
-4. Enable the platforms you want to support (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord)
-5. Scroll down to **Platform API Keys** and enter your API credentials for each enabled platform
+Each component can be toggled on/off independently. Toggle names follow the pattern `{componentName}Enabled` in the Content settings.
 
-### Tiers
-
-| Feature | Universal | Power |
-|---------|-----------|-------|
-| Basic posting & monitoring | Yes | Yes |
-| Full scheduling | No | Yes |
-| Trend analysis | No | Yes |
-| AI content generation | Limited | Full |
-| Analytics & automation | No | Yes |
-| AI generations per day | 10 | 100 |
-| Posts per day | 20 | 10,000 |
-
-### Niche Guidance (AI Prompts)
-
-Admins can configure **niche-specific guidance entries** for the AI post generation system:
-
-- Each entry has a **key** (internal identifier), **label** (display name), and **guidance** (instructions for the AI)
-- 15 default niche prompts are provided and can be customized
-- Empty entries are automatically filtered on save
-- If no niche matches or no guidance is configured, a sensible default is used: *"Use a casual, local, authentic small business voice. Sound like a real person talking to their neighbors and community."*
-
-### Engagement Pull Configuration
-
-Configure how often the system collects engagement data (likes, shares, comments) from platform APIs:
-
-- **Pull Interval** (1-168 hours) — How often to fetch engagement metrics
-- **Lookback Window** (1-168 hours) — How far back to look for posts when pulling data
-- Both default to 24 hours if not configured
-- Settings are stored per-organization and used by the BullMQ engagement pull job
-
-### Platform API Keys
-
-When PassivePost is enabled, a **Platform API Keys** section appears on the PassivePost setup page. This works the same way as the main API Keys page:
-
-- Keys are organized by platform in collapsible groups
-- Each platform shows a status badge (configured count)
-- Inline edit, reveal, and delete controls
-- Source badges show whether keys come from the Dashboard or Environment Variables
-
-### What Users See
-
-When PassivePost is enabled, users see a **Social Accounts** page in their dashboard (`/dashboard/social`) where they can:
-- Connect their social media accounts
-- Create and schedule posts (with AI-powered content generation if AI features are enabled)
-- View post status and history
-
-### Dependencies & Warnings
-
-PassivePost shows dependency warnings on the setup page when:
-- **AI features are disabled** — AI-powered post generation requires AI to be enabled in Setup > Features
-- **No platforms are enabled** — At least one platform must be toggled on
-- **API keys are missing** — Platform API credentials must be configured for enabled platforms
-
-### Social KPI Cards
-
-When PassivePost is enabled, additional KPI cards appear on the admin Metrics Dashboard showing:
-- Current tier badge (Universal/Power)
-- AI generation count for the current period
-- Social posting activity
-
-### n8n Integration
-
-PassivePost includes pre-built n8n workflow templates for automation:
-- **Auto-post RSS** — Automatically post new RSS feed items to social platforms
-- **AI Generate & Schedule** — Use AI to generate and schedule social content
-- **Engagement Monitor** — Monitor social engagement metrics
-
-Templates are located in `src/lib/social/n8n-templates/`. Set `MUSEKIT_URL` and `MUSEKIT_SESSION_COOKIE` environment variables in your n8n instance.
-
-### Troubleshooting
-
-- **"Social module not enabled"** — Admin must toggle on in Setup > PassivePost
-- **"AI features not enabled"** — Enable AI in Setup > Features
-- **"Rate limit exceeded"** — User hit daily tier cap; upgrade to Power or wait for daily reset
-- **Posts stuck in "scheduled"** — Check BullMQ queue dashboard (`/admin/queue`), verify Redis connection
-- **Token validation fails** — Re-connect the social account with fresh credentials
+**Feature Sub-Pages** — Create dedicated pages for individual features at `/features/{slug}`. Each page can have a hero section with background image and screenshot, alternating image/text blocks, and a closing CTA.
 
 ---
 
-## PassivePost Extension
+## PassivePost (Social Media Management)
 
-PassivePost is a full SaaS product built on top of MuseKit using the database extension pattern. It provides AI-powered social media scheduling targeted at solopreneurs and gig workers.
+PassivePost is a separate product built on MuseKit. For complete documentation including dashboard pages, tier system, API routes, OAuth flows, and admin configuration, see `docs/PASSIVEPOST.md`.
 
-### What It Adds
-
-PassivePost extends MuseKit's core platform with:
-
-- **OAuth Platform Connections** — Users connect Facebook Page, LinkedIn, and Twitter/X accounts via OAuth with PKCE
-- **Per-User Stripe Tiers** — Subscription metadata maps to admin-configurable tiers (default: Starter/Basic/Premium) with different post and AI generation limits. Tier definitions, display names, Stripe metadata values, and rate limits are all editable from the admin dashboard's PassivePost setup page
-- **Brand Preferences** — Users set their tone, niche, location, target audience, posting goals, preferred platforms, and frequency
-- **AI Post Generation** — Uses 15 niche-specific prompts (admin-editable) combined with brand preferences for solopreneur-friendly content
-- **7-Page Social Dashboard**:
-  - **Overview** — Usage progress bar, posts remaining, Quick Generate dialog
-  - **Calendar** — Month-grid view with platform filters and per-platform count tooltips
-  - **Engagement** — Recharts analytics charts for likes, shares, comments
-  - **Queue** — Manage queued and scheduled posts
-  - **Posts** — Post history and management
-  - **Brand** — Brand preference settings
-  - **Onboarding** — Social-specific onboarding wizard
-
-### Upgrade Banner
-
-A reusable upgrade banner appears across all 5 social dashboard pages when a user reaches 80% of their tier's post limit. The banner:
-- Shows "X posts remaining" with a progress bar
-- Can be dismissed (stays dismissed for the browser session)
-- Links to the upgrade/pricing page
-
-### Quick Generate
-
-On the Overview page, users can generate AI posts on-demand:
-1. Click "Quick Generate"
-2. Select a platform (Facebook, LinkedIn, or Twitter/X)
-3. Enter a topic or leave blank for general content
-4. The AI generates a post using brand preferences and niche guidance
-5. Copy the result to clipboard with one click
-
-### Stripe Tier Limits
-
-Tier definitions are admin-configurable from the PassivePost setup page (`/admin/setup/passivepost`). You can add, remove, or edit tiers — the system is not locked to 3. Default tiers ship out of the box:
-
-| Tier | Posts/Day | AI Generations/Day | Metadata Key | Metadata Value |
-|------|-----------|-------------------|--------------|----------------|
-| Starter (tier_1) | 5 | 3 | `muse_tier` | `tier_1` |
-| Basic (tier_2) | 20 | 15 | `muse_tier` | `tier_2` |
-| Premium (tier_3) | 100 | 50 | `muse_tier` | `tier_3` |
-
-### Configuring Tiers
-
-To customize tiers from the admin dashboard:
-
-1. Navigate to **Admin > Setup > PassivePost**
-2. Scroll to the **Tier Definitions** section
-3. Edit display names, Stripe metadata values, and rate limits per tier
-4. Add new tiers or remove existing ones as needed
-5. Click **Save Changes**
-
-Each tier uses the `TierDefinition` interface: `{ id, displayName, stripeMetadataValue, limits }`. The default fallback tier is `tier_1`.
-
-### Debug Mode
-
-For development and testing, set the environment variable `MUSE_DEBUG_MODE=true` to enable a debug endpoint at `/api/social/debug` that returns mock data without requiring real platform connections.
+**Quick reference for admins:**
+- Admin config page: `/admin/setup/passivepost`
+- User dashboard: `/dashboard/social/overview`
+- 3 tiers: Starter, Basic, Premium (configurable)
+- 10 social platforms supported
+- AI post generation with 15 niche-specific prompts
 
 ---
 
@@ -898,4 +790,4 @@ All pages automatically support dark/light mode and are responsive on mobile dev
 
 ---
 
-*Last Updated: February 9, 2026*
+*Last Updated: February 19, 2026*

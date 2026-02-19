@@ -4,7 +4,7 @@ This checklist guides you through setting up a new project from the Master SaaS 
 
 **Estimated time: 15-30 minutes**
 
-**Template Status: MVP COMPLETE + Full Feature Set + PassivePost Extension (February 2026)**
+**Template Status: MVP COMPLETE + Full Feature Set + PassivePost Extension + Marketing Components + UI Polish (February 2026)**
 
 ---
 
@@ -176,11 +176,11 @@ If using PassivePost, create additional Stripe products with tier metadata:
 > **Note:** Tier definitions are admin-configurable from the PassivePost setup page. The default 3 tiers (tier_1/Starter, tier_2/Basic, tier_3/Premium) ship out of the box. Admins can add, remove, or edit tiers and their limits from the dashboard.
 
 These tiers map to post/AI generation limits:
-| Tier | Posts/Day | AI Generations/Day |
-|------|-----------|-------------------|
-| Starter | 5 | 3 |
-| Basic | 20 | 15 |
-| Premium | 100 | 50 |
+| Tier | Daily AI Generations | Daily Posts | Monthly Posts | Max Platforms |
+|------|---------------------|-------------|---------------|---------------|
+| Starter (tier_1) | 5 | 1 | 15 | 2 |
+| Basic (tier_2) | 10 | 2 | 30 | 3 |
+| Premium (tier_3) | 100 | 10,000 | 999,999 | 10 |
 
 ---
 
@@ -299,6 +299,8 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] **Hero Image** - Upload or paste URL for landing page hero
 - [ ] **Primary Color** - Main brand color (use color picker)
 - [ ] **Accent Color** - Secondary brand color
+- [ ] **Header Style** - Configure header background color, text color, opacity, sticky positioning, and border
+- [ ] **Footer Style** - Configure footer background color, text color, background image, and layout mode
 
 ### Pricing Sub-Page
 - [ ] Click "Manage Products in Stripe" button to open Stripe Dashboard
@@ -381,6 +383,12 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
   - **Monitoring** (Optional): Sentry DSN, Plausible Domain
 - [ ] Keys show source badges (Dashboard vs Env Var)
 - [ ] Format validation runs on save
+
+### Content Sub-Page
+- [ ] Configure homepage section order (use arrow buttons to reorder)
+- [ ] Set per-section background colors (optional)
+- [ ] Toggle landing page components on/off (Founder Letter, Comparison Bars, Product Showcase, Bottom Hero CTA, Image Collage, Image+Text Blocks)
+- [ ] Configure Feature Sub-Pages at `/features/[slug]` (optional)
 
 ### PassivePost Sub-Page (Social Module)
 - [ ] Navigate to `/admin/setup/passivepost`
@@ -482,6 +490,14 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - [ ] Social engagement page loads with charts (if PassivePost)
 - [ ] Brand preferences page loads at `/dashboard/social/brand` (if PassivePost)
 - [ ] Upgrade banner appears at 80%+ usage across social dashboard pages
+- [ ] Landing page hero displays correctly with chosen style
+- [ ] Landing page sections render in configured order
+- [ ] Header/footer styling reflects admin configuration
+- [ ] Dark/light mode toggle works on landing page and dashboard
+- [ ] Founder Letter section renders with portrait (if enabled)
+- [ ] Comparison Bars animate on scroll (if enabled)
+- [ ] Feature sub-pages load at `/features/{slug}` (if configured)
+- [ ] 950-scale color model adapts to configured primary color
 
 ---
 
@@ -606,6 +622,14 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - 9 legal/compliance pages with dynamic variable replacement
 - Cookie consent banner
 
+### Marketing & Landing Page
+- 16 reusable landing page components (all admin-toggleable)
+- Feature Sub-Page System for detailed product feature pages
+- 950-scale color model for automatic palette adaptation
+- Interactive state system (hover/active/toggle feedback)
+- Configurable header and footer styling
+- Section ordering and per-section background colors
+
 ### PassivePost Module
 - Toggleable social media management extension
 - 2 tiers: Universal (basic) and Power (advanced)
@@ -677,6 +701,19 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 
 ---
 
+## Documentation
+
+- `docs/SETUP_GUIDE.md` — Full setup instructions and SQL schemas
+- `docs/ADMIN_GUIDE.md` — Admin dashboard usage guide
+- `docs/ARCHITECTURE.md` — System architecture overview
+- `docs/ADDING_A_PRODUCT.md` — How to add new products/extensions
+- `docs/PROJECT_OVERVIEW.md` — Project overview and goals
+- `docs/MASTER_PLAN.md` — Roadmap and planning
+- `docs/PASSIVEPOST.md` — Dedicated PassivePost product guide
+- `docs/MUSE_CHECKLIST.md` — This checklist
+
+---
+
 ## Pre-Production Checklist
 
 Before launching with live customer data:
@@ -699,4 +736,4 @@ Before launching with live customer data:
 
 ---
 
-*Last Updated: February 9, 2026*
+*Last Updated: February 19, 2026*

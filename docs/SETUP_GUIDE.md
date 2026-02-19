@@ -2,7 +2,7 @@
 
 This guide walks you through creating a new SaaS from the Master SaaS Muse Template.
 
-**Template Status: MVP COMPLETE + Full Feature Set + PassivePost Module + PassivePost Extension (February 2026)**
+**Template Status: MVP COMPLETE + Full Feature Set + PassivePost Extension + Marketing Components + UI Polish (February 2026)**
 
 ---
 
@@ -221,6 +221,7 @@ master-saas-muse/
 │   │   │   ├── dmca/page.tsx
 │   │   │   ├── ai-data-usage/page.tsx
 │   │   │   ├── security-policy/page.tsx
+│   │   │   ├── features/[slug]/page.tsx   # Feature sub-pages
 │   │   │   └── p/[slug]/page.tsx
 │   │   ├── admin/
 │   │   │   ├── page.tsx (dashboard)
@@ -252,12 +253,16 @@ master-saas-muse/
 │   │   │   └── waitlist/page.tsx
 │   │   ├── dashboard/
 │   │   │   └── social/
+│   │   │       ├── layout.tsx
+│   │   │       ├── page.tsx             # Accounts page
 │   │   │       ├── overview/page.tsx
+│   │   │       ├── posts/page.tsx
+│   │   │       ├── queue/page.tsx
 │   │   │       ├── calendar/page.tsx
 │   │   │       ├── engagement/page.tsx
-│   │   │       ├── queue/page.tsx
-│   │   │       ├── posts/page.tsx
+│   │   │       ├── leads/page.tsx
 │   │   │       ├── brand/page.tsx
+│   │   │       ├── settings/page.tsx
 │   │   │       └── onboarding/page.tsx
 │   │   ├── api/
 │   │   │   ├── admin/ (setup, stats, metrics, posts, users, users/[userId], notes, team, invitations, email-templates, webhooks, sso, notifications, queue, integrations)
@@ -283,11 +288,12 @@ master-saas-muse/
 │   ├── components/
 │   │   ├── ui/ (70+ shadcn components)
 │   │   ├── layout/ (header, footer)
-│   │   ├── landing/ (hero, marquee, counters, etc.)
+│   │   ├── landing/ # 16 reusable marketing components (hero, marquee, counters, founder-letter, comparison-bars, product-showcase, bottom-hero-cta, image-collage, image-text, etc.)
 │   │   ├── branding/ (dynamic branding)
 │   │   ├── auth/ (UserNav)
 │   │   ├── admin/ (image-upload)
 │   │   ├── subscription/ (UpgradeBanner)
+│   │   ├── social/          # PassivePost social dashboard components
 │   │   ├── analytics/ (plausible)
 │   │   ├── feedback-widget.tsx
 │   │   ├── help-widget.tsx
@@ -302,7 +308,7 @@ master-saas-muse/
 │   │   ├── webhooks/ (dispatcher - HMAC, retry, fire-and-forget)
 │   │   ├── sso/ (provider - SAML SSO management)
 │   │   ├── queue/ (index - BullMQ job queue with 10 job types, types)
-│   │   ├── social/ (client, rate-limits, user-tier, debug, n8n-templates/)
+│   │   ├── social/ (types, client, user-tier, rate-limits, api-rate-limiter, token-refresh, queue-jobs, trend-alerts, email-notifications, crypto, debug, demo-data, n8n-templates/)
 │   │   ├── config/ (secrets, ensure-table - centralized API key management)
 │   │   ├── validation/ (schemas, index)
 │   │   ├── rate-limit/ (index - Upstash Redis sliding window)
@@ -335,6 +341,9 @@ master-saas-muse/
 │   ├── MASTER_PLAN.md
 │   ├── MUSE_CHECKLIST.md
 │   ├── PROJECT_OVERVIEW.md
+│   ├── PASSIVEPOST.md
+│   ├── ADDING_A_PRODUCT.md
+│   ├── ARCHITECTURE.md
 │   └── SETUP_GUIDE.md
 ├── middleware.ts
 ├── next.config.ts
@@ -692,6 +701,16 @@ The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these met
 | `npx playwright test` | Run E2E tests (92 tests across 7 files) |
 | `git push` | Deploy to Vercel (auto-deploy) |
 
+### Documentation Reference
+- `docs/SETUP_GUIDE.md` - This file (setup & configuration)
+- `docs/ADMIN_GUIDE.md` - Admin dashboard usage
+- `docs/PASSIVEPOST.md` - PassivePost extension guide
+- `docs/ADDING_A_PRODUCT.md` - How to add new products
+- `docs/ARCHITECTURE.md` - System architecture overview
+- `docs/MASTER_PLAN.md` - Project roadmap
+- `docs/MUSE_CHECKLIST.md` - Feature checklist
+- `docs/PROJECT_OVERVIEW.md` - Project overview
+
 ---
 
 ## Important URLs
@@ -759,4 +778,4 @@ The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these met
 
 ---
 
-*Last Updated: February 9, 2026*
+*Last Updated: February 19, 2026*
