@@ -255,7 +255,7 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
             </div>
           ) : (
             <div
-              className={`font-mono text-sm py-2 px-3 rounded-md border flex items-center cursor-pointer hover-elevate ${
+              className={`font-mono text-sm py-2 px-3 rounded-md border flex items-center cursor-pointer hover-elevate active-elevate-2 ${
                 keyData.configured
                   ? 'bg-muted/40'
                   : 'bg-muted/20 border-dashed'

@@ -423,7 +423,7 @@ export default function SocialOverviewPage() {
                 return (
                   <div
                     key={post.id}
-                    className="flex items-start gap-3 p-3 rounded-md border cursor-pointer hover-elevate"
+                    className="flex items-start gap-3 p-3 rounded-md border cursor-pointer hover-elevate active-elevate-2"
                     onClick={() => setDetailPost(post as unknown as PostDetailData)}
                     data-testid={`recent-post-${post.id}`}
                   >

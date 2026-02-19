@@ -538,7 +538,7 @@ export default function SocialPostsPage() {
       ) : (
         <div className="space-y-3">
           {posts.map(post => (
-            <Card key={post.id} className="cursor-pointer hover-elevate" onClick={() => setDetailPost(post)} data-testid={`card-post-${post.id}`}>
+            <Card key={post.id} className="cursor-pointer hover-elevate active-elevate-2" onClick={() => setDetailPost(post)} data-testid={`card-post-${post.id}`}>
               <CardContent className="py-4">
                 <div className="flex flex-row items-start justify-between gap-3 flex-wrap">
                   <div className="flex items-start gap-3 min-w-0 flex-1">

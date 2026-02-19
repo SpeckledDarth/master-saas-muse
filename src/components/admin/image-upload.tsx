@@ -262,7 +262,7 @@ export function ImageUpload({
           </div>
         ) : (
           <div
-            className="relative rounded-lg border-2 border-dashed border-muted-foreground/25 transition-colors cursor-pointer hover-elevate"
+            className="relative rounded-lg border-2 border-dashed border-muted-foreground/25 transition-colors cursor-pointer hover-elevate active-elevate-2"
             style={{ aspectRatio }}
             onClick={() => fileInputRef.current?.click()}
             data-testid={`${testId}-dropzone`}

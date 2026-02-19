@@ -54,7 +54,7 @@ export default function FAQPage() {
             <Card key={item.id} className="overflow-hidden">
               <button
                 onClick={() => toggleItem(item.id)}
-                className="w-full text-left p-6 flex items-center justify-between gap-4 hover-elevate"
+                className="w-full text-left p-6 flex items-center justify-between gap-4 hover-elevate active-elevate-2"
                 data-testid={`button-faq-${item.id}`}
               >
                 <div className="flex items-start gap-3">

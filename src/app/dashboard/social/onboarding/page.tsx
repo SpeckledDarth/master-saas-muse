@@ -430,7 +430,7 @@ function OnboardingContent() {
 
             <div className="space-y-3 pt-2">
               <div
-                className={`flex items-center justify-between p-3 border rounded-md cursor-pointer hover-elevate ${
+                className={`flex items-center justify-between p-3 border rounded-md cursor-pointer hover-elevate active-elevate-2 ${
                   postingPrefs.requireApproval ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-950' : ''
                 }`}
                 onClick={() => setPostingPrefs(prev => ({ ...prev, requireApproval: !prev.requireApproval }))}
@@ -446,7 +446,7 @@ function OnboardingContent() {
               </div>
 
               <div
-                className={`flex items-center justify-between p-3 border rounded-md cursor-pointer hover-elevate ${
+                className={`flex items-center justify-between p-3 border rounded-md cursor-pointer hover-elevate active-elevate-2 ${
                   postingPrefs.autoHashtags ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-950' : ''
                 }`}
                 onClick={() => setPostingPrefs(prev => ({ ...prev, autoHashtags: !prev.autoHashtags }))}

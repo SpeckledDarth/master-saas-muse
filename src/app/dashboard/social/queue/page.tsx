@@ -181,7 +181,7 @@ export default function ApprovalQueuePage() {
             {posts.length} post{posts.length !== 1 ? 's' : ''} waiting for review
           </p>
           {posts.map(post => (
-            <Card key={post.id} className="cursor-pointer hover-elevate" onClick={() => setDetailPost(post as unknown as PostDetailData)}>
+            <Card key={post.id} className="cursor-pointer hover-elevate active-elevate-2" onClick={() => setDetailPost(post as unknown as PostDetailData)}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2">

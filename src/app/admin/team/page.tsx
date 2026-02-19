@@ -310,7 +310,7 @@ export default function TeamPage() {
       <Collapsible open={rolesInfoOpen} onOpenChange={setRolesInfoOpen}>
         <Card>
           <CollapsibleTrigger asChild>
-            <CardHeader className="cursor-pointer hover-elevate">
+            <CardHeader className="cursor-pointer hover-elevate active-elevate-2">
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <Info className="h-5 w-5" />
