@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { Loader2, Check, X as XIcon, Edit2, Send, Clock, Sparkles, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
-import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
 import Link from 'next/link'
 
 interface QueuePost {
@@ -125,7 +124,7 @@ export default function ApprovalQueuePage() {
 
   if (error) {
     return (
-      <div className="container max-w-3xl mx-auto py-8 px-4">
+      <div className="p-6">
         <Card data-testid="error-state-queue">
           <CardContent className="py-12 text-center">
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -141,9 +140,7 @@ export default function ApprovalQueuePage() {
   }
 
   return (
-    <>
-    <SocialUpgradeBanner />
-    <div className="container max-w-3xl mx-auto py-8 px-4 space-y-6">
+    <div className="p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Approval Queue</h1>
         <p className="text-muted-foreground mt-1">
@@ -269,6 +266,5 @@ export default function ApprovalQueuePage() {
         </div>
       )}
     </div>
-    </>
   )
 }

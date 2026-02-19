@@ -141,7 +141,7 @@ export default function BrandPreferencesPage() {
 
   if (error) {
     return (
-      <div className="container max-w-2xl mx-auto py-8 px-4">
+      <div className="p-6">
         <Card data-testid="error-state-brand">
           <CardContent className="py-12 text-center">
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -157,7 +157,7 @@ export default function BrandPreferencesPage() {
   }
 
   return (
-    <div className="container max-w-2xl mx-auto py-8 px-4 space-y-6">
+    <div className="p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Brand Preferences</h1>
         <p className="text-muted-foreground mt-1">

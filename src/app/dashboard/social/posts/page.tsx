@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
-import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Trash2, Edit, FileText, AlertCircle } from 'lucide-react'
@@ -268,7 +267,7 @@ export default function SocialPostsPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto max-w-4xl py-8 px-4">
+      <div className="p-6">
         <Card data-testid="error-state-posts">
           <CardContent className="py-12 text-center">
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -285,7 +284,7 @@ export default function SocialPostsPage() {
 
   if (moduleDisabled) {
     return (
-      <div className="container mx-auto max-w-4xl py-8 px-4">
+      <div className="p-6">
         <Card>
           <CardHeader>
             <CardTitle data-testid="text-social-disabled-title">Social Module Not Enabled</CardTitle>
@@ -299,9 +298,7 @@ export default function SocialPostsPage() {
   }
 
   return (
-    <>
-    <SocialUpgradeBanner />
-    <div className="container mx-auto max-w-4xl py-8 px-4">
+    <div className="p-6">
       <div className="flex flex-row items-start justify-between gap-4 flex-wrap mb-6">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-posts-title">Social Posts</h1>
@@ -629,6 +626,5 @@ export default function SocialPostsPage() {
         </DialogContent>
       </Dialog>
     </div>
-    </>
   )
 }

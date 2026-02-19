@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Loader2, BarChart3, TrendingUp, Users, Sparkles, AlertCircle } from 'lucide-react'
-import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
 import Link from 'next/link'
 import {
   BarChart,
@@ -87,7 +86,7 @@ export default function EngagementAnalyticsPage() {
 
   if (error) {
     return (
-      <div className="container max-w-5xl mx-auto py-8 px-4">
+      <div className="p-6">
         <Card data-testid="error-state-engagement">
           <CardContent className="py-12 text-center">
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -104,7 +103,7 @@ export default function EngagementAnalyticsPage() {
 
   if (posts.length === 0) {
     return (
-      <div className="container max-w-5xl mx-auto py-8 px-4">
+      <div className="p-6">
         <h1 className="text-2xl font-bold mb-2" data-testid="text-page-title">Engagement Analytics</h1>
         <p className="text-muted-foreground mb-6">Track your social media performance and engagement metrics.</p>
         <Card data-testid="empty-state-engagement">
@@ -166,9 +165,7 @@ export default function EngagementAnalyticsPage() {
     .sort((a, b) => b.avg - a.avg)
 
   return (
-    <>
-    <SocialUpgradeBanner />
-    <div className="container max-w-5xl mx-auto py-8 px-4 space-y-6">
+    <div className="p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Engagement Analytics</h1>
         <p className="text-muted-foreground mt-1">
@@ -237,7 +234,7 @@ export default function EngagementAnalyticsPage() {
                   <XAxis dataKey="month" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -256,7 +253,7 @@ export default function EngagementAnalyticsPage() {
                   <XAxis dataKey="week" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="engagement" stroke="#6366f1" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="engagement" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -275,7 +272,7 @@ export default function EngagementAnalyticsPage() {
                   <XAxis dataKey="platform" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#a855f7" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="count" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -294,7 +291,7 @@ export default function EngagementAnalyticsPage() {
                   <XAxis dataKey="platform" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Bar dataKey="avg" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="avg" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -302,6 +299,5 @@ export default function EngagementAnalyticsPage() {
         </Card>
       </div>
     </div>
-    </>
   )
 }

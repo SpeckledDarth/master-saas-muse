@@ -16,15 +16,10 @@ import {
   Sparkles,
   Link2,
   Shield,
-  CalendarDays,
-  BarChart3,
-  Clock,
-  Palette,
   Bell,
   TrendingUp,
   Zap,
 } from 'lucide-react'
-import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
 
 interface SocialPost {
   id: string
@@ -57,13 +52,6 @@ const TIER_DISPLAY: Record<string, string> = {
   universal: 'Universal',
   power: 'Power',
 }
-
-const QUICK_LINKS = [
-  { label: 'Calendar', href: '/dashboard/social/calendar', icon: CalendarDays },
-  { label: 'Engagement', href: '/dashboard/social/engagement', icon: BarChart3 },
-  { label: 'Post Queue', href: '/dashboard/social/queue', icon: Clock },
-  { label: 'Brand Preferences', href: '/dashboard/social/brand', icon: Palette },
-]
 
 function isCurrentMonth(dateStr: string): boolean {
   const date = new Date(dateStr)
@@ -175,9 +163,7 @@ export default function SocialOverviewPage() {
 
   if (totalPosts === 0 && connectedPlatforms === 0) {
     return (
-      <>
-      <SocialUpgradeBanner />
-      <div className="container max-w-4xl mx-auto py-8 px-4 space-y-6">
+      <div className="p-6 space-y-6">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-page-title">Social Dashboard</h1>
           <p className="text-muted-foreground mt-1" data-testid="text-page-subtitle">
@@ -202,41 +188,12 @@ export default function SocialOverviewPage() {
           </CardContent>
         </Card>
 
-        <Card data-testid="card-quick-links-empty">
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: 'Onboarding', href: '/dashboard/social/onboarding', icon: Sparkles },
-                ...QUICK_LINKS,
-                { label: 'All Posts', href: '/dashboard/social/posts', icon: FileText },
-              ].map(link => {
-                const Icon = link.icon
-                return (
-                  <Button
-                    key={link.href}
-                    variant="outline"
-                    asChild
-                    data-testid={`link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
-                  >
-                    <Link href={link.href} className="flex flex-col items-center gap-2 h-auto py-4">
-                      <Icon className="h-5 w-5 text-muted-foreground" />
-                      <span className="text-sm">{link.label}</span>
-                    </Link>
-                  </Button>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
       </div>
-      </>
     )
   }
 
   return (
-    <>
-    <SocialUpgradeBanner />
-    <div className="container max-w-4xl mx-auto py-8 px-4 space-y-6">
+    <div className="p-6 space-y-6">
       <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-page-title">Social Dashboard</h1>
@@ -407,32 +364,6 @@ export default function SocialOverviewPage() {
         </CardContent>
       </Card>
 
-      <Card data-testid="card-quick-links">
-        <CardHeader>
-          <CardTitle className="text-base">Quick Links</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {QUICK_LINKS.map(link => {
-              const Icon = link.icon
-              return (
-                <Button
-                  key={link.href}
-                  variant="outline"
-                  asChild
-                  data-testid={`link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
-                >
-                  <Link href={link.href} className="flex flex-col items-center gap-2 h-auto py-4">
-                    <Icon className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-sm">{link.label}</span>
-                  </Link>
-                </Button>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
     </div>
-    </>
   )
 }

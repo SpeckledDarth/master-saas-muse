@@ -169,7 +169,7 @@ export default function SocialAccountsPage() {
 
   if (moduleDisabled) {
     return (
-      <div className="container mx-auto max-w-4xl py-8 px-4">
+      <div className="p-6">
         <Card>
           <CardHeader>
             <CardTitle data-testid="text-social-disabled-title">Social Module Not Enabled</CardTitle>
@@ -183,7 +183,7 @@ export default function SocialAccountsPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl py-8 px-4">
+    <div className="p-6">
       <div className="flex flex-row items-start justify-between gap-4 flex-wrap mb-6">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-social-title">

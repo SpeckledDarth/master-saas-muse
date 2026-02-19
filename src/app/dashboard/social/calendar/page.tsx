@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Loader2, ChevronLeft, ChevronRight, CalendarDays, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
-import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
 import Link from 'next/link'
 
 interface CalendarPost {
@@ -175,7 +174,7 @@ export default function SocialCalendarPage() {
 
   if (error) {
     return (
-      <div className="container max-w-4xl mx-auto py-8 px-4">
+      <div className="p-6">
         <Card data-testid="error-state-calendar">
           <CardContent className="py-12 text-center">
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -191,9 +190,7 @@ export default function SocialCalendarPage() {
   }
 
   return (
-    <>
-    <SocialUpgradeBanner />
-    <div className="container max-w-4xl mx-auto py-8 px-4 space-y-6">
+    <div className="p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Post Calendar</h1>
         <p className="text-muted-foreground mt-1" data-testid="text-page-description">
@@ -436,6 +433,5 @@ export default function SocialCalendarPage() {
         </>
       )}
     </div>
-    </>
   )
 }
