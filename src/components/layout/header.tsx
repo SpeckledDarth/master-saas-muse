@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { NotificationBell } from '@/components/notification-bell'
 import { UserNav } from '@/components/auth/UserNav'
@@ -23,27 +24,33 @@ function getContrastColor(hex: string): string {
 }
 
 export function Header() {
+  const pathname = usePathname()
   const { settings, loading } = useSettings()
   const branding = settings?.branding
   const { resolvedTheme } = useTheme()
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const isSocialDashboard = pathname?.startsWith('/dashboard/social')
 
-  // Handle scroll detection for header effects
   useEffect(() => {
+    if (isSocialDashboard) return
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll() // Check initial state
+    handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [isSocialDashboard])
 
-  // Trigger mount animation after component mounts
   useEffect(() => {
+    if (isSocialDashboard) return
     const timer = setTimeout(() => setMounted(true), 100)
     return () => clearTimeout(timer)
-  }, [])
+  }, [isSocialDashboard])
+
+  if (isSocialDashboard) {
+    return null
+  }
 
   const logoHeight = branding?.logoHeight ?? 40
   const logoHoverEffect = branding?.logoHoverEffect ?? true

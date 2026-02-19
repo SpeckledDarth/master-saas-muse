@@ -3,6 +3,7 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { SocialSidebar } from '@/components/social/social-sidebar'
 import { SocialUpgradeBanner } from '@/components/social-upgrade-banner'
+import { QuickGenerateFab } from '@/components/social/quick-generate-fab'
 
 export default function SocialDashboardLayout({
   children,
@@ -29,6 +30,7 @@ export default function SocialDashboardLayout({
           </main>
         </div>
       </div>
+      <QuickGenerateFab />
     </SidebarProvider>
   )
 }

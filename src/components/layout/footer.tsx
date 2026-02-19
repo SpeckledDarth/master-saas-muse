@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { usePathname } from "next/navigation"
 import { useSettings } from "@/hooks/use-settings"
 import { cn } from "@/lib/utils"
 import { SiX, SiLinkedin, SiGithub } from "react-icons/si"
@@ -17,7 +18,12 @@ function getContrastColor(hex: string): string {
 }
 
 export function Footer() {
+  const pathname = usePathname()
   const { settings, loading } = useSettings()
+
+  if (pathname?.startsWith('/dashboard/social')) {
+    return null
+  }
   
   if (loading || !settings) {
     return (

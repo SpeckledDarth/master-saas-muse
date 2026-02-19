@@ -12,6 +12,8 @@ import {
   Link2,
   Settings,
   Sparkles,
+  ArrowLeft,
+  ExternalLink,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -102,7 +104,7 @@ export function SocialSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-4 space-y-1">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -117,6 +119,26 @@ export function SocialSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        <div className="border-t pt-2 mt-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild data-testid="nav-back-dashboard">
+                <Link href="/dashboard">
+                  <ArrowLeft className="h-4 w-4" />
+                  <span>Back to Dashboard</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild data-testid="nav-back-main-site">
+                <Link href="/">
+                  <ExternalLink className="h-4 w-4" />
+                  <span>Main Site</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </div>
       </SidebarFooter>
     </Sidebar>
   )
