@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Loader2, ChevronLeft, ChevronRight, CalendarDays, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
+import { DEMO_POSTS } from '@/lib/social/demo-data'
 
 interface CalendarPost {
   id: string
@@ -74,12 +75,17 @@ export default function SocialCalendarPage() {
   const fetchPosts = useCallback(async () => {
     try {
       const res = await fetch('/api/social/posts?limit=200')
-      if (!res.ok) { setPosts([]); setLoading(false); return }
+      if (!res.ok) {
+        setPosts(DEMO_POSTS as unknown as CalendarPost[])
+        setLoading(false)
+        return
+      }
       let data
       try { data = await res.json() } catch { data = {} }
-      setPosts(data.posts || [])
+      const realPosts = data.posts || []
+      setPosts(realPosts.length > 0 ? realPosts : DEMO_POSTS as unknown as CalendarPost[])
     } catch {
-      setPosts([])
+      setPosts(DEMO_POSTS as unknown as CalendarPost[])
     } finally {
       setLoading(false)
     }

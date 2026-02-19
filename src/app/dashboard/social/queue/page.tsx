@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Loader2, Check, X as XIcon, Edit2, Send, Clock, Sparkles, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
+import { DEMO_POSTS } from '@/lib/social/demo-data'
 
 interface QueuePost {
   id: string
@@ -47,12 +48,18 @@ export default function ApprovalQueuePage() {
   const fetchQueue = useCallback(async () => {
     try {
       const res = await fetch('/api/social/posts?status=draft&limit=50')
-      if (!res.ok) { setPosts([]); setLoading(false); return }
+      const demoDrafts = DEMO_POSTS.filter(p => p.status === 'draft') as unknown as QueuePost[]
+      if (!res.ok) {
+        setPosts(demoDrafts)
+        setLoading(false)
+        return
+      }
       let data
       try { data = await res.json() } catch { data = {} }
-      setPosts(data.posts || [])
+      const realPosts = data.posts || []
+      setPosts(realPosts.length > 0 ? realPosts : demoDrafts)
     } catch {
-      setPosts([])
+      setPosts(DEMO_POSTS.filter(p => p.status === 'draft') as unknown as QueuePost[])
     } finally {
       setLoading(false)
     }

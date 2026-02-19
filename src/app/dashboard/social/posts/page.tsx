@@ -14,6 +14,7 @@ import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Facebook, Trash2, Ed
 import { useToast } from '@/hooks/use-toast'
 import { PostPreview } from '@/components/social/post-preview'
 import { BulkImport } from '@/components/social/bulk-import'
+import { DEMO_POSTS } from '@/lib/social/demo-data'
 
 type PostStatus = 'draft' | 'scheduled' | 'posting' | 'posted' | 'failed'
 
@@ -103,12 +104,17 @@ export default function SocialPostsPage() {
         setLoading(false)
         return
       }
-      if (!res.ok) { setPosts([]); setLoading(false); return }
+      if (!res.ok) {
+        setPosts(DEMO_POSTS as unknown as SocialPost[])
+        setLoading(false)
+        return
+      }
       let data
       try { data = await res.json() } catch { data = {} }
-      setPosts(data.posts || [])
+      const realPosts = data.posts || []
+      setPosts(realPosts.length > 0 ? realPosts : DEMO_POSTS as unknown as SocialPost[])
     } catch {
-      setPosts([])
+      setPosts(DEMO_POSTS as unknown as SocialPost[])
     } finally {
       setLoading(false)
     }
