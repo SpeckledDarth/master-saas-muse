@@ -20,16 +20,18 @@ interface CalendarPost {
   created_at: string
 }
 
-const PLATFORM_DOT_CLASS: Record<string, string> = {
-  twitter: 'bg-chart-1',
-  linkedin: 'bg-chart-2',
-  facebook: 'bg-chart-3',
+function getPlatformDotClass(platform: string): string {
+  if (platform === 'twitter') return 'bg-chart-1'
+  if (platform === 'linkedin') return 'bg-chart-2'
+  if (platform === 'facebook') return 'bg-chart-3'
+  return 'bg-muted-foreground'
 }
 
-const PLATFORM_BADGE_CLASS: Record<string, string> = {
-  twitter: 'text-chart-1 border-chart-1',
-  linkedin: 'text-chart-2 border-chart-2',
-  facebook: 'text-chart-3 border-chart-3',
+function getPlatformBadgeClass(platform: string): string {
+  if (platform === 'twitter') return 'text-chart-1 border-chart-1'
+  if (platform === 'linkedin') return 'text-chart-2 border-chart-2'
+  if (platform === 'facebook') return 'text-chart-3 border-chart-3'
+  return ''
 }
 
 const PLATFORM_NAMES: Record<string, string> = {
@@ -71,7 +73,7 @@ export default function SocialCalendarPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentDate, setCurrentDate] = useState(() => new Date())
-  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedDate, setSelectedDate] = useState<string | null>(() => toDateKey(new Date()))
   const [platformFilter, setPlatformFilter] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month')
   const { toast } = useToast()
@@ -361,7 +363,7 @@ export default function SocialCalendarPage() {
                           {uniquePlatforms.slice(0, 4).map(platform => (
                             <span
                               key={platform}
-                              className={`block h-2 w-2 rounded-full ${PLATFORM_DOT_CLASS[platform] || 'bg-muted-foreground'}`}
+                              className={`block h-2 w-2 rounded-full ${getPlatformDotClass(platform)}`}
                               data-testid={`dot-platform-${dateKey}-${platform}`}
                             />
                           ))}
@@ -397,7 +399,7 @@ export default function SocialCalendarPage() {
                           ).map(([platform, count]) => (
                             <div key={platform} className="flex items-center gap-1">
                               <span
-                                className={`block h-1.5 w-1.5 flex-shrink-0 rounded-full ${PLATFORM_DOT_CLASS[platform] || 'bg-muted-foreground'}`}
+                                className={`block h-1.5 w-1.5 flex-shrink-0 rounded-full ${getPlatformDotClass(platform)}`}
                               />
                               <span>{count} {PLATFORM_NAMES[platform] || platform}</span>
                             </div>
@@ -406,7 +408,7 @@ export default function SocialCalendarPage() {
                         {dayPosts.slice(0, 3).map(post => (
                           <div key={post.id} className="flex items-start gap-1.5">
                             <span
-                              className={`mt-1 block h-1.5 w-1.5 flex-shrink-0 rounded-full ${PLATFORM_DOT_CLASS[post.platform] || 'bg-muted-foreground'}`}
+                              className={`mt-1 block h-1.5 w-1.5 flex-shrink-0 rounded-full ${getPlatformDotClass(post.platform)}`}
                             />
                             <span className="line-clamp-1">{post.content}</span>
                           </div>
@@ -446,7 +448,7 @@ export default function SocialCalendarPage() {
                       >
                         <Badge
                           variant="outline"
-                          className={`shrink-0 ${PLATFORM_BADGE_CLASS[post.platform] || ''}`}
+                          className={`shrink-0 ${getPlatformBadgeClass(post.platform)}`}
                           data-testid={`badge-platform-${post.id}`}
                         >
                           {PLATFORM_NAMES[post.platform] || post.platform}
@@ -517,7 +519,7 @@ export default function SocialCalendarPage() {
                           <div className="space-y-1.5">
                             {dayPosts.map(post => (
                               <div key={post.id} className="flex items-center gap-2 text-xs">
-                                <span className={`block h-2 w-2 rounded-full shrink-0 ${PLATFORM_DOT_CLASS[post.platform] || 'bg-muted-foreground'}`} />
+                                <span className={`block h-2 w-2 rounded-full shrink-0 ${getPlatformDotClass(post.platform)}`} />
                                 <span className="truncate flex-1">{post.content}</span>
                                 <Badge variant={STATUS_VARIANT[post.status] || 'outline'} className="text-xs shrink-0">{post.status}</Badge>
                               </div>
