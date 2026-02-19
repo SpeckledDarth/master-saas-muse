@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Loader2, BarChart3, TrendingUp, Users, Sparkles, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -179,6 +180,12 @@ export default function EngagementAnalyticsPage() {
     }))
     .sort((a, b) => b.avg - a.avg)
 
+  const aiPosts = posts.filter(p => p.ai_generated)
+  const manualPosts = posts.filter(p => !p.ai_generated)
+  const aiAvgEng = aiPosts.length > 0 ? Math.round(aiPosts.reduce((s, p) => s + getEngagementTotal(p.engagement_data), 0) / aiPosts.length) : 0
+  const manualAvgEng = manualPosts.length > 0 ? Math.round(manualPosts.reduce((s, p) => s + getEngagementTotal(p.engagement_data), 0) / manualPosts.length) : 0
+  const winner = aiAvgEng > manualAvgEng ? 'ai' : manualAvgEng > aiAvgEng ? 'manual' : 'tie'
+
   return (
     <div className="p-6 space-y-6">
       <div>
@@ -313,6 +320,50 @@ export default function EngagementAnalyticsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card data-testid="card-ai-vs-manual">
+        <CardHeader>
+          <CardTitle className="text-base">AI vs. Manual Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className={`p-4 rounded-md border ${winner === 'ai' ? 'ring-2 ring-primary' : ''}`} data-testid="section-ai-performance">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">AI-Generated</span>
+                {winner === 'ai' && <Badge variant="default" className="text-xs">Top Performer</Badge>}
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">Posts</span>
+                  <span className="text-sm font-medium" data-testid="text-ai-post-count">{aiPosts.length}</span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">Avg. Engagement</span>
+                  <span className="text-sm font-medium" data-testid="text-ai-avg-engagement">{aiAvgEng.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+            <div className={`p-4 rounded-md border ${winner === 'manual' ? 'ring-2 ring-primary' : ''}`} data-testid="section-manual-performance">
+              <div className="flex items-center gap-2 mb-3">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Manually Written</span>
+                {winner === 'manual' && <Badge variant="default" className="text-xs">Top Performer</Badge>}
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">Posts</span>
+                  <span className="text-sm font-medium" data-testid="text-manual-post-count">{manualPosts.length}</span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">Avg. Engagement</span>
+                  <span className="text-sm font-medium" data-testid="text-manual-avg-engagement">{manualAvgEng.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
     </div>
   )

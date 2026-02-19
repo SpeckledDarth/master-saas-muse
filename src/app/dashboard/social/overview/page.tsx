@@ -15,7 +15,10 @@ import {
   Shield,
   Bell,
   TrendingUp,
+  Plus,
+  Clock,
 } from 'lucide-react'
+import { PlatformIconCircle } from '@/components/social/platform-icon'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
@@ -205,6 +208,14 @@ export default function SocialOverviewPage() {
             </p>
           </div>
         </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button asChild data-testid="button-quick-create">
+            <Link href="/dashboard/social/posts"><Plus className="mr-2 h-4 w-4" />Create Post</Link>
+          </Button>
+          <Button variant="outline" asChild data-testid="button-quick-schedule">
+            <Link href="/dashboard/social/calendar"><Clock className="mr-2 h-4 w-4" />Schedule Post</Link>
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -313,9 +324,7 @@ export default function SocialOverviewPage() {
                     data-testid={`account-${account.id}`}
                   >
                     <div className="relative">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-                        <span className="text-xs font-bold uppercase">{account.platform.slice(0, 2)}</span>
-                      </div>
+                      <PlatformIconCircle platform={account.platform} />
                       <span
                         className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background ${account.is_valid !== false ? 'bg-chart-2' : 'bg-destructive'}`}
                         data-testid={`status-dot-${account.id}`}
@@ -370,6 +379,33 @@ export default function SocialOverviewPage() {
         </Card>
       </div>
 
+      <Card data-testid="card-best-times">
+        <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
+          <CardTitle className="text-base">Best Times to Post</CardTitle>
+          <Clock className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3" data-testid="list-best-times">
+            {[
+              { platform: 'twitter', day: 'Tue & Thu', time: '9:00 AM - 11:00 AM', engagement: 'High' },
+              { platform: 'facebook', day: 'Wed & Fri', time: '12:00 PM - 2:00 PM', engagement: 'High' },
+              { platform: 'linkedin', day: 'Tue & Wed', time: '8:00 AM - 10:00 AM', engagement: 'Medium' },
+            ].map(slot => (
+              <div key={slot.platform} className="flex items-center gap-3 p-2.5 rounded-md border" data-testid={`best-time-${slot.platform}`}>
+                <PlatformIconCircle platform={slot.platform} size="sm" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium">{slot.day}</p>
+                  <p className="text-xs text-muted-foreground">{slot.time}</p>
+                </div>
+                <Badge variant={slot.engagement === 'High' ? 'default' : 'secondary'} className="text-xs shrink-0" data-testid={`badge-engagement-${slot.platform}`}>
+                  {slot.engagement}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {recentPosts.length > 0 && (
         <Card data-testid="card-recent-activity">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
@@ -388,9 +424,7 @@ export default function SocialOverviewPage() {
                     className="flex items-start gap-3 p-3 rounded-md border"
                     data-testid={`recent-post-${post.id}`}
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
-                      <span className="text-[10px] font-bold uppercase">{post.platform.slice(0, 2)}</span>
-                    </div>
+                    <PlatformIconCircle platform={post.platform} size="sm" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm line-clamp-2">{post.content}</p>
                       <div className="flex items-center gap-2 mt-1 flex-wrap">

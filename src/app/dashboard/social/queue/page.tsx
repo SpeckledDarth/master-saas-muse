@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, Check, X as XIcon, Edit2, Send, Clock, Sparkles, AlertCircle } from 'lucide-react'
+import { Loader2, Check, X as XIcon, Edit2, Send, Clock, Sparkles, AlertCircle, FileText } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { DEMO_POSTS } from '@/lib/social/demo-data'
@@ -158,7 +158,11 @@ export default function ApprovalQueuePage() {
       {posts.length === 0 ? (
         <Card data-testid="empty-state-queue">
           <CardContent className="py-12 text-center">
-            <Clock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <div className="flex items-center justify-center gap-2 mb-4" data-testid="empty-icon-composition">
+              <Clock className="h-8 w-8 text-muted-foreground/40" />
+              <Check className="h-12 w-12 text-muted-foreground" />
+              <FileText className="h-8 w-8 text-muted-foreground/40" />
+            </div>
             <h3 className="text-lg font-medium" data-testid="text-empty-queue">Queue is empty</h3>
             <p className="text-muted-foreground mt-1">
               No posts waiting for review. AI-generated posts will appear here when approval is required.

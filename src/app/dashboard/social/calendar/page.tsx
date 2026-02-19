@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Loader2, ChevronLeft, ChevronRight, CalendarDays, AlertCircle } from 'lucide-react'
+import { Loader2, ChevronLeft, ChevronRight, CalendarDays, AlertCircle, List, Clock, Send } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { DEMO_POSTS } from '@/lib/social/demo-data'
@@ -20,10 +20,16 @@ interface CalendarPost {
   created_at: string
 }
 
-const PLATFORM_COLORS: Record<string, string> = {
-  twitter: '#1DA1F2',
-  linkedin: '#0A66C2',
-  facebook: '#1877F2',
+const PLATFORM_DOT_CLASS: Record<string, string> = {
+  twitter: 'bg-chart-1',
+  linkedin: 'bg-chart-2',
+  facebook: 'bg-chart-3',
+}
+
+const PLATFORM_BADGE_CLASS: Record<string, string> = {
+  twitter: 'text-chart-1 border-chart-1',
+  linkedin: 'text-chart-2 border-chart-2',
+  facebook: 'text-chart-3 border-chart-3',
 }
 
 const PLATFORM_NAMES: Record<string, string> = {
@@ -67,6 +73,7 @@ export default function SocialCalendarPage() {
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [platformFilter, setPlatformFilter] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState<'month' | 'week'>('month')
   const { toast } = useToast()
 
   const currentYear = currentDate.getFullYear()
@@ -152,6 +159,16 @@ export default function SocialCalendarPage() {
     return days
   }, [currentYear, currentMonth])
 
+  const weekDays = useMemo(() => {
+    const start = new Date(currentDate)
+    start.setDate(start.getDate() - start.getDay())
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(start)
+      d.setDate(d.getDate() + i)
+      return d
+    })
+  }, [currentDate])
+
   const todayKey = toDateKey(new Date())
 
   const goToPrevMonth = () => {
@@ -203,6 +220,28 @@ export default function SocialCalendarPage() {
         <p className="text-muted-foreground mt-1" data-testid="text-page-description">
           View your scheduled and published posts on your content calendar
         </p>
+        <div className="flex items-center gap-2 mt-3" data-testid="view-toggle">
+          <Button
+            variant={viewMode === 'month' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('month')}
+            data-testid="button-view-month"
+            className="toggle-elevate"
+          >
+            <CalendarDays className="mr-1.5 h-3.5 w-3.5" />
+            Month
+          </Button>
+          <Button
+            variant={viewMode === 'week' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('week')}
+            data-testid="button-view-week"
+            className="toggle-elevate"
+          >
+            <List className="mr-1.5 h-3.5 w-3.5" />
+            Week
+          </Button>
+        </div>
       </div>
 
       {calendarPosts.length > 0 && (
@@ -232,7 +271,11 @@ export default function SocialCalendarPage() {
       {calendarPosts.length === 0 ? (
         <Card data-testid="empty-state-calendar">
           <CardContent className="py-12 text-center">
-            <CalendarDays className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <div className="flex items-center justify-center gap-3 mb-4" data-testid="empty-icon-composition">
+              <Clock className="h-8 w-8 text-muted-foreground/40" />
+              <CalendarDays className="h-12 w-12 text-muted-foreground" />
+              <Send className="h-8 w-8 text-muted-foreground/40" />
+            </div>
             <h3 className="text-lg font-medium" data-testid="text-empty-calendar">No posts yet</h3>
             <p className="text-muted-foreground mt-1">
               Create and schedule posts to see them on your content calendar.
@@ -244,6 +287,7 @@ export default function SocialCalendarPage() {
         </Card>
       ) : (
         <>
+          {viewMode === 'month' && (
           <Card>
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -317,8 +361,7 @@ export default function SocialCalendarPage() {
                           {uniquePlatforms.slice(0, 4).map(platform => (
                             <span
                               key={platform}
-                              className="block h-2 w-2 rounded-full"
-                              style={{ backgroundColor: PLATFORM_COLORS[platform] || 'hsl(var(--muted-foreground))' }}
+                              className={`block h-2 w-2 rounded-full ${PLATFORM_DOT_CLASS[platform] || 'bg-muted-foreground'}`}
                               data-testid={`dot-platform-${dateKey}-${platform}`}
                             />
                           ))}
@@ -328,6 +371,11 @@ export default function SocialCalendarPage() {
                             </span>
                           )}
                         </div>
+                      )}
+                      {dayPosts.length > 1 && (
+                        <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground" data-testid={`count-${dateKey}`}>
+                          {dayPosts.length}
+                        </span>
                       )}
                     </button>
                   )
@@ -349,8 +397,7 @@ export default function SocialCalendarPage() {
                           ).map(([platform, count]) => (
                             <div key={platform} className="flex items-center gap-1">
                               <span
-                                className="block h-1.5 w-1.5 flex-shrink-0 rounded-full"
-                                style={{ backgroundColor: PLATFORM_COLORS[platform] || 'hsl(var(--muted-foreground))' }}
+                                className={`block h-1.5 w-1.5 flex-shrink-0 rounded-full ${PLATFORM_DOT_CLASS[platform] || 'bg-muted-foreground'}`}
                               />
                               <span>{count} {PLATFORM_NAMES[platform] || platform}</span>
                             </div>
@@ -359,8 +406,7 @@ export default function SocialCalendarPage() {
                         {dayPosts.slice(0, 3).map(post => (
                           <div key={post.id} className="flex items-start gap-1.5">
                             <span
-                              className="mt-1 block h-1.5 w-1.5 flex-shrink-0 rounded-full"
-                              style={{ backgroundColor: PLATFORM_COLORS[post.platform] || 'hsl(var(--muted-foreground))' }}
+                              className={`mt-1 block h-1.5 w-1.5 flex-shrink-0 rounded-full ${PLATFORM_DOT_CLASS[post.platform] || 'bg-muted-foreground'}`}
                             />
                             <span className="line-clamp-1">{post.content}</span>
                           </div>
@@ -376,8 +422,9 @@ export default function SocialCalendarPage() {
               </TooltipProvider>
             </CardContent>
           </Card>
+          )}
 
-          {selectedDate && (
+          {viewMode === 'month' && selectedDate && (
             <Card data-testid="card-selected-day">
               <CardHeader>
                 <CardTitle className="text-base" data-testid="text-selected-date">
@@ -399,11 +446,7 @@ export default function SocialCalendarPage() {
                       >
                         <Badge
                           variant="outline"
-                          className="shrink-0"
-                          style={{
-                            borderColor: PLATFORM_COLORS[post.platform] || undefined,
-                            color: PLATFORM_COLORS[post.platform] || undefined,
-                          }}
+                          className={`shrink-0 ${PLATFORM_BADGE_CLASS[post.platform] || ''}`}
                           data-testid={`badge-platform-${post.id}`}
                         >
                           {PLATFORM_NAMES[post.platform] || post.platform}
@@ -434,6 +477,57 @@ export default function SocialCalendarPage() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          )}
+
+          {viewMode === 'week' && (
+            <Card data-testid="card-week-view">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <Button variant="outline" size="icon" onClick={() => setCurrentDate(new Date(currentDate.getTime() - 7 * 86400000))} data-testid="button-prev-week">
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-lg" data-testid="text-week-range">
+                      {weekDays[0].toLocaleDateString('default', { month: 'short', day: 'numeric' })} - {weekDays[6].toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </CardTitle>
+                    <Button variant="outline" size="sm" onClick={goToToday} data-testid="button-today-week">Today</Button>
+                  </div>
+                  <Button variant="outline" size="icon" onClick={() => setCurrentDate(new Date(currentDate.getTime() + 7 * 86400000))} data-testid="button-next-week">
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2" data-testid="week-list">
+                  {weekDays.map(day => {
+                    const dateKey = toDateKey(day)
+                    const dayPosts = postsByDate[dateKey] || []
+                    const isToday = dateKey === todayKey
+                    return (
+                      <div key={dateKey} className={`p-3 rounded-md border ${isToday ? 'ring-2 ring-primary' : ''}`} data-testid={`week-day-${dateKey}`}>
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <span className="text-sm font-medium">{day.toLocaleDateString('default', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                          <Badge variant="outline" className="text-xs">{dayPosts.length} post{dayPosts.length !== 1 ? 's' : ''}</Badge>
+                        </div>
+                        {dayPosts.length === 0 ? (
+                          <p className="text-xs text-muted-foreground">No posts</p>
+                        ) : (
+                          <div className="space-y-1.5">
+                            {dayPosts.map(post => (
+                              <div key={post.id} className="flex items-center gap-2 text-xs">
+                                <span className={`block h-2 w-2 rounded-full shrink-0 ${PLATFORM_DOT_CLASS[post.platform] || 'bg-muted-foreground'}`} />
+                                <span className="truncate flex-1">{post.content}</span>
+                                <Badge variant={STATUS_VARIANT[post.status] || 'outline'} className="text-xs shrink-0">{post.status}</Badge>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
               </CardContent>
             </Card>
           )}

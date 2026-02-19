@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Facebook, Trash2, Edit, FileText, AlertCircle } from 'lucide-react'
+import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Facebook, Trash2, Edit, FileText, AlertCircle, Heart, MessageCircle, Share2, MousePointerClick } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { PostPreview } from '@/components/social/post-preview'
 import { BulkImport } from '@/components/social/bulk-import'
@@ -31,6 +31,10 @@ interface SocialPost {
   error_message: string | null
   ai_generated: boolean
   created_at: string
+  engagement_likes?: number
+  engagement_shares?: number
+  engagement_comments?: number
+  engagement_clicks?: number
 }
 
 const PLATFORM_LIMITS: Record<string, number> = {
@@ -522,7 +526,11 @@ export default function SocialPostsPage() {
       {posts.length === 0 ? (
         <Card data-testid="empty-state-posts">
           <CardContent className="py-12 text-center">
-            <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <div className="flex items-center justify-center gap-2 mb-4" data-testid="empty-icon-composition">
+              <Twitter className="h-8 w-8 text-muted-foreground/40" />
+              <FileText className="h-12 w-12 text-muted-foreground" />
+              <Linkedin className="h-8 w-8 text-muted-foreground/40" />
+            </div>
             <h3 className="text-lg font-medium" data-testid="text-no-posts">No posts yet</h3>
             <p className="text-muted-foreground mt-1">
               {activeTab === 'all'
@@ -573,6 +581,30 @@ export default function SocialPostsPage() {
                         <p className="text-xs text-destructive mt-1" data-testid={`text-error-${post.id}`}>
                           {post.error_message}
                         </p>
+                      )}
+                      {post.status === 'posted' && (post.engagement_likes || post.engagement_shares || post.engagement_comments || post.engagement_clicks) && (
+                        <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground" data-testid={`engagement-${post.id}`}>
+                          {typeof post.engagement_likes === 'number' && (
+                            <span className="flex items-center gap-1" data-testid={`likes-${post.id}`}>
+                              <Heart className="h-3 w-3" /> {post.engagement_likes.toLocaleString()}
+                            </span>
+                          )}
+                          {typeof post.engagement_comments === 'number' && (
+                            <span className="flex items-center gap-1" data-testid={`comments-${post.id}`}>
+                              <MessageCircle className="h-3 w-3" /> {post.engagement_comments.toLocaleString()}
+                            </span>
+                          )}
+                          {typeof post.engagement_shares === 'number' && (
+                            <span className="flex items-center gap-1" data-testid={`shares-${post.id}`}>
+                              <Share2 className="h-3 w-3" /> {post.engagement_shares.toLocaleString()}
+                            </span>
+                          )}
+                          {typeof post.engagement_clicks === 'number' && (
+                            <span className="flex items-center gap-1" data-testid={`clicks-${post.id}`}>
+                              <MousePointerClick className="h-3 w-3" /> {post.engagement_clicks.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
