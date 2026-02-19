@@ -9,6 +9,8 @@ import { Loader2, ChevronLeft, ChevronRight, CalendarDays, AlertCircle, List, Cl
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { DEMO_POSTS } from '@/lib/social/demo-data'
+import { PostDetailDialog, PostDetailData } from '@/components/social/post-detail-dialog'
+import { PlatformIconCircle } from '@/components/social/platform-icon'
 
 interface CalendarPost {
   id: string
@@ -76,6 +78,7 @@ export default function SocialCalendarPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(() => toDateKey(new Date()))
   const [platformFilter, setPlatformFilter] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month')
+  const [detailPost, setDetailPost] = useState<PostDetailData | null>(null)
   const { toast } = useToast()
 
   const currentYear = currentDate.getFullYear()
@@ -443,16 +446,11 @@ export default function SocialCalendarPage() {
                     {selectedDayPosts.map(post => (
                       <div
                         key={post.id}
-                        className="flex items-start gap-3 p-3 rounded-md border"
+                        className="flex items-start gap-3 p-3 rounded-md border cursor-pointer hover-elevate"
+                        onClick={() => setDetailPost(post)}
                         data-testid={`card-post-${post.id}`}
                       >
-                        <Badge
-                          variant="outline"
-                          className={`shrink-0 ${getPlatformBadgeClass(post.platform)}`}
-                          data-testid={`badge-platform-${post.id}`}
-                        >
-                          {PLATFORM_NAMES[post.platform] || post.platform}
-                        </Badge>
+                        <PlatformIconCircle platform={post.platform} size="sm" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm" data-testid={`text-content-${post.id}`}>
                             {post.content.length > 100
@@ -518,7 +516,7 @@ export default function SocialCalendarPage() {
                         ) : (
                           <div className="space-y-1.5">
                             {dayPosts.map(post => (
-                              <div key={post.id} className="flex items-center gap-2 text-xs">
+                              <div key={post.id} className="flex items-center gap-2 text-xs cursor-pointer hover-elevate rounded-sm p-1 -m-1" onClick={() => setDetailPost(post)}>
                                 <span className={`block h-2 w-2 rounded-full shrink-0 ${getPlatformDotClass(post.platform)}`} />
                                 <span className="truncate flex-1">{post.content}</span>
                                 <Badge variant={STATUS_VARIANT[post.status] || 'outline'} className="text-xs shrink-0">{post.status}</Badge>
@@ -535,6 +533,11 @@ export default function SocialCalendarPage() {
           )}
         </>
       )}
+      <PostDetailDialog
+        post={detailPost}
+        open={!!detailPost}
+        onOpenChange={(open) => { if (!open) setDetailPost(null) }}
+      />
     </div>
   )
 }

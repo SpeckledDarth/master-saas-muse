@@ -9,6 +9,8 @@ import { Loader2, Check, X as XIcon, Edit2, Send, Clock, Sparkles, AlertCircle, 
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { DEMO_POSTS } from '@/lib/social/demo-data'
+import { PlatformIconCircle } from '@/components/social/platform-icon'
+import { PostDetailDialog, PostDetailData } from '@/components/social/post-detail-dialog'
 
 interface QueuePost {
   id: string
@@ -43,6 +45,7 @@ export default function ApprovalQueuePage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [detailPost, setDetailPost] = useState<PostDetailData | null>(null)
   const { toast } = useToast()
 
   const fetchQueue = useCallback(async () => {
@@ -178,10 +181,11 @@ export default function ApprovalQueuePage() {
             {posts.length} post{posts.length !== 1 ? 's' : ''} waiting for review
           </p>
           {posts.map(post => (
-            <Card key={post.id}>
+            <Card key={post.id} className="cursor-pointer hover-elevate" onClick={() => setDetailPost(post as unknown as PostDetailData)}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
+                    <PlatformIconCircle platform={post.platform} size="sm" />
                     <Badge variant="outline" data-testid={`badge-platform-${post.id}`}>
                       {PLATFORM_NAMES[post.platform] || post.platform}
                     </Badge>
@@ -208,6 +212,7 @@ export default function ApprovalQueuePage() {
                   <Textarea
                     value={editContent}
                     onChange={e => setEditContent(e.target.value)}
+                    onClick={e => e.stopPropagation()}
                     className="resize-none"
                     rows={5}
                     data-testid={`textarea-edit-${post.id}`}
@@ -220,7 +225,7 @@ export default function ApprovalQueuePage() {
 
                 <div className="flex items-center gap-2 flex-wrap">
                   <Button
-                    onClick={() => handleAction(post.id, 'approve')}
+                    onClick={(e) => { e.stopPropagation(); handleAction(post.id, 'approve') }}
                     disabled={actionLoading === post.id || editingId === post.id}
                     data-testid={`button-approve-${post.id}`}
                   >
@@ -234,7 +239,7 @@ export default function ApprovalQueuePage() {
 
                   <Button
                     variant="outline"
-                    onClick={() => handleAction(post.id, 'edit')}
+                    onClick={(e) => { e.stopPropagation(); handleAction(post.id, 'edit') }}
                     disabled={actionLoading === post.id}
                     data-testid={`button-edit-${post.id}`}
                   >
@@ -253,7 +258,7 @@ export default function ApprovalQueuePage() {
 
                   <Button
                     variant="ghost"
-                    onClick={() => handleAction(post.id, 'reject')}
+                    onClick={(e) => { e.stopPropagation(); handleAction(post.id, 'reject') }}
                     disabled={actionLoading === post.id || editingId === post.id}
                     data-testid={`button-reject-${post.id}`}
                   >
@@ -264,7 +269,7 @@ export default function ApprovalQueuePage() {
                   {editingId === post.id && (
                     <Button
                       variant="ghost"
-                      onClick={() => { setEditingId(null); setEditContent('') }}
+                      onClick={(e) => { e.stopPropagation(); setEditingId(null); setEditContent('') }}
                       data-testid={`button-cancel-edit-${post.id}`}
                     >
                       Cancel
@@ -276,6 +281,12 @@ export default function ApprovalQueuePage() {
           ))}
         </div>
       )}
+
+      <PostDetailDialog
+        post={detailPost}
+        open={!!detailPost}
+        onOpenChange={(open) => { if (!open) setDetailPost(null) }}
+      />
     </div>
   )
 }

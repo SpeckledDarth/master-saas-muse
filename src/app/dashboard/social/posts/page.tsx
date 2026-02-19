@@ -14,6 +14,8 @@ import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Facebook, Trash2, Ed
 import { useToast } from '@/hooks/use-toast'
 import { PostPreview } from '@/components/social/post-preview'
 import { BulkImport } from '@/components/social/bulk-import'
+import { PlatformIconCircle } from '@/components/social/platform-icon'
+import { PostDetailDialog, PostDetailData } from '@/components/social/post-detail-dialog'
 import { DEMO_POSTS } from '@/lib/social/demo-data'
 
 type PostStatus = 'draft' | 'scheduled' | 'posting' | 'posted' | 'failed'
@@ -61,13 +63,6 @@ function getStatusVariant(status: PostStatus): 'default' | 'secondary' | 'destru
   }
 }
 
-function PlatformIcon({ platform, className }: { platform: string; className?: string }) {
-  if (platform === 'twitter') return <Twitter className={className} />
-  if (platform === 'linkedin') return <Linkedin className={className} />
-  if (platform === 'facebook') return <Facebook className={className} />
-  return <FileText className={className} />
-}
-
 export default function SocialPostsPage() {
   const [posts, setPosts] = useState<SocialPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -97,6 +92,7 @@ export default function SocialPostsPage() {
   const [aiResult, setAiResult] = useState('')
 
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [detailPost, setDetailPost] = useState<PostDetailData | null>(null)
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -542,13 +538,11 @@ export default function SocialPostsPage() {
       ) : (
         <div className="space-y-3">
           {posts.map(post => (
-            <Card key={post.id} data-testid={`card-post-${post.id}`}>
+            <Card key={post.id} className="cursor-pointer hover-elevate" onClick={() => setDetailPost(post)} data-testid={`card-post-${post.id}`}>
               <CardContent className="py-4">
                 <div className="flex flex-row items-start justify-between gap-3 flex-wrap">
                   <div className="flex items-start gap-3 min-w-0 flex-1">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-muted">
-                      <PlatformIcon platform={post.platform} className="h-4 w-4" />
-                    </div>
+                    <PlatformIconCircle platform={post.platform} />
                     <div className="min-w-0 flex-1">
                       <p
                         className="text-sm line-clamp-2"
@@ -613,7 +607,7 @@ export default function SocialPostsPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => openEditDialog(post)}
+                        onClick={(e) => { e.stopPropagation(); openEditDialog(post) }}
                         data-testid={`button-edit-${post.id}`}
                       >
                         <Edit className="h-4 w-4" />
@@ -621,7 +615,7 @@ export default function SocialPostsPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleDelete(post.id)}
+                        onClick={(e) => { e.stopPropagation(); handleDelete(post.id) }}
                         disabled={deleting === post.id}
                         data-testid={`button-delete-${post.id}`}
                       >
@@ -665,6 +659,12 @@ export default function SocialPostsPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <PostDetailDialog
+        post={detailPost}
+        open={!!detailPost}
+        onOpenChange={(open) => { if (!open) setDetailPost(null) }}
+      />
     </div>
   )
 }

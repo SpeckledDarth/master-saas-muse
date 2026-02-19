@@ -19,6 +19,7 @@ import {
   Clock,
 } from 'lucide-react'
 import { PlatformIconCircle } from '@/components/social/platform-icon'
+import { PostDetailDialog, PostDetailData } from '@/components/social/post-detail-dialog'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
@@ -94,6 +95,7 @@ export default function SocialOverviewPage() {
   const [accounts, setAccounts] = useState<SocialAccount[]>([])
   const [recentPosts, setRecentPosts] = useState<SocialPost[]>([])
   const [user, setUser] = useState<User | null>(null)
+  const [detailPost, setDetailPost] = useState<PostDetailData | null>(null)
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
 
   if (typeof window !== 'undefined' && !supabaseRef.current) {
@@ -421,7 +423,8 @@ export default function SocialOverviewPage() {
                 return (
                   <div
                     key={post.id}
-                    className="flex items-start gap-3 p-3 rounded-md border"
+                    className="flex items-start gap-3 p-3 rounded-md border cursor-pointer hover-elevate"
+                    onClick={() => setDetailPost(post as unknown as PostDetailData)}
                     data-testid={`recent-post-${post.id}`}
                   >
                     <PlatformIconCircle platform={post.platform} size="sm" />
@@ -451,6 +454,11 @@ export default function SocialOverviewPage() {
         </Card>
       )}
 
+      <PostDetailDialog
+        post={detailPost}
+        open={!!detailPost}
+        onOpenChange={(open) => { if (!open) setDetailPost(null) }}
+      />
     </div>
   )
 }
