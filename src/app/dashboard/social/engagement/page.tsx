@@ -3,8 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Loader2, BarChart3, TrendingUp, Users, Sparkles, AlertCircle, Target, MessageSquare, ArrowRight } from 'lucide-react'
+import { Loader2, BarChart3, TrendingUp, Users, Sparkles, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import {
   BarChart,
@@ -250,7 +249,7 @@ export default function EngagementAnalyticsPage() {
                   <XAxis dataKey="month" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="count" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -269,7 +268,7 @@ export default function EngagementAnalyticsPage() {
                   <XAxis dataKey="week" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="engagement" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="engagement" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -315,85 +314,6 @@ export default function EngagementAnalyticsPage() {
         </Card>
       </div>
 
-      <Card data-testid="card-lead-tracker">
-        <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
-          <div className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-base">Lead Tracker</CardTitle>
-          </div>
-          <Badge variant="secondary" className="text-xs">3 new</Badge>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            High-intent engagement detected from your recent posts.
-          </p>
-          <div className="space-y-3" data-testid="list-leads">
-            {[
-              {
-                id: 'lead-1',
-                platform: 'facebook',
-                name: 'Sarah M.',
-                snippet: 'How much would it cost to do a full bathroom remodel? We have a small space but want to make it modern.',
-                signal: 'Price inquiry',
-                time: '3 hours ago',
-                suggestedReply: "Hi Sarah! I'd love to help with your bathroom remodel. Could you send me a few photos of the space? I can give you a free estimate within 24 hours.",
-              },
-              {
-                id: 'lead-2',
-                platform: 'twitter',
-                name: '@HomeOwnerJake',
-                snippet: "This is exactly what I need! Do you service the Brooklyn area? I've been looking for someone reliable.",
-                signal: 'Service area check',
-                time: '8 hours ago',
-                suggestedReply: "Yes, we cover all of Brooklyn! DM me your address and I'll get you on the schedule. First consultation is free.",
-              },
-              {
-                id: 'lead-3',
-                platform: 'linkedin',
-                name: 'Michael R.',
-                snippet: 'Great post. We manage 12 rental properties and need ongoing maintenance help. Can we discuss a contract?',
-                signal: 'Bulk/contract inquiry',
-                time: '1 day ago',
-                suggestedReply: "Michael, that sounds like a great fit! I'd love to discuss a property management maintenance plan. Can we set up a call this week?",
-              },
-            ].map(lead => (
-              <div
-                key={lead.id}
-                className="rounded-md border p-4 space-y-2"
-                data-testid={`lead-${lead.id}`}
-              >
-                <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs capitalize">{lead.platform}</Badge>
-                    <span className="text-sm font-medium">{lead.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="default" className="text-xs">{lead.signal}</Badge>
-                    <span className="text-xs text-muted-foreground">{lead.time}</span>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <MessageSquare className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <p className="text-sm">{lead.snippet}</p>
-                </div>
-                <div className="rounded-md bg-muted p-3">
-                  <p className="text-xs text-muted-foreground mb-1 font-medium">Suggested Reply</p>
-                  <p className="text-sm">{lead.suggestedReply}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button size="sm" data-testid={`button-reply-${lead.id}`}>
-                    <ArrowRight className="mr-1 h-3 w-3" />
-                    Reply
-                  </Button>
-                  <Button variant="outline" size="sm" data-testid={`button-dismiss-${lead.id}`}>
-                    Dismiss
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

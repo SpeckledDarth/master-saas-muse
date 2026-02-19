@@ -8,6 +8,7 @@ import {
   Clock,
   CalendarDays,
   BarChart3,
+  Target,
   Palette,
   Link2,
   Settings,
@@ -43,6 +44,7 @@ const NAV_ITEMS = [
     group: 'Insights',
     items: [
       { title: 'Engagement', href: '/dashboard/social/engagement', icon: BarChart3 },
+      { title: 'Leads', href: '/dashboard/social/leads', icon: Target },
     ],
   },
   {

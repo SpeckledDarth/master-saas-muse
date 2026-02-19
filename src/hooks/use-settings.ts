@@ -191,6 +191,23 @@ function applyShadeScale(root: HTMLElement, prefix: string, hex: string) {
   }
 }
 
+function applyChartColors(root: HTMLElement, primaryHex: string, isDark: boolean) {
+  const scale = generateShadeScaleHsl(primaryHex)
+  if (isDark) {
+    root.style.setProperty('--chart-1', scale['400'] || '')
+    root.style.setProperty('--chart-2', scale['300'] || '')
+    root.style.setProperty('--chart-3', scale['500'] || '')
+    root.style.setProperty('--chart-4', scale['200'] || '')
+    root.style.setProperty('--chart-5', scale['600'] || '')
+  } else {
+    root.style.setProperty('--chart-1', scale['500'] || '')
+    root.style.setProperty('--chart-2', scale['400'] || '')
+    root.style.setProperty('--chart-3', scale['600'] || '')
+    root.style.setProperty('--chart-4', scale['300'] || '')
+    root.style.setProperty('--chart-5', scale['700'] || '')
+  }
+}
+
 function loadGoogleFont(fontName: string) {
   if (fontName === 'system' || typeof document === 'undefined') return
   const id = `gfont-${fontName.replace(/\s+/g, '-')}`
@@ -228,6 +245,7 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
         root.style.setProperty('--primary-foreground', getContrastForeground(settings.branding.primaryColor))
       }
       applyShadeScale(root, 'primary', settings.branding.primaryColor)
+      applyChartColors(root, settings.branding.primaryColor, isDark)
     }
     if (settings.branding.accentColor) {
       applyShadeScale(root, 'accent', settings.branding.accentColor)
@@ -302,6 +320,7 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
           root.style.setProperty('--primary-foreground', getContrastForeground(settings.branding.primaryColor))
         }
         applyShadeScale(root, 'primary', settings.branding.primaryColor)
+        applyChartColors(root, settings.branding.primaryColor, isDark)
       }
       
       if (settings.branding.accentColor) {
