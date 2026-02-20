@@ -22,7 +22,12 @@ These docs describe **PassivePost** — the first product built on MuseKit. When
 
 | Document | Purpose |
 |----------|---------|
-| `PRODUCT_GUIDE.md` | What PassivePost is, who it's for, features, tiers, architecture |
+| `OVERVIEW.md` | Elevator pitch, target audience, pricing, differentiators — great for sharing with other AIs |
+| `FEATURES.md` | Deep dive into every feature with mechanics and details |
+| `ARCHITECTURE.md` | Technical blueprint: database schema, API routes, OAuth flows, queue system |
+| `SITEMAP.md` | Every page, route, and API endpoint in the application |
+| `USER_GUIDE.md` | Step-by-step guide for end users |
+| `PRODUCT_GUIDE.md` | Original comprehensive reference (all-in-one) |
 | `BLOG_PUBLISHING.md` | Blog publishing feature: platforms, cross-linking, SEO, content series |
 | `ROADMAP.md` | PassivePost-specific feature roadmap and implementation phases |
 

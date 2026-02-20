@@ -545,4 +545,20 @@ The data model already supports post approval workflows. A future UI will allow 
 
 ---
 
-*Last Updated: February 19, 2026*
+## 20. Related Documentation
+
+This Product Guide is the original comprehensive reference. For focused documentation, see:
+
+| Document | What It Covers |
+|----------|---------------|
+| [OVERVIEW.md](./OVERVIEW.md) | Elevator pitch, target audience, pricing, differentiators — ideal for sharing with AI assistants or non-technical stakeholders |
+| [FEATURES.md](./FEATURES.md) | Deep dive into every feature with mechanics and details |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Technical blueprint: database schema, API routes, OAuth flows, queue system |
+| [SITEMAP.md](./SITEMAP.md) | Every page, route, and API endpoint in the application |
+| [USER_GUIDE.md](./USER_GUIDE.md) | Step-by-step guide for end users |
+| [BLOG_PUBLISHING.md](./BLOG_PUBLISHING.md) | Blog cross-posting feature details (coming soon) |
+| [ROADMAP.md](./ROADMAP.md) | PassivePost-specific feature roadmap |
+
+---
+
+*Last Updated: February 20, 2026*
