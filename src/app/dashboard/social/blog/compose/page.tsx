@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -48,7 +48,15 @@ function SeoPreview({ title, description, slug }: { title: string; description: 
   )
 }
 
-export default function BlogComposePage() {
+export default function BlogComposePageWrapper() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></div>}>
+      <BlogComposePage />
+    </Suspense>
+  )
+}
+
+function BlogComposePage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const editId = searchParams.get('edit')
