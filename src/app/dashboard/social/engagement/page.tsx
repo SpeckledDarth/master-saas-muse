@@ -17,6 +17,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import { ThemedChartTooltip } from '@/components/ui/chart-tooltip'
 import { HelpTooltip } from '@/components/social/help-tooltip'
 
 interface SocialPost {
@@ -256,7 +257,7 @@ export default function EngagementAnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="month" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip />
+                  <Tooltip content={<ThemedChartTooltip valueLabel="count" />} cursor={{ fill: 'hsl(var(--primary) / 0.1)' }} />
                   <Bar dataKey="count" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -275,7 +276,7 @@ export default function EngagementAnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="week" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip />
+                  <Tooltip content={<ThemedChartTooltip valueLabel="engagement" />} cursor={{ stroke: 'hsl(var(--primary) / 0.3)' }} />
                   <Line type="monotone" dataKey="engagement" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
@@ -294,7 +295,7 @@ export default function EngagementAnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="platform" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip />
+                  <Tooltip content={<ThemedChartTooltip valueLabel="count" />} cursor={{ fill: 'hsl(var(--primary) / 0.1)' }} />
                   <Bar dataKey="count" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -313,7 +314,7 @@ export default function EngagementAnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="platform" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip />
+                  <Tooltip content={<ThemedChartTooltip valueLabel="avg" />} cursor={{ fill: 'hsl(var(--primary) / 0.1)' }} />
                   <Bar dataKey="avg" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

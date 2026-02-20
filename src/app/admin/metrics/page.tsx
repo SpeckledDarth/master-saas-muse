@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Loader2, Users, DollarSign, CreditCard, UserPlus, MessageSquare, ListChecks, TrendingDown, Target, ThumbsUp, BarChart3, Send, Bell } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { ThemedChartTooltip } from '@/components/ui/chart-tooltip'
 
 interface MetricsData {
   totalUsers: number
@@ -289,7 +290,7 @@ export default function MetricsPage() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="date" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip />
+                  <Tooltip content={<ThemedChartTooltip valueLabel="users" />} cursor={{ stroke: 'hsl(var(--primary) / 0.3)' }} />
                   <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
@@ -309,7 +310,7 @@ export default function MetricsPage() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="date" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip />
+                  <Tooltip content={<ThemedChartTooltip valueLabel="revenue" valueFormatter={(v) => `$${v.toLocaleString()}`} />} cursor={{ stroke: 'hsl(var(--primary) / 0.3)' }} />
                   <Line type="monotone" dataKey="amount" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
