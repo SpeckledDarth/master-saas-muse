@@ -42,6 +42,7 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **Product Registry**: Supports multiple SaaS products via `muse_products` and `muse_product_subscriptions` tables. Each product registers with its own Stripe product ID, metadata, and tier definitions, enabling product-scoped checkout, webhook routing, and feature gating.
 
 - **Blog Publishing**: Cross-platform blog posting system with SEO preview, Markdown editor, repurpose engine (AI blog-to-social snippets), and calendar integration. Supports Medium, WordPress, Ghost, LinkedIn Articles, and Substack (beta). Database tables in `migrations/extensions/003_blog_publishing_tables.sql`. API routes at `src/app/api/social/blog/`. UI pages at `src/app/dashboard/social/blog/`. Full docs in `docs/passivepost/BLOG_PUBLISHING.md`.
+- **Flywheel Master Plan**: 38-feature, 7-phase roadmap for content flywheel metrics, intelligence, automation, ROI, and collaboration. **READ `docs/passivepost/FLYWHEEL_MASTER_PLAN.md` AT SESSION START** to resume where we left off. Phases: (1) Flywheel Foundation, (2) Content Intelligence, (3) Advanced Automation, (4) Distribution Intelligence, (5) Revenue & ROI, (6) Engagement & Retention, (7) Collaboration.
 
 **Design Rules for Product Extensions (Merge-Friendly Architecture):**
 - Product-specific files should be added, not modify core files.

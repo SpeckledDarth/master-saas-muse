@@ -30,6 +30,7 @@ These docs describe **PassivePost** — the first product built on MuseKit. When
 | `PRODUCT_GUIDE.md` | Original comprehensive reference (all-in-one) |
 | `BLOG_PUBLISHING.md` | Blog publishing feature: platforms, cross-linking, SEO, content series |
 | `ROADMAP.md` | PassivePost-specific feature roadmap and implementation phases |
+| `FLYWHEEL_MASTER_PLAN.md` | **READ THIS FIRST** — Complete 38-feature, 7-phase plan for flywheel metrics, content intelligence, automation, ROI tracking, and collaboration features |
 
 ## When Cloning MuseKit for a New Product
 
