@@ -1,0 +1,58 @@
+High-Impact, Low-Effort (Add Now if Possible — Quick Wins)
+
+Gig Lead Notifications:
+Auto-scan mentions/replies for "need [niche]" keywords (e.g., "need magician in NYC") via n8n. Alert via email/push with "Reply Now" link.
+Why: Turns passive into active leads — huge USP for giggers.
+Effort: Extend alert-and-approve workflow; use X/FB search APIs (already stubbed).
+Upsell: Premium gets priority alerts + auto-reply templates.
+
+Hashtag Optimizer:
+AI-suggest 3–5 hashtags per post based on niche/location/trends (pull from X trends).
+Why: Boosts reach without manual research — giggers hate hashtag hunts.
+Effort: Add to buildSocialPrompt() or separate endpoint; low-code.
+Upsell: Basic+ gets unlimited; Free limited to 3.
+
+Post Performance Tips:
+After pulling engagement (BullMQ job), AI-analyze low-performers (e.g., "This post got low likes — try shorter captions next time"). Show in engagement dashboard.
+Why: "Coaching" USP — makes users better over time, increases retention.
+Effort: Grok prompt on engagement_data JSONB; add card in dashboard.
+Upsell: Premium gets personalized weekly summaries.
+
+
+Medium-Impact, Medium-Effort (Add Post-Beta if Users Ask)
+
+Content Repurposer:
+Take one post → AI-gen variants for other platforms (e.g., short tweet → longer LinkedIn).
+Why: Saves time for cross-posting — giggers want one idea, many channels.
+Effort: New dialog in queue/editor; extend AI pipeline.
+USP: "One post, everywhere" flywheel.
+
+Local Event Scanner:
+n8n cron scans FB events/X for niche-relevant local happenings (e.g., "kids party in NYC" for magicians) → gen promo post.
+Why: Proactive leads — turns "passive" into "opportunity-spotter."
+Effort: New workflow template; use location from prefs.
+Upsell: Premium gets daily scans vs. weekly.
+
+Collaborator Mode:
+Invite 1–2 team members (e.g., VA for approvals) on Premium.
+Why: For growing giggers who hire help — adds B2B angle without complexity.
+Effort: Leverage MuseKit orgs; add RLS for shared queues.
+USP: "Scale your passive empire."
+
+
+High-Impact, Higher-Effort (Roadmap for $2K MRR+)
+
+Blog Cross-Poster (Already in Dev):
+Expand to full flywheel: AI-gen blog outline from social post → publish to Medium/WordPress → auto-snippets back to social.
+Why: That "passive post" name upside — content marketing loop.
+USP: "Social to blog to leads — all passive."
+
+AI Voice Fine-Tuner:
+Upload 5–10 sample posts → Grok analyzes/creates custom prompt template.
+Why: Next-level personalization — giggers get "my exact voice."
+USP: "AI that sounds like you, not a bot."
+
+Lead CRM Mini:
+Simple CRM in leads page: Tag contacts, add notes, export CSV.
+Why: Turns mentions into trackable sales (e.g., "magician needed" → follow-up).
+USP: "From post to paying gig."
