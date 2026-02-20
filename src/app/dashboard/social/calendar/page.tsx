@@ -27,6 +27,7 @@ function getPlatformDotClass(platform: string): string {
   if (platform === 'twitter') return 'bg-chart-1'
   if (platform === 'linkedin') return 'bg-chart-2'
   if (platform === 'facebook') return 'bg-chart-3'
+  if (platform === 'blog') return 'bg-chart-4'
   return 'bg-muted-foreground'
 }
 
@@ -34,6 +35,7 @@ function getPlatformBadgeClass(platform: string): string {
   if (platform === 'twitter') return 'text-chart-1 border-chart-1'
   if (platform === 'linkedin') return 'text-chart-2 border-chart-2'
   if (platform === 'facebook') return 'text-chart-3 border-chart-3'
+  if (platform === 'blog') return 'text-chart-4 border-chart-4'
   return ''
 }
 
@@ -48,6 +50,7 @@ const PLATFORM_NAMES: Record<string, string> = {
   pinterest: 'Pinterest',
   snapchat: 'Snapchat',
   discord: 'Discord',
+  blog: 'Blog Article',
 }
 
 const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -87,16 +90,37 @@ export default function SocialCalendarPage() {
 
   const fetchPosts = useCallback(async () => {
     try {
-      const res = await fetch('/api/social/posts?limit=200')
-      if (!res.ok) {
-        setPosts(DEMO_POSTS as unknown as CalendarPost[])
-        setLoading(false)
-        return
+      const [socialRes, blogRes] = await Promise.all([
+        fetch('/api/social/posts?limit=200'),
+        fetch('/api/social/blog/posts?limit=200').catch(() => null),
+      ])
+
+      let socialPosts: CalendarPost[] = []
+      if (socialRes.ok) {
+        let data
+        try { data = await socialRes.json() } catch { data = {} }
+        socialPosts = data.posts || []
       }
-      let data
-      try { data = await res.json() } catch { data = {} }
-      const realPosts = data.posts || []
-      setPosts(realPosts.length > 0 ? realPosts : DEMO_POSTS as unknown as CalendarPost[])
+
+      let blogPosts: CalendarPost[] = []
+      if (blogRes && blogRes.ok) {
+        try {
+          const blogData = await blogRes.json()
+          const statusMap: Record<string, string> = { published: 'posted', publishing: 'posting' }
+          blogPosts = (blogData.posts || []).map((bp: any) => ({
+            id: bp.id,
+            platform: 'blog',
+            content: bp.title || 'Untitled Article',
+            status: statusMap[bp.status] || bp.status,
+            scheduled_at: bp.scheduled_at,
+            posted_at: bp.published_at,
+            created_at: bp.created_at,
+          }))
+        } catch {}
+      }
+
+      const allPosts = [...socialPosts, ...blogPosts]
+      setPosts(allPosts.length > 0 ? allPosts : DEMO_POSTS as unknown as CalendarPost[])
     } catch {
       setPosts(DEMO_POSTS as unknown as CalendarPost[])
     } finally {

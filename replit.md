@@ -41,6 +41,8 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **API Token Rotation**: Automated webhook secret rotation via BullMQ.
 - **Product Registry**: Supports multiple SaaS products via `muse_products` and `muse_product_subscriptions` tables. Each product registers with its own Stripe product ID, metadata, and tier definitions, enabling product-scoped checkout, webhook routing, and feature gating.
 
+- **Blog Publishing**: Cross-platform blog posting system with SEO preview, Markdown editor, repurpose engine (AI blog-to-social snippets), and calendar integration. Supports Medium, WordPress, Ghost, LinkedIn Articles, and Substack (beta). Database tables in `migrations/extensions/003_blog_publishing_tables.sql`. API routes at `src/app/api/social/blog/`. UI pages at `src/app/dashboard/social/blog/`. Full docs in `docs/passivepost/BLOG_PUBLISHING.md`.
+
 **Design Rules for Product Extensions (Merge-Friendly Architecture):**
 - Product-specific files should be added, not modify core files.
 - Product database tables reside in `migrations/extensions/`.

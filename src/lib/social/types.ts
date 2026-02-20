@@ -129,3 +129,57 @@ export const defaultSocialModuleSettings: SocialModuleSettings = {
     lookbackHours: 24,
   },
 }
+
+export type BlogPlatform = 'medium' | 'wordpress' | 'linkedin_article' | 'ghost' | 'substack'
+
+export type BlogPostStatus = 'draft' | 'scheduled' | 'publishing' | 'published' | 'failed'
+
+export interface BlogConnection {
+  id: string
+  user_id: string
+  platform: BlogPlatform
+  platform_username: string | null
+  display_name: string | null
+  site_url: string | null
+  access_token_encrypted: string | null
+  api_key_encrypted: string | null
+  is_valid: boolean
+  last_validated_at: string | null
+  last_error: string | null
+  connected_at: string
+  updated_at: string
+}
+
+export interface BlogPost {
+  id: string
+  user_id: string
+  title: string
+  content: string
+  excerpt: string | null
+  slug: string | null
+  cover_image_url: string | null
+  status: BlogPostStatus
+  platforms: BlogPlatform[]
+  published_urls: Record<string, string>
+  seo_title: string | null
+  seo_description: string | null
+  tags: string[]
+  series_name: string | null
+  scheduled_at: string | null
+  published_at: string | null
+  repurposed: boolean
+  repurpose_count: number
+  error_message: string | null
+  created_at: string
+  updated_at: string
+}
+
+export const BLOG_PLATFORM_CONFIG: Record<BlogPlatform, { name: string; color: string; darkColor?: string; apiType: string; beta?: boolean }> = {
+  medium: { name: 'Medium', color: '#000000', darkColor: '#FFFFFF', apiType: 'REST API' },
+  wordpress: { name: 'WordPress', color: '#21759B', apiType: 'REST API + OAuth' },
+  linkedin_article: { name: 'LinkedIn Articles', color: '#0A66C2', apiType: 'Extends social connection' },
+  ghost: { name: 'Ghost', color: '#15171A', darkColor: '#FFFFFF', apiType: 'Admin API' },
+  substack: { name: 'Substack', color: '#FF6719', apiType: 'Unofficial API', beta: true },
+}
+
+export const BLOG_PLATFORMS: BlogPlatform[] = ['medium', 'wordpress', 'linkedin_article', 'ghost', 'substack']

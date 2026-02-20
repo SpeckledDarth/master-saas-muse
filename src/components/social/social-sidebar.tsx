@@ -18,6 +18,9 @@ import {
   ExternalLink,
   LogOut,
   ChevronUp,
+  BookOpen,
+  Pen,
+  Library,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -52,6 +55,14 @@ const NAV_ITEMS = [
       { title: 'Posts', href: '/dashboard/social/posts', icon: FileText },
       { title: 'Queue', href: '/dashboard/social/queue', icon: Clock },
       { title: 'Calendar', href: '/dashboard/social/calendar', icon: CalendarDays },
+    ],
+  },
+  {
+    group: 'Blog',
+    items: [
+      { title: 'Blog Home', href: '/dashboard/social/blog', icon: BookOpen, exact: true },
+      { title: 'Compose', href: '/dashboard/social/blog/compose', icon: Pen },
+      { title: 'Articles', href: '/dashboard/social/blog/posts', icon: Library },
     ],
   },
   {
