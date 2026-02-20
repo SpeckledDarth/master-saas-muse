@@ -21,6 +21,7 @@ import {
   BookOpen,
   Pen,
   Library,
+  Brain,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -69,6 +70,7 @@ const NAV_ITEMS = [
     group: 'Insights',
     items: [
       { title: 'Engagement', href: '/dashboard/social/engagement', icon: BarChart3 },
+      { title: 'Intelligence', href: '/dashboard/social/intelligence', icon: Brain },
       { title: 'Leads', href: '/dashboard/social/leads', icon: Target },
     ],
   },

@@ -152,14 +152,14 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  let body: { platform?: string; content?: string; scheduledAt?: string; mediaUrls?: string[] }
+  let body: { platform?: string; content?: string; scheduledAt?: string; mediaUrls?: string[]; source_blog_id?: string }
   try {
     body = await request.json()
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { platform, content, scheduledAt, mediaUrls } = body
+  const { platform, content, scheduledAt, mediaUrls, source_blog_id } = body
 
   if (!platform || !VALID_PLATFORMS.includes(platform as typeof VALID_PLATFORMS[number])) {
     return NextResponse.json({ error: 'Invalid platform. Must be one of: twitter, linkedin, instagram' }, { status: 400 })
@@ -184,6 +184,7 @@ export async function POST(request: NextRequest) {
         media_urls: mediaUrls || [],
         ai_generated: false,
         created_at: new Date().toISOString(),
+        ...(source_blog_id ? { source_blog_id } : {}),
       })
       .select('*')
       .single()

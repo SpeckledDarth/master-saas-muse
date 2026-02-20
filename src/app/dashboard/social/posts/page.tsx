@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Facebook, Trash2, Edit, FileText, AlertCircle, Heart, MessageCircle, Share2, MousePointerClick } from 'lucide-react'
+import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Facebook, Trash2, Edit, FileText, AlertCircle, Heart, MessageCircle, Share2, MousePointerClick, BookOpen } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { PostPreview } from '@/components/social/post-preview'
 import { BulkImport } from '@/components/social/bulk-import'
@@ -38,6 +38,7 @@ interface SocialPost {
   engagement_shares?: number
   engagement_comments?: number
   engagement_clicks?: number
+  source_blog_id?: string | null
 }
 
 const PLATFORM_LIMITS: Record<string, number> = {
@@ -95,6 +96,10 @@ export default function SocialPostsPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [detailPost, setDetailPost] = useState<PostDetailData | null>(null)
 
+  const [sourceBlogId, setSourceBlogId] = useState<string>('')
+  const [blogArticles, setBlogArticles] = useState<{id: string, title: string, published_urls?: Record<string, string>}[]>([])
+  const [blogTitleMap, setBlogTitleMap] = useState<Record<string, string>>({})
+
   const fetchPosts = useCallback(async () => {
     try {
       const params = new URLSearchParams()
@@ -126,6 +131,15 @@ export default function SocialPostsPage() {
     fetchPosts()
   }, [fetchPosts])
 
+  useEffect(() => {
+    fetch('/api/social/blog/posts').then(r => r.json()).then(d => {
+      setBlogArticles(d.posts || [])
+      const map: Record<string, string> = {};
+      (d.posts || []).forEach((p: any) => { map[p.id] = p.title })
+      setBlogTitleMap(map)
+    }).catch(() => {})
+  }, [])
+
   const handleCreatePost = async (postNow: boolean) => {
     if (!content.trim()) {
       toast({ title: 'Error', description: 'Content is required', variant: 'destructive' })
@@ -138,6 +152,7 @@ export default function SocialPostsPage() {
       if (scheduleEnabled && scheduledAt) {
         body.scheduledAt = new Date(scheduledAt).toISOString()
       }
+      if (sourceBlogId && sourceBlogId !== 'none') body.source_blog_id = sourceBlogId
 
       const res = await fetch('/api/social/posts', {
         method: 'POST',
@@ -155,6 +170,7 @@ export default function SocialPostsPage() {
       setContent('')
       setScheduleEnabled(false)
       setScheduledAt('')
+      setSourceBlogId('')
       toast({ title: 'Post Created', description: scheduleEnabled ? 'Post has been scheduled' : 'Post saved as draft' })
     } catch (err) {
       toast({ title: 'Error', description: (err as Error).message, variant: 'destructive' })
@@ -482,6 +498,31 @@ export default function SocialPostsPage() {
               />
             </div>
           )}
+          <div className="space-y-2">
+            <Label>Link to Blog Article (optional) <HelpTooltip text="Link this post to one of your blog articles. The blog URL will be appended to your post." /></Label>
+            <Select value={sourceBlogId} onValueChange={(val) => {
+              setSourceBlogId(val)
+              if (val && val !== 'none') {
+                const article = blogArticles.find(a => a.id === val)
+                if (article?.published_urls) {
+                  const url = Object.values(article.published_urls)[0]
+                  if (url && !content.includes(url)) {
+                    setContent(prev => prev + (prev.trim() ? '\n\n' : '') + url)
+                  }
+                }
+              }
+            }}>
+              <SelectTrigger data-testid="select-link-blog">
+                <SelectValue placeholder="None — standalone post" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None — standalone post</SelectItem>
+                {blogArticles.map(a => (
+                  <SelectItem key={a.id} value={a.id}>{a.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex gap-2 flex-wrap">
             <Button
               onClick={() => handleCreatePost(false)}
@@ -569,6 +610,12 @@ export default function SocialPostsPage() {
                         {post.ai_generated && (
                           <Badge variant="outline" data-testid={`badge-ai-${post.id}`}>
                             <Sparkles className="mr-1 h-3 w-3" /> AI
+                          </Badge>
+                        )}
+                        {post.source_blog_id && blogTitleMap[post.source_blog_id] && (
+                          <Badge variant="outline" className="text-[10px]" data-testid={`badge-blog-source-${post.id}`}>
+                            <BookOpen className="mr-1 h-2.5 w-2.5" />
+                            From: {blogTitleMap[post.source_blog_id]}
                           </Badge>
                         )}
                       </div>
