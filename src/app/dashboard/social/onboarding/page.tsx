@@ -51,6 +51,22 @@ function OnboardingContent() {
   const [loading, setLoading] = useState(false)
   const [connectedPlatforms, setConnectedPlatforms] = useState<string[]>([])
 
+  const trackOnboardingStep = (step: number, stepName: string, action: string = 'viewed') => {
+    fetch('/api/onboarding/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ step, step_name: stepName, action }),
+    }).catch(() => {})
+  }
+
+  const navigateToStep = (step: number) => {
+    const stepInfo = STEPS.find(s => s.id === step)
+    if (stepInfo) {
+      trackOnboardingStep(step, stepInfo.title, 'viewed')
+    }
+    setCurrentStep(step)
+  }
+
   const [brandPrefs, setBrandPrefs] = useState({
     tone: '',
     niche: '',
@@ -82,6 +98,7 @@ function OnboardingContent() {
   useEffect(() => {
     fetchConnectedAccounts()
     fetchBrandPreferences()
+    trackOnboardingStep(1, 'Connect Platforms', 'viewed')
   }, [])
 
   async function fetchConnectedAccounts() {
@@ -149,7 +166,8 @@ function OnboardingContent() {
       })
       if (!res.ok) throw new Error('Failed to save')
       toast({ title: 'Saved', description: 'Brand preferences saved successfully.' })
-      setCurrentStep(3)
+      trackOnboardingStep(2, 'Brand Voice', 'completed')
+      navigateToStep(3)
     } catch {
       toast({ title: 'Error', description: 'Could not save brand preferences.', variant: 'destructive' })
     } finally {
@@ -179,10 +197,11 @@ function OnboardingContent() {
       } else {
         toast({ title: 'Saved', description: 'Posting preferences saved successfully.' })
       }
-      setCurrentStep(4)
+      trackOnboardingStep(3, 'Preferences', 'completed')
+      navigateToStep(4)
     } catch {
       toast({ title: 'Warning', description: 'Could not save preferences to server, but you can continue.', variant: 'destructive' })
-      setCurrentStep(4)
+      navigateToStep(4)
     } finally {
       setLoading(false)
     }
@@ -288,7 +307,7 @@ function OnboardingContent() {
 
             <div className="flex justify-end pt-2">
               <Button
-                onClick={() => setCurrentStep(2)}
+                onClick={() => { trackOnboardingStep(1, 'Connect Platforms', 'completed'); navigateToStep(2) }}
                 disabled={!canProceed(1)}
                 data-testid="button-next-step-1"
               >
@@ -384,7 +403,7 @@ function OnboardingContent() {
             </div>
 
             <div className="flex justify-between pt-2">
-              <Button variant="outline" onClick={() => setCurrentStep(1)} data-testid="button-back-step-2">
+              <Button variant="outline" onClick={() => navigateToStep(1)} data-testid="button-back-step-2">
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
@@ -464,7 +483,7 @@ function OnboardingContent() {
             </div>
 
             <div className="flex justify-between pt-2">
-              <Button variant="outline" onClick={() => setCurrentStep(2)} data-testid="button-back-step-3">
+              <Button variant="outline" onClick={() => navigateToStep(2)} data-testid="button-back-step-3">
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
@@ -554,7 +573,7 @@ function OnboardingContent() {
             </Button>
             <Button
               variant="ghost"
-              onClick={() => setCurrentStep(3)}
+              onClick={() => navigateToStep(3)}
               data-testid="button-back-step-4"
             >
               <ChevronLeft className="h-4 w-4 mr-1" />

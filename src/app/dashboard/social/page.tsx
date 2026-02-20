@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import type { SocialAccount } from '@/lib/social/client'
+import { ShareLink } from '@/components/social/share-link'
 
 type PlatformInfo = {
   id: string
@@ -309,6 +310,8 @@ export default function SocialAccountsPage() {
           )
         })}
       </div>
+
+      <ShareLink />
 
       <Dialog open={connectDialogOpen} onOpenChange={setConnectDialogOpen}>
         <DialogContent data-testid="dialog-connect-account">

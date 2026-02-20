@@ -14,6 +14,7 @@ export function FeedbackWidget() {
   const [message, setMessage] = useState('')
   const [email, setEmail] = useState('')
   const [npsScore, setNpsScore] = useState<number | null>(null)
+  const [heardFrom, setHeardFrom] = useState('')
   const [sending, setSending] = useState(false)
   const [user, setUser] = useState<any>(null)
   const { toast } = useToast()
@@ -68,6 +69,7 @@ export function FeedbackWidget() {
           email: email || user?.email,
           pageUrl: window.location.pathname,
           npsScore,
+          heardFrom: heardFrom || undefined,
         }),
       })
 
@@ -77,6 +79,7 @@ export function FeedbackWidget() {
         setMessage('')
         setEmail('')
         setNpsScore(null)
+        setHeardFrom('')
         setOpen(false)
         toast({ title: 'Thank you!', description: 'Your feedback has been submitted successfully.' })
       } else {
@@ -140,6 +143,27 @@ export function FeedbackWidget() {
                 rows={4}
                 data-testid="input-feedback-message"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label data-testid="label-heard-from">How did you hear about us? <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <select
+                value={heardFrom}
+                onChange={(e) => setHeardFrom(e.target.value)}
+                className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+                data-testid="select-heard-from"
+              >
+                <option value="">Select...</option>
+                <option value="search">Search Engine (Google, etc.)</option>
+                <option value="social">Social Media</option>
+                <option value="friend">Friend or Colleague</option>
+                <option value="blog">Blog or Article</option>
+                <option value="podcast">Podcast</option>
+                <option value="youtube">YouTube</option>
+                <option value="newsletter">Newsletter</option>
+                <option value="referral">Referral Link</option>
+                <option value="other">Other</option>
+              </select>
             </div>
 
             <div className="space-y-2">

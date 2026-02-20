@@ -17,7 +17,7 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 | Phase | Name | Status | Target |
 |-------|------|--------|--------|
 | 1 | Testimonial/Success Metrics Dashboard | Complete | Week 1 |
-| 1.5 | Launch Kit | Not Started | Week 1-2 |
+| 1.5 | Launch Kit | Complete | Week 1-2 |
 | 2 | Connect Real Platform APIs & Full Testing | Not Started | Week 2-3 |
 | 3 | Affiliate Marketing Features | Not Started | Week 3-4 |
 | 4 | Mobile App (PWA First) | Not Started | Week 4+ |
@@ -45,12 +45,12 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 1.5.1 | Configurable watermark on published posts — admin toggle (on/off), position setting, appended as text line on published posts | Not Started | Simple on/off, no white-labeling. Higher tiers can disable. |
-| 1.5.2 | Public changelog/roadmap page — markdown-driven, visible to visitors | Not Started | Signals active development, builds trust |
-| 1.5.3 | Onboarding email drip sequences via Resend — welcome series for new signups | Not Started | Uses existing Resend integration |
-| 1.5.4 | Simple share/referral link in user dashboard — unique URL per user, copy button, basic click tracking | Not Started | Seeds Phase 3 affiliate system. Links upgrade to tracked affiliate links later. |
-| 1.5.5 | Onboarding completion funnel tracking — track drop-off at each wizard step, display funnel metrics in admin dashboard | Not Started | Helps optimize signup-to-active conversion |
-| 1.5.6 | "How did you hear about us?" dropdown in feedback widget | Not Started | Cross-checks referral tracking in Phase 3 |
+| 1.5.1 | Configurable watermark on published posts — admin toggle (on/off), position setting, appended as text line on published posts | Complete | API: `src/app/api/social/watermark/route.ts`, Admin: `src/app/admin/setup/watermark/page.tsx`, Integrated into cron post processor |
+| 1.5.2 | Public changelog/roadmap page — markdown-driven, visible to visitors | Complete | Existing page at `/changelog`, public API: `src/app/api/public/changelog/route.ts`, DB table: `changelog_entries` |
+| 1.5.3 | Onboarding email drip sequences via Resend — welcome series for new signups | Complete | Drip endpoint: `src/app/api/email/drip/route.ts`, 4-step welcome sequence, tracks in `email_drip_log` table |
+| 1.5.4 | Simple share/referral link in user dashboard — unique URL per user, copy button, basic click tracking | Complete | API: `src/app/api/referral/route.ts`, Component: `src/components/social/share-link.tsx`, Tracker: `src/components/referral-tracker.tsx`, DB tables: `referral_links`, `referral_clicks` |
+| 1.5.5 | Onboarding completion funnel tracking — track drop-off at each wizard step, display funnel metrics in admin dashboard | Complete | API: `src/app/api/onboarding/track/route.ts`, Admin: `src/app/admin/setup/funnel/page.tsx`, Integrated into onboarding wizard, DB table: `onboarding_events` |
+| 1.5.6 | "How did you hear about us?" dropdown in feedback widget | Complete | Added to `src/components/feedback-widget.tsx` with 9 attribution sources |
 
 **Dependencies:**
 - 1.5.4 (share links) should use a URL structure that's compatible with Phase 3 affiliate tracking (e.g., `?ref=USER_CODE`)

@@ -50,6 +50,9 @@ export async function POST(request: NextRequest) {
     let enqueued = 0
     const errors: string[] = []
 
+    const { getWatermarkConfig, applyWatermark } = await import('@/lib/social/watermark')
+    const watermarkConfig = await getWatermarkConfig()
+
     for (const post of duePosts) {
       try {
         await admin
@@ -58,11 +61,13 @@ export async function POST(request: NextRequest) {
           .eq('id', post.id)
           .eq('status', 'scheduled')
 
+        const finalContent = applyWatermark(post.content, watermarkConfig)
+
         const jobId = await addSocialPostJob({
           postId: post.id,
           userId: post.user_id,
           platform: post.platform,
-          content: post.content,
+          content: finalContent,
           mediaUrls: post.media_urls || [],
         })
 

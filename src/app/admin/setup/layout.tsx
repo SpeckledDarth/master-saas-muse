@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Palette, Paintbrush, FileText, BookOpen, DollarSign, Globe, Settings, Save, Check, Loader2, Scale, MessageCircle, Shield, KeyRound, Package, Quote } from 'lucide-react'
+import { Palette, Paintbrush, FileText, BookOpen, DollarSign, Globe, Settings, Save, Check, Loader2, Scale, MessageCircle, Shield, KeyRound, Package, Quote, Stamp, BarChart3 } from 'lucide-react'
 import { SetupSettingsProvider, useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
@@ -37,6 +37,8 @@ const sectionGroups = [
       { id: 'social', label: 'Social Links', icon: Globe, href: '/admin/setup/social' },
       { id: 'support', label: 'Support', icon: MessageCircle, href: '/admin/setup/support' },
       { id: 'integrations', label: 'Integrations', icon: KeyRound, href: '/admin/setup/integrations' },
+      { id: 'watermark', label: 'Watermark', icon: Stamp, href: '/admin/setup/watermark' },
+      { id: 'funnel', label: 'Onboarding Funnel', icon: BarChart3, href: '/admin/setup/funnel' },
     ],
   },
   {

@@ -10,6 +10,8 @@ import { ImpersonationBanner } from "@/components/impersonation-banner"
 import { CookieConsentWrapper } from "@/components/cookie-consent-wrapper"
 import { UnifiedSupportWidget } from "@/components/unified-support-widget"
 import { Toaster } from "@/components/ui/toaster"
+import { Suspense } from "react"
+import { ReferralTracker } from "@/components/referral-tracker"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -62,6 +64,9 @@ export default function RootLayout({
               <Footer />
               <CookieConsentWrapper />
               <UnifiedSupportWidget />
+              <Suspense fallback={null}>
+                <ReferralTracker />
+              </Suspense>
             </div>
             <Toaster />
           </ThemeSettingsProvider>
