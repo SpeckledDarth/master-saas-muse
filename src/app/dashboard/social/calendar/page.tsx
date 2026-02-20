@@ -570,7 +570,7 @@ export default function SocialCalendarPage() {
                   <Card key={`${qm.year}-${qm.month}`} className="overflow-visible">
                     <CardContent className="p-4">
                       <h3
-                        className="text-sm font-semibold text-center mb-3"
+                        className="text-base font-semibold text-center mb-3"
                         data-testid={`text-quarter-month-${qm.year}-${qm.month}`}
                       >
                         {new Date(qm.year, qm.month, 1).toLocaleString('default', { month: 'long' })}
@@ -579,7 +579,7 @@ export default function SocialCalendarPage() {
                         {DAYS_OF_WEEK.map(day => (
                           <div
                             key={day}
-                            className="text-center text-xs font-medium text-muted-foreground py-1.5"
+                            className="text-center text-sm font-medium text-muted-foreground py-1.5"
                           >
                             {day}
                           </div>
@@ -596,7 +596,7 @@ export default function SocialCalendarPage() {
                               key={index}
                               onClick={() => setSelectedDate(dateKey)}
                               className={`
-                                relative flex flex-col items-center justify-center py-1.5 rounded-md text-xs transition-colors
+                                relative flex flex-col items-center justify-center py-1.5 rounded-md text-sm transition-colors
                                 ${isCurrentMonth ? '' : 'opacity-30'}
                                 ${isToday ? 'ring-1 ring-primary font-bold' : ''}
                                 ${isSelected ? 'bg-accent' : ''}
