@@ -22,6 +22,11 @@ import {
   Pen,
   Library,
   Brain,
+  Zap,
+  Share2,
+  DollarSign,
+  Flame,
+  Users,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -67,11 +72,26 @@ const NAV_ITEMS = [
     ],
   },
   {
+    group: 'Automation',
+    items: [
+      { title: 'Autopilot', href: '/dashboard/social/automation', icon: Zap },
+    ],
+  },
+  {
     group: 'Insights',
     items: [
       { title: 'Engagement', href: '/dashboard/social/engagement', icon: BarChart3 },
       { title: 'Intelligence', href: '/dashboard/social/intelligence', icon: Brain },
+      { title: 'Distribution', href: '/dashboard/social/distribution', icon: Share2 },
+      { title: 'Revenue & ROI', href: '/dashboard/social/revenue', icon: DollarSign },
+      { title: 'Retention', href: '/dashboard/social/retention', icon: Flame },
       { title: 'Leads', href: '/dashboard/social/leads', icon: Target },
+    ],
+  },
+  {
+    group: 'Collaborate',
+    items: [
+      { title: 'Approvals', href: '/dashboard/social/collaboration', icon: Users },
     ],
   },
   {
