@@ -533,57 +533,55 @@ export default function SocialCalendarPage() {
           )}
 
           {viewMode === 'quarter' && (
-            <Card data-testid="card-quarter-view">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div data-testid="card-quarter-view">
+              <div className="flex items-center justify-between gap-4 flex-wrap mb-4">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setCurrentDate(new Date(currentYear, currentMonth - 3, 1))}
+                  data-testid="button-prev-quarter"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-semibold" data-testid="text-quarter-range">
+                    {quarterMonths[0].label} &ndash; {quarterMonths[2].label}
+                  </h2>
                   <Button
                     variant="outline"
-                    size="icon"
-                    onClick={() => setCurrentDate(new Date(currentYear, currentMonth - 3, 1))}
-                    data-testid="button-prev-quarter"
+                    size="sm"
+                    onClick={goToToday}
+                    data-testid="button-today-quarter"
                   >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <div className="flex items-center gap-2">
-                    <CardTitle className="text-lg" data-testid="text-quarter-range">
-                      {quarterMonths[0].label} &ndash; {quarterMonths[2].label}
-                    </CardTitle>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={goToToday}
-                      data-testid="button-today-quarter"
-                    >
-                      Today
-                    </Button>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setCurrentDate(new Date(currentYear, currentMonth + 3, 1))}
-                    data-testid="button-next-quarter"
-                  >
-                    <ChevronRight className="h-4 w-4" />
+                    Today
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="quarter-grid">
-                  {quarterMonths.map(qm => (
-                    <div key={`${qm.year}-${qm.month}`}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setCurrentDate(new Date(currentYear, currentMonth + 3, 1))}
+                  data-testid="button-next-quarter"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-testid="quarter-grid">
+                {quarterMonths.map(qm => (
+                  <Card key={`${qm.year}-${qm.month}`} className="overflow-visible">
+                    <CardContent className="p-4">
                       <h3
-                        className="text-sm font-semibold text-center mb-2"
+                        className="text-sm font-semibold text-center mb-3"
                         data-testid={`text-quarter-month-${qm.year}-${qm.month}`}
                       >
-                        {qm.label}
+                        {new Date(qm.year, qm.month, 1).toLocaleString('default', { month: 'long' })}
                       </h3>
-                      <div className="grid grid-cols-7 gap-px">
+                      <div className="grid grid-cols-7">
                         {DAYS_OF_WEEK.map(day => (
                           <div
                             key={day}
-                            className="text-center text-[10px] font-medium text-muted-foreground py-1"
+                            className="text-center text-xs font-medium text-muted-foreground py-1.5"
                           >
-                            {day.charAt(0)}
+                            {day}
                           </div>
                         ))}
                         {qm.days.map(({ date, isCurrentMonth }, index) => {
@@ -598,7 +596,7 @@ export default function SocialCalendarPage() {
                               key={index}
                               onClick={() => setSelectedDate(dateKey)}
                               className={`
-                                relative flex flex-col items-center py-1 rounded-sm text-[11px] transition-colors
+                                relative flex flex-col items-center justify-center py-1.5 rounded-md text-xs transition-colors
                                 ${isCurrentMonth ? '' : 'opacity-30'}
                                 ${isToday ? 'ring-1 ring-primary font-bold' : ''}
                                 ${isSelected ? 'bg-accent' : ''}
@@ -610,7 +608,7 @@ export default function SocialCalendarPage() {
                                 {date.getDate()}
                               </span>
                               {uniquePlatforms.length > 0 && (
-                                <div className="flex gap-px mt-0.5">
+                                <div className="flex gap-0.5 mt-0.5">
                                   {uniquePlatforms.slice(0, 3).map(platform => (
                                     <span
                                       key={platform}
@@ -626,11 +624,11 @@ export default function SocialCalendarPage() {
                           )
                         })}
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
           )}
 
           {viewMode === 'quarter' && selectedDate && (

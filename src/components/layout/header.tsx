@@ -23,6 +23,20 @@ function getContrastColor(hex: string): string {
   return luminance > 0.5 ? '#1a1a1a' : '#ffffff'
 }
 
+function getEffectiveContrastColor(hex: string, opacity: number, isDark: boolean): string {
+  const cleaned = hex.replace('#', '')
+  const fgR = parseInt(cleaned.substring(0, 2), 16)
+  const fgG = parseInt(cleaned.substring(2, 4), 16)
+  const fgB = parseInt(cleaned.substring(4, 6), 16)
+  const bgVal = isDark ? 10 : 250
+  const alpha = opacity / 100
+  const r = Math.round(fgR * alpha + bgVal * (1 - alpha))
+  const g = Math.round(fgG * alpha + bgVal * (1 - alpha))
+  const b = Math.round(fgB * alpha + bgVal * (1 - alpha))
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  return luminance > 0.5 ? '#1a1a1a' : '#ffffff'
+}
+
 export function Header() {
   const pathname = usePathname()
   const { settings, loading } = useSettings()
@@ -79,8 +93,13 @@ export function Header() {
   const showBorder = headerStyle?.borderBottom !== false
   const brandingPrimary = settings?.branding?.primaryColor
   const customBg = headerStyle?.bgColor || brandingPrimary || undefined
-  const customTextColor = headerStyle?.textColor || (brandingPrimary ? getContrastColor(brandingPrimary) : undefined)
   const bgOpacity = headerStyle?.bgOpacity ?? (isTransparent ? 0 : 95)
+  const autoTextColor = customBg
+    ? (resolvedTheme === 'dark' && !headerStyle?.bgColor
+      ? '#ffffff'
+      : getEffectiveContrastColor(customBg, bgOpacity, resolvedTheme === 'dark'))
+    : undefined
+  const customTextColor = headerStyle?.textColor || autoTextColor
 
   const headerBgStyle: React.CSSProperties = {}
   if (customBg) {
@@ -190,7 +209,7 @@ export function Header() {
               href={item.href}
               className={cn(
                 "text-sm transition-colors flex items-center gap-1.5 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary-600 dark:after:bg-primary-400 after:transition-all hover:after:w-full",
-                customTextColor ? "opacity-80 hover:opacity-100" : "text-muted-foreground hover:text-foreground"
+                customTextColor ? "opacity-90 hover:opacity-100" : "text-muted-foreground hover:text-foreground"
               )}
               data-testid={`link-nav-${item.id}`}
             >
@@ -212,7 +231,7 @@ export function Header() {
               href={`/p/${page.slug}`}
               className={cn(
                 "text-sm transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary-600 dark:after:bg-primary-400 after:transition-all hover:after:w-full",
-                customTextColor ? "opacity-80 hover:opacity-100" : "text-muted-foreground hover:text-foreground"
+                customTextColor ? "opacity-90 hover:opacity-100" : "text-muted-foreground hover:text-foreground"
               )}
               data-testid={`link-custom-${page.slug}`}
             >

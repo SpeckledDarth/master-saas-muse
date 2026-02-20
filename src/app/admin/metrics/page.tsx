@@ -290,7 +290,7 @@ export default function MetricsPage() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="date" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip content={<ThemedChartTooltip valueLabel="users" />} cursor={{ stroke: 'hsl(var(--primary) / 0.3)' }} />
+                  <Tooltip content={<ThemedChartTooltip valueLabel="users" />} cursor={false} />
                   <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
@@ -310,7 +310,7 @@ export default function MetricsPage() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="date" className="text-xs" tick={{ fontSize: 12 }} />
                   <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip content={<ThemedChartTooltip valueLabel="revenue" valueFormatter={(v) => `$${v.toLocaleString()}`} />} cursor={{ stroke: 'hsl(var(--primary) / 0.3)' }} />
+                  <Tooltip content={<ThemedChartTooltip valueLabel="revenue" valueFormatter={(v) => `$${v.toLocaleString()}`} />} cursor={false} />
                   <Line type="monotone" dataKey="amount" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
