@@ -1,6 +1,6 @@
 # MuseKit Architecture: Option B (Separate Deployments)
 
-*Last Updated: February 19, 2026*
+> **Revision:** 5.0 | **Last Updated:** February 20, 2026 | **Created:** February 2026
 
 **Decision Date**: February 2026
 

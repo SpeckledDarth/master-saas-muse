@@ -1,5 +1,7 @@
 # Adding a New Product to MuseKit
 
+> **Revision:** 5.0 | **Last Updated:** February 20, 2026 | **Created:** February 2026
+
 ## Overview
 
 MuseKit is a multi-product SaaS foundation. Instead of building every SaaS from scratch, you clone MuseKit (which provides auth, billing, admin, email, etc.) and layer your own product on top. The **Product Registry** system lets you run multiple products within a single MuseKit instance, each with its own Stripe billing, tier system, and feature limits.
@@ -396,4 +398,3 @@ For complete PassivePost documentation including all dashboard pages, API routes
 | `migrations/extensions/` | Directory for product-specific migration files |
 | `scripts/seed-products.ts` | Example script for seeding Stripe products |
 
-*Last Updated: February 19, 2026*

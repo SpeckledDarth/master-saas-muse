@@ -1,5 +1,7 @@
 # Master SaaS Muse Template - Setup Guide
 
+> **Revision:** 5.0 | **Last Updated:** February 20, 2026 | **Created:** February 2026
+
 This guide walks you through creating a new SaaS from the Master SaaS Muse Template.
 
 **Template Status: MVP COMPLETE + Full Feature Set + PassivePost Extension + Marketing Components + UI Polish (February 2026)**
@@ -778,4 +780,3 @@ The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these met
 
 ---
 
-*Last Updated: February 19, 2026*

@@ -1,5 +1,7 @@
 # Documentation Structure
 
+> **Revision:** 5.0 | **Last Updated:** February 20, 2026 | **Created:** February 2026
+
 This documentation is organized into two distinct categories:
 
 ## `/docs/musekit/` — Template Documentation

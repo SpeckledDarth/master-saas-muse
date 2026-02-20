@@ -1,5 +1,7 @@
 # New Muse Quick-Start Checklist
 
+> **Revision:** 5.0 | **Last Updated:** February 20, 2026 | **Created:** February 2026
+
 This checklist guides you through setting up a new project from the Master SaaS Muse Template.
 
 **Estimated time: 15-30 minutes**
@@ -736,4 +738,3 @@ Before launching with live customer data:
 
 ---
 
-*Last Updated: February 19, 2026*

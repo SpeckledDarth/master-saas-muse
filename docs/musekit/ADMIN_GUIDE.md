@@ -1,5 +1,7 @@
 # MuseKit Admin Guide
 
+> **Revision:** 5.0 | **Last Updated:** February 20, 2026 | **Created:** February 2026
+
 A complete guide for managing your MuseKit-powered application. Written for team members who manage the platform day-to-day — no coding knowledge required.
 
 ---
@@ -790,4 +792,3 @@ All pages automatically support dark/light mode and are responsive on mobile dev
 
 ---
 
-*Last Updated: February 19, 2026*
