@@ -21,6 +21,17 @@ A step-by-step guide for using PassivePost to manage your social media presence.
 13. [Upgrading Your Plan](#13-upgrading-your-plan)
 14. [Settings & Preferences](#14-settings--preferences)
 15. [Tips for Best Results](#15-tips-for-best-results)
+16. [Blog Publishing](#16-blog-publishing)
+17. [Content Intelligence](#17-content-intelligence)
+18. [Automation](#18-automation)
+19. [Distribution Intelligence](#19-distribution-intelligence)
+20. [Revenue & ROI](#20-revenue--roi)
+21. [Engagement & Retention](#21-engagement--retention)
+22. [Team Collaboration](#22-team-collaboration)
+23. [AI Hashtag Suggestions](#23-ai-hashtag-suggestions)
+24. [AI Voice Fine-Tuner](#24-ai-voice-fine-tuner)
+25. [Gig Lead Scanner](#25-gig-lead-scanner)
+26. [Lead CRM](#26-lead-crm)
 
 ---
 
@@ -414,6 +425,141 @@ Go to **Profile** from the sidebar user menu to manage:
 2. **Track what works** — Check your Engagement page weekly to see top performers
 3. **Cross-promote** — Your LinkedIn audience might not follow you on Twitter yet
 4. **Post when your audience is active** — Check the Best Times section in Engagement
+
+---
+
+## 16. Blog Publishing
+
+### How to Use Blog Publishing
+
+1. **Connect a Blog Platform** — Go to Blog Home from the sidebar. Click "Connect" and choose your platform (Medium, WordPress, Ghost, LinkedIn Articles, or Substack). Enter your API credentials.
+2. **Write a Blog Post** — Click "Compose" to open the Markdown editor. Write your article, add a title and excerpt, and use the SEO preview to see how it will appear in search results.
+3. **Publish** — Choose which platforms to publish to and click Publish. The post will be sent to all selected platforms.
+4. **Repurpose to Social** — After publishing, click "Repurpose" to have AI generate 5-7 social media snippets from your blog post. Each snippet links back to the original article, creating a traffic flywheel.
+5. **Schedule Snippets** — Click "Schedule All" to spread the snippets across the next 7-14 days for sustained promotion.
+
+---
+
+## 17. Content Intelligence
+
+PassivePost analyzes your content to help you improve:
+
+- **Content Grader** — Before publishing, get an AI score on engagement potential, readability, and brand alignment
+- **Content DNA** — See what patterns your best-performing posts share
+- **Topic Fatigue** — Get warned when you're posting too much about the same topic
+- **Content Mix** — See if your content balance is right (educational vs promotional vs entertaining)
+- **Tone Drift** — Get alerted if your writing style is drifting from your brand voice
+- **Engagement Prediction** — See predicted engagement before you hit publish
+
+Access these from the Intelligence page in the sidebar under Insights.
+
+---
+
+## 18. Automation
+
+Let PassivePost handle the repetitive work:
+
+- **Calendar Autopilot** — AI fills your content calendar for the week based on optimal timing and content mix
+- **Content Recycling** — High-performing old posts are automatically identified for reposting
+- **Batch Repurpose** — Convert multiple posts into different formats at once
+- **Evergreen Finder** — Identifies content that stays relevant over time
+- **Blog-to-Thread** — Converts blog posts into Twitter thread format with one click
+- **Draft Warnings** — Get notified about drafts sitting unpublished
+
+Access these from the Automation page in the sidebar.
+
+---
+
+## 19. Distribution Intelligence
+
+Optimize where and when you post:
+
+- **Platform Timing** — See the best times to post on each platform based on your audience data
+- **Hashtag Tracker** — Track which hashtags drive the most engagement
+- **Audience Personas** — AI builds detailed profiles of your ideal audience segments
+- **Competitor Gap** — Discover topics your competitors cover that you haven't
+
+Access these from the Distribution page under Insights.
+
+---
+
+## 20. Revenue & ROI
+
+Prove the business value of your content:
+
+- **ROI Calculator** — Input your time and costs, see the estimated return on your content investment
+- **Cost Per Post** — Track how much each piece of content actually costs to produce
+- **Monthly Report Card** — Automated monthly summary of your content performance
+- **Client Reports** — Generate branded reports to share with clients or stakeholders
+
+Access these from the Revenue & ROI page under Insights.
+
+---
+
+## 21. Engagement & Retention
+
+Stay motivated and consistent:
+
+- **Posting Streaks** — Track your consecutive posting days. Don't break the streak!
+- **Weekly Digest** — Get a summary of your content performance for the week
+- **Content Templates** — Browse pre-built templates for common content types to get started faster
+- **Public Scorecard** — Share your content performance with a public profile URL
+
+Access the streak and templates from the Retention page under Insights.
+
+---
+
+## 22. Team Collaboration
+
+Work with clients and team members:
+
+- **Client Approval Portal** — Send a link to clients so they can review and approve content before it's published. No login required for clients.
+- **Approval Queue** — See all pending approvals in one place. Track what's been approved, rejected, or is still waiting.
+- **Shared Content Library** — Team members can share content templates and drafts.
+
+Access these from the Approvals page under Collaborate in the sidebar.
+
+---
+
+## 23. AI Hashtag Suggestions
+
+When composing a post, click the "Suggest Hashtags" button. AI analyzes your content and suggests relevant hashtags based on your niche, platform best practices, and trending topics. Click any suggestion to add it to your post.
+
+---
+
+## 24. AI Voice Fine-Tuner
+
+Teach PassivePost your unique writing style:
+
+1. Go to the Brand Voice page
+2. Find the "Voice Fine-Tuner" section
+3. Paste 3-15 of your best writing samples
+4. Click "Analyze My Voice"
+5. AI builds a detailed voice profile (tone, vocabulary, sentence style, emoji usage, CTA patterns)
+6. This profile is saved and used for all future AI content generation
+
+---
+
+## 25. Gig Lead Scanner
+
+Find potential clients on social media:
+
+1. Go to the Leads page and click the "Gig Alerts" tab
+2. The scanner searches for posts matching your niche keywords
+3. Each lead shows the person's name, platform, relevant snippet, and signal strength
+4. Reply templates are generated to help you respond quickly
+
+---
+
+## 26. Lead CRM
+
+Manage your leads beyond just tracking:
+
+1. Go to the Leads page and click the "CRM" tab
+2. Add tags to categorize leads (hot, cold, follow-up, etc.)
+3. Add notes to track your interactions
+4. Filter leads by tag or status
+5. Export your leads to CSV for use in other tools
 
 ---
 

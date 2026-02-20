@@ -122,7 +122,7 @@ All PassivePost TypeScript types live in `src/lib/social/types.ts`, not in core 
 ```
 src/
 ├── app/
-│   ├── dashboard/social/              # Dashboard pages (10 pages)
+│   ├── dashboard/social/              # Dashboard pages (17+ pages)
 │   │   ├── layout.tsx                 # Social dashboard layout with sidebar
 │   │   ├── page.tsx                   # Accounts management page
 │   │   ├── overview/page.tsx          # Overview dashboard
@@ -130,26 +130,46 @@ src/
 │   │   ├── queue/page.tsx             # Post queue
 │   │   ├── calendar/page.tsx          # Content calendar
 │   │   ├── engagement/page.tsx        # Analytics
-│   │   ├── leads/page.tsx             # Lead tracking
-│   │   ├── brand/page.tsx             # Brand voice config
+│   │   ├── leads/page.tsx             # Lead tracking + CRM
+│   │   ├── brand/page.tsx             # Brand voice config + voice fine-tuner
 │   │   ├── settings/page.tsx          # Module settings
-│   │   └── onboarding/page.tsx        # Setup wizard
-│   ├── api/social/                    # API routes (18 endpoints)
+│   │   ├── onboarding/page.tsx        # Setup wizard
+│   │   ├── blog/page.tsx              # Blog home dashboard
+│   │   ├── blog/compose/page.tsx      # Blog article editor
+│   │   ├── blog/posts/page.tsx        # Blog article list
+│   │   ├── intelligence/page.tsx      # Content intelligence (Phase 2)
+│   │   ├── automation/page.tsx        # Advanced automation (Phase 3)
+│   │   ├── distribution/page.tsx      # Distribution intelligence (Phase 4)
+│   │   ├── revenue/page.tsx           # Revenue & ROI (Phase 5)
+│   │   ├── retention/page.tsx         # Engagement & retention (Phase 6)
+│   │   └── collaboration/page.tsx     # Collaboration & approvals (Phase 7)
+│   ├── approve/[token]/page.tsx       # Public client approval page
+│   ├── api/social/                    # API routes (60+ endpoints)
 │   │   ├── accounts/                  # Account CRUD + validation
 │   │   ├── posts/                     # Post CRUD
 │   │   ├── connect/                   # OAuth initiation
 │   │   ├── callback/[platform]/       # OAuth callbacks
 │   │   ├── generate-post/             # AI generation
 │   │   ├── brand-preferences/         # Brand voice API
+│   │   ├── brand-voice/fine-tune/     # AI voice fine-tuner
 │   │   ├── posting-preferences/       # Posting schedule API
 │   │   ├── tier/                      # Tier info
 │   │   ├── bulk-import/               # Bulk post import
 │   │   ├── trend-alerts/              # Trend monitoring
 │   │   ├── health/                    # Platform health check
-│   │   ├── debug/                     # Debug mode (beta)
-│   │   └── cron/                      # Scheduled task endpoints
+│   │   ├── debug/                     # Debug mode
+│   │   ├── cron/                      # Scheduled task endpoints
+│   │   ├── blog/                      # Blog publishing (connections, posts, repurpose, snippets)
+│   │   ├── flywheel/                  # Flywheel metrics
+│   │   ├── intelligence/              # Content intelligence (8 endpoints)
+│   │   ├── automation/                # Advanced automation (10 endpoints incl. hashtag-suggest)
+│   │   ├── distribution/             # Distribution intelligence (4 endpoints)
+│   │   ├── revenue/                   # Revenue & ROI (4 endpoints)
+│   │   ├── engagement/               # Engagement & retention (4 endpoints)
+│   │   ├── collaboration/            # Collaboration (2 endpoints)
+│   │   └── leads/                     # Lead management (gig-scanner, manage, export, reply-templates)
 │   └── admin/setup/passivepost/       # Admin configuration page
-├── components/social/                 # UI components (8 components)
+├── components/social/                 # UI components (10+ components)
 │   ├── social-sidebar.tsx             # Dashboard sidebar navigation
 │   ├── coaching-card.tsx              # Motivational tips card
 │   ├── platform-icon.tsx              # Platform icons with brand colors
@@ -157,7 +177,8 @@ src/
 │   ├── post-preview.tsx               # Compact post preview
 │   ├── quick-generate-fab.tsx         # Floating AI generate button
 │   ├── bulk-import.tsx                # Bulk import UI
-│   └── help-tooltip.tsx               # Contextual help tooltips
+│   ├── help-tooltip.tsx               # Contextual help tooltips
+│   └── lead-crm.tsx                   # Lead CRM component (tags, notes, export)
 └── lib/social/                        # Business logic (14 files)
     ├── types.ts                       # All TypeScript types and defaults
     ├── client.ts                      # Platform API clients (10 platforms)
@@ -283,6 +304,39 @@ Stores trend alert history and actions taken.
 
 Index: `(user_id, created_at DESC)` for chronological alert feeds.
 
+#### `blog_connections` (Extension — `migrations/extensions/003_blog_publishing_tables.sql`)
+Stores blog platform credentials and connection status.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `user_id` | UUID | References `auth.users(id)` |
+| `platform` | TEXT | Blog platform (medium, wordpress, ghost, linkedin, substack) |
+| `credentials_encrypted` | TEXT | Encrypted API keys/tokens |
+| `platform_username` | TEXT | Username on blog platform |
+| `blog_url` | TEXT | URL of the blog |
+| `is_valid` | BOOLEAN | Whether credentials are valid |
+| `connected_at` | TIMESTAMPTZ | Connection timestamp |
+
+#### `blog_posts` (Extension — `migrations/extensions/003_blog_publishing_tables.sql`)
+Stores blog articles with content, SEO metadata, and cross-post status.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `user_id` | UUID | References `auth.users(id)` |
+| `title` | TEXT | Article title |
+| `content` | TEXT | Markdown content |
+| `excerpt` | TEXT | Article excerpt/summary |
+| `seo_title` | TEXT | SEO-optimized title |
+| `seo_description` | TEXT | Meta description |
+| `slug` | TEXT | URL slug |
+| `status` | TEXT | draft, scheduled, publishing, published, failed |
+| `platforms` | JSONB | Cross-post targets and status per platform |
+| `series_name` | TEXT | Optional content series grouping |
+| `created_at` | TIMESTAMPTZ | Creation timestamp |
+| `published_at` | TIMESTAMPTZ | Publication timestamp |
+
 ### Row Level Security (RLS)
 All tables have RLS enabled. Users can only access their own data:
 - `social_accounts`: Users view/manage their own connected accounts
@@ -352,6 +406,93 @@ All PassivePost API routes are under `/api/social/`.
 |--------|----------|-------------|
 | `GET` | `/api/social/cron/process-scheduled` | Process due scheduled posts |
 | `GET` | `/api/social/cron/pull-engagement` | Pull engagement metrics |
+
+### Blog Publishing
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/social/blog/connections` | List blog platform connections |
+| `POST` | `/api/social/blog/connections` | Connect a blog platform |
+| `DELETE` | `/api/social/blog/connections/[id]` | Disconnect a blog platform |
+| `GET` | `/api/social/blog/posts` | List blog posts |
+| `POST` | `/api/social/blog/posts` | Create a blog post |
+| `GET/PATCH/DELETE` | `/api/social/blog/posts/[id]` | Get/update/delete a blog post |
+| `POST` | `/api/social/blog/repurpose` | AI-generate social snippets from blog |
+| `POST` | `/api/social/blog/schedule-snippets` | Schedule repurposed snippets |
+| `GET` | `/api/social/blog/[id]/snippets` | Get snippets for a blog post |
+
+### Content Flywheel & Intelligence
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/social/flywheel/metrics` | Flywheel health scores and velocity |
+| `POST` | `/api/social/intelligence/grade` | AI content grader |
+| `GET` | `/api/social/intelligence/content-dna` | Best performing content DNA |
+| `GET` | `/api/social/intelligence/topic-fatigue` | Topic fatigue detection |
+| `GET` | `/api/social/intelligence/content-mix` | Content mix optimizer |
+| `GET` | `/api/social/intelligence/tone-drift` | Tone drift monitor |
+| `GET` | `/api/social/intelligence/cannibalization` | Content cannibalization |
+| `POST` | `/api/social/intelligence/engagement-prediction` | Engagement prediction |
+| `POST` | `/api/social/intelligence/brief` | Content brief generator |
+
+### Advanced Automation
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/social/automation/calendar-autopilot` | Calendar autopilot |
+| `POST` | `/api/social/automation/batch-repurpose` | Batch repurpose |
+| `GET` | `/api/social/automation/recycling-queue` | Content recycling queue |
+| `GET` | `/api/social/automation/evergreen-scan` | Evergreen content identifier |
+| `POST` | `/api/social/automation/blog-to-thread` | Blog-to-thread converter |
+| `GET` | `/api/social/automation/crosspost-timing` | Cross-post timing optimizer |
+| `POST` | `/api/social/automation/repurpose-chains` | Repurpose chains |
+| `GET` | `/api/social/automation/draft-warnings` | Draft expiration warnings |
+| `GET` | `/api/social/automation/content-decay` | Content decay alerts |
+| `POST` | `/api/social/automation/hashtag-suggest` | AI hashtag suggestions (bonus) |
+
+### Distribution Intelligence
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/social/distribution/platform-timing` | Platform timing optimizer |
+| `GET` | `/api/social/distribution/hashtag-tracker` | Hashtag performance tracker |
+| `POST` | `/api/social/distribution/audience-personas` | Audience persona builder |
+| `POST` | `/api/social/distribution/competitor-gap` | Competitor gap analysis |
+
+### Revenue & ROI
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET/POST` | `/api/social/revenue/roi-calculator` | Content ROI calculator |
+| `GET` | `/api/social/revenue/cost-per-post` | Cost per post tracking |
+| `GET` | `/api/social/revenue/report-card` | Monthly report card |
+| `POST` | `/api/social/revenue/export-report` | White-label report export |
+
+### Engagement & Retention
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/social/engagement/streak` | Posting streak system |
+| `GET` | `/api/social/engagement/digest-preview` | Weekly flywheel digest |
+| `GET` | `/api/social/engagement/templates` | Content templates (public) |
+| `GET` | `/api/social/engagement/scorecard/[username]` | Public content scorecard |
+
+### Collaboration
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET/POST` | `/api/social/collaboration/approval-portal` | Client approval portal |
+| `POST` | `/api/social/collaboration/approval-action` | Approve/reject content |
+
+### Lead Management (Bonus)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET/POST` | `/api/social/leads/gig-scanner` | Gig lead scanner |
+| `GET/POST` | `/api/social/leads/reply-templates` | Reply templates |
+| `GET/POST/PATCH` | `/api/social/leads/manage` | Lead CRM (CRUD) |
+| `GET` | `/api/social/leads/export` | Lead CSV export |
+| `GET/POST` | `/api/social/brand-voice/fine-tune` | AI voice fine-tuner |
 
 ---
 

@@ -34,7 +34,10 @@ PassivePost solves this by combining:
 3. **Smart automation** — Queues, calendars, and scheduled publishing keep your accounts active without daily effort
 4. **Engagement analytics** — See what's working, what's not, and where your audience is growing
 5. **Lead tracking** — Surface potential customers from social interactions
-6. **Blog cross-posting** *(coming soon)* — Publish long-form content to Medium, WordPress, LinkedIn Articles, Ghost, and Substack, then auto-generate social snippets to drive traffic back
+6. **Blog cross-posting** — Publish long-form content to Medium, WordPress, LinkedIn Articles, Ghost, and Substack, then auto-generate social snippets to drive traffic back
+7. **Content flywheel** — A 38-feature system across 7 phases that makes your content marketing smarter, more automated, and more profitable over time
+8. **Revenue & ROI tracking** — Measure the actual business value of your social media efforts
+9. **Team collaboration** — Client approval portals and shared content workflows for agencies
 
 ---
 
@@ -90,7 +93,13 @@ Admins can add, edit, or remove niches at any time from the admin dashboard — 
 | Coaching Tips | Rotating motivational tips and strategy advice on the dashboard |
 | Upgrade Prompts | Contextual upgrade banners when approaching tier limits |
 | n8n Automation | Pre-built workflow templates for RSS auto-posting, trend monitoring, and more |
-| Blog Cross-Posting | *(Coming soon)* Publish to Medium, WordPress, LinkedIn Articles, Ghost, Substack |
+| Blog Cross-Posting | Publish to Medium, WordPress, LinkedIn Articles, Ghost, Substack |
+| Content Intelligence | AI-powered analysis of your content: grading, DNA patterns, topic fatigue, engagement prediction |
+| Content Flywheel | 38-feature system automating content recycling, repurposing, scheduling, and optimization |
+| Revenue & ROI | Track cost per post, calculate content ROI, generate client reports |
+| Team Collaboration | Client approval portals, shared content libraries, team workflows |
+| AI Voice Fine-Tuner | Paste writing samples to teach AI your unique voice |
+| Lead CRM | Tag, note, and export leads from social interactions |
 
 ---
 
@@ -124,8 +133,8 @@ Enterprise social media tools start at $99/month and up. PassivePost is designed
 ### 4. Complete Workflow
 Most tools do either content creation OR scheduling OR analytics. PassivePost covers the entire workflow: generate → schedule → publish → analyze → improve.
 
-### 5. Blog-to-Social Flywheel *(Coming Soon)*
-Write one blog post, and PassivePost automatically generates 5–7 social media snippets with links back to the article. Your blog drives social engagement, and social drives blog traffic — a self-reinforcing growth loop.
+### 5. Blog-to-Social Content Flywheel
+Write one blog post, and PassivePost automatically generates 5-7 social media snippets with links back to the article. Your blog drives social engagement, and social drives blog traffic — a self-reinforcing growth loop. Plus, 38 intelligent features across content grading, automation, distribution optimization, ROI tracking, and team collaboration make your entire content strategy smarter over time.
 
 ---
 
@@ -150,13 +159,21 @@ PassivePost adds its own layer on top: social platform API clients, AI content g
 - 3 platforms with full OAuth: Twitter/X, LinkedIn, Facebook
 - 7 platforms with stubbed API clients ready for integration
 - AI content generation with multimodal image support
-- Complete dashboard with 10 pages
+- Complete dashboard with 17+ pages
+- Blog publishing to Medium, WordPress, Ghost, LinkedIn Articles, and Substack
+- Content flywheel system: 38 features across 7 phases (all complete)
+- Content intelligence: AI grading, DNA analysis, topic fatigue, engagement prediction
+- Advanced automation: calendar autopilot, content recycling, repurpose chains
+- Distribution intelligence: platform timing, hashtag tracking, audience personas
+- Revenue & ROI: cost tracking, ROI calculator, client reports
+- Engagement & retention: streaks, digest, templates, leaderboard
+- Team collaboration: client approval portal, shared content library
+- Bonus features: AI hashtag suggestions, gig lead scanner, voice fine-tuner, lead CRM
 - Engagement analytics with Recharts charts
-- Lead tracking
-- Brand voice configuration with 14 niches
+- Lead tracking with CRM capabilities
+- Brand voice configuration with 14 niches + AI voice fine-tuning
 - Trend alerts and monitoring
 - n8n automation templates
-- Blog publishing system (in development)
 
 ---
 
@@ -170,6 +187,7 @@ PassivePost adds its own layer on top: social platform API clients, AI content g
 | [USER_GUIDE.md](./USER_GUIDE.md) | Step-by-step guide for using PassivePost |
 | [PRODUCT_GUIDE.md](./PRODUCT_GUIDE.md) | Combined reference (original comprehensive doc) |
 | [BLOG_PUBLISHING.md](./BLOG_PUBLISHING.md) | Blog cross-posting feature details |
+| [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md) | Complete 38-feature flywheel system: phases, APIs, dashboards |
 
 ---
 

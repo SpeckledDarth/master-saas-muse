@@ -2,7 +2,7 @@
 
 > **Purpose**: This is the single source of truth for all planned PassivePost features. If agent memory resets between sessions, read this file first to resume work. Every feature, its phase, description, and status is documented here.
 
-> **Last Updated**: February 20, 2026 (All 38 features complete across 7 phases)
+> **Last Updated**: February 20, 2026 (All 38 flywheel features + 4 bonus features = 42 total, complete across 7 phases)
 
 ---
 
@@ -260,6 +260,32 @@ Before diving into the plan, here's what exists today:
 
 ---
 
+## Bonus Features (Beyond the 38-Feature Flywheel) ✅
+**Goal**: Additional high-value features that complement the flywheel system.
+**Status**: Complete (Feb 2026)
+
+### B.1 AI Hashtag Suggestions
+- **What**: Button in the post composer that generates relevant hashtags using AI analysis of post content, niche context, and platform best practices
+- **Status**: [x] Complete (Feb 2026)
+- **Files**: `src/app/api/social/automation/hashtag-suggest/route.ts`, `src/app/dashboard/social/posts/page.tsx`
+
+### B.2 Gig Lead Notifications
+- **What**: Keyword scanner that searches social platforms for posts matching the user's niche, surfacing potential clients with signal strength scoring and auto-generated reply templates
+- **Status**: [x] Complete (Feb 2026)
+- **Files**: `src/app/api/social/leads/gig-scanner/route.ts`, `src/app/api/social/leads/reply-templates/route.ts`, `src/app/dashboard/social/leads/page.tsx`
+
+### B.3 AI Voice Fine-Tuner
+- **What**: Users paste 3-15 writing samples and AI analyzes their unique voice patterns (tone, vocabulary, sentence style, emoji usage, CTA patterns), creating a reusable voice profile for all future content generation
+- **Status**: [x] Complete (Feb 2026)
+- **Files**: `src/app/api/social/brand-voice/fine-tune/route.ts`, `src/app/dashboard/social/brand/page.tsx`
+
+### B.4 Lead CRM Mini
+- **What**: Tags, notes, status tracking, and CSV export for leads. Adds CRM-like functionality to the Leads page with user-scoped data isolation
+- **Status**: [x] Complete (Feb 2026)
+- **Files**: `src/app/api/social/leads/manage/route.ts`, `src/app/api/social/leads/export/route.ts`, `src/components/social/lead-crm.tsx`, `src/app/dashboard/social/leads/page.tsx`
+
+---
+
 ## Implementation Summary
 
 | Phase | Name | Features | Status |
@@ -271,8 +297,9 @@ Before diving into the plan, here's what exists today:
 | 5 | Revenue, Reporting & ROI | 4 features | ✅ Complete |
 | 6 | Engagement & Retention | 6 features | ✅ Complete |
 | 7 | Collaboration & Client | 2 features | ✅ Complete |
+| Bonus | Extra Features | 4 features | ✅ Complete |
 
-**Total: 38 features across 7 phases — ALL COMPLETE**
+**Total: 38 flywheel features + 4 bonus features across 7 phases — ALL COMPLETE**
 
 ---
 
@@ -338,6 +365,14 @@ All features are accessible from the social dashboard sidebar:
 - `GET/POST /api/social/collaboration/approval-portal`
 - `POST /api/social/collaboration/approval-action`
 
+### Bonus Features
+- `POST /api/social/automation/hashtag-suggest`
+- `GET/POST /api/social/leads/gig-scanner`
+- `GET/POST /api/social/leads/reply-templates`
+- `GET/POST /api/social/brand-voice/fine-tune`
+- `GET/POST/PATCH /api/social/leads/manage`
+- `GET /api/social/leads/export`
+
 ---
 
-*This document was created on February 20, 2026. All 38 features completed on February 20, 2026.*
+*This document was created on February 20, 2026. All 38 flywheel features + 4 bonus features completed on February 20, 2026.*

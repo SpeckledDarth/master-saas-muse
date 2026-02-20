@@ -34,11 +34,17 @@ All routes live under `src/app/api/social/blog/`:
 | `/api/social/blog/posts/[id]` | PATCH | Update a blog post |
 | `/api/social/blog/posts/[id]` | DELETE | Delete a blog post |
 | `/api/social/blog/repurpose` | POST | AI-generate social snippets from a blog post |
+| `/api/social/blog/schedule-snippets` | POST | Schedule repurposed social snippets across 7-14 days |
+| `/api/social/blog/[id]/snippets` | GET | Get social snippets linked to a blog post |
+
+### Cross-Channel Linking
+Located in `migrations/extensions/004_blog_cross_linking.sql`:
+Blog posts and social posts are linked bidirectionally. When a blog post is repurposed into social snippets, the relationship is tracked so users can see which social posts drive traffic to which blog articles, and vice versa. This powers the flywheel metrics on the Blog Home dashboard.
 
 ### Dashboard Pages
 | URL | File | Purpose |
 |-----|------|---------|
-| `/dashboard/social/blog` | `src/app/dashboard/social/blog/page.tsx` | Blog connections management |
+| `/dashboard/social/blog` | `src/app/dashboard/social/blog/page.tsx` | Blog home dashboard with flywheel metrics and connections |
 | `/dashboard/social/blog/compose` | `src/app/dashboard/social/blog/compose/page.tsx` | Article editor with SEO preview |
 | `/dashboard/social/blog/posts` | `src/app/dashboard/social/blog/posts/page.tsx` | Blog post list with filtering |
 

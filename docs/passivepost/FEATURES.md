@@ -19,10 +19,18 @@ A detailed breakdown of every feature in PassivePost, how it works, and what use
 11. [Bulk Import](#11-bulk-import)
 12. [Tier System & Usage Limits](#12-tier-system--usage-limits)
 13. [n8n Automation Templates](#13-n8n-automation-templates)
-14. [Blog Publishing (Coming Soon)](#14-blog-publishing-coming-soon)
+14. [Blog Publishing](#14-blog-publishing)
 15. [Onboarding Wizard](#15-onboarding-wizard)
 16. [Notifications & Alerts](#16-notifications--alerts)
 17. [Dark Mode](#17-dark-mode)
+18. [Content Flywheel System](#18-content-flywheel-system)
+19. [Content Intelligence (Phase 2)](#19-content-intelligence-phase-2)
+20. [Advanced Automation (Phase 3)](#20-advanced-automation-phase-3)
+21. [Distribution Intelligence (Phase 4)](#21-distribution-intelligence-phase-4)
+22. [Revenue & ROI (Phase 5)](#22-revenue--roi-phase-5)
+23. [Engagement & Retention (Phase 6)](#23-engagement--retention-phase-6)
+24. [Collaboration (Phase 7)](#24-collaboration-phase-7)
+25. [Bonus Features](#25-bonus-features)
 
 ---
 
@@ -325,26 +333,30 @@ Pre-built workflow templates for the n8n automation platform, allowing users to 
 
 ---
 
-## 14. Blog Publishing (Coming Soon)
+## 14. Blog Publishing
 
 ### Overview
-A blog cross-posting system that lets users write once and publish to multiple blogging platforms, then automatically generate social media snippets to drive traffic.
+A full blog cross-posting system that lets users write long-form content once and publish to multiple blogging platforms simultaneously. The system then automatically generates social media snippets to drive traffic back to the blog, creating a self-reinforcing content flywheel where blog drives social and social drives blog.
 
 ### Supported Blog Platforms
-- **Medium** — Full integration via API
-- **WordPress** — Full integration via OAuth + app passwords
-- **LinkedIn Articles** — Extends existing LinkedIn connection
-- **Ghost** — Full integration via Admin API
-- **Substack** — Beta support (unofficial API, user consent required)
+
+| Platform | Integration Type | Status |
+|----------|-----------------|--------|
+| **Medium** | Full API integration | Complete |
+| **WordPress** | OAuth + app passwords | Complete |
+| **Ghost** | Admin API | Complete |
+| **LinkedIn Articles** | Extends existing LinkedIn OAuth connection | Complete |
+| **Substack** | Unofficial API (user consent required) | Beta |
 
 ### Key Capabilities
-- **Cross-Linking Flywheel**: Blog posts auto-generate 5–7 social snippets with links back to the article. Social drives blog traffic, blog drives social engagement.
-- **SEO Preview**: See how your post will appear in search results before publishing
-- **Repurpose Engine**: Automatically converts long-form blog content into platform-appropriate social posts
-- **Content Series**: Group related posts into series for sequential publishing
-- **Unified Calendar**: Blog posts appear alongside social posts in the content calendar
-- **Draft Sharing**: Share blog drafts for review before publishing
-- **Analytics Rollup**: See blog and social metrics together
+- **Markdown Editor**: Write blog posts in a rich Markdown editor with live preview and formatting toolbar. Supports headings, lists, code blocks, images, and embedded media.
+- **SEO Preview**: See exactly how your post will appear in Google search results before publishing. Preview includes title, meta description, and URL slug — all editable in real time.
+- **Repurpose Engine**: When a blog post is published, AI automatically generates 5-7 platform-appropriate social media snippets with links back to the article. Each snippet is tailored for its target platform (concise for Twitter/X, professional for LinkedIn, visual for Instagram).
+- **Calendar Integration**: Blog posts appear alongside social posts in the unified content calendar, giving users a complete view of all scheduled content across both blog and social channels.
+- **Content Flywheel**: Blog posts generate social snippets that drive traffic to the blog. Engagement data from social posts feeds back into the intelligence system, informing future blog topics and social strategy. This creates a virtuous cycle where each piece of content amplifies the others.
+- **Content Series**: Group related posts into series for sequential publishing across platforms.
+- **Draft Sharing**: Share blog drafts for review before publishing to external platforms.
+- **Analytics Rollup**: See blog and social metrics together in a unified dashboard view.
 
 For full details, see [BLOG_PUBLISHING.md](./BLOG_PUBLISHING.md).
 
@@ -392,6 +404,183 @@ All Recharts analytics components use themed tooltips that adapt to the current 
 
 ---
 
+## 18. Content Flywheel System
+
+### Overview
+The Content Flywheel is a 7-phase system comprising 38 features that transforms PassivePost from a social media scheduling tool into a complete content marketing platform. Each phase builds on the previous one, creating a self-reinforcing loop where content creation, intelligence, automation, distribution, revenue tracking, engagement, and collaboration all feed into each other to continuously improve results.
+
+### The 7 Phases
+
+| Phase | Name | Features | Purpose |
+|-------|------|----------|---------|
+| 1 | Blog Publishing | 5 | Cross-platform blog publishing with social repurposing |
+| 2 | Content Intelligence | 8 | AI-powered content analysis, scoring, and optimization |
+| 3 | Advanced Automation | 9 | Automated content workflows, recycling, and transformation |
+| 4 | Distribution Intelligence | 4 | Platform-specific timing, hashtag tracking, and audience analysis |
+| 5 | Revenue & ROI | 4 | Content ROI calculation, cost tracking, and reporting |
+| 6 | Engagement & Retention | 6 | Streaks, digests, templates, and gamification |
+| 7 | Collaboration | 2 | Client approval portals and team approval queues |
+
+### How It Works
+The flywheel begins with content creation (blog and social posts) and feeds performance data into the intelligence layer. Intelligence insights inform automation rules, which optimize distribution. Distribution data feeds into ROI tracking, which helps users understand what content is worth investing in. Engagement features keep users active and consistent, while collaboration tools extend the flywheel to teams and clients. Each phase amplifies the others, meaning the system gets smarter and more effective the more it is used.
+
+For the complete technical specification, implementation details, and phase-by-phase breakdown, see [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md).
+
+---
+
+## 19. Content Intelligence (Phase 2)
+
+Phase 2 of the Content Flywheel provides AI-powered analysis tools that help users understand what makes their content succeed and how to improve it. All intelligence features are accessible from the Intelligence dashboard page.
+
+### AI Content Grader
+Scores draft posts on three dimensions: engagement potential, readability, and brand alignment. Users see a composite score (0-100) before publishing, along with specific suggestions for improvement. The grader analyzes factors like post length, question usage, call-to-action presence, and emotional tone to predict how well the content will perform.
+
+### Best Performing Content DNA
+Analyzes your top-performing published posts to extract the patterns that drive engagement. The system identifies common elements across your best content — such as tone, length, topic categories, posting times, and formatting choices — and presents them as a "DNA profile" that users can reference when creating new content.
+
+### Topic Fatigue Detection
+Monitors the topics you post about and warns when you are overusing the same themes. The system tracks topic frequency over configurable time windows and surfaces alerts when a topic exceeds a healthy posting threshold. Users see recommendations for underused topics to keep their content mix fresh and their audience engaged.
+
+### Content Mix Optimizer
+Recommends the ideal balance of content types (educational, promotional, entertaining, engagement-driven) based on your audience's response patterns. The optimizer compares your current content distribution against industry benchmarks and your own historical performance data, then suggests adjustments to maximize overall engagement.
+
+### Tone Drift Monitor
+Continuously compares your recent posts against your configured brand voice settings and alerts you when your writing style begins to drift. The monitor tracks metrics like formality level, vocabulary complexity, and emotional tone across your recent content. When drift is detected, users receive specific guidance on how to realign with their brand voice.
+
+### Content Cannibalization Detector
+Identifies posts that are competing for the same audience attention by covering overlapping topics or targeting the same keywords. The detector scans your content library for semantic similarity and flags potential cannibalization issues. Users receive suggestions for differentiating or consolidating competing content.
+
+### Engagement Prediction
+Uses machine learning trained on your historical posting data to predict how a draft post will perform before you publish it. The prediction engine estimates likely engagement metrics (likes, comments, shares, reach) and provides a confidence score. Users can compare predicted performance across different content variations to choose the strongest option.
+
+### Content Brief Generator
+AI creates detailed content briefs based on identified gaps in your content strategy and current trending topics in your niche. Each brief includes a suggested title, key talking points, target audience segment, recommended format, optimal posting time, and relevant hashtags. Users can generate briefs on demand or receive them as automated weekly suggestions.
+
+---
+
+## 20. Advanced Automation (Phase 3)
+
+Phase 3 of the Content Flywheel introduces intelligent automation features that reduce manual content management work. These tools handle repetitive tasks like content recycling, format conversion, and calendar management, accessible from the Automation dashboard page.
+
+### Calendar Autopilot
+AI automatically fills your content calendar based on optimal posting times, content mix recommendations, and available draft content. Users configure their preferred posting frequency and content goals, then Autopilot suggests a complete weekly or monthly calendar. Users can accept the full plan, adjust individual slots, or override specific dates before the schedule goes live.
+
+### Batch Repurpose
+Converts multiple posts into different formats simultaneously. Users select a set of posts and choose target formats (e.g., convert 10 LinkedIn posts into Twitter threads and Instagram captions at once). The AI adapts each piece of content to the target platform's conventions, character limits, and hashtag norms, saving hours of manual reformatting.
+
+### Content Recycling Queue
+Automatically identifies high-performing older content that is worth reposting. The system analyzes historical engagement data, considers time since last posting, and evaluates continued relevance to build a queue of recyclable content. Users can review the queue, approve or skip suggestions, and set minimum time gaps between reposts to avoid audience fatigue.
+
+### Evergreen Content Identifier
+Scans your content library and flags posts that remain relevant regardless of when they were originally published. The identifier evaluates factors like topic timelessness, lack of date-specific references, and sustained engagement over time. Flagged content is automatically added to the recycling queue for periodic reposting.
+
+### Blog-to-Thread Converter
+Transforms long-form blog posts into Twitter/X thread format with a single click. The converter intelligently splits blog content into tweet-sized segments, preserves logical flow between tweets, adds thread numbering, and creates an engaging hook for the first tweet. Users can edit individual tweets in the thread before scheduling.
+
+### Cross-Post Timing Optimizer
+Staggers posts across multiple platforms to maximize total reach rather than posting everywhere simultaneously. The optimizer uses platform-specific engagement data to determine the best posting window for each platform, then spaces out cross-posts accordingly. Users see a visual timeline of planned cross-posts with estimated reach projections.
+
+### Repurpose Chains
+Multi-step content transformation pipelines that automate complex repurposing workflows. Users define chains like "Blog Post to LinkedIn Article to Twitter Thread to Instagram Carousel" and the system executes each transformation step automatically. Chains can be saved as templates and applied to new content with one click.
+
+### Draft Expiration Warnings
+Sends alerts when draft posts have been sitting unfinished for a configurable period. The system tracks draft age and notifies users via in-dashboard alerts and optional email reminders. Users can set custom expiration windows per content type and choose to publish, reschedule, or archive expired drafts.
+
+### Content Decay Alerts
+Monitors previously high-performing published content and notifies users when engagement metrics begin to decline significantly. The system compares recent engagement rates against historical averages for each post and triggers alerts when decay exceeds a configurable threshold. Users receive suggestions for refreshing or repurposing decaying content.
+
+---
+
+## 21. Distribution Intelligence (Phase 4)
+
+Phase 4 of the Content Flywheel focuses on optimizing how and where content reaches its audience. These features use engagement data to provide platform-specific recommendations, accessible from the Distribution dashboard page.
+
+### Platform-Specific Timing Optimizer
+Analyzes your historical engagement data on each connected platform to determine the best posting times specific to your audience. Unlike generic "best times to post" advice, this optimizer learns from your actual followers' behavior patterns. Users see a heatmap of optimal posting windows per platform and can apply recommended times directly to scheduled posts.
+
+### Hashtag Performance Tracker
+Tracks which hashtags you use and measures their impact on engagement over time. The tracker records impressions, reach, and engagement rates for each hashtag across platforms, then ranks them by effectiveness. Users can identify their top-performing hashtags, discover declining hashtags to retire, and see recommendations for new hashtags to try.
+
+### Audience Persona Builder
+AI creates detailed audience personas based on who actually engages with your content. The builder analyzes engagement patterns, commenter profiles, sharing behavior, and demographic data (where available) to construct persona profiles. Each persona includes estimated demographics, interests, preferred content types, and active hours — helping users tailor content to their real audience.
+
+### Competitor Content Gap Analysis
+Identifies topics and content themes that your competitors cover but you do not. Users input competitor profiles or URLs, and the system analyzes their content strategy to find gaps in your coverage. The analysis surfaces specific topic opportunities ranked by estimated audience interest and competitive difficulty.
+
+---
+
+## 22. Revenue & ROI (Phase 5)
+
+Phase 5 of the Content Flywheel connects content performance to business outcomes. These features help users understand the financial value of their content efforts, accessible from the Revenue dashboard page.
+
+### Content ROI Calculator
+Calculates the return on time and money invested in content creation. Users input their time spent creating content and any associated costs (tools, freelancers, ads), and the calculator estimates the value generated through engagement, reach, lead generation, and conversions. Results are presented as a clear ROI percentage with trends over time.
+
+### Cost Per Post Tracking
+Tracks the true cost of creating and publishing each piece of content by factoring in time spent drafting, editing, scheduling, and managing responses. Users can log time manually or let the system estimate based on activity patterns. The tracker breaks down costs by platform, content type, and whether the post was AI-generated or manually created.
+
+### Monthly Content Report Card
+Generates an automated monthly performance summary covering all content activity across platforms. The report card includes total posts published, engagement metrics, audience growth, top-performing content, content mix analysis, and month-over-month comparisons. Users receive the report card via email and can view it in the dashboard.
+
+### White-Label Reports
+Export professionally branded reports for clients or stakeholders with your own logo and branding. Reports include customizable sections for engagement metrics, content calendar summaries, ROI analysis, and strategic recommendations. Users can generate PDF or interactive web reports and schedule automated recurring report delivery.
+
+---
+
+## 23. Engagement & Retention (Phase 6)
+
+Phase 6 of the Content Flywheel focuses on keeping users actively engaged with the platform through gamification, actionable insights, and community features. These features are accessible from the Engagement and Retention dashboard pages.
+
+### Streak System
+Rewards consistent posting with streak tracking that counts consecutive days (or weeks) of publishing content. Users see their current streak prominently displayed on the dashboard along with their longest streak record. The system sends encouraging notifications to maintain streaks and celebratory messages for milestone achievements (7-day, 30-day, 100-day streaks).
+
+### Weekly Flywheel Digest
+An email-ready summary of your content performance from the past week, including posts published, total engagement, top-performing content, and suggested actions for the coming week. Users can preview the digest in the dashboard before it sends. The digest also highlights flywheel metrics showing how blog and social content reinforced each other.
+
+### Next Best Action Prompts
+AI analyzes your current content state — drafts waiting, scheduled posts, engagement trends, gaps in your calendar — and suggests the single most impactful action you should take next. Suggestions appear as a prominent card on the dashboard and might include "Publish your 3-day-old draft about X" or "Your LinkedIn engagement is down — try posting a question post today." Each prompt includes a one-click action button to execute the suggestion.
+
+### Content Templates Library
+A collection of pre-built content templates for common post types like product announcements, tips and tricks, testimonials, behind-the-scenes, polls, and engagement hooks. Users can browse templates by category and platform, customize them with their own brand voice, and save custom templates for reuse. Templates include placeholder text, suggested formatting, and hashtag recommendations.
+
+### Public Content Scorecard
+A shareable public profile page that showcases your content performance metrics. The scorecard displays posting consistency, engagement rates, platform reach, and content volume in a visually appealing format. Users can share their scorecard URL on social media or include it in portfolios to demonstrate their content marketing capabilities.
+
+### Flywheel Leaderboard
+Team rankings for collaborative environments where multiple users contribute to a shared content strategy. The leaderboard tracks metrics like posts published, engagement generated, streaks maintained, and content quality scores. Teams can compete on weekly or monthly cycles, and individual contributors see how their efforts compare to teammates.
+
+---
+
+## 24. Collaboration (Phase 7)
+
+Phase 7 of the Content Flywheel adds team and client collaboration features that extend PassivePost into agency and team workflows. These features are accessible from the Collaboration dashboard page.
+
+### Client Approval Portal
+A public-facing page where clients can review and approve pending content without needing a PassivePost account. Each client receives a unique, secure approval link that shows their queued content with full previews. Clients can approve, request changes (with inline comments), or reject posts directly from the portal. All client actions sync back to the creator's dashboard in real time.
+
+### Approval Queue
+An internal dashboard for managing all content pending approval across clients and team members. The queue displays posts grouped by client or project with status indicators (pending, approved, changes requested, rejected). Users can filter by client, platform, or date range, and take bulk actions to approve or reschedule multiple posts at once.
+
+---
+
+## 25. Bonus Features
+
+Additional standalone features that enhance the core PassivePost experience.
+
+### AI Hashtag Suggestions
+A dedicated button in the post composer that generates contextually relevant hashtags based on your post content, target platform, and niche. The AI analyzes your post text and suggests 5-15 hashtags ranked by estimated reach and relevance. Users can add individual hashtags with a single click or insert all suggestions at once. The system learns from your hashtag performance history to improve recommendations over time.
+
+### Gig Lead Notifications
+A keyword scanner that monitors social platforms for posts matching configurable keywords related to your services. When someone posts looking for help in your niche (e.g., "looking for a plumber in Denver"), the system captures it as a potential lead and sends a notification. Users configure scan keywords, target platforms, and geographic filters to focus on the most relevant opportunities.
+
+### AI Voice Fine-Tuner
+Paste samples of your existing writing (blog posts, emails, social posts) and the AI analyzes your unique voice patterns — including sentence structure, vocabulary preferences, formality level, humor usage, and emotional tone. The analysis results are stored as a voice profile that enhances all future AI content generation, making generated posts sound authentically like you rather than generic AI output. Users can update their voice profile at any time by adding new writing samples.
+
+### Lead CRM Mini
+A lightweight lead management system built into PassivePost for tracking potential clients discovered through social engagement and gig lead notifications. Users can tag leads by status (new, contacted, qualified, converted), add notes to each lead record, and export lead lists as CSV for use in external CRM tools. The CRM tracks lead source, engagement history, and communication timeline in a streamlined interface designed for solopreneurs and small teams.
+
+---
+
 ## Related Documentation
 
 | Document | What It Covers |
@@ -400,6 +589,8 @@ All Recharts analytics components use themed tooltips that adapt to the current 
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Technical blueprint: database, APIs, OAuth, queue system |
 | [SITEMAP.md](./SITEMAP.md) | Every page and URL in the application |
 | [USER_GUIDE.md](./USER_GUIDE.md) | Step-by-step guide for using PassivePost |
+| [BLOG_PUBLISHING.md](./BLOG_PUBLISHING.md) | Full blog cross-posting system documentation |
+| [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md) | Complete 7-phase Content Flywheel specification |
 
 ---
 

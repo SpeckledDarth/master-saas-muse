@@ -55,7 +55,7 @@ Each niche has an admin-editable prompt guidance entry that shapes how the AI ge
 
 ## 3. Dashboard Pages
 
-The PassivePost social dashboard lives at `/dashboard/social/` and uses a dedicated sidebar layout with 10 pages.
+The PassivePost social dashboard lives at `/dashboard/social/` and uses a dedicated sidebar layout with 17+ pages covering content management, blog publishing, content intelligence, automation, distribution, revenue tracking, retention, and team collaboration.
 
 ### Overview (`/dashboard/social/overview`)
 
@@ -527,7 +527,34 @@ npx playwright test tests/passivepost.spec.ts
 
 ---
 
-## 19. Roadmap / Future
+## 19. Content Flywheel System
+
+PassivePost includes a complete 38-feature content flywheel across 7 phases, plus 4 bonus features (42 total). The flywheel transforms PassivePost from a simple scheduling tool into a comprehensive content marketing platform.
+
+### Phases Overview
+
+| Phase | Name | Features |
+|-------|------|----------|
+| 1 | Flywheel Foundation | Blog publishing, repurpose engine, flywheel metrics |
+| 2 | Content Intelligence | AI grader, content DNA, topic fatigue, content mix, tone drift, cannibalization, engagement prediction, brief generator |
+| 3 | Advanced Automation | Calendar autopilot, batch repurpose, content recycling, evergreen finder, blog-to-thread, cross-post timing, repurpose chains, draft warnings, content decay |
+| 4 | Distribution Intelligence | Platform timing, hashtag tracker, audience personas, competitor gap |
+| 5 | Revenue & ROI | ROI calculator, cost per post, report card, white-label exports |
+| 6 | Engagement & Retention | Streaks, digest, next best action, templates, scorecard, leaderboard |
+| 7 | Collaboration | Client approval portal, approval queue |
+
+### Bonus Features
+
+- **AI Hashtag Suggestions** — Button in post composer generates relevant hashtags using AI
+- **Gig Lead Notifications** — Keyword scanner finds potential clients on social platforms
+- **AI Voice Fine-Tuner** — Paste writing samples to teach AI your unique voice patterns
+- **Lead CRM Mini** — Tags, notes, status tracking, and CSV export for leads
+
+For complete details on every feature, see [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md).
+
+---
+
+## 20. Roadmap / Future
 
 The following features are planned for future development:
 
@@ -539,13 +566,9 @@ Currently, PassivePost ships with 3 default tiers (Starter, Basic, Premium). A f
 
 Of the 10 supported platforms, 3 have full API integration (Twitter/X, LinkedIn, Facebook). The remaining 7 platforms (YouTube, TikTok, Reddit, Pinterest, Snapchat, Discord, Instagram) have stubbed API client methods that are ready for real implementation as platform APIs are integrated.
 
-### Approval Queue UI
-
-The data model already supports post approval workflows. A future UI will allow team leads or account owners to review and approve AI-generated posts before they are scheduled for publishing.
-
 ---
 
-## 20. Related Documentation
+## 21. Related Documentation
 
 This Product Guide is the original comprehensive reference. For focused documentation, see:
 
@@ -556,8 +579,8 @@ This Product Guide is the original comprehensive reference. For focused document
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Technical blueprint: database schema, API routes, OAuth flows, queue system |
 | [SITEMAP.md](./SITEMAP.md) | Every page, route, and API endpoint in the application |
 | [USER_GUIDE.md](./USER_GUIDE.md) | Step-by-step guide for end users |
-| [BLOG_PUBLISHING.md](./BLOG_PUBLISHING.md) | Blog cross-posting feature details (coming soon) |
-| [ROADMAP.md](./ROADMAP.md) | PassivePost-specific feature roadmap |
+| [BLOG_PUBLISHING.md](./BLOG_PUBLISHING.md) | Blog cross-posting feature details |
+| [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md) | Complete 38-feature flywheel system: phases, APIs, dashboards |
 
 ---
 

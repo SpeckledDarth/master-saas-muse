@@ -915,7 +915,7 @@ PassivePost is a SaaS product built **on top of** MuseKit using the database ext
 - [x] Database extension pattern: core tables in `migrations/core/`, PassivePost-specific in `migrations/extensions/`
 - [x] Per-user Stripe tier resolution (`getUserSocialTier` in `src/lib/social/user-tier.ts`) maps subscription metadata key `muse_tier` (values: tier_1/tier_2/tier_3, admin-configurable) to rate limits
 - [x] OAuth flows for Facebook/LinkedIn/Twitter with PKCE (`/api/social/connect`, `/api/social/callback/[platform]`)
-- [x] Social dashboard with 7 pages: overview, calendar, engagement, queue, posts, brand preferences, onboarding
+- [x] Social dashboard with 17+ pages: overview, calendar, engagement, queue, posts, brand preferences, onboarding, blog (3 pages), intelligence, automation, distribution, revenue, retention, collaboration, leads
 - [x] Social overview dashboard with usage progress bar, "X posts remaining" line, and Quick Generate dialog
 - [x] Engagement analytics dashboard with Recharts charts (`/dashboard/social/engagement`)
 - [x] Calendar view with month-grid showing scheduled posts and per-platform count tooltips (`/dashboard/social/calendar`)
@@ -929,6 +929,12 @@ PassivePost is a SaaS product built **on top of** MuseKit using the database ext
 - [x] BullMQ "no posts" case logs at info level (not error) for clean log output
 - [x] All RLS policies verified, proper empty states on all dashboard pages, no secrets exposed
 - [x] Admin-configurable niche guidance entries with validation (empty entries filtered on save)
+- [x] Blog publishing to Medium, WordPress, Ghost, LinkedIn Articles, and Substack (beta)
+- [x] Content flywheel system: 38 features across 7 phases (Content Intelligence, Advanced Automation, Distribution Intelligence, Revenue & ROI, Engagement & Retention, Collaboration)
+- [x] 4 bonus features: AI Hashtag Suggestions, Gig Lead Notifications, AI Voice Fine-Tuner, Lead CRM Mini
+- [x] 60+ API routes covering all flywheel phases and bonus features
+- [x] Client approval portal at `/approve/[token]` (public, no auth required)
+- [x] Full E2E testing passed with 100% success rate across all API routes
 
 **Database Extension Tables** (`migrations/extensions/`):
 - `brand_preferences` (id, user_id, org_id, tone, niche, location, sample_urls, target_audience, posting_goals, preferred_platforms, post_frequency)
@@ -1151,7 +1157,7 @@ src/
 | 36| API Token Rotation               | 52     | COMPLETE    |
 | 37| PassivePost Module (10 platforms) | 21     | COMPLETE    |
 | 38| Centralized API Keys & Integrations | 53 | COMPLETE    |
-| 39| PassivePost Extension         | 54     | COMPLETE    |
+| 39| PassivePost Extension (42 features) | 54     | COMPLETE    |
 
 ---
 
@@ -1259,7 +1265,7 @@ When creating a new muse from this template:
 - [x] Module 52: API Token Rotation - Automated webhook secret rotation
 - [x] Module 21: PassivePost Module - Toggleable social media management with 10 platforms, 2 tiers, AI-powered post generation, scheduling, n8n templates, E2E tests
 - [x] Module 53: Centralized API Keys & Integrations - Collapsible groups, Required/Optional labels, format validation, social keys on PassivePost page
-- [x] Module 54: PassivePost Extension - OAuth flows, Stripe tier integration, engagement analytics, calendar, brand preferences, Quick Generate, upgrade banner, admin-configurable engagement pull
+- [x] Module 54: PassivePost Extension - OAuth flows, Stripe tier integration, engagement analytics, calendar, brand preferences, Quick Generate, upgrade banner, admin-configurable engagement pull, blog publishing (5 platforms), 38-feature content flywheel (7 phases), 4 bonus features (42 total), 60+ API routes, client approval portal, E2E tested
 
 ### Next Steps:
 - [ ] Clone template for first production muse (ExtrusionCalculator.com)
