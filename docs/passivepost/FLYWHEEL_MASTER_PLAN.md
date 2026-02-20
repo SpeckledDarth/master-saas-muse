@@ -2,7 +2,7 @@
 
 > **Purpose**: This is the single source of truth for all planned PassivePost features. If agent memory resets between sessions, read this file first to resume work. Every feature, its phase, description, and status is documented here.
 
-> **Last Updated**: February 20, 2026
+> **Last Updated**: February 20, 2026 (Phase 1 complete)
 
 ---
 
@@ -35,8 +35,8 @@ Before diving into the plan, here's what exists today:
 - [x] Sidebar navigation for Blog section
 
 ### What's Missing
-- [ ] Flywheel metrics and health scoring
-- [ ] Cross-channel linking (blog ↔ social)
+- [x] Flywheel metrics and health scoring (Phase 1 — complete Feb 2026)
+- [x] Cross-channel linking (blog ↔ social) (Phase 1 — complete Feb 2026)
 - [ ] Content intelligence features
 - [ ] Advanced automation
 - [ ] Revenue/ROI tracking
@@ -63,7 +63,8 @@ Before diving into the plan, here's what exists today:
   - Cross-posting to multiple platforms? (25 points)
   - Repurposing into social snippets? (25 points)
   - Scheduling/publishing those snippets? (25 points)
-- **Status**: [ ] Not started
+- **Status**: [x] Complete (Feb 2026)
+- **Files**: `src/app/api/social/flywheel/metrics/route.ts`
 
 ### 1.2 Blog Home Dashboard Upgrade
 - **What**: Replace the connections-only Blog Home page with a proper dashboard
@@ -71,7 +72,8 @@ Before diving into the plan, here's what exists today:
   - Stats row: total articles, articles this month, cross-posts published, snippets generated
   - Per-article performance cards: title, platforms cross-posted to, snippet count, snippet publish status
   - Quick actions: Compose new, View all articles, Manage connections (moved to sub-section)
-- **Status**: [ ] Not started
+- **Status**: [x] Complete (Feb 2026)
+- **Files**: `src/app/dashboard/social/blog/page.tsx`
 
 ### 1.3 Flywheel Health Score on Overview
 - **What**: Prominent card on the main social overview dashboard
@@ -81,7 +83,8 @@ Before diving into the plan, here's what exists today:
   - Breakdown bars: Writing, Cross-posting, Repurposing, Scheduling
   - Content velocity sparkline (30-day trend)
   - "Next Best Action" prompt (e.g., "Repurpose your last 3 blog posts" or "Schedule 4 drafted snippets")
-- **Status**: [ ] Not started
+- **Status**: [x] Complete (Feb 2026)
+- **Files**: `src/app/dashboard/social/overview/page.tsx` (flywheel card section)
 
 ### 1.4 Cross-Channel Linking (Both Directions)
 - **What**: Connect blog content and social posts visually and functionally
@@ -92,13 +95,15 @@ Before diving into the plan, here's what exists today:
   - When composing a social post, "Link to Blog" dropdown that auto-inserts the blog URL
   - On social post cards, show "From blog: [title]" tag for repurposed posts
   - Track `source_blog_id` on social posts to maintain the connection
-- **Status**: [ ] Not started
+- **Status**: [x] Complete (Feb 2026)
+- **Files**: `migrations/extensions/004_blog_cross_linking.sql`, `src/app/api/social/blog/repurpose/route.ts` (saves linked posts), `src/app/api/social/blog/[id]/snippets/route.ts`
 
 ### 1.5 Auto-Snippet Scheduling
 - **What**: After repurposing a blog post into 5-7 snippets, one click spreads them across the next 7-14 days automatically
 - **Logic**: Distribute snippets evenly, using the "Best Times to Post" data for each platform, avoiding weekends (configurable)
 - **UI**: "Schedule All" button on the repurpose results, with a preview of the proposed schedule
-- **Status**: [ ] Not started
+- **Status**: [x] Complete (Feb 2026)
+- **Files**: `src/app/api/social/blog/schedule-snippets/route.ts`, `src/app/dashboard/social/blog/posts/page.tsx` (Schedule All button per article)
 
 ---
 

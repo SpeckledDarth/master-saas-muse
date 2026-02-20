@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Pen, Trash2, FileText, ArrowLeft, Clock, CheckCircle, XCircle, Repeat, ExternalLink, AlertCircle, Search } from 'lucide-react'
+import { Loader2, Pen, Trash2, FileText, ArrowLeft, Clock, CheckCircle, XCircle, Repeat, ExternalLink, AlertCircle, Search, Sparkles, CalendarCheck } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { HelpTooltip } from '@/components/social/help-tooltip'
 import Link from 'next/link'
@@ -38,13 +38,44 @@ function getStatusVariant(status: BlogPostStatus): 'default' | 'secondary' | 'de
   }
 }
 
+interface SnippetInfo {
+  total: number
+  drafted: number
+  scheduled: number
+  published: number
+}
+
 export default function BlogPostsPage() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('all')
   const [deleting, setDeleting] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [snippetMap, setSnippetMap] = useState<Record<string, SnippetInfo>>({})
+  const [scheduling, setScheduling] = useState<string | null>(null)
   const { toast } = useToast()
+
+  const fetchSnippets = useCallback(async (postIds: string[]) => {
+    const map: Record<string, SnippetInfo> = {}
+    await Promise.all(
+      postIds.map(async id => {
+        try {
+          const res = await fetch(`/api/social/blog/${id}/snippets`)
+          if (res.ok) {
+            const data = await res.json()
+            const snippets = data.snippets || []
+            map[id] = {
+              total: snippets.length,
+              drafted: snippets.filter((s: any) => s.status === 'draft').length,
+              scheduled: snippets.filter((s: any) => s.status === 'scheduled').length,
+              published: snippets.filter((s: any) => s.status === 'posted').length,
+            }
+          }
+        } catch {}
+      })
+    )
+    setSnippetMap(map)
+  }, [])
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -53,13 +84,17 @@ export default function BlogPostsPage() {
       const res = await fetch(`/api/social/blog/posts?${params.toString()}`)
       if (!res.ok) { setPosts([]); return }
       const data = await res.json()
-      setPosts(data.posts || [])
+      const fetched = data.posts || []
+      setPosts(fetched)
+      if (fetched.length > 0) {
+        fetchSnippets(fetched.map((p: BlogPost) => p.id))
+      }
     } catch {
       setPosts([])
     } finally {
       setLoading(false)
     }
-  }, [activeTab])
+  }, [activeTab, fetchSnippets])
 
   useEffect(() => {
     setLoading(true)
@@ -80,6 +115,28 @@ export default function BlogPostsPage() {
       toast({ title: 'Error', description: (err as Error).message, variant: 'destructive' })
     } finally {
       setDeleting(null)
+    }
+  }
+
+  const handleScheduleAll = async (postId: string) => {
+    setScheduling(postId)
+    try {
+      const res = await fetch('/api/social/blog/schedule-snippets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blogPostId: postId }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to schedule snippets')
+      }
+      const data = await res.json()
+      toast({ title: 'Snippets Scheduled', description: `${data.scheduled} snippet${data.scheduled !== 1 ? 's' : ''} spread across ${data.spreadDays} days` })
+      fetchSnippets([postId])
+    } catch (err) {
+      toast({ title: 'Error', description: (err as Error).message, variant: 'destructive' })
+    } finally {
+      setScheduling(null)
     }
   }
 
@@ -233,7 +290,34 @@ export default function BlogPostsPage() {
                           <Repeat className="mr-0.5 h-2.5 w-2.5" /> {post.repurpose_count} snippets
                         </Badge>
                       )}
+
+                      {snippetMap[post.id] && snippetMap[post.id].total > 0 && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          <Sparkles className="mr-0.5 h-2.5 w-2.5" />
+                          {snippetMap[post.id].published}/{snippetMap[post.id].total} snippets published
+                        </Badge>
+                      )}
                     </div>
+
+                    {snippetMap[post.id] && snippetMap[post.id].drafted > 0 && (
+                      <div className="mt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs h-7"
+                          onClick={() => handleScheduleAll(post.id)}
+                          disabled={scheduling === post.id}
+                          data-testid={`button-schedule-all-${post.id}`}
+                        >
+                          {scheduling === post.id ? (
+                            <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />
+                          ) : (
+                            <CalendarCheck className="mr-1.5 h-3 w-3" />
+                          )}
+                          Schedule {snippetMap[post.id].drafted} snippet{snippetMap[post.id].drafted !== 1 ? 's' : ''}
+                        </Button>
+                      </div>
+                    )}
 
                     {post.published_urls && Object.keys(post.published_urls).length > 0 && (
                       <div className="flex items-center gap-2 mt-2 flex-wrap">

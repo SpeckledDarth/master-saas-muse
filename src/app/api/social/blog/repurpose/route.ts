@@ -133,14 +133,34 @@ export async function POST(request: NextRequest) {
     }
 
     if (body.blogPostId) {
+      const admin = getSupabaseAdmin()
       try {
-        const admin = getSupabaseAdmin()
         await admin
           .from('blog_posts')
           .update({ repurposed: true, repurpose_count: snippets.length })
           .eq('id', body.blogPostId)
           .eq('user_id', user.id)
       } catch {}
+
+      try {
+        const socialPosts = snippets.map(s => ({
+          user_id: user.id,
+          platform: s.platform,
+          content: s.content,
+          status: 'draft',
+          source_blog_id: body.blogPostId,
+          created_at: new Date().toISOString(),
+        }))
+        const { data: inserted } = await admin
+          .from('social_posts')
+          .insert(socialPosts)
+          .select('id, platform, content, status, source_blog_id')
+        if (inserted) {
+          return NextResponse.json({ snippets, savedPosts: inserted, count: snippets.length })
+        }
+      } catch (saveErr) {
+        console.warn('[Repurpose] Could not save snippets as social posts:', (saveErr as Error).message)
+      }
     }
 
     return NextResponse.json({ snippets, count: snippets.length })

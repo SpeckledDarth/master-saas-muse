@@ -17,6 +17,11 @@ import {
   TrendingUp,
   Plus,
   Clock,
+  RefreshCw,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+  ExternalLink,
 } from 'lucide-react'
 import { PlatformIconCircle } from '@/components/social/platform-icon'
 import { PostDetailDialog, PostDetailData } from '@/components/social/post-detail-dialog'
@@ -51,6 +56,15 @@ interface TierInfo {
     monthlyPosts?: number
     maxPlatforms?: number
   }
+}
+
+interface FlywheelData {
+  healthScore: number
+  momentum: 'accelerating' | 'steady' | 'decelerating'
+  breakdown: { writing: number; crossPosting: number; repurposing: number; scheduling: number }
+  counts: { totalArticles: number; articlesThisMonth: number; totalSnippets: number; publishedSnippets: number; draftedSnippets: number }
+  velocity: { date: string; count: number }[]
+  nextAction: { type: string; message: string; href: string } | null
 }
 
 const TIER_DISPLAY: Record<string, string> = {
@@ -98,6 +112,7 @@ export default function SocialOverviewPage() {
   const [recentPosts, setRecentPosts] = useState<SocialPost[]>([])
   const [user, setUser] = useState<User | null>(null)
   const [detailPost, setDetailPost] = useState<PostDetailData | null>(null)
+  const [flywheel, setFlywheel] = useState<FlywheelData | null>(null)
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
 
   if (typeof window !== 'undefined' && !supabaseRef.current) {
@@ -123,10 +138,11 @@ export default function SocialOverviewPage() {
         } catch { return fallback }
       }
 
-      const [postsData, accountsData, tierData] = await Promise.all([
+      const [postsData, accountsData, tierData, flywheelData] = await Promise.all([
         safeFetch('/api/social/posts?limit=200', { posts: [] }),
         safeFetch('/api/social/accounts', { accounts: [] }),
         safeFetch('/api/social/tier', {}),
+        safeFetch('/api/social/flywheel/metrics', {}),
       ])
 
       const posts: SocialPost[] = postsData.posts || []
@@ -168,6 +184,10 @@ export default function SocialOverviewPage() {
         }
       } else if (!hasRealData) {
         setTierName('Basic')
+      }
+
+      if (flywheelData.healthScore !== undefined) {
+        setFlywheel(flywheelData as FlywheelData)
       }
     } catch {
       console.error('[SocialOverview] Unexpected error loading dashboard data')
@@ -303,6 +323,93 @@ export default function SocialOverviewPage() {
       )}
 
       <CoachingCard />
+
+      {flywheel && (
+        <Card className="border-primary/20" data-testid="card-flywheel-health">
+          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
+            <CardTitle className="text-base flex items-center gap-2">
+              <RefreshCw className="h-4 w-4 text-primary" />
+              Content Flywheel
+              <HelpTooltip text="Your content flywheel score measures how well you're turning blog articles into social media reach. Write blogs, cross-post, repurpose into snippets, and schedule them." />
+            </CardTitle>
+            <Link href="/dashboard/social/blog">
+              <Button variant="outline" size="sm" data-testid="button-flywheel-details">Details</Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="flex flex-col items-center justify-center text-center">
+                <div className={`text-4xl font-bold ${flywheel.healthScore >= 70 ? 'text-green-600 dark:text-green-400' : flywheel.healthScore >= 40 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`} data-testid="text-flywheel-overview-score">
+                  {flywheel.healthScore}
+                </div>
+                <span className="text-sm text-muted-foreground mt-1">out of 100</span>
+                <div className="flex items-center gap-1 mt-2">
+                  {flywheel.momentum === 'accelerating' ? (
+                    <ArrowUp className="h-4 w-4 text-green-500" />
+                  ) : flywheel.momentum === 'decelerating' ? (
+                    <ArrowDown className="h-4 w-4 text-red-500" />
+                  ) : (
+                    <Minus className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <span className="text-xs text-muted-foreground capitalize">{flywheel.momentum}</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {[
+                  { label: 'Writing', value: flywheel.breakdown.writing },
+                  { label: 'Cross-Posting', value: flywheel.breakdown.crossPosting },
+                  { label: 'Repurposing', value: flywheel.breakdown.repurposing },
+                  { label: 'Scheduling', value: flywheel.breakdown.scheduling },
+                ].map(item => (
+                  <div key={item.label} className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs text-muted-foreground">{item.label}</span>
+                      <span className="text-xs font-medium">{item.value}/25</span>
+                    </div>
+                    <Progress value={(item.value / 25) * 100} className="h-1.5" />
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-3">
+                <div className="text-xs text-muted-foreground uppercase tracking-wide font-medium">30-Day Velocity</div>
+                <div className="flex items-end gap-[2px] h-12" data-testid="chart-velocity-sparkline">
+                  {flywheel.velocity.slice(-14).map((d, i) => {
+                    const max = Math.max(...flywheel.velocity.slice(-14).map(v => v.count), 1)
+                    const height = Math.max((d.count / max) * 100, 4)
+                    return (
+                      <div
+                        key={i}
+                        className="flex-1 bg-primary/60 rounded-t-sm min-w-[3px]"
+                        style={{ height: `${height}%` }}
+                        title={`${d.date}: ${d.count}`}
+                      />
+                    )
+                  })}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {flywheel.counts.totalArticles} article{flywheel.counts.totalArticles !== 1 ? 's' : ''} &middot; {flywheel.counts.totalSnippets} snippet{flywheel.counts.totalSnippets !== 1 ? 's' : ''}
+                </p>
+              </div>
+            </div>
+
+            {flywheel.nextAction && (
+              <div className="mt-4 pt-4 border-t flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary shrink-0" />
+                  <p className="text-sm text-muted-foreground">{flywheel.nextAction.message}</p>
+                </div>
+                <Link href={flywheel.nextAction.href}>
+                  <Button size="sm" variant="outline" data-testid="button-flywheel-next-action">
+                    Do it <ExternalLink className="ml-1.5 h-3 w-3" />
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card data-testid="card-connected-accounts-list">
