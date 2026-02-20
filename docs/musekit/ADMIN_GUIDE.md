@@ -699,7 +699,7 @@ Each component can be toggled on/off independently. Toggle names follow the patt
 
 ## PassivePost (Social Media Management)
 
-PassivePost is a separate product built on MuseKit. For complete documentation including dashboard pages, tier system, API routes, OAuth flows, and admin configuration, see `docs/PASSIVEPOST.md`.
+PassivePost is a separate product built on MuseKit. For complete documentation including dashboard pages, tier system, API routes, OAuth flows, and admin configuration, see `docs/passivepost/PRODUCT_GUIDE.md`.
 
 **Quick reference for admins:**
 - Admin config page: `/admin/setup/passivepost`

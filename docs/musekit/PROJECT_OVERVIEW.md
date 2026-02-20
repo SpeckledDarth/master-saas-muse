@@ -23,7 +23,7 @@ MuseKit and PassivePost are **two distinct sides** of this project:
 | **Database** | `migrations/core/` | `migrations/extensions/` |
 | **Can be removed?** | No — it's the foundation | Yes — delete `/social/` dirs to remove |
 
-PassivePost proves the MuseKit extension model works. For full PassivePost details, see `docs/PASSIVEPOST.md`.
+PassivePost proves the MuseKit extension model works. For full PassivePost details, see `docs/passivepost/PRODUCT_GUIDE.md`.
 
 ---
 
@@ -255,7 +255,7 @@ Key highlights:
 - Engagement analytics, calendar view, and post queue management
 - 4 BullMQ background job types for social operations
 
-For complete details, see `docs/PASSIVEPOST.md`.
+For complete details, see `docs/passivepost/PRODUCT_GUIDE.md`.
 
 ---
 
@@ -315,7 +315,7 @@ MuseKit supports a clean extension model for building products on top of the tem
 - **Extension tables** live in `migrations/extensions/` and add product-specific schemas
 - This ensures clean template cloning — extensions can be included or excluded per product
 - PassivePost is the first product built using this pattern, proving the model works
-- See `docs/ADDING_A_PRODUCT.md` for how to build your own product on MuseKit
+- See `docs/musekit/ADDING_A_PRODUCT.md` for how to build your own product on MuseKit
 
 ---
 
@@ -488,14 +488,14 @@ MuseKit exists to eliminate that barrier. With a production-ready foundation, fo
 
 | Document | Purpose |
 |----------|---------|
-| `docs/PROJECT_OVERVIEW.md` | This file — high-level overview of the entire project |
-| `docs/PASSIVEPOST.md` | Dedicated guide for the PassivePost social media product |
-| `docs/SETUP_GUIDE.md` | Step-by-step setup instructions for new clones |
-| `docs/MUSE_CHECKLIST.md` | Launch readiness checklist |
-| `docs/ADMIN_GUIDE.md` | Day-to-day admin dashboard guide |
-| `docs/MASTER_PLAN.md` | Detailed technical specifications and module breakdown |
-| `docs/ARCHITECTURE.md` | Deployment model, merge rules, and separation boundaries |
-| `docs/ADDING_A_PRODUCT.md` | How to build a new product on MuseKit |
+| `docs/musekit/PROJECT_OVERVIEW.md` | This file — high-level overview of the entire project |
+| `docs/passivepost/PRODUCT_GUIDE.md` | Dedicated guide for the PassivePost social media product |
+| `docs/musekit/SETUP_GUIDE.md` | Step-by-step setup instructions for new clones |
+| `docs/musekit/MUSE_CHECKLIST.md` | Launch readiness checklist |
+| `docs/musekit/ADMIN_GUIDE.md` | Day-to-day admin dashboard guide |
+| `docs/musekit/MASTER_PLAN.md` | Detailed technical specifications and module breakdown |
+| `docs/musekit/ARCHITECTURE.md` | Deployment model, merge rules, and separation boundaries |
+| `docs/musekit/ADDING_A_PRODUCT.md` | How to build a new product on MuseKit |
 
 ---
 

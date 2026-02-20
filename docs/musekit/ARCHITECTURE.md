@@ -155,7 +155,7 @@ Product-specific files live in isolated directories:
 - `src/app/api/social/` - PassivePost API routes
 - `src/app/admin/setup/passivepost/` - PassivePost admin config
 - `migrations/extensions/` - PassivePost database tables
-- `docs/PASSIVEPOST.md` - PassivePost product documentation
+- `docs/passivepost/PRODUCT_GUIDE.md` - PassivePost product documentation
 
 ---
 

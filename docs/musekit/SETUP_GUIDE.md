@@ -702,14 +702,14 @@ The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these met
 | `git push` | Deploy to Vercel (auto-deploy) |
 
 ### Documentation Reference
-- `docs/SETUP_GUIDE.md` - This file (setup & configuration)
-- `docs/ADMIN_GUIDE.md` - Admin dashboard usage
-- `docs/PASSIVEPOST.md` - PassivePost extension guide
-- `docs/ADDING_A_PRODUCT.md` - How to add new products
-- `docs/ARCHITECTURE.md` - System architecture overview
-- `docs/MASTER_PLAN.md` - Project roadmap
-- `docs/MUSE_CHECKLIST.md` - Feature checklist
-- `docs/PROJECT_OVERVIEW.md` - Project overview
+- `docs/musekit/SETUP_GUIDE.md` - This file (setup & configuration)
+- `docs/musekit/ADMIN_GUIDE.md` - Admin dashboard usage
+- `docs/passivepost/PRODUCT_GUIDE.md` - PassivePost extension guide
+- `docs/musekit/ADDING_A_PRODUCT.md` - How to add new products
+- `docs/musekit/ARCHITECTURE.md` - System architecture overview
+- `docs/musekit/MASTER_PLAN.md` - Project roadmap
+- `docs/musekit/MUSE_CHECKLIST.md` - Feature checklist
+- `docs/musekit/PROJECT_OVERVIEW.md` - Project overview
 
 ---
 

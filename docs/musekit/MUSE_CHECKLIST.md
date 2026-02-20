@@ -62,7 +62,7 @@ This checklist guides you through setting up a new project from the Master SaaS 
 
 ## Step 4: Create Database Tables (5 min)
 
-Run the SQL from `docs/SETUP_GUIDE.md` in Supabase SQL Editor:
+Run the SQL from `docs/musekit/SETUP_GUIDE.md` in Supabase SQL Editor:
 - [ ] Create `profiles` table (with stripe fields)
 - [ ] Create `user_roles` table
 - [ ] Create `organization_settings` table
@@ -74,7 +74,7 @@ Run the SQL from `docs/SETUP_GUIDE.md` in Supabase SQL Editor:
 - [ ] Enable Row Level Security on all tables
 - [ ] Create RLS policies
 
-> **New Table:** The `admin_notes` table is used by the Customer Service Tools in the admin Users page. See `docs/SETUP_GUIDE.md` for the SQL.
+> **New Table:** The `admin_notes` table is used by the Customer Service Tools in the admin Users page. See `docs/musekit/SETUP_GUIDE.md` for the SQL.
 
 ---
 
@@ -703,14 +703,14 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 
 ## Documentation
 
-- `docs/SETUP_GUIDE.md` — Full setup instructions and SQL schemas
-- `docs/ADMIN_GUIDE.md` — Admin dashboard usage guide
-- `docs/ARCHITECTURE.md` — System architecture overview
-- `docs/ADDING_A_PRODUCT.md` — How to add new products/extensions
-- `docs/PROJECT_OVERVIEW.md` — Project overview and goals
-- `docs/MASTER_PLAN.md` — Roadmap and planning
-- `docs/PASSIVEPOST.md` — Dedicated PassivePost product guide
-- `docs/MUSE_CHECKLIST.md` — This checklist
+- `docs/musekit/SETUP_GUIDE.md` — Full setup instructions and SQL schemas
+- `docs/musekit/ADMIN_GUIDE.md` — Admin dashboard usage guide
+- `docs/musekit/ARCHITECTURE.md` — System architecture overview
+- `docs/musekit/ADDING_A_PRODUCT.md` — How to add new products/extensions
+- `docs/musekit/PROJECT_OVERVIEW.md` — Project overview and goals
+- `docs/musekit/MASTER_PLAN.md` — Roadmap and planning
+- `docs/passivepost/PRODUCT_GUIDE.md` — Dedicated PassivePost product guide
+- `docs/musekit/MUSE_CHECKLIST.md` — This checklist
 
 ---
 

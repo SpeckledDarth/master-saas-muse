@@ -377,7 +377,7 @@ export async function getUserSocialTier(userId: string) {
 
 This pattern (a thin wrapper around the core tier resolver) is recommended for all products.
 
-For complete PassivePost documentation including all dashboard pages, API routes, OAuth flows, and tier details, see `docs/PASSIVEPOST.md`.
+For complete PassivePost documentation including all dashboard pages, API routes, OAuth flows, and tier details, see `docs/passivepost/PRODUCT_GUIDE.md`.
 
 ## File Reference
 

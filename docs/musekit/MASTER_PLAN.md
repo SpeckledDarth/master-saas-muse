@@ -689,7 +689,7 @@ src/
 **Status**: COMPLETE (February 2026)
 
 **Deliverables**:
-- [x] Comprehensive Admin Guide (`docs/ADMIN_GUIDE.md`) - 24+ sections, 800+ lines
+- [x] Comprehensive Admin Guide (`docs/musekit/ADMIN_GUIDE.md`) - 24+ sections, 800+ lines
 - [x] Non-technical language for team members managing the platform
 - [x] Covers all admin features, setup, and best practices
 
@@ -866,7 +866,7 @@ src/
 │   └── api/social/                      # Social API routes (accounts, posts, generate-post, health)
 ```
 
-> For complete PassivePost documentation, see `docs/PASSIVEPOST.md`.
+> For complete PassivePost documentation, see `docs/passivepost/PRODUCT_GUIDE.md`.
 
 ---
 
@@ -978,7 +978,7 @@ src/
     └── 002_engagement_metrics_placeholder.sql
 ```
 
-> For complete PassivePost documentation, see `docs/PASSIVEPOST.md`.
+> For complete PassivePost documentation, see `docs/passivepost/PRODUCT_GUIDE.md`.
 
 ---
 
