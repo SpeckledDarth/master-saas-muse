@@ -21,6 +21,7 @@ import {
 import { PlatformIconCircle } from '@/components/social/platform-icon'
 import { PostDetailDialog, PostDetailData } from '@/components/social/post-detail-dialog'
 import { HelpTooltip } from '@/components/social/help-tooltip'
+import { CoachingCard } from '@/components/social/coaching-card'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
@@ -300,6 +301,8 @@ export default function SocialOverviewPage() {
           </CardContent>
         </Card>
       )}
+
+      <CoachingCard />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card data-testid="card-connected-accounts-list">

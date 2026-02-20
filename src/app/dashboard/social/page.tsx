@@ -4,9 +4,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Twitter, Linkedin, Instagram, Youtube, Facebook, Music, MessageSquare, Image, Camera, Gamepad2, Check, X, RefreshCw, Unlink } from 'lucide-react'
+import { Loader2, Check, X, RefreshCw, Unlink } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { HelpTooltip } from '@/components/social/help-tooltip'
+import { PlatformIcon, getPlatformColor } from '@/components/social/platform-icon'
 import {
   Dialog,
   DialogContent,
@@ -19,21 +20,20 @@ import type { SocialAccount } from '@/lib/social/client'
 type PlatformInfo = {
   id: string
   name: string
-  icon: typeof Twitter
   comingSoon?: boolean
 }
 
 const PLATFORMS: PlatformInfo[] = [
-  { id: 'twitter', name: 'Twitter / X', icon: Twitter },
-  { id: 'linkedin', name: 'LinkedIn', icon: Linkedin },
-  { id: 'instagram', name: 'Instagram', icon: Instagram },
-  { id: 'youtube', name: 'YouTube', icon: Youtube },
-  { id: 'facebook', name: 'Facebook', icon: Facebook },
-  { id: 'tiktok', name: 'TikTok', icon: Music },
-  { id: 'reddit', name: 'Reddit', icon: MessageSquare },
-  { id: 'pinterest', name: 'Pinterest', icon: Image },
-  { id: 'snapchat', name: 'Snapchat', icon: Camera },
-  { id: 'discord', name: 'Discord', icon: Gamepad2 },
+  { id: 'twitter', name: 'X' },
+  { id: 'linkedin', name: 'LinkedIn' },
+  { id: 'instagram', name: 'Instagram' },
+  { id: 'youtube', name: 'YouTube' },
+  { id: 'facebook', name: 'Facebook' },
+  { id: 'tiktok', name: 'TikTok' },
+  { id: 'reddit', name: 'Reddit' },
+  { id: 'pinterest', name: 'Pinterest' },
+  { id: 'snapchat', name: 'Snapchat' },
+  { id: 'discord', name: 'Discord' },
 ]
 
 export default function SocialAccountsPage() {
@@ -215,14 +215,17 @@ export default function SocialAccountsPage() {
       <div className="grid gap-4">
         {PLATFORMS.map(platform => {
           const account = getAccountForPlatform(platform.id)
-          const Icon = platform.icon
+          const brandColor = getPlatformColor(platform.id)
 
           return (
             <Card key={platform.id} data-testid={`card-platform-${platform.id}`}>
               <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-2">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted">
-                    <Icon className="h-5 w-5" />
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-md"
+                    style={{ backgroundColor: `${brandColor}14` }}
+                  >
+                    <PlatformIcon platform={platform.id} className="h-5 w-5" />
                   </div>
                   <div>
                     <CardTitle className="text-base" data-testid={`text-platform-name-${platform.id}`}>
