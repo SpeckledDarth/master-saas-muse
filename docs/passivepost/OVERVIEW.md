@@ -1,5 +1,7 @@
 # PassivePost — Product Overview
 
+> **Revision:** 2 | **Last Updated:** February 20, 2026 | **Created:** February 20, 2026
+
 **AI-Powered Social Media Scheduling for Solopreneurs and Small Businesses**
 
 ---
@@ -243,4 +245,3 @@ PassivePost adds its own layer on top: social platform API clients, AI content g
 
 ---
 
-*Last Updated: February 20, 2026*

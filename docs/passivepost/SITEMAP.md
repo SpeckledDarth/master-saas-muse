@@ -1,5 +1,7 @@
 # PassivePost — Sitemap
 
+> **Revision:** 2 | **Last Updated:** February 20, 2026 | **Created:** February 20, 2026
+
 A complete reference of every page, API endpoint, and route in PassivePost.
 
 ---
@@ -430,4 +432,3 @@ PassivePost users also interact with these MuseKit core pages:
 
 ---
 
-*Last Updated: February 20, 2026*

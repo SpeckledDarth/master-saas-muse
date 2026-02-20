@@ -1,5 +1,7 @@
 # PassivePost — Technical Architecture
 
+> **Revision:** 2 | **Last Updated:** February 20, 2026 | **Created:** February 20, 2026
+
 A technical reference covering PassivePost's system design, database schema, API surface, OAuth flows, background jobs, and how it integrates with the MuseKit template.
 
 ---
@@ -719,4 +721,3 @@ For agencies or power users managing content at scale:
 
 ---
 
-*Last Updated: February 20, 2026*

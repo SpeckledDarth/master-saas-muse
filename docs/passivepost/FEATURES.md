@@ -1,5 +1,7 @@
 # PassivePost — Feature Guide
 
+> **Revision:** 2 | **Last Updated:** February 20, 2026 | **Created:** February 20, 2026
+
 A detailed breakdown of every feature in PassivePost, how it works, and what users can do with it.
 
 > **All 7 Flywheel Phases Complete** — PassivePost ships with the full 38-feature content flywheel system plus 4 bonus features (42 total). Every phase is implemented and functional.
@@ -614,4 +616,3 @@ A lightweight lead management system built into PassivePost for tracking potenti
 
 ---
 
-*Last Updated: February 20, 2026*

@@ -1,5 +1,7 @@
 # PassivePost — User Guide
 
+> **Revision:** 2 | **Last Updated:** February 20, 2026 | **Created:** February 20, 2026
+
 A step-by-step guide for using PassivePost to manage your social media presence.
 
 ---
@@ -602,4 +604,3 @@ Manage your leads beyond just tracking:
 
 ---
 
-*Last Updated: February 20, 2026*

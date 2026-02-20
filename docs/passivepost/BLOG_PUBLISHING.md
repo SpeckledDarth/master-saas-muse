@@ -1,5 +1,7 @@
 # Blog Publishing Feature
 
+> **Revision:** 2 | **Last Updated:** February 20, 2026 | **Created:** February 20, 2026
+
 ## Overview
 Blog Publishing extends PassivePost from a social media management tool into a full content marketing platform. Users can write blog articles, cross-post to multiple blogging platforms, and generate social media snippets from their blog content — creating a "content flywheel" that drives traffic between blogs and social profiles.
 

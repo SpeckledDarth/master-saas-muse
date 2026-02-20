@@ -1,5 +1,7 @@
 # PassivePost -- Comprehensive Product Guide
 
+> **Revision:** 2 | **Last Updated:** February 20, 2026 | **Created:** February 20, 2026
+
 **AI-Powered Social Media Scheduling for Solopreneurs and Gig Workers**
 
 ---
@@ -650,4 +652,3 @@ This Product Guide is the original comprehensive reference. For focused document
 
 ---
 
-*Last Updated: February 20, 2026*
