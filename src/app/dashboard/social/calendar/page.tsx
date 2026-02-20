@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Loader2, ChevronLeft, ChevronRight, CalendarDays, AlertCircle, List, Clock, Send } from 'lucide-react'
+import { Loader2, ChevronLeft, ChevronRight, CalendarDays, AlertCircle, List, Clock, Send, LayoutGrid } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { DEMO_POSTS } from '@/lib/social/demo-data'
@@ -78,7 +78,7 @@ export default function SocialCalendarPage() {
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [selectedDate, setSelectedDate] = useState<string | null>(() => toDateKey(new Date()))
   const [platformFilter, setPlatformFilter] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<'month' | 'week'>('month')
+  const [viewMode, setViewMode] = useState<'month' | 'week' | 'quarter'>('quarter')
   const [detailPost, setDetailPost] = useState<PostDetailData | null>(null)
   const { toast } = useToast()
 
@@ -175,6 +175,45 @@ export default function SocialCalendarPage() {
     })
   }, [currentDate])
 
+  const quarterMonths = useMemo(() => {
+    return [-1, 0, 1].map(offset => {
+      const year = currentYear + Math.floor((currentMonth + offset) / 12)
+      const month = ((currentMonth + offset) % 12 + 12) % 12
+      const daysInMonth = getDaysInMonth(year, month)
+      const firstDay = getFirstDayOfMonth(year, month)
+      const prevMonthDays = getDaysInMonth(year, month - 1)
+
+      const days: { date: Date; isCurrentMonth: boolean }[] = []
+
+      for (let i = firstDay - 1; i >= 0; i--) {
+        days.push({
+          date: new Date(year, month - 1, prevMonthDays - i),
+          isCurrentMonth: false,
+        })
+      }
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        days.push({
+          date: new Date(year, month, i),
+          isCurrentMonth: true,
+        })
+      }
+
+      const remaining = 7 - (days.length % 7)
+      if (remaining < 7) {
+        for (let i = 1; i <= remaining; i++) {
+          days.push({
+            date: new Date(year, month + 1, i),
+            isCurrentMonth: false,
+          })
+        }
+      }
+
+      const label = new Date(year, month, 1).toLocaleString('default', { month: 'long', year: 'numeric' })
+      return { year, month, days, label }
+    })
+  }, [currentYear, currentMonth])
+
   const todayKey = toDateKey(new Date())
 
   const goToPrevMonth = () => {
@@ -225,7 +264,7 @@ export default function SocialCalendarPage() {
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Post Calendar <HelpTooltip text="See all your scheduled and published posts laid out on a calendar." /></h1>
         <p className="text-muted-foreground mt-1" data-testid="text-page-description">
           View your scheduled and published posts on your content calendar
-          <HelpTooltip text="Switch between month and week views. Click any day to see its posts. Use the platform filter to focus on one network." />
+          <HelpTooltip text="Switch between quarter, month, and week views. Click any day to see its posts. Use the platform filter to focus on one network." />
         </p>
         <div className="flex items-center gap-2 mt-3" data-testid="view-toggle">
           <Button
@@ -237,6 +276,16 @@ export default function SocialCalendarPage() {
           >
             <CalendarDays className="mr-1.5 h-3.5 w-3.5" />
             Month
+          </Button>
+          <Button
+            variant={viewMode === 'quarter' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('quarter')}
+            data-testid="button-view-quarter"
+            className="toggle-elevate"
+          >
+            <LayoutGrid className="mr-1.5 h-3.5 w-3.5" />
+            Quarter
           </Button>
           <Button
             variant={viewMode === 'week' ? 'default' : 'outline'}
@@ -472,6 +521,159 @@ export default function SocialCalendarPage() {
                           variant={STATUS_VARIANT[post.status] || 'outline'}
                           className="shrink-0"
                           data-testid={`badge-status-${post.id}`}
+                        >
+                          {post.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {viewMode === 'quarter' && (
+            <Card data-testid="card-quarter-view">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setCurrentDate(new Date(currentYear, currentMonth - 3, 1))}
+                    data-testid="button-prev-quarter"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-lg" data-testid="text-quarter-range">
+                      {quarterMonths[0].label} &ndash; {quarterMonths[2].label}
+                    </CardTitle>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={goToToday}
+                      data-testid="button-today-quarter"
+                    >
+                      Today
+                    </Button>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setCurrentDate(new Date(currentYear, currentMonth + 3, 1))}
+                    data-testid="button-next-quarter"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="quarter-grid">
+                  {quarterMonths.map(qm => (
+                    <div key={`${qm.year}-${qm.month}`}>
+                      <h3
+                        className="text-sm font-semibold text-center mb-2"
+                        data-testid={`text-quarter-month-${qm.year}-${qm.month}`}
+                      >
+                        {qm.label}
+                      </h3>
+                      <div className="grid grid-cols-7 gap-px">
+                        {DAYS_OF_WEEK.map(day => (
+                          <div
+                            key={day}
+                            className="text-center text-[10px] font-medium text-muted-foreground py-1"
+                          >
+                            {day.charAt(0)}
+                          </div>
+                        ))}
+                        {qm.days.map(({ date, isCurrentMonth }, index) => {
+                          const dateKey = toDateKey(date)
+                          const dayPosts = postsByDate[dateKey] || []
+                          const isToday = dateKey === todayKey
+                          const isSelected = dateKey === selectedDate
+                          const uniquePlatforms = [...new Set(dayPosts.map(p => p.platform))]
+
+                          return (
+                            <button
+                              key={index}
+                              onClick={() => setSelectedDate(dateKey)}
+                              className={`
+                                relative flex flex-col items-center py-1 rounded-sm text-[11px] transition-colors
+                                ${isCurrentMonth ? '' : 'opacity-30'}
+                                ${isToday ? 'ring-1 ring-primary font-bold' : ''}
+                                ${isSelected ? 'bg-accent' : ''}
+                                ${!isSelected ? 'hover-elevate' : ''}
+                              `}
+                              data-testid={`button-quarter-day-${dateKey}`}
+                            >
+                              <span className={isToday ? 'text-primary-600 dark:text-primary-400' : ''}>
+                                {date.getDate()}
+                              </span>
+                              {uniquePlatforms.length > 0 && (
+                                <div className="flex gap-px mt-0.5">
+                                  {uniquePlatforms.slice(0, 3).map(platform => (
+                                    <span
+                                      key={platform}
+                                      className={`block h-1.5 w-1.5 rounded-full ${getPlatformDotClass(platform)}`}
+                                    />
+                                  ))}
+                                  {uniquePlatforms.length > 3 && (
+                                    <span className="text-[8px] text-muted-foreground leading-none">+</span>
+                                  )}
+                                </div>
+                              )}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {viewMode === 'quarter' && selectedDate && (
+            <Card data-testid="card-selected-day-quarter">
+              <CardHeader>
+                <CardTitle className="text-base" data-testid="text-selected-date-quarter">
+                  Posts for {new Date(selectedDate + 'T00:00:00').toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {selectedDayPosts.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-posts-day-quarter">
+                    No posts scheduled for this day
+                  </p>
+                ) : (
+                  <div className="space-y-3" data-testid="list-day-posts-quarter">
+                    {selectedDayPosts.map(post => (
+                      <div
+                        key={post.id}
+                        className="flex items-start gap-3 p-3 rounded-md border cursor-pointer hover-elevate active-elevate-2"
+                        onClick={() => setDetailPost(post)}
+                        data-testid={`card-post-quarter-${post.id}`}
+                      >
+                        <PlatformIconCircle platform={post.platform} size="sm" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm" data-testid={`text-content-quarter-${post.id}`}>
+                            {post.content.length > 100
+                              ? post.content.slice(0, 100) + '...'
+                              : post.content}
+                          </p>
+                          {post.scheduled_at && (
+                            <p className="text-xs text-muted-foreground mt-1" data-testid={`text-time-quarter-${post.id}`}>
+                              {new Date(post.scheduled_at).toLocaleTimeString('default', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
+                          )}
+                        </div>
+                        <Badge
+                          variant={STATUS_VARIANT[post.status] || 'outline'}
+                          className="shrink-0"
+                          data-testid={`badge-status-quarter-${post.id}`}
                         >
                           {post.status}
                         </Badge>
