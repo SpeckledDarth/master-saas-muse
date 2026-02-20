@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -60,6 +61,10 @@ export default function BrandPreferencesPage() {
   const [saving, setSaving] = useState(false)
   const [hasExisting, setHasExisting] = useState(false)
   const [newSampleUrl, setNewSampleUrl] = useState('')
+  const [voiceSamples, setVoiceSamples] = useState<string[]>(['', '', ''])
+  const [voiceAnalyzing, setVoiceAnalyzing] = useState(false)
+  const [voiceProfile, setVoiceProfile] = useState<any>(null)
+  const [voiceLoading, setVoiceLoading] = useState(true)
   const { toast } = useToast()
 
   const fetchPreferences = useCallback(async () => {
@@ -88,6 +93,12 @@ export default function BrandPreferencesPage() {
     fetchPreferences()
   }, [fetchPreferences])
 
+  useEffect(() => {
+    fetch('/api/social/brand-voice/fine-tune').then(r => r.ok ? r.json() : null).then(data => {
+      if (data?.profile) setVoiceProfile(data.profile)
+    }).catch(() => {}).finally(() => setVoiceLoading(false))
+  }, [])
+
   const handleSave = async () => {
     setSaving(true)
     try {
@@ -112,6 +123,30 @@ export default function BrandPreferencesPage() {
       })
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleVoiceAnalysis = async () => {
+    const filled = voiceSamples.filter(s => s.trim().length > 10)
+    if (filled.length < 3) {
+      toast({ title: 'Need more samples', description: 'Please provide at least 3 writing samples (10+ characters each)', variant: 'destructive' })
+      return
+    }
+    setVoiceAnalyzing(true)
+    try {
+      const res = await fetch('/api/social/brand-voice/fine-tune', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ samplePosts: filled }),
+      })
+      if (!res.ok) throw new Error('Analysis failed')
+      const data = await res.json()
+      setVoiceProfile(data.profile)
+      toast({ title: 'Voice Profile Created', description: 'Your AI writing voice has been analyzed and saved' })
+    } catch {
+      toast({ title: 'Error', description: 'Could not analyze voice samples', variant: 'destructive' })
+    } finally {
+      setVoiceAnalyzing(false)
     }
   }
 
@@ -339,6 +374,98 @@ export default function BrandPreferencesPage() {
           Save Preferences
         </Button>
       </div>
+
+      <Card className="mt-6" data-testid="card-voice-fine-tuner">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2 flex-wrap">
+            <Sparkles className="h-5 w-5" />
+            AI Voice Fine-Tuner
+            <HelpTooltip text="Paste 3-10 examples of your writing (social posts, blog excerpts, emails). AI will analyze your unique voice and create a custom writing template." />
+          </CardTitle>
+          <CardDescription>Teach AI to write exactly like you</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {voiceProfile && (
+            <Card className="border-primary/30 bg-primary/5" data-testid="card-voice-profile">
+              <CardContent className="pt-4 space-y-3">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <h4 className="font-medium">Your Voice Profile</h4>
+                  <Badge variant="secondary">Active</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">{voiceProfile.summary}</p>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="font-medium">Tone:</span> {voiceProfile.tone}</div>
+                  <div><span className="font-medium">Sentence Style:</span> {voiceProfile.sentenceStyle}</div>
+                  <div><span className="font-medium">Emoji Usage:</span> {voiceProfile.emojiUsage}</div>
+                  <div><span className="font-medium">CTA Style:</span> {voiceProfile.ctaStyle}</div>
+                </div>
+                {voiceProfile.uniquePhrases?.length > 0 && (
+                  <div>
+                    <span className="text-sm font-medium">Unique Phrases: </span>
+                    {voiceProfile.uniquePhrases.map((p: string, i: number) => (
+                      <Badge key={i} variant="outline" className="mr-1 mb-1">{p}</Badge>
+                    ))}
+                  </div>
+                )}
+                {voiceProfile.promptTemplate && (
+                  <div className="mt-2">
+                    <span className="text-sm font-medium">AI Prompt Template:</span>
+                    <pre className="mt-1 text-xs bg-muted p-3 rounded-md overflow-x-auto whitespace-pre-wrap">{voiceProfile.promptTemplate}</pre>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+          <div className="space-y-3">
+            <Label>Paste Your Writing Samples</Label>
+            <p className="text-xs text-muted-foreground">Add at least 3 examples of your writing (posts, emails, blog excerpts). The more samples, the better the AI learns your voice.</p>
+            {voiceSamples.map((sample, i) => (
+              <div key={i} className="flex gap-2">
+                <Textarea
+                  placeholder={`Sample ${i + 1}: Paste a post or writing example...`}
+                  value={sample}
+                  onChange={e => {
+                    const updated = [...voiceSamples]
+                    updated[i] = e.target.value
+                    setVoiceSamples(updated)
+                  }}
+                  className="min-h-[60px] resize-none"
+                  data-testid={`input-voice-sample-${i}`}
+                />
+              </div>
+            ))}
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setVoiceSamples(prev => [...prev, ''])}
+                disabled={voiceSamples.length >= 15}
+                data-testid="button-add-sample"
+              >
+                <Plus className="mr-1 h-3 w-3" /> Add Sample
+              </Button>
+              {voiceSamples.length > 3 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setVoiceSamples(prev => prev.slice(0, -1))}
+                  data-testid="button-remove-sample"
+                >
+                  <XIcon className="mr-1 h-3 w-3" /> Remove Last
+                </Button>
+              )}
+            </div>
+          </div>
+          <Button
+            onClick={handleVoiceAnalysis}
+            disabled={voiceAnalyzing || voiceSamples.filter(s => s.trim().length > 10).length < 3}
+            data-testid="button-analyze-voice"
+          >
+            {voiceAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+            Analyze My Voice
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   )
 }

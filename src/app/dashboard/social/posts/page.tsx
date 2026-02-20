@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Facebook, Trash2, Edit, FileText, AlertCircle, Heart, MessageCircle, Share2, MousePointerClick, BookOpen } from 'lucide-react'
+import { Loader2, Send, Clock, Sparkles, Twitter, Linkedin, Facebook, Trash2, Edit, FileText, AlertCircle, Heart, MessageCircle, Share2, MousePointerClick, BookOpen, Hash } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { PostPreview } from '@/components/social/post-preview'
 import { BulkImport } from '@/components/social/bulk-import'
@@ -99,6 +99,9 @@ export default function SocialPostsPage() {
   const [sourceBlogId, setSourceBlogId] = useState<string>('')
   const [blogArticles, setBlogArticles] = useState<{id: string, title: string, published_urls?: Record<string, string>}[]>([])
   const [blogTitleMap, setBlogTitleMap] = useState<Record<string, string>>({})
+
+  const [hashtagSuggesting, setHashtagSuggesting] = useState(false)
+  const [suggestedHashtags, setSuggestedHashtags] = useState<string[]>([])
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -266,6 +269,36 @@ export default function SocialPostsPage() {
     setAiResult('')
     setAiTopic('')
     setAiBrandVoice('')
+  }
+
+  const handleSuggestHashtags = async () => {
+    if (!content.trim()) {
+      toast({ title: 'Error', description: 'Write some content first', variant: 'destructive' })
+      return
+    }
+    setHashtagSuggesting(true)
+    setSuggestedHashtags([])
+    try {
+      const res = await fetch('/api/social/automation/hashtag-suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: content.trim(), platform }),
+      })
+      if (!res.ok) throw new Error('Failed to suggest hashtags')
+      const data = await res.json()
+      setSuggestedHashtags(data.hashtags || [])
+    } catch (err) {
+      toast({ title: 'Error', description: 'Could not suggest hashtags', variant: 'destructive' })
+    } finally {
+      setHashtagSuggesting(false)
+    }
+  }
+
+  const handleAddHashtag = (tag: string) => {
+    if (!content.includes(tag)) {
+      setContent(prev => prev + (prev.trim() ? ' ' : '') + tag)
+    }
+    setSuggestedHashtags(prev => prev.filter(t => t !== tag))
   }
 
   const formatDate = (dateStr: string | null) => {
@@ -476,6 +509,29 @@ export default function SocialPostsPage() {
               className="min-h-[100px] resize-none"
               data-testid="input-post-content"
             />
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSuggestHashtags}
+              disabled={hashtagSuggesting || !content.trim()}
+              data-testid="button-suggest-hashtags"
+            >
+              {hashtagSuggesting ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Hash className="mr-2 h-3 w-3" />}
+              Suggest Hashtags
+            </Button>
+            {suggestedHashtags.map(tag => (
+              <Badge
+                key={tag}
+                variant="secondary"
+                className="cursor-pointer"
+                onClick={() => handleAddHashtag(tag)}
+                data-testid={`badge-hashtag-${tag.replace('#', '')}`}
+              >
+                {tag} +
+              </Badge>
+            ))}
           </div>
           <div className="flex items-center gap-2">
             <Switch
