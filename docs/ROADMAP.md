@@ -16,7 +16,7 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 
 | Phase | Name | Status | Target |
 |-------|------|--------|--------|
-| 1 | Testimonial/Success Metrics Dashboard | Not Started | Week 1 |
+| 1 | Testimonial/Success Metrics Dashboard | Complete | Week 1 |
 | 1.5 | Launch Kit | Not Started | Week 1-2 |
 | 2 | Connect Real Platform APIs & Full Testing | Not Started | Week 2-3 |
 | 3 | Affiliate Marketing Features | Not Started | Week 3-4 |
@@ -30,10 +30,10 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 1.1 | Testimonial management system — database table, admin CRUD page (add, edit, approve, feature testimonials) | Not Started | Admin page in setup section |
-| 1.2 | Public "Wall of Love" / success metrics page — displays featured testimonials and aggregate success stats | Not Started | Public route, no auth required |
-| 1.3 | Live aggregate usage counters — wire landing page animated counters to real database data (total posts, users, platforms connected) | Not Started | Replace manually-set counter values |
-| 1.4 | Social proof notification popups — toast-style notifications on landing page ("Sarah from Austin just scheduled 12 posts") | Not Started | Lightweight, non-intrusive popups |
+| 1.1 | Testimonial management system — database table, admin CRUD page (add, edit, approve, feature testimonials) | Complete | Migration: `migrations/core/003_testimonials.sql`, API: `src/app/api/admin/testimonials/route.ts`, Admin: `src/app/admin/setup/testimonials/page.tsx` |
+| 1.2 | Public "Wall of Love" / success metrics page — displays featured testimonials and aggregate success stats | Complete | Public route: `/testimonials`, API: `src/app/api/public/testimonials/route.ts` |
+| 1.3 | Live aggregate usage counters — wire landing page animated counters to real database data (total posts, users, platforms connected) | Complete | API: `src/app/api/public/stats/route.ts`, wired to Wall of Love stats section |
+| 1.4 | Social proof notification popups — toast-style notifications on landing page ("Sarah from Austin just scheduled 12 posts") | Complete | Component: `src/components/landing/social-proof-popup.tsx`, togglable via `socialProofEnabled` in ContentSettings |
 
 **Dependencies:** None — standalone features.
 
@@ -151,6 +151,7 @@ Running log of what was accomplished each session. Update at the end of every se
 | Date | Session Summary | Phase Progress |
 |------|----------------|----------------|
 | Feb 20, 2026 | Completed all 42 PassivePost features. Updated all documentation with visual diagrams, scalability sections, deployment guides, pricing tie-ins, access levels, and screenshot placeholders. Added version tracking to all 16 docs (8 PassivePost + 8 MuseKit). Created this roadmap. | Pre-Phase 1 |
+| Feb 20, 2026 | Built Phase 1: Testimonial management (migration, API, admin CRUD page), public Wall of Love page with live stats, aggregate stats API endpoint, social proof notification popups on landing page. All 4 features complete. | Phase 1 Complete |
 
 ---
 

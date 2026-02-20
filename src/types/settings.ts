@@ -361,6 +361,7 @@ export interface ContentSettings {
   imageCollageImages?: string[]
   imageCollageHeadline?: string
   imageCollageSubheadline?: string
+  socialProofEnabled?: boolean
 }
 
 export interface TeamMember {

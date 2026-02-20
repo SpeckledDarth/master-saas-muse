@@ -23,6 +23,7 @@ import { ComparisonBars } from '@/components/landing/comparison-bars'
 import { BottomHeroCta } from '@/components/landing/bottom-hero-cta'
 import { ProductShowcase } from '@/components/landing/product-showcase'
 import { ImageCollageSection } from '@/components/landing/image-collage-section'
+import { SocialProofPopup } from '@/components/landing/social-proof-popup'
 
 const iconMap: Record<string, React.ReactNode> = {
   Zap: <Zap className="h-5 w-5 text-primary-800 dark:text-primary-200" />,
@@ -93,6 +94,7 @@ export default function HomePage() {
   const bottomHeroCtaEnabled = content?.bottomHeroCtaEnabled ?? false
   const productShowcaseEnabled = content?.productShowcaseEnabled ?? false
   const imageCollageEnabled = content?.imageCollageEnabled ?? false
+  const socialProofEnabled = content?.socialProofEnabled ?? true
 
   const getSectionBg = (section: 'features' | 'testimonials' | 'faq' | 'cta' | 'customerStories') => {
     const style = content?.sectionBackgrounds?.[section] ?? 'default'
@@ -419,6 +421,7 @@ export default function HomePage() {
     <div className="flex flex-col">
       <AnnouncementBar />
       {renderHero()}
+      <SocialProofPopup enabled={socialProofEnabled} />
 
       {sectionOrder.map(sectionId => {
         switch (sectionId) {
