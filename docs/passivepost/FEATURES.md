@@ -2,6 +2,8 @@
 
 A detailed breakdown of every feature in PassivePost, how it works, and what users can do with it.
 
+> **All 7 Flywheel Phases Complete** — PassivePost ships with the full 38-feature content flywheel system plus 4 bonus features (42 total). Every phase is implemented and functional.
+
 ---
 
 ## Table of Contents
@@ -406,10 +408,14 @@ All Recharts analytics components use themed tooltips that adapt to the current 
 
 ## 18. Content Flywheel System
 
+<!-- Screenshot: Flywheel overview dashboard showing phase health scores and velocity metrics -->
+
 ### Overview
 The Content Flywheel is a 7-phase system comprising 38 features that transforms PassivePost from a social media scheduling tool into a complete content marketing platform. Each phase builds on the previous one, creating a self-reinforcing loop where content creation, intelligence, automation, distribution, revenue tracking, engagement, and collaboration all feed into each other to continuously improve results.
 
 ### The 7 Phases
+
+<!-- Screenshot: Phase 1 (Blog Publishing) — blog compose page with Markdown editor, SEO preview, and connected platforms -->
 
 | Phase | Name | Features | Purpose |
 |-------|------|----------|---------|
@@ -429,6 +435,8 @@ For the complete technical specification, implementation details, and phase-by-p
 ---
 
 ## 19. Content Intelligence (Phase 2)
+
+<!-- Screenshot: Intelligence dashboard showing AI Content Grader scores, Content DNA patterns, and Topic Fatigue warnings -->
 
 Phase 2 of the Content Flywheel provides AI-powered analysis tools that help users understand what makes their content succeed and how to improve it. All intelligence features are accessible from the Intelligence dashboard page.
 
@@ -459,6 +467,8 @@ AI creates detailed content briefs based on identified gaps in your content stra
 ---
 
 ## 20. Advanced Automation (Phase 3)
+
+<!-- Screenshot: Automation dashboard showing Calendar Autopilot, Content Recycling Queue, and Batch Repurpose panels -->
 
 Phase 3 of the Content Flywheel introduces intelligent automation features that reduce manual content management work. These tools handle repetitive tasks like content recycling, format conversion, and calendar management, accessible from the Automation dashboard page.
 
@@ -493,6 +503,8 @@ Monitors previously high-performing published content and notifies users when en
 
 ## 21. Distribution Intelligence (Phase 4)
 
+<!-- Screenshot: Distribution dashboard showing Hashtag Performance heatmap, Audience Personas, and Competitor Gap analysis -->
+
 Phase 4 of the Content Flywheel focuses on optimizing how and where content reaches its audience. These features use engagement data to provide platform-specific recommendations, accessible from the Distribution dashboard page.
 
 ### Platform-Specific Timing Optimizer
@@ -511,6 +523,8 @@ Identifies topics and content themes that your competitors cover but you do not.
 
 ## 22. Revenue & ROI (Phase 5)
 
+<!-- Screenshot: Revenue dashboard showing ROI Calculator results, Cost Per Post breakdown, and Monthly Report Card -->
+
 Phase 5 of the Content Flywheel connects content performance to business outcomes. These features help users understand the financial value of their content efforts, accessible from the Revenue dashboard page.
 
 ### Content ROI Calculator
@@ -528,6 +542,8 @@ Export professionally branded reports for clients or stakeholders with your own 
 ---
 
 ## 23. Engagement & Retention (Phase 6)
+
+<!-- Screenshot: Retention dashboard showing Streak tracker, Weekly Digest preview, Template Library, and Leaderboard -->
 
 Phase 6 of the Content Flywheel focuses on keeping users actively engaged with the platform through gamification, actionable insights, and community features. These features are accessible from the Engagement and Retention dashboard pages.
 
@@ -553,6 +569,8 @@ Team rankings for collaborative environments where multiple users contribute to 
 
 ## 24. Collaboration (Phase 7)
 
+<!-- Screenshot: Collaboration dashboard showing Client Approval Queue, Shared Content Library, and Team Workflows -->
+
 Phase 7 of the Content Flywheel adds team and client collaboration features that extend PassivePost into agency and team workflows. These features are accessible from the Collaboration dashboard page.
 
 ### Client Approval Portal
@@ -564,6 +582,8 @@ An internal dashboard for managing all content pending approval across clients a
 ---
 
 ## 25. Bonus Features
+
+<!-- Screenshot: AI Hashtag Suggestions in the post composer, Gig Lead Scanner alerts, and Lead CRM table view -->
 
 Additional standalone features that enhance the core PassivePost experience.
 

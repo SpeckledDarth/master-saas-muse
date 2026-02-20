@@ -525,6 +525,72 @@ Run tests with:
 npx playwright test tests/passivepost.spec.ts
 ```
 
+### Unit Testing Areas
+
+The following areas are recommended for unit test coverage when extending PassivePost:
+
+| Area | What to Test | Key Files |
+|------|-------------|-----------|
+| AI Prompt Construction | Verify niche guidance is injected correctly, brand voice fields are included, platform constraints are applied | `src/app/api/social/generate-post/route.ts` |
+| Tier Resolution | Test fallback to Starter tier, metadata parsing, limit enforcement at boundaries | `src/lib/social/user-tier.ts`, `src/lib/social/rate-limits.ts` |
+| Queue Job Processing | Test retry logic (3 retries, exponential backoff), failure handling, "no posts" info logging | `src/lib/social/queue-jobs.ts` |
+| Token Encryption | Verify encrypt/decrypt round-trip, invalid key handling | `src/lib/social/crypto.ts` |
+| Blog Repurpose Engine | Test snippet count (5-7), platform targeting, `[BLOG_LINK]` placeholder inclusion | `src/app/api/social/blog/repurpose/route.ts` |
+| Flywheel Metrics | Test score calculation, velocity tracking, phase health aggregation | `src/app/api/social/flywheel/metrics/route.ts` |
+| Lead CRM Scoping | Verify user isolation (users can only see their own leads) | `src/app/api/social/leads/manage/route.ts` |
+
+### Deployment Guide (Vercel)
+
+PassivePost is designed for deployment on Vercel. Follow these steps:
+
+**1. Prerequisites**
+- GitHub repository connected to Vercel
+- Supabase project with database tables created (run all migrations in `migrations/core/` and `migrations/extensions/`)
+- Stripe account with products and pricing configured
+- Resend account for transactional emails
+
+**2. Environment Variables**
+
+Set these in Vercel's project settings (Settings > Environment Variables):
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anonymous/public key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (server-side only) |
+| `STRIPE_SECRET_KEY` | Yes | Stripe secret key for billing |
+| `SESSION_SECRET` | Yes | Random string for session encryption |
+| `SOCIAL_ENCRYPTION_KEY` | Yes | 32-byte hex key for encrypting OAuth tokens |
+| `RESEND_API_KEY` | Yes | Resend API key for emails |
+| `UPSTASH_REDIS_REST_URL` | Yes | Upstash Redis URL for BullMQ queues |
+| `UPSTASH_REDIS_REST_TOKEN` | Yes | Upstash Redis token |
+| `XAI_API_KEY` | Recommended | xAI API key for AI content generation |
+| `NEXT_PUBLIC_SENTRY_DSN` | Optional | Sentry DSN for error tracking |
+| `MUSE_DEBUG_MODE` | Optional | Set to `true` to enable debug endpoints |
+
+**3. Deploy**
+```bash
+git push origin main
+```
+Vercel auto-deploys on push. The build command (`next build`) and output directory are auto-detected.
+
+**4. Cron Jobs**
+Configure Vercel Cron in `vercel.json` for scheduled tasks:
+```json
+{
+  "crons": [
+    { "path": "/api/social/cron/process-scheduled", "schedule": "*/5 * * * *" },
+    { "path": "/api/social/cron/pull-engagement", "schedule": "0 */6 * * *" }
+  ]
+}
+```
+
+**5. Post-Deploy Checklist**
+- Verify OAuth callback URLs are set correctly for each platform (must use production domain)
+- Test Stripe webhook endpoint is receiving events
+- Confirm cron jobs are running (check Vercel dashboard > Cron Jobs)
+- Validate `SOCIAL_ENCRYPTION_KEY` matches across environments (tokens encrypted with one key can't be decrypted with another)
+
 ---
 
 ## 19. Content Flywheel System

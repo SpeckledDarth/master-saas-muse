@@ -49,27 +49,32 @@ PassivePost Dashboard
 
 ### Page Details
 
-| Route | Page Name | Description |
-|-------|-----------|-------------|
-| `/dashboard/social/overview` | **Overview** | Main landing page. Usage progress bars, quick stats (posts created, accounts connected, AI generations used), coaching card with rotating tips, and Quick Generate button. |
-| `/dashboard/social/posts` | **Posts** | Post management hub. Filter by platform, status, and date range. Bulk actions (delete, reschedule). Click any post to open the detail dialog. |
-| `/dashboard/social/queue` | **Queue** | Scheduled posts waiting to publish, ordered by time. Reorder, edit, or cancel queued posts. |
-| `/dashboard/social/calendar` | **Calendar** | Month-grid calendar showing scheduled and published posts. Hover tooltips show per-platform counts per day. |
-| `/dashboard/social/blog` | **Blog Home** | Blog publishing dashboard with flywheel metrics, connected blog platform management, and blog-to-social content pipeline overview. |
-| `/dashboard/social/blog/compose` | **Blog Compose** | Full Markdown editor with live SEO preview, meta tag editing, and one-click publish to connected blog platforms. |
-| `/dashboard/social/blog/posts` | **Blog Articles** | List of all blog posts with status filtering (draft, published, scheduled), search, and bulk actions. |
-| `/dashboard/social/automation` | **Automation** | Advanced automation hub: calendar autopilot, batch repurpose, content recycling, evergreen content identifier, blog-to-thread converter, cross-post timing optimizer, repurpose chains, draft expiration warnings, and content decay alerts. |
-| `/dashboard/social/engagement` | **Engagement** | Analytics dashboard with Recharts charts. Engagement metrics (likes, shares, comments), per-platform breakdowns, best-performing content. |
-| `/dashboard/social/intelligence` | **Content Intelligence** | AI-powered content analysis: content grader, content DNA analyzer, topic fatigue detection, content mix optimizer, tone drift monitor, cannibalization detector, engagement prediction, and content brief generator. |
-| `/dashboard/social/distribution` | **Distribution Intelligence** | Platform-specific timing optimizer, hashtag performance tracker, audience persona builder, and competitor content gap analysis. |
-| `/dashboard/social/revenue` | **Revenue & ROI** | Content ROI calculator, cost per post tracking, monthly content report card, and white-label report exports. |
-| `/dashboard/social/retention` | **Retention** | Streak system, weekly flywheel digest preview, content templates library, and leaderboard. |
-| `/dashboard/social/leads` | **Leads** | Lead tracking from social engagement. Contact info, source platform, engagement history, gig scanner, reply templates, lead CRM, and CSV export. |
-| `/dashboard/social/collaboration` | **Collaboration** | Team workflows, client approval queue, and shared content library. Manage content review and approval workflows with external clients. |
-| `/dashboard/social/brand` | **Brand Voice** | Brand identity configuration: tone, niche, location, sample URLs, audience, goals, platforms, frequency. |
-| `/dashboard/social` | **Accounts** | Connected account management. Connect/disconnect social accounts, validate credentials, view connection status. |
-| `/dashboard/social/settings` | **Settings** | PassivePost-specific settings: notification preferences, module configuration. |
-| `/dashboard/social/onboarding` | **Onboarding** | Guided setup wizard for new users: connect first account, set brand voice, generate first post. |
+| Route | Page Name | Access Level | Description |
+|-------|-----------|-------------|-------------|
+| `/dashboard/social/overview` | **Overview** | All tiers | Main landing page. Usage progress bars, quick stats (posts created, accounts connected, AI generations used), coaching card with rotating tips, and Quick Generate button. |
+| `/dashboard/social/posts` | **Posts** | All tiers | Post management hub. Filter by platform, status, and date range. Bulk actions (delete, reschedule). Click any post to open the detail dialog. |
+| `/dashboard/social/queue` | **Queue** | All tiers | Scheduled posts waiting to publish, ordered by time. Reorder, edit, or cancel queued posts. |
+| `/dashboard/social/calendar` | **Calendar** | All tiers | Month-grid calendar showing scheduled and published posts. Hover tooltips show per-platform counts per day. |
+| `/dashboard/social/blog` | **Blog Home** | All tiers | Blog publishing dashboard with flywheel metrics, connected blog platform management, and blog-to-social content pipeline overview. |
+| `/dashboard/social/blog/compose` | **Blog Compose** | All tiers | Full Markdown editor with live SEO preview, meta tag editing, and one-click publish to connected blog platforms. |
+| `/dashboard/social/blog/posts` | **Blog Articles** | All tiers | List of all blog posts with status filtering (draft, published, scheduled), search, and bulk actions. |
+| `/dashboard/social/automation` | **Automation** | Basic+ | Advanced automation hub: calendar autopilot, batch repurpose, content recycling, evergreen content identifier, blog-to-thread converter, cross-post timing optimizer, repurpose chains, draft expiration warnings, and content decay alerts. |
+| `/dashboard/social/engagement` | **Engagement** | All tiers | Analytics dashboard with Recharts charts. Engagement metrics (likes, shares, comments), per-platform breakdowns, best-performing content. |
+| `/dashboard/social/intelligence` | **Content Intelligence** | Basic+ | AI-powered content analysis: content grader, content DNA analyzer, topic fatigue detection, content mix optimizer, tone drift monitor, cannibalization detector, engagement prediction, and content brief generator. |
+| `/dashboard/social/distribution` | **Distribution Intelligence** | Premium | Platform-specific timing optimizer, hashtag performance tracker, audience persona builder, and competitor content gap analysis. |
+| `/dashboard/social/revenue` | **Revenue & ROI** | Premium | Content ROI calculator, cost per post tracking, monthly content report card, and white-label report exports. |
+| `/dashboard/social/retention` | **Retention** | All tiers | Streak system, weekly flywheel digest preview, content templates library, and leaderboard. |
+| `/dashboard/social/leads` | **Leads** | Basic+ | Lead tracking from social engagement. Contact info, source platform, engagement history, gig scanner, reply templates, lead CRM, and CSV export. |
+| `/dashboard/social/collaboration` | **Collaboration** | Premium | Team workflows, client approval queue, and shared content library. Manage content review and approval workflows with external clients. |
+| `/dashboard/social/brand` | **Brand Voice** | All tiers | Brand identity configuration: tone, niche, location, sample URLs, audience, goals, platforms, frequency. |
+| `/dashboard/social` | **Accounts** | All tiers | Connected account management. Connect/disconnect social accounts, validate credentials, view connection status. |
+| `/dashboard/social/settings` | **Settings** | All tiers | PassivePost-specific settings: notification preferences, module configuration. |
+| `/dashboard/social/onboarding` | **Onboarding** | All tiers | Guided setup wizard for new users: connect first account, set brand voice, generate first post. |
+
+**Access Level Key:**
+- **All tiers** — Available to Starter, Basic, and Premium users
+- **Basic+** — Requires Basic or Premium subscription
+- **Premium** — Requires Premium subscription only
 
 ### Layout
 

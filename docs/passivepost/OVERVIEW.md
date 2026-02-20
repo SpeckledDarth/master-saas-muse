@@ -133,8 +133,60 @@ Enterprise social media tools start at $99/month and up. PassivePost is designed
 ### 4. Complete Workflow
 Most tools do either content creation OR scheduling OR analytics. PassivePost covers the entire workflow: generate → schedule → publish → analyze → improve.
 
-### 5. Blog-to-Social Content Flywheel
-Write one blog post, and PassivePost automatically generates 5-7 social media snippets with links back to the article. Your blog drives social engagement, and social drives blog traffic — a self-reinforcing growth loop. Plus, 38 intelligent features across content grading, automation, distribution optimization, ROI tracking, and team collaboration make your entire content strategy smarter over time.
+### 5. Passive Content Growth (The Blog-to-Social Flywheel)
+Write one blog post, and PassivePost automatically generates 5-7 social media snippets with links back to the article. Your blog drives social engagement, and social drives blog traffic — a self-reinforcing growth loop. The key insight: **blog content works for you passively**. A single article, once repurposed, generates weeks of social posts without additional effort. Plus, 38 intelligent features across content grading, automation, distribution optimization, ROI tracking, and team collaboration make your entire content strategy smarter over time.
+
+### The Content Flywheel (How It All Connects)
+
+```
+                    ┌─────────────────┐
+                    │   BLOG CONTENT  │
+                    │  (Write Once)   │
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   REPURPOSE     │
+                    │  (AI generates  │
+                    │   5-7 snippets) │
+                    └────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+        ┌──────────┐  ┌──────────┐  ┌──────────┐
+        │ Twitter  │  │ LinkedIn │  │ Facebook │
+        │ threads  │  │ articles │  │ posts    │
+        └─────┬────┘  └─────┬────┘  └─────┬────┘
+              │              │              │
+              └──────────────┼──────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   ENGAGEMENT    │
+                    │  (Likes, shares,│
+                    │   comments)     │
+                    └────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+        ┌──────────┐  ┌──────────┐  ┌──────────┐
+        │ INTEL-   │  │ AUTOMATE │  │ REVENUE  │
+        │ LIGENCE  │  │ (Recycle,│  │ (ROI,    │
+        │ (Grade,  │  │  schedule│  │  reports) │
+        │  predict)│  │  optimize│  │          │
+        └─────┬────┘  └─────┬────┘  └─────┬────┘
+              │              │              │
+              └──────────────┼──────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │  BETTER CONTENT │
+                    │  (Informed by   │
+                    │   data + AI)    │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    (Back to BLOG CONTENT)
+```
+
+Each cycle produces better content, more engagement, and more passive growth — the system gets smarter the more you use it.
 
 ---
 

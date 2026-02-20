@@ -22,6 +22,7 @@ A technical reference covering PassivePost's system design, database schema, API
 14. [n8n Workflow Templates](#14-n8n-workflow-templates)
 15. [Cron Endpoints (Vercel)](#15-cron-endpoints-vercel)
 16. [Testing](#16-testing)
+17. [Scalability](#17-scalability)
 
 ---
 
@@ -527,6 +528,8 @@ Instagram, YouTube, TikTok, Reddit, Pinterest, Snapchat, and Discord have stubbe
 ### Encryption
 OAuth tokens are encrypted before database storage using AES-256-GCM via `src/lib/social/crypto.ts`. The encryption key is stored as the `SOCIAL_ENCRYPTION_KEY` environment variable/secret.
 
+Blog platform API keys and tokens (Medium integration tokens, WordPress app passwords, Ghost admin API keys, Substack session tokens) are encrypted using the same `encryptToken()` / `decryptToken()` functions from `src/lib/social/crypto.ts` before being stored in the `blog_connections.credentials_encrypted` column. This ensures all third-party credentials — both social and blog — use a single, consistent encryption mechanism.
+
 ### Token Refresh
 `src/lib/social/token-refresh.ts` automatically refreshes expired access tokens when platform API calls are made. If a refresh fails (e.g., user revoked access), the account is marked as invalid (`is_valid = false`) with an error message.
 
@@ -667,6 +670,41 @@ Set `MUSE_DEBUG_MODE=true` to enable the `/api/social/debug` endpoint, which ret
 
 ### Demo Data
 `src/lib/social/demo-data.ts` provides mock posts, accounts, and engagement metrics for development when real platform connections aren't available.
+
+---
+
+## 17. Scalability
+
+### Database Scalability
+
+**Row Level Security (RLS)** provides data isolation in a multi-tenant environment. Tables with RLS policies restrict access to the authenticated user's own rows. This means:
+- Multiple users share the same database tables without seeing each other's data
+- Supabase enforces RLS at the database level, below the application layer
+- RLS policies should be applied to all user-facing tables; review `migrations/` to confirm coverage for new tables
+
+**Indexes** on frequently queried columns (e.g., `user_id`, `status`, `scheduled_at`) help maintain performance as data grows. When adding new tables, consider adding composite indexes for common query patterns.
+
+### Queue Scalability (BullMQ + Upstash Redis)
+
+The BullMQ queue system with Upstash Redis as the backend supports high-volume operations:
+- **Horizontal scaling**: Multiple workers can process jobs concurrently. Each job type (`social-post`, `social-engagement-pull`, etc.) can be scaled independently.
+- **Retry with backoff**: Failed jobs are retried with exponential backoff (3 retries by default), preventing thundering herd problems during platform outages.
+- **Rate limiting**: Tier-based rate limits prevent any single user from overwhelming the queue. Daily caps on posts and AI generations ensure fair resource distribution.
+- **Serverless fallback**: For Vercel deployments without persistent workers, cron endpoints provide the same functionality as background jobs, scaled by Vercel's serverless infrastructure.
+
+### API Rate Limiting
+
+API endpoints are protected by Upstash Redis sliding window rate limiting with an in-memory fallback:
+- Prevents abuse and ensures fair access across users
+- Configurable per-endpoint limits
+- Graceful degradation: if Redis is unavailable, the in-memory rate limiter takes over without service interruption
+
+### High-Volume Use Cases
+
+For agencies or power users managing content at scale:
+- **Batch operations** (bulk import, batch repurpose) process multiple items in a single request, reducing API call overhead
+- **Content recycling** and **calendar autopilot** run as background processes, not blocking the user's session
+- **White-label report exports** are generated server-side to handle large datasets without browser memory constraints
 
 ---
 

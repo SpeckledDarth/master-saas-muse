@@ -426,6 +426,26 @@ Go to **Profile** from the sidebar user menu to manage:
 3. **Cross-promote** — Your LinkedIn audience might not follow you on Twitter yet
 4. **Post when your audience is active** — Check the Best Times section in Engagement
 
+### Phase-Specific Tips by Tier
+
+**Starter Tier Tips:**
+- Check your **Engagement page** regularly — even on Starter, reviewing which posts perform best helps you learn what works
+- Set up your **Brand Voice** thoroughly — the AI quality difference between minimal and detailed brand settings is dramatic
+- Write **one blog post per week** and use Repurpose to get 3 social snippets from it — that's 3 posts for the effort of 1
+
+**Basic Tier Tips:**
+- Run **Calendar Autopilot** at the start of each week — let AI plan your schedule, then tweak as needed
+- Check **Topic Fatigue** weekly — if you see warnings, pivot to underused content themes
+- Use **Batch Repurpose** when you have 5+ posts sitting as drafts — convert them all to new platforms in one click
+- Run the **Gig Lead Scanner** daily — fresh leads come and go quickly
+
+**Premium Tier Tips:**
+- Set up the **Client Approval Portal** for any freelance/agency work — it makes you look professional and saves email back-and-forth
+- Review your **Monthly Report Card** to show clients the value you're delivering
+- Use **Competitor Gap Analysis** monthly to find content opportunities your competitors are missing
+- Enable **Content Recycling** for evergreen posts — let the system automatically resurface your best content
+- Export **White-Label Reports** for client meetings — branded PDFs make a strong impression
+
 ---
 
 ## 16. Blog Publishing

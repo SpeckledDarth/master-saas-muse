@@ -99,6 +99,24 @@ The recommended workflow for maximum content leverage:
 4. Each snippet links back to the blog post, driving traffic
 5. Schedule snippets across different days for sustained engagement
 
+## Pricing Tie-In
+
+Blog publishing features are available across all tiers, but with tier-based limits on the repurpose engine:
+
+| Tier | Blog Posts | Repurpose Snippets per Post | Schedule Snippets |
+|------|-----------|---------------------------|-------------------|
+| Starter | Unlimited drafts, 5 published/month | 3 snippets | Manual only |
+| Basic | Unlimited drafts, 15 published/month | 5 snippets | Manual + auto-spread |
+| Premium | Unlimited | 7 snippets | Full auto-schedule across 7-14 days |
+
+These limits are enforced by the existing tier resolution system (`getUserSocialTier`). Blog post creation counts toward the user's monthly post limit. Repurposed snippets count toward daily AI generation limits.
+
+## Future Enhancements
+
+- **AI Article Generation from Outlines**: Users provide a topic and bullet-point outline, and AI generates a full blog article draft. This would integrate with the existing AI generation pipeline and brand voice system, producing long-form content that matches the user's writing style. Currently under consideration for a future release.
+- **Auto-Suggest Blog Topics**: Based on content intelligence data (top-performing social topics, audience personas, competitor gaps), suggest blog article ideas that are likely to perform well.
+- **SEO Keyword Integration**: Connect to keyword research APIs to suggest high-value keywords during blog composition.
+
 ## Extension Pattern Compliance
 This feature follows MuseKit's merge-friendly extension pattern:
 - All new files are in `/blog/` subdirectories (no core file modifications except sidebar)
