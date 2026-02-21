@@ -3,7 +3,6 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { getConfigValue } from '@/lib/config/secrets'
-import { signRedirectUrl } from '@/app/api/social/redirect/route'
 import crypto from 'crypto'
 
 function getSupabaseAdmin() {
@@ -128,8 +127,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unsupported platform' }, { status: 400 })
     }
 
-    const authUrlSig = signRedirectUrl(authUrl)
-    return NextResponse.json({ authUrl, authUrlSig, debugRedirectUri: redirectUri })
+    return NextResponse.json({ authUrl, debugRedirectUri: redirectUri })
   } catch (error) {
     console.error(`[Social Connect] Error building auth URL for ${platform}:`, error)
     return NextResponse.json({ error: 'Failed to generate authorization URL' }, { status: 500 })

@@ -14,52 +14,18 @@ function getSupabaseAdmin() {
 
 const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook']
 
-function popupResponse(status: 'success' | 'error', detail: string, baseUrl: string, platform?: string) {
-  const bgColor = status === 'success' ? '#10b981' : '#ef4444'
-  const title = status === 'success' ? 'Connected!' : 'Connection Error'
-  const messageData = status === 'success'
-    ? `{ type: 'oauth_success', platform: ${JSON.stringify(platform || '')} }`
-    : `{ type: 'oauth_error', message: ${JSON.stringify(detail)} }`
-
-  const autoCloseScript = status === 'success'
-    ? `setTimeout(function() { try { window.close(); } catch(e) {} }, 3000);`
-    : ``
-
-  const safeDetail = detail.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-
-  const html = `<!DOCTYPE html>
-<html><head><title>${title}</title>
-<style>body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#111;color:#fff}
-.card{text-align:center;padding:2rem;border-radius:12px;max-width:420px}
-.icon{font-size:3rem;margin-bottom:1rem}
-h2{margin:0.5rem 0}
-.msg{color:#aaa;margin-top:0.5rem;font-size:0.85rem;word-break:break-word;white-space:pre-wrap;text-align:left;background:#222;padding:1rem;border-radius:8px;max-height:200px;overflow-y:auto}
-.btn{margin-top:1.5rem;padding:0.5rem 1.5rem;border:none;border-radius:6px;background:#333;color:#fff;font-size:1rem;cursor:pointer}
-.btn:hover{background:#444}
-.hint{color:#666;font-size:0.75rem;margin-top:1rem}
-</style></head>
-<body><div class="card">
-<div class="icon" style="color:${bgColor}">${status === 'success' ? '&#10003;' : '&#10007;'}</div>
-<h2>${title}</h2>
-<div class="msg">${safeDetail}</div>
-<button class="btn" onclick="try{window.close()}catch(e){}">Close Window</button>
-${status === 'error' ? '<p class="hint">This window will stay open so you can read the error. Close it manually when done.</p>' : ''}
-</div>
-<script>
-try { if (window.opener) window.opener.postMessage(${messageData}, '*'); } catch(e) {}
-${autoCloseScript}
-</script></body></html>`
-  return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } })
-}
-
 function redirectWithError(baseUrl: string, message: string) {
   console.error('[Social Callback] OAuth error:', message)
-  return popupResponse('error', message, baseUrl)
+  const url = new URL('/dashboard/social', baseUrl)
+  url.searchParams.set('error', message)
+  return NextResponse.redirect(url.toString())
 }
 
 function redirectWithSuccess(baseUrl: string, platform: string) {
   console.log('[Social Callback] OAuth success for:', platform)
-  return popupResponse('success', `Your ${platform} account has been connected!`, baseUrl, platform)
+  const url = new URL('/dashboard/social', baseUrl)
+  url.searchParams.set('connected', platform)
+  return NextResponse.redirect(url.toString())
 }
 
 interface StatePayload {
