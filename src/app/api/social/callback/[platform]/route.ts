@@ -4,6 +4,7 @@ import { getConfigValue } from '@/lib/config/secrets'
 import { getPlatformClient, type SocialPlatform } from '@/lib/social/client'
 import { encryptToken } from '@/lib/social/crypto'
 import { verifyState } from '@/app/api/social/connect/route'
+import { getAppOrigin } from '@/lib/utils'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -14,10 +15,11 @@ function getSupabaseAdmin() {
 
 const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook']
 
-function redirectWithError(baseUrl: string, message: string) {
+function redirectWithError(baseUrl: string, message: string, platform?: string) {
   console.error('[Social Callback] OAuth error:', message)
-  const url = new URL('/dashboard/social', baseUrl)
+  const url = new URL('/oauth/error', baseUrl)
   url.searchParams.set('error', message)
+  if (platform) url.searchParams.set('platform', platform)
   return NextResponse.redirect(url.toString())
 }
 
@@ -162,9 +164,9 @@ export async function GET(
   { params }: { params: Promise<{ platform: string }> }
 ) {
   const { platform } = await params
-  const baseUrl = request.nextUrl.origin
+  const baseUrl = getAppOrigin(request)
 
-  console.log(`[Social Callback] Hit for platform: ${platform}, baseUrl: ${baseUrl}`)
+  console.log(`[Social Callback] Hit for platform: ${platform}, baseUrl: ${baseUrl}, nextUrl.origin: ${request.nextUrl.origin}`)
 
   if (!VALID_PLATFORMS.includes(platform)) {
     return redirectWithError(baseUrl, 'Invalid platform')
@@ -179,27 +181,27 @@ export async function GET(
 
   if (errorParam) {
     const errorDescription = searchParams.get('error_description') || errorParam
-    return redirectWithError(baseUrl, errorDescription)
+    return redirectWithError(baseUrl, errorDescription, platform)
   }
 
   if (!code || !stateParam) {
-    return redirectWithError(baseUrl, 'Missing authorization code or state')
+    return redirectWithError(baseUrl, 'Missing authorization code or state', platform)
   }
 
   const verified = verifyState(stateParam)
   if (!verified) {
     console.error('[Social Callback] State verification failed - invalid signature or expired')
-    return redirectWithError(baseUrl, 'Invalid or expired state parameter. Please try connecting again.')
+    return redirectWithError(baseUrl, 'Invalid or expired state parameter. Please try connecting again.', platform)
   }
 
   const state: StatePayload = { userId: verified.userId, platform: verified.platform, codeVerifier: verified.codeVerifier, redirectUri: verified.redirectUri }
 
   if (!state.userId || !state.platform) {
-    return redirectWithError(baseUrl, 'Invalid state payload')
+    return redirectWithError(baseUrl, 'Invalid state payload', platform)
   }
 
   if (state.platform !== platform) {
-    return redirectWithError(baseUrl, 'State platform mismatch')
+    return redirectWithError(baseUrl, 'State platform mismatch', platform)
   }
 
   const redirectUri = state.redirectUri || `${baseUrl}/api/social/callback/${platform}`
@@ -223,19 +225,19 @@ export async function GET(
       refreshToken = result.refreshToken
     } else if (platform === 'twitter') {
       if (!state.codeVerifier) {
-        return redirectWithError(baseUrl, 'Missing code verifier for Twitter PKCE')
+        return redirectWithError(baseUrl, 'Missing code verifier for Twitter PKCE', platform)
       }
       const result = await exchangeTwitterToken(code, redirectUri, state.codeVerifier)
       accessToken = result.accessToken
       refreshToken = result.refreshToken
     } else {
-      return redirectWithError(baseUrl, 'Unsupported platform')
+      return redirectWithError(baseUrl, 'Unsupported platform', platform)
     }
 
     const client = getPlatformClient(platform as SocialPlatform)
     const validation = await client.validateToken(accessToken)
     if (!validation.valid) {
-      return redirectWithError(baseUrl, `Token validation failed: ${validation.error || 'Unknown error'}`)
+      return redirectWithError(baseUrl, `Token validation failed: ${validation.error || 'Unknown error'}`, platform)
     }
 
     const profile = await client.getUserProfile(accessToken)
@@ -262,13 +264,13 @@ export async function GET(
 
     if (upsertError) {
       console.error(`[Social Callback] Upsert error for ${platform}:`, upsertError)
-      return redirectWithError(baseUrl, 'Failed to save account connection')
+      return redirectWithError(baseUrl, 'Failed to save account connection', platform)
     }
 
     return redirectWithSuccess(baseUrl, platform)
   } catch (error) {
     console.error(`[Social Callback] Error for ${platform}:`, error)
     const message = (error as Error).message || 'Connection failed'
-    return redirectWithError(baseUrl, message)
+    return redirectWithError(baseUrl, message, platform)
   }
 }

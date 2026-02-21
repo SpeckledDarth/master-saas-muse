@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { getConfigValue } from '@/lib/config/secrets'
+import { getAppOrigin } from '@/lib/utils'
 import crypto from 'crypto'
 
 function getSupabaseAdmin() {
@@ -88,9 +89,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `Invalid platform. Must be one of: ${VALID_PLATFORMS.join(', ')}` }, { status: 400 })
   }
 
-  const origin = request.nextUrl.origin
+  const origin = getAppOrigin(request)
   const redirectUri = `${origin}/api/social/callback/${platform}`
-  console.log(`[Social Connect] Platform: ${platform}, redirectUri: ${redirectUri}`)
+  console.log(`[Social Connect] Platform: ${platform}, origin: ${origin}, redirectUri: ${redirectUri}`)
+  console.log(`[Social Connect] Origin sources — NEXT_PUBLIC_APP_URL: ${process.env.NEXT_PUBLIC_APP_URL || '(not set)'}, VERCEL_URL: ${process.env.VERCEL_URL || '(not set)'}, x-forwarded-host: ${request.headers.get('x-forwarded-host') || '(not set)'}, host: ${request.headers.get('host') || '(not set)'}, nextUrl.origin: ${request.nextUrl.origin}`)
 
   try {
     let authUrl: string

@@ -49,3 +49,8 @@ waitForPort = 5000
 
 [agent]
 integrations = ["stripe:2.0.0", "github:1.0.0", "resend:1.0.0"]
+
+[userenv]
+
+[userenv.shared]
+NEXT_PUBLIC_APP_URL = "https://master-saas-muse-u7ga.vercel.app"
