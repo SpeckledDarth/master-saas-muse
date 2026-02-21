@@ -39,7 +39,9 @@ function generateCodeChallenge(verifier: string): string {
 }
 
 function getStateSigningKey(): string {
-  return process.env.SESSION_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'fallback-signing-key'
+  const key = process.env.SESSION_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!key) throw new Error('No signing key available — set SESSION_SECRET or SUPABASE_SERVICE_ROLE_KEY')
+  return key
 }
 
 export function signState(payload: Record<string, any>): string {
@@ -99,7 +101,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Facebook App ID is not configured' }, { status: 500 })
       }
 
-      const state = signState({ userId: user.id, platform })
+      const state = signState({ userId: user.id, platform, redirectUri })
       authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${encodeURIComponent(appId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=pages_manage_posts,pages_read_engagement,pages_show_list&state=${state}`
 
     } else if (platform === 'linkedin') {
@@ -108,7 +110,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'LinkedIn Client ID is not configured' }, { status: 500 })
       }
 
-      const state = signState({ userId: user.id, platform })
+      const state = signState({ userId: user.id, platform, redirectUri })
       authUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid%20profile%20email%20w_member_social&state=${state}`
 
     } else if (platform === 'twitter') {
@@ -119,7 +121,7 @@ export async function POST(request: NextRequest) {
 
       const codeVerifier = generateCodeVerifier()
       const codeChallenge = generateCodeChallenge(codeVerifier)
-      const state = signState({ userId: user.id, platform, codeVerifier })
+      const state = signState({ userId: user.id, platform, codeVerifier, redirectUri })
       authUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${encodeURIComponent(apiKey)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.read%20tweet.write%20users.read%20offline.access&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`
       console.log(`[Social Connect] Twitter authUrl redirect_uri: ${redirectUri}`)
 

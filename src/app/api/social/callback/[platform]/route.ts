@@ -32,6 +32,7 @@ interface StatePayload {
   userId: string
   platform: string
   codeVerifier?: string
+  redirectUri?: string
 }
 
 async function exchangeFacebookToken(code: string, redirectUri: string): Promise<{ accessToken: string; refreshToken?: string; pageTokens?: Array<{ id: string; name: string; access_token: string }> }> {
@@ -191,7 +192,7 @@ export async function GET(
     return redirectWithError(baseUrl, 'Invalid or expired state parameter. Please try connecting again.')
   }
 
-  const state: StatePayload = { userId: verified.userId, platform: verified.platform, codeVerifier: verified.codeVerifier }
+  const state: StatePayload = { userId: verified.userId, platform: verified.platform, codeVerifier: verified.codeVerifier, redirectUri: verified.redirectUri }
 
   if (!state.userId || !state.platform) {
     return redirectWithError(baseUrl, 'Invalid state payload')
@@ -201,7 +202,8 @@ export async function GET(
     return redirectWithError(baseUrl, 'State platform mismatch')
   }
 
-  const redirectUri = `${baseUrl}/api/social/callback/${platform}`
+  const redirectUri = state.redirectUri || `${baseUrl}/api/social/callback/${platform}`
+  console.log(`[Social Callback] Using redirectUri for token exchange: ${redirectUri}`)
 
   try {
     let accessToken: string

@@ -46,6 +46,8 @@ function SocialAccountsContent() {
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null)
   const [connecting, setConnecting] = useState<string | null>(null)
   const [moduleDisabled, setModuleDisabled] = useState(false)
+  const [oauthError, setOauthError] = useState<string | null>(null)
+  const [oauthSuccess, setOauthSuccess] = useState<string | null>(null)
   const { toast } = useToast()
   const searchParams = useSearchParams()
   const toastShownRef = useRef(false)
@@ -57,18 +59,11 @@ function SocialAccountsContent() {
     if (connected) {
       toastShownRef.current = true
       const platformName = PLATFORMS.find(p => p.id === connected)?.name || connected
-      toast({
-        title: 'Account Connected',
-        description: `Your ${platformName} account has been successfully connected!`,
-      })
+      setOauthSuccess(`Your ${platformName} account has been successfully connected!`)
       window.history.replaceState({}, '', '/dashboard/social')
     } else if (error) {
       toastShownRef.current = true
-      toast({
-        title: 'Connection Error',
-        description: error,
-        variant: 'destructive',
-      })
+      setOauthError(error)
       window.history.replaceState({}, '', '/dashboard/social')
     }
   }, [searchParams, toast])
@@ -106,6 +101,8 @@ function SocialAccountsContent() {
   const handleConnect = async (platformId: string) => {
     if (OAUTH_PLATFORMS.includes(platformId)) {
       setConnecting(platformId)
+      setOauthError(null)
+      setOauthSuccess(null)
       try {
         const res = await fetch('/api/social/connect', {
           method: 'POST',
@@ -242,6 +239,32 @@ function SocialAccountsContent() {
 
   return (
     <div className="p-6">
+      {oauthError && (
+        <div className="mb-4 p-4 rounded-lg border border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-800" data-testid="banner-oauth-error">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1">
+              <h3 className="font-semibold text-red-800 dark:text-red-300 mb-1">Connection Error</h3>
+              <p className="text-sm text-red-700 dark:text-red-400 whitespace-pre-wrap break-words">{oauthError}</p>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setOauthError(null)} className="shrink-0 h-7 w-7" data-testid="button-dismiss-oauth-error">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+      {oauthSuccess && (
+        <div className="mb-4 p-4 rounded-lg border border-green-300 bg-green-50 dark:bg-green-950/30 dark:border-green-800" data-testid="banner-oauth-success">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1">
+              <h3 className="font-semibold text-green-800 dark:text-green-300 mb-1">Connected!</h3>
+              <p className="text-sm text-green-700 dark:text-green-400">{oauthSuccess}</p>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setOauthSuccess(null)} className="shrink-0 h-7 w-7" data-testid="button-dismiss-oauth-success">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
       <div className="flex flex-row items-start justify-between gap-4 flex-wrap mb-6">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-social-title">
