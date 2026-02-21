@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getAppOrigin(request?: { headers: { get(name: string): string | null }; nextUrl?: { origin: string } }): string {
-  const explicitUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL
+  const explicitUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || '').trim()
   if (explicitUrl) {
     const cleaned = explicitUrl.replace(/\/$/, '')
     return cleaned.startsWith('http') ? cleaned : `https://${cleaned}`
