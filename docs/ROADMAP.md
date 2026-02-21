@@ -1,6 +1,6 @@
 # MuseKit + PassivePost — Development Roadmap
 
-> **Revision:** 1.0 | **Last Updated:** February 20, 2026 | **Created:** February 20, 2026
+> **Revision:** 1.1 | **Last Updated:** February 21, 2026 | **Created:** February 20, 2026
 
 > **IMPORTANT — READ THIS FILE AT THE START OF EVERY SESSION.** This is the single source of truth for the multi-week development plan. If agent memory resets, this file restores full context.
 
@@ -50,7 +50,7 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 | 1.5.3 | Onboarding email drip sequences via Resend — welcome series for new signups | Complete | Drip endpoint: `src/app/api/email/drip/route.ts`, 4-step welcome sequence, tracks in `email_drip_log` table |
 | 1.5.4 | Simple share/referral link in user dashboard — unique URL per user, copy button, basic click tracking | Complete | API: `src/app/api/referral/route.ts`, Component: `src/components/social/share-link.tsx`, Tracker: `src/components/referral-tracker.tsx`, DB tables: `referral_links`, `referral_clicks` |
 | 1.5.5 | Onboarding completion funnel tracking — track drop-off at each wizard step, display funnel metrics in admin dashboard | Complete | API: `src/app/api/onboarding/track/route.ts`, Admin: `src/app/admin/setup/funnel/page.tsx`, Integrated into onboarding wizard, DB table: `onboarding_events` |
-| 1.5.6 | "How did you hear about us?" dropdown in feedback widget | Complete | Added to `src/components/feedback-widget.tsx` with 9 attribution sources |
+| 1.5.6 | "How did you hear about us?" dropdown in feedback widget | Complete | Added to both `src/components/feedback-widget.tsx` and `src/components/help-widget.tsx` with 9 attribution sources, works in both widget modes |
 
 **Dependencies:**
 - 1.5.4 (share links) should use a URL structure that's compatible with Phase 3 affiliate tracking (e.g., `?ref=USER_CODE`)
@@ -152,6 +152,7 @@ Running log of what was accomplished each session. Update at the end of every se
 |------|----------------|----------------|
 | Feb 20, 2026 | Completed all 42 PassivePost features. Updated all documentation with visual diagrams, scalability sections, deployment guides, pricing tie-ins, access levels, and screenshot placeholders. Added version tracking to all 16 docs (8 PassivePost + 8 MuseKit). Created this roadmap. | Pre-Phase 1 |
 | Feb 20, 2026 | Built Phase 1: Testimonial management (migration, API, admin CRUD page), public Wall of Love page with live stats, aggregate stats API endpoint, social proof notification popups on landing page. All 4 features complete. | Phase 1 Complete |
+| Feb 21, 2026 | Post-deployment fixes: (1) Moved ShareLink component from accounts page to social overview dashboard so users see it on main page. (2) Added "How did you hear about us?" dropdown to HelpWidget (was only in FeedbackWidget). (3) Fixed Quick Generate FAB button overlapping with Support Widget — moved FAB to `bottom-20` above the support widget. (4) Added empty-state card for ShareLink when referral tables aren't migrated yet. All Phase 1.5 polish complete. | Phase 1.5 Polish |
 
 ---
 
