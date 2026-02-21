@@ -21,7 +21,7 @@ export function verifyRedirectUrl(url: string, sig: string): boolean {
   }
 }
 
-const ALLOWED_HOSTS = ['twitter.com', 'www.facebook.com', 'www.linkedin.com', 'x.com', 'api.twitter.com']
+const ALLOWED_HOSTS = ['x.com', 'www.facebook.com', 'www.linkedin.com', 'twitter.com', 'api.x.com', 'api.twitter.com']
 
 export async function GET(request: NextRequest) {
   const authUrl = request.nextUrl.searchParams.get('url')

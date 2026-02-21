@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
         code_challenge: codeChallenge,
         code_challenge_method: 'S256',
       })
-      authUrl = `https://twitter.com/i/oauth2/authorize?${twParams.toString().replace(/\+/g, '%20')}`
+      authUrl = `https://x.com/i/oauth2/authorize?${twParams.toString().replace(/\+/g, '%20')}`
       console.log(`[Social Connect] Twitter authUrl redirect_uri: ${redirectUri}`)
 
     } else {

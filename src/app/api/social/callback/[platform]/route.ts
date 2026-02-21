@@ -135,7 +135,7 @@ async function exchangeTwitterToken(code: string, redirectUri: string, codeVerif
 
   const credentials = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64')
 
-  const tokenRes = await fetch('https://api.twitter.com/2/oauth2/token', {
+  const tokenRes = await fetch('https://api.x.com/2/oauth2/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
