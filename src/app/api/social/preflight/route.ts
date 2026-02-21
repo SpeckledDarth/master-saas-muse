@@ -85,24 +85,25 @@ export async function POST(request: NextRequest) {
     detail: hasSessionSecret ? undefined : 'Missing SESSION_SECRET environment variable. This is needed to secure the OAuth flow.',
   })
 
-  const hasAppUrl = !!process.env.NEXT_PUBLIC_APP_URL
+  const explicitUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL
+  const hasAppUrl = !!explicitUrl
   const isProduction = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production'
   checks.push({
     ok: hasAppUrl || !isProduction,
     label: 'App URL is configured',
     detail: !hasAppUrl && isProduction
-      ? `NEXT_PUBLIC_APP_URL is not set. Set it to your production domain (e.g., https://yourapp.com) so OAuth callback URLs resolve correctly.`
+      ? `Neither NEXT_PUBLIC_APP_URL nor NEXT_PUBLIC_SITE_URL is set. Set one to your production domain so OAuth callback URLs resolve correctly.`
       : undefined,
   })
 
-  if (hasAppUrl && process.env.NEXT_PUBLIC_APP_URL) {
-    const configuredOrigin = process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')
+  if (hasAppUrl && explicitUrl) {
+    const configuredOrigin = (explicitUrl.startsWith('http') ? explicitUrl : `https://${explicitUrl}`).replace(/\/$/, '')
     const detectedOrigin = origin.replace(/\/$/, '')
     const originsMatch = configuredOrigin === detectedOrigin
     checks.push({
       ok: originsMatch,
       label: 'App URL matches detected origin',
-      detail: originsMatch ? undefined : `NEXT_PUBLIC_APP_URL is "${configuredOrigin}" but the detected origin is "${detectedOrigin}". These must match or OAuth callbacks will fail. Update NEXT_PUBLIC_APP_URL to match your actual domain.`,
+      detail: originsMatch ? undefined : `Configured URL is "${configuredOrigin}" but the detected origin is "${detectedOrigin}". These must match or OAuth callbacks will fail.`,
     })
   }
 

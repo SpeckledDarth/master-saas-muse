@@ -118,7 +118,7 @@ A `/api/social/preflight` endpoint validates all prerequisites before attempting
 
 | Variable | Used By | Notes |
 |----------|---------|-------|
-| `NEXT_PUBLIC_APP_URL` | All platforms | Your production URL (e.g., `https://passivepost.io`). Required for callback URL generation. |
+| `NEXT_PUBLIC_SITE_URL` | All platforms | Your production URL (e.g., `https://master-saas-muse-u7ga.vercel.app`). Required for callback URL generation. `getAppOrigin()` checks both `NEXT_PUBLIC_APP_URL` and `NEXT_PUBLIC_SITE_URL`. |
 | `SESSION_SECRET` | All platforms | Random string for OAuth state signing. Generate with `openssl rand -hex 32`. |
 | `SOCIAL_ENCRYPTION_KEY` | All platforms | 32-byte hex key for token encryption. Generate with `openssl rand -hex 32`. If missing, auto-generates and stores in database, but pre-setting avoids first-connection delay. |
 | `TWITTER_API_KEY` | Twitter/X | OAuth 2.0 Client ID (NOT Consumer Key) from X Developer Portal. |

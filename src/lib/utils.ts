@@ -6,8 +6,10 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getAppOrigin(request?: { headers: { get(name: string): string | null }; nextUrl?: { origin: string } }): string {
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')
+  const explicitUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL
+  if (explicitUrl) {
+    const cleaned = explicitUrl.replace(/\/$/, '')
+    return cleaned.startsWith('http') ? cleaned : `https://${cleaned}`
   }
 
   if (process.env.VERCEL_URL) {
