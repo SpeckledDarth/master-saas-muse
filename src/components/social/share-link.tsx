@@ -51,7 +51,19 @@ export function ShareLink() {
     )
   }
 
-  if (!link) return null
+  if (!link) {
+    return (
+      <Card data-testid="card-share-link-empty">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Share2 className="h-5 w-5" />
+            Share Link
+          </CardTitle>
+          <CardDescription>Your referral link will appear here once referrals are enabled.</CardDescription>
+        </CardHeader>
+      </Card>
+    )
+  }
 
   return (
     <Card data-testid="card-share-link">
