@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { InfoTooltip } from '../components'
 import {
   Loader2, ExternalLink, Database, CreditCard, Mail, Brain,
-  Server, ShieldAlert, BarChart3, KeyRound,
+  Server, ShieldAlert, BarChart3, KeyRound, Share2,
   Pencil, Save, Trash2, Eye, EyeOff, Check, X, CircleDot,
   ChevronDown, ChevronRight
 } from 'lucide-react'
@@ -391,15 +391,17 @@ function CollapsibleGroup({ group, iconMap, onSaved }: { group: IntegrationGroup
 export default function IntegrationsPage() {
   const [loading, setLoading] = useState(true)
   const [techStack, setTechStack] = useState<IntegrationGroup[]>([])
-  const [summary, setSummary] = useState({ techConfigured: 0, techTotal: 0, requiredConfigured: 0, requiredTotal: 0 })
+  const [socialPlatforms, setSocialPlatforms] = useState<IntegrationGroup[]>([])
+  const [summary, setSummary] = useState({ techConfigured: 0, techTotal: 0, requiredConfigured: 0, requiredTotal: 0, socialConfigured: 0, socialTotal: 0 })
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/integrations?section=tech')
+      const res = await fetch('/api/admin/integrations')
       if (!res.ok) throw new Error('Failed to fetch')
       const data = await res.json()
-      setTechStack(data.techStack)
-      setSummary(data.summary)
+      setTechStack(data.techStack || [])
+      setSocialPlatforms(data.socialPlatforms || [])
+      setSummary(data.summary || {})
     } catch {
     } finally {
       setLoading(false)
@@ -420,16 +422,29 @@ export default function IntegrationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <Card data-testid="card-total-summary">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div>
-                <p className="text-sm text-muted-foreground">Total Keys</p>
+                <p className="text-sm text-muted-foreground">Tech Stack Keys</p>
                 <p className="text-2xl font-bold" data-testid="text-tech-count">{summary.techConfigured}/{summary.techTotal}</p>
               </div>
               <Badge variant={summary.techConfigured === summary.techTotal ? 'default' : 'secondary'}>
                 {summary.techConfigured === summary.techTotal ? 'All Set' : 'Incomplete'}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+        <Card data-testid="card-social-summary">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div>
+                <p className="text-sm text-muted-foreground">Social Platform Keys</p>
+                <p className="text-2xl font-bold" data-testid="text-social-count">{summary.socialConfigured}/{summary.socialTotal}</p>
+              </div>
+              <Badge variant={summary.socialConfigured === summary.socialTotal ? 'default' : 'secondary'}>
+                {summary.socialConfigured === summary.socialTotal ? 'All Set' : 'Incomplete'}
               </Badge>
             </div>
           </CardContent>
@@ -473,6 +488,33 @@ export default function IntegrationsPage() {
           ))}
         </CardContent>
       </Card>
+
+      {socialPlatforms.length > 0 && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Share2 className="h-5 w-5" />
+                  Social Platform Credentials
+                  <InfoTooltip text="These are your app-level API credentials for each social platform. Users never see these — they just click Connect and go through OAuth. Enter your developer app credentials here to enable OAuth flows." />
+                </CardTitle>
+                <CardDescription>App-level API keys that power OAuth connections for all users</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {socialPlatforms.map((group) => (
+              <CollapsibleGroup
+                key={group.id}
+                group={group}
+                iconMap={TECH_ICONS}
+                onSaved={fetchData}
+              />
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="p-4 rounded-md bg-muted/30 border text-sm text-muted-foreground space-y-1" data-testid="text-env-info">
         <p>Keys can be set in two ways:</p>
