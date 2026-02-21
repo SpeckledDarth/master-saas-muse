@@ -68,9 +68,9 @@ Wire up the 3 platforms where B2B/SaaS audiences live. API keys already obtained
 
 | # | Platform | Status | Notes |
 |---|----------|--------|-------|
-| 2.1a | Twitter/X — OAuth 2.0 + posting | Not Started | 6 API keys obtained. OAuth callback: `https://master-saas-muse-u7ga.vercel.app/api/social/callback/twitter` |
-| 2.1b | LinkedIn — OAuth 2.0 + posting | Not Started | Client ID/Secret obtained. Company page linked. OAuth callback: `.../callback/linkedin` |
-| 2.1c | Facebook — OAuth + page posting | Not Started | App ID/Secret obtained. OAuth callback: `.../callback/facebook` |
+| 2.1a | Twitter/X — OAuth 2.0 + posting | In Progress | OAuth 2.0 Client ID + Secret stored. OAuth flow wired (connect route → callback → token exchange → encrypted storage). Ready for live testing. |
+| 2.1b | LinkedIn — OAuth 2.0 + posting | In Progress | Client ID + Secret stored. OAuth flow wired. Ready for live testing. |
+| 2.1c | Facebook — OAuth + page posting | Blocked | Waiting for App ID + App Secret from user. OAuth flow code is ready. |
 | 2.1d | Real engagement metric pulling for Batch 1 platforms | Not Started | Powers analytics, content intelligence |
 | 2.1e | Error handling, rate limits, token refresh for Batch 1 | Not Started | Edge cases, API failures, retry logic |
 
@@ -106,7 +106,7 @@ Build cloneable self-hosted WordPress + Ghost as reusable infrastructure for all
 
 | Batch | Platforms | API Keys | Status |
 |-------|-----------|----------|--------|
-| 1 — Core Social | Twitter/X, LinkedIn, Facebook | Obtained | Not Started |
+| 1 — Core Social | Twitter/X, LinkedIn, Facebook | Twitter + LinkedIn ready, Facebook waiting on credentials | In Progress |
 | 2 — Easy Wins | Instagram, Reddit, Discord | Need to obtain | Not Started |
 | 3 — Review-Required | YouTube, Pinterest, TikTok, Snapchat | Need to obtain + submit for review | Not Started |
 | 4 — Blog Platforms | WordPress, Ghost, Medium | Self-hosted setup needed | Not Started |
