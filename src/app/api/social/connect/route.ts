@@ -119,14 +119,9 @@ export async function POST(request: NextRequest) {
       }
 
       const state = signState({ userId: user.id, platform, redirectUri })
-      const liParams = new URLSearchParams({
-        response_type: 'code',
-        client_id: clientId,
-        redirect_uri: redirectUri,
-        scope: 'openid profile email w_member_social',
-        state,
-      })
-      authUrl = `https://www.linkedin.com/oauth/v2/authorization?${liParams.toString().replace(/\+/g, '%20')}`
+      const scope = 'openid profile email w_member_social'
+      authUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}`
+      console.log(`[Social Connect] LinkedIn redirect_uri: ${redirectUri}`)
 
     } else if (platform === 'twitter') {
       const apiKey = await getConfigValue('TWITTER_API_KEY')
