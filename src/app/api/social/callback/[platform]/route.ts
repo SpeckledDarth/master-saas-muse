@@ -14,16 +14,31 @@ function getSupabaseAdmin() {
 
 const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook']
 
+function popupResponse(script: string) {
+  const html = `<!DOCTYPE html><html><head><title>Connecting...</title></head><body><p>Processing... you can close this window.</p><script>${script}</script></body></html>`
+  return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } })
+}
+
 function redirectWithError(baseUrl: string, message: string) {
-  const url = new URL('/dashboard/social', baseUrl)
-  url.searchParams.set('error', message)
-  return NextResponse.redirect(url.toString())
+  return popupResponse(`
+    if (window.opener) {
+      window.opener.postMessage({ type: 'oauth_error', message: ${JSON.stringify(message)} }, ${JSON.stringify(baseUrl)});
+      window.close();
+    } else {
+      window.location.href = ${JSON.stringify(baseUrl + '/dashboard/social?error=' + encodeURIComponent(message))};
+    }
+  `)
 }
 
 function redirectWithSuccess(baseUrl: string, platform: string) {
-  const url = new URL('/dashboard/social', baseUrl)
-  url.searchParams.set('connected', platform)
-  return NextResponse.redirect(url.toString())
+  return popupResponse(`
+    if (window.opener) {
+      window.opener.postMessage({ type: 'oauth_success', platform: ${JSON.stringify(platform)} }, ${JSON.stringify(baseUrl)});
+      window.close();
+    } else {
+      window.location.href = ${JSON.stringify(baseUrl + '/dashboard/social?connected=' + encodeURIComponent(platform))};
+    }
+  `)
 }
 
 interface StatePayload {

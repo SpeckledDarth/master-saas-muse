@@ -103,9 +103,33 @@ function SocialAccountsContent() {
 
   const OAUTH_PLATFORMS = ['twitter', 'linkedin', 'facebook']
 
+  useEffect(() => {
+    const handleOAuthMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'oauth_success' && event.data?.platform) {
+        const platformName = PLATFORMS.find(p => p.id === event.data.platform)?.name || event.data.platform
+        toast({
+          title: 'Account Connected',
+          description: `Your ${platformName} account has been successfully connected!`,
+        })
+        fetchAccounts()
+        setConnecting(null)
+      } else if (event.data?.type === 'oauth_error' && event.data?.message) {
+        toast({
+          title: 'Connection Error',
+          description: event.data.message,
+          variant: 'destructive',
+        })
+        setConnecting(null)
+      }
+    }
+    window.addEventListener('message', handleOAuthMessage)
+    return () => window.removeEventListener('message', handleOAuthMessage)
+  }, [toast, fetchAccounts])
+
   const handleConnect = async (platformId: string) => {
     if (OAUTH_PLATFORMS.includes(platformId)) {
       setConnecting(platformId)
+      const popup = window.open('about:blank', `connect_${platformId}`, 'width=600,height=700,scrollbars=yes')
       try {
         const res = await fetch('/api/social/connect', {
           method: 'POST',
@@ -118,11 +142,28 @@ function SocialAccountsContent() {
         }
         const data = await res.json()
         if (data.authUrl) {
-          window.location.href = data.authUrl
+          if (popup && !popup.closed) {
+            popup.location.href = data.authUrl
+            const pollTimer = setInterval(() => {
+              try {
+                if (popup.closed) {
+                  clearInterval(pollTimer)
+                  setConnecting(null)
+                  fetchAccounts()
+                }
+              } catch {
+                // cross-origin, popup still open
+              }
+            }, 500)
+          } else {
+            window.location.href = data.authUrl
+          }
         } else {
+          if (popup && !popup.closed) popup.close()
           throw new Error('No authorization URL returned')
         }
       } catch (err) {
+        if (popup && !popup.closed) popup.close()
         toast({
           title: 'Connection Failed',
           description: (err as Error).message,
