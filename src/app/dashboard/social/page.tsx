@@ -104,6 +104,23 @@ function SocialAccountsContent() {
       setOauthError(null)
       setOauthSuccess(null)
       try {
+        const preflightRes = await fetch('/api/social/preflight', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ platform: platformId }),
+        })
+        if (!preflightRes.ok) {
+          const errData = await preflightRes.json().catch(() => ({}))
+          throw new Error(errData.error || 'Pre-flight check failed. Please try again.')
+        }
+        const preflight = await preflightRes.json()
+        if (!preflight.ready) {
+          const issues = preflight.failures
+            .map((f: { label: string; detail?: string }) => f.detail || f.label)
+            .join('\n')
+          throw new Error(`Setup incomplete:\n${issues}`)
+        }
+
         const res = await fetch('/api/social/connect', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -120,11 +137,8 @@ function SocialAccountsContent() {
           throw new Error('No authorization URL returned')
         }
       } catch (err) {
-        toast({
-          title: 'Connection Failed',
-          description: (err as Error).message,
-          variant: 'destructive',
-        })
+        const message = (err as Error).message
+        setOauthError(message)
         setConnecting(null)
       }
     } else {

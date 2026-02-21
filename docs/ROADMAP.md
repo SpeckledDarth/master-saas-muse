@@ -111,6 +111,35 @@ Build cloneable self-hosted WordPress + Ghost as reusable infrastructure for all
 | 3 — Review-Required | YouTube, Pinterest, TikTok, Snapchat | Need to obtain + submit for review | Not Started |
 | 4 — Blog Platforms | WordPress, Ghost, Medium | Self-hosted setup needed | Not Started |
 
+**Pre-Flight Check System:**
+A `/api/social/preflight` endpoint validates all prerequisites before attempting OAuth. The Connect button calls this automatically and shows clear, actionable error messages if anything is missing. This prevents the trial-and-error debugging that plagued the Twitter/X connection.
+
+**Required Vercel Environment Variables per Platform:**
+
+| Variable | Used By | Notes |
+|----------|---------|-------|
+| `NEXT_PUBLIC_APP_URL` | All platforms | Your production URL (e.g., `https://passivepost.io`). Required for callback URL generation. |
+| `SESSION_SECRET` | All platforms | Random string for OAuth state signing. Generate with `openssl rand -hex 32`. |
+| `SOCIAL_ENCRYPTION_KEY` | All platforms | 32-byte hex key for token encryption. Generate with `openssl rand -hex 32`. If missing, auto-generates and stores in database, but pre-setting avoids first-connection delay. |
+| `TWITTER_API_KEY` | Twitter/X | OAuth 2.0 Client ID (NOT Consumer Key) from X Developer Portal. |
+| `TWITTER_API_SECRET` | Twitter/X | OAuth 2.0 Client Secret from X Developer Portal. |
+| `LINKEDIN_CLIENT_ID` | LinkedIn | From LinkedIn Developer Portal app credentials. |
+| `LINKEDIN_CLIENT_SECRET` | LinkedIn | From LinkedIn Developer Portal app credentials. |
+| `FACEBOOK_APP_ID` | Facebook | From Meta Developer Portal app settings. |
+| `FACEBOOK_APP_SECRET` | Facebook | From Meta Developer Portal app settings. |
+
+**Callback URLs to Register (replace `YOUR_DOMAIN`):**
+
+| Platform | Callback URL |
+|----------|-------------|
+| Twitter/X | `https://YOUR_DOMAIN/api/social/callback/twitter` |
+| LinkedIn | `https://YOUR_DOMAIN/api/social/callback/linkedin` |
+| Facebook | `https://YOUR_DOMAIN/api/social/callback/facebook` |
+
+**Database Prerequisites:**
+- Run `migrations/core/001_social_tables.sql` in Supabase SQL Editor (creates `social_accounts` table)
+- `config_secrets` table auto-creates via RPC on first use
+
 **Dependencies:**
 - Phase 1 and 1.5 should be complete so the product has social proof ready when real users arrive
 - Batch 1: API keys obtained — ready to wire
