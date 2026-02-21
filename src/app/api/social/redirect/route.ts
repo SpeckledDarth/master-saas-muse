@@ -44,26 +44,5 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Invalid URL', { status: 400 })
   }
 
-  const safeUrl = authUrl.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-
-  const html = `<!DOCTYPE html>
-<html><head><title>Connecting...</title>
-<style>
-body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#111;color:#fff}
-.card{text-align:center;padding:2rem}
-.spinner{width:40px;height:40px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem}
-@keyframes spin{to{transform:rotate(360deg)}}
-p{color:#aaa;font-size:0.9rem}
-</style></head>
-<body><div class="card">
-<div class="spinner"></div>
-<p>Redirecting to login...</p>
-</div>
-<script>
-setTimeout(function() {
-  window.location.href = "${safeUrl}";
-}, 500);
-</script></body></html>`
-
-  return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } })
+  return NextResponse.redirect(authUrl)
 }
