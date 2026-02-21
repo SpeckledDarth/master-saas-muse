@@ -263,8 +263,8 @@ export async function GET(
       })
 
     if (upsertError) {
-      console.error(`[Social Callback] Upsert error for ${platform}:`, upsertError)
-      return redirectWithError(baseUrl, 'Failed to save account connection', platform)
+      console.error(`[Social Callback] Upsert error for ${platform}:`, JSON.stringify(upsertError))
+      return redirectWithError(baseUrl, `Failed to save account connection: ${upsertError.message || upsertError.code || 'Unknown database error'}`, platform)
     }
 
     return redirectWithSuccess(baseUrl, platform)
