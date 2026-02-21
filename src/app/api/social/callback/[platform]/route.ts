@@ -15,13 +15,13 @@ function getSupabaseAdmin() {
 const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook']
 
 function redirectWithError(baseUrl: string, message: string) {
-  const url = new URL('/dashboard/social/onboarding', baseUrl)
+  const url = new URL('/dashboard/social', baseUrl)
   url.searchParams.set('error', message)
   return NextResponse.redirect(url.toString())
 }
 
 function redirectWithSuccess(baseUrl: string, platform: string) {
-  const url = new URL('/dashboard/social/onboarding', baseUrl)
+  const url = new URL('/dashboard/social', baseUrl)
   url.searchParams.set('connected', platform)
   return NextResponse.redirect(url.toString())
 }

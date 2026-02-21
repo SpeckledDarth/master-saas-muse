@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -36,15 +37,41 @@ const PLATFORMS: PlatformInfo[] = [
   { id: 'discord', name: 'Discord' },
 ]
 
-export default function SocialAccountsPage() {
+function SocialAccountsContent() {
   const [accounts, setAccounts] = useState<SocialAccount[]>([])
   const [loading, setLoading] = useState(true)
   const [validating, setValidating] = useState(false)
   const [disconnecting, setDisconnecting] = useState<string | null>(null)
   const [connectDialogOpen, setConnectDialogOpen] = useState(false)
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null)
+  const [connecting, setConnecting] = useState<string | null>(null)
   const [moduleDisabled, setModuleDisabled] = useState(false)
   const { toast } = useToast()
+  const searchParams = useSearchParams()
+  const toastShownRef = useRef(false)
+
+  useEffect(() => {
+    if (toastShownRef.current) return
+    const connected = searchParams.get('connected')
+    const error = searchParams.get('error')
+    if (connected) {
+      toastShownRef.current = true
+      const platformName = PLATFORMS.find(p => p.id === connected)?.name || connected
+      toast({
+        title: 'Account Connected',
+        description: `Your ${platformName} account has been successfully connected!`,
+      })
+      window.history.replaceState({}, '', '/dashboard/social')
+    } else if (error) {
+      toastShownRef.current = true
+      toast({
+        title: 'Connection Error',
+        description: error,
+        variant: 'destructive',
+      })
+      window.history.replaceState({}, '', '/dashboard/social')
+    }
+  }, [searchParams, toast])
 
   const fetchAccounts = useCallback(async () => {
     try {
@@ -74,9 +101,39 @@ export default function SocialAccountsPage() {
     fetchAccounts()
   }, [fetchAccounts])
 
-  const handleConnect = (platformId: string) => {
-    setSelectedPlatform(platformId)
-    setConnectDialogOpen(true)
+  const OAUTH_PLATFORMS = ['twitter', 'linkedin', 'facebook']
+
+  const handleConnect = async (platformId: string) => {
+    if (OAUTH_PLATFORMS.includes(platformId)) {
+      setConnecting(platformId)
+      try {
+        const res = await fetch('/api/social/connect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ platform: platformId }),
+        })
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}))
+          throw new Error(data.error || 'Failed to start connection')
+        }
+        const data = await res.json()
+        if (data.authUrl) {
+          window.location.href = data.authUrl
+        } else {
+          throw new Error('No authorization URL returned')
+        }
+      } catch (err) {
+        toast({
+          title: 'Connection Failed',
+          description: (err as Error).message,
+          variant: 'destructive',
+        })
+        setConnecting(null)
+      }
+    } else {
+      setSelectedPlatform(platformId)
+      setConnectDialogOpen(true)
+    }
   }
 
   const handleDisconnect = async (accountId: string) => {
@@ -275,10 +332,17 @@ export default function SocialAccountsPage() {
                     <Button
                       variant="outline"
                       onClick={() => handleConnect(platform.id)}
-                      disabled={platform.comingSoon}
+                      disabled={platform.comingSoon || connecting === platform.id}
                       data-testid={`button-connect-${platform.id}`}
                     >
-                      Connect
+                      {connecting === platform.id ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Connecting...
+                        </>
+                      ) : (
+                        'Connect'
+                      )}
                     </Button>
                   )}
                 </div>
@@ -317,10 +381,8 @@ export default function SocialAccountsPage() {
               Connect {PLATFORMS.find(p => p.id === selectedPlatform)?.name}
             </DialogTitle>
             <DialogDescription data-testid="text-connect-dialog-description">
-              OAuth integration is not yet configured. To connect your{' '}
-              {PLATFORMS.find(p => p.id === selectedPlatform)?.name} account,
-              an administrator needs to set up the OAuth credentials in the admin panel
-              under Setup &gt; PassivePost.
+              {PLATFORMS.find(p => p.id === selectedPlatform)?.name} integration is coming soon.
+              Stay tuned for updates!
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
@@ -335,5 +397,17 @@ export default function SocialAccountsPage() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+export default function SocialAccountsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    }>
+      <SocialAccountsContent />
+    </Suspense>
   )
 }
