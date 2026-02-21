@@ -85,8 +85,7 @@ export async function POST(request: NextRequest) {
     detail: hasSessionSecret ? undefined : 'Missing SESSION_SECRET environment variable. This is needed to secure the OAuth flow.',
   })
 
-  const explicitUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL
-  const hasAppUrl = !!explicitUrl
+  const hasAppUrl = !!(process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL)
   const isProduction = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production'
   checks.push({
     ok: hasAppUrl || !isProduction,
@@ -96,16 +95,10 @@ export async function POST(request: NextRequest) {
       : undefined,
   })
 
-  if (hasAppUrl && explicitUrl) {
-    const configuredOrigin = (explicitUrl.startsWith('http') ? explicitUrl : `https://${explicitUrl}`).replace(/\/$/, '')
-    const detectedOrigin = origin.replace(/\/$/, '')
-    const originsMatch = configuredOrigin === detectedOrigin
-    checks.push({
-      ok: originsMatch,
-      label: 'App URL matches detected origin',
-      detail: originsMatch ? undefined : `Configured URL is "${configuredOrigin}" but the detected origin is "${detectedOrigin}". These must match or OAuth callbacks will fail.`,
-    })
-  }
+  checks.push({
+    ok: true,
+    label: `Resolved origin: ${origin}`,
+  })
 
   const callbackUrl = `${origin}${config.callbackPath}`
   checks.push({
