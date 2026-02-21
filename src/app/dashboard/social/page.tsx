@@ -143,6 +143,7 @@ function SocialAccountsContent() {
         const data = await res.json()
         if (data.authUrl) {
           console.log('[OAuth Debug] authUrl:', data.authUrl)
+          console.log('[OAuth Debug] redirect_uri used by server:', data.debugRedirectUri)
           if (popup && !popup.closed) {
             popup.location.href = data.authUrl
             const pollTimer = setInterval(() => {

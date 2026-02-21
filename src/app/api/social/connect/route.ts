@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unsupported platform' }, { status: 400 })
     }
 
-    return NextResponse.json({ authUrl })
+    return NextResponse.json({ authUrl, debugRedirectUri: redirectUri })
   } catch (error) {
     console.error(`[Social Connect] Error building auth URL for ${platform}:`, error)
     return NextResponse.json({ error: 'Failed to generate authorization URL' }, { status: 500 })

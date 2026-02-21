@@ -20,31 +20,34 @@ function popupResponse(status: 'success' | 'error', detail: string, baseUrl: str
   const messageData = status === 'success'
     ? `{ type: 'oauth_success', platform: ${JSON.stringify(platform || '')} }`
     : `{ type: 'oauth_error', message: ${JSON.stringify(detail)} }`
-  const redirectUrl = status === 'success'
-    ? `${baseUrl}/dashboard/social?connected=${encodeURIComponent(platform || '')}`
-    : `${baseUrl}/dashboard/social?error=${encodeURIComponent(detail)}`
+
+  const autoCloseScript = status === 'success'
+    ? `setTimeout(function() { try { window.close(); } catch(e) {} }, 3000);`
+    : ``
+
+  const safeDetail = detail.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
   const html = `<!DOCTYPE html>
 <html><head><title>${title}</title>
 <style>body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#111;color:#fff}
-.card{text-align:center;padding:2rem;border-radius:12px;max-width:400px}
+.card{text-align:center;padding:2rem;border-radius:12px;max-width:420px}
 .icon{font-size:3rem;margin-bottom:1rem}
-.msg{color:#aaa;margin-top:0.5rem;font-size:0.85rem;word-break:break-word}
-.btn{margin-top:1.5rem;padding:0.5rem 1.5rem;border:none;border-radius:6px;background:${bgColor};color:#fff;font-size:1rem;cursor:pointer}
+h2{margin:0.5rem 0}
+.msg{color:#aaa;margin-top:0.5rem;font-size:0.85rem;word-break:break-word;white-space:pre-wrap;text-align:left;background:#222;padding:1rem;border-radius:8px;max-height:200px;overflow-y:auto}
+.btn{margin-top:1.5rem;padding:0.5rem 1.5rem;border:none;border-radius:6px;background:#333;color:#fff;font-size:1rem;cursor:pointer}
+.btn:hover{background:#444}
+.hint{color:#666;font-size:0.75rem;margin-top:1rem}
 </style></head>
 <body><div class="card">
-<div class="icon">${status === 'success' ? '&#10003;' : '&#10007;'}</div>
+<div class="icon" style="color:${bgColor}">${status === 'success' ? '&#10003;' : '&#10007;'}</div>
 <h2>${title}</h2>
-<p class="msg">${detail.length > 200 ? detail.substring(0, 200) + '...' : detail}</p>
-<button class="btn" onclick="tryClose()">Close Window</button>
+<div class="msg">${safeDetail}</div>
+<button class="btn" onclick="try{window.close()}catch(e){}">Close Window</button>
+${status === 'error' ? '<p class="hint">This window will stay open so you can read the error. Close it manually when done.</p>' : ''}
 </div>
 <script>
 try { if (window.opener) window.opener.postMessage(${messageData}, '*'); } catch(e) {}
-function tryClose() {
-  try { window.close(); } catch(e) {}
-  setTimeout(function() { window.location.href = ${JSON.stringify(redirectUrl)}; }, 500);
-}
-setTimeout(tryClose, 2000);
+${autoCloseScript}
 </script></body></html>`
   return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } })
 }
