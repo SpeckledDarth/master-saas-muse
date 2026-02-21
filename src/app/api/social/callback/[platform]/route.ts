@@ -14,31 +14,49 @@ function getSupabaseAdmin() {
 
 const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook']
 
-function popupResponse(script: string) {
-  const html = `<!DOCTYPE html><html><head><title>Connecting...</title></head><body><p>Processing... you can close this window.</p><script>${script}</script></body></html>`
+function popupResponse(status: 'success' | 'error', detail: string, baseUrl: string, platform?: string) {
+  const bgColor = status === 'success' ? '#10b981' : '#ef4444'
+  const title = status === 'success' ? 'Connected!' : 'Connection Error'
+  const messageData = status === 'success'
+    ? `{ type: 'oauth_success', platform: ${JSON.stringify(platform || '')} }`
+    : `{ type: 'oauth_error', message: ${JSON.stringify(detail)} }`
+  const redirectUrl = status === 'success'
+    ? `${baseUrl}/dashboard/social?connected=${encodeURIComponent(platform || '')}`
+    : `${baseUrl}/dashboard/social?error=${encodeURIComponent(detail)}`
+
+  const html = `<!DOCTYPE html>
+<html><head><title>${title}</title>
+<style>body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#111;color:#fff}
+.card{text-align:center;padding:2rem;border-radius:12px;max-width:400px}
+.icon{font-size:3rem;margin-bottom:1rem}
+.msg{color:#aaa;margin-top:0.5rem;font-size:0.85rem;word-break:break-word}
+.btn{margin-top:1.5rem;padding:0.5rem 1.5rem;border:none;border-radius:6px;background:${bgColor};color:#fff;font-size:1rem;cursor:pointer}
+</style></head>
+<body><div class="card">
+<div class="icon">${status === 'success' ? '&#10003;' : '&#10007;'}</div>
+<h2>${title}</h2>
+<p class="msg">${detail.length > 200 ? detail.substring(0, 200) + '...' : detail}</p>
+<button class="btn" onclick="tryClose()">Close Window</button>
+</div>
+<script>
+try { if (window.opener) window.opener.postMessage(${messageData}, '*'); } catch(e) {}
+function tryClose() {
+  try { window.close(); } catch(e) {}
+  setTimeout(function() { window.location.href = ${JSON.stringify(redirectUrl)}; }, 500);
+}
+setTimeout(tryClose, 2000);
+</script></body></html>`
   return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } })
 }
 
 function redirectWithError(baseUrl: string, message: string) {
-  return popupResponse(`
-    if (window.opener) {
-      window.opener.postMessage({ type: 'oauth_error', message: ${JSON.stringify(message)} }, ${JSON.stringify(baseUrl)});
-      window.close();
-    } else {
-      window.location.href = ${JSON.stringify(baseUrl + '/dashboard/social?error=' + encodeURIComponent(message))};
-    }
-  `)
+  console.error('[Social Callback] OAuth error:', message)
+  return popupResponse('error', message, baseUrl)
 }
 
 function redirectWithSuccess(baseUrl: string, platform: string) {
-  return popupResponse(`
-    if (window.opener) {
-      window.opener.postMessage({ type: 'oauth_success', platform: ${JSON.stringify(platform)} }, ${JSON.stringify(baseUrl)});
-      window.close();
-    } else {
-      window.location.href = ${JSON.stringify(baseUrl + '/dashboard/social?connected=' + encodeURIComponent(platform))};
-    }
-  `)
+  console.log('[Social Callback] OAuth success for:', platform)
+  return popupResponse('success', `Your ${platform} account has been connected!`, baseUrl, platform)
 }
 
 interface StatePayload {
@@ -132,6 +150,9 @@ async function exchangeTwitterToken(code: string, redirectUri: string, codeVerif
   const apiSecret = await getConfigValue('TWITTER_API_SECRET')
   if (!apiKey || !apiSecret) throw new Error('Twitter credentials not configured')
 
+  console.log('[Twitter Token Exchange] redirect_uri:', redirectUri)
+  console.log('[Twitter Token Exchange] client_id length:', apiKey.length, 'client_secret length:', apiSecret.length)
+
   const body = new URLSearchParams({
     grant_type: 'authorization_code',
     code,
@@ -154,10 +175,12 @@ async function exchangeTwitterToken(code: string, redirectUri: string, codeVerif
 
   if (!tokenRes.ok) {
     const errData = await tokenRes.text().catch(() => 'Unknown error')
-    throw new Error(`Twitter token exchange failed: ${errData}`)
+    console.error('[Twitter Token Exchange] Failed:', tokenRes.status, errData)
+    throw new Error(`Twitter token exchange failed (${tokenRes.status}): ${errData}`)
   }
 
   const tokenData = await tokenRes.json()
+  console.log('[Twitter Token Exchange] Success, token type:', tokenData.token_type)
   return {
     accessToken: tokenData.access_token,
     refreshToken: tokenData.refresh_token,
@@ -171,6 +194,8 @@ export async function GET(
   const { platform } = await params
   const baseUrl = request.nextUrl.origin
 
+  console.log(`[Social Callback] Hit for platform: ${platform}, baseUrl: ${baseUrl}`)
+
   if (!VALID_PLATFORMS.includes(platform)) {
     return redirectWithError(baseUrl, 'Invalid platform')
   }
@@ -179,6 +204,8 @@ export async function GET(
   const code = searchParams.get('code')
   const stateParam = searchParams.get('state')
   const errorParam = searchParams.get('error')
+
+  console.log(`[Social Callback] code present: ${!!code}, state present: ${!!stateParam}, error: ${errorParam || 'none'}`)
 
   if (errorParam) {
     const errorDescription = searchParams.get('error_description') || errorParam
@@ -191,7 +218,8 @@ export async function GET(
 
   const verified = verifyState(stateParam)
   if (!verified) {
-    return redirectWithError(baseUrl, 'Invalid or expired state parameter')
+    console.error('[Social Callback] State verification failed - invalid signature or expired')
+    return redirectWithError(baseUrl, 'Invalid or expired state parameter. Please try connecting again.')
   }
 
   const state: StatePayload = { userId: verified.userId, platform: verified.platform, codeVerifier: verified.codeVerifier }
