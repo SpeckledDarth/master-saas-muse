@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       const fbParams = new URLSearchParams({
         client_id: appId,
         redirect_uri: redirectUri,
-        scope: 'pages_manage_posts,pages_read_engagement,pages_show_list',
+        scope: 'email,public_profile',
         state,
       })
       authUrl = `https://www.facebook.com/v19.0/dialog/oauth?${fbParams.toString()}`
