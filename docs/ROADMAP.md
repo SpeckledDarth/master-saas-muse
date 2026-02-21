@@ -69,7 +69,7 @@ Wire up the 3 platforms where B2B/SaaS audiences live. API keys already obtained
 | # | Platform | Status | Notes |
 |---|----------|--------|-------|
 | 2.1a | Twitter/X — OAuth 2.0 + posting | Connected | OAuth 2.0 flow fully working on Vercel. Uses `x.com` domain (not twitter.com). Requires `TWITTER_API_KEY` (OAuth 2.0 Client ID), `TWITTER_API_SECRET` (OAuth 2.0 Client Secret), `SESSION_SECRET`, `NEXT_PUBLIC_APP_URL` in Vercel env vars. Migration `001_social_tables.sql` must be run in Supabase. |
-| 2.1b | LinkedIn — OAuth 2.0 + posting | In Progress | Client ID + Secret stored. OAuth flow wired. Ready for live testing. |
+| 2.1b | LinkedIn — OAuth 2.0 + posting | Connected | OAuth 2.0 flow working on Vercel. Uses OpenID Connect scopes (`openid profile email w_member_social`). Token exchange via `www.linkedin.com/oauth/v2/accessToken`. Profile via `/v2/userinfo`. |
 | 2.1c | Facebook — OAuth + page posting | In Progress | App ID + Secret stored. OAuth flow wired. Ready for live testing. |
 | 2.1d | Real engagement metric pulling for Batch 1 platforms | Not Started | Powers analytics, content intelligence |
 | 2.1e | Error handling, rate limits, token refresh for Batch 1 | Not Started | Edge cases, API failures, retry logic |
