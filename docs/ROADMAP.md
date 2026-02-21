@@ -68,7 +68,7 @@ Wire up the 3 platforms where B2B/SaaS audiences live. API keys already obtained
 
 | # | Platform | Status | Notes |
 |---|----------|--------|-------|
-| 2.1a | Twitter/X — OAuth 2.0 + posting | In Progress | OAuth 2.0 Client ID + Secret stored. OAuth flow wired (connect route → callback → token exchange → encrypted storage). Ready for live testing. |
+| 2.1a | Twitter/X — OAuth 2.0 + posting | Connected | OAuth 2.0 flow fully working on Vercel. Uses `x.com` domain (not twitter.com). Requires `TWITTER_API_KEY` (OAuth 2.0 Client ID), `TWITTER_API_SECRET` (OAuth 2.0 Client Secret), `SESSION_SECRET`, `NEXT_PUBLIC_APP_URL` in Vercel env vars. Migration `001_social_tables.sql` must be run in Supabase. |
 | 2.1b | LinkedIn — OAuth 2.0 + posting | In Progress | Client ID + Secret stored. OAuth flow wired. Ready for live testing. |
 | 2.1c | Facebook — OAuth + page posting | In Progress | App ID + Secret stored. OAuth flow wired. Ready for live testing. |
 | 2.1d | Real engagement metric pulling for Batch 1 platforms | Not Started | Powers analytics, content intelligence |
@@ -206,6 +206,7 @@ Running log of what was accomplished each session. Update at the end of every se
 | Feb 20, 2026 | Built Phase 1: Testimonial management (migration, API, admin CRUD page), public Wall of Love page with live stats, aggregate stats API endpoint, social proof notification popups on landing page. All 4 features complete. | Phase 1 Complete |
 | Feb 21, 2026 | Post-deployment fixes: (1) Moved ShareLink component from accounts page to social overview dashboard so users see it on main page. (2) Added "How did you hear about us?" dropdown to HelpWidget (was only in FeedbackWidget). (3) Fixed Quick Generate FAB button overlapping with Support Widget — moved FAB to `bottom-20` above the support widget. (4) Added empty-state card for ShareLink when referral tables aren't migrated yet. All Phase 1.5 polish complete. | Phase 1.5 Polish |
 | Feb 21, 2026 | Planned Phase 2 in detail: 4-batch platform rollout (Core Social → Easy Wins → Review-Required → Blog Platforms). Documented all 13 platform integrations, API key status, and infrastructure decisions. WordPress + Ghost will be self-hosted as cloneable VPS templates. Medium API closed — marked "coming soon". | Phase 2 Planning |
+| Feb 21, 2026 | **Twitter/X OAuth fully connected on Vercel.** Fixed 4 issues: (1) URL encoding — switched to URLSearchParams for proper parameter encoding. (2) Encryption key — made encryptToken/decryptToken async, added auto-generation of SOCIAL_ENCRYPTION_KEY with DB storage. (3) Domain migration — changed OAuth URLs from twitter.com to x.com (documented cause of infinite redirect loops). (4) Missing Supabase table — ran `001_social_tables.sql` migration in Supabase to create `social_accounts` table. Also added: reliable origin detection via `getAppOrigin()` utility (NEXT_PUBLIC_APP_URL > VERCEL_URL > headers > fallback), dedicated `/oauth/error` page with contextual help, diagnostic logging in OAuth routes. Key lesson: Vercel env vars are separate from Replit — must set TWITTER_API_KEY, TWITTER_API_SECRET, SESSION_SECRET, NEXT_PUBLIC_APP_URL in Vercel dashboard. | Phase 2 Batch 1 — Twitter Connected |
 
 ---
 
