@@ -102,7 +102,13 @@ export async function POST(request: NextRequest) {
       }
 
       const state = signState({ userId: user.id, platform, redirectUri })
-      authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${encodeURIComponent(appId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=pages_manage_posts,pages_read_engagement,pages_show_list&state=${state}`
+      const fbParams = new URLSearchParams({
+        client_id: appId,
+        redirect_uri: redirectUri,
+        scope: 'pages_manage_posts,pages_read_engagement,pages_show_list',
+        state,
+      })
+      authUrl = `https://www.facebook.com/v19.0/dialog/oauth?${fbParams.toString()}`
 
     } else if (platform === 'linkedin') {
       const clientId = await getConfigValue('LINKEDIN_CLIENT_ID')
@@ -111,7 +117,14 @@ export async function POST(request: NextRequest) {
       }
 
       const state = signState({ userId: user.id, platform, redirectUri })
-      authUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid%20profile%20email%20w_member_social&state=${state}`
+      const liParams = new URLSearchParams({
+        response_type: 'code',
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        scope: 'openid profile email w_member_social',
+        state,
+      })
+      authUrl = `https://www.linkedin.com/oauth/v2/authorization?${liParams.toString().replace(/\+/g, '%20')}`
 
     } else if (platform === 'twitter') {
       const apiKey = await getConfigValue('TWITTER_API_KEY')
@@ -122,7 +135,16 @@ export async function POST(request: NextRequest) {
       const codeVerifier = generateCodeVerifier()
       const codeChallenge = generateCodeChallenge(codeVerifier)
       const state = signState({ userId: user.id, platform, codeVerifier, redirectUri })
-      authUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${encodeURIComponent(apiKey)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.read%20tweet.write%20users.read%20offline.access&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`
+      const twParams = new URLSearchParams({
+        response_type: 'code',
+        client_id: apiKey,
+        redirect_uri: redirectUri,
+        scope: 'tweet.read tweet.write users.read offline.access',
+        state,
+        code_challenge: codeChallenge,
+        code_challenge_method: 'S256',
+      })
+      authUrl = `https://twitter.com/i/oauth2/authorize?${twParams.toString().replace(/\+/g, '%20')}`
       console.log(`[Social Connect] Twitter authUrl redirect_uri: ${redirectUri}`)
 
     } else {
