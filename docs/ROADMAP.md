@@ -59,18 +59,65 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 
 ## Phase 2: Connect Real Platform APIs & Full Testing
 
-**Goal:** Move from demo data to production-ready platform integrations.
+**Goal:** Move from demo data to production-ready platform integrations across all 10 social platforms + 3 blog platforms.
 
-| # | Feature | Status | Notes |
-|---|---------|--------|-------|
-| 2.1 | Social platform OAuth + real posting (Twitter/X, LinkedIn, Facebook) | Not Started | Core value proposition |
-| 2.2 | Blog platform connections (Medium, WordPress, Ghost) | Not Started | Blog-to-social flywheel |
-| 2.3 | Real engagement metric pulling from platform APIs | Not Started | Powers analytics, content intelligence |
-| 2.4 | Stress testing, edge cases, error handling | Not Started | Rate limits, token expiry, API failures |
+**Strategy:** Phased rollout in 4 batches, prioritizing platforms by audience value and API simplicity. Submit apps for platforms with review processes early to avoid blocking later work.
+
+### Batch 1 — Core Social (Priority: Highest)
+Wire up the 3 platforms where B2B/SaaS audiences live. API keys already obtained.
+
+| # | Platform | Status | Notes |
+|---|----------|--------|-------|
+| 2.1a | Twitter/X — OAuth 2.0 + posting | Not Started | 6 API keys obtained. OAuth callback: `https://master-saas-muse-u7ga.vercel.app/api/social/callback/twitter` |
+| 2.1b | LinkedIn — OAuth 2.0 + posting | Not Started | Client ID/Secret obtained. Company page linked. OAuth callback: `.../callback/linkedin` |
+| 2.1c | Facebook — OAuth + page posting | Not Started | App ID/Secret obtained. OAuth callback: `.../callback/facebook` |
+| 2.1d | Real engagement metric pulling for Batch 1 platforms | Not Started | Powers analytics, content intelligence |
+| 2.1e | Error handling, rate limits, token refresh for Batch 1 | Not Started | Edge cases, API failures, retry logic |
+
+### Batch 2 — Easy Wins (Priority: High)
+Platforms with straightforward APIs. Instagram shares the Facebook/Meta app.
+
+| # | Platform | Status | Notes |
+|---|----------|--------|-------|
+| 2.2a | Instagram — via Facebook/Meta Graph API | Not Started | May use existing FB app credentials. Requires Instagram Business account. |
+| 2.2b | Reddit — OAuth 2.0 + posting | Not Started | Need to create Reddit app at https://www.reddit.com/prefs/apps |
+| 2.2c | Discord — Bot/webhook integration | Not Started | Need to create Discord app at https://discord.com/developers |
+
+### Batch 3 — Review-Required Platforms (Priority: Medium)
+These platforms have stricter app review processes. Submit applications early.
+
+| # | Platform | Status | Notes |
+|---|----------|--------|-------|
+| 2.3a | YouTube — Google/YouTube Data API v3 | Not Started | Need Google Cloud project with YouTube API enabled |
+| 2.3b | Pinterest — OAuth 2.0 + pin creation | Not Started | Need Pinterest developer app |
+| 2.3c | TikTok — Content Posting API | Not Started | Requires app review — submit early, approval can take weeks |
+| 2.3d | Snapchat — Public Content API | Not Started | Requires app review — submit early |
+
+### Batch 4 — Blog Platforms (Priority: Medium, Self-Hosted Infrastructure)
+Build cloneable self-hosted WordPress + Ghost as reusable infrastructure for all MuseKit products.
+
+| # | Platform | Status | Notes |
+|---|----------|--------|-------|
+| 2.4a | WordPress (self-hosted) — REST API posting | Not Started | Set up on a VPS (e.g., $5/mo DigitalOcean), create cloneable template for all MuseKit products |
+| 2.4b | Ghost (self-hosted) — Admin API posting | Not Started | Co-locate with WordPress on same VPS, cloneable setup |
+| 2.4c | Medium — API integration | Not Started | API closed to new integrations as of Jan 2025. Mark as "coming soon" or find workaround. |
+
+### Phase 2 Summary
+
+| Batch | Platforms | API Keys | Status |
+|-------|-----------|----------|--------|
+| 1 — Core Social | Twitter/X, LinkedIn, Facebook | Obtained | Not Started |
+| 2 — Easy Wins | Instagram, Reddit, Discord | Need to obtain | Not Started |
+| 3 — Review-Required | YouTube, Pinterest, TikTok, Snapchat | Need to obtain + submit for review | Not Started |
+| 4 — Blog Platforms | WordPress, Ghost, Medium | Self-hosted setup needed | Not Started |
 
 **Dependencies:**
 - Phase 1 and 1.5 should be complete so the product has social proof ready when real users arrive
-- Platform developer accounts and API keys needed (Twitter, LinkedIn, Facebook, Medium, WordPress, Ghost)
+- Batch 1: API keys obtained — ready to wire
+- Batch 2: Instagram may reuse Facebook app; Reddit + Discord apps need creation
+- Batch 3: Submit TikTok + Snapchat apps for review ASAP — approval takes time
+- Batch 4: Requires VPS setup for self-hosted WordPress + Ghost (cloneable for future MuseKit products)
+- Medium API is closed — monitor for reopening or mark as "coming soon"
 
 ---
 
@@ -126,6 +173,11 @@ Decisions made during planning, preserved for context.
 | Feb 20, 2026 | Mobile app starts as PWA, not native | Lowest effort, lets us validate demand before investing in native |
 | Feb 20, 2026 | Affiliate system should be MuseKit core, not PassivePost-specific | Any product on the template benefits from referrals |
 | Feb 20, 2026 | Live counters replace manually-set animated counter values | Authentic numbers are more compelling than round placeholder numbers |
+| Feb 21, 2026 | Phase 2 uses 4-batch rollout: Core Social → Easy Wins → Review-Required → Blog Platforms | Prioritizes highest-value platforms first; submits slow-review apps (TikTok, Snapchat) early to avoid blocking |
+| Feb 21, 2026 | WordPress + Ghost will be self-hosted on a VPS as cloneable infrastructure | Eliminates recurring SaaS fees, reusable template for all future MuseKit products |
+| Feb 21, 2026 | Medium marked as "coming soon" — API closed to new integrations since Jan 2025 | No viable path to integrate; monitor for reopening |
+| Feb 21, 2026 | Instagram integration will attempt to reuse existing Facebook/Meta app credentials | Same Graph API, reduces credential management overhead |
+| Feb 21, 2026 | 10 social platforms + 3 blog platforms = 13 total platform integrations as PassivePost USP | Broad platform support is the key differentiator |
 
 ---
 
@@ -153,6 +205,7 @@ Running log of what was accomplished each session. Update at the end of every se
 | Feb 20, 2026 | Completed all 42 PassivePost features. Updated all documentation with visual diagrams, scalability sections, deployment guides, pricing tie-ins, access levels, and screenshot placeholders. Added version tracking to all 16 docs (8 PassivePost + 8 MuseKit). Created this roadmap. | Pre-Phase 1 |
 | Feb 20, 2026 | Built Phase 1: Testimonial management (migration, API, admin CRUD page), public Wall of Love page with live stats, aggregate stats API endpoint, social proof notification popups on landing page. All 4 features complete. | Phase 1 Complete |
 | Feb 21, 2026 | Post-deployment fixes: (1) Moved ShareLink component from accounts page to social overview dashboard so users see it on main page. (2) Added "How did you hear about us?" dropdown to HelpWidget (was only in FeedbackWidget). (3) Fixed Quick Generate FAB button overlapping with Support Widget — moved FAB to `bottom-20` above the support widget. (4) Added empty-state card for ShareLink when referral tables aren't migrated yet. All Phase 1.5 polish complete. | Phase 1.5 Polish |
+| Feb 21, 2026 | Planned Phase 2 in detail: 4-batch platform rollout (Core Social → Easy Wins → Review-Required → Blog Platforms). Documented all 13 platform integrations, API key status, and infrastructure decisions. WordPress + Ghost will be self-hosted as cloneable VPS templates. Medium API closed — marked "coming soon". | Phase 2 Planning |
 
 ---
 
