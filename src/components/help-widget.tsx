@@ -27,6 +27,7 @@ export function HelpWidget({
   const [npsScore, setNpsScore] = useState<number | null>(null)
   const [npsSubmitted, setNpsSubmitted] = useState(false)
   const [npsSubmitting, setNpsSubmitting] = useState(false)
+  const [heardFrom, setHeardFrom] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -70,6 +71,7 @@ export function HelpWidget({
           message: 'NPS rating from support chat',
           pageUrl: typeof window !== 'undefined' ? window.location.pathname : '',
           npsScore,
+          heardFrom: heardFrom || undefined,
         }),
       })
       if (res.ok) {
@@ -181,6 +183,24 @@ export function HelpWidget({
 
           {hasUserMessages && !npsSubmitted && (
             <div className="border-t px-4 py-3 space-y-2">
+              <Label className="text-xs" data-testid="label-help-heard-from">How did you hear about us? <span className="text-muted-foreground">(optional)</span></Label>
+              <select
+                value={heardFrom}
+                onChange={(e) => setHeardFrom(e.target.value)}
+                className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs"
+                data-testid="select-help-heard-from"
+              >
+                <option value="">Select...</option>
+                <option value="search">Search Engine (Google, etc.)</option>
+                <option value="social">Social Media</option>
+                <option value="friend">Friend or Colleague</option>
+                <option value="blog">Blog or Article</option>
+                <option value="podcast">Podcast</option>
+                <option value="youtube">YouTube</option>
+                <option value="newsletter">Newsletter</option>
+                <option value="referral">Referral Link</option>
+                <option value="other">Other</option>
+              </select>
               <Label className="text-xs" data-testid="label-help-nps">How likely are you to recommend us? <span className="text-muted-foreground">(optional)</span></Label>
               <div className="flex items-center gap-1">
                 {Array.from({ length: 11 }, (_, i) => (

@@ -27,6 +27,7 @@ import { PlatformIconCircle } from '@/components/social/platform-icon'
 import { PostDetailDialog, PostDetailData } from '@/components/social/post-detail-dialog'
 import { HelpTooltip } from '@/components/social/help-tooltip'
 import { CoachingCard } from '@/components/social/coaching-card'
+import { ShareLink } from '@/components/social/share-link'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
@@ -564,6 +565,8 @@ export default function SocialOverviewPage() {
           </CardContent>
         </Card>
       )}
+
+      <ShareLink />
 
       <PostDetailDialog
         post={detailPost}
