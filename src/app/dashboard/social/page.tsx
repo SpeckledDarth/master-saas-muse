@@ -145,7 +145,8 @@ function SocialAccountsContent() {
           console.log('[OAuth Debug] authUrl:', data.authUrl)
           console.log('[OAuth Debug] redirect_uri used by server:', data.debugRedirectUri)
           if (popup && !popup.closed) {
-            popup.location.href = data.authUrl
+            const redirectUrl = `/api/social/redirect?url=${encodeURIComponent(data.authUrl)}&sig=${encodeURIComponent(data.authUrlSig)}`
+            popup.location.href = redirectUrl
             const pollTimer = setInterval(() => {
               try {
                 if (popup.closed) {
