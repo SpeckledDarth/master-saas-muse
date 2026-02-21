@@ -1,20 +1,35 @@
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto'
+import { getConfigValue, setDbSecret } from '@/lib/config/secrets'
 
 const ALGORITHM = 'aes-256-gcm'
 const IV_LENGTH = 16
 const TAG_LENGTH = 16
 const SALT = 'passivepost-token-salt'
 
-function getKey(): Buffer {
-  const secret = process.env.SOCIAL_ENCRYPTION_KEY
+let cachedKey: Buffer | null = null
+let cachedSecret: string | null = null
+
+async function getKey(): Promise<Buffer> {
+  let secret = await getConfigValue('SOCIAL_ENCRYPTION_KEY')
   if (!secret) {
-    throw new Error('SOCIAL_ENCRYPTION_KEY environment variable is not set. Generate one with: openssl rand -hex 32')
+    const generated = randomBytes(32).toString('hex')
+    await setDbSecret('SOCIAL_ENCRYPTION_KEY', generated, 'system-auto-generated')
+    secret = await getConfigValue('SOCIAL_ENCRYPTION_KEY')
+    if (!secret) {
+      throw new Error('Failed to auto-generate SOCIAL_ENCRYPTION_KEY. Please set it manually.')
+    }
+    console.log('[Social Crypto] Auto-generated SOCIAL_ENCRYPTION_KEY and stored in database')
   }
-  return scryptSync(secret, SALT, 32)
+  if (secret === cachedSecret && cachedKey) {
+    return cachedKey
+  }
+  cachedSecret = secret
+  cachedKey = scryptSync(secret, SALT, 32)
+  return cachedKey
 }
 
-export function encryptToken(plaintext: string): string {
-  const key = getKey()
+export async function encryptToken(plaintext: string): Promise<string> {
+  const key = await getKey()
   const iv = randomBytes(IV_LENGTH)
   const cipher = createCipheriv(ALGORITHM, key, iv)
 
@@ -26,7 +41,7 @@ export function encryptToken(plaintext: string): string {
   return `${iv.toString('hex')}:${tag.toString('hex')}:${encrypted}`
 }
 
-export function decryptToken(ciphertext: string): string {
+export async function decryptToken(ciphertext: string): Promise<string> {
   if (!ciphertext.includes(':')) {
     return ciphertext
   }
@@ -36,7 +51,7 @@ export function decryptToken(ciphertext: string): string {
     return ciphertext
   }
 
-  const key = getKey()
+  const key = await getKey()
   const iv = Buffer.from(parts[0], 'hex')
   const tag = Buffer.from(parts[1], 'hex')
   const encrypted = parts[2]

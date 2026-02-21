@@ -14,7 +14,7 @@ export async function refreshAccessToken(
       return null
     }
 
-    const refreshToken = decryptToken(refreshTokenEncrypted)
+    const refreshToken = await decryptToken(refreshTokenEncrypted)
 
     let newAccessToken: string | null = null
     let newRefreshToken: string | null = null
@@ -90,7 +90,7 @@ export async function refreshAccessToken(
     }
 
     const updateData: Record<string, any> = {
-      access_token_encrypted: encryptToken(newAccessToken),
+      access_token_encrypted: await encryptToken(newAccessToken),
       is_valid: true,
       last_validated_at: new Date().toISOString(),
       last_error: null,
@@ -98,7 +98,7 @@ export async function refreshAccessToken(
     }
 
     if (newRefreshToken) {
-      updateData.refresh_token_encrypted = encryptToken(newRefreshToken)
+      updateData.refresh_token_encrypted = await encryptToken(newRefreshToken)
     }
 
     await admin

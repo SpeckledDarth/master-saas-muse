@@ -20,6 +20,7 @@ const ALLOWED_KEYS = new Set([
   'SNAPCHAT_CLIENT_ID', 'SNAPCHAT_CLIENT_SECRET',
   'DISCORD_CLIENT_ID', 'DISCORD_CLIENT_SECRET', 'DISCORD_BOT_TOKEN',
   'SESSION_SECRET',
+  'SOCIAL_ENCRYPTION_KEY',
 ])
 
 export function isAllowedKey(key: string): boolean {

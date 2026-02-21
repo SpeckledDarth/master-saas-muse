@@ -122,8 +122,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const encryptedApiKey = apiKey ? encryptToken(apiKey) : null
-    const encryptedAccessToken = accessToken ? encryptToken(accessToken) : null
+    const encryptedApiKey = apiKey ? await encryptToken(apiKey) : null
+    const encryptedAccessToken = accessToken ? await encryptToken(accessToken) : null
 
     const admin = getSupabaseAdmin()
     const { data, error } = await admin

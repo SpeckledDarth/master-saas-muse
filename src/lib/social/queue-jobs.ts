@@ -61,7 +61,7 @@ export async function processSocialPostJob(job: Job<SocialPostJobData>): Promise
       throw new Error(`No valid ${job.data.platform} account for user ${job.data.userId}`)
     }
 
-    let accessToken = decryptToken(account.access_token_encrypted)
+    let accessToken = await decryptToken(account.access_token_encrypted)
     const client = getPlatformClient(job.data.platform as SocialPlatform)
 
     const validation = await client.validateToken(accessToken)
@@ -233,7 +233,7 @@ export async function processSocialEngagementPullJob(job: Job<SocialEngagementPu
       return
     }
 
-    const accessToken = decryptToken(account.access_token_encrypted)
+    const accessToken = await decryptToken(account.access_token_encrypted)
 
     const { data: posts } = await admin
       .from('social_posts')

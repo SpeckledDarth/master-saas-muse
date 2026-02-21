@@ -68,7 +68,7 @@ export async function POST() {
     const results = await Promise.all(
       accounts.map(async (account) => {
         const client = getPlatformClient(account.platform as SocialPlatform)
-        const token = account.access_token_encrypted ? decryptToken(account.access_token_encrypted) : ''
+        const token = account.access_token_encrypted ? await decryptToken(account.access_token_encrypted) : ''
         const validation = await client.validateToken(token)
 
         await admin
