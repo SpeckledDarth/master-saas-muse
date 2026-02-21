@@ -56,6 +56,7 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
   const [inputValue, setInputValue] = useState('')
   const [revealedValue, setRevealedValue] = useState<string | null>(null)
   const [revealed, setRevealed] = useState(false)
+  const [inputRevealed, setInputRevealed] = useState(false)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [revealing, setRevealing] = useState(false)
@@ -117,6 +118,7 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
   function handleCancel() {
     setEditing(false)
     setInputValue('')
+    setInputRevealed(false)
     setError(null)
   }
 
@@ -153,6 +155,7 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
       }
       setEditing(false)
       setInputValue('')
+      setInputRevealed(false)
       setRevealed(false)
       setRevealedValue(null)
       onSaved()
@@ -226,16 +229,29 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
         <div className="min-w-0">
           {editing ? (
             <div className="flex items-center gap-2">
-              <Input
-                type="text"
-                value={inputValue}
-                onChange={(e) => { setInputValue(e.target.value); setError(null) }}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') handleCancel() }}
-                placeholder={`Enter ${keyData.label}...`}
-                className="font-mono text-sm"
-                autoFocus
-                data-testid={`input-${keyData.id}`}
-              />
+              <div className="relative flex-1">
+                <Input
+                  type={inputRevealed ? 'text' : 'password'}
+                  value={inputValue}
+                  onChange={(e) => { setInputValue(e.target.value); setError(null) }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') handleCancel() }}
+                  placeholder={`Enter ${keyData.label}...`}
+                  className="font-mono text-sm pr-10"
+                  autoFocus
+                  data-testid={`input-${keyData.id}`}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-2"
+                  onClick={() => setInputRevealed(!inputRevealed)}
+                  tabIndex={-1}
+                  data-testid={`button-toggle-input-${keyData.id}`}
+                >
+                  {inputRevealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
               <Button
                 size="icon"
                 onClick={handleSave}
