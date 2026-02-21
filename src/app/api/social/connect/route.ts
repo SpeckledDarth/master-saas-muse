@@ -86,8 +86,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `Invalid platform. Must be one of: ${VALID_PLATFORMS.join(', ')}` }, { status: 400 })
   }
 
-  const origin = request.headers.get('origin') || request.nextUrl.origin
+  const origin = request.nextUrl.origin
   const redirectUri = `${origin}/api/social/callback/${platform}`
+  console.log(`[Social Connect] Platform: ${platform}, redirectUri: ${redirectUri}`)
 
   try {
     let authUrl: string
@@ -120,6 +121,7 @@ export async function POST(request: NextRequest) {
       const codeChallenge = generateCodeChallenge(codeVerifier)
       const state = signState({ userId: user.id, platform, codeVerifier })
       authUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${encodeURIComponent(apiKey)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.read%20tweet.write%20users.read%20offline.access&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`
+      console.log(`[Social Connect] Twitter authUrl redirect_uri: ${redirectUri}`)
 
     } else {
       return NextResponse.json({ error: 'Unsupported platform' }, { status: 400 })
