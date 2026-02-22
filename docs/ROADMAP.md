@@ -21,7 +21,7 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 | 2 | Connect Real Platform APIs & Full Testing | Complete (All batches, engagement metrics, posting, guides) | Week 2-3 |
 | 3 | Affiliate Marketing Features | Complete | Week 3-4 |
 | 3.5 | Open Affiliate Program (Public Signup) | Complete | Week 3-4 |
-| 3.6 | Affiliate Enhancements & Discount Codes | Not Started | Week 4-6 |
+| 3.6 | Affiliate Enhancements & Discount Codes | Sprint 1 Complete (5/32) | Week 4-6 |
 | 4 | Mobile App (PWA First) | Not Started | Week 6+ |
 
 ---
@@ -224,11 +224,11 @@ A `/api/social/preflight` endpoint validates all prerequisites before attempting
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 3.6.1 | Discount Code System with dual-attribution — admin CRUD, Stripe coupon sync, checkout integration, affiliate code-based attribution as fallback | Not Started | Standalone admin page `/admin/setup/discount-codes`. Tables: `discount_codes`, `discount_code_redemptions`. Attribution conflict policy configurable. |
-| 3.6.2 | Milestone Bonuses — flat bonuses at referral count thresholds | Not Started | Tables: `affiliate_milestones`, `affiliate_milestone_awards`. Admin CRUD + affiliate progress bar. |
-| 3.6.3 | Real-Time Earnings Widget — live "today's earnings" counter on dashboard | Not Started | No new tables. Aggregates existing commissions. |
-| 3.6.4 | Affiliate Newsletter / Broadcast System — admin bulk email to affiliates | Not Started | Tables: `affiliate_broadcasts`, `affiliate_broadcast_receipts`. Audience segmentation (tier, activity, status). |
-| 3.6.5 | Admin Program Health Dashboard — ROI, growth trends, churn risk, fraud alerts | Not Started | No new tables. Aggregates existing data. Top-level view on affiliate admin page. |
+| 3.6.1 | Discount Code System with dual-attribution — admin CRUD, Stripe coupon sync, checkout integration, affiliate code-based attribution as fallback | Complete | Standalone admin page `/admin/setup/discount-codes`. Tables: `discount_codes`, `discount_code_redemptions`. Attribution conflict policy configurable in affiliate settings. API: `/api/admin/discount-codes`. Public validation: `/api/discount-codes/validate`. |
+| 3.6.2 | Milestone Bonuses — flat bonuses at referral count thresholds | Complete | Tables: `affiliate_milestones`, `affiliate_milestone_awards`. Admin CRUD on Milestones tab. Affiliate dashboard progress card with per-milestone progress bars. API: `/api/affiliate/milestones`. |
+| 3.6.3 | Real-Time Earnings Widget — live "today's earnings" counter on dashboard | Complete | No new tables. Aggregates existing commissions by period. Live earnings card on affiliate dashboard with Today/Week/Month toggle. API: `/api/affiliate/earnings`. |
+| 3.6.4 | Affiliate Newsletter / Broadcast System — admin bulk email to affiliates | Complete | Tables: `affiliate_broadcasts`, `affiliate_broadcast_receipts`. Broadcasts tab on admin affiliate page with draft/send workflow and audience segmentation. API: `/api/admin/affiliate/broadcasts`. |
+| 3.6.5 | Admin Program Health Dashboard — ROI, growth trends, churn risk, fraud alerts | Complete | No new tables. Aggregates existing data. Health tab (default) on admin affiliate page with KPI cards, revenue impact, engagement metrics, top performers. API: `/api/admin/affiliate/health`. |
 
 ### Sprint 2 — Affiliate Tools & Analytics (6 features)
 
@@ -365,6 +365,7 @@ Running log of what was accomplished each session. Update at the end of every se
 | Feb 22, 2026 | **Phase 2 fully complete.** (1) In-app setup guides for all platforms: social platforms show pre-OAuth guide dialog with numbered steps, security reassurance, and time estimates; blog platforms have collapsible credential generation guides with navigation paths. (2) Engagement metrics infrastructure: summary API (`/api/social/engagement/summary`), manual pull trigger (`/api/social/engagement/pull`), dashboard upgraded with real metric cards and "Refresh Metrics" button. (3) Real posting flow wired: "Post Now" and "Publish" buttons on draft posts, blog publishing endpoint (`/api/social/blog/posts/publish`). (4) All demo data fallbacks removed from posts and engagement pages. (5) Display Name field restored in blog connection form. (6) Discord guide language corrected. **Phase 2 is complete — ready for Phase 3 (Affiliate Marketing).** | Phase 2 — Complete |
 | Feb 22, 2026 | **Phase 3 fully complete — Affiliate Marketing System.** Built complete affiliate infrastructure: (1) Database migration with 6 new tables (affiliate_program_settings, affiliate_tiers, affiliate_referrals, affiliate_commissions, affiliate_payouts, affiliate_assets) plus referral_links upgrade. (2) Core library with grandfathering (lock-in rates on activation), fraud detection (email domain, IP volume, self-referral), performance tiers, and notification helpers. (3) Admin management page with settings, tier CRUD, marketing assets, affiliate rankings, and fraud alerts. (4) User affiliate dashboard with stats cards, tier progress, referral/earnings/payout history, marketing assets browser. (5) Cookie attribution (30-day pp_ref cookie, configurable duration). (6) Stripe webhook commission tracking on invoice.paid with deduplication. (7) Payout management (pending → approved → paid workflow). (8) 3-email onboarding drip sequence via Resend. (9) Real-time notifications for clicks, signups, conversions, and payouts. **Phase 3 complete — ready for Phase 4.** | Phase 3 — Complete |
 | Feb 22, 2026 | **Phase 3.5 — Open Affiliate Program built.** Architecture decision: affiliates are 100% separate from product users (different login, dashboard, purpose). Built: (1) Public affiliate landing page at /affiliate with commission structure, benefits, "How It Works" steps, audience types, CTAs. (2) Application form at /affiliate/join with name, email, website, promotion method, message — duplicate detection (pending/approved). (3) `affiliate_applications` table + `affiliate_network_settings` table (migration 006). (4) Separate login at /affiliate/login with magic link + password modes. (5) Standalone dashboard at /affiliate/dashboard with own header, no product sidebar — full stats, earnings, payouts, referral link, marketing assets. (6) Admin applications tab with approve/reject workflow — approve auto-creates Supabase user with 'affiliate' role + referral link. (7) Admin networks tab for ShareASale, Impact, PartnerStack integration (tracking IDs, postback URLs, toggle active). (8) Cleaned up product sidebar — "Earn > Affiliate" now links to /affiliate landing page. Header/footer hidden on affiliate dashboard. Footer gets "Affiliate Program" link. | Phase 3.5 — Complete |
+| Feb 22, 2026 | **Phase 3.6 Sprint 1 — Complete (5/5 features).** Built all 5 core affiliate enhancements: (1) **Discount Code System** — standalone admin page at `/admin/setup/discount-codes` with full CRUD, 6 discount types (percentage, fixed_amount, free_trial, bogo, tiered, bundle), affiliate linking for dual-attribution, usage limit tracking, public validation API. Attribution conflict policy (cookie_wins/code_wins/first_touch/split) added to affiliate settings. (2) **Milestone Bonuses** — admin CRUD on new Milestones tab in affiliate page, affiliate dashboard shows milestone progress card with per-milestone progress bars and achieved status. (3) **Real-Time Earnings Widget** — live earnings card on affiliate dashboard with Today/Week/Month toggle, aggregates from existing commissions table. (4) **Broadcast System** — Broadcasts tab on admin affiliate page with draft creation, audience segmentation (all/top_performers/dormant), send tracking (sent/opened/clicked counts). (5) **Program Health Dashboard** — new default Health tab on admin affiliate page with KPI cards (active/dormant affiliates, net ROI, conversion rate), revenue impact breakdown, engagement metrics, top performers ranking. Migration 007 with all Sprint 1 tables. All APIs handle missing tables gracefully (42P01 error code). | Phase 3.6 Sprint 1 — Complete |
 
 ---
 
@@ -414,17 +415,16 @@ Key files for each phase, so agents can find relevant code quickly.
 
 ### Phase 3.6 (Affiliate Enhancements & Discount Codes — 32 features)
 - Feature plan: `docs/musekit/AFFILIATE_ENHANCEMENTS.md` (full specs, schemas, implementation notes for all 32 features)
-- Migrations: `migrations/core/007_affiliate_enhancements_p1.sql`, `008_..._p2.sql`, `009_..._p3.sql` (to be created)
-- Discount codes admin: `src/app/admin/setup/discount-codes/page.tsx` (to be created)
-- Discount codes API: `src/app/api/admin/discount-codes/` (to be created)
-- Leaderboard API: `src/app/api/affiliate/leaderboard/` (to be created)
-- Milestones API: `src/app/api/affiliate/milestones/` (to be created)
-- Contests API: `src/app/api/affiliate/contests/` (to be created)
-- Broadcasts API: `src/app/api/admin/affiliate/broadcasts/` (to be created)
-- Program Health API: `src/app/api/admin/affiliate/health/` (to be created)
-- Funnel API: `src/app/api/affiliate/funnel/` (to be created)
-- Messaging API: `src/app/api/affiliate/messages/` (to be created)
-- Webhooks API: `src/app/api/affiliate/webhooks/` (to be created)
+- Sprint 1 migration: `migrations/core/007_affiliate_enhancements_p1.sql` (discount_codes, discount_code_redemptions, affiliate_milestones, affiliate_milestone_awards, affiliate_broadcasts, affiliate_broadcast_receipts, attribution_conflict_policy column)
+- Discount codes admin: `src/app/admin/setup/discount-codes/page.tsx` (full CRUD, 6 discount types, affiliate linking, usage tracking)
+- Discount codes API: `src/app/api/admin/discount-codes/route.ts` (admin CRUD), `src/app/api/discount-codes/validate/route.ts` (public validation)
+- Milestones API: `src/app/api/affiliate/milestones/route.ts` (admin CRUD via ?admin=true, affiliate progress via GET)
+- Earnings API: `src/app/api/affiliate/earnings/route.ts` (aggregated by today/week/month/allTime)
+- Broadcasts API: `src/app/api/admin/affiliate/broadcasts/route.ts` (admin CRUD + send)
+- Program Health API: `src/app/api/admin/affiliate/health/route.ts` (ROI, engagement, growth, alerts, top performers)
+- Admin affiliate page: `src/app/admin/setup/affiliate/page.tsx` (new Health/Milestones/Broadcasts tabs, attribution policy in settings)
+- Affiliate dashboard: `src/app/affiliate/dashboard/page.tsx` (live earnings widget, milestone progress card)
+- Remaining Sprint 2-4 APIs: `src/app/api/affiliate/leaderboard/`, contests/, funnel/, messages/, webhooks/ (to be created)
 
 ### Phase 4
 - PWA: `public/manifest.json`, service worker, `next.config.js` PWA config

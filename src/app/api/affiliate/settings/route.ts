@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { commission_rate, commission_duration_months, min_payout_cents, cookie_duration_days, program_active } = body
+    const { commission_rate, commission_duration_months, min_payout_cents, cookie_duration_days, program_active, attribution_conflict_policy } = body
 
     const { data: existing } = await admin
       .from('affiliate_program_settings')
@@ -62,6 +62,7 @@ export async function PUT(request: NextRequest) {
     if (min_payout_cents !== undefined) updates.min_payout_cents = min_payout_cents
     if (cookie_duration_days !== undefined) updates.cookie_duration_days = cookie_duration_days
     if (program_active !== undefined) updates.program_active = program_active
+    if (attribution_conflict_policy !== undefined) updates.attribution_conflict_policy = attribution_conflict_policy
 
     if (existing) {
       const { error } = await admin

@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Loader2, Copy, Check, DollarSign, Users, TrendingUp, Share2,
   Award, MousePointerClick, FileImage, FileText,
-  ExternalLink, Clock, CheckCircle, LogOut,
+  ExternalLink, Clock, CheckCircle, LogOut, Target, Zap,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -109,6 +109,9 @@ export default function StandaloneAffiliateDashboard() {
   const [copied, setCopied] = useState(false)
   const [copiedAsset, setCopiedAsset] = useState<string | null>(null)
   const [userEmail, setUserEmail] = useState('')
+  const [earnings, setEarnings] = useState<{ today: number; thisWeek: number; thisMonth: number; allTime: number } | null>(null)
+  const [earningsPeriod, setEarningsPeriod] = useState<'today' | 'thisWeek' | 'thisMonth'>('today')
+  const [milestoneData, setMilestoneData] = useState<{ milestones: any[]; currentReferrals: number; totalBonusEarned: number } | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -127,18 +130,24 @@ export default function StandaloneAffiliateDashboard() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [dashRes, assetsRes] = await Promise.all([
+      const [dashRes, assetsRes, earningsRes, milestonesRes] = await Promise.all([
         fetch('/api/affiliate/dashboard'),
         fetch('/api/affiliate/assets'),
+        fetch('/api/affiliate/earnings'),
+        fetch('/api/affiliate/milestones'),
       ])
 
-      const [dashData, assetsData] = await Promise.all([
+      const [dashData, assetsData, earningsData, msData] = await Promise.all([
         dashRes.json(),
         assetsRes.json(),
+        earningsRes.json(),
+        milestonesRes.json(),
       ])
 
       setData(dashData.affiliate)
       setAssets(assetsData.assets || [])
+      setEarnings(earningsData)
+      setMilestoneData(msData)
     } catch (err) {
       console.error('Failed to load affiliate data:', err)
     } finally {
@@ -264,6 +273,36 @@ export default function StandaloneAffiliateDashboard() {
             </CardContent>
           </Card>
 
+          {earnings && (
+            <Card className="border-green-500/30 bg-green-50/30 dark:bg-green-950/20" data-testid="card-live-earnings">
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-green-500" />
+                    <span className="text-sm font-medium">Live Earnings</span>
+                  </div>
+                  <div className="flex gap-1">
+                    {(['today', 'thisWeek', 'thisMonth'] as const).map(period => (
+                      <Button
+                        key={period}
+                        variant={earningsPeriod === period ? 'default' : 'ghost'}
+                        size="sm"
+                        className="h-6 text-xs px-2"
+                        onClick={() => setEarningsPeriod(period)}
+                        data-testid={`button-earnings-${period}`}
+                      >
+                        {period === 'today' ? 'Today' : period === 'thisWeek' ? 'Week' : 'Month'}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-3xl font-bold mt-2 text-green-600 dark:text-green-400" data-testid="text-live-earnings-value">
+                  ${(earnings[earningsPeriod] / 100).toFixed(2)}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
             <Card data-testid="stat-clicks">
               <CardContent className="pt-4 pb-3">
@@ -325,6 +364,49 @@ export default function StandaloneAffiliateDashboard() {
                 {!data.tier.next && (
                   <p className="text-xs text-muted-foreground">You've reached the highest tier!</p>
                 )}
+              </CardContent>
+            </Card>
+          )}
+
+          {milestoneData && milestoneData.milestones.length > 0 && (
+            <Card data-testid="card-milestone-progress">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Milestone Bonuses
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground mb-3">
+                  You have {milestoneData.currentReferrals} referral{milestoneData.currentReferrals !== 1 ? 's' : ''} total.
+                  {milestoneData.totalBonusEarned > 0 && ` Earned $${(milestoneData.totalBonusEarned / 100).toFixed(2)} in milestone bonuses.`}
+                </p>
+                <div className="space-y-2">
+                  {milestoneData.milestones.map(ms => {
+                    const achieved = milestoneData.currentReferrals >= ms.referral_threshold
+                    const progress = Math.min((milestoneData.currentReferrals / ms.referral_threshold) * 100, 100)
+                    return (
+                      <div key={ms.id} className={`p-3 rounded-md border ${achieved ? 'border-green-500/30 bg-green-50/30 dark:bg-green-950/20' : ''}`} data-testid={`milestone-progress-${ms.id}`}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium">{ms.name}</span>
+                          <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                            ${(ms.bonus_amount_cents / 100).toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Progress value={progress} className="h-1.5 flex-1" />
+                          <span className="text-xs text-muted-foreground w-16 text-right">
+                            {achieved ? (
+                              <span className="text-green-600 dark:text-green-400 flex items-center gap-1 justify-end"><CheckCircle className="h-3 w-3" /> Done</span>
+                            ) : (
+                              `${milestoneData.currentReferrals}/${ms.referral_threshold}`
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </CardContent>
             </Card>
           )}

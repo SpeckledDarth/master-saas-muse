@@ -11,10 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Progress } from '@/components/ui/progress'
 import {
   Loader2, Save, DollarSign, Users, TrendingUp, AlertTriangle,
   Plus, Trash2, Pencil, Award, FileImage, FileText, Share2,
   CheckCircle, XCircle, Clock, Eye, Globe, UserPlus, Mail,
+  Target, Send, BarChart3, Activity, Megaphone,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -24,6 +26,39 @@ interface Settings {
   min_payout_cents: number
   cookie_duration_days: number
   program_active: boolean
+  attribution_conflict_policy: string
+}
+
+interface Milestone {
+  id: string
+  name: string
+  referral_threshold: number
+  bonus_amount_cents: number
+  description: string | null
+  is_active: boolean
+  sort_order: number
+}
+
+interface Broadcast {
+  id: string
+  subject: string
+  body: string
+  audience_filter: any
+  sent_count: number
+  opened_count: number
+  clicked_count: number
+  status: string
+  sent_at: string | null
+  created_at: string
+}
+
+interface HealthData {
+  overview: { totalAffiliates: number; activeAffiliates: number; dormantAffiliates: number; suspended: number }
+  revenue: { totalRevenue: number; totalCommissionsPaid: number; totalCommissionsPending: number; netROI: number }
+  growth: { newAffiliatesThisMonth: number; referralsThisMonth: number; conversionsThisMonth: number; conversionRate: number }
+  engagement: { avgReferralsPerAffiliate: number; avgEarningsPerAffiliate: number }
+  topPerformers: Array<{ userId: string; referrals: number; earnings: number }>
+  alerts: { flaggedReferrals: number; pendingPayoutAmount: number }
 }
 
 interface Tier {
@@ -135,6 +170,7 @@ export default function AffiliateSettingsPage() {
     min_payout_cents: 5000,
     cookie_duration_days: 30,
     program_active: true,
+    attribution_conflict_policy: 'cookie_wins',
   })
   const [tiers, setTiers] = useState<Tier[]>([])
   const [assets, setAssets] = useState<Asset[]>([])
@@ -157,29 +193,47 @@ export default function AffiliateSettingsPage() {
 
   const [networks, setNetworks] = useState<NetworkSetting[]>([])
 
+  const [milestones, setMilestones] = useState<Milestone[]>([])
+  const [milestoneDialog, setMilestoneDialog] = useState(false)
+  const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null)
+  const [milestoneForm, setMilestoneForm] = useState({ name: '', referral_threshold: 10, bonus_amount_cents: 5000, description: '', is_active: true, sort_order: 0 })
+
+  const [broadcasts, setBroadcasts] = useState<Broadcast[]>([])
+  const [broadcastDialog, setBroadcastDialog] = useState(false)
+  const [broadcastForm, setBroadcastForm] = useState({ subject: '', body: '', audience_type: 'all' })
+  const [sendingBroadcast, setSendingBroadcast] = useState<string | null>(null)
+
+  const [healthData, setHealthData] = useState<HealthData | null>(null)
+
   const { toast } = useToast()
 
   const fetchData = useCallback(async () => {
     try {
-      const [settingsRes, tiersRes, assetsRes, referralsRes, appsRes, networksRes] = await Promise.all([
+      const [settingsRes, tiersRes, assetsRes, referralsRes, appsRes, networksRes, milestonesRes, broadcastsRes, healthRes] = await Promise.all([
         fetch('/api/affiliate/settings'),
         fetch('/api/affiliate/tiers'),
         fetch('/api/affiliate/assets'),
         fetch('/api/affiliate/referrals?admin=true'),
         fetch('/api/affiliate/applications?status=all'),
         fetch('/api/affiliate/networks'),
+        fetch('/api/affiliate/milestones?admin=true'),
+        fetch('/api/admin/affiliate/broadcasts'),
+        fetch('/api/admin/affiliate/health'),
       ])
 
-      const [settingsData, tiersData, assetsData, referralsData, appsData, networksData] = await Promise.all([
+      const [settingsData, tiersData, assetsData, referralsData, appsData, networksData, milestonesData, broadcastsData, healthResData] = await Promise.all([
         settingsRes.json(),
         tiersRes.json(),
         assetsRes.json(),
         referralsRes.json(),
         appsRes.json(),
         networksRes.json(),
+        milestonesRes.json(),
+        broadcastsRes.json(),
+        healthRes.json(),
       ])
 
-      if (settingsData.settings) setSettings(settingsData.settings)
+      if (settingsData.settings) setSettings(s => ({ ...s, ...settingsData.settings }))
       if (tiersData.tiers) setTiers(tiersData.tiers)
       if (assetsData.assets) setAssets(assetsData.assets)
       if (referralsData.affiliates) setAffiliates(referralsData.affiliates)
@@ -187,6 +241,9 @@ export default function AffiliateSettingsPage() {
       if (referralsData.flaggedReferrals) setFlaggedReferrals(referralsData.flaggedReferrals)
       if (appsData.applications) setApplications(appsData.applications)
       if (networksData.networks) setNetworks(networksData.networks)
+      if (milestonesData.milestones) setMilestones(milestonesData.milestones)
+      if (broadcastsData.broadcasts) setBroadcasts(broadcastsData.broadcasts)
+      if (healthResData.health) setHealthData(healthResData.health)
     } catch (err) {
       console.error('Failed to load affiliate data:', err)
     } finally {
@@ -327,6 +384,73 @@ export default function AffiliateSettingsPage() {
     }
   }
 
+  const saveMilestone = async () => {
+    try {
+      const method = editingMilestone ? 'PUT' : 'POST'
+      const body = editingMilestone ? { id: editingMilestone.id, ...milestoneForm } : milestoneForm
+      const res = await fetch('/api/affiliate/milestones', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (!res.ok) throw new Error('Failed')
+      toast({ title: editingMilestone ? 'Milestone updated' : 'Milestone created' })
+      setMilestoneDialog(false)
+      setEditingMilestone(null)
+      setMilestoneForm({ name: '', referral_threshold: 10, bonus_amount_cents: 5000, description: '', is_active: true, sort_order: 0 })
+      fetchData()
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save milestone', variant: 'destructive' })
+    }
+  }
+
+  const deleteMilestone = async (id: string) => {
+    try {
+      const res = await fetch(`/api/affiliate/milestones?id=${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed')
+      toast({ title: 'Milestone deleted' })
+      fetchData()
+    } catch {
+      toast({ title: 'Error', description: 'Failed to delete milestone', variant: 'destructive' })
+    }
+  }
+
+  const saveBroadcast = async () => {
+    if (!broadcastForm.subject || !broadcastForm.body) {
+      toast({ title: 'Missing fields', description: 'Subject and body are required', variant: 'destructive' })
+      return
+    }
+    try {
+      const res = await fetch('/api/admin/affiliate/broadcasts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject: broadcastForm.subject,
+          body: broadcastForm.body,
+          audience_filter: { type: broadcastForm.audience_type },
+        }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      toast({ title: 'Broadcast draft created' })
+      setBroadcastDialog(false)
+      setBroadcastForm({ subject: '', body: '', audience_type: 'all' })
+      fetchData()
+    } catch {
+      toast({ title: 'Error', description: 'Failed to create broadcast', variant: 'destructive' })
+    }
+  }
+
+  const deleteBroadcast = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/affiliate/broadcasts?id=${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed')
+      toast({ title: 'Broadcast deleted' })
+      fetchData()
+    } catch {
+      toast({ title: 'Error', description: 'Failed to delete broadcast', variant: 'destructive' })
+    }
+  }
+
   const filteredApplications = applications.filter(a => appFilter === 'all' || a.status === appFilter)
   const pendingCount = applications.filter(a => a.status === 'pending').length
 
@@ -408,17 +532,158 @@ export default function AffiliateSettingsPage() {
         </Card>
       )}
 
-      <Tabs defaultValue="applications" data-testid="tabs-affiliate-admin">
+      <Tabs defaultValue="health" data-testid="tabs-affiliate-admin">
         <TabsList className="flex-wrap">
+          <TabsTrigger value="health" data-testid="tab-health">
+            <Activity className="h-3.5 w-3.5 mr-1" /> Health
+          </TabsTrigger>
           <TabsTrigger value="applications" data-testid="tab-applications">
             Applications {pendingCount > 0 && <Badge variant="destructive" className="ml-1.5 text-[10px] px-1.5 py-0">{pendingCount}</Badge>}
           </TabsTrigger>
           <TabsTrigger value="settings" data-testid="tab-settings">Settings</TabsTrigger>
           <TabsTrigger value="tiers" data-testid="tab-tiers">Tiers</TabsTrigger>
+          <TabsTrigger value="milestones" data-testid="tab-milestones">Milestones</TabsTrigger>
           <TabsTrigger value="assets" data-testid="tab-assets">Marketing Assets</TabsTrigger>
+          <TabsTrigger value="broadcasts" data-testid="tab-broadcasts">Broadcasts</TabsTrigger>
           <TabsTrigger value="affiliates" data-testid="tab-affiliates">Affiliates</TabsTrigger>
           <TabsTrigger value="networks" data-testid="tab-networks">Networks</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="health" className="space-y-4 mt-4">
+          {healthData ? (
+            <>
+              <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                <Card data-testid="health-active-affiliates">
+                  <CardContent className="pt-4 pb-3">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-green-500" />
+                      <span className="text-sm text-muted-foreground">Active</span>
+                    </div>
+                    <p className="text-2xl font-bold mt-1">{healthData.overview.activeAffiliates}</p>
+                    <p className="text-xs text-muted-foreground">of {healthData.overview.totalAffiliates} total</p>
+                  </CardContent>
+                </Card>
+                <Card data-testid="health-dormant-affiliates">
+                  <CardContent className="pt-4 pb-3">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-amber-500" />
+                      <span className="text-sm text-muted-foreground">Dormant</span>
+                    </div>
+                    <p className="text-2xl font-bold mt-1">{healthData.overview.dormantAffiliates}</p>
+                    <p className="text-xs text-muted-foreground">no activity in 30 days</p>
+                  </CardContent>
+                </Card>
+                <Card data-testid="health-net-roi">
+                  <CardContent className="pt-4 pb-3">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-green-500" />
+                      <span className="text-sm text-muted-foreground">Net ROI</span>
+                    </div>
+                    <p className="text-2xl font-bold mt-1">${(healthData.revenue.netROI / 100).toFixed(2)}</p>
+                    <p className="text-xs text-muted-foreground">revenue minus commissions</p>
+                  </CardContent>
+                </Card>
+                <Card data-testid="health-conversion-rate">
+                  <CardContent className="pt-4 pb-3">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4 text-blue-500" />
+                      <span className="text-sm text-muted-foreground">Conversion Rate</span>
+                    </div>
+                    <p className="text-2xl font-bold mt-1">{healthData.growth.conversionRate}%</p>
+                    <p className="text-xs text-muted-foreground">{healthData.growth.conversionsThisMonth} this month</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-2">
+                <Card data-testid="health-revenue-breakdown">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Revenue Impact</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Total referred revenue</span>
+                      <span className="font-medium">${(healthData.revenue.totalRevenue / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Commissions paid</span>
+                      <span className="font-medium text-red-500">-${(healthData.revenue.totalCommissionsPaid / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Commissions pending</span>
+                      <span className="font-medium text-amber-500">-${(healthData.revenue.totalCommissionsPending / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm border-t pt-2">
+                      <span className="font-medium">Net profit from affiliates</span>
+                      <span className="font-bold text-green-600">${(healthData.revenue.netROI / 100).toFixed(2)}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card data-testid="health-engagement">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Program Engagement</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Avg referrals per affiliate</span>
+                      <span className="font-medium">{healthData.engagement.avgReferralsPerAffiliate}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Avg earnings per affiliate</span>
+                      <span className="font-medium">${(healthData.engagement.avgEarningsPerAffiliate / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">New referrals this month</span>
+                      <span className="font-medium">{healthData.growth.referralsThisMonth}</span>
+                    </div>
+                    {healthData.alerts.flaggedReferrals > 0 && (
+                      <div className="flex justify-between text-sm text-amber-500 border-t pt-2">
+                        <span className="flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Flagged referrals</span>
+                        <span className="font-medium">{healthData.alerts.flaggedReferrals}</span>
+                      </div>
+                    )}
+                    {healthData.alerts.pendingPayoutAmount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Pending payouts</span>
+                        <span className="font-medium">${(healthData.alerts.pendingPayoutAmount / 100).toFixed(2)}</span>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {healthData.topPerformers.length > 0 && (
+                <Card data-testid="health-top-performers">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Top Performers</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {healthData.topPerformers.map((tp, i) => (
+                        <div key={tp.userId} className="flex items-center justify-between p-2 rounded border text-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-muted-foreground w-5">#{i + 1}</span>
+                            <span className="font-mono text-xs truncate max-w-[120px]">{tp.userId.slice(0, 8)}...</span>
+                            <span className="text-xs text-muted-foreground">{tp.referrals} referrals</span>
+                          </div>
+                          <span className="font-medium">${(tp.earnings / 100).toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          ) : (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <Activity className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">Program health data will appear here once you have affiliates and referral activity.</p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
 
         <TabsContent value="applications" className="space-y-4 mt-4">
           <Card data-testid="card-applications">
@@ -595,6 +860,22 @@ export default function AffiliateSettingsPage() {
                   <p className="text-xs text-muted-foreground mt-1">How long the referral cookie lasts after a click</p>
                 </div>
               </div>
+              <div className="border-t pt-4 mt-4">
+                <Label htmlFor="attribution-policy">Attribution Conflict Policy</Label>
+                <p className="text-xs text-muted-foreground mb-2">When both a referral cookie and a discount code point to different affiliates, who gets the commission?</p>
+                <Select value={settings.attribution_conflict_policy || 'cookie_wins'} onValueChange={v => setSettings(s => ({ ...s, attribution_conflict_policy: v }))}>
+                  <SelectTrigger className="w-full sm:w-64" data-testid="select-attribution-policy">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cookie_wins">Cookie Wins (default)</SelectItem>
+                    <SelectItem value="code_wins">Discount Code Wins</SelectItem>
+                    <SelectItem value="first_touch">First Touch Wins</SelectItem>
+                    <SelectItem value="split">Split Commission</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <Button onClick={saveSettings} disabled={saving} data-testid="button-save-settings">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
                 Save Settings
@@ -820,6 +1101,190 @@ export default function AffiliateSettingsPage() {
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="milestones" className="space-y-4 mt-4">
+          <Card data-testid="card-milestones">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <div>
+                <CardTitle className="text-base">Milestone Bonuses</CardTitle>
+                <CardDescription>One-time bonuses when affiliates hit referral count thresholds</CardDescription>
+              </div>
+              <Dialog open={milestoneDialog} onOpenChange={(open) => {
+                setMilestoneDialog(open)
+                if (!open) { setEditingMilestone(null); setMilestoneForm({ name: '', referral_threshold: 10, bonus_amount_cents: 5000, description: '', is_active: true, sort_order: 0 }) }
+              }}>
+                <DialogTrigger asChild>
+                  <Button size="sm" data-testid="button-add-milestone">
+                    <Plus className="h-4 w-4 mr-1" /> Add Milestone
+                  </Button>
+                </DialogTrigger>
+                <DialogContent data-testid="dialog-milestone-form">
+                  <DialogHeader>
+                    <DialogTitle>{editingMilestone ? 'Edit Milestone' : 'Add Milestone'}</DialogTitle>
+                    <DialogDescription>Set a bonus that affiliates earn when they reach a referral count.</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-3">
+                    <div>
+                      <Label>Name</Label>
+                      <Input value={milestoneForm.name} onChange={e => setMilestoneForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g., First 10 Referrals" data-testid="input-milestone-name" />
+                    </div>
+                    <div>
+                      <Label>Referral Threshold</Label>
+                      <Input type="number" min="1" value={milestoneForm.referral_threshold} onChange={e => setMilestoneForm(f => ({ ...f, referral_threshold: parseInt(e.target.value) || 0 }))} data-testid="input-milestone-threshold" />
+                    </div>
+                    <div>
+                      <Label>Bonus Amount ($)</Label>
+                      <Input type="number" min="0" step="5" value={milestoneForm.bonus_amount_cents / 100} onChange={e => setMilestoneForm(f => ({ ...f, bonus_amount_cents: Math.round((parseFloat(e.target.value) || 0) * 100) }))} data-testid="input-milestone-bonus" />
+                    </div>
+                    <div>
+                      <Label>Description</Label>
+                      <Input value={milestoneForm.description} onChange={e => setMilestoneForm(f => ({ ...f, description: e.target.value }))} placeholder="Shown to affiliates on their dashboard" data-testid="input-milestone-description" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label>Active</Label>
+                      <Switch checked={milestoneForm.is_active} onCheckedChange={v => setMilestoneForm(f => ({ ...f, is_active: v }))} data-testid="switch-milestone-active" />
+                    </div>
+                    <Button onClick={saveMilestone} className="w-full" data-testid="button-save-milestone">
+                      {editingMilestone ? 'Update Milestone' : 'Create Milestone'}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              {milestones.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-milestones">
+                  No milestones configured. Add milestones to motivate affiliates with bonus payouts at specific referral counts.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {milestones.map(ms => (
+                    <div key={ms.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`milestone-${ms.id}`}>
+                      <div className="flex items-center gap-3">
+                        <Target className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium text-sm">{ms.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {ms.referral_threshold} referrals = ${(ms.bonus_amount_cents / 100).toFixed(2)} bonus
+                          </p>
+                          {ms.description && <p className="text-xs text-muted-foreground italic">{ms.description}</p>}
+                        </div>
+                        {!ms.is_active && <Badge variant="outline" className="text-xs">Inactive</Badge>}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="sm" onClick={() => {
+                          setEditingMilestone(ms)
+                          setMilestoneForm({ name: ms.name, referral_threshold: ms.referral_threshold, bonus_amount_cents: ms.bonus_amount_cents, description: ms.description || '', is_active: ms.is_active, sort_order: ms.sort_order })
+                          setMilestoneDialog(true)
+                        }} data-testid={`button-edit-milestone-${ms.id}`}>
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => deleteMilestone(ms.id)} data-testid={`button-delete-milestone-${ms.id}`}>
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="broadcasts" className="space-y-4 mt-4">
+          <Card data-testid="card-broadcasts">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <div>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Megaphone className="h-4 w-4" />
+                  Affiliate Broadcasts
+                </CardTitle>
+                <CardDescription>Send announcements and updates to your affiliates</CardDescription>
+              </div>
+              <Dialog open={broadcastDialog} onOpenChange={(open) => {
+                setBroadcastDialog(open)
+                if (!open) setBroadcastForm({ subject: '', body: '', audience_type: 'all' })
+              }}>
+                <DialogTrigger asChild>
+                  <Button size="sm" data-testid="button-add-broadcast">
+                    <Plus className="h-4 w-4 mr-1" /> New Broadcast
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg" data-testid="dialog-broadcast-form">
+                  <DialogHeader>
+                    <DialogTitle>Create Broadcast</DialogTitle>
+                    <DialogDescription>Compose an email to send to your affiliates.</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-3">
+                    <div>
+                      <Label>Subject</Label>
+                      <Input value={broadcastForm.subject} onChange={e => setBroadcastForm(f => ({ ...f, subject: e.target.value }))} placeholder="e.g., New commission rate increase!" data-testid="input-broadcast-subject" />
+                    </div>
+                    <div>
+                      <Label>Audience</Label>
+                      <Select value={broadcastForm.audience_type} onValueChange={v => setBroadcastForm(f => ({ ...f, audience_type: v }))}>
+                        <SelectTrigger data-testid="select-broadcast-audience">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Active Affiliates</SelectItem>
+                          <SelectItem value="top_performers">Top Performers</SelectItem>
+                          <SelectItem value="dormant">Dormant Affiliates</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Body</Label>
+                      <Textarea value={broadcastForm.body} onChange={e => setBroadcastForm(f => ({ ...f, body: e.target.value }))} placeholder="Write your message here..." rows={6} data-testid="input-broadcast-body" />
+                    </div>
+                    <Button onClick={saveBroadcast} className="w-full" data-testid="button-save-broadcast">
+                      Save as Draft
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              {broadcasts.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-broadcasts">
+                  No broadcasts yet. Create one to communicate with your affiliates.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {broadcasts.map(bc => (
+                    <div key={bc.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`broadcast-${bc.id}`}>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-sm truncate">{bc.subject}</p>
+                          <Badge variant={bc.status === 'sent' ? 'default' : 'outline'} className="text-xs capitalize">
+                            {bc.status}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                          <span>{new Date(bc.created_at).toLocaleDateString()}</span>
+                          {bc.status === 'sent' && (
+                            <>
+                              <span>Sent: {bc.sent_count}</span>
+                              <span>Opened: {bc.opened_count}</span>
+                              <span>Clicked: {bc.clicked_count}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0 ml-3">
+                        {bc.status === 'draft' && (
+                          <Button variant="ghost" size="sm" onClick={() => deleteBroadcast(bc.id)} data-testid={`button-delete-broadcast-${bc.id}`}>
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="networks" className="space-y-4 mt-4">
