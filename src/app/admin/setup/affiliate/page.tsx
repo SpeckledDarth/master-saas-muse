@@ -920,8 +920,8 @@ export default function AffiliateSettingsPage() {
                     min="0"
                     max="100"
                     step="0.5"
-                    value={settings.commission_rate}
-                    onChange={(e) => setSettings(s => ({ ...s, commission_rate: parseFloat(e.target.value) || 0 }))}
+                    value={settings.commission_rate || ''}
+                    onChange={(e) => setSettings(s => ({ ...s, commission_rate: e.target.value === '' ? 0 : parseFloat(e.target.value) }))}
                     data-testid="input-commission-rate"
                   />
                   <p className="text-xs text-muted-foreground mt-1">Percentage of each referred payment</p>
@@ -933,8 +933,8 @@ export default function AffiliateSettingsPage() {
                     type="number"
                     min="1"
                     max="120"
-                    value={settings.commission_duration_months}
-                    onChange={(e) => setSettings(s => ({ ...s, commission_duration_months: parseInt(e.target.value) || 12 }))}
+                    value={settings.commission_duration_months || ''}
+                    onChange={(e) => setSettings(s => ({ ...s, commission_duration_months: e.target.value === '' ? 0 : parseInt(e.target.value) }))}
                     data-testid="input-duration"
                   />
                   <p className="text-xs text-muted-foreground mt-1">How long commissions are earned per referral</p>
@@ -946,8 +946,8 @@ export default function AffiliateSettingsPage() {
                     type="number"
                     min="0"
                     step="5"
-                    value={settings.min_payout_cents / 100}
-                    onChange={(e) => setSettings(s => ({ ...s, min_payout_cents: Math.round((parseFloat(e.target.value) || 0) * 100) }))}
+                    value={settings.min_payout_cents ? settings.min_payout_cents / 100 : ''}
+                    onChange={(e) => setSettings(s => ({ ...s, min_payout_cents: e.target.value === '' ? 0 : Math.round(parseFloat(e.target.value) * 100) }))}
                     data-testid="input-min-payout"
                   />
                   <p className="text-xs text-muted-foreground mt-1">Minimum balance before payout is available</p>
@@ -959,8 +959,8 @@ export default function AffiliateSettingsPage() {
                     type="number"
                     min="1"
                     max="365"
-                    value={settings.cookie_duration_days}
-                    onChange={(e) => setSettings(s => ({ ...s, cookie_duration_days: parseInt(e.target.value) || 30 }))}
+                    value={settings.cookie_duration_days || ''}
+                    onChange={(e) => setSettings(s => ({ ...s, cookie_duration_days: e.target.value === '' ? 0 : parseInt(e.target.value) }))}
                     data-testid="input-cookie-days"
                   />
                   <p className="text-xs text-muted-foreground mt-1">How long the referral cookie lasts after a click</p>
@@ -1029,12 +1029,12 @@ export default function AffiliateSettingsPage() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <Label>Dormancy Threshold (days)</Label>
-                      <Input type="number" min="7" max="180" value={settings.dormancy_threshold_days} onChange={e => setSettings(s => ({ ...s, dormancy_threshold_days: parseInt(e.target.value) || 30 }))} data-testid="input-dormancy-days" />
+                      <Input type="number" min="7" max="180" value={settings.dormancy_threshold_days || ''} onChange={e => setSettings(s => ({ ...s, dormancy_threshold_days: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-dormancy-days" />
                       <p className="text-xs text-muted-foreground mt-1">Days of inactivity before sending re-engagement</p>
                     </div>
                     <div>
                       <Label>Max Re-Engagement Emails</Label>
-                      <Input type="number" min="1" max="10" value={settings.max_reengagement_emails} onChange={e => setSettings(s => ({ ...s, max_reengagement_emails: parseInt(e.target.value) || 3 }))} data-testid="input-max-reengagement" />
+                      <Input type="number" min="1" max="10" value={settings.max_reengagement_emails || ''} onChange={e => setSettings(s => ({ ...s, max_reengagement_emails: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-max-reengagement" />
                       <p className="text-xs text-muted-foreground mt-1">Maximum emails to send per dormant affiliate</p>
                     </div>
                   </div>
@@ -1058,12 +1058,12 @@ export default function AffiliateSettingsPage() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <Label>Schedule Day of Month</Label>
-                      <Input type="number" min="1" max="28" value={settings.payout_schedule_day} onChange={e => setSettings(s => ({ ...s, payout_schedule_day: parseInt(e.target.value) || 1 }))} data-testid="input-payout-schedule-day" />
+                      <Input type="number" min="1" max="28" value={settings.payout_schedule_day || ''} onChange={e => setSettings(s => ({ ...s, payout_schedule_day: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-payout-schedule-day" />
                       <p className="text-xs text-muted-foreground mt-1">Day of month to auto-generate batches</p>
                     </div>
                     <div>
                       <Label>Auto-Approve Threshold ($)</Label>
-                      <Input type="number" min="0" step="50" value={settings.auto_approve_threshold_cents / 100} onChange={e => setSettings(s => ({ ...s, auto_approve_threshold_cents: Math.round((parseFloat(e.target.value) || 0) * 100) }))} data-testid="input-auto-approve-threshold" />
+                      <Input type="number" min="0" step="50" value={settings.auto_approve_threshold_cents ? settings.auto_approve_threshold_cents / 100 : ''} onChange={e => setSettings(s => ({ ...s, auto_approve_threshold_cents: e.target.value === '' ? 0 : Math.round(parseFloat(e.target.value) * 100) }))} data-testid="input-auto-approve-threshold" />
                       <p className="text-xs text-muted-foreground mt-1">Batches under this amount auto-approve (0 = manual only)</p>
                     </div>
                   </div>
@@ -1103,19 +1103,19 @@ export default function AffiliateSettingsPage() {
                     </div>
                     <div>
                       <Label>Minimum Referrals</Label>
-                      <Input type="number" min="0" value={tierForm.min_referrals} onChange={e => setTierForm(f => ({ ...f, min_referrals: parseInt(e.target.value) || 0 }))} data-testid="input-tier-min-referrals" />
+                      <Input type="number" min="0" value={tierForm.min_referrals || ''} onChange={e => setTierForm(f => ({ ...f, min_referrals: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-tier-min-referrals" />
                     </div>
                     <div>
                       <Label>Commission Rate (%)</Label>
-                      <Input type="number" min="0" max="100" step="0.5" value={tierForm.commission_rate} onChange={e => setTierForm(f => ({ ...f, commission_rate: parseFloat(e.target.value) || 0 }))} data-testid="input-tier-rate" />
+                      <Input type="number" min="0" max="100" step="0.5" value={tierForm.commission_rate || ''} onChange={e => setTierForm(f => ({ ...f, commission_rate: e.target.value === '' ? 0 : parseFloat(e.target.value) }))} data-testid="input-tier-rate" />
                     </div>
                     <div>
                       <Label>Sort Order</Label>
-                      <Input type="number" min="0" value={tierForm.sort_order} onChange={e => setTierForm(f => ({ ...f, sort_order: parseInt(e.target.value) || 0 }))} data-testid="input-tier-sort" />
+                      <Input type="number" min="0" value={tierForm.sort_order || ''} onChange={e => setTierForm(f => ({ ...f, sort_order: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-tier-sort" />
                     </div>
                     <div>
                       <Label>Min Payout Override ($)</Label>
-                      <Input type="number" min="0" step="5" value={tierForm.min_payout_cents / 100} onChange={e => setTierForm(f => ({ ...f, min_payout_cents: Math.round((parseFloat(e.target.value) || 0) * 100) }))} data-testid="input-tier-min-payout" />
+                      <Input type="number" min="0" step="5" value={tierForm.min_payout_cents ? tierForm.min_payout_cents / 100 : ''} onChange={e => setTierForm(f => ({ ...f, min_payout_cents: e.target.value === '' ? 0 : Math.round(parseFloat(e.target.value) * 100) }))} data-testid="input-tier-min-payout" />
                     </div>
                     <div>
                       <Label>Perks (comma-separated)</Label>
@@ -1340,11 +1340,11 @@ export default function AffiliateSettingsPage() {
                     </div>
                     <div>
                       <Label>Referral Threshold</Label>
-                      <Input type="number" min="1" value={milestoneForm.referral_threshold} onChange={e => setMilestoneForm(f => ({ ...f, referral_threshold: parseInt(e.target.value) || 0 }))} data-testid="input-milestone-threshold" />
+                      <Input type="number" min="1" value={milestoneForm.referral_threshold || ''} onChange={e => setMilestoneForm(f => ({ ...f, referral_threshold: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-milestone-threshold" />
                     </div>
                     <div>
                       <Label>Bonus Amount ($)</Label>
-                      <Input type="number" min="0" step="5" value={milestoneForm.bonus_amount_cents / 100} onChange={e => setMilestoneForm(f => ({ ...f, bonus_amount_cents: Math.round((parseFloat(e.target.value) || 0) * 100) }))} data-testid="input-milestone-bonus" />
+                      <Input type="number" min="0" step="5" value={milestoneForm.bonus_amount_cents ? milestoneForm.bonus_amount_cents / 100 : ''} onChange={e => setMilestoneForm(f => ({ ...f, bonus_amount_cents: e.target.value === '' ? 0 : Math.round(parseFloat(e.target.value) * 100) }))} data-testid="input-milestone-bonus" />
                     </div>
                     <div>
                       <Label>Description</Label>
@@ -1644,7 +1644,7 @@ export default function AffiliateSettingsPage() {
                   </div>
                   <div>
                     <Label>Prize Amount ($)</Label>
-                    <Input type="number" min="0" step="10" value={contestForm.prize_amount_cents / 100} onChange={e => setContestForm(f => ({ ...f, prize_amount_cents: Math.round((parseFloat(e.target.value) || 0) * 100) }))} data-testid="input-contest-prize" />
+                    <Input type="number" min="0" step="10" value={contestForm.prize_amount_cents ? contestForm.prize_amount_cents / 100 : ''} onChange={e => setContestForm(f => ({ ...f, prize_amount_cents: e.target.value === '' ? 0 : Math.round(parseFloat(e.target.value) * 100) }))} data-testid="input-contest-prize" />
                   </div>
                 </div>
                 <div>

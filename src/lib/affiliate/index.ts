@@ -16,6 +16,8 @@ export interface AffiliateTier {
   min_referrals: number
   commission_rate: number
   sort_order: number
+  min_payout_cents?: number | null
+  perks?: string[]
 }
 
 export interface AffiliateLink {

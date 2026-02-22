@@ -39,7 +39,7 @@ interface AffiliateDashboardData {
     effectiveRate: number
   }
   tier: {
-    current: { id: string; name: string; commission_rate: number } | null
+    current: { id: string; name: string; commission_rate: number; perks?: string[] } | null
     next: { id: string; name: string; min_referrals: number; commission_rate: number } | null
     referralsToNext: number
   }
@@ -221,7 +221,9 @@ export default function StandaloneAffiliateDashboard() {
       if (dashData.affiliate?.link?.is_affiliate) {
         fetch('/api/affiliate/contests').then(r => r.json()).then(d => setContests(d.contests || [])).catch(() => {})
       }
-      if (dashData.affiliate?.tier?.current?.perks) setTierPerks(dashData.affiliate.tier.current.perks)
+      if (dashData.affiliate?.tier?.current?.perks && Array.isArray(dashData.affiliate.tier.current.perks)) {
+        setTierPerks(dashData.affiliate.tier.current.perks)
+      }
     } catch (err) {
       console.error('Failed to load affiliate data:', err)
     } finally {
