@@ -172,6 +172,48 @@ export async function createNotification(userId: string, title: string, message:
   }
 }
 
+export async function checkTierProximityNotification(userId: string, referralCount: number): Promise<void> {
+  try {
+    const admin = createAdminClient()
+    const tiers = await getAffiliateTiers()
+    if (!tiers.length) return
+
+    const nextTier = getNextTier(referralCount, tiers)
+    if (!nextTier) return
+
+    const remaining = nextTier.min_referrals - referralCount
+    const threshold = nextTier.min_referrals
+
+    if (remaining === 0) {
+      await createNotification(
+        userId,
+        `Tier Promotion: ${nextTier.name}!`,
+        `Congratulations! You've reached ${nextTier.name} tier — your commission rate is now ${nextTier.commission_rate}%!`,
+        'success',
+        '/affiliate/dashboard'
+      )
+    } else if (remaining <= Math.ceil(threshold * 0.1)) {
+      await createNotification(
+        userId,
+        `Almost there!`,
+        `Just ${remaining} more referral${remaining !== 1 ? 's' : ''} to unlock ${nextTier.name} tier (${nextTier.commission_rate}% commission)!`,
+        'info',
+        '/affiliate/dashboard'
+      )
+    } else if (remaining <= Math.ceil(threshold * 0.2)) {
+      await createNotification(
+        userId,
+        `You're close!`,
+        `${remaining} more referral${remaining !== 1 ? 's' : ''} to unlock ${nextTier.name} tier with ${nextTier.commission_rate}% commission.`,
+        'info',
+        '/affiliate/dashboard'
+      )
+    }
+  } catch (err) {
+    console.error('Tier proximity notification error:', err)
+  }
+}
+
 export async function checkFraudFlags(
   affiliateUserId: string,
   referredEmail: string,

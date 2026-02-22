@@ -17,7 +17,7 @@ import {
   Loader2, Copy, Check, DollarSign, Users, TrendingUp, Share2,
   Award, MousePointerClick, FileImage, FileText,
   ExternalLink, Clock, CheckCircle, LogOut, Target, Zap,
-  Link2, Trophy, BarChart3, ArrowDown, ArrowUp,
+  Link2, Trophy, BarChart3, ArrowDown, ArrowUp, Calendar, Gift,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -128,6 +128,11 @@ const ASSET_TYPE_ICONS: Record<string, any> = {
   email_template: FileText,
   social_post: Share2,
   text_snippet: FileText,
+  video: FileImage,
+  case_study: FileText,
+  one_pager: FileText,
+  swipe_file: FileText,
+  landing_page: FileText,
 }
 
 const DEEP_LINK_PAGES = [
@@ -171,6 +176,9 @@ export default function StandaloneAffiliateDashboard() {
 
   const [forecast, setForecast] = useState<ForecastData | null>(null)
 
+  const [contests, setContests] = useState<any[]>([])
+  const [tierPerks, setTierPerks] = useState<string[]>([])
+
   const { toast } = useToast()
 
   useEffect(() => {
@@ -210,6 +218,10 @@ export default function StandaloneAffiliateDashboard() {
       setEarnings(earningsData)
       setMilestoneData(msData)
       if (forecastData && !forecastData.error) setForecast(forecastData)
+      if (dashData.affiliate?.link?.is_affiliate) {
+        fetch('/api/affiliate/contests').then(r => r.json()).then(d => setContests(d.contests || [])).catch(() => {})
+      }
+      if (dashData.affiliate?.tier?.current?.perks) setTierPerks(dashData.affiliate.tier.current.perks)
     } catch (err) {
       console.error('Failed to load affiliate data:', err)
     } finally {
@@ -505,6 +517,19 @@ export default function StandaloneAffiliateDashboard() {
                 {!data.tier.next && (
                   <p className="text-xs text-muted-foreground">You've reached the highest tier!</p>
                 )}
+                {tierPerks.length > 0 && (
+                  <div className="mt-3 pt-3 border-t">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Gift className="h-3.5 w-3.5 text-primary" />
+                      <span className="text-xs font-medium">Your Tier Perks</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {tierPerks.map((perk, i) => (
+                        <Badge key={i} variant="outline" className="text-xs">{perk}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
@@ -543,6 +568,54 @@ export default function StandaloneAffiliateDashboard() {
                               `${milestoneData.currentReferrals}/${ms.referral_threshold}`
                             )}
                           </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {contests.length > 0 && (
+            <Card className="border-yellow-500/30 bg-yellow-50/30 dark:bg-yellow-950/20" data-testid="card-active-contests">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                  Active Contests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {contests.map(contest => {
+                    const now = new Date()
+                    const end = new Date(contest.end_date)
+                    const start = new Date(contest.start_date)
+                    const isActive = contest.status === 'active' && now >= start && now <= end
+                    const daysLeft = isActive ? Math.max(0, Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))) : null
+                    return (
+                      <div key={contest.id} className={`p-4 rounded-md border ${isActive ? 'border-yellow-500/50' : ''}`} data-testid={`contest-${contest.id}`}>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium text-sm">{contest.name}</span>
+                              <Badge variant={isActive ? 'default' : 'outline'} className="text-xs">
+                                {isActive ? 'Active' : 'Upcoming'}
+                              </Badge>
+                            </div>
+                            {contest.description && <p className="text-xs text-muted-foreground">{contest.description}</p>}
+                            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                              <span>Metric: {contest.metric}</span>
+                              <span>Prize: ${((contest.prize_amount_cents || 0) / 100).toFixed(2)}</span>
+                              {contest.prize_description && <span>{contest.prize_description}</span>}
+                            </div>
+                          </div>
+                          {daysLeft !== null && (
+                            <div className="text-right shrink-0">
+                              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{daysLeft}</p>
+                              <p className="text-[10px] text-muted-foreground">days left</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )

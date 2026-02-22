@@ -16,7 +16,7 @@ import {
   Loader2, Save, DollarSign, Users, TrendingUp, AlertTriangle,
   Plus, Trash2, Pencil, Award, FileImage, FileText, Share2,
   CheckCircle, XCircle, Clock, Eye, Globe, UserPlus, Mail,
-  Target, Send, BarChart3, Activity, Megaphone,
+  Target, Send, BarChart3, Activity, Megaphone, Calendar, Package, RefreshCw,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -29,6 +29,12 @@ interface Settings {
   attribution_conflict_policy: string
   leaderboard_enabled: boolean
   leaderboard_privacy_mode: string
+  auto_batch_enabled: boolean
+  payout_schedule_day: number
+  auto_approve_threshold_cents: number
+  reengagement_enabled: boolean
+  dormancy_threshold_days: number
+  max_reengagement_emails: number
 }
 
 interface Milestone {
@@ -144,6 +150,11 @@ const ASSET_TYPES = [
   { value: 'email_template', label: 'Email Template' },
   { value: 'social_post', label: 'Social Post Template' },
   { value: 'text_snippet', label: 'Text Snippet' },
+  { value: 'video', label: 'Video' },
+  { value: 'case_study', label: 'Case Study' },
+  { value: 'one_pager', label: 'One-Pager / PDF' },
+  { value: 'swipe_file', label: 'Swipe File' },
+  { value: 'landing_page', label: 'Landing Page Template' },
 ]
 
 const PROMOTION_LABELS: Record<string, string> = {
@@ -175,6 +186,12 @@ export default function AffiliateSettingsPage() {
     attribution_conflict_policy: 'cookie_wins',
     leaderboard_enabled: true,
     leaderboard_privacy_mode: 'initials',
+    auto_batch_enabled: false,
+    payout_schedule_day: 1,
+    auto_approve_threshold_cents: 0,
+    reengagement_enabled: false,
+    dormancy_threshold_days: 30,
+    max_reengagement_emails: 3,
   })
   const [tiers, setTiers] = useState<Tier[]>([])
   const [assets, setAssets] = useState<Asset[]>([])
@@ -184,7 +201,7 @@ export default function AffiliateSettingsPage() {
 
   const [tierDialog, setTierDialog] = useState(false)
   const [editingTier, setEditingTier] = useState<Tier | null>(null)
-  const [tierForm, setTierForm] = useState({ name: '', min_referrals: 0, commission_rate: 20, sort_order: 0 })
+  const [tierForm, setTierForm] = useState({ name: '', min_referrals: 0, commission_rate: 20, sort_order: 0, min_payout_cents: 0, perks: '' })
 
   const [assetDialog, setAssetDialog] = useState(false)
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null)
@@ -208,6 +225,16 @@ export default function AffiliateSettingsPage() {
   const [sendingBroadcast, setSendingBroadcast] = useState<string | null>(null)
 
   const [healthData, setHealthData] = useState<HealthData | null>(null)
+
+  const [contests, setContests] = useState<any[]>([])
+  const [contestDialog, setContestDialog] = useState(false)
+  const [editingContest, setEditingContest] = useState<any>(null)
+  const [contestForm, setContestForm] = useState({
+    name: '', description: '', metric: 'referrals', start_date: '', end_date: '',
+    prize_description: '', prize_amount_cents: 10000
+  })
+  const [payoutBatches, setPayoutBatches] = useState<any[]>([])
+  const [generatingBatch, setGeneratingBatch] = useState(false)
 
   const { toast } = useToast()
 
@@ -248,6 +275,9 @@ export default function AffiliateSettingsPage() {
       if (milestonesData.milestones) setMilestones(milestonesData.milestones)
       if (broadcastsData.broadcasts) setBroadcasts(broadcastsData.broadcasts)
       if (healthResData.health) setHealthData(healthResData.health)
+
+      fetch('/api/affiliate/contests?admin=true').then(r => r.json()).then(d => setContests(d.contests || [])).catch(() => {})
+      fetch('/api/affiliate/payout-batches').then(r => r.json()).then(d => setPayoutBatches(d.batches || [])).catch(() => {})
     } catch (err) {
       console.error('Failed to load affiliate data:', err)
     } finally {
@@ -277,7 +307,8 @@ export default function AffiliateSettingsPage() {
   const saveTier = async () => {
     try {
       const method = editingTier ? 'PUT' : 'POST'
-      const body = editingTier ? { id: editingTier.id, ...tierForm } : tierForm
+      const tierPayload = { ...tierForm, perks: tierForm.perks ? tierForm.perks.split(',').map((s: string) => s.trim()).filter(Boolean) : [] }
+      const body = editingTier ? { id: editingTier.id, ...tierPayload } : tierPayload
       const res = await fetch('/api/affiliate/tiers', {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -287,7 +318,7 @@ export default function AffiliateSettingsPage() {
       toast({ title: editingTier ? 'Tier updated' : 'Tier created' })
       setTierDialog(false)
       setEditingTier(null)
-      setTierForm({ name: '', min_referrals: 0, commission_rate: 20, sort_order: 0 })
+      setTierForm({ name: '', min_referrals: 0, commission_rate: 20, sort_order: 0, min_payout_cents: 0, perks: '' })
       fetchData()
     } catch {
       toast({ title: 'Error', description: 'Failed to save tier', variant: 'destructive' })
@@ -455,6 +486,71 @@ export default function AffiliateSettingsPage() {
     }
   }
 
+  const saveContest = async () => {
+    try {
+      const method = editingContest ? 'PUT' : 'POST'
+      const body = editingContest ? { id: editingContest.id, ...contestForm } : contestForm
+      const res = await fetch('/api/affiliate/contests', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (!res.ok) throw new Error('Failed')
+      toast({ title: editingContest ? 'Contest updated' : 'Contest created' })
+      setContestDialog(false)
+      setEditingContest(null)
+      setContestForm({ name: '', description: '', metric: 'referrals', start_date: '', end_date: '', prize_description: '', prize_amount_cents: 10000 })
+      fetchData()
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save contest', variant: 'destructive' })
+    }
+  }
+
+  const deleteContest = async (id: string) => {
+    try {
+      const res = await fetch(`/api/affiliate/contests?id=${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed')
+      toast({ title: 'Contest deleted' })
+      fetchData()
+    } catch {
+      toast({ title: 'Error', description: 'Failed to delete contest', variant: 'destructive' })
+    }
+  }
+
+  const generatePayoutBatch = async () => {
+    setGeneratingBatch(true)
+    try {
+      const res = await fetch('/api/affiliate/payout-batches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'generate' }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      const d = await res.json()
+      toast({ title: 'Payout batch generated', description: `${d.payoutCount || 0} payouts in batch` })
+      fetchData()
+    } catch {
+      toast({ title: 'Error', description: 'Failed to generate payout batch', variant: 'destructive' })
+    } finally {
+      setGeneratingBatch(false)
+    }
+  }
+
+  const approveBatch = async (batchId: string, action: 'approved' | 'rejected') => {
+    try {
+      const res = await fetch('/api/affiliate/payout-batches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'approve', batch_id: batchId, status: action }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      toast({ title: `Batch ${action}` })
+      fetchData()
+    } catch {
+      toast({ title: 'Error', description: `Failed to ${action} batch`, variant: 'destructive' })
+    }
+  }
+
   const filteredApplications = applications.filter(a => appFilter === 'all' || a.status === appFilter)
   const pendingCount = applications.filter(a => a.status === 'pending').length
 
@@ -551,6 +647,12 @@ export default function AffiliateSettingsPage() {
           <TabsTrigger value="broadcasts" data-testid="tab-broadcasts">Broadcasts</TabsTrigger>
           <TabsTrigger value="affiliates" data-testid="tab-affiliates">Affiliates</TabsTrigger>
           <TabsTrigger value="networks" data-testid="tab-networks">Networks</TabsTrigger>
+          <TabsTrigger value="contests" data-testid="tab-contests">
+            <Calendar className="h-3.5 w-3.5 mr-1" /> Contests
+          </TabsTrigger>
+          <TabsTrigger value="payout-batches" data-testid="tab-payout-batches">
+            <Package className="h-3.5 w-3.5 mr-1" /> Payout Runs
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="health" className="space-y-4 mt-4">
@@ -910,6 +1012,64 @@ export default function AffiliateSettingsPage() {
                 )}
               </div>
 
+              <div className="border-t pt-4 mt-4">
+                <h4 className="text-sm font-medium mb-3">Re-Engagement Settings</h4>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <Label>Re-Engagement Emails</Label>
+                    <p className="text-xs text-muted-foreground">Automatically email dormant affiliates to re-activate them</p>
+                  </div>
+                  <Switch
+                    checked={settings.reengagement_enabled}
+                    onCheckedChange={(v) => setSettings(s => ({ ...s, reengagement_enabled: v }))}
+                    data-testid="switch-reengagement-enabled"
+                  />
+                </div>
+                {settings.reengagement_enabled && (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <Label>Dormancy Threshold (days)</Label>
+                      <Input type="number" min="7" max="180" value={settings.dormancy_threshold_days} onChange={e => setSettings(s => ({ ...s, dormancy_threshold_days: parseInt(e.target.value) || 30 }))} data-testid="input-dormancy-days" />
+                      <p className="text-xs text-muted-foreground mt-1">Days of inactivity before sending re-engagement</p>
+                    </div>
+                    <div>
+                      <Label>Max Re-Engagement Emails</Label>
+                      <Input type="number" min="1" max="10" value={settings.max_reengagement_emails} onChange={e => setSettings(s => ({ ...s, max_reengagement_emails: parseInt(e.target.value) || 3 }))} data-testid="input-max-reengagement" />
+                      <p className="text-xs text-muted-foreground mt-1">Maximum emails to send per dormant affiliate</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t pt-4 mt-4">
+                <h4 className="text-sm font-medium mb-3">Payout Automation</h4>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <Label>Automatic Batch Generation</Label>
+                    <p className="text-xs text-muted-foreground">Auto-generate payout batches on a schedule</p>
+                  </div>
+                  <Switch
+                    checked={settings.auto_batch_enabled}
+                    onCheckedChange={(v) => setSettings(s => ({ ...s, auto_batch_enabled: v }))}
+                    data-testid="switch-auto-batch"
+                  />
+                </div>
+                {settings.auto_batch_enabled && (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <Label>Schedule Day of Month</Label>
+                      <Input type="number" min="1" max="28" value={settings.payout_schedule_day} onChange={e => setSettings(s => ({ ...s, payout_schedule_day: parseInt(e.target.value) || 1 }))} data-testid="input-payout-schedule-day" />
+                      <p className="text-xs text-muted-foreground mt-1">Day of month to auto-generate batches</p>
+                    </div>
+                    <div>
+                      <Label>Auto-Approve Threshold ($)</Label>
+                      <Input type="number" min="0" step="50" value={settings.auto_approve_threshold_cents / 100} onChange={e => setSettings(s => ({ ...s, auto_approve_threshold_cents: Math.round((parseFloat(e.target.value) || 0) * 100) }))} data-testid="input-auto-approve-threshold" />
+                      <p className="text-xs text-muted-foreground mt-1">Batches under this amount auto-approve (0 = manual only)</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <Button onClick={saveSettings} disabled={saving} data-testid="button-save-settings">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
                 Save Settings
@@ -925,7 +1085,7 @@ export default function AffiliateSettingsPage() {
                 <CardTitle className="text-base">Performance Tiers</CardTitle>
                 <CardDescription>Reward top affiliates with higher commission rates</CardDescription>
               </div>
-              <Dialog open={tierDialog} onOpenChange={(open) => { setTierDialog(open); if (!open) { setEditingTier(null); setTierForm({ name: '', min_referrals: 0, commission_rate: 20, sort_order: 0 }) } }}>
+              <Dialog open={tierDialog} onOpenChange={(open) => { setTierDialog(open); if (!open) { setEditingTier(null); setTierForm({ name: '', min_referrals: 0, commission_rate: 20, sort_order: 0, min_payout_cents: 0, perks: '' }) } }}>
                 <DialogTrigger asChild>
                   <Button size="sm" data-testid="button-add-tier">
                     <Plus className="h-4 w-4 mr-1" /> Add Tier
@@ -953,6 +1113,14 @@ export default function AffiliateSettingsPage() {
                       <Label>Sort Order</Label>
                       <Input type="number" min="0" value={tierForm.sort_order} onChange={e => setTierForm(f => ({ ...f, sort_order: parseInt(e.target.value) || 0 }))} data-testid="input-tier-sort" />
                     </div>
+                    <div>
+                      <Label>Min Payout Override ($)</Label>
+                      <Input type="number" min="0" step="5" value={tierForm.min_payout_cents / 100} onChange={e => setTierForm(f => ({ ...f, min_payout_cents: Math.round((parseFloat(e.target.value) || 0) * 100) }))} data-testid="input-tier-min-payout" />
+                    </div>
+                    <div>
+                      <Label>Perks (comma-separated)</Label>
+                      <Input value={tierForm.perks} onChange={e => setTierForm(f => ({ ...f, perks: e.target.value }))} placeholder="e.g., Priority support, Early access, Custom banners" data-testid="input-tier-perks" />
+                    </div>
                     <Button onClick={saveTier} className="w-full" data-testid="button-save-tier">
                       {editingTier ? 'Update Tier' : 'Create Tier'}
                     </Button>
@@ -972,10 +1140,17 @@ export default function AffiliateSettingsPage() {
                         <div>
                           <p className="font-medium text-sm">{tier.name}</p>
                           <p className="text-xs text-muted-foreground">{tier.min_referrals}+ referrals = {tier.commission_rate}% commission</p>
+                          {(tier as any).perks && (tier as any).perks.length > 0 && (
+                            <div className="flex items-center gap-1 mt-1 flex-wrap">
+                              {(tier as any).perks.map((perk: string, i: number) => (
+                                <Badge key={i} variant="outline" className="text-xs">{perk}</Badge>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => { setEditingTier(tier); setTierForm({ name: tier.name, min_referrals: tier.min_referrals, commission_rate: tier.commission_rate, sort_order: tier.sort_order }); setTierDialog(true) }} data-testid={`button-edit-tier-${tier.id}`}>
+                        <Button variant="ghost" size="sm" onClick={() => { setEditingTier(tier); setTierForm({ name: tier.name, min_referrals: tier.min_referrals, commission_rate: tier.commission_rate, sort_order: tier.sort_order, min_payout_cents: (tier as any).min_payout_cents || 0, perks: ((tier as any).perks || []).join(', ') }); setTierDialog(true) }} data-testid={`button-edit-tier-${tier.id}`}>
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => deleteTier(tier.id)} data-testid={`button-delete-tier-${tier.id}`}>
@@ -1030,15 +1205,15 @@ export default function AffiliateSettingsPage() {
                       <Label>Description</Label>
                       <Input value={assetForm.description} onChange={e => setAssetForm(f => ({ ...f, description: e.target.value }))} placeholder="Short description of this asset" data-testid="input-asset-description" />
                     </div>
-                    {(assetForm.asset_type === 'email_template' || assetForm.asset_type === 'social_post' || assetForm.asset_type === 'text_snippet') && (
+                    {(['email_template', 'social_post', 'text_snippet', 'swipe_file', 'landing_page'].includes(assetForm.asset_type)) && (
                       <div>
                         <Label>Content</Label>
                         <Textarea value={assetForm.content} onChange={e => setAssetForm(f => ({ ...f, content: e.target.value }))} placeholder="Paste your template content here..." rows={6} data-testid="input-asset-content" />
                       </div>
                     )}
-                    {assetForm.asset_type === 'banner' && (
+                    {(['banner', 'video', 'case_study', 'one_pager'].includes(assetForm.asset_type)) && (
                       <div>
-                        <Label>Image URL</Label>
+                        <Label>{assetForm.asset_type === 'video' ? 'Video URL' : assetForm.asset_type === 'banner' ? 'Image URL' : 'File URL'}</Label>
                         <Input value={assetForm.file_url} onChange={e => setAssetForm(f => ({ ...f, file_url: e.target.value }))} placeholder="https://..." data-testid="input-asset-file-url" />
                       </div>
                     )}
@@ -1384,6 +1559,161 @@ export default function AffiliateSettingsPage() {
                           </div>
                         </div>
                       )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="contests" className="space-y-4 mt-4">
+          <Card data-testid="card-contests">
+            <CardHeader className="flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-base">Quarterly Contests</CardTitle>
+                <CardDescription>Create competitions to motivate affiliates</CardDescription>
+              </div>
+              <Button size="sm" onClick={() => { setEditingContest(null); setContestForm({ name: '', description: '', metric: 'referrals', start_date: '', end_date: '', prize_description: '', prize_amount_cents: 10000 }); setContestDialog(true) }} data-testid="button-add-contest">
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add Contest
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {contests.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-contests">No contests created yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {contests.map(c => (
+                    <div key={c.id} className="p-4 rounded-md border" data-testid={`contest-${c.id}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium text-sm">{c.name}</p>
+                            <Badge variant={c.status === 'active' ? 'default' : c.status === 'completed' ? 'secondary' : 'outline'} className="text-xs capitalize">
+                              {c.status}
+                            </Badge>
+                          </div>
+                          {c.description && <p className="text-xs text-muted-foreground">{c.description}</p>}
+                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                            <span>Metric: {c.metric}</span>
+                            <span>Prize: ${(c.prize_amount_cents / 100).toFixed(2)}</span>
+                            <span>{new Date(c.start_date).toLocaleDateString()} — {new Date(c.end_date).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-1 shrink-0">
+                          <Button variant="outline" size="sm" onClick={() => { setEditingContest(c); setContestForm({ name: c.name, description: c.description || '', metric: c.metric || 'referrals', start_date: c.start_date?.split('T')[0] || '', end_date: c.end_date?.split('T')[0] || '', prize_description: c.prize_description || '', prize_amount_cents: c.prize_amount_cents || 0 }); setContestDialog(true) }} data-testid={`button-edit-contest-${c.id}`}>
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => deleteContest(c.id)} data-testid={`button-delete-contest-${c.id}`}>
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Dialog open={contestDialog} onOpenChange={setContestDialog}>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>{editingContest ? 'Edit Contest' : 'Create Contest'}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3">
+                <div>
+                  <Label>Name</Label>
+                  <Input value={contestForm.name} onChange={e => setContestForm(f => ({ ...f, name: e.target.value }))} data-testid="input-contest-name" />
+                </div>
+                <div>
+                  <Label>Description</Label>
+                  <Input value={contestForm.description} onChange={e => setContestForm(f => ({ ...f, description: e.target.value }))} data-testid="input-contest-description" />
+                </div>
+                <div className="grid gap-3 grid-cols-2">
+                  <div>
+                    <Label>Metric</Label>
+                    <Select value={contestForm.metric} onValueChange={v => setContestForm(f => ({ ...f, metric: v }))}>
+                      <SelectTrigger data-testid="select-contest-metric"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="referrals">Referrals</SelectItem>
+                        <SelectItem value="earnings">Earnings</SelectItem>
+                        <SelectItem value="clicks">Clicks</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Prize Amount ($)</Label>
+                    <Input type="number" min="0" step="10" value={contestForm.prize_amount_cents / 100} onChange={e => setContestForm(f => ({ ...f, prize_amount_cents: Math.round((parseFloat(e.target.value) || 0) * 100) }))} data-testid="input-contest-prize" />
+                  </div>
+                </div>
+                <div>
+                  <Label>Prize Description</Label>
+                  <Input value={contestForm.prize_description} onChange={e => setContestForm(f => ({ ...f, prize_description: e.target.value }))} placeholder="e.g. Cash bonus + featured spotlight" data-testid="input-contest-prize-desc" />
+                </div>
+                <div className="grid gap-3 grid-cols-2">
+                  <div>
+                    <Label>Start Date</Label>
+                    <Input type="date" value={contestForm.start_date} onChange={e => setContestForm(f => ({ ...f, start_date: e.target.value }))} data-testid="input-contest-start" />
+                  </div>
+                  <div>
+                    <Label>End Date</Label>
+                    <Input type="date" value={contestForm.end_date} onChange={e => setContestForm(f => ({ ...f, end_date: e.target.value }))} data-testid="input-contest-end" />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button variant="outline" onClick={() => setContestDialog(false)}>Cancel</Button>
+                  <Button onClick={saveContest} data-testid="button-save-contest">{editingContest ? 'Update' : 'Create'} Contest</Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </TabsContent>
+
+        <TabsContent value="payout-batches" className="space-y-4 mt-4">
+          <Card data-testid="card-payout-batches">
+            <CardHeader className="flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-base">Scheduled Payout Runs</CardTitle>
+                <CardDescription>Generate and approve batched payout runs</CardDescription>
+              </div>
+              <Button size="sm" onClick={generatePayoutBatch} disabled={generatingBatch} data-testid="button-generate-batch">
+                {generatingBatch ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <RefreshCw className="h-3.5 w-3.5 mr-1" />}
+                Generate Batch
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {payoutBatches.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-batches">No payout batches yet. Generate one to get started.</p>
+              ) : (
+                <div className="space-y-3">
+                  {payoutBatches.map(b => (
+                    <div key={b.id} className="p-4 rounded-md border" data-testid={`batch-${b.id}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant={b.status === 'pending' ? 'outline' : b.status === 'approved' ? 'secondary' : 'destructive'} className="text-xs capitalize">
+                              {b.status}
+                            </Badge>
+                            <span className="text-sm font-medium">${((b.total_amount_cents || 0) / 100).toFixed(2)}</span>
+                            <span className="text-xs text-muted-foreground">{b.payout_count || 0} payouts</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>Batch: {new Date(b.batch_date || b.created_at).toLocaleDateString()}</span>
+                            {b.notes && <span>{b.notes}</span>}
+                          </div>
+                        </div>
+                        {b.status === 'pending' && (
+                          <div className="flex gap-1 shrink-0">
+                            <Button size="sm" onClick={() => approveBatch(b.id, 'approved')} data-testid={`button-approve-batch-${b.id}`}>
+                              <CheckCircle className="h-3.5 w-3.5 mr-1" /> Approve
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => approveBatch(b.id, 'rejected')} data-testid={`button-reject-batch-${b.id}`}>
+                              <XCircle className="h-3.5 w-3.5 mr-1" /> Reject
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

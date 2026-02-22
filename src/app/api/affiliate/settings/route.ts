@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { commission_rate, commission_duration_months, min_payout_cents, cookie_duration_days, program_active, attribution_conflict_policy, leaderboard_enabled, leaderboard_privacy_mode } = body
+    const { commission_rate, commission_duration_months, min_payout_cents, cookie_duration_days, program_active, attribution_conflict_policy, leaderboard_enabled, leaderboard_privacy_mode, auto_batch_enabled, payout_schedule_day, auto_approve_threshold_cents, reengagement_enabled, dormancy_threshold_days, max_reengagement_emails } = body
 
     const { data: existing } = await admin
       .from('affiliate_program_settings')
@@ -65,6 +65,12 @@ export async function PUT(request: NextRequest) {
     if (attribution_conflict_policy !== undefined) updates.attribution_conflict_policy = attribution_conflict_policy
     if (leaderboard_enabled !== undefined) updates.leaderboard_enabled = leaderboard_enabled
     if (leaderboard_privacy_mode !== undefined) updates.leaderboard_privacy_mode = leaderboard_privacy_mode
+    if (auto_batch_enabled !== undefined) updates.auto_batch_enabled = auto_batch_enabled
+    if (payout_schedule_day !== undefined) updates.payout_schedule_day = payout_schedule_day
+    if (auto_approve_threshold_cents !== undefined) updates.auto_approve_threshold_cents = auto_approve_threshold_cents
+    if (reengagement_enabled !== undefined) updates.reengagement_enabled = reengagement_enabled
+    if (dormancy_threshold_days !== undefined) updates.dormancy_threshold_days = dormancy_threshold_days
+    if (max_reengagement_emails !== undefined) updates.max_reengagement_emails = max_reengagement_emails
 
     if (existing) {
       const { error } = await admin
@@ -72,13 +78,19 @@ export async function PUT(request: NextRequest) {
         .update(updates)
         .eq('id', existing.id)
 
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+      if (error) {
+        if (error.code === '42P01') return NextResponse.json({ error: 'Settings table not created yet. Run migration.' }, { status: 503 })
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
     } else {
       const { error } = await admin
         .from('affiliate_program_settings')
         .insert({ ...updates, commission_rate: commission_rate ?? 20, commission_duration_months: commission_duration_months ?? 12, min_payout_cents: min_payout_cents ?? 5000, cookie_duration_days: cookie_duration_days ?? 30 })
 
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+      if (error) {
+        if (error.code === '42P01') return NextResponse.json({ error: 'Settings table not created yet. Run migration.' }, { status: 503 })
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
     }
 
     return NextResponse.json({ success: true })
