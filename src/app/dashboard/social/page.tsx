@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import Link from 'next/link'
-import { BookOpen } from 'lucide-react'
+import { BookOpen, ShieldCheck, ExternalLink, ChevronRight } from 'lucide-react'
 import type { SocialAccount } from '@/lib/social/client'
 
 type PlatformInfo = {
@@ -36,6 +36,99 @@ const PLATFORMS: PlatformInfo[] = [
   { id: 'pinterest', name: 'Pinterest' },
   { id: 'discord', name: 'Discord' },
 ]
+
+const PLATFORM_GUIDES: Record<string, { what: string; steps: string[]; time: string; note?: string }> = {
+  twitter: {
+    what: 'PassivePost will be able to post tweets and view your profile on your behalf.',
+    steps: [
+      'Click "Connect with X" below.',
+      'You\'ll be taken to X (Twitter) — log in if needed.',
+      'Review the permissions and click "Authorize app".',
+      'You\'ll be brought back here automatically.',
+    ],
+    time: 'Takes about 30 seconds',
+    note: 'Your password is never shared with PassivePost. X uses a secure system where you grant permission directly on their site.',
+  },
+  linkedin: {
+    what: 'PassivePost will be able to create posts and view your profile on your behalf.',
+    steps: [
+      'Click "Connect with LinkedIn" below.',
+      'You\'ll be taken to LinkedIn — log in if needed.',
+      'Review the permissions and click "Allow".',
+      'You\'ll be brought back here automatically.',
+    ],
+    time: 'Takes about 30 seconds',
+    note: 'Your password is never shared with PassivePost. LinkedIn uses a secure system where you grant permission directly on their site.',
+  },
+  facebook: {
+    what: 'PassivePost will be able to post to your Facebook Pages on your behalf.',
+    steps: [
+      'Click "Connect with Facebook" below.',
+      'You\'ll be taken to Facebook — log in if needed.',
+      'Choose which Pages to connect (you can select multiple).',
+      'Click "Done" and you\'ll be brought back here.',
+    ],
+    time: 'Takes about 1 minute',
+    note: 'PassivePost only posts to Pages you select — it cannot access your personal profile or messages.',
+  },
+  instagram: {
+    what: 'PassivePost will be able to view your Instagram profile and engagement data.',
+    steps: [
+      'Click "Connect with Instagram" below.',
+      'You\'ll be taken to Instagram — log in if needed.',
+      'Review the permissions and click "Allow".',
+      'You\'ll be brought back here automatically.',
+    ],
+    time: 'Takes about 30 seconds',
+    note: 'Instagram requires a Business or Creator account. Personal accounts cannot be connected.',
+  },
+  youtube: {
+    what: 'PassivePost will be able to view your channel info and upload videos on your behalf.',
+    steps: [
+      'Click "Connect with YouTube" below.',
+      'You\'ll be taken to Google — log in if needed.',
+      'Choose the Google account linked to your YouTube channel.',
+      'Review the permissions and click "Allow".',
+      'You\'ll be brought back here automatically.',
+    ],
+    time: 'Takes about 30 seconds',
+    note: 'You must have a YouTube channel on the Google account you choose.',
+  },
+  reddit: {
+    what: 'PassivePost will be able to create posts and view your profile on Reddit.',
+    steps: [
+      'Click "Connect with Reddit" below.',
+      'You\'ll be taken to Reddit — log in if needed.',
+      'Review the permissions and click "Allow".',
+      'You\'ll be brought back here automatically.',
+    ],
+    time: 'Takes about 30 seconds',
+    note: 'Your Reddit account should be at least 30 days old to post in most communities.',
+  },
+  pinterest: {
+    what: 'PassivePost will be able to create pins and view your boards.',
+    steps: [
+      'Click "Connect with Pinterest" below.',
+      'You\'ll be taken to Pinterest — log in if needed.',
+      'Review the permissions and click "Allow".',
+      'You\'ll be brought back here automatically.',
+    ],
+    time: 'Takes about 30 seconds',
+    note: 'You need a Pinterest Business account. You can convert a personal account for free in Pinterest settings.',
+  },
+  discord: {
+    what: 'PassivePost will be able to post messages to your Discord server on your behalf.',
+    steps: [
+      'Click "Connect with Discord" below.',
+      'You\'ll be taken to Discord — log in if needed.',
+      'Choose which server to connect.',
+      'Review the permissions and click "Authorize".',
+      'You\'ll be brought back here automatically.',
+    ],
+    time: 'Takes about 30 seconds',
+    note: 'You need to be an admin or have "Manage Server" permission on the Discord server you want to connect.',
+  },
+}
 
 function SocialAccountsContent() {
   const [accounts, setAccounts] = useState<SocialAccount[]>([])
@@ -98,49 +191,59 @@ function SocialAccountsContent() {
 
   const OAUTH_PLATFORMS = ['twitter', 'linkedin', 'facebook', 'instagram', 'reddit', 'discord', 'youtube', 'pinterest']
 
-  const handleConnect = async (platformId: string) => {
-    if (OAUTH_PLATFORMS.includes(platformId)) {
-      setConnecting(platformId)
-      setOauthError(null)
-      setOauthSuccess(null)
-      try {
-        const preflightRes = await fetch('/api/social/preflight', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ platform: platformId }),
-        })
-        if (!preflightRes.ok) {
-          const errData = await preflightRes.json().catch(() => ({}))
-          throw new Error(errData.error || 'Pre-flight check failed. Please try again.')
-        }
-        const preflight = await preflightRes.json()
-        if (!preflight.ready) {
-          const issues = preflight.failures
-            .map((f: { label: string; detail?: string }) => f.detail || f.label)
-            .join('\n')
-          throw new Error(`Setup incomplete:\n${issues}`)
-        }
+  const showGuideDialog = (platformId: string) => {
+    setSelectedPlatform(platformId)
+    setConnectDialogOpen(true)
+  }
 
-        const res = await fetch('/api/social/connect', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ platform: platformId }),
-        })
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}))
-          throw new Error(data.error || 'Failed to start connection')
-        }
-        const data = await res.json()
-        if (data.authUrl) {
-          window.location.href = data.authUrl
-        } else {
-          throw new Error('No authorization URL returned')
-        }
-      } catch (err) {
-        const message = (err as Error).message
-        setOauthError(message)
-        setConnecting(null)
+  const startOAuthConnect = async (platformId: string) => {
+    setConnecting(platformId)
+    setConnectDialogOpen(false)
+    setOauthError(null)
+    setOauthSuccess(null)
+    try {
+      const preflightRes = await fetch('/api/social/preflight', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform: platformId }),
+      })
+      if (!preflightRes.ok) {
+        const errData = await preflightRes.json().catch(() => ({}))
+        throw new Error(errData.error || 'Pre-flight check failed. Please try again.')
       }
+      const preflight = await preflightRes.json()
+      if (!preflight.ready) {
+        const issues = preflight.failures
+          .map((f: { label: string; detail?: string }) => f.detail || f.label)
+          .join('\n')
+        throw new Error(`Setup incomplete:\n${issues}`)
+      }
+
+      const res = await fetch('/api/social/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform: platformId }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Failed to start connection')
+      }
+      const data = await res.json()
+      if (data.authUrl) {
+        window.location.href = data.authUrl
+      } else {
+        throw new Error('No authorization URL returned')
+      }
+    } catch (err) {
+      const message = (err as Error).message
+      setOauthError(message)
+      setConnecting(null)
+    }
+  }
+
+  const handleConnect = (platformId: string) => {
+    if (OAUTH_PLATFORMS.includes(platformId)) {
+      showGuideDialog(platformId)
     } else {
       setSelectedPlatform(platformId)
       setConnectDialogOpen(true)
@@ -465,25 +568,91 @@ function SocialAccountsContent() {
       </Card>
 
       <Dialog open={connectDialogOpen} onOpenChange={setConnectDialogOpen}>
-        <DialogContent data-testid="dialog-connect-account">
-          <DialogHeader>
-            <DialogTitle data-testid="text-connect-dialog-title">
-              Connect {PLATFORMS.find(p => p.id === selectedPlatform)?.name}
-            </DialogTitle>
-            <DialogDescription data-testid="text-connect-dialog-description">
-              {PLATFORMS.find(p => p.id === selectedPlatform)?.name} integration is coming soon.
-              Stay tuned for updates!
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setConnectDialogOpen(false)}
-              data-testid="button-close-connect-dialog"
-            >
-              Close
-            </Button>
-          </div>
+        <DialogContent className="sm:max-w-lg" data-testid="dialog-connect-account">
+          {selectedPlatform && PLATFORM_GUIDES[selectedPlatform] ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2" data-testid="text-connect-dialog-title">
+                  <PlatformIcon platform={selectedPlatform} className="h-5 w-5" />
+                  Connect {PLATFORMS.find(p => p.id === selectedPlatform)?.name}
+                </DialogTitle>
+                <DialogDescription data-testid="text-connect-dialog-description">
+                  {PLATFORM_GUIDES[selectedPlatform].what}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">How it works:</p>
+                  <ol className="space-y-2 ml-1">
+                    {PLATFORM_GUIDES[selectedPlatform].steps.map((step, i) => (
+                      <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
+                          {i + 1}
+                        </span>
+                        {step}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+
+                <p className="text-xs text-muted-foreground italic">
+                  {PLATFORM_GUIDES[selectedPlatform].time}
+                </p>
+
+                {PLATFORM_GUIDES[selectedPlatform].note && (
+                  <div className="flex items-start gap-2 rounded-lg border bg-muted/50 p-3">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-green-600 dark:text-green-400 mt-0.5" />
+                    <p className="text-xs text-muted-foreground">
+                      {PLATFORM_GUIDES[selectedPlatform].note}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setConnectDialogOpen(false)}
+                    data-testid="button-close-connect-dialog"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => startOAuthConnect(selectedPlatform)}
+                    disabled={connecting === selectedPlatform}
+                    data-testid="button-start-oauth-connect"
+                  >
+                    {connecting === selectedPlatform ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                    )}
+                    Connect with {PLATFORMS.find(p => p.id === selectedPlatform)?.name}
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle data-testid="text-connect-dialog-title">
+                  Connect {PLATFORMS.find(p => p.id === selectedPlatform)?.name}
+                </DialogTitle>
+                <DialogDescription data-testid="text-connect-dialog-description">
+                  This integration is coming soon. Stay tuned for updates!
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setConnectDialogOpen(false)}
+                  data-testid="button-close-connect-dialog"
+                >
+                  Close
+                </Button>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>

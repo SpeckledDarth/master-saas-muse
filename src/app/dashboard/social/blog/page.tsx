@@ -13,6 +13,7 @@ import {
   Loader2, Plus, Trash2, ExternalLink, CheckCircle, XCircle, AlertTriangle,
   BookOpen, Pen, FileText, Globe, TrendingUp, ArrowUp, ArrowDown, Minus,
   RefreshCw, Sparkles, ChevronDown, ChevronUp as ChevronUpIcon, Layers,
+  ShieldCheck, HelpCircle,
 } from 'lucide-react'
 import { SiMedium, SiLinkedin, SiWordpress, SiGhost, SiSubstack } from 'react-icons/si'
 import { useToast } from '@/hooks/use-toast'
@@ -83,6 +84,154 @@ interface ArticlePerformance {
 }
 
 const EMPTY_FORM: ConnectionFormState = { platform: '', apiKey: '', accessToken: '', siteUrl: '', username: '', displayName: '' }
+
+const BLOG_SETUP_GUIDES: Record<string, { steps: { title: string; detail: string }[]; time: string; security: string }> = {
+  wordpress: {
+    steps: [
+      { title: 'Log into your WordPress site', detail: 'Go to your WordPress admin area (usually yourblog.com/wp-admin) and log in.' },
+      { title: 'Go to your Profile page', detail: 'In the left sidebar, click Users, then click Profile (or "Your Profile").' },
+      { title: 'Create an Application Password', detail: 'Scroll down to the "Application Passwords" section. Type "PassivePost" in the "New Application Password Name" field and click "Add New Application Password".' },
+      { title: 'Copy the password', detail: 'WordPress will show you a password (looks like: xxxx xxxx xxxx xxxx). Copy it now — you won\'t be able to see it again!' },
+      { title: 'Paste it here', detail: 'In the field below, type your WordPress username, a colon, then paste the password. Example: john:xxxx xxxx xxxx xxxx' },
+    ],
+    time: 'Takes about 2 minutes',
+    security: 'Application Passwords give PassivePost permission to create blog posts on your behalf. Your main WordPress password is never shared. You can revoke this anytime from the same Profile page.',
+  },
+  ghost: {
+    steps: [
+      { title: 'Log into your Ghost admin', detail: 'Go to your Ghost admin area (usually yourblog.com/ghost) and log in.' },
+      { title: 'Open Settings', detail: 'Click the gear icon (Settings) in the bottom-left corner.' },
+      { title: 'Go to Integrations', detail: 'Scroll down and click "Integrations".' },
+      { title: 'Add a Custom Integration', detail: 'Click "Add custom integration" and name it "PassivePost". Click "Create".' },
+      { title: 'Copy the Admin API Key', detail: 'You\'ll see an "Admin API Key" — it looks like a long string with a colon in the middle (e.g., 6489a5...abcd:1234...5678). Copy the full thing.' },
+      { title: 'Paste it here', detail: 'Paste the full Admin API Key in the field below.' },
+    ],
+    time: 'Takes about 2 minutes',
+    security: 'The Admin API Key lets PassivePost create and edit blog posts on your behalf. It cannot change your site settings or delete your account. You can revoke it anytime by deleting the integration.',
+  },
+}
+
+function BlogConnectionForm({ platform, form, setForm, saving, onConnect, onCancel, needsSiteUrl, config }: {
+  platform: string
+  form: ConnectionFormState
+  setForm: (fn: (prev: ConnectionFormState) => ConnectionFormState) => void
+  saving: boolean
+  onConnect: () => void
+  onCancel: () => void
+  needsSiteUrl: boolean
+  config: { name: string; color: string; darkColor?: string; apiType: string; beta?: boolean }
+}) {
+  const [showGuide, setShowGuide] = useState(true)
+  const guide = BLOG_SETUP_GUIDES[platform]
+
+  return (
+    <div className="space-y-4">
+      {config.beta && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950 p-3">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-sm text-amber-800 dark:text-amber-200">
+              This integration is in beta and uses an unofficial API. It may break without notice.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {guide && (
+        <div className="rounded-lg border bg-muted/30">
+          <button
+            type="button"
+            onClick={() => setShowGuide(!showGuide)}
+            className="flex w-full items-center justify-between p-3 text-left"
+            data-testid="button-toggle-setup-guide"
+          >
+            <span className="flex items-center gap-2 text-sm font-medium">
+              <HelpCircle className="h-4 w-4 text-primary" />
+              How do I find my {platform === 'wordpress' ? 'Application Password' : 'Admin API Key'}?
+            </span>
+            {showGuide ? <ChevronUpIcon className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+          {showGuide && (
+            <div className="border-t px-3 pb-3 pt-2 space-y-3">
+              <ol className="space-y-2.5">
+                {guide.steps.map((step, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary mt-0.5">
+                      {i + 1}
+                    </span>
+                    <div>
+                      <p className="text-sm font-medium">{step.title}</p>
+                      <p className="text-xs text-muted-foreground">{step.detail}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <p className="text-xs text-muted-foreground italic">{guide.time}</p>
+              <div className="flex items-start gap-2 rounded-md border bg-muted/50 p-2.5">
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-green-600 dark:text-green-400 mt-0.5" />
+                <p className="text-xs text-muted-foreground">{guide.security}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {needsSiteUrl && (
+        <div className="space-y-2">
+          <Label htmlFor="site-url">Site URL</Label>
+          <Input
+            id="site-url"
+            placeholder={platform === 'wordpress' ? 'https://myblog.com' : 'https://myblog.ghost.io'}
+            value={form.siteUrl}
+            onChange={e => setForm(f => ({ ...f, siteUrl: e.target.value }))}
+            data-testid="input-blog-site-url"
+          />
+          <p className="text-xs text-muted-foreground">
+            {platform === 'wordpress'
+              ? 'The address of your WordPress blog (e.g., https://myblog.com)'
+              : 'The address of your Ghost blog (e.g., https://myblog.ghost.io)'}
+          </p>
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <Label htmlFor="api-key">
+          {platform === 'ghost' ? 'Admin API Key' : platform === 'wordpress' ? 'Application Password' : 'API Key'}
+        </Label>
+        <Input
+          id="api-key"
+          type="password"
+          placeholder={platform === 'wordpress' ? 'username:xxxx xxxx xxxx xxxx' : platform === 'ghost' ? '6489...abcd:1234...5678' : 'Paste your key here'}
+          value={form.apiKey}
+          onChange={e => setForm(f => ({ ...f, apiKey: e.target.value }))}
+          data-testid="input-blog-api-key"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="display-name">Display Name (optional)</Label>
+        <Input
+          id="display-name"
+          placeholder="My Blog"
+          value={form.displayName}
+          onChange={e => setForm(f => ({ ...f, displayName: e.target.value }))}
+          data-testid="input-blog-display-name"
+        />
+        <p className="text-xs text-muted-foreground">
+          We'll auto-detect your site name if left blank.
+        </p>
+      </div>
+
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button onClick={onConnect} disabled={saving} data-testid="button-save-connection">
+          {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Connect & Test
+        </Button>
+      </div>
+    </div>
+  )
+}
 
 const STATUS_COLORS: Record<string, string> = {
   draft: 'outline',
@@ -564,79 +713,16 @@ export default function BlogDashboardPage() {
                                 </div>
                               </div>
                             ) : (
-                              <div className="space-y-4">
-                                {config.beta && (
-                                  <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950 p-3">
-                                    <div className="flex items-start gap-2">
-                                      <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                                      <p className="text-sm text-amber-800 dark:text-amber-200">
-                                        This integration is in beta and uses an unofficial API. It may break without notice.
-                                      </p>
-                                    </div>
-                                  </div>
-                                )}
-
-                                {needsSiteUrl && (
-                                  <div className="space-y-2">
-                                    <Label htmlFor="site-url">Site URL</Label>
-                                    <Input
-                                      id="site-url"
-                                      placeholder={form.platform === 'wordpress' ? 'https://myblog.com' : 'https://myblog.ghost.io'}
-                                      value={form.siteUrl}
-                                      onChange={e => setForm(f => ({ ...f, siteUrl: e.target.value }))}
-                                      data-testid="input-blog-site-url"
-                                    />
-                                    <p className="text-xs text-muted-foreground">
-                                      {form.platform === 'wordpress'
-                                        ? 'Your WordPress site URL (e.g., https://myblog.com or https://myblog.wordpress.com)'
-                                        : 'Your Ghost site URL (e.g., https://myblog.ghost.io)'}
-                                    </p>
-                                  </div>
-                                )}
-
-                                <div className="space-y-2">
-                                  <Label htmlFor="api-key">
-                                    {form.platform === 'medium' ? 'Integration Token' : form.platform === 'ghost' ? 'Admin API Key' : form.platform === 'wordpress' ? 'Application Password' : 'API Key'}
-                                  </Label>
-                                  <Input
-                                    id="api-key"
-                                    type="password"
-                                    placeholder={form.platform === 'wordpress' ? 'username:xxxx xxxx xxxx xxxx' : form.platform === 'ghost' ? '6489...abcd:1234...5678' : 'Paste your token or API key'}
-                                    value={form.apiKey}
-                                    onChange={e => setForm(f => ({ ...f, apiKey: e.target.value }))}
-                                    data-testid="input-blog-api-key"
-                                  />
-                                  <p className="text-xs text-muted-foreground">
-                                    {form.platform === 'wordpress'
-                                      ? 'Format: username:password. Generate under Users > Profile > Application Passwords in WordPress admin.'
-                                      : form.platform === 'ghost'
-                                        ? 'Format: id:secret. Find under Settings > Integrations > Add custom integration in Ghost admin.'
-                                        : 'Your API key or integration token.'}
-                                  </p>
-                                </div>
-
-                                <div className="space-y-2">
-                                  <Label htmlFor="display-name">Display Name (optional)</Label>
-                                  <Input
-                                    id="display-name"
-                                    placeholder="My Blog"
-                                    value={form.displayName}
-                                    onChange={e => setForm(f => ({ ...f, displayName: e.target.value }))}
-                                    data-testid="input-blog-display-name"
-                                  />
-                                  <p className="text-xs text-muted-foreground">
-                                    Optional. We'll auto-detect your site name if left blank.
-                                  </p>
-                                </div>
-
-                                <div className="flex justify-end gap-2">
-                                  <Button variant="outline" onClick={() => { setDialogOpen(false); setForm(EMPTY_FORM) }}>Cancel</Button>
-                                  <Button onClick={handleConnect} disabled={saving} data-testid="button-save-connection">
-                                    {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Connect
-                                  </Button>
-                                </div>
-                              </div>
+                              <BlogConnectionForm
+                                platform={form.platform}
+                                form={form}
+                                setForm={setForm}
+                                saving={saving}
+                                onConnect={handleConnect}
+                                onCancel={() => { setDialogOpen(false); setForm(EMPTY_FORM) }}
+                                needsSiteUrl={needsSiteUrl}
+                                config={config}
+                              />
                             )}
                           </DialogContent>
                         </Dialog>
