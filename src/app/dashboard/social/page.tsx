@@ -30,10 +30,8 @@ const PLATFORMS: PlatformInfo[] = [
   { id: 'instagram', name: 'Instagram' },
   { id: 'youtube', name: 'YouTube' },
   { id: 'facebook', name: 'Facebook' },
-  { id: 'tiktok', name: 'TikTok' },
   { id: 'reddit', name: 'Reddit' },
   { id: 'pinterest', name: 'Pinterest' },
-  { id: 'snapchat', name: 'Snapchat' },
   { id: 'discord', name: 'Discord' },
 ]
 
@@ -96,7 +94,7 @@ function SocialAccountsContent() {
     fetchAccounts()
   }, [fetchAccounts])
 
-  const OAUTH_PLATFORMS = ['twitter', 'linkedin', 'facebook', 'instagram', 'reddit', 'discord']
+  const OAUTH_PLATFORMS = ['twitter', 'linkedin', 'facebook', 'instagram', 'reddit', 'discord', 'youtube', 'pinterest']
 
   const handleConnect = async (platformId: string) => {
     if (OAUTH_PLATFORMS.includes(platformId)) {

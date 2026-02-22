@@ -540,19 +540,45 @@ export class InstagramClient implements PlatformClient {
 }
 
 export class YouTubeClient implements PlatformClient {
+  private apiUrl = 'https://www.googleapis.com/youtube/v3'
+
   async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
     try {
       if (!accessToken || accessToken.length < 10) {
         return { valid: false, error: 'Invalid token format' }
       }
-      return { valid: true }
+      const response = await fetch(`${this.apiUrl}/channels?part=snippet&mine=true`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+        signal: AbortSignal.timeout(10000),
+      })
+      if (response.ok) {
+        return { valid: true }
+      }
+      const errorData = await response.json().catch(() => ({}))
+      return { valid: false, error: `YouTube token invalid (${response.status}): ${errorData.error?.message || 'Unknown error'}` }
     } catch (error) {
       return { valid: false, error: (error as Error).message }
     }
   }
 
   async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
-    return null
+    try {
+      const response = await fetch(`${this.apiUrl}/channels?part=snippet&mine=true`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+        signal: AbortSignal.timeout(10000),
+      })
+      if (!response.ok) return null
+      const data = await response.json()
+      const channel = data.items?.[0]
+      if (!channel) return null
+      return {
+        id: channel.id,
+        username: channel.snippet?.customUrl || channel.snippet?.title || channel.id,
+        displayName: channel.snippet?.title || 'YouTube Channel',
+      }
+    } catch {
+      return null
+    }
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
@@ -699,19 +725,43 @@ export class RedditClient implements PlatformClient {
 }
 
 export class PinterestClient implements PlatformClient {
+  private apiUrl = 'https://api.pinterest.com/v5'
+
   async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
     try {
       if (!accessToken || accessToken.length < 10) {
         return { valid: false, error: 'Invalid token format' }
       }
-      return { valid: true }
+      const response = await fetch(`${this.apiUrl}/user_account`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+        signal: AbortSignal.timeout(10000),
+      })
+      if (response.ok) {
+        return { valid: true }
+      }
+      const errorData = await response.json().catch(() => ({}))
+      return { valid: false, error: `Pinterest token invalid (${response.status}): ${errorData.message || 'Unknown error'}` }
     } catch (error) {
       return { valid: false, error: (error as Error).message }
     }
   }
 
   async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
-    return null
+    try {
+      const response = await fetch(`${this.apiUrl}/user_account`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+        signal: AbortSignal.timeout(10000),
+      })
+      if (!response.ok) return null
+      const data = await response.json()
+      return {
+        id: data.id || data.username,
+        username: data.username || data.id,
+        displayName: data.business_name || data.username || 'Pinterest User',
+      }
+    } catch {
+      return null
+    }
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {

@@ -14,7 +14,7 @@ function getSupabaseAdmin() {
   )
 }
 
-const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook', 'instagram', 'reddit', 'discord']
+const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook', 'instagram', 'reddit', 'discord', 'youtube', 'pinterest']
 
 function redirectWithError(baseUrl: string, message: string, platform?: string) {
   console.error('[Social Callback] OAuth error:', message)
@@ -281,6 +281,75 @@ async function exchangeDiscordToken(code: string, redirectUri: string): Promise<
   }
 }
 
+async function exchangeYouTubeToken(code: string, redirectUri: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
+  const clientId = await getConfigValue('GOOGLE_CLIENT_ID')
+  const clientSecret = await getConfigValue('GOOGLE_CLIENT_SECRET')
+  if (!clientId || !clientSecret) throw new Error('Google credentials not configured')
+
+  const body = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code,
+    client_id: clientId,
+    client_secret: clientSecret,
+    redirect_uri: redirectUri,
+  })
+
+  const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!tokenRes.ok) {
+    const errData = await tokenRes.text().catch(() => 'Unknown error')
+    throw new Error(`YouTube (Google) token exchange failed: ${errData}`)
+  }
+
+  const tokenData = await tokenRes.json()
+  return {
+    accessToken: tokenData.access_token,
+    refreshToken: tokenData.refresh_token,
+    expiresIn: tokenData.expires_in,
+  }
+}
+
+async function exchangePinterestToken(code: string, redirectUri: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
+  const appId = await getConfigValue('PINTEREST_APP_ID')
+  const appSecret = await getConfigValue('PINTEREST_APP_SECRET')
+  if (!appId || !appSecret) throw new Error('Pinterest credentials not configured')
+
+  const credentials = Buffer.from(`${appId}:${appSecret}`).toString('base64')
+
+  const body = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code,
+    redirect_uri: redirectUri,
+  })
+
+  const tokenRes = await fetch('https://api.pinterest.com/v5/oauth/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${credentials}`,
+    },
+    body: body.toString(),
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!tokenRes.ok) {
+    const errData = await tokenRes.text().catch(() => 'Unknown error')
+    throw new Error(`Pinterest token exchange failed: ${errData}`)
+  }
+
+  const tokenData = await tokenRes.json()
+  return {
+    accessToken: tokenData.access_token,
+    refreshToken: tokenData.refresh_token,
+    expiresIn: tokenData.access_token_expiration || tokenData.expires_in,
+  }
+}
+
 function getFriendlyOAuthError(errorCode: string, description: string, platform: string): string {
   const platformNames: Record<string, string> = {
     twitter: 'X (Twitter)',
@@ -289,6 +358,8 @@ function getFriendlyOAuthError(errorCode: string, description: string, platform:
     instagram: 'Instagram',
     reddit: 'Reddit',
     discord: 'Discord',
+    youtube: 'YouTube',
+    pinterest: 'Pinterest',
   }
   const name = platformNames[platform] || platform
 
@@ -399,6 +470,16 @@ export async function GET(
       expiresIn = result.expiresIn
     } else if (platform === 'discord') {
       const result = await exchangeDiscordToken(code, redirectUri)
+      accessToken = result.accessToken
+      refreshToken = result.refreshToken
+      expiresIn = result.expiresIn
+    } else if (platform === 'youtube') {
+      const result = await exchangeYouTubeToken(code, redirectUri)
+      accessToken = result.accessToken
+      refreshToken = result.refreshToken
+      expiresIn = result.expiresIn
+    } else if (platform === 'pinterest') {
+      const result = await exchangePinterestToken(code, redirectUri)
       accessToken = result.accessToken
       refreshToken = result.refreshToken
       expiresIn = result.expiresIn

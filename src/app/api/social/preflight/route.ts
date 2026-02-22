@@ -57,6 +57,14 @@ const PLATFORM_CREDENTIALS: Record<string, { keys: string[]; callbackPath: strin
     keys: ['DISCORD_CLIENT_ID', 'DISCORD_CLIENT_SECRET'],
     callbackPath: '/api/social/callback/discord',
   },
+  youtube: {
+    keys: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'],
+    callbackPath: '/api/social/callback/youtube',
+  },
+  pinterest: {
+    keys: ['PINTEREST_APP_ID', 'PINTEREST_APP_SECRET'],
+    callbackPath: '/api/social/callback/pinterest',
+  },
 }
 
 export async function POST(request: NextRequest) {

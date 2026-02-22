@@ -69,7 +69,7 @@ export function verifyState(stateParam: string): Record<string, any> | null {
   }
 }
 
-const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook', 'instagram', 'reddit', 'discord']
+const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook', 'instagram', 'reddit', 'discord', 'youtube', 'pinterest']
 
 export async function POST(request: NextRequest) {
   const user = await getAuthenticatedUser()
@@ -192,6 +192,40 @@ export async function POST(request: NextRequest) {
         state,
       })
       authUrl = `https://discord.com/oauth2/authorize?${discordParams.toString()}`
+
+    } else if (platform === 'youtube') {
+      const clientId = await getConfigValue('GOOGLE_CLIENT_ID')
+      if (!clientId) {
+        return NextResponse.json({ error: 'Google Client ID is not configured' }, { status: 500 })
+      }
+
+      const state = signState({ userId: user.id, platform, redirectUri })
+      const ytParams = new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        response_type: 'code',
+        scope: 'https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/userinfo.profile',
+        access_type: 'offline',
+        prompt: 'consent',
+        state,
+      })
+      authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${ytParams.toString()}`
+
+    } else if (platform === 'pinterest') {
+      const clientId = await getConfigValue('PINTEREST_APP_ID')
+      if (!clientId) {
+        return NextResponse.json({ error: 'Pinterest App ID is not configured' }, { status: 500 })
+      }
+
+      const state = signState({ userId: user.id, platform, redirectUri })
+      const pinParams = new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        response_type: 'code',
+        scope: 'boards:read,pins:read,pins:write,user_accounts:read',
+        state,
+      })
+      authUrl = `https://www.pinterest.com/oauth/?${pinParams.toString()}`
 
     } else {
       return NextResponse.json({ error: 'Unsupported platform' }, { status: 400 })

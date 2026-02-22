@@ -108,7 +108,8 @@ Build cloneable self-hosted WordPress + Ghost as reusable infrastructure for all
 |-------|-----------|----------|--------|
 | 1 — Core Social | Twitter/X, LinkedIn, Facebook | All credentials stored | Complete |
 | 2 — Easy Wins | Instagram, Reddit, Discord | Instagram uses FB creds; Reddit + Discord need new creds | Complete |
-| 3 — Review-Required | YouTube, Pinterest, TikTok, Snapchat | Need to obtain + submit for review | Not Started |
+| 3 — Remaining Social | YouTube, Pinterest | YouTube uses Google OAuth; Pinterest uses Pinterest OAuth | Complete |
+| ~~TikTok, Snapchat~~ | ~~Deferred~~ | Video-first platforms — deferred (not enough text surface area for content flywheel) | Deferred |
 | 4 — Blog Platforms | WordPress, Ghost, Medium | Self-hosted setup needed | Not Started |
 
 **Pre-Flight Check System:**
@@ -131,6 +132,10 @@ A `/api/social/preflight` endpoint validates all prerequisites before attempting
 | `REDDIT_CLIENT_SECRET` | Reddit | From Reddit app at https://www.reddit.com/prefs/apps. |
 | `DISCORD_CLIENT_ID` | Discord | From Discord Developer Portal at https://discord.com/developers/applications. |
 | `DISCORD_CLIENT_SECRET` | Discord | From Discord Developer Portal. |
+| `GOOGLE_CLIENT_ID` | YouTube | From Google Cloud Console. Enable YouTube Data API v3. |
+| `GOOGLE_CLIENT_SECRET` | YouTube | From Google Cloud Console OAuth 2.0 credentials. |
+| `PINTEREST_APP_ID` | Pinterest | From Pinterest Developer Portal at https://developers.pinterest.com/apps/. |
+| `PINTEREST_APP_SECRET` | Pinterest | From Pinterest Developer Portal. |
 
 **Callback URLs to Register (replace `YOUR_DOMAIN`):**
 
@@ -142,6 +147,8 @@ A `/api/social/preflight` endpoint validates all prerequisites before attempting
 | Instagram | `https://YOUR_DOMAIN/api/social/callback/instagram` |
 | Reddit | `https://YOUR_DOMAIN/api/social/callback/reddit` |
 | Discord | `https://YOUR_DOMAIN/api/social/callback/discord` |
+| YouTube | `https://YOUR_DOMAIN/api/social/callback/youtube` |
+| Pinterest | `https://YOUR_DOMAIN/api/social/callback/pinterest` |
 
 **Database Prerequisites:**
 - Run `migrations/core/001_social_tables.sql` in Supabase SQL Editor (creates `social_accounts` table)
@@ -248,6 +255,7 @@ Running log of what was accomplished each session. Update at the end of every se
 | Feb 21, 2026 | **Facebook connected.** Reduced OAuth scopes to `email,public_profile` (the permissions currently approved in Meta Developer Portal). Page posting scopes (`pages_manage_posts`, `pages_read_engagement`, `pages_show_list`) to be added later when posting feature is needed. **Batch 1 complete — all 3 core social platforms (X, LinkedIn, Facebook) connected.** | Phase 2 Batch 1 — Complete |
 | Feb 22, 2026 | **Token refresh + error hardening (2.1e) complete.** Built universal token refresh for all 3 platforms: X uses refresh_token (2hr expiry), LinkedIn uses refresh_token (60d), Facebook re-exchanges long-lived token. Added `with-token-refresh.ts` middleware for automatic retry on 401s. Validate All now attempts token refresh before marking accounts invalid. Added `token_expires_at` tracking on initial connect and refresh. Added `Reconnect` button in UI for expired tokens. Improved OAuth error page with friendly messages for denied, timeout, callback mismatch, credentials not configured. Established `TokenExpiredError` class to distinguish "needs reconnect" vs "temporary failure". **Lessons learned:** Facebook has no refresh_token — must re-exchange current access_token for new long-lived token before it expires. X tokens rotate on every refresh (new refresh_token issued). LinkedIn refresh_token availability depends on OAuth app configuration. | Phase 2.1e — Complete |
 | Feb 22, 2026 | **Batch 2 complete — Instagram, Reddit, Discord all wired.** Instagram uses same FACEBOOK_APP_ID/SECRET via Instagram Graph API (`api.instagram.com` for OAuth, `graph.instagram.com` for API/refresh). 60-day long-lived tokens with `ig_refresh_token` refresh. Reddit uses Basic auth (base64 client_id:secret) for token exchange, permanent refresh tokens, 24h access tokens, requires User-Agent header. Discord uses standard OAuth2 with 7-day tokens and refresh_token support. All 3 have real `validateToken`/`getUserProfile` implementations, preflight checks, token refresh in `token-refresh.ts`, and are wired into dashboard UI. Total platforms connected: 6 (X, LinkedIn, Facebook, Instagram, Reddit, Discord). **Next:** Reddit + Discord need developer apps created and credentials added to Vercel env vars. Instagram needs `instagram_basic` scope enabled in Meta app. | Phase 2 Batch 2 — Complete |
+| Feb 22, 2026 | **YouTube + Pinterest wired. TikTok/Snapchat deferred.** YouTube uses Google OAuth2 (`accounts.google.com` for auth, `oauth2.googleapis.com` for token exchange/refresh). Scopes: `youtube.readonly`, `youtube`, `userinfo.profile`. Uses `access_type=offline&prompt=consent` to get refresh_token. 1hr access tokens with refresh via standard Google OAuth refresh. Validates via YouTube Data API v3 `channels?part=snippet&mine=true`. Pinterest uses Pinterest OAuth2 (`pinterest.com/oauth` for auth, `api.pinterest.com/v5/oauth/token` for tokens). Uses Basic auth (base64 app_id:secret). 30-day access tokens, refresh_token for re-auth. Validates via `api.pinterest.com/v5/user_account`. Removed TikTok and Snapchat from platform list — deferred as video-first platforms with insufficient text surface for content flywheel. **Total platforms: 8 social (X, LinkedIn, Facebook, Instagram, Reddit, Discord, YouTube, Pinterest).** Next: Blog platforms (WordPress, Ghost, Medium). | Phase 2 Batch 3 — Complete |
 
 ---
 

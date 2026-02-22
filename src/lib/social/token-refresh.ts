@@ -16,6 +16,8 @@ const TOKEN_EXPIRY_DEFAULTS: Record<string, number> = {
   instagram: 60 * 24 * 60 * 60,
   reddit: 24 * 60 * 60,
   discord: 7 * 24 * 60 * 60,
+  youtube: 3600,
+  pinterest: 30 * 24 * 60 * 60,
 }
 
 export function computeTokenExpiry(platform: string, expiresIn?: number): string {
@@ -253,6 +255,83 @@ async function refreshDiscordToken(refreshToken: string): Promise<{ accessToken:
   }
 }
 
+async function refreshYouTubeToken(refreshToken: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
+  const clientId = await getConfigValue('GOOGLE_CLIENT_ID')
+  const clientSecret = await getConfigValue('GOOGLE_CLIENT_SECRET')
+  if (!clientId || !clientSecret) {
+    throw new Error('Google credentials not configured')
+  }
+
+  const body = new URLSearchParams({
+    grant_type: 'refresh_token',
+    refresh_token: refreshToken,
+    client_id: clientId,
+    client_secret: clientSecret,
+  })
+
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => 'Unknown error')
+    if (response.status === 400 || response.status === 401) {
+      throw new TokenExpiredError(`YouTube (Google) refresh token revoked or expired (${response.status}): ${errText}`)
+    }
+    throw new Error(`YouTube token refresh failed (${response.status}): ${errText}`)
+  }
+
+  const data = await response.json()
+  return {
+    accessToken: data.access_token,
+    refreshToken: data.refresh_token || undefined,
+    expiresIn: data.expires_in,
+  }
+}
+
+async function refreshPinterestToken(refreshToken: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
+  const appId = await getConfigValue('PINTEREST_APP_ID')
+  const appSecret = await getConfigValue('PINTEREST_APP_SECRET')
+  if (!appId || !appSecret) {
+    throw new Error('Pinterest credentials not configured')
+  }
+
+  const credentials = Buffer.from(`${appId}:${appSecret}`).toString('base64')
+
+  const body = new URLSearchParams({
+    grant_type: 'refresh_token',
+    refresh_token: refreshToken,
+  })
+
+  const response = await fetch('https://api.pinterest.com/v5/oauth/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${credentials}`,
+    },
+    body: body.toString(),
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => 'Unknown error')
+    if (response.status === 400 || response.status === 401) {
+      throw new TokenExpiredError(`Pinterest refresh token expired (${response.status}): ${errText}`)
+    }
+    throw new Error(`Pinterest token refresh failed (${response.status}): ${errText}`)
+  }
+
+  const data = await response.json()
+  return {
+    accessToken: data.access_token,
+    refreshToken: data.refresh_token || undefined,
+    expiresIn: data.access_token_expiration || data.expires_in,
+  }
+}
+
 export class TokenExpiredError extends Error {
   constructor(message: string) {
     super(message)
@@ -299,6 +378,16 @@ export async function refreshAccessToken(
       expiresIn = result.expiresIn
     } else if (platform === 'discord') {
       const result = await refreshDiscordToken(decryptedToken)
+      newAccessToken = result.accessToken
+      newRefreshToken = result.refreshToken
+      expiresIn = result.expiresIn
+    } else if (platform === 'youtube') {
+      const result = await refreshYouTubeToken(decryptedToken)
+      newAccessToken = result.accessToken
+      newRefreshToken = result.refreshToken
+      expiresIn = result.expiresIn
+    } else if (platform === 'pinterest') {
+      const result = await refreshPinterestToken(decryptedToken)
       newAccessToken = result.accessToken
       newRefreshToken = result.refreshToken
       expiresIn = result.expiresIn
