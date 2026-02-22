@@ -93,14 +93,17 @@ These platforms have stricter app review processes. Submit applications early.
 | 2.3c | TikTok — Content Posting API | Not Started | Requires app review — submit early, approval can take weeks |
 | 2.3d | Snapchat — Public Content API | Not Started | Requires app review — submit early |
 
-### Batch 4 — Blog Platforms (Priority: Medium, Self-Hosted Infrastructure)
-Build cloneable self-hosted WordPress + Ghost as reusable infrastructure for all MuseKit products.
+### Batch 4 — Blog Platforms (Priority: Medium, Two Scenarios)
+**Scenario 1 (Build First):** Users connect their existing WordPress/Ghost blogs via API credentials (URL + API key). No VPS or OAuth needed.
+**Scenario 2 (Future):** PassivePost provisions blogs for users who don't have one. Requires VPS infrastructure.
+PassivePost itself is just a user of its own service (dogfooding) — it will use Scenario 1 or 2 like any other customer.
 
 | # | Platform | Status | Notes |
 |---|----------|--------|-------|
-| 2.4a | WordPress (self-hosted) — REST API posting | Not Started | Set up on a VPS (e.g., $5/mo DigitalOcean), create cloneable template for all MuseKit products |
-| 2.4b | Ghost (self-hosted) — Admin API posting | Not Started | Co-locate with WordPress on same VPS, cloneable setup |
-| 2.4c | Medium — API integration | Not Started | API closed to new integrations as of Jan 2025. Mark as "coming soon" or find workaround. |
+| 2.4a | WordPress — REST API posting (Scenario 1) | In Progress | User provides blog URL + Application Password. API client validates connection and publishes posts via WordPress REST API. No VPS needed. |
+| 2.4b | Ghost — Admin API posting (Scenario 1) | In Progress | User provides Ghost URL + Admin API key. API client validates connection and publishes posts via Ghost Admin API. No VPS needed. |
+| 2.4c | Medium — API integration | Deferred | API closed to new integrations as of Jan 2025. Marked as "coming soon". |
+| 2.4d | Blog validation endpoint | In Progress | Test connection endpoint to verify credentials work before saving. |
 
 ### Phase 2 Summary
 
@@ -110,7 +113,7 @@ Build cloneable self-hosted WordPress + Ghost as reusable infrastructure for all
 | 2 — Easy Wins | Instagram, Reddit, Discord | Instagram uses FB creds; Reddit + Discord need new creds | Complete |
 | 3 — Remaining Social | YouTube, Pinterest | YouTube uses Google OAuth; Pinterest uses Pinterest OAuth | Complete |
 | ~~TikTok, Snapchat~~ | ~~Deferred~~ | Video-first platforms — deferred (not enough text surface area for content flywheel) | Deferred |
-| 4 — Blog Platforms | WordPress, Ghost, Medium | Self-hosted setup needed | Not Started |
+| 4 — Blog Platforms | WordPress, Ghost, Medium | Scenario 1: user-provided credentials, no VPS | In Progress |
 
 **Pre-Flight Check System:**
 A `/api/social/preflight` endpoint validates all prerequisites before attempting OAuth. The Connect button calls this automatically and shows clear, actionable error messages if anything is missing. This prevents the trial-and-error debugging that plagued the Twitter/X connection.
@@ -218,6 +221,7 @@ Decisions made during planning, preserved for context.
 | Feb 20, 2026 | Live counters replace manually-set animated counter values | Authentic numbers are more compelling than round placeholder numbers |
 | Feb 21, 2026 | Phase 2 uses 4-batch rollout: Core Social → Easy Wins → Review-Required → Blog Platforms | Prioritizes highest-value platforms first; submits slow-review apps (TikTok, Snapchat) early to avoid blocking |
 | Feb 21, 2026 | WordPress + Ghost will be self-hosted on a VPS as cloneable infrastructure | Eliminates recurring SaaS fees, reusable template for all future MuseKit products |
+| Feb 22, 2026 | Blog integration split into Scenario 1 (connect existing) and Scenario 2 (provision for users) | Scenario 1 requires no infrastructure — just API client code. Scenario 2 deferred for VPS setup later. PassivePost dogfoods its own service as a regular user. |
 | Feb 21, 2026 | Medium marked as "coming soon" — API closed to new integrations since Jan 2025 | No viable path to integrate; monitor for reopening |
 | Feb 21, 2026 | Instagram integration will attempt to reuse existing Facebook/Meta app credentials | Same Graph API, reduces credential management overhead |
 | Feb 21, 2026 | 10 social platforms + 3 blog platforms = 13 total platform integrations as PassivePost USP | Broad platform support is the key differentiator |
