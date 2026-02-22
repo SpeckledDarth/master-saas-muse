@@ -1,6 +1,6 @@
 # MuseKit + PassivePost — Development Roadmap
 
-> **Revision:** 1.1 | **Last Updated:** February 21, 2026 | **Created:** February 20, 2026
+> **Revision:** 1.2 | **Last Updated:** February 22, 2026 | **Created:** February 20, 2026
 
 > **IMPORTANT — READ THIS FILE AT THE START OF EVERY SESSION.** This is the single source of truth for the multi-week development plan. If agent memory resets, this file restores full context.
 
@@ -18,7 +18,7 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 |-------|------|--------|--------|
 | 1 | Testimonial/Success Metrics Dashboard | Complete | Week 1 |
 | 1.5 | Launch Kit | Complete | Week 1-2 |
-| 2 | Connect Real Platform APIs & Full Testing | Not Started | Week 2-3 |
+| 2 | Connect Real Platform APIs & Full Testing | In Progress (Batches 1-4 Complete, engagement metrics remaining) | Week 2-3 |
 | 3 | Affiliate Marketing Features | Not Started | Week 3-4 |
 | 4 | Mobile App (PWA First) | Not Started | Week 4+ |
 
@@ -88,10 +88,10 @@ These platforms have stricter app review processes. Submit applications early.
 
 | # | Platform | Status | Notes |
 |---|----------|--------|-------|
-| 2.3a | YouTube — Google/YouTube Data API v3 | Not Started | Need Google Cloud project with YouTube API enabled |
-| 2.3b | Pinterest — OAuth 2.0 + pin creation | Not Started | Need Pinterest developer app |
-| 2.3c | TikTok — Content Posting API | Not Started | Requires app review — submit early, approval can take weeks |
-| 2.3d | Snapchat — Public Content API | Not Started | Requires app review — submit early |
+| 2.3a | YouTube — Google/YouTube Data API v3 | Connected | Google OAuth2 (`accounts.google.com`). Scopes: `youtube.readonly`, `youtube`, `userinfo.profile`. Uses `access_type=offline&prompt=consent` for refresh_token. 1hr tokens, standard Google refresh. Validates via YouTube Data API v3 `channels?part=snippet&mine=true`. Needs `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`. |
+| 2.3b | Pinterest — OAuth 2.0 + pin creation | Connected | Pinterest OAuth2. Basic auth (app_id:secret) for token exchange. 30-day tokens with refresh. Validates via `/v5/user_account`. App ID: 1548296 (awaiting trial access approval, 1-3 business days). Needs `PINTEREST_APP_ID`, `PINTEREST_APP_SECRET`. |
+| 2.3c | TikTok — Content Posting API | Deferred | Video-first platform — insufficient text surface for content flywheel. Removed from platform list. |
+| 2.3d | Snapchat — Public Content API | Deferred | Video-first platform — insufficient text surface for content flywheel. Removed from platform list. |
 
 ### Batch 4 — Blog Platforms (Priority: Medium, Two Scenarios)
 **Scenario 1 (Build First):** Users connect their existing WordPress/Ghost blogs via API credentials (URL + API key). No VPS or OAuth needed.
@@ -100,10 +100,10 @@ PassivePost itself is just a user of its own service (dogfooding) — it will us
 
 | # | Platform | Status | Notes |
 |---|----------|--------|-------|
-| 2.4a | WordPress — REST API posting (Scenario 1) | In Progress | User provides blog URL + Application Password. API client validates connection and publishes posts via WordPress REST API. No VPS needed. |
-| 2.4b | Ghost — Admin API posting (Scenario 1) | In Progress | User provides Ghost URL + Admin API key. API client validates connection and publishes posts via Ghost Admin API. No VPS needed. |
-| 2.4c | Medium — API integration | Deferred | API closed to new integrations as of Jan 2025. Marked as "coming soon". |
-| 2.4d | Blog validation endpoint | In Progress | Test connection endpoint to verify credentials work before saving. |
+| 2.4a | WordPress — REST API posting (Scenario 1) | Complete | Client: `src/lib/social/blog-clients.ts` (WordPressClient). Validates via `/wp-json/wp/v2/users/me`. Publishes/updates/deletes via `/wp-json/wp/v2/posts`. Resolves tags (find or create). Uploads cover images as featured media. Auth: Application Password format `username:password`. Auto-validates on connect. |
+| 2.4b | Ghost — Admin API posting (Scenario 1) | Complete | Client: `src/lib/social/blog-clients.ts` (GhostClient). JWT generation from Admin API key (`id:secret` hex). Validates via `/ghost/api/admin/site/`. Publishes/updates/deletes via `/ghost/api/admin/posts/`. Supports tags, excerpts, slugs, cover images. Auto-validates on connect. |
+| 2.4c | Medium — API integration | Deferred | API closed to new integrations as of Jan 2025. Marked as "coming soon" in UI. |
+| 2.4d | Blog validation endpoint | Complete | API: `/api/social/blog/connections/validate`. Supports pre-connect validation (raw credentials) and post-connect re-validation (stored encrypted credentials). Dashboard "Test" button for WordPress/Ghost. Auto-validates on initial connect (rejects bad credentials before saving). |
 
 ### Phase 2 Summary
 
@@ -113,7 +113,7 @@ PassivePost itself is just a user of its own service (dogfooding) — it will us
 | 2 — Easy Wins | Instagram, Reddit, Discord | Instagram uses FB creds; Reddit + Discord need new creds | Complete |
 | 3 — Remaining Social | YouTube, Pinterest | YouTube uses Google OAuth; Pinterest uses Pinterest OAuth | Complete |
 | ~~TikTok, Snapchat~~ | ~~Deferred~~ | Video-first platforms — deferred (not enough text surface area for content flywheel) | Deferred |
-| 4 — Blog Platforms | WordPress, Ghost, Medium | Scenario 1: user-provided credentials, no VPS | In Progress |
+| 4 — Blog Platforms | WordPress, Ghost, Medium | Scenario 1: user-provided credentials, no VPS. Medium deferred (API closed). | Complete (Scenario 1) |
 
 **Pre-Flight Check System:**
 A `/api/social/preflight` endpoint validates all prerequisites before attempting OAuth. The Connect button calls this automatically and shows clear, actionable error messages if anything is missing. This prevents the trial-and-error debugging that plagued the Twitter/X connection.
