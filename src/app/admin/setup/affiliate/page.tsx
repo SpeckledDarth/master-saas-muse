@@ -27,6 +27,8 @@ interface Settings {
   cookie_duration_days: number
   program_active: boolean
   attribution_conflict_policy: string
+  leaderboard_enabled: boolean
+  leaderboard_privacy_mode: string
 }
 
 interface Milestone {
@@ -171,6 +173,8 @@ export default function AffiliateSettingsPage() {
     cookie_duration_days: 30,
     program_active: true,
     attribution_conflict_policy: 'cookie_wins',
+    leaderboard_enabled: true,
+    leaderboard_privacy_mode: 'initials',
   })
   const [tiers, setTiers] = useState<Tier[]>([])
   const [assets, setAssets] = useState<Asset[]>([])
@@ -874,6 +878,36 @@ export default function AffiliateSettingsPage() {
                     <SelectItem value="split">Split Commission</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="border-t pt-4 mt-4">
+                <h4 className="text-sm font-medium mb-3">Leaderboard Settings</h4>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <Label>Leaderboard Enabled</Label>
+                    <p className="text-xs text-muted-foreground">Show a ranked leaderboard on the affiliate dashboard</p>
+                  </div>
+                  <Switch
+                    checked={settings.leaderboard_enabled}
+                    onCheckedChange={(v) => setSettings(s => ({ ...s, leaderboard_enabled: v }))}
+                    data-testid="switch-leaderboard-enabled"
+                  />
+                </div>
+                {settings.leaderboard_enabled && (
+                  <div>
+                    <Label>Privacy Mode</Label>
+                    <p className="text-xs text-muted-foreground mb-2">How affiliate names appear on the leaderboard</p>
+                    <Select value={settings.leaderboard_privacy_mode} onValueChange={v => setSettings(s => ({ ...s, leaderboard_privacy_mode: v }))}>
+                      <SelectTrigger className="w-full sm:w-64" data-testid="select-leaderboard-privacy">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="initials">Initials Only (e.g., J.S.)</SelectItem>
+                        <SelectItem value="full_name">Full Name (opt-in)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
 
               <Button onClick={saveSettings} disabled={saving} data-testid="button-save-settings">

@@ -38,12 +38,19 @@ export function ReferralTracker() {
     setCookie('pp_ref', refCode, cookieDays)
     localStorage.setItem('ref_code', refCode)
 
+    const sourceTag = searchParams.get('src') || null
+    if (sourceTag) {
+      localStorage.setItem('ref_source', sourceTag)
+    }
+
     fetch('/api/referral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ref_code: refCode,
         page_url: window.location.pathname,
+        landing_page: window.location.pathname,
+        source_tag: sourceTag,
       }),
     })
       .then(() => {

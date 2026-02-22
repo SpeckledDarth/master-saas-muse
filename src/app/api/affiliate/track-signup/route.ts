@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const refCode = body.ref_code
+    const sourceTag = body.source_tag || null
 
     if (!refCode) {
       return NextResponse.json({ error: 'No referral code provided' }, { status: 400 })
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest) {
         ip_hash: ipHash,
         status: 'signed_up',
         fraud_flags: fraudFlags,
+        source_tag: sourceTag,
       })
 
     if (error) {

@@ -59,7 +59,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { ref_code, page_url } = body
+    const { ref_code, page_url, landing_page, source_tag } = body
 
     if (!ref_code) {
       return NextResponse.json({ error: 'Missing ref_code' }, { status: 400 })
@@ -79,6 +79,8 @@ export async function POST(request: NextRequest) {
         ip_hash: ipHash,
         user_agent: request.headers.get('user-agent')?.substring(0, 200) || null,
         page_url: page_url || null,
+        landing_page: landing_page || null,
+        source_tag: source_tag || null,
       })
 
     const rpcResult = await adminClient.rpc('increment_referral_clicks', { code: ref_code })
