@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { encryptToken } from '@/lib/social/crypto'
+import { getBlogClient } from '@/lib/social/blog-clients'
 import { BLOG_PLATFORMS } from '@/lib/social/types'
 import type { BlogPlatform } from '@/lib/social/types'
 
@@ -122,6 +123,27 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const blogClient = getBlogClient(platform)
+    let validatedUsername = username || null
+    let validatedDisplayName = displayName || null
+    let isValid = true
+    let lastError: string | null = null
+
+    if (blogClient && siteUrl && apiKey) {
+      const validation = await blogClient.validateConnection(siteUrl, apiKey)
+      isValid = validation.success
+      lastError = validation.error || null
+      if (validation.success) {
+        if (validation.username && !username) validatedUsername = validation.username
+        if (validation.siteTitle && !displayName) validatedDisplayName = validation.siteTitle
+      } else {
+        return NextResponse.json({
+          error: validation.error || 'Connection validation failed. Please check your credentials.',
+          validationFailed: true,
+        }, { status: 400 })
+      }
+    }
+
     const encryptedApiKey = apiKey ? await encryptToken(apiKey) : null
     const encryptedAccessToken = accessToken ? await encryptToken(accessToken) : null
 
@@ -131,13 +153,14 @@ export async function POST(request: NextRequest) {
       .upsert({
         user_id: user.id,
         platform,
-        platform_username: username || null,
-        display_name: displayName || null,
+        platform_username: validatedUsername,
+        display_name: validatedDisplayName,
         site_url: siteUrl || null,
         api_key_encrypted: encryptedApiKey,
         access_token_encrypted: encryptedAccessToken,
-        is_valid: true,
+        is_valid: isValid,
         last_validated_at: new Date().toISOString(),
+        last_error: lastError,
         connected_at: new Date().toISOString(),
       }, { onConflict: 'user_id,platform' })
       .select('id, user_id, platform, platform_username, display_name, site_url, is_valid, last_validated_at, connected_at, updated_at')

@@ -100,6 +100,7 @@ export default function BlogDashboardPage() {
   const [form, setForm] = useState<ConnectionFormState>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [disconnecting, setDisconnecting] = useState<string | null>(null)
+  const [validatingConn, setValidatingConn] = useState<string | null>(null)
   const [showConnections, setShowConnections] = useState(false)
   const { toast } = useToast()
 
@@ -187,6 +188,37 @@ export default function BlogDashboardPage() {
       toast({ title: 'Error', description: (err as Error).message, variant: 'destructive' })
     } finally {
       setDisconnecting(null)
+    }
+  }
+
+  const handleValidateConnection = async (conn: BlogConnection) => {
+    setValidatingConn(conn.id)
+    try {
+      const res = await fetch('/api/social/blog/connections/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ connectionId: conn.id }),
+      })
+      const data = await res.json()
+      if (data.valid) {
+        setConnections(prev => prev.map(c =>
+          c.id === conn.id
+            ? { ...c, is_valid: true, last_validated_at: new Date().toISOString(), last_error: null, display_name: data.siteTitle || c.display_name, platform_username: data.username || c.platform_username }
+            : c
+        ))
+        toast({ title: 'Connection Valid', description: `${BLOG_PLATFORM_CONFIG[conn.platform]?.name || conn.platform} connection is working.` })
+      } else {
+        setConnections(prev => prev.map(c =>
+          c.id === conn.id
+            ? { ...c, is_valid: false, last_validated_at: new Date().toISOString(), last_error: data.error || 'Validation failed' }
+            : c
+        ))
+        toast({ title: 'Connection Invalid', description: data.error || 'Validation failed', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Could not validate connection', variant: 'destructive' })
+    } finally {
+      setValidatingConn(null)
     }
   }
 
@@ -459,17 +491,31 @@ export default function BlogDashboardPage() {
                             {conn.last_error && <span className="text-xs">: {conn.last_error}</span>}
                           </div>
                         )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => handleDisconnect(conn)}
-                          disabled={disconnecting === conn.id}
-                          data-testid={`button-disconnect-${platform}`}
-                        >
-                          {disconnecting === conn.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Trash2 className="mr-1 h-3 w-3" />}
-                          Disconnect
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          {(platform === 'wordpress' || platform === 'ghost') && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleValidateConnection(conn)}
+                              disabled={validatingConn === conn.id}
+                              data-testid={`button-validate-${platform}`}
+                            >
+                              {validatingConn === conn.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <RefreshCw className="mr-1 h-3 w-3" />}
+                              Test
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => handleDisconnect(conn)}
+                            disabled={disconnecting === conn.id}
+                            data-testid={`button-disconnect-${platform}`}
+                          >
+                            {disconnecting === conn.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Trash2 className="mr-1 h-3 w-3" />}
+                            Disconnect
+                          </Button>
+                        </div>
                       </div>
                     )}
 
@@ -535,11 +581,16 @@ export default function BlogDashboardPage() {
                                     <Label htmlFor="site-url">Site URL</Label>
                                     <Input
                                       id="site-url"
-                                      placeholder={form.platform === 'wordpress' ? 'https://myblog.wordpress.com' : 'https://myblog.ghost.io'}
+                                      placeholder={form.platform === 'wordpress' ? 'https://myblog.com' : 'https://myblog.ghost.io'}
                                       value={form.siteUrl}
                                       onChange={e => setForm(f => ({ ...f, siteUrl: e.target.value }))}
                                       data-testid="input-blog-site-url"
                                     />
+                                    <p className="text-xs text-muted-foreground">
+                                      {form.platform === 'wordpress'
+                                        ? 'Your WordPress site URL (e.g., https://myblog.com or https://myblog.wordpress.com)'
+                                        : 'Your Ghost site URL (e.g., https://myblog.ghost.io)'}
+                                    </p>
                                   </div>
                                 )}
 
@@ -550,11 +601,18 @@ export default function BlogDashboardPage() {
                                   <Input
                                     id="api-key"
                                     type="password"
-                                    placeholder="Paste your token or API key"
+                                    placeholder={form.platform === 'wordpress' ? 'username:xxxx xxxx xxxx xxxx' : form.platform === 'ghost' ? '6489...abcd:1234...5678' : 'Paste your token or API key'}
                                     value={form.apiKey}
                                     onChange={e => setForm(f => ({ ...f, apiKey: e.target.value }))}
                                     data-testid="input-blog-api-key"
                                   />
+                                  <p className="text-xs text-muted-foreground">
+                                    {form.platform === 'wordpress'
+                                      ? 'Format: username:password. Generate under Users > Profile > Application Passwords in WordPress admin.'
+                                      : form.platform === 'ghost'
+                                        ? 'Format: id:secret. Find under Settings > Integrations > Add custom integration in Ghost admin.'
+                                        : 'Your API key or integration token.'}
+                                  </p>
                                 </div>
 
                                 <div className="space-y-2">
@@ -566,6 +624,9 @@ export default function BlogDashboardPage() {
                                     onChange={e => setForm(f => ({ ...f, displayName: e.target.value }))}
                                     data-testid="input-blog-display-name"
                                   />
+                                  <p className="text-xs text-muted-foreground">
+                                    Optional. We'll auto-detect your site name if left blank.
+                                  </p>
                                 </div>
 
                                 <div className="flex justify-end gap-2">

@@ -16,6 +16,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import Link from 'next/link'
+import { BookOpen } from 'lucide-react'
 import type { SocialAccount } from '@/lib/social/client'
 
 type PlatformInfo = {
@@ -442,6 +444,25 @@ function SocialAccountsContent() {
           )
         })}
       </div>
+
+      <Card className="mt-6" data-testid="card-blog-platforms-link">
+        <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-2">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted">
+              <BookOpen className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div>
+              <CardTitle className="text-base" data-testid="text-blog-section-title">Blog Platforms</CardTitle>
+              <CardDescription>Connect WordPress, Ghost, and other blog platforms</CardDescription>
+            </div>
+          </div>
+          <Link href="/dashboard/social/blog">
+            <Button variant="outline" data-testid="button-manage-blogs">
+              Manage Blogs
+            </Button>
+          </Link>
+        </CardHeader>
+      </Card>
 
       <Dialog open={connectDialogOpen} onOpenChange={setConnectDialogOpen}>
         <DialogContent data-testid="dialog-connect-account">
