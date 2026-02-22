@@ -42,6 +42,12 @@ const sectionGroups = [
     ],
   },
   {
+    label: 'Growth',
+    items: [
+      { id: 'affiliate', label: 'Affiliate Program', icon: DollarSign, href: '/admin/setup/affiliate' },
+    ],
+  },
+  {
     label: 'Legal & Security',
     items: [
       { id: 'compliance', label: 'Compliance', icon: Scale, href: '/admin/setup/compliance' },

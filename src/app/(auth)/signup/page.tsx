@@ -13,6 +13,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2 } from 'lucide-react'
 import { SiGoogle, SiGithub, SiApple, SiX } from 'react-icons/si'
 
+function getCookieValue(name: string): string | null {
+  if (typeof document === 'undefined') return null
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
+  return match ? decodeURIComponent(match[2]) : null
+}
+
 function SignupForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -66,9 +72,19 @@ function SignupForm() {
       return
     }
 
-    // If user is immediately logged in (email confirmation disabled), redirect
     if (data?.session) {
-      // Keep pendingInviteToken if redirecting to invite page (will be used for auto-accept)
+      try {
+        const refCode = localStorage.getItem('ref_code') || getCookieValue('pp_ref')
+        if (refCode) {
+          fetch('/api/affiliate/track-signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ref_code: refCode }),
+          }).catch(() => {})
+          localStorage.removeItem('ref_code')
+        }
+      } catch {}
+
       if (!redirectTo.startsWith('/invite/')) {
         localStorage.removeItem('pendingInviteToken')
       }

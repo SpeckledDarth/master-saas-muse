@@ -216,6 +216,117 @@ export async function POST(request: NextRequest) {
         });
         break;
       }
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice;
+        console.log('Invoice paid:', invoice.id);
+
+        try {
+          const { createAdminClient: createAdmin } = await import('@/lib/supabase/admin');
+          const { getAffiliateLink, getAffiliateTiers, getCommissionRate, createNotification } = await import('@/lib/affiliate');
+          const adminDb = createAdmin();
+
+          const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
+          if (!customerId) break;
+
+          const { data: sub } = await adminDb
+            .from('subscriptions')
+            .select('user_id')
+            .eq('stripe_customer_id', customerId)
+            .maybeSingle();
+
+          if (!sub?.user_id) break;
+
+          const { data: referral } = await adminDb
+            .from('affiliate_referrals')
+            .select('*')
+            .eq('referred_user_id', sub.user_id)
+            .eq('status', 'converted')
+            .maybeSingle() as any;
+
+          let referralRecord = referral;
+
+          if (!referralRecord) {
+            const { data: signedUpRef } = await adminDb
+              .from('affiliate_referrals')
+              .select('*')
+              .eq('referred_user_id', sub.user_id)
+              .eq('status', 'signed_up')
+              .maybeSingle() as any;
+
+            if (!signedUpRef) break;
+
+            await adminDb
+              .from('affiliate_referrals')
+              .update({ status: 'converted', converted_at: new Date().toISOString() })
+              .eq('id', signedUpRef.id);
+
+            referralRecord = { ...signedUpRef, status: 'converted' };
+          }
+
+          if (!referralRecord) break;
+
+          const { data: existingCommission } = await adminDb
+            .from('affiliate_commissions')
+            .select('id')
+            .eq('stripe_invoice_id', invoice.id)
+            .maybeSingle();
+
+          if (existingCommission) break;
+
+          const affiliateLink = await getAffiliateLink(referralRecord.affiliate_user_id);
+          if (!affiliateLink) break;
+
+          if (affiliateLink.locked_at) {
+            const lockedDate = new Date(affiliateLink.locked_at);
+            const durationMs = (affiliateLink.locked_duration_months || 12) * 30 * 86400000;
+            if (Date.now() > lockedDate.getTime() + durationMs) {
+              console.log(`Commission window expired for affiliate ${referralRecord.affiliate_user_id}`);
+              break;
+            }
+          }
+
+          const tiers = await getAffiliateTiers();
+          const rate = getCommissionRate(affiliateLink, tiers);
+          const invoiceAmountCents = invoice.amount_paid || 0;
+          const commissionCents = Math.round(invoiceAmountCents * (rate / 100));
+
+          if (commissionCents <= 0) break;
+
+          await adminDb
+            .from('affiliate_commissions')
+            .insert({
+              affiliate_user_id: referralRecord.affiliate_user_id,
+              referral_id: referralRecord.id,
+              stripe_invoice_id: invoice.id,
+              invoice_amount_cents: invoiceAmountCents,
+              commission_rate: rate,
+              commission_amount_cents: commissionCents,
+              status: 'pending',
+            });
+
+          await adminDb
+            .from('referral_links')
+            .update({
+              total_earnings_cents: (affiliateLink.total_earnings_cents || 0) + commissionCents,
+              pending_earnings_cents: (affiliateLink.pending_earnings_cents || 0) + commissionCents,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('user_id', referralRecord.affiliate_user_id);
+
+          await createNotification(
+            referralRecord.affiliate_user_id,
+            'Commission Earned!',
+            `You earned $${(commissionCents / 100).toFixed(2)} from a referral payment.`,
+            'success',
+            '/dashboard/social/affiliate'
+          );
+
+          console.log(`Affiliate commission created: $${(commissionCents / 100).toFixed(2)} for user ${referralRecord.affiliate_user_id}`);
+        } catch (affErr) {
+          console.error('Affiliate commission processing error:', affErr);
+        }
+        break;
+      }
       default:
         console.log('Unhandled event type:', event.type);
     }

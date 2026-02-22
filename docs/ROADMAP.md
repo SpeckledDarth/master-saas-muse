@@ -173,18 +173,25 @@ A `/api/social/preflight` endpoint validates all prerequisites before attempting
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 3.1 | Upgrade Phase 1.5 share links to tracked affiliate links with attribution | Not Started | Builds on existing share link infrastructure |
-| 3.2 | Commission tracking on Stripe subscription events | Not Started | Listen for `invoice.paid`, check `referred_by` |
-| 3.3 | Affiliate dashboard — referrals, earnings, payout status | Not Started | User-facing page in dashboard |
-| 3.4 | Admin affiliate management — set rates, approve/deny affiliates, view program stats | Not Started | Admin dashboard page |
-| 3.5 | Payout tracking (manual to start) | Not Started | Admin marks payouts as complete |
+| 3.1 | Upgrade Phase 1.5 share links to tracked affiliate links with attribution | Complete | `referral_links` table upgraded with `is_affiliate`, `locked_commission_rate`, `locked_duration_months`, `locked_at`, `total_earnings_cents`, `paid_earnings_cents`, `pending_earnings_cents`. Cookie attribution (`pp_ref` cookie, 30-day default). Signup tracking via `/api/affiliate/track-signup`. |
+| 3.2 | Commission tracking on Stripe subscription events | Complete | `invoice.paid` webhook handler in `src/app/api/stripe/webhook/route.ts`. Calculates commission using locked-in rate, respects duration window, creates `affiliate_commissions` record, updates affiliate balance. Deduplicates by `stripe_invoice_id`. |
+| 3.3 | Affiliate dashboard — referrals, earnings, payout status | Complete | User-facing page at `/dashboard/social/affiliate`. Shows stats cards (clicks, signups, pending earnings, total earned), tier progress bar, referral list, earnings breakdown, payout history, marketing assets browser. Activation flow with locked-in terms display. |
+| 3.4 | Admin affiliate management — set rates, approve/deny affiliates, view program stats | Complete | Admin page at `/admin/setup/affiliate`. Tabs: Settings (commission rate/duration/min payout/cookie days/active toggle), Tiers (CRUD), Marketing Assets (CRUD with 4 types), Affiliates (ranked list with locked terms). Fraud alert cards. Stats dashboard. |
+| 3.5 | Payout tracking (manual to start) | Complete | `affiliate_payouts` table. Admin creates/approves/marks paid via `/api/affiliate/payouts`. On payout completion: updates affiliate balance, marks commissions as paid, sends notification. Status flow: pending → approved → paid. |
+| 3.6 | Configurable commission settings with grandfathering | Complete | `affiliate_program_settings` table. Admin adjusts rate/duration anytime. When affiliate activates, current terms are locked in via `lockInAffiliateTerms()`. Calculations always use locked-in terms, never global settings. |
+| 3.7 | Performance tiers | Complete | `affiliate_tiers` table with default Bronze/Silver/Gold. Higher tier rate overrides locked-in rate if greater. Admin CRUD. Tier progress shown in affiliate dashboard. |
+| 3.8 | Marketing assets library | Complete | `affiliate_assets` table (banner, email_template, social_post, text_snippet types). Admin uploads/manages. Affiliates browse and copy/download from their dashboard. |
+| 3.9 | Cookie attribution (30-day window) | Complete | `ReferralTracker` component sets `pp_ref` cookie on `?ref=CODE` visits. Signup page reads cookie and calls `/api/affiliate/track-signup`. Cookie duration configurable in admin settings. |
+| 3.10 | Fraud protection | Complete | `checkFraudFlags()` in `src/lib/affiliate/index.ts`. Checks: same email domain, suspicious IP volume (3+ from same IP in 1hr), self-referral. Flags stored on `affiliate_referrals.fraud_flags`. Admin sees flagged referrals with alert cards. |
+| 3.11 | Real-time notifications | Complete | Notifications sent via existing `notifications` table: on link click, on signup, on commission earned, on payout processed. All link to `/dashboard/social/affiliate`. |
+| 3.12 | Affiliate onboarding email drip | Complete | 3-email sequence via Resend: Welcome (immediate), Tips (24hr), Strategy (72hr). Uses existing `email_drip_log` table with `sequence_name='affiliate'`. Triggered on activation. |
 
 **Dependencies:**
-- Phase 1.5.4 (share links) must be built first — affiliate system upgrades those links
-- Phase 2 should be complete so affiliates send traffic to a fully working product
-- Stripe webhooks already wired — just adding a handler
+- Phase 1.5.4 (share links) — built, upgraded with affiliate fields
+- Phase 2 — complete, product fully functional
+- Stripe webhooks — `invoice.paid` handler added
 
-**Open Decision:** Build as MuseKit core feature (available to all products) vs. PassivePost-specific. Recommendation: MuseKit core, since any product benefits from referrals.
+**Decision:** Built as MuseKit core feature (available to all products).
 
 ---
 
@@ -262,6 +269,7 @@ Running log of what was accomplished each session. Update at the end of every se
 | Feb 22, 2026 | **YouTube + Pinterest wired. TikTok/Snapchat deferred.** YouTube uses Google OAuth2 (`accounts.google.com` for auth, `oauth2.googleapis.com` for token exchange/refresh). Scopes: `youtube.readonly`, `youtube`, `userinfo.profile`. Uses `access_type=offline&prompt=consent` to get refresh_token. 1hr access tokens with refresh via standard Google OAuth refresh. Validates via YouTube Data API v3 `channels?part=snippet&mine=true`. Pinterest uses Pinterest OAuth2 (`pinterest.com/oauth` for auth, `api.pinterest.com/v5/oauth/token` for tokens). Uses Basic auth (base64 app_id:secret). 30-day access tokens, refresh_token for re-auth. Validates via `api.pinterest.com/v5/user_account`. Removed TikTok and Snapchat from platform list — deferred as video-first platforms with insufficient text surface for content flywheel. **Total platforms: 8 social (X, LinkedIn, Facebook, Instagram, Reddit, Discord, YouTube, Pinterest).** Next: Blog platforms (WordPress, Ghost, Medium). | Phase 2 Batch 3 — Complete |
 | Feb 22, 2026 | **Blog platform integrations (Scenario 1) built.** Created `blog-clients.ts` with WordPress REST API client (validates via `/wp-json/wp/v2/users/me`, publishes/updates/deletes via `/wp-json/wp/v2/posts`, resolves tags, uploads featured images) and Ghost Admin API client (JWT token generation from `id:secret` key, validates via `/ghost/api/admin/site/`, publishes/updates/deletes via `/ghost/api/admin/posts/`). Added `/api/social/blog/connections/validate` endpoint for testing existing connections. Updated blog connections POST to auto-validate on connect (WordPress/Ghost). Enhanced dashboard blog page with "Test" button for connected platforms and improved connection dialog with credential format guidance. Added "Blog Platforms" card to social accounts page linking to blog dashboard. **Decision:** Blog strategy split into Scenario 1 (connect existing — built) and Scenario 2 (provision for users — deferred). Medium API closed — deferred. | Phase 2 Batch 4 — Complete |
 | Feb 22, 2026 | **Phase 2 fully complete.** (1) In-app setup guides for all platforms: social platforms show pre-OAuth guide dialog with numbered steps, security reassurance, and time estimates; blog platforms have collapsible credential generation guides with navigation paths. (2) Engagement metrics infrastructure: summary API (`/api/social/engagement/summary`), manual pull trigger (`/api/social/engagement/pull`), dashboard upgraded with real metric cards and "Refresh Metrics" button. (3) Real posting flow wired: "Post Now" and "Publish" buttons on draft posts, blog publishing endpoint (`/api/social/blog/posts/publish`). (4) All demo data fallbacks removed from posts and engagement pages. (5) Display Name field restored in blog connection form. (6) Discord guide language corrected. **Phase 2 is complete — ready for Phase 3 (Affiliate Marketing).** | Phase 2 — Complete |
+| Feb 22, 2026 | **Phase 3 fully complete — Affiliate Marketing System.** Built complete affiliate infrastructure: (1) Database migration with 6 new tables (affiliate_program_settings, affiliate_tiers, affiliate_referrals, affiliate_commissions, affiliate_payouts, affiliate_assets) plus referral_links upgrade. (2) Core library with grandfathering (lock-in rates on activation), fraud detection (email domain, IP volume, self-referral), performance tiers, and notification helpers. (3) Admin management page with settings, tier CRUD, marketing assets, affiliate rankings, and fraud alerts. (4) User affiliate dashboard with stats cards, tier progress, referral/earnings/payout history, marketing assets browser. (5) Cookie attribution (30-day pp_ref cookie, configurable duration). (6) Stripe webhook commission tracking on invoice.paid with deduplication. (7) Payout management (pending → approved → paid workflow). (8) 3-email onboarding drip sequence via Resend. (9) Real-time notifications for clicks, signups, conversions, and payouts. **Phase 3 complete — ready for Phase 4.** | Phase 3 — Complete |
 
 ---
 
@@ -288,8 +296,14 @@ Key files for each phase, so agents can find relevant code quickly.
 - Engagement pulling: `src/app/api/social/cron/` (existing cron endpoints)
 
 ### Phase 3
-- Affiliate system: New migration in `migrations/core/`, new dashboard section, Stripe webhook handler
-- Builds on Phase 1.5.4 share link infrastructure
+- Migration: `migrations/core/005_affiliate_system.sql` (6 tables + referral_links upgrade)
+- Core library: `src/lib/affiliate/index.ts` (grandfathering, fraud detection, notifications, tier logic)
+- Admin page: `src/app/admin/setup/affiliate/page.tsx` (settings, tiers, assets, management)
+- User dashboard: `src/app/dashboard/social/affiliate/page.tsx` (stats, tiers, earnings, payouts, assets)
+- API routes: `src/app/api/affiliate/` (settings, tiers, assets, payouts, referrals, dashboard, activate, track-signup, drip)
+- Stripe webhook: `src/app/api/stripe/webhook/route.ts` (invoice.paid handler with commission creation)
+- Cookie tracking: `src/components/referral-tracker.tsx` (pp_ref cookie on ?ref= visits)
+- Signup integration: `src/app/(auth)/signup/page.tsx` (reads pp_ref cookie, calls track-signup)
 
 ### Phase 4
 - PWA: `public/manifest.json`, service worker, `next.config.js` PWA config

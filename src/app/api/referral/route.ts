@@ -85,9 +85,31 @@ export async function POST(request: NextRequest) {
     if (rpcResult.error) {
       await adminClient
         .from('referral_links')
-        .update({ updated_at: new Date().toISOString() })
+        .update({
+          clicks: (await adminClient.from('referral_links').select('clicks').eq('ref_code', ref_code).maybeSingle()).data?.clicks + 1 || 1,
+          updated_at: new Date().toISOString(),
+        })
         .eq('ref_code', ref_code)
     }
+
+    try {
+      const { data: linkOwner } = await adminClient
+        .from('referral_links')
+        .select('user_id, is_affiliate')
+        .eq('ref_code', ref_code)
+        .maybeSingle()
+
+      if (linkOwner?.is_affiliate) {
+        const { createNotification } = await import('@/lib/affiliate')
+        await createNotification(
+          linkOwner.user_id,
+          'Link Clicked!',
+          'Someone clicked your referral link.',
+          'info',
+          '/dashboard/social/affiliate'
+        )
+      }
+    } catch {}
 
     return NextResponse.json({ tracked: true })
   } catch (error) {

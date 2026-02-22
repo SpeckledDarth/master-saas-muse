@@ -95,6 +95,12 @@ const NAV_ITEMS = [
     ],
   },
   {
+    group: 'Earn',
+    items: [
+      { title: 'Affiliate', href: '/dashboard/social/affiliate', icon: DollarSign },
+    ],
+  },
+  {
     group: 'Setup',
     items: [
       { title: 'Brand Voice', href: '/dashboard/social/brand', icon: Palette },
