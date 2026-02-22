@@ -14,7 +14,7 @@ function getSupabaseAdmin() {
   )
 }
 
-const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook']
+const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook', 'instagram', 'reddit', 'discord']
 
 function redirectWithError(baseUrl: string, message: string, platform?: string) {
   console.error('[Social Callback] OAuth error:', message)
@@ -164,11 +164,131 @@ async function exchangeTwitterToken(code: string, redirectUri: string, codeVerif
   }
 }
 
+async function exchangeInstagramToken(code: string, redirectUri: string): Promise<{ accessToken: string; expiresIn?: number }> {
+  const appId = await getConfigValue('FACEBOOK_APP_ID')
+  const appSecret = await getConfigValue('FACEBOOK_APP_SECRET')
+  if (!appId || !appSecret) throw new Error('Instagram (Meta) credentials not configured')
+
+  const body = new URLSearchParams({
+    client_id: appId,
+    client_secret: appSecret,
+    grant_type: 'authorization_code',
+    redirect_uri: redirectUri,
+    code,
+  })
+
+  const tokenRes = await fetch('https://api.instagram.com/oauth/access_token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!tokenRes.ok) {
+    const errData = await tokenRes.text().catch(() => 'Unknown error')
+    throw new Error(`Instagram token exchange failed: ${errData}`)
+  }
+
+  const tokenData = await tokenRes.json()
+  const shortLivedToken = tokenData.access_token
+
+  const longLivedUrl = new URL('https://graph.instagram.com/access_token')
+  longLivedUrl.searchParams.set('grant_type', 'ig_exchange_token')
+  longLivedUrl.searchParams.set('client_secret', appSecret)
+  longLivedUrl.searchParams.set('access_token', shortLivedToken)
+
+  const longLivedRes = await fetch(longLivedUrl.toString(), { method: 'GET', signal: AbortSignal.timeout(15000) })
+  let accessToken = shortLivedToken
+  let expiresIn: number | undefined
+
+  if (longLivedRes.ok) {
+    const longLivedData = await longLivedRes.json()
+    accessToken = longLivedData.access_token || shortLivedToken
+    expiresIn = longLivedData.expires_in
+  }
+
+  return { accessToken, expiresIn }
+}
+
+async function exchangeRedditToken(code: string, redirectUri: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
+  const clientId = await getConfigValue('REDDIT_CLIENT_ID')
+  const clientSecret = await getConfigValue('REDDIT_CLIENT_SECRET')
+  if (!clientId || !clientSecret) throw new Error('Reddit credentials not configured')
+
+  const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
+
+  const body = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code,
+    redirect_uri: redirectUri,
+  })
+
+  const tokenRes = await fetch('https://www.reddit.com/api/v1/access_token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${credentials}`,
+      'User-Agent': 'PassivePost/1.0',
+    },
+    body: body.toString(),
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!tokenRes.ok) {
+    const errData = await tokenRes.text().catch(() => 'Unknown error')
+    throw new Error(`Reddit token exchange failed: ${errData}`)
+  }
+
+  const tokenData = await tokenRes.json()
+  return {
+    accessToken: tokenData.access_token,
+    refreshToken: tokenData.refresh_token,
+    expiresIn: tokenData.expires_in,
+  }
+}
+
+async function exchangeDiscordToken(code: string, redirectUri: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number; webhook?: { id: string; token: string; channel_id: string; guild_id: string } }> {
+  const clientId = await getConfigValue('DISCORD_CLIENT_ID')
+  const clientSecret = await getConfigValue('DISCORD_CLIENT_SECRET')
+  if (!clientId || !clientSecret) throw new Error('Discord credentials not configured')
+
+  const body = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code,
+    redirect_uri: redirectUri,
+    client_id: clientId,
+    client_secret: clientSecret,
+  })
+
+  const tokenRes = await fetch('https://discord.com/api/v10/oauth2/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!tokenRes.ok) {
+    const errData = await tokenRes.text().catch(() => 'Unknown error')
+    throw new Error(`Discord token exchange failed: ${errData}`)
+  }
+
+  const tokenData = await tokenRes.json()
+  return {
+    accessToken: tokenData.access_token,
+    refreshToken: tokenData.refresh_token,
+    expiresIn: tokenData.expires_in,
+    webhook: tokenData.webhook,
+  }
+}
+
 function getFriendlyOAuthError(errorCode: string, description: string, platform: string): string {
   const platformNames: Record<string, string> = {
     twitter: 'X (Twitter)',
     linkedin: 'LinkedIn',
     facebook: 'Facebook',
+    instagram: 'Instagram',
+    reddit: 'Reddit',
+    discord: 'Discord',
   }
   const name = platformNames[platform] || platform
 
@@ -264,6 +384,21 @@ export async function GET(
         return redirectWithError(baseUrl, 'Missing code verifier for Twitter PKCE', platform)
       }
       const result = await exchangeTwitterToken(code, redirectUri, state.codeVerifier)
+      accessToken = result.accessToken
+      refreshToken = result.refreshToken
+      expiresIn = result.expiresIn
+    } else if (platform === 'instagram') {
+      const result = await exchangeInstagramToken(code, redirectUri)
+      accessToken = result.accessToken
+      refreshToken = undefined
+      expiresIn = result.expiresIn
+    } else if (platform === 'reddit') {
+      const result = await exchangeRedditToken(code, redirectUri)
+      accessToken = result.accessToken
+      refreshToken = result.refreshToken
+      expiresIn = result.expiresIn
+    } else if (platform === 'discord') {
+      const result = await exchangeDiscordToken(code, redirectUri)
       accessToken = result.accessToken
       refreshToken = result.refreshToken
       expiresIn = result.expiresIn

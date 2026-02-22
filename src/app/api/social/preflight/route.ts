@@ -45,6 +45,18 @@ const PLATFORM_CREDENTIALS: Record<string, { keys: string[]; callbackPath: strin
     keys: ['FACEBOOK_APP_ID', 'FACEBOOK_APP_SECRET'],
     callbackPath: '/api/social/callback/facebook',
   },
+  instagram: {
+    keys: ['FACEBOOK_APP_ID', 'FACEBOOK_APP_SECRET'],
+    callbackPath: '/api/social/callback/instagram',
+  },
+  reddit: {
+    keys: ['REDDIT_CLIENT_ID', 'REDDIT_CLIENT_SECRET'],
+    callbackPath: '/api/social/callback/reddit',
+  },
+  discord: {
+    keys: ['DISCORD_CLIENT_ID', 'DISCORD_CLIENT_SECRET'],
+    callbackPath: '/api/social/callback/discord',
+  },
 }
 
 export async function POST(request: NextRequest) {

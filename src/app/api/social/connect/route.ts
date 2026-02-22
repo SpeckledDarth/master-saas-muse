@@ -69,7 +69,7 @@ export function verifyState(stateParam: string): Record<string, any> | null {
   }
 }
 
-const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook']
+const VALID_PLATFORMS = ['twitter', 'linkedin', 'facebook', 'instagram', 'reddit', 'discord']
 
 export async function POST(request: NextRequest) {
   const user = await getAuthenticatedUser()
@@ -143,6 +143,55 @@ export async function POST(request: NextRequest) {
       })
       authUrl = `https://x.com/i/oauth2/authorize?${twParams.toString().replace(/\+/g, '%20')}`
       console.log(`[Social Connect] Twitter authUrl redirect_uri: ${redirectUri}`)
+
+    } else if (platform === 'instagram') {
+      const appId = await getConfigValue('FACEBOOK_APP_ID')
+      if (!appId) {
+        return NextResponse.json({ error: 'Instagram (Meta) App ID is not configured' }, { status: 500 })
+      }
+
+      const state = signState({ userId: user.id, platform, redirectUri })
+      const igParams = new URLSearchParams({
+        client_id: appId,
+        redirect_uri: redirectUri,
+        scope: 'instagram_basic',
+        response_type: 'code',
+        state,
+      })
+      authUrl = `https://api.instagram.com/oauth/authorize?${igParams.toString()}`
+
+    } else if (platform === 'reddit') {
+      const clientId = await getConfigValue('REDDIT_CLIENT_ID')
+      if (!clientId) {
+        return NextResponse.json({ error: 'Reddit Client ID is not configured' }, { status: 500 })
+      }
+
+      const state = signState({ userId: user.id, platform, redirectUri })
+      const redditParams = new URLSearchParams({
+        client_id: clientId,
+        response_type: 'code',
+        state,
+        redirect_uri: redirectUri,
+        duration: 'permanent',
+        scope: 'identity submit read',
+      })
+      authUrl = `https://www.reddit.com/api/v1/authorize?${redditParams.toString()}`
+
+    } else if (platform === 'discord') {
+      const clientId = await getConfigValue('DISCORD_CLIENT_ID')
+      if (!clientId) {
+        return NextResponse.json({ error: 'Discord Client ID is not configured' }, { status: 500 })
+      }
+
+      const state = signState({ userId: user.id, platform, redirectUri })
+      const discordParams = new URLSearchParams({
+        client_id: clientId,
+        response_type: 'code',
+        redirect_uri: redirectUri,
+        scope: 'identify guilds webhook.incoming',
+        state,
+      })
+      authUrl = `https://discord.com/oauth2/authorize?${discordParams.toString()}`
 
     } else {
       return NextResponse.json({ error: 'Unsupported platform' }, { status: 400 })

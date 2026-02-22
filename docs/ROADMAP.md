@@ -79,9 +79,9 @@ Platforms with straightforward APIs. Instagram shares the Facebook/Meta app.
 
 | # | Platform | Status | Notes |
 |---|----------|--------|-------|
-| 2.2a | Instagram — via Facebook/Meta Graph API | Not Started | May use existing FB app credentials. Requires Instagram Business account. |
-| 2.2b | Reddit — OAuth 2.0 + posting | Not Started | Need to create Reddit app at https://www.reddit.com/prefs/apps |
-| 2.2c | Discord — Bot/webhook integration | Not Started | Need to create Discord app at https://discord.com/developers |
+| 2.2a | Instagram — via Instagram Graph API | Connected | Uses same FACEBOOK_APP_ID/SECRET (Meta app). OAuth via `api.instagram.com/oauth/authorize`, token exchange via `api.instagram.com/oauth/access_token`, long-lived exchange via `graph.instagram.com/access_token`. Refresh via `graph.instagram.com/refresh_access_token`. 60-day token expiry. Scopes: `instagram_basic`. Callback: `/api/social/callback/instagram`. |
+| 2.2b | Reddit — OAuth 2.0 + posting | Connected | OAuth via `reddit.com/api/v1/authorize`. Uses Basic auth (client_id:client_secret) for token exchange. Permanent refresh tokens. 24-hour access token expiry. User-Agent header required. Scopes: `identity submit read`. Needs `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`. Callback: `/api/social/callback/reddit`. |
+| 2.2c | Discord — OAuth 2.0 + webhook integration | Connected | OAuth via `discord.com/oauth2/authorize`. Token exchange via `discord.com/api/v10/oauth2/token`. 7-day token expiry with refresh_token. Scopes: `identify guilds webhook.incoming`. Needs `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`. Callback: `/api/social/callback/discord`. |
 
 ### Batch 3 — Review-Required Platforms (Priority: Medium)
 These platforms have stricter app review processes. Submit applications early.
@@ -106,8 +106,8 @@ Build cloneable self-hosted WordPress + Ghost as reusable infrastructure for all
 
 | Batch | Platforms | API Keys | Status |
 |-------|-----------|----------|--------|
-| 1 — Core Social | Twitter/X, LinkedIn, Facebook | All credentials stored | In Progress |
-| 2 — Easy Wins | Instagram, Reddit, Discord | Need to obtain | Not Started |
+| 1 — Core Social | Twitter/X, LinkedIn, Facebook | All credentials stored | Complete |
+| 2 — Easy Wins | Instagram, Reddit, Discord | Instagram uses FB creds; Reddit + Discord need new creds | Complete |
 | 3 — Review-Required | YouTube, Pinterest, TikTok, Snapchat | Need to obtain + submit for review | Not Started |
 | 4 — Blog Platforms | WordPress, Ghost, Medium | Self-hosted setup needed | Not Started |
 
@@ -125,8 +125,12 @@ A `/api/social/preflight` endpoint validates all prerequisites before attempting
 | `TWITTER_API_SECRET` | Twitter/X | OAuth 2.0 Client Secret from X Developer Portal. |
 | `LINKEDIN_CLIENT_ID` | LinkedIn | From LinkedIn Developer Portal app credentials. |
 | `LINKEDIN_CLIENT_SECRET` | LinkedIn | From LinkedIn Developer Portal app credentials. |
-| `FACEBOOK_APP_ID` | Facebook | From Meta Developer Portal app settings. |
-| `FACEBOOK_APP_SECRET` | Facebook | From Meta Developer Portal app settings. |
+| `FACEBOOK_APP_ID` | Facebook, Instagram | From Meta Developer Portal app settings. Instagram uses the same Meta app. |
+| `FACEBOOK_APP_SECRET` | Facebook, Instagram | From Meta Developer Portal app settings. |
+| `REDDIT_CLIENT_ID` | Reddit | From Reddit app at https://www.reddit.com/prefs/apps (type: "web app"). |
+| `REDDIT_CLIENT_SECRET` | Reddit | From Reddit app at https://www.reddit.com/prefs/apps. |
+| `DISCORD_CLIENT_ID` | Discord | From Discord Developer Portal at https://discord.com/developers/applications. |
+| `DISCORD_CLIENT_SECRET` | Discord | From Discord Developer Portal. |
 
 **Callback URLs to Register (replace `YOUR_DOMAIN`):**
 
@@ -135,6 +139,9 @@ A `/api/social/preflight` endpoint validates all prerequisites before attempting
 | Twitter/X | `https://YOUR_DOMAIN/api/social/callback/twitter` |
 | LinkedIn | `https://YOUR_DOMAIN/api/social/callback/linkedin` |
 | Facebook | `https://YOUR_DOMAIN/api/social/callback/facebook` |
+| Instagram | `https://YOUR_DOMAIN/api/social/callback/instagram` |
+| Reddit | `https://YOUR_DOMAIN/api/social/callback/reddit` |
+| Discord | `https://YOUR_DOMAIN/api/social/callback/discord` |
 
 **Database Prerequisites:**
 - Run `migrations/core/001_social_tables.sql` in Supabase SQL Editor (creates `social_accounts` table)
@@ -240,6 +247,7 @@ Running log of what was accomplished each session. Update at the end of every se
 | Feb 21, 2026 | **LinkedIn connected.** Fixed `getAppOrigin()` to check both `NEXT_PUBLIC_APP_URL` and `NEXT_PUBLIC_SITE_URL` (the actual env var in Vercel). Added `.trim()` to handle whitespace in env var values. Fixed LinkedIn URL encoding — replaced blanket `+` to `%20` replacement with proper `encodeURIComponent` per parameter. Fixed preflight double-`https://` bug by using resolved `origin` instead of re-processing raw env var. | Phase 2 Batch 1 — LinkedIn Connected |
 | Feb 21, 2026 | **Facebook connected.** Reduced OAuth scopes to `email,public_profile` (the permissions currently approved in Meta Developer Portal). Page posting scopes (`pages_manage_posts`, `pages_read_engagement`, `pages_show_list`) to be added later when posting feature is needed. **Batch 1 complete — all 3 core social platforms (X, LinkedIn, Facebook) connected.** | Phase 2 Batch 1 — Complete |
 | Feb 22, 2026 | **Token refresh + error hardening (2.1e) complete.** Built universal token refresh for all 3 platforms: X uses refresh_token (2hr expiry), LinkedIn uses refresh_token (60d), Facebook re-exchanges long-lived token. Added `with-token-refresh.ts` middleware for automatic retry on 401s. Validate All now attempts token refresh before marking accounts invalid. Added `token_expires_at` tracking on initial connect and refresh. Added `Reconnect` button in UI for expired tokens. Improved OAuth error page with friendly messages for denied, timeout, callback mismatch, credentials not configured. Established `TokenExpiredError` class to distinguish "needs reconnect" vs "temporary failure". **Lessons learned:** Facebook has no refresh_token — must re-exchange current access_token for new long-lived token before it expires. X tokens rotate on every refresh (new refresh_token issued). LinkedIn refresh_token availability depends on OAuth app configuration. | Phase 2.1e — Complete |
+| Feb 22, 2026 | **Batch 2 complete — Instagram, Reddit, Discord all wired.** Instagram uses same FACEBOOK_APP_ID/SECRET via Instagram Graph API (`api.instagram.com` for OAuth, `graph.instagram.com` for API/refresh). 60-day long-lived tokens with `ig_refresh_token` refresh. Reddit uses Basic auth (base64 client_id:secret) for token exchange, permanent refresh tokens, 24h access tokens, requires User-Agent header. Discord uses standard OAuth2 with 7-day tokens and refresh_token support. All 3 have real `validateToken`/`getUserProfile` implementations, preflight checks, token refresh in `token-refresh.ts`, and are wired into dashboard UI. Total platforms connected: 6 (X, LinkedIn, Facebook, Instagram, Reddit, Discord). **Next:** Reddit + Discord need developer apps created and credentials added to Vercel env vars. Instagram needs `instagram_basic` scope enabled in Meta app. | Phase 2 Batch 2 — Complete |
 
 ---
 

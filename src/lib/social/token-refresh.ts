@@ -13,6 +13,9 @@ const TOKEN_EXPIRY_DEFAULTS: Record<string, number> = {
   twitter: 2 * 60 * 60,
   linkedin: 60 * 24 * 60 * 60,
   facebook: 60 * 24 * 60 * 60,
+  instagram: 60 * 24 * 60 * 60,
+  reddit: 24 * 60 * 60,
+  discord: 7 * 24 * 60 * 60,
 }
 
 export function computeTokenExpiry(platform: string, expiresIn?: number): string {
@@ -143,6 +146,113 @@ async function refreshFacebookToken(currentAccessToken: string): Promise<{ acces
   }
 }
 
+async function refreshInstagramToken(currentAccessToken: string): Promise<{ accessToken: string; expiresIn?: number }> {
+  const url = new URL('https://graph.instagram.com/refresh_access_token')
+  url.searchParams.set('grant_type', 'ig_refresh_token')
+  url.searchParams.set('access_token', currentAccessToken)
+
+  const response = await fetch(url.toString(), {
+    method: 'GET',
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => 'Unknown error')
+    if (response.status === 400 || response.status === 401) {
+      throw new TokenExpiredError(`Instagram token expired or invalid (${response.status}): ${errText}`)
+    }
+    throw new Error(`Instagram token refresh failed (${response.status}): ${errText}`)
+  }
+
+  const data = await response.json()
+  if (!data.access_token) {
+    throw new Error('Instagram returned no access token during refresh')
+  }
+
+  return {
+    accessToken: data.access_token,
+    expiresIn: data.expires_in,
+  }
+}
+
+async function refreshRedditToken(refreshToken: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
+  const clientId = await getConfigValue('REDDIT_CLIENT_ID')
+  const clientSecret = await getConfigValue('REDDIT_CLIENT_SECRET')
+  if (!clientId || !clientSecret) {
+    throw new Error('Reddit credentials not configured')
+  }
+
+  const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
+
+  const body = new URLSearchParams({
+    grant_type: 'refresh_token',
+    refresh_token: refreshToken,
+  })
+
+  const response = await fetch('https://www.reddit.com/api/v1/access_token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${credentials}`,
+      'User-Agent': 'PassivePost/1.0',
+    },
+    body: body.toString(),
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => 'Unknown error')
+    if (response.status === 400 || response.status === 401) {
+      throw new TokenExpiredError(`Reddit refresh token revoked or expired (${response.status}): ${errText}`)
+    }
+    throw new Error(`Reddit token refresh failed (${response.status}): ${errText}`)
+  }
+
+  const data = await response.json()
+  return {
+    accessToken: data.access_token,
+    refreshToken: data.refresh_token || undefined,
+    expiresIn: data.expires_in,
+  }
+}
+
+async function refreshDiscordToken(refreshToken: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
+  const clientId = await getConfigValue('DISCORD_CLIENT_ID')
+  const clientSecret = await getConfigValue('DISCORD_CLIENT_SECRET')
+  if (!clientId || !clientSecret) {
+    throw new Error('Discord credentials not configured')
+  }
+
+  const body = new URLSearchParams({
+    grant_type: 'refresh_token',
+    refresh_token: refreshToken,
+    client_id: clientId,
+    client_secret: clientSecret,
+  })
+
+  const response = await fetch('https://discord.com/api/v10/oauth2/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => 'Unknown error')
+    if (response.status === 400 || response.status === 401) {
+      throw new TokenExpiredError(`Discord refresh token expired (${response.status}): ${errText}`)
+    }
+    throw new Error(`Discord token refresh failed (${response.status}): ${errText}`)
+  }
+
+  const data = await response.json()
+  return {
+    accessToken: data.access_token,
+    refreshToken: data.refresh_token || undefined,
+    expiresIn: data.expires_in,
+  }
+}
+
 export class TokenExpiredError extends Error {
   constructor(message: string) {
     super(message)
@@ -177,6 +287,20 @@ export async function refreshAccessToken(
     } else if (platform === 'facebook') {
       const result = await refreshFacebookToken(decryptedToken)
       newAccessToken = result.accessToken
+      expiresIn = result.expiresIn
+    } else if (platform === 'instagram') {
+      const result = await refreshInstagramToken(decryptedToken)
+      newAccessToken = result.accessToken
+      expiresIn = result.expiresIn
+    } else if (platform === 'reddit') {
+      const result = await refreshRedditToken(decryptedToken)
+      newAccessToken = result.accessToken
+      newRefreshToken = result.refreshToken
+      expiresIn = result.expiresIn
+    } else if (platform === 'discord') {
+      const result = await refreshDiscordToken(decryptedToken)
+      newAccessToken = result.accessToken
+      newRefreshToken = result.refreshToken
       expiresIn = result.expiresIn
     } else {
       return { success: false, error: `Token refresh not supported for ${platform}` }

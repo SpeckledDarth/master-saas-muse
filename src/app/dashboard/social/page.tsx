@@ -96,7 +96,7 @@ function SocialAccountsContent() {
     fetchAccounts()
   }, [fetchAccounts])
 
-  const OAUTH_PLATFORMS = ['twitter', 'linkedin', 'facebook']
+  const OAUTH_PLATFORMS = ['twitter', 'linkedin', 'facebook', 'instagram', 'reddit', 'discord']
 
   const handleConnect = async (platformId: string) => {
     if (OAUTH_PLATFORMS.includes(platformId)) {

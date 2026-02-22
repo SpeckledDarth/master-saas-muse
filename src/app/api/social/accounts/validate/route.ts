@@ -74,7 +74,7 @@ export async function POST() {
         let validation = await client.validateToken(token)
 
         if (!validation.valid || isTokenExpiringSoon(account.token_expires_at)) {
-          const refreshableToken = account.platform === 'facebook'
+          const refreshableToken = (account.platform === 'facebook' || account.platform === 'instagram')
             ? account.access_token_encrypted
             : account.refresh_token_encrypted
 

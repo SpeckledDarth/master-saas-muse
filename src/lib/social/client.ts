@@ -475,13 +475,44 @@ export class FacebookClient implements PlatformClient {
 }
 
 export class InstagramClient implements PlatformClient {
+  private graphUrl = 'https://graph.instagram.com'
+
   async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
-    return { valid: false, error: 'Instagram integration coming soon' }
+    try {
+      if (!accessToken || accessToken.length < 10) {
+        return { valid: false, error: 'Invalid token format' }
+      }
+      const response = await fetch(`${this.graphUrl}/me?fields=id,username&access_token=${accessToken}`, {
+        signal: AbortSignal.timeout(10000),
+      })
+      if (response.ok) {
+        return { valid: true }
+      }
+      const errorData = await response.json().catch(() => ({}))
+      return { valid: false, error: `Instagram token invalid (${response.status}): ${errorData.error?.message || 'Unknown error'}` }
+    } catch (error) {
+      return { valid: false, error: (error as Error).message }
+    }
   }
 
-  async getUserProfile(accessToken: string) { return null }
+  async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
+    try {
+      const response = await fetch(`${this.graphUrl}/me?fields=id,username,name,account_type&access_token=${accessToken}`, {
+        signal: AbortSignal.timeout(10000),
+      })
+      if (!response.ok) return null
+      const data = await response.json()
+      return {
+        id: data.id,
+        username: data.username || data.id,
+        displayName: data.name || data.username || 'Instagram User',
+      }
+    } catch {
+      return null
+    }
+  }
 
-  async createPost(accessToken: string, content: string) {
+  async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
     const rateLimitCheck = checkApiRateLimit('instagram', 'post')
     if (!rateLimitCheck.allowed) {
       throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
@@ -489,15 +520,22 @@ export class InstagramClient implements PlatformClient {
     return null
   }
 
-  async getPostEngagement(accessToken: string, postId: string) {
+  async getPostEngagement(accessToken: string, postId: string): Promise<Record<string, number>> {
     const rateLimitCheck = checkApiRateLimit('instagram', 'read')
     if (!rateLimitCheck.allowed) {
       throw new Error(`Platform API rate limit reached. Retry after ${rateLimitCheck.retryAfterMs}ms`)
     }
-    return {}
+    return { likes: 0, comments: 0, reach: 0, impressions: 0 }
   }
+
   async checkHealth(): Promise<{ healthy: boolean; latencyMs: number }> {
-    return { healthy: false, latencyMs: 0 }
+    const start = Date.now()
+    try {
+      const response = await fetch('https://graph.instagram.com/', { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+      return { healthy: response.status !== 500, latencyMs: Date.now() - start }
+    } catch {
+      return { healthy: false, latencyMs: Date.now() - start }
+    }
   }
 }
 
@@ -588,19 +626,49 @@ export class TikTokClient implements PlatformClient {
 }
 
 export class RedditClient implements PlatformClient {
+  private baseUrl = 'https://oauth.reddit.com'
+
   async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
     try {
       if (!accessToken || accessToken.length < 10) {
         return { valid: false, error: 'Invalid token format' }
       }
-      return { valid: true }
+      const response = await fetch(`${this.baseUrl}/api/v1/me`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'User-Agent': 'PassivePost/1.0',
+        },
+        signal: AbortSignal.timeout(10000),
+      })
+      if (response.ok) {
+        return { valid: true }
+      }
+      const errorText = await response.text().catch(() => 'Unknown error')
+      return { valid: false, error: `Reddit token invalid (${response.status}): ${errorText}` }
     } catch (error) {
       return { valid: false, error: (error as Error).message }
     }
   }
 
   async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
-    return null
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/me`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'User-Agent': 'PassivePost/1.0',
+        },
+        signal: AbortSignal.timeout(10000),
+      })
+      if (!response.ok) return null
+      const data = await response.json()
+      return {
+        id: data.id,
+        username: data.name,
+        displayName: data.subreddit?.title || data.name,
+      }
+    } catch {
+      return null
+    }
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
@@ -717,19 +785,43 @@ export class SnapchatClient implements PlatformClient {
 }
 
 export class DiscordClient implements PlatformClient {
+  private baseUrl = 'https://discord.com/api/v10'
+
   async validateToken(accessToken: string): Promise<{ valid: boolean; error?: string }> {
     try {
       if (!accessToken || accessToken.length < 10) {
         return { valid: false, error: 'Invalid token format' }
       }
-      return { valid: true }
+      const response = await fetch(`${this.baseUrl}/users/@me`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+        signal: AbortSignal.timeout(10000),
+      })
+      if (response.ok) {
+        return { valid: true }
+      }
+      const errorText = await response.text().catch(() => 'Unknown error')
+      return { valid: false, error: `Discord token invalid (${response.status}): ${errorText}` }
     } catch (error) {
       return { valid: false, error: (error as Error).message }
     }
   }
 
   async getUserProfile(accessToken: string): Promise<{ id: string; username: string; displayName: string } | null> {
-    return null
+    try {
+      const response = await fetch(`${this.baseUrl}/users/@me`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+        signal: AbortSignal.timeout(10000),
+      })
+      if (!response.ok) return null
+      const data = await response.json()
+      return {
+        id: data.id,
+        username: data.username,
+        displayName: data.global_name || data.username,
+      }
+    } catch {
+      return null
+    }
   }
 
   async createPost(accessToken: string, content: string, mediaUrls?: string[]): Promise<{ postId: string; url: string } | null> {
