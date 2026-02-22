@@ -471,7 +471,7 @@ export default function AffiliateSettingsPage() {
                                 <Globe className="h-3 w-3" /> {app.website_url.replace(/^https?:\/\//, '').slice(0, 30)}
                               </a>
                             )}
-                            <span>{PROMOTION_LABELS[app.promotion_method] || app.promotion_method}</span>
+                            <span>{app.promotion_method.split(',').map(m => PROMOTION_LABELS[m.trim()] || m.trim()).join(', ')}</span>
                             <span>{new Date(app.created_at).toLocaleDateString()}</span>
                           </div>
                           {app.message && (

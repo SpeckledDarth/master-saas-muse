@@ -90,7 +90,7 @@ The Affiliate System lets you run a partner/referral program for your SaaS produ
 | Route | Purpose |
 |---|---|
 | `/affiliate` | Landing page — program overview, commission rates, benefits, "How It Works", audience types, CTAs |
-| `/affiliate/join` | Application form — name, email, website, promotion method, message |
+| `/affiliate/join` | Application form — name, email, website, promotion methods (multi-select), message |
 | `/affiliate/login` | Affiliate-only login — magic link or password |
 | `/affiliate/test-links` | **Temporary** — developer quick-links page for testing (remove before launch) |
 
@@ -202,7 +202,7 @@ A simple form anyone can fill out — no account required.
 - Full Name (required)
 - Email Address (required)
 - Website / Channel URL (optional)
-- Promotion Method (required) — dropdown: Blog/Website, YouTube, Social Media, Newsletter, Podcast, Online Course/Community, Consulting/Freelance, Other
+- Promotion Methods (required, multi-select checkboxes — select all that apply): Blog/Website, YouTube, Social Media, Newsletter, Podcast, Online Course/Community, Consulting/Freelance, Other. Stored as comma-separated string.
 - Additional Message (optional)
 
 **Behavior:**

@@ -8,8 +8,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2, CheckCircle, ArrowLeft } from 'lucide-react'
+
+const PROMOTION_METHODS = [
+  { value: 'blog', label: 'Blog / Website' },
+  { value: 'youtube', label: 'YouTube' },
+  { value: 'social_media', label: 'Social Media' },
+  { value: 'newsletter', label: 'Newsletter / Email List' },
+  { value: 'podcast', label: 'Podcast' },
+  { value: 'course', label: 'Online Course / Community' },
+  { value: 'consulting', label: 'Consulting / Freelance' },
+  { value: 'other', label: 'Other' },
+] as const
 
 export default function AffiliateJoinPage() {
   const { settings } = useSettings()
@@ -18,7 +29,7 @@ export default function AffiliateJoinPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [websiteUrl, setWebsiteUrl] = useState('')
-  const [promotionMethod, setPromotionMethod] = useState('')
+  const [promotionMethods, setPromotionMethods] = useState<string[]>([])
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -37,7 +48,7 @@ export default function AffiliateJoinPage() {
           name,
           email,
           website_url: websiteUrl || null,
-          promotion_method: promotionMethod,
+          promotion_method: promotionMethods.join(','),
           message: message || null,
         }),
       })
@@ -133,23 +144,29 @@ export default function AffiliateJoinPage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="method">How will you promote? *</Label>
-                <Select value={promotionMethod} onValueChange={setPromotionMethod} required>
-                  <SelectTrigger data-testid="select-promotion-method">
-                    <SelectValue placeholder="Select your primary method" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="blog">Blog / Website</SelectItem>
-                    <SelectItem value="youtube">YouTube</SelectItem>
-                    <SelectItem value="social_media">Social Media</SelectItem>
-                    <SelectItem value="newsletter">Newsletter / Email List</SelectItem>
-                    <SelectItem value="podcast">Podcast</SelectItem>
-                    <SelectItem value="course">Online Course / Community</SelectItem>
-                    <SelectItem value="consulting">Consulting / Freelance</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-3">
+                <Label>How will you promote? * <span className="text-muted-foreground font-normal">(select all that apply)</span></Label>
+                <div className="grid grid-cols-2 gap-3">
+                  {PROMOTION_METHODS.map((method) => (
+                    <label
+                      key={method.value}
+                      className="flex items-center gap-2 cursor-pointer text-sm text-black dark:text-white"
+                      data-testid={`checkbox-promotion-${method.value}`}
+                    >
+                      <Checkbox
+                        checked={promotionMethods.includes(method.value)}
+                        onCheckedChange={(checked) => {
+                          setPromotionMethods(prev =>
+                            checked
+                              ? [...prev, method.value]
+                              : prev.filter(v => v !== method.value)
+                          )
+                        }}
+                      />
+                      {method.label}
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -170,7 +187,7 @@ export default function AffiliateJoinPage() {
                 </div>
               )}
 
-              <Button type="submit" className="w-full" size="lg" disabled={loading || !name || !email || !promotionMethod} data-testid="button-submit-application">
+              <Button type="submit" className="w-full" size="lg" disabled={loading || !name || !email || promotionMethods.length === 0} data-testid="button-submit-application">
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Submit Application
               </Button>

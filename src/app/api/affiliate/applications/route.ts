@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
           await admin.from('notifications').insert({
             user_id: a.user_id,
             title: 'New Affiliate Application',
-            message: `${name} (${email}) applied to the affiliate program via ${promotion_method}.`,
+            message: `${name} (${email}) applied to the affiliate program. Promotion methods: ${promotion_method}.`,
             type: 'info',
             link: '/admin/setup/affiliate',
           })
