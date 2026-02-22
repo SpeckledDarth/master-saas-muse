@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getConfigValue } from '@/lib/config/secrets'
 import { getPlatformClient, type SocialPlatform } from '@/lib/social/client'
 import { encryptToken } from '@/lib/social/crypto'
+import { computeTokenExpiry } from '@/lib/social/token-refresh'
 import { verifyState } from '@/app/api/social/connect/route'
 import { getAppOrigin } from '@/lib/utils'
 
@@ -37,7 +38,7 @@ interface StatePayload {
   redirectUri?: string
 }
 
-async function exchangeFacebookToken(code: string, redirectUri: string): Promise<{ accessToken: string; refreshToken?: string; pageTokens?: Array<{ id: string; name: string; access_token: string }> }> {
+async function exchangeFacebookToken(code: string, redirectUri: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number; pageTokens?: Array<{ id: string; name: string; access_token: string }> }> {
   const appId = await getConfigValue('FACEBOOK_APP_ID')
   const appSecret = await getConfigValue('FACEBOOK_APP_SECRET')
   if (!appId || !appSecret) throw new Error('Facebook credentials not configured')
@@ -64,9 +65,11 @@ async function exchangeFacebookToken(code: string, redirectUri: string): Promise
 
   const longLivedRes = await fetch(longLivedUrl.toString(), { method: 'GET', signal: AbortSignal.timeout(15000) })
   let accessToken = shortLivedToken
+  let expiresIn: number | undefined
   if (longLivedRes.ok) {
     const longLivedData = await longLivedRes.json()
     accessToken = longLivedData.access_token || shortLivedToken
+    expiresIn = longLivedData.expires_in
   }
 
   const pagesRes = await fetch(`https://graph.facebook.com/v19.0/me/accounts?access_token=${encodeURIComponent(accessToken)}`, {
@@ -82,10 +85,10 @@ async function exchangeFacebookToken(code: string, redirectUri: string): Promise
     }))
   }
 
-  return { accessToken, pageTokens }
+  return { accessToken, expiresIn, pageTokens }
 }
 
-async function exchangeLinkedInToken(code: string, redirectUri: string): Promise<{ accessToken: string; refreshToken?: string }> {
+async function exchangeLinkedInToken(code: string, redirectUri: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
   const clientId = await getConfigValue('LINKEDIN_CLIENT_ID')
   const clientSecret = await getConfigValue('LINKEDIN_CLIENT_SECRET')
   if (!clientId || !clientSecret) throw new Error('LinkedIn credentials not configured')
@@ -114,10 +117,11 @@ async function exchangeLinkedInToken(code: string, redirectUri: string): Promise
   return {
     accessToken: tokenData.access_token,
     refreshToken: tokenData.refresh_token,
+    expiresIn: tokenData.expires_in,
   }
 }
 
-async function exchangeTwitterToken(code: string, redirectUri: string, codeVerifier: string): Promise<{ accessToken: string; refreshToken?: string }> {
+async function exchangeTwitterToken(code: string, redirectUri: string, codeVerifier: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
   const apiKey = await getConfigValue('TWITTER_API_KEY')
   const apiSecret = await getConfigValue('TWITTER_API_SECRET')
   if (!apiKey || !apiSecret) throw new Error('Twitter credentials not configured')
@@ -156,7 +160,35 @@ async function exchangeTwitterToken(code: string, redirectUri: string, codeVerif
   return {
     accessToken: tokenData.access_token,
     refreshToken: tokenData.refresh_token,
+    expiresIn: tokenData.expires_in,
   }
+}
+
+function getFriendlyOAuthError(errorCode: string, description: string, platform: string): string {
+  const platformNames: Record<string, string> = {
+    twitter: 'X (Twitter)',
+    linkedin: 'LinkedIn',
+    facebook: 'Facebook',
+  }
+  const name = platformNames[platform] || platform
+
+  if (errorCode === 'access_denied' || errorCode === 'user_denied') {
+    return `You declined the ${name} connection request. If this was a mistake, try connecting again.`
+  }
+  if (errorCode === 'consent_required') {
+    return `${name} requires you to grant permissions before connecting. Please try again and accept the permissions.`
+  }
+  if (errorCode === 'server_error' || errorCode === 'temporarily_unavailable') {
+    return `${name} is temporarily unavailable. Please wait a few minutes and try again.`
+  }
+  if (errorCode === 'invalid_scope') {
+    return `The permissions requested from ${name} are not available. This may mean the app needs to be reviewed by ${name}.`
+  }
+  if (description.toLowerCase().includes('redirect_uri') || description.toLowerCase().includes('redirect uri')) {
+    return `Callback URL mismatch — the redirect URL registered in your ${name} developer app doesn't match your site URL.`
+  }
+
+  return description || `Connection to ${name} failed: ${errorCode}`
 }
 
 export async function GET(
@@ -181,7 +213,8 @@ export async function GET(
 
   if (errorParam) {
     const errorDescription = searchParams.get('error_description') || errorParam
-    return redirectWithError(baseUrl, errorDescription, platform)
+    const friendlyMessage = getFriendlyOAuthError(errorParam, errorDescription, platform)
+    return redirectWithError(baseUrl, friendlyMessage, platform)
   }
 
   if (!code || !stateParam) {
@@ -210,6 +243,7 @@ export async function GET(
   try {
     let accessToken: string
     let refreshToken: string | undefined
+    let expiresIn: number | undefined
 
     if (platform === 'facebook') {
       const result = await exchangeFacebookToken(code, redirectUri)
@@ -219,10 +253,12 @@ export async function GET(
         accessToken = result.accessToken
       }
       refreshToken = undefined
+      expiresIn = result.expiresIn
     } else if (platform === 'linkedin') {
       const result = await exchangeLinkedInToken(code, redirectUri)
       accessToken = result.accessToken
       refreshToken = result.refreshToken
+      expiresIn = result.expiresIn
     } else if (platform === 'twitter') {
       if (!state.codeVerifier) {
         return redirectWithError(baseUrl, 'Missing code verifier for Twitter PKCE', platform)
@@ -230,6 +266,7 @@ export async function GET(
       const result = await exchangeTwitterToken(code, redirectUri, state.codeVerifier)
       accessToken = result.accessToken
       refreshToken = result.refreshToken
+      expiresIn = result.expiresIn
     } else {
       return redirectWithError(baseUrl, 'Unsupported platform', platform)
     }
@@ -253,6 +290,7 @@ export async function GET(
         display_name: profile?.displayName || null,
         access_token_encrypted: await encryptToken(accessToken),
         refresh_token_encrypted: refreshToken ? await encryptToken(refreshToken) : null,
+        token_expires_at: computeTokenExpiry(platform, expiresIn),
         is_valid: true,
         last_validated_at: new Date().toISOString(),
         last_error: null,
@@ -270,7 +308,19 @@ export async function GET(
     return redirectWithSuccess(baseUrl, platform)
   } catch (error) {
     console.error(`[Social Callback] Error for ${platform}:`, error)
-    const message = (error as Error).message || 'Connection failed'
-    return redirectWithError(baseUrl, message, platform)
+    const rawMessage = (error as Error).message || 'Connection failed'
+
+    let friendlyMessage = rawMessage
+    if (rawMessage.includes('token exchange failed')) {
+      friendlyMessage = `Token exchange with ${platform} failed. This usually means the authorization code expired or credentials are incorrect. Please try connecting again.`
+    } else if (rawMessage.includes('credentials not configured')) {
+      friendlyMessage = `${platform} API credentials are not configured. Please check your admin settings.`
+    } else if (rawMessage.includes('ETIMEDOUT') || rawMessage.includes('timeout') || rawMessage.includes('AbortError')) {
+      friendlyMessage = `The connection to ${platform} timed out. Please check your internet connection and try again.`
+    } else if (rawMessage.includes('Token validation failed')) {
+      friendlyMessage = `${platform} returned a token but it could not be validated. The token may have been revoked. Please try again.`
+    }
+
+    return redirectWithError(baseUrl, friendlyMessage, platform)
   }
 }

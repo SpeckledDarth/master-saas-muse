@@ -18,9 +18,12 @@ function OAuthErrorContent() {
     facebook: 'Facebook',
   }[platform] || platform
 
-  const isCallbackMismatch = error.toLowerCase().includes('redirect') || error.toLowerCase().includes('mismatch')
+  const isCallbackMismatch = error.toLowerCase().includes('redirect') || error.toLowerCase().includes('mismatch') || error.toLowerCase().includes('callback url')
   const isExpired = error.toLowerCase().includes('expired')
   const isTokenFailed = error.toLowerCase().includes('token exchange')
+  const isDenied = error.toLowerCase().includes('declined') || error.toLowerCase().includes('denied')
+  const isTimeout = error.toLowerCase().includes('timed out') || error.toLowerCase().includes('timeout')
+  const isCredentials = error.toLowerCase().includes('credentials') || error.toLowerCase().includes('not configured')
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
@@ -64,6 +67,30 @@ function OAuthErrorContent() {
             <div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
               <p className="text-sm text-amber-800 dark:text-amber-200">
                 The token exchange with {platformName} failed. Check that your API credentials (Client ID and Secret) are correct in the admin settings.
+              </p>
+            </div>
+          )}
+
+          {isDenied && (
+            <div className="rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                No worries — you can try connecting again whenever you&apos;re ready. Just click &quot;Try Again&quot; below.
+              </p>
+            </div>
+          )}
+
+          {isTimeout && (
+            <div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                The request to {platformName} timed out. This can happen if {platformName}&apos;s servers are slow. Wait a moment and try again.
+              </p>
+            </div>
+          )}
+
+          {isCredentials && (
+            <div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                Your {platformName} API credentials may not be set up yet. Go to Admin Settings to add the Client ID and Secret.
               </p>
             </div>
           )}

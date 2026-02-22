@@ -66,12 +66,17 @@ export async function processSocialPostJob(job: Job<SocialPostJobData>): Promise
 
     const validation = await client.validateToken(accessToken)
     if (!validation.valid) {
-      if (account.refresh_token_encrypted) {
-        const newToken = await refreshAccessToken(job.data.platform, job.data.userId, account.refresh_token_encrypted)
-        if (newToken) {
-          accessToken = newToken
+      const refreshTokenField = job.data.platform === 'facebook' ? 'access_token_encrypted' : 'refresh_token_encrypted'
+      const tokenToRefresh = job.data.platform === 'facebook' ? account.access_token_encrypted : account.refresh_token_encrypted
+      if (tokenToRefresh) {
+        const refreshResult = await refreshAccessToken(job.data.platform, job.data.userId, tokenToRefresh)
+        if (refreshResult.success && refreshResult.newAccessToken) {
+          accessToken = refreshResult.newAccessToken
         } else {
-          await admin.from('social_posts').update({ status: 'failed', error_message: 'Token expired, please reconnect your account' }).eq('id', job.data.postId)
+          const msg = refreshResult.requiresReconnect
+            ? 'Token expired, please reconnect your account'
+            : `Token refresh failed: ${refreshResult.error || 'Unknown error'}`
+          await admin.from('social_posts').update({ status: 'failed', error_message: msg }).eq('id', job.data.postId)
           throw new Error(`Token expired for ${job.data.platform} account, user ${job.data.userId}`)
         }
       } else {

@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { getPlatformClient, type SocialPlatform } from '@/lib/social/client'
 import { decryptToken } from '@/lib/social/crypto'
+import { refreshAccessToken, isTokenExpiringSoon } from '@/lib/social/token-refresh'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -51,7 +52,7 @@ export async function POST() {
     const admin = getSupabaseAdmin()
     const { data: accounts, error } = await admin
       .from('social_accounts')
-      .select('id, platform, access_token_encrypted')
+      .select('id, platform, access_token_encrypted, refresh_token_encrypted, token_expires_at')
       .eq('user_id', user.id)
 
     if (error) {
@@ -68,8 +69,48 @@ export async function POST() {
     const results = await Promise.all(
       accounts.map(async (account) => {
         const client = getPlatformClient(account.platform as SocialPlatform)
-        const token = account.access_token_encrypted ? await decryptToken(account.access_token_encrypted) : ''
-        const validation = await client.validateToken(token)
+        let token = account.access_token_encrypted ? await decryptToken(account.access_token_encrypted) : ''
+        let refreshed = false
+        let validation = await client.validateToken(token)
+
+        if (!validation.valid || isTokenExpiringSoon(account.token_expires_at)) {
+          const refreshableToken = account.platform === 'facebook'
+            ? account.access_token_encrypted
+            : account.refresh_token_encrypted
+
+          if (refreshableToken) {
+            console.log(`[Validate] Attempting token refresh for ${account.platform} (account ${account.id})`)
+            const refreshResult = await refreshAccessToken(account.platform, user.id, refreshableToken)
+            if (refreshResult.success && refreshResult.newAccessToken) {
+              token = refreshResult.newAccessToken
+              refreshed = true
+              validation = await client.validateToken(token)
+            } else {
+              const errorMsg = refreshResult.requiresReconnect
+                ? `Token expired — please reconnect your ${account.platform} account`
+                : refreshResult.error || 'Token refresh failed'
+
+              await admin
+                .from('social_accounts')
+                .update({
+                  is_valid: false,
+                  last_validated_at: new Date().toISOString(),
+                  last_error: errorMsg,
+                  updated_at: new Date().toISOString(),
+                })
+                .eq('id', account.id)
+
+              return {
+                id: account.id,
+                platform: account.platform,
+                is_valid: false,
+                refreshed: false,
+                requires_reconnect: refreshResult.requiresReconnect || false,
+                error: errorMsg,
+              }
+            }
+          }
+        }
 
         await admin
           .from('social_accounts')
@@ -85,6 +126,8 @@ export async function POST() {
           id: account.id,
           platform: account.platform,
           is_valid: validation.valid,
+          refreshed,
+          requires_reconnect: !validation.valid && !refreshed,
           error: validation.error || null,
         }
       })

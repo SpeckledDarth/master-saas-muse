@@ -191,17 +191,30 @@ function SocialAccountsContent() {
                 ...account,
                 is_valid: result.is_valid,
                 last_validated_at: new Date().toISOString(),
-                last_error: result.error,
+                last_error: result.requires_reconnect
+                  ? `Token expired — please reconnect`
+                  : result.error,
               }
             }
             return account
           })
         )
+
+        const refreshedCount = data.results.filter((r: { refreshed: boolean }) => r.refreshed).length
+        const invalidCount = data.results.filter((r: { is_valid: boolean }) => !r.is_valid).length
+        const reconnectCount = data.results.filter((r: { requires_reconnect: boolean }) => r.requires_reconnect).length
+        const total = data.results.length
+
+        let description = `Validated ${total} account(s).`
+        if (refreshedCount > 0) description += ` ${refreshedCount} token(s) refreshed.`
+        if (reconnectCount > 0) description += ` ${reconnectCount} need reconnecting.`
+
+        toast({
+          title: invalidCount > 0 ? 'Validation Complete — Issues Found' : 'All Accounts Valid',
+          description,
+          variant: invalidCount > 0 ? 'destructive' : 'default',
+        })
       }
-      toast({
-        title: 'Validation Complete',
-        description: `Validated ${data.results?.length || 0} account(s)`,
-      })
     } catch {
       toast({
         title: 'Error',
@@ -349,8 +362,29 @@ function SocialAccountsContent() {
                         ) : (
                           <X className="mr-1 h-3 w-3" />
                         )}
-                        {account.is_valid ? 'Connected' : 'Invalid'}
+                        {account.is_valid ? 'Connected' : 'Expired'}
                       </Badge>
+                      {!account.is_valid && account.last_error?.includes('reconnect') && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleConnect(platform.id)}
+                          disabled={connecting === platform.id}
+                          data-testid={`button-reconnect-${platform.id}`}
+                        >
+                          {connecting === platform.id ? (
+                            <>
+                              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                              Reconnecting...
+                            </>
+                          ) : (
+                            <>
+                              <RefreshCw className="mr-1 h-3 w-3" />
+                              Reconnect
+                            </>
+                          )}
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
