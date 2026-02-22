@@ -13,7 +13,7 @@ import {
   Loader2, Plus, Trash2, ExternalLink, CheckCircle, XCircle, AlertTriangle,
   BookOpen, Pen, FileText, Globe, TrendingUp, ArrowUp, ArrowDown, Minus,
   RefreshCw, Sparkles, ChevronDown, ChevronUp as ChevronUpIcon, Layers,
-  ShieldCheck, HelpCircle,
+  ShieldCheck, HelpCircle, Send,
 } from 'lucide-react'
 import { SiMedium, SiLinkedin, SiWordpress, SiGhost, SiSubstack } from 'react-icons/si'
 import { useToast } from '@/hooks/use-toast'
@@ -249,6 +249,7 @@ export default function BlogDashboardPage() {
   const [form, setForm] = useState<ConnectionFormState>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [disconnecting, setDisconnecting] = useState<string | null>(null)
+  const [publishingArticleId, setPublishingArticleId] = useState<string | null>(null)
   const [validatingConn, setValidatingConn] = useState<string | null>(null)
   const [showConnections, setShowConnections] = useState(false)
   const { toast } = useToast()
@@ -320,6 +321,35 @@ export default function BlogDashboardPage() {
       toast({ title: 'Error', description: (err as Error).message, variant: 'destructive' })
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handlePublishBlogPost = async (postId: string) => {
+    if (publishingArticleId) return
+    setPublishingArticleId(postId)
+    try {
+      toast({ title: 'Publishing...', description: 'Your article is being published to your connected blogs.' })
+      const res = await fetch('/api/social/blog/posts/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to publish')
+      }
+      if (data.success) {
+        toast({ title: 'Published!', description: 'Your article has been published to your connected blogs.' })
+        fetchData()
+      } else {
+        const failures = Object.entries(data.results || {}).filter(([, r]: any) => !r.success).map(([p, r]: any) => `${p}: ${r.error}`)
+        toast({ title: 'Partial Failure', description: failures.join('; '), variant: 'destructive' })
+        fetchData()
+      }
+    } catch (err) {
+      toast({ title: 'Error', description: (err as Error).message, variant: 'destructive' })
+    } finally {
+      setPublishingArticleId(null)
     }
   }
 
@@ -559,6 +589,23 @@ export default function BlogDashboardPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
+                    {article.status === 'draft' && connections.length > 0 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 px-2.5 text-xs"
+                        onClick={() => handlePublishBlogPost(article.id)}
+                        disabled={publishingArticleId === article.id}
+                        data-testid={`button-publish-article-${article.id}`}
+                      >
+                        {publishingArticleId === article.id ? (
+                          <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                        ) : (
+                          <Send className="h-3.5 w-3.5 mr-1" />
+                        )}
+                        {publishingArticleId === article.id ? 'Publishing...' : 'Publish'}
+                      </Button>
+                    )}
                     <Link href={`/dashboard/social/blog/compose?edit=${article.id}`}>
                       <Button variant="ghost" size="sm" className="h-8 px-2" data-testid={`button-edit-article-${article.id}`}>
                         <Pen className="h-3.5 w-3.5" />

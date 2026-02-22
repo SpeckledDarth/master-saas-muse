@@ -99,7 +99,7 @@ export async function PATCH(
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    if (body.status === 'scheduled' && body.scheduledAt) {
+    if (body.status === 'queued' || (body.status === 'scheduled' && body.scheduledAt)) {
       try {
         await addSocialPostJob({
           postId: id,
@@ -107,7 +107,7 @@ export async function PATCH(
           platform: data.platform,
           content: data.content,
           mediaUrls: data.media_urls,
-          scheduledAt: body.scheduledAt,
+          scheduledAt: body.status === 'scheduled' ? body.scheduledAt : undefined,
         })
       } catch (queueErr) {
         console.warn('[Social Posts] Could not enqueue post job:', (queueErr as Error).message)

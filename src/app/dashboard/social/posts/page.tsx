@@ -114,16 +114,15 @@ export default function SocialPostsPage() {
         return
       }
       if (!res.ok) {
-        setPosts(DEMO_POSTS as unknown as SocialPost[])
+        setPosts([])
         setLoading(false)
         return
       }
       let data
       try { data = await res.json() } catch { data = {} }
-      const realPosts = data.posts || []
-      setPosts(realPosts.length > 0 ? realPosts : DEMO_POSTS as unknown as SocialPost[])
+      setPosts(data.posts || [])
     } catch {
-      setPosts(DEMO_POSTS as unknown as SocialPost[])
+      setPosts([])
     } finally {
       setLoading(false)
     }
@@ -152,7 +151,9 @@ export default function SocialPostsPage() {
     setSubmitting(true)
     try {
       const body: Record<string, unknown> = { platform, content: content.trim() }
-      if (scheduleEnabled && scheduledAt) {
+      if (postNow) {
+        body.publishNow = true
+      } else if (scheduleEnabled && scheduledAt) {
         body.scheduledAt = new Date(scheduledAt).toISOString()
       }
       if (sourceBlogId && sourceBlogId !== 'none') body.source_blog_id = sourceBlogId
@@ -174,11 +175,35 @@ export default function SocialPostsPage() {
       setScheduleEnabled(false)
       setScheduledAt('')
       setSourceBlogId('')
-      toast({ title: 'Post Created', description: scheduleEnabled ? 'Post has been scheduled' : 'Post saved as draft' })
+      toast({
+        title: postNow ? 'Publishing...' : 'Post Created',
+        description: postNow
+          ? 'Your post is being published now. It will appear on your feed shortly.'
+          : scheduleEnabled ? 'Post has been scheduled' : 'Post saved as draft',
+      })
     } catch (err) {
       toast({ title: 'Error', description: (err as Error).message, variant: 'destructive' })
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handlePublishNow = async (postId: string) => {
+    try {
+      const res = await fetch(`/api/social/posts/${postId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'queued' }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to publish post')
+      }
+      const data = await res.json()
+      setPosts(prev => prev.map(p => p.id === postId ? data.post : p))
+      toast({ title: 'Publishing...', description: 'Your post is being published now.' })
+    } catch (err) {
+      toast({ title: 'Error', description: (err as Error).message, variant: 'destructive' })
     }
   }
 
@@ -583,12 +608,22 @@ export default function SocialPostsPage() {
             <Button
               onClick={() => handleCreatePost(false)}
               disabled={submitting || !content.trim()}
-              variant={scheduleEnabled ? 'outline' : 'default'}
+              variant="outline"
               data-testid="button-save-draft"
             >
-              {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+              {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Clock className="mr-2 h-4 w-4" />}
               {scheduleEnabled ? 'Schedule' : 'Save as Draft'}
             </Button>
+            {!scheduleEnabled && (
+              <Button
+                onClick={() => handleCreatePost(true)}
+                disabled={submitting || !content.trim()}
+                data-testid="button-post-now"
+              >
+                {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+                Post Now
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -708,6 +743,18 @@ export default function SocialPostsPage() {
                   </div>
                   {(post.status === 'draft' || post.status === 'scheduled') && (
                     <div className="flex items-center gap-1">
+                      {post.status === 'draft' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => { e.stopPropagation(); handlePublishNow(post.id) }}
+                          data-testid={`button-publish-${post.id}`}
+                          className="text-xs"
+                        >
+                          <Send className="h-3.5 w-3.5 mr-1" />
+                          Publish
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"

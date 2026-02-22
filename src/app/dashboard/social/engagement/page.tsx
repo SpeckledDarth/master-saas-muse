@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Loader2, BarChart3, TrendingUp, Users, Sparkles, AlertCircle } from 'lucide-react'
+import { Loader2, BarChart3, TrendingUp, Users, Sparkles, AlertCircle, RefreshCw, Heart, MessageSquare, Share2, Eye } from 'lucide-react'
 import Link from 'next/link'
 import {
   BarChart,
@@ -20,6 +20,29 @@ import {
 import { ThemedChartTooltip } from '@/components/ui/chart-tooltip'
 import { HelpTooltip } from '@/components/social/help-tooltip'
 
+interface EngagementSummary {
+  week: {
+    likes: number
+    comments: number
+    shares: number
+    impressions: number
+    totalEngagement: number
+    postCount: number
+    engagementRate: string | null
+  }
+  month: {
+    likes: number
+    comments: number
+    shares: number
+    impressions: number
+    totalEngagement: number
+    postCount: number
+  }
+  platformBreakdown: Record<string, { posts: number; likes: number; comments: number; shares: number; impressions: number }>
+  topPost: { platform: string; content: string; engagement: number; postedAt: string } | null
+  dailyTrend: { date: string; posts: number; engagement: number }[]
+}
+
 interface SocialPost {
   id: string
   platform: string
@@ -33,9 +56,6 @@ interface SocialPost {
 
 function getWeekKey(dateStr: string): string {
   const date = new Date(dateStr)
-  const startOfYear = new Date(date.getFullYear(), 0, 1)
-  const diff = date.getTime() - startOfYear.getTime()
-  const weekNum = Math.ceil((diff / 86400000 + startOfYear.getDay() + 1) / 7)
   const month = date.toLocaleString('default', { month: 'short' })
   const day = date.getDate()
   return `${month} ${day}`
@@ -51,68 +71,72 @@ function getEngagementTotal(data: Record<string, number> | null | undefined): nu
   return Object.values(data).reduce((sum, val) => sum + (typeof val === 'number' ? val : 0), 0)
 }
 
-function getEngagementCore(data: Record<string, number> | null | undefined): number {
-  if (!data || typeof data !== 'object') return 0
-  return (data.likes || 0) + (data.shares || 0) + (data.comments || 0)
+function formatNumber(n: number): string {
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`
+  return n.toLocaleString()
 }
 
-function generateSamplePosts(): SocialPost[] {
-  const platforms = ['twitter', 'linkedin', 'facebook', 'instagram']
-  const now = new Date()
-  const posts: SocialPost[] = []
-
-  for (let i = 0; i < 64; i++) {
-    const daysAgo = Math.floor(Math.random() * 180)
-    const date = new Date(now.getTime() - daysAgo * 86400000)
-    const platform = platforms[i % platforms.length]
-    const isAi = Math.random() > 0.35
-    const baseLikes = platform === 'linkedin' ? 45 : platform === 'twitter' ? 28 : platform === 'instagram' ? 62 : 35
-    const baseShares = platform === 'linkedin' ? 12 : platform === 'twitter' ? 18 : 8
-    const baseComments = platform === 'linkedin' ? 8 : platform === 'twitter' ? 14 : platform === 'instagram' ? 22 : 10
-
-    posts.push({
-      id: `sample-${i}`,
-      platform,
-      content: `Sample post #${i + 1} for ${platform}`,
-      status: 'posted',
-      ai_generated: isAi,
-      engagement_data: {
-        likes: Math.floor(baseLikes + Math.random() * baseLikes * 1.5),
-        shares: Math.floor(baseShares + Math.random() * baseShares * 1.2),
-        comments: Math.floor(baseComments + Math.random() * baseComments * 1.4),
-        impressions: Math.floor(200 + Math.random() * 1800),
-      },
-      posted_at: date.toISOString(),
-      created_at: date.toISOString(),
-    })
-  }
-
-  return posts.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+const PLATFORM_COLORS: Record<string, string> = {
+  twitter: 'hsl(var(--chart-1))',
+  linkedin: 'hsl(var(--chart-2))',
+  facebook: 'hsl(var(--chart-3))',
+  instagram: 'hsl(var(--chart-4))',
+  youtube: 'hsl(var(--chart-5))',
 }
 
 export default function EngagementAnalyticsPage() {
+  const [summary, setSummary] = useState<EngagementSummary | null>(null)
   const [posts, setPosts] = useState<SocialPost[]>([])
   const [loading, setLoading] = useState(true)
+  const [pulling, setPulling] = useState(false)
+  const [pullMessage, setPullMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchPosts = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const res = await fetch('/api/social/posts?limit=200')
-      if (!res.ok) { setPosts(generateSamplePosts()); setLoading(false); return }
-      let data
-      try { data = await res.json() } catch { data = {} }
-      const fetched = data.posts || []
-      setPosts(fetched.length > 0 ? fetched : generateSamplePosts())
-    } catch {
-      setPosts(generateSamplePosts())
+      const [summaryRes, postsRes] = await Promise.all([
+        fetch('/api/social/engagement/summary'),
+        fetch('/api/social/posts?limit=200'),
+      ])
+
+      if (summaryRes.ok) {
+        const data = await summaryRes.json()
+        setSummary(data)
+      }
+
+      if (postsRes.ok) {
+        const data = await postsRes.json().catch(() => ({}))
+        setPosts(data.posts || [])
+      }
+    } catch (err) {
+      setError('Failed to load engagement data')
     } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    fetchPosts()
-  }, [fetchPosts])
+    fetchData()
+  }, [fetchData])
+
+  const handleRefreshMetrics = async () => {
+    setPulling(true)
+    setPullMessage(null)
+    try {
+      const res = await fetch('/api/social/engagement/pull', { method: 'POST' })
+      const data = await res.json()
+      setPullMessage(data.message || 'Metrics refresh started')
+      setTimeout(() => {
+        fetchData()
+        setPullMessage(null)
+      }, 5000)
+    } catch {
+      setPullMessage('Failed to trigger metrics refresh')
+    } finally {
+      setPulling(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -130,7 +154,7 @@ export default function EngagementAnalyticsPage() {
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium">Something went wrong</h3>
             <p className="text-muted-foreground mt-1">{error}</p>
-            <Button className="mt-4" onClick={() => { setError(null); setLoading(true); fetchPosts() }} data-testid="button-retry-engagement">
+            <Button className="mt-4" onClick={() => { setError(null); setLoading(true); fetchData() }} data-testid="button-retry-engagement">
               Try Again
             </Button>
           </CardContent>
@@ -139,6 +163,43 @@ export default function EngagementAnalyticsPage() {
     )
   }
 
+  const hasData = (summary?.week.postCount || 0) > 0 || posts.length > 0
+
+  if (!hasData) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold" data-testid="text-page-title">Engagement Analytics</h1>
+            <p className="text-muted-foreground mt-1">Track your social media performance and engagement metrics.</p>
+          </div>
+        </div>
+        <Card>
+          <CardContent className="py-16 text-center">
+            <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium">No engagement data yet</h3>
+            <p className="text-muted-foreground mt-2 max-w-md mx-auto">
+              Once you start publishing posts to your connected social accounts, your engagement metrics will appear here automatically.
+            </p>
+            <div className="flex gap-2 justify-center mt-6">
+              <Link href="/dashboard/social/posts">
+                <Button data-testid="button-go-to-posts">Create Your First Post</Button>
+              </Link>
+              <Link href="/dashboard/social">
+                <Button variant="outline" data-testid="button-connect-accounts">Connect Accounts</Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  const weekMetrics = summary?.week || { likes: 0, comments: 0, shares: 0, impressions: 0, totalEngagement: 0, postCount: 0, engagementRate: null }
+  const monthMetrics = summary?.month || { likes: 0, comments: 0, shares: 0, impressions: 0, totalEngagement: 0, postCount: 0 }
+  const platformBreakdown = summary?.platformBreakdown || {}
+  const topPost = summary?.topPost
+  const dailyTrend = summary?.dailyTrend || []
 
   const totalPosts = posts.length
   const totalEngagement = posts.reduce((sum, p) => sum + getEngagementTotal(p.engagement_data), 0)
@@ -146,41 +207,24 @@ export default function EngagementAnalyticsPage() {
   const aiPercent = totalPosts > 0 ? Math.round((aiGeneratedCount / totalPosts) * 100) : 0
   const avgEngagement = totalPosts > 0 ? Math.round(totalEngagement / totalPosts) : 0
 
-  const monthMap = new Map<string, number>()
   const sortedByDate = [...posts].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+
+  const monthMap = new Map<string, number>()
   for (const post of sortedByDate) {
     const key = getMonthKey(post.created_at)
     monthMap.set(key, (monthMap.get(key) || 0) + 1)
   }
   const postsPerMonth = Array.from(monthMap.entries()).map(([month, count]) => ({ month, count }))
 
-  const weekMap = new Map<string, number>()
-  for (const post of sortedByDate) {
-    const key = getWeekKey(post.created_at)
-    const engagement = getEngagementCore(post.engagement_data)
-    weekMap.set(key, (weekMap.get(key) || 0) + engagement)
-  }
-  const engagementOverTime = Array.from(weekMap.entries()).map(([week, engagement]) => ({ week, engagement }))
-
-  const platformCountMap = new Map<string, number>()
-  const platformEngagementMap = new Map<string, { total: number; count: number }>()
-  for (const post of posts) {
-    const p = post.platform
-    platformCountMap.set(p, (platformCountMap.get(p) || 0) + 1)
-    const eng = getEngagementTotal(post.engagement_data)
-    const existing = platformEngagementMap.get(p) || { total: 0, count: 0 }
-    platformEngagementMap.set(p, { total: existing.total + eng, count: existing.count + 1 })
-  }
-  const platformBreakdown = Array.from(platformCountMap.entries())
-    .map(([platform, count]) => ({ platform, count }))
-    .sort((a, b) => b.count - a.count)
-
-  const engagementByPlatform = Array.from(platformEngagementMap.entries())
-    .map(([platform, data]) => ({
-      platform,
-      avg: data.count > 0 ? Math.round(data.total / data.count) : 0,
-    }))
-    .sort((a, b) => b.avg - a.avg)
+  const platformData = Object.entries(platformBreakdown).map(([platform, data]) => ({
+    platform,
+    posts: data.posts,
+    likes: data.likes,
+    comments: data.comments,
+    shares: data.shares,
+    impressions: data.impressions,
+    avgEngagement: data.posts > 0 ? Math.round((data.likes + data.comments + data.shares) / data.posts) : 0,
+  })).sort((a, b) => b.avgEngagement - a.avgEngagement)
 
   const aiPosts = posts.filter(p => p.ai_generated)
   const manualPosts = posts.filter(p => !p.ai_generated)
@@ -190,12 +234,100 @@ export default function EngagementAnalyticsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold" data-testid="text-page-title">Engagement Analytics</h1>
-        <p className="text-muted-foreground mt-1">
-          Track your social media performance and engagement metrics.
-        </p>
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="text-2xl font-bold" data-testid="text-page-title">Engagement Analytics</h1>
+          <p className="text-muted-foreground mt-1">
+            Track your social media performance and engagement metrics.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {pullMessage && (
+            <span className="text-sm text-muted-foreground">{pullMessage}</span>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefreshMetrics}
+            disabled={pulling}
+            data-testid="button-refresh-metrics"
+          >
+            {pulling ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Refresh Metrics
+          </Button>
+        </div>
       </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card data-testid="card-week-likes">
+          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Likes (7d) <HelpTooltip text="Total likes across all platforms in the last 7 days." /></CardTitle>
+            <Heart className="h-4 w-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold" data-testid="text-week-likes">{formatNumber(weekMetrics.likes)}</div>
+            <p className="text-xs text-muted-foreground">{formatNumber(monthMetrics.likes)} this month</p>
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-week-comments">
+          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Comments (7d) <HelpTooltip text="Total comments and replies across all platforms in the last 7 days." /></CardTitle>
+            <MessageSquare className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold" data-testid="text-week-comments">{formatNumber(weekMetrics.comments)}</div>
+            <p className="text-xs text-muted-foreground">{formatNumber(monthMetrics.comments)} this month</p>
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-week-shares">
+          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Shares (7d) <HelpTooltip text="Total shares and retweets across all platforms in the last 7 days." /></CardTitle>
+            <Share2 className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold" data-testid="text-week-shares">{formatNumber(weekMetrics.shares)}</div>
+            <p className="text-xs text-muted-foreground">{formatNumber(monthMetrics.shares)} this month</p>
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-week-impressions">
+          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Impressions (7d) <HelpTooltip text="Total times your posts were shown to people in the last 7 days." /></CardTitle>
+            <Eye className="h-4 w-4 text-purple-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold" data-testid="text-week-impressions">{formatNumber(weekMetrics.impressions)}</div>
+            {weekMetrics.engagementRate && (
+              <p className="text-xs text-muted-foreground">{weekMetrics.engagementRate}% engagement rate</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {topPost && (
+        <Card data-testid="card-top-post">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Top Performing Post This Week</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-start gap-3">
+              <Badge variant="outline" className="capitalize shrink-0">{topPost.platform}</Badge>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm truncate">{topPost.content}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {topPost.engagement} total interactions &middot; {new Date(topPost.postedAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card data-testid="card-total-posts">
@@ -215,7 +347,7 @@ export default function EngagementAnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-total-engagement">
-              {totalEngagement.toLocaleString()}
+              {formatNumber(totalEngagement)}
             </div>
           </CardContent>
         </Card>
@@ -246,82 +378,86 @@ export default function EngagementAnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card data-testid="card-posts-per-month">
-          <CardHeader>
-            <CardTitle className="text-base">Posts per Month</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={postsPerMonth}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="month" className="text-xs" tick={{ fontSize: 12 }} />
-                  <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip content={<ThemedChartTooltip valueLabel="count" />} cursor={false} />
-                  <Bar dataKey="count" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        {dailyTrend.length > 0 && (
+          <Card data-testid="card-daily-engagement-trend">
+            <CardHeader>
+              <CardTitle className="text-base">Daily Engagement (Last 7 Days)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={dailyTrend}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="date" className="text-xs" tick={{ fontSize: 12 }} tickFormatter={(v) => new Date(v + 'T00:00:00').toLocaleDateString('default', { weekday: 'short' })} />
+                    <YAxis className="text-xs" tick={{ fontSize: 12 }} />
+                    <Tooltip content={<ThemedChartTooltip valueLabel="engagement" />} cursor={false} />
+                    <Bar dataKey="engagement" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card data-testid="card-engagement-over-time">
-          <CardHeader>
-            <CardTitle className="text-base">Engagement over Time</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={engagementOverTime}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="week" className="text-xs" tick={{ fontSize: 12 }} />
-                  <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip content={<ThemedChartTooltip valueLabel="engagement" />} cursor={false} />
-                  <Line type="monotone" dataKey="engagement" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        {postsPerMonth.length > 0 && (
+          <Card data-testid="card-posts-per-month">
+            <CardHeader>
+              <CardTitle className="text-base">Posts per Month</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={postsPerMonth}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="month" className="text-xs" tick={{ fontSize: 12 }} />
+                    <YAxis className="text-xs" tick={{ fontSize: 12 }} />
+                    <Tooltip content={<ThemedChartTooltip valueLabel="count" />} cursor={false} />
+                    <Bar dataKey="count" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
+      {platformData.length > 0 && (
         <Card data-testid="card-platform-breakdown">
           <CardHeader>
-            <CardTitle className="text-base">Platform Breakdown</CardTitle>
+            <CardTitle className="text-base">Performance by Platform (Last 30 Days)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={platformBreakdown}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="platform" className="text-xs" tick={{ fontSize: 12 }} />
-                  <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip content={<ThemedChartTooltip valueLabel="count" />} cursor={false} />
-                  <Bar dataKey="count" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2 font-medium">Platform</th>
+                    <th className="text-right py-2 font-medium">Posts</th>
+                    <th className="text-right py-2 font-medium">Likes</th>
+                    <th className="text-right py-2 font-medium">Comments</th>
+                    <th className="text-right py-2 font-medium">Shares</th>
+                    <th className="text-right py-2 font-medium">Impressions</th>
+                    <th className="text-right py-2 font-medium">Avg Eng.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {platformData.map((p) => (
+                    <tr key={p.platform} className="border-b last:border-0" data-testid={`row-platform-${p.platform}`}>
+                      <td className="py-2 capitalize font-medium">{p.platform}</td>
+                      <td className="py-2 text-right">{p.posts}</td>
+                      <td className="py-2 text-right">{formatNumber(p.likes)}</td>
+                      <td className="py-2 text-right">{formatNumber(p.comments)}</td>
+                      <td className="py-2 text-right">{formatNumber(p.shares)}</td>
+                      <td className="py-2 text-right">{formatNumber(p.impressions)}</td>
+                      <td className="py-2 text-right font-medium">{p.avgEngagement}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </CardContent>
         </Card>
-
-        <Card data-testid="card-engagement-by-platform">
-          <CardHeader>
-            <CardTitle className="text-base">Engagement by Platform</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={engagementByPlatform}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="platform" className="text-xs" tick={{ fontSize: 12 }} />
-                  <YAxis className="text-xs" tick={{ fontSize: 12 }} />
-                  <Tooltip content={<ThemedChartTooltip valueLabel="avg" />} cursor={false} />
-                  <Bar dataKey="avg" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      )}
 
       <Card data-testid="card-ai-vs-manual">
         <CardHeader>

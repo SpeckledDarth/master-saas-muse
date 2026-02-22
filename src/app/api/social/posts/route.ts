@@ -152,24 +152,24 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  let body: { platform?: string; content?: string; scheduledAt?: string; mediaUrls?: string[]; source_blog_id?: string }
+  let body: { platform?: string; content?: string; scheduledAt?: string; mediaUrls?: string[]; source_blog_id?: string; publishNow?: boolean; ai_generated?: boolean }
   try {
     body = await request.json()
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { platform, content, scheduledAt, mediaUrls, source_blog_id } = body
+  const { platform, content, scheduledAt, mediaUrls, source_blog_id, publishNow, ai_generated } = body
 
   if (!platform || !VALID_PLATFORMS.includes(platform as typeof VALID_PLATFORMS[number])) {
-    return NextResponse.json({ error: 'Invalid platform. Must be one of: twitter, linkedin, instagram' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid platform. Must be one of: twitter, linkedin, instagram, facebook' }, { status: 400 })
   }
 
   if (!content || typeof content !== 'string' || content.trim().length === 0) {
     return NextResponse.json({ error: 'Content is required' }, { status: 400 })
   }
 
-  const status = scheduledAt ? 'scheduled' : 'draft'
+  const status = publishNow ? 'queued' : scheduledAt ? 'scheduled' : 'draft'
 
   try {
     const admin = getSupabaseAdmin()
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
         status,
         scheduled_at: scheduledAt || null,
         media_urls: mediaUrls || [],
-        ai_generated: false,
+        ai_generated: ai_generated ?? false,
         created_at: new Date().toISOString(),
         ...(source_blog_id ? { source_blog_id } : {}),
       })
@@ -198,15 +198,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    if (scheduledAt && data) {
+    if (data && (publishNow || scheduledAt)) {
       try {
         await addSocialPostJob({
           postId: data.id,
           userId: user.id,
-          platform: platform as 'twitter' | 'linkedin' | 'instagram',
+          platform: platform as 'twitter' | 'linkedin' | 'instagram' | 'facebook',
           content: content.trim(),
           mediaUrls,
-          scheduledAt,
+          scheduledAt: scheduledAt || undefined,
         })
       } catch (queueErr) {
         console.warn('[Social Posts] Could not enqueue post job:', (queueErr as Error).message)
