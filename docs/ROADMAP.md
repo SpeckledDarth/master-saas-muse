@@ -21,7 +21,8 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 | 2 | Connect Real Platform APIs & Full Testing | Complete (All batches, engagement metrics, posting, guides) | Week 2-3 |
 | 3 | Affiliate Marketing Features | Complete | Week 3-4 |
 | 3.5 | Open Affiliate Program (Public Signup) | Complete | Week 3-4 |
-| 4 | Mobile App (PWA First) | Not Started | Week 4+ |
+| 3.6 | Affiliate Enhancements & Discount Codes | Not Started | Week 4-6 |
+| 4 | Mobile App (PWA First) | Not Started | Week 6+ |
 
 ---
 
@@ -213,6 +214,59 @@ A `/api/social/preflight` endpoint validates all prerequisites before attempting
 
 ---
 
+## Phase 3.6: Affiliate Enhancements & Discount Codes
+
+**Goal:** Elevate the affiliate system from functional to world-class with advanced motivation, analytics, compliance, and a standalone discount code system.
+
+**Detailed plan:** See `docs/musekit/AFFILIATE_ENHANCEMENTS.md` for full feature specs, database schemas, and implementation notes.
+
+### Sprint 1 — Core Revenue & Motivation
+
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 3.6.1 | Discount Code System — admin CRUD, Stripe coupon sync, checkout integration | Not Started | Standalone admin page `/admin/setup/discount-codes`. Tables: `discount_codes`, `discount_code_redemptions`. |
+| 3.6.2 | Milestone Bonuses — flat bonuses at referral count thresholds | Not Started | Tables: `affiliate_milestones`, `affiliate_milestone_awards`. Admin CRUD + affiliate progress bar. |
+| 3.6.3 | Real-Time Earnings Widget — live "today's earnings" counter on dashboard | Not Started | No new tables. Aggregates existing commissions. |
+
+### Sprint 2 — Affiliate Tools
+
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 3.6.4 | Deep Link Generator — affiliate links to specific pages | Not Started | Frontend tool on affiliate dashboard. Optional `landing_page` column on `referral_clicks`. |
+| 3.6.5 | Affiliate Leaderboard — ranked top performers | Not Started | No new tables. Configurable in program settings (enabled/privacy mode). |
+| 3.6.6 | Referral Sub-Tracking — source tags on affiliate links | Not Started | `source_tag` columns on `referral_clicks` and `affiliate_referrals`. |
+| 3.6.7 | UTM Parameter Support — auto-append UTM tags to affiliate links | Not Started | Frontend enhancement to deep link generator. No DB changes. |
+
+### Sprint 3 — Engagement & Content
+
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 3.6.8 | Payout Accelerators — lower min payout for top tiers | Not Started | `min_payout_cents` column on `affiliate_tiers`. |
+| 3.6.9 | Exclusive Access / Tier Perks — non-monetary rewards per tier | Not Started | `perks` JSONB column on `affiliate_tiers`. |
+| 3.6.10 | Quarterly Contests — time-bound competitions with prizes | Not Started | Table: `affiliate_contests`. Admin CRUD + affiliate countdown. |
+| 3.6.11 | 7-Day Onboarding Sequence — expanded affiliate drip emails | Not Started | Extends existing Resend drip system. |
+| 3.6.12 | Affiliate Resource Center — swipe files, templates, FAQs, tutorials | Not Started | Extends existing `affiliate_assets` with new types. |
+
+### Sprint 4 — Advanced & Compliance
+
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 3.6.13 | Anti-Spam & Compliance Rules — enforceable terms + violation tracking | Not Started | `agreed_to_terms` on applications. `suspended` on referral_links. |
+| 3.6.14 | Automated Fraud Scoring — numeric score with auto-pause | Not Started | `fraud_score` column on `referral_links`. Builds on existing fraud flags. |
+| 3.6.15 | Tax Compliance (1099 / W-9) — collect tax info before payouts | Not Started | Table: `affiliate_tax_info`. Required before first payout. |
+| 3.6.16 | Co-Branded Landing Pages — personalized affiliate partner pages | Not Started | Table: `affiliate_landing_pages`. Public route: `/partner/[slug]`. |
+| 3.6.17 | Two-Tier Referrals — earn from recruited affiliates' sales | Not Started | `recruited_by_affiliate_id` column + `affiliate_second_tier_commissions` table. |
+| 3.6.18 | Affiliate API Access — RESTful API for power affiliates | Not Started | Table: `affiliate_api_keys`. Rate limited, key-authenticated. |
+| 3.6.19 | PassivePost Auto-Promo — auto-generate promo posts for affiliate-users | Not Started | Bridge between affiliate dashboard and social posting API. |
+| 3.6.20 | PartnerStack Seeding Strategy — operational playbook for network recruitment | Not Started | Documentation, not code. Postback URL configuration. |
+
+**Dependencies:**
+- Phase 3.5 (Open Affiliate Program) must be complete — it is
+- Stripe integration (Phase 3.2) required for discount codes — it is
+- Migrations 005 + 006 must be run on Supabase before testing
+
+---
+
 ## Phase 4: Mobile App
 
 **Goal:** Extend PassivePost to mobile users.
@@ -253,6 +307,9 @@ Decisions made during planning, preserved for context.
 | Feb 22, 2026 | Affiliates are 100% separate from product users — different login, dashboard, purpose | Two different audiences with different goals. Mixing creates confusion. Product side only needs ReferralTracker + auth callback attribution. |
 | Feb 22, 2026 | Open affiliate program supports non-user applicants (bloggers, YouTubers, influencers) | Expands reach beyond existing customers. Application → admin review → auto-provisioned account. |
 | Feb 22, 2026 | External affiliate network integration (ShareASale, Impact, PartnerStack) via postback URLs | Enables broader distribution through established affiliate networks. Server-side postbacks on Stripe conversions. |
+| Feb 22, 2026 | Promotion method changed to multi-select checkboxes | Affiliates typically use multiple channels. Stored as comma-separated string in DB. |
+| Feb 22, 2026 | Discount codes are a standalone system that can optionally tie to affiliates | Every SaaS needs promo codes regardless of affiliate program. Affiliate-linked codes get attribution credit. |
+| Feb 22, 2026 | Phase 3.6 planned with 20 affiliate enhancements across 4 sprints | Covers motivation (milestones, leaderboard, contests), tools (deep links, sub-tracking, UTM), compliance (tax, anti-spam), and growth (co-branded pages, two-tier referrals). |
 
 ---
 
@@ -262,9 +319,9 @@ Questions to resolve during implementation.
 
 | # | Question | Phase | Status |
 |---|----------|-------|--------|
-| 1 | Commission model: one-time per signup, recurring percentage, or tiered? | Phase 3 | Undecided |
-| 2 | Who can be an affiliate: any user, application-based, or Premium only? | Phase 3 | Undecided |
-| 3 | Payout method: PayPal, bank transfer, or account credit? | Phase 3 | Undecided |
+| 1 | Commission model: one-time per signup, recurring percentage, or tiered? | Phase 3 | Resolved — recurring percentage with tiered rates (Bronze 20%, Silver 25%, Gold 30%), locked in on activation |
+| 2 | Who can be an affiliate: any user, application-based, or Premium only? | Phase 3 | Resolved — open application (anyone can apply), admin review required |
+| 3 | Payout method: PayPal, bank transfer, or account credit? | Phase 3 | Resolved — manual payouts to start, Stripe Connect automation deferred |
 | 4 | PWA vs Capacitor vs React Native for mobile? | Phase 4 | Leaning PWA first |
 | 5 | Should the testimonial system allow user-submitted testimonials or admin-only entry? | Phase 1 | Undecided |
 | 6 | What onboarding email sequence length? 3 emails? 5? 7? | Phase 1.5 | Undecided |
@@ -338,6 +395,15 @@ Key files for each phase, so agents can find relevant code quickly.
 - Networks API: `src/app/api/affiliate/networks/route.ts` (GET, PUT for admin)
 - Footer link: `src/components/layout/footer.tsx` (Affiliate Program in Company section)
 - Sidebar cleanup: `src/components/social/social-sidebar.tsx` (Earn > Affiliate links to /affiliate)
+
+### Phase 3.6 (Affiliate Enhancements & Discount Codes)
+- Feature plan: `docs/musekit/AFFILIATE_ENHANCEMENTS.md` (full specs, schemas, implementation notes)
+- Migrations: `migrations/core/007_affiliate_enhancements_p1.sql`, `008_..._p2.sql`, `009_..._p3.sql` (to be created)
+- Discount codes admin: `src/app/admin/setup/discount-codes/page.tsx` (to be created)
+- Discount codes API: `src/app/api/admin/discount-codes/` (to be created)
+- Leaderboard API: `src/app/api/affiliate/leaderboard/` (to be created)
+- Milestones API: `src/app/api/affiliate/milestones/` (to be created)
+- Contests API: `src/app/api/affiliate/contests/` (to be created)
 
 ### Phase 4
 - PWA: `public/manifest.json`, service worker, `next.config.js` PWA config
