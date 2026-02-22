@@ -21,7 +21,7 @@ export function Footer() {
   const pathname = usePathname()
   const { settings, loading } = useSettings()
 
-  if (pathname?.startsWith('/dashboard/social')) {
+  if (pathname?.startsWith('/dashboard/social') || pathname?.startsWith('/affiliate/dashboard')) {
     return null
   }
   
@@ -176,6 +176,7 @@ export function Footer() {
               <ul className={cn("space-y-2 text-sm", effectiveTextColor ? "opacity-70" : "text-muted-foreground")}>
                 <li><Link href="/about" className={cn("transition-colors", effectiveTextColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-about">About</Link></li>
                 <li><Link href="/contact" className={cn("transition-colors", effectiveTextColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-contact">Contact</Link></li>
+                <li><Link href="/affiliate" className={cn("transition-colors", effectiveTextColor ? "hover:opacity-100" : "hover:text-foreground")} data-testid="link-footer-affiliate">Affiliate Program</Link></li>
               </ul>
             </div>
 

@@ -19,7 +19,8 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 | 1 | Testimonial/Success Metrics Dashboard | Complete | Week 1 |
 | 1.5 | Launch Kit | Complete | Week 1-2 |
 | 2 | Connect Real Platform APIs & Full Testing | Complete (All batches, engagement metrics, posting, guides) | Week 2-3 |
-| 3 | Affiliate Marketing Features | Not Started | Week 3-4 |
+| 3 | Affiliate Marketing Features | Complete | Week 3-4 |
+| 3.5 | Open Affiliate Program (Public Signup) | Complete | Week 3-4 |
 | 4 | Mobile App (PWA First) | Not Started | Week 4+ |
 
 ---
@@ -193,6 +194,23 @@ A `/api/social/preflight` endpoint validates all prerequisites before attempting
 
 **Decision:** Built as MuseKit core feature (available to all products).
 
+### Phase 3.5: Open Affiliate Program (Public Signup)
+
+**Goal:** Allow non-users (bloggers, YouTubers, influencers) to apply as affiliates with completely separate login and dashboard from product users.
+
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 3.5.1 | Public affiliate landing page at /affiliate | Complete | Commission structure, benefits, 'Apply Now' CTA. Footer link added. |
+| 3.5.2 | Affiliate application form at /affiliate/join | Complete | Name, email, website, promotion method, message. No account required. Duplicate detection. |
+| 3.5.3 | affiliate_applications table + submission API | Complete | Migration: `migrations/core/006_affiliate_applications.sql`. API: `/api/affiliate/applications`. Admin notifications on new applications. |
+| 3.5.4 | Separate affiliate login at /affiliate/login | Complete | Magic link + password login. Completely independent from product user login. Redirects to /affiliate/dashboard. |
+| 3.5.5 | Standalone affiliate dashboard at /affiliate/dashboard | Complete | Own header/layout (no product sidebar). Stats, earnings, payouts, referral link, marketing assets. Auth-gated. |
+| 3.5.6 | Admin applications tab | Complete | New tab on admin affiliate page. Filter by pending/approved/rejected. Approve creates Supabase user + referral link + role. Reject with notes. |
+| 3.5.7 | Network integration infrastructure | Complete | `affiliate_network_settings` table. Admin tab for ShareASale, Impact, PartnerStack. Toggle active, set tracking ID and postback URL. |
+| 3.5.8 | Product-side cleanup | Complete | Sidebar "Earn > Affiliate" now links to /affiliate (public landing page). Header/footer hidden on affiliate dashboard. Old dashboard page preserved for existing product-user affiliates. |
+
+**Architecture Decision:** Affiliates are 100% separate from product users — different login (/affiliate/login vs /login), different dashboard (/affiliate/dashboard vs /dashboard), different purpose. Product side only has: ReferralTracker component on marketing pages + auth callback attribution.
+
 ---
 
 ## Phase 4: Mobile App
@@ -232,6 +250,9 @@ Decisions made during planning, preserved for context.
 | Feb 21, 2026 | Medium marked as "coming soon" — API closed to new integrations since Jan 2025 | No viable path to integrate; monitor for reopening |
 | Feb 21, 2026 | Instagram integration will attempt to reuse existing Facebook/Meta app credentials | Same Graph API, reduces credential management overhead |
 | Feb 21, 2026 | 10 social platforms + 3 blog platforms = 13 total platform integrations as PassivePost USP | Broad platform support is the key differentiator |
+| Feb 22, 2026 | Affiliates are 100% separate from product users — different login, dashboard, purpose | Two different audiences with different goals. Mixing creates confusion. Product side only needs ReferralTracker + auth callback attribution. |
+| Feb 22, 2026 | Open affiliate program supports non-user applicants (bloggers, YouTubers, influencers) | Expands reach beyond existing customers. Application → admin review → auto-provisioned account. |
+| Feb 22, 2026 | External affiliate network integration (ShareASale, Impact, PartnerStack) via postback URLs | Enables broader distribution through established affiliate networks. Server-side postbacks on Stripe conversions. |
 
 ---
 
@@ -270,6 +291,7 @@ Running log of what was accomplished each session. Update at the end of every se
 | Feb 22, 2026 | **Blog platform integrations (Scenario 1) built.** Created `blog-clients.ts` with WordPress REST API client (validates via `/wp-json/wp/v2/users/me`, publishes/updates/deletes via `/wp-json/wp/v2/posts`, resolves tags, uploads featured images) and Ghost Admin API client (JWT token generation from `id:secret` key, validates via `/ghost/api/admin/site/`, publishes/updates/deletes via `/ghost/api/admin/posts/`). Added `/api/social/blog/connections/validate` endpoint for testing existing connections. Updated blog connections POST to auto-validate on connect (WordPress/Ghost). Enhanced dashboard blog page with "Test" button for connected platforms and improved connection dialog with credential format guidance. Added "Blog Platforms" card to social accounts page linking to blog dashboard. **Decision:** Blog strategy split into Scenario 1 (connect existing — built) and Scenario 2 (provision for users — deferred). Medium API closed — deferred. | Phase 2 Batch 4 — Complete |
 | Feb 22, 2026 | **Phase 2 fully complete.** (1) In-app setup guides for all platforms: social platforms show pre-OAuth guide dialog with numbered steps, security reassurance, and time estimates; blog platforms have collapsible credential generation guides with navigation paths. (2) Engagement metrics infrastructure: summary API (`/api/social/engagement/summary`), manual pull trigger (`/api/social/engagement/pull`), dashboard upgraded with real metric cards and "Refresh Metrics" button. (3) Real posting flow wired: "Post Now" and "Publish" buttons on draft posts, blog publishing endpoint (`/api/social/blog/posts/publish`). (4) All demo data fallbacks removed from posts and engagement pages. (5) Display Name field restored in blog connection form. (6) Discord guide language corrected. **Phase 2 is complete — ready for Phase 3 (Affiliate Marketing).** | Phase 2 — Complete |
 | Feb 22, 2026 | **Phase 3 fully complete — Affiliate Marketing System.** Built complete affiliate infrastructure: (1) Database migration with 6 new tables (affiliate_program_settings, affiliate_tiers, affiliate_referrals, affiliate_commissions, affiliate_payouts, affiliate_assets) plus referral_links upgrade. (2) Core library with grandfathering (lock-in rates on activation), fraud detection (email domain, IP volume, self-referral), performance tiers, and notification helpers. (3) Admin management page with settings, tier CRUD, marketing assets, affiliate rankings, and fraud alerts. (4) User affiliate dashboard with stats cards, tier progress, referral/earnings/payout history, marketing assets browser. (5) Cookie attribution (30-day pp_ref cookie, configurable duration). (6) Stripe webhook commission tracking on invoice.paid with deduplication. (7) Payout management (pending → approved → paid workflow). (8) 3-email onboarding drip sequence via Resend. (9) Real-time notifications for clicks, signups, conversions, and payouts. **Phase 3 complete — ready for Phase 4.** | Phase 3 — Complete |
+| Feb 22, 2026 | **Phase 3.5 — Open Affiliate Program built.** Architecture decision: affiliates are 100% separate from product users (different login, dashboard, purpose). Built: (1) Public affiliate landing page at /affiliate with commission structure, benefits, "How It Works" steps, audience types, CTAs. (2) Application form at /affiliate/join with name, email, website, promotion method, message — duplicate detection (pending/approved). (3) `affiliate_applications` table + `affiliate_network_settings` table (migration 006). (4) Separate login at /affiliate/login with magic link + password modes. (5) Standalone dashboard at /affiliate/dashboard with own header, no product sidebar — full stats, earnings, payouts, referral link, marketing assets. (6) Admin applications tab with approve/reject workflow — approve auto-creates Supabase user with 'affiliate' role + referral link. (7) Admin networks tab for ShareASale, Impact, PartnerStack integration (tracking IDs, postback URLs, toggle active). (8) Cleaned up product sidebar — "Earn > Affiliate" now links to /affiliate landing page. Header/footer hidden on affiliate dashboard. Footer gets "Affiliate Program" link. | Phase 3.5 — Complete |
 
 ---
 
@@ -298,12 +320,24 @@ Key files for each phase, so agents can find relevant code quickly.
 ### Phase 3
 - Migration: `migrations/core/005_affiliate_system.sql` (6 tables + referral_links upgrade)
 - Core library: `src/lib/affiliate/index.ts` (grandfathering, fraud detection, notifications, tier logic)
-- Admin page: `src/app/admin/setup/affiliate/page.tsx` (settings, tiers, assets, management)
-- User dashboard: `src/app/dashboard/social/affiliate/page.tsx` (stats, tiers, earnings, payouts, assets)
-- API routes: `src/app/api/affiliate/` (settings, tiers, assets, payouts, referrals, dashboard, activate, track-signup, drip)
+- Admin page: `src/app/admin/setup/affiliate/page.tsx` (settings, tiers, assets, management, applications, networks)
+- Product user dashboard: `src/app/dashboard/social/affiliate/page.tsx` (stats, tiers, earnings, payouts, assets — for existing product-user affiliates)
+- API routes: `src/app/api/affiliate/` (settings, tiers, assets, payouts, referrals, dashboard, activate, track-signup, drip, applications, applications/review, networks)
 - Stripe webhook: `src/app/api/stripe/webhook/route.ts` (invoice.paid handler with commission creation)
 - Cookie tracking: `src/components/referral-tracker.tsx` (pp_ref cookie on ?ref= visits)
 - Signup integration: `src/app/(auth)/signup/page.tsx` (reads pp_ref cookie, calls track-signup)
+
+### Phase 3.5 (Open Affiliate Program)
+- Migration: `migrations/core/006_affiliate_applications.sql` (affiliate_applications, affiliate_network_settings, referral_links affiliate_role)
+- Public landing page: `src/app/affiliate/page.tsx`
+- Application form: `src/app/affiliate/join/page.tsx`
+- Affiliate login: `src/app/affiliate/login/page.tsx` (magic link + password, independent from product login)
+- Standalone dashboard: `src/app/affiliate/dashboard/page.tsx` (own header, no product sidebar)
+- Application API: `src/app/api/affiliate/applications/route.ts` (POST for public, GET for admin)
+- Review API: `src/app/api/affiliate/applications/review/route.ts` (approve/reject with auto-provisioning)
+- Networks API: `src/app/api/affiliate/networks/route.ts` (GET, PUT for admin)
+- Footer link: `src/components/layout/footer.tsx` (Affiliate Program in Company section)
+- Sidebar cleanup: `src/components/social/social-sidebar.tsx` (Earn > Affiliate links to /affiliate)
 
 ### Phase 4
 - PWA: `public/manifest.json`, service worker, `next.config.js` PWA config

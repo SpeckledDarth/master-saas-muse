@@ -97,7 +97,7 @@ const NAV_ITEMS = [
   {
     group: 'Earn',
     items: [
-      { title: 'Affiliate', href: '/dashboard/social/affiliate', icon: DollarSign },
+      { title: 'Affiliate Program', href: '/affiliate', icon: DollarSign },
     ],
   },
   {

@@ -45,24 +45,26 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
   const isSocialDashboard = pathname?.startsWith('/dashboard/social')
+  const isAffiliateDashboard = pathname?.startsWith('/affiliate/dashboard')
+  const hideHeader = isSocialDashboard || isAffiliateDashboard
 
   useEffect(() => {
-    if (isSocialDashboard) return
+    if (hideHeader) return
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [isSocialDashboard])
+  }, [hideHeader])
 
   useEffect(() => {
-    if (isSocialDashboard) return
+    if (hideHeader) return
     const timer = setTimeout(() => setMounted(true), 100)
     return () => clearTimeout(timer)
-  }, [isSocialDashboard])
+  }, [hideHeader])
 
-  if (isSocialDashboard) {
+  if (hideHeader) {
     return null
   }
 

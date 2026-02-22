@@ -48,6 +48,7 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **Flywheel System**: Comprehensive content flywheel across 7 phases, including content intelligence, advanced automation, distribution, revenue, engagement, and collaboration features.
 - **Bonus Features**: AI Hashtag Suggestions, Gig Lead Notifications (keyword scanner, reply templates), AI Voice Fine-Tuner, and a Lead CRM Mini.
 - **Testimonial Management**: Admin CRUD for testimonials with public display on a "Wall of Love" page and social proof popups on the landing page.
+- **Affiliate System**: Complete affiliate marketing infrastructure with tracked referral links, commission tracking on Stripe events, fraud detection, performance tiers, marketing assets, and payout management. Includes open affiliate program with public signup (`/affiliate`), application form (`/affiliate/join`), separate login (`/affiliate/login`), and standalone dashboard (`/affiliate/dashboard`). Affiliates are 100% separate from product users — different login, dashboard, and purpose. Admin manages applications, networks (ShareASale, Impact, PartnerStack), and all affiliate settings from `/admin/setup/affiliate`.
 - **Product Extension Design Rules**: Emphasizes adding new files and tables for product-specific features (`migrations/extensions/`, `/dashboard/social/`, `src/lib/<product>/`), using plugin patterns for queue jobs, and minimizing core file modifications.
 
 ## External Dependencies

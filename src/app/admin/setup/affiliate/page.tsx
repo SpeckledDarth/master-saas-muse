@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Loader2, Save, DollarSign, Users, TrendingUp, AlertTriangle,
   Plus, Trash2, Pencil, Award, FileImage, FileText, Share2,
-  CheckCircle, XCircle, Clock, Eye,
+  CheckCircle, XCircle, Clock, Eye, Globe, UserPlus, Mail,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -78,12 +78,47 @@ interface FlaggedReferral {
   created_at: string
 }
 
+interface Application {
+  id: string
+  name: string
+  email: string
+  website_url: string | null
+  promotion_method: string
+  message: string | null
+  status: string
+  reviewer_notes: string | null
+  reviewed_at: string | null
+  created_at: string
+}
+
+interface NetworkSetting {
+  id: string
+  network_name: string
+  network_slug: string
+  is_active: boolean
+  tracking_id: string | null
+  postback_url: string | null
+  api_key: string | null
+  config: Record<string, any>
+}
+
 const ASSET_TYPES = [
   { value: 'banner', label: 'Banner Image' },
   { value: 'email_template', label: 'Email Template' },
   { value: 'social_post', label: 'Social Post Template' },
   { value: 'text_snippet', label: 'Text Snippet' },
 ]
+
+const PROMOTION_LABELS: Record<string, string> = {
+  blog: 'Blog / Website',
+  youtube: 'YouTube',
+  social_media: 'Social Media',
+  newsletter: 'Newsletter / Email',
+  podcast: 'Podcast',
+  course: 'Online Course / Community',
+  consulting: 'Consulting / Freelance',
+  other: 'Other',
+}
 
 const FRAUD_FLAG_LABELS: Record<string, string> = {
   same_email_domain: 'Same email domain as affiliate',
@@ -115,22 +150,33 @@ export default function AffiliateSettingsPage() {
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null)
   const [assetForm, setAssetForm] = useState({ title: '', description: '', asset_type: 'banner', content: '', file_url: '' })
 
+  const [applications, setApplications] = useState<Application[]>([])
+  const [appFilter, setAppFilter] = useState('pending')
+  const [reviewingApp, setReviewingApp] = useState<string | null>(null)
+  const [reviewNotes, setReviewNotes] = useState('')
+
+  const [networks, setNetworks] = useState<NetworkSetting[]>([])
+
   const { toast } = useToast()
 
   const fetchData = useCallback(async () => {
     try {
-      const [settingsRes, tiersRes, assetsRes, referralsRes] = await Promise.all([
+      const [settingsRes, tiersRes, assetsRes, referralsRes, appsRes, networksRes] = await Promise.all([
         fetch('/api/affiliate/settings'),
         fetch('/api/affiliate/tiers'),
         fetch('/api/affiliate/assets'),
         fetch('/api/affiliate/referrals?admin=true'),
+        fetch('/api/affiliate/applications?status=all'),
+        fetch('/api/affiliate/networks'),
       ])
 
-      const [settingsData, tiersData, assetsData, referralsData] = await Promise.all([
+      const [settingsData, tiersData, assetsData, referralsData, appsData, networksData] = await Promise.all([
         settingsRes.json(),
         tiersRes.json(),
         assetsRes.json(),
         referralsRes.json(),
+        appsRes.json(),
+        networksRes.json(),
       ])
 
       if (settingsData.settings) setSettings(settingsData.settings)
@@ -139,6 +185,8 @@ export default function AffiliateSettingsPage() {
       if (referralsData.affiliates) setAffiliates(referralsData.affiliates)
       if (referralsData.stats) setStats(referralsData.stats)
       if (referralsData.flaggedReferrals) setFlaggedReferrals(referralsData.flaggedReferrals)
+      if (appsData.applications) setApplications(appsData.applications)
+      if (networksData.networks) setNetworks(networksData.networks)
     } catch (err) {
       console.error('Failed to load affiliate data:', err)
     } finally {
@@ -227,6 +275,61 @@ export default function AffiliateSettingsPage() {
     }
   }
 
+  const reviewApplication = async (applicationId: string, action: 'approve' | 'reject') => {
+    setReviewingApp(applicationId)
+    try {
+      const res = await fetch('/api/affiliate/applications/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ application_id: applicationId, action, reviewer_notes: reviewNotes }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed')
+      }
+      toast({ title: action === 'approve' ? 'Application Approved' : 'Application Rejected', description: action === 'approve' ? 'Affiliate account created with referral link.' : 'Applicant has been notified.' })
+      setReviewNotes('')
+      fetchData()
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to review application', variant: 'destructive' })
+    } finally {
+      setReviewingApp(null)
+    }
+  }
+
+  const toggleNetwork = async (network: NetworkSetting) => {
+    try {
+      const res = await fetch('/api/affiliate/networks', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: network.id, is_active: !network.is_active }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      toast({ title: `${network.network_name} ${!network.is_active ? 'enabled' : 'disabled'}` })
+      fetchData()
+    } catch {
+      toast({ title: 'Error', description: 'Failed to update network', variant: 'destructive' })
+    }
+  }
+
+  const saveNetwork = async (network: NetworkSetting, updates: Partial<NetworkSetting>) => {
+    try {
+      const res = await fetch('/api/affiliate/networks', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: network.id, ...updates }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      toast({ title: 'Network settings saved' })
+      fetchData()
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save network settings', variant: 'destructive' })
+    }
+  }
+
+  const filteredApplications = applications.filter(a => appFilter === 'all' || a.status === appFilter)
+  const pendingCount = applications.filter(a => a.status === 'pending').length
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]" data-testid="loading-affiliate">
@@ -305,13 +408,119 @@ export default function AffiliateSettingsPage() {
         </Card>
       )}
 
-      <Tabs defaultValue="settings" data-testid="tabs-affiliate-admin">
-        <TabsList>
+      <Tabs defaultValue="applications" data-testid="tabs-affiliate-admin">
+        <TabsList className="flex-wrap">
+          <TabsTrigger value="applications" data-testid="tab-applications">
+            Applications {pendingCount > 0 && <Badge variant="destructive" className="ml-1.5 text-[10px] px-1.5 py-0">{pendingCount}</Badge>}
+          </TabsTrigger>
           <TabsTrigger value="settings" data-testid="tab-settings">Settings</TabsTrigger>
           <TabsTrigger value="tiers" data-testid="tab-tiers">Tiers</TabsTrigger>
           <TabsTrigger value="assets" data-testid="tab-assets">Marketing Assets</TabsTrigger>
           <TabsTrigger value="affiliates" data-testid="tab-affiliates">Affiliates</TabsTrigger>
+          <TabsTrigger value="networks" data-testid="tab-networks">Networks</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="applications" className="space-y-4 mt-4">
+          <Card data-testid="card-applications">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <div>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Affiliate Applications ({filteredApplications.length})
+                </CardTitle>
+                <CardDescription>Review and approve affiliate program applications</CardDescription>
+              </div>
+              <Select value={appFilter} onValueChange={setAppFilter}>
+                <SelectTrigger className="w-36" data-testid="select-app-filter">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                </SelectContent>
+              </Select>
+            </CardHeader>
+            <CardContent>
+              {filteredApplications.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-applications">
+                  No {appFilter !== 'all' ? appFilter : ''} applications.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {filteredApplications.map(app => (
+                    <div key={app.id} className="p-4 rounded-md border" data-testid={`application-${app.id}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium text-sm">{app.name}</p>
+                            <Badge
+                              variant={app.status === 'pending' ? 'outline' : app.status === 'approved' ? 'secondary' : 'destructive'}
+                              className="text-xs capitalize"
+                            >
+                              {app.status}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                            <a href={`mailto:${app.email}`} className="hover:underline flex items-center gap-1">
+                              <Mail className="h-3 w-3" /> {app.email}
+                            </a>
+                            {app.website_url && (
+                              <a href={app.website_url} target="_blank" rel="noopener noreferrer" className="hover:underline flex items-center gap-1">
+                                <Globe className="h-3 w-3" /> {app.website_url.replace(/^https?:\/\//, '').slice(0, 30)}
+                              </a>
+                            )}
+                            <span>{PROMOTION_LABELS[app.promotion_method] || app.promotion_method}</span>
+                            <span>{new Date(app.created_at).toLocaleDateString()}</span>
+                          </div>
+                          {app.message && (
+                            <p className="text-xs text-muted-foreground mt-2 bg-muted/50 rounded p-2 italic">"{app.message}"</p>
+                          )}
+                          {app.reviewer_notes && (
+                            <p className="text-xs text-muted-foreground mt-1">Notes: {app.reviewer_notes}</p>
+                          )}
+                        </div>
+                        {app.status === 'pending' && (
+                          <div className="flex flex-col gap-2 shrink-0">
+                            <div className="flex items-center gap-1">
+                              <Button
+                                size="sm"
+                                onClick={() => reviewApplication(app.id, 'approve')}
+                                disabled={reviewingApp === app.id}
+                                data-testid={`button-approve-${app.id}`}
+                              >
+                                {reviewingApp === app.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle className="h-3.5 w-3.5 mr-1" />}
+                                Approve
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => reviewApplication(app.id, 'reject')}
+                                disabled={reviewingApp === app.id}
+                                data-testid={`button-reject-${app.id}`}
+                              >
+                                <XCircle className="h-3.5 w-3.5 mr-1" />
+                                Reject
+                              </Button>
+                            </div>
+                            <Input
+                              placeholder="Reviewer notes (optional)"
+                              value={reviewNotes}
+                              onChange={e => setReviewNotes(e.target.value)}
+                              className="text-xs h-7"
+                              data-testid={`input-review-notes-${app.id}`}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="settings" className="space-y-4 mt-4">
           <Card data-testid="card-commission-settings">
@@ -611,6 +820,77 @@ export default function AffiliateSettingsPage() {
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="networks" className="space-y-4 mt-4">
+          <Card data-testid="card-networks">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                Affiliate Networks
+              </CardTitle>
+              <CardDescription>Connect to external affiliate networks for broader reach. Configure tracking IDs and postback URLs for server-side conversion tracking.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {networks.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-networks">
+                  No affiliate networks configured yet. Networks will appear here once the database migration is run.
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {networks.map(network => (
+                    <div key={network.id} className="p-4 rounded-md border" data-testid={`network-${network.network_slug}`}>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-medium text-sm">{network.network_name}</h4>
+                          <Badge variant={network.is_active ? 'secondary' : 'outline'} className="text-xs">
+                            {network.is_active ? 'Active' : 'Inactive'}
+                          </Badge>
+                        </div>
+                        <Switch
+                          checked={network.is_active}
+                          onCheckedChange={() => toggleNetwork(network)}
+                          data-testid={`switch-network-${network.network_slug}`}
+                        />
+                      </div>
+                      {network.is_active && (
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <div>
+                            <Label className="text-xs">Tracking ID</Label>
+                            <Input
+                              defaultValue={network.tracking_id || ''}
+                              placeholder="Your network tracking ID"
+                              onBlur={e => {
+                                if (e.target.value !== (network.tracking_id || '')) {
+                                  saveNetwork(network, { tracking_id: e.target.value || null })
+                                }
+                              }}
+                              className="text-xs h-8"
+                              data-testid={`input-tracking-${network.network_slug}`}
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Postback URL</Label>
+                            <Input
+                              defaultValue={network.postback_url || ''}
+                              placeholder="https://network.com/postback?..."
+                              onBlur={e => {
+                                if (e.target.value !== (network.postback_url || '')) {
+                                  saveNetwork(network, { postback_url: e.target.value || null })
+                                }
+                              }}
+                              className="text-xs h-8"
+                              data-testid={`input-postback-${network.network_slug}`}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
