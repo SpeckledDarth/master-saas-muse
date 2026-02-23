@@ -229,7 +229,7 @@ export default function AffiliateSettingsPage() {
   const [assetForm, setAssetForm] = useState({ title: '', description: '', asset_type: 'banner', content: '', file_url: '' })
 
   const [applications, setApplications] = useState<Application[]>([])
-  const [appFilter, setAppFilter] = useState('pending')
+  const [appFilter, setAppFilter] = useState('all')
   const [reviewingApp, setReviewingApp] = useState<string | null>(null)
   const [reviewNotes, setReviewNotes] = useState('')
 

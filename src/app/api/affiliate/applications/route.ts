@@ -17,11 +17,12 @@ export async function POST(request: NextRequest) {
     }
 
     const admin = createAdminClient()
+    const normalizedEmail = email.toLowerCase().trim()
 
     const { data: existing } = await admin
       .from('affiliate_applications')
       .select('id, status')
-      .eq('email', email.toLowerCase().trim())
+      .eq('email', normalizedEmail)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
@@ -35,11 +36,35 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    let matchingUserId: string | null = null
+    let page = 1
+    while (true) {
+      const { data: { users } } = await admin.auth.admin.listUsers({ page, perPage: 1000 })
+      if (!users?.length) break
+      const found = users.find(u => u.email?.toLowerCase() === normalizedEmail)
+      if (found) { matchingUserId = found.id; break }
+      if (users.length < 1000) break
+      page++
+    }
+
+    if (matchingUserId) {
+      const { data: activeLink } = await admin
+        .from('referral_links')
+        .select('id')
+        .eq('user_id', matchingUserId)
+        .eq('is_affiliate', true)
+        .maybeSingle()
+
+      if (activeLink) {
+        return NextResponse.json({ error: 'You\'re already an approved affiliate! Log in to access your dashboard.' }, { status: 400 })
+      }
+    }
+
     const { data, error } = await admin
       .from('affiliate_applications')
       .insert({
         name: name.trim(),
-        email: email.toLowerCase().trim(),
+        email: normalizedEmail,
         website_url: website_url?.trim() || null,
         promotion_method,
         message: message?.trim() || null,
@@ -52,8 +77,11 @@ export async function POST(request: NextRequest) {
       if (error.code === '42P01') {
         return NextResponse.json({ error: 'Affiliate applications system not yet configured. Please try again later.' }, { status: 503 })
       }
+      if (error.code === '23505') {
+        return NextResponse.json({ error: 'An application with this email already exists. Please contact support.' }, { status: 400 })
+      }
       console.error('Affiliate application insert error:', error)
-      return NextResponse.json({ error: 'Failed to submit application' }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to submit application. Please try again.' }, { status: 500 })
     }
 
     try {
@@ -68,13 +96,48 @@ export async function POST(request: NextRequest) {
           await admin.from('notifications').insert({
             user_id: a.user_id,
             title: 'New Affiliate Application',
-            message: `${name} (${email}) applied to the affiliate program. Promotion methods: ${promotion_method}.`,
+            message: `${name} (${normalizedEmail}) applied to the affiliate program. Promotion methods: ${promotion_method}.`,
             type: 'info',
             link: '/admin/setup/affiliate',
           })
         }
       }
     } catch {}
+
+    try {
+      const { getEmailClient } = await import('@/lib/email/client')
+      const { client: emailClient, fromEmail } = await getEmailClient()
+      const { data: admins } = await admin
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'admin')
+        .limit(5)
+
+      if (admins?.length) {
+        const adminIds = admins.map(a => a.user_id)
+        const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 })
+        const adminEmails = users?.filter(u => adminIds.includes(u.id) && u.email).map(u => u.email!) || []
+
+        if (adminEmails.length > 0) {
+          await emailClient.emails.send({
+            from: fromEmail,
+            to: adminEmails,
+            subject: `New Affiliate Application: ${name}`,
+            html: `
+              <h2>New Affiliate Application</h2>
+              <p><strong>Name:</strong> ${name}</p>
+              <p><strong>Email:</strong> ${normalizedEmail}</p>
+              ${website_url ? `<p><strong>Website:</strong> ${website_url}</p>` : ''}
+              <p><strong>Promotion Methods:</strong> ${promotion_method}</p>
+              ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
+              <p><a href="https://passivepost.io/admin/setup/affiliate">Review Application</a></p>
+            `,
+          })
+        }
+      }
+    } catch (emailErr) {
+      console.error('Failed to send admin notification email:', emailErr)
+    }
 
     return NextResponse.json({ success: true, id: data.id })
   } catch (err) {
@@ -152,6 +215,28 @@ export async function DELETE(request: NextRequest) {
 
     if (!id) {
       return NextResponse.json({ error: 'Application id is required' }, { status: 400 })
+    }
+
+    const { data: app } = await admin
+      .from('affiliate_applications')
+      .select('email, status')
+      .eq('id', id)
+      .maybeSingle()
+
+    if (app?.status === 'approved') {
+      try {
+        const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 })
+        const matchingUser = users?.find(u => u.email?.toLowerCase() === app.email.toLowerCase())
+        if (matchingUser) {
+          await admin.from('affiliate_commissions').delete().eq('affiliate_user_id', matchingUser.id)
+          await admin.from('affiliate_payouts').delete().eq('affiliate_user_id', matchingUser.id)
+          await admin.from('affiliate_referrals').delete().eq('affiliate_user_id', matchingUser.id)
+          await admin.from('referral_links').delete().eq('user_id', matchingUser.id)
+          await admin.from('user_roles').delete().eq('user_id', matchingUser.id).eq('role', 'affiliate')
+        }
+      } catch (cleanupErr) {
+        console.error('Affiliate cleanup error (non-fatal):', cleanupErr)
+      }
     }
 
     const { error } = await admin
