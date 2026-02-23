@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   Loader2, Copy, Check, DollarSign, Users, TrendingUp, Share2,
   Award, MousePointerClick, FileImage, FileText,
-  ExternalLink, Clock, CheckCircle, LogOut, Target, Zap,
+  ExternalLink, Clock, CheckCircle, LogOut, Target, Zap, Lock,
   Link2, Trophy, BarChart3, ArrowDown, ArrowUp, Calendar, Gift,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
@@ -383,6 +383,11 @@ export default function StandaloneAffiliateDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground hidden sm:inline">{userEmail}</span>
+            <Link href="/affiliate/set-password">
+              <Button variant="ghost" size="sm" title="Set or change password" data-testid="button-set-password">
+                <Lock className="h-4 w-4" />
+              </Button>
+            </Link>
             <Button variant="ghost" size="sm" onClick={handleLogout} data-testid="button-logout">
               <LogOut className="h-4 w-4" />
             </Button>

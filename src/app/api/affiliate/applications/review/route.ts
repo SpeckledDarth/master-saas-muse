@@ -192,12 +192,13 @@ export async function POST(request: NextRequest) {
             <ol>
               <li>Go to <a href="${baseUrl}/affiliate/login">${baseUrl}/affiliate/login</a></li>
               <li>Enter your email: <strong>${application.email}</strong></li>
-              <li>Click "Send Magic Link" — you'll receive a login link in your inbox</li>
+              <li>Click <strong>"Send Login Link"</strong> — you'll receive a one-time login link in your inbox</li>
+              <li>Once logged in, you can <a href="${baseUrl}/affiliate/set-password">set a password</a> so you can log in directly next time</li>
             </ol>
             <p style="margin: 24px 0;">
               <a href="${baseUrl}/affiliate/login" style="background-color: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">Go to Affiliate Login</a>
             </p>
-            <p>Once logged in, you'll find your referral link, marketing assets, and real-time performance stats on your dashboard.</p>
+            <p>Once logged in, you'll find your referral link, marketing assets, and real-time performance stats on your dashboard. We recommend setting a password so you can log in easily in the future.</p>
             <p>Thanks for joining,<br/>The Team</p>
           </div>
         `,

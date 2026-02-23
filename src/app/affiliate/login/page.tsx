@@ -164,7 +164,12 @@ export default function AffiliateLoginPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <Link href="/affiliate/forgot-password" className="text-xs text-primary hover:underline" data-testid="link-forgot-password">
+                      Forgot password?
+                    </Link>
+                  </div>
                   <Input
                     id="password"
                     type="password"
@@ -187,15 +192,21 @@ export default function AffiliateLoginPage() {
                   Log In
                 </Button>
 
-                <div className="text-center">
+                <div className="text-center space-y-2">
                   <button
                     type="button"
                     onClick={() => { setMode('magic'); setError(null) }}
-                    className="text-sm text-muted-foreground hover:text-foreground"
+                    className="text-sm text-muted-foreground hover:text-foreground block w-full"
                     data-testid="button-switch-magic"
                   >
                     Use magic link instead
                   </button>
+                  <p className="text-xs text-muted-foreground">
+                    Don't have a password yet?{' '}
+                    <Link href="/affiliate/forgot-password" className="text-primary hover:underline" data-testid="link-set-password-hint">
+                      Set one up
+                    </Link>
+                  </p>
                 </div>
               </form>
             )}
