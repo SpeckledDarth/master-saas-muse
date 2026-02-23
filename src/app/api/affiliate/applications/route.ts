@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -84,6 +85,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to submit application. Please try again.' }, { status: 500 })
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io'
+
     try {
       const { data: admins } = await admin
         .from('user_roles')
@@ -105,8 +108,24 @@ export async function POST(request: NextRequest) {
     } catch {}
 
     try {
-      const { getEmailClient } = await import('@/lib/email/client')
-      const { client: emailClient, fromEmail } = await getEmailClient()
+      await sendEmail({
+        to: normalizedEmail,
+        subject: 'Application Received — We\'ll Be in Touch!',
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #333;">Thanks for Applying, ${name.trim()}!</h2>
+            <p>We've received your affiliate application and our team will review it shortly — typically within 24–48 hours.</p>
+            <p>Once approved, you'll receive a welcome email with instructions to access your affiliate dashboard, referral link, and marketing materials.</p>
+            <p style="color: #666; font-size: 14px;">If you have any questions in the meantime, just reply to this email.</p>
+            <p>— The Team</p>
+          </div>
+        `,
+      })
+    } catch (emailErr) {
+      console.error('Failed to send applicant confirmation email:', emailErr)
+    }
+
+    try {
       const { data: admins } = await admin
         .from('user_roles')
         .select('user_id')
@@ -115,22 +134,31 @@ export async function POST(request: NextRequest) {
 
       if (admins?.length) {
         const adminIds = admins.map(a => a.user_id)
-        const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 })
-        const adminEmails = users?.filter(u => adminIds.includes(u.id) && u.email).map(u => u.email!) || []
+        let allUsers: any[] = []
+        let pg = 1
+        while (true) {
+          const { data: { users: pageUsers } } = await admin.auth.admin.listUsers({ page: pg, perPage: 1000 })
+          if (!pageUsers?.length) break
+          allUsers = allUsers.concat(pageUsers)
+          if (pageUsers.length < 1000) break
+          pg++
+        }
+        const adminEmails = allUsers.filter(u => adminIds.includes(u.id) && u.email).map(u => u.email!)
 
         if (adminEmails.length > 0) {
-          await emailClient.emails.send({
-            from: fromEmail,
+          await sendEmail({
             to: adminEmails,
             subject: `New Affiliate Application: ${name}`,
             html: `
-              <h2>New Affiliate Application</h2>
-              <p><strong>Name:</strong> ${name}</p>
-              <p><strong>Email:</strong> ${normalizedEmail}</p>
-              ${website_url ? `<p><strong>Website:</strong> ${website_url}</p>` : ''}
-              <p><strong>Promotion Methods:</strong> ${promotion_method}</p>
-              ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
-              <p><a href="https://passivepost.io/admin/setup/affiliate">Review Application</a></p>
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2>New Affiliate Application</h2>
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Email:</strong> ${normalizedEmail}</p>
+                ${website_url ? `<p><strong>Website:</strong> ${website_url}</p>` : ''}
+                <p><strong>Promotion Methods:</strong> ${promotion_method}</p>
+                ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
+                <p><a href="${baseUrl}/admin/setup/affiliate" style="background: #2563eb; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; display: inline-block;">Review Application</a></p>
+              </div>
             `,
           })
         }
