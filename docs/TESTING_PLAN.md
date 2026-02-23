@@ -1,7 +1,7 @@
 # PassivePost — Deep Testing Plan
 
 > **Created:** February 23, 2026
-> **Scope:** Phase 3 (Affiliate Core), Phase 3.5 (Open Affiliate Program), Phase 3.6 Sprint 1 (Revenue & Motivation), Phase 3.6 Sprint 2 (Tools & Analytics), Phase 3.6 Sprint 3 (Consolidation)
+> **Scope:** Phase 3 (Affiliate Core), Phase 3.5 (Open Affiliate Program), Phase 3.6 Sprint 1 (Revenue & Motivation), Phase 3.6 Sprint 2 (Tools & Analytics), Phase 3.6 Sprint 3 (Consolidation), Round 4 (Regression Fixes)
 > **Test on:** Live Vercel deployment (passivepost.io)
 
 ---
@@ -390,6 +390,107 @@ CREATE INDEX IF NOT EXISTS idx_email_templates_category ON email_templates(categ
 
 **When something fails:**
 1. Note the section number (R3-X.X) and what happened
+2. Take a screenshot if possible
+3. Check browser console for errors (F12 > Console)
+4. We'll batch all fixes together
+
+---
+
+## ROUND 4: Regression Tests for Round 3 Fixes
+
+> **Created:** February 23, 2026
+> **Goal:** Verify the 6 fixes deployed after Round 3 testing. Only tests prone to breakage from these specific changes are included.
+> **Pre-requisite:** Round 4 code pushed to GitHub and deployed on Vercel. Admin logged in.
+
+---
+
+### SECTION R4-1: Email Template Save/Edit
+
+> **Where:** Admin > Email Templates (`/admin/email-templates`)
+> **What was fixed:** Templates were failing to save silently. API now handles missing `category` column gracefully, and error messages now display properly.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R4-1.1 | Create new template | Click "Create Template", fill in name, subject, body. Save. | Template saves successfully and appears in the list | |
+| R4-1.2 | Edit existing template | Click edit on any template, change the subject or body. Save. | Saves without error, updated content shows on reload | |
+| R4-1.3 | Error message displays | (If possible) try saving a template with an empty required field | A meaningful error message appears in the toast — not blank or generic | |
+
+---
+
+### SECTION R4-2: Audit Log Filtering
+
+> **Where:** Admin > Audit Logs (`/admin/audit-logs`)
+> **What was fixed:** Category and action filters were conflicting, causing empty results. Action filter now hides when a category is selected.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R4-2.1 | Category filter hides action | Select "affiliate" from the Category dropdown | The Action dropdown disappears. Results show only affiliate-related entries | |
+| R4-2.2 | Return to all categories | Change Category back to "All Categories" | The Action dropdown reappears. Results are unfiltered | |
+| R4-2.3 | Action filter works alone | With Category set to "All Categories", select an action (e.g., "approve") | Results filter correctly by that action | |
+| R4-2.4 | No empty results from conflict | Select category "affiliate", then switch back to "All Categories" and pick an action | Results appear correctly — no blank screen from stale filters | |
+
+---
+
+### SECTION R4-3: Broadcast Edit Dialog
+
+> **Where:** Admin > Setup > Affiliate > Broadcasts tab
+> **What was fixed:** Field was confusingly labeled "Subject" in both create and edit. Renamed to "Broadcast Name" to distinguish from email subject line.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R4-3.1 | Create label correct | Click "New Broadcast" | First text input is labeled "Broadcast Name" (not "Subject") | |
+| R4-3.2 | Edit shows field | Click edit (pencil icon) on an existing broadcast | Dialog opens with "Broadcast Name" field visible and pre-filled | |
+| R4-3.3 | Edit saves changes | Change the broadcast name in edit mode, save | Updated name appears in the broadcast list | |
+
+---
+
+### SECTION R4-4: Affiliate Applications
+
+> **Where:** Public form at `/affiliate/join` and Admin > Setup > Affiliate > Applications tab
+> **What was fixed:** Applications weren't loading or saving due to missing `deleted_at` column. API now retries without that filter.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R4-4.1 | Submit new application | Go to `/affiliate/join`, fill in a fresh email and details, submit | Success message appears | |
+| R4-4.2 | Application appears in admin | Go to Admin > Affiliate > Applications tab | The application you just submitted appears in the list | |
+| R4-4.3 | Duplicate blocked | Submit a second application with the same email | You get a "pending application" message, not a crash or silent failure | |
+
+---
+
+### SECTION R4-5: Notifications
+
+> **Where:** Any page (notification bell icon) + browser console
+> **What was fixed:** `/api/notifications` was returning 500 errors because the notifications table may not exist. Now returns empty data gracefully.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R4-5.1 | No console 500 errors | Open browser console (F12 > Console), navigate through admin pages | No red 500 errors from `/api/notifications` | |
+| R4-5.2 | Bell icon works | If a notification bell is visible, click it | Opens without crashing (may show empty list) | |
+
+---
+
+### SECTION R4-6: Members Search Scope
+
+> **Where:** Admin > Setup > Affiliate > Members tab
+> **What was fixed:** Search was matching user IDs and referral codes (hidden fields). Now only matches name and email.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R4-6.1 | Search by name | Type part of a known member's name in the search box | Member appears in results | |
+| R4-6.2 | Search by email | Type part of a known member's email | Member appears in results | |
+| R4-6.3 | ID does not match | Copy a user ID or referral code and paste it into search | No results found (search should NOT match hidden fields) | |
+
+---
+
+## Testing Notes (Round 4)
+
+**Round 4 Focus:**
+- These 15 tests cover ONLY the 6 areas changed after Round 3
+- If all pass, we can move forward to Sprint 4 features
+- If any fail, note the test number and what happened
+
+**When something fails:**
+1. Note the section number (R4-X.X) and what happened
 2. Take a screenshot if possible
 3. Check browser console for errors (F12 > Console)
 4. We'll batch all fixes together
