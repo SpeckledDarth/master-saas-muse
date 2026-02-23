@@ -295,8 +295,19 @@ export async function DELETE(request: NextRequest) {
       .eq('id', id)
 
     if (error) {
-      console.error('Soft-delete application error:', error)
-      return NextResponse.json({ error: 'Failed to delete application' }, { status: 500 })
+      if (error.message?.includes('deleted_at') || error.message?.includes('deleted_by') || error.message?.includes('column')) {
+        const { error: hardDeleteErr } = await admin
+          .from('affiliate_applications')
+          .delete()
+          .eq('id', id)
+        if (hardDeleteErr) {
+          console.error('Hard-delete application error:', hardDeleteErr)
+          return NextResponse.json({ error: 'Failed to delete application' }, { status: 500 })
+        }
+      } else {
+        console.error('Soft-delete application error:', error)
+        return NextResponse.json({ error: 'Failed to delete application' }, { status: 500 })
+      }
     }
 
     logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'soft_delete', entity_type: 'application', entity_id: id, entity_name: app.name, details: { email: app.email, previous_status: app.status } })

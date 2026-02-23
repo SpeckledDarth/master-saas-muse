@@ -20,6 +20,55 @@ async function requireAdmin() {
   return { user, admin }
 }
 
+async function insertBroadcast(admin: any, fields: Record<string, any>) {
+  const { data, error } = await admin
+    .from('affiliate_broadcasts')
+    .insert(fields)
+    .select()
+    .single()
+
+  if (error) {
+    if (error.message?.includes('sent_by') || error.message?.includes('column')) {
+      const { sent_by, ...withoutSentBy } = fields
+      const retry = await admin
+        .from('affiliate_broadcasts')
+        .insert(withoutSentBy)
+        .select()
+        .single()
+      if (retry.error) throw retry.error
+      return retry.data
+    }
+    throw error
+  }
+  return data
+}
+
+async function updateBroadcast(admin: any, id: string, updates: Record<string, any>) {
+  const { error } = await admin
+    .from('affiliate_broadcasts')
+    .update(updates)
+    .eq('id', id)
+
+  if (error) {
+    if (error.message?.includes('column') || error.code === '42703') {
+      const coreFields = ['status', 'subject', 'body', 'audience_filter']
+      const minimal: Record<string, any> = {}
+      for (const key of coreFields) {
+        if (key in updates) minimal[key] = updates[key]
+      }
+      if (Object.keys(minimal).length > 0) {
+        const retry = await admin
+          .from('affiliate_broadcasts')
+          .update(minimal)
+          .eq('id', id)
+        if (retry.error) throw retry.error
+        return
+      }
+    }
+    throw error
+  }
+}
+
 export async function GET() {
   try {
     const auth = await requireAdmin()
@@ -57,22 +106,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Subject and body are required' }, { status: 400 })
     }
 
-    const { data, error } = await auth.admin
-      .from('affiliate_broadcasts')
-      .insert({
-        subject,
-        body: messageBody,
-        audience_filter: audience_filter || { type: 'all' },
-        status: 'draft',
-        sent_by: auth.user.id,
-      })
-      .select()
-      .single()
-
-    if (error) {
-      if (error.code === '42P01') return NextResponse.json({ error: 'Broadcasts table not created yet. Run migration 007.' }, { status: 503 })
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    const data = await insertBroadcast(auth.admin, {
+      subject,
+      body: messageBody,
+      audience_filter: audience_filter || { type: 'all' },
+      status: 'draft',
+      sent_by: auth.user.id,
+    })
 
     logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'create', entity_type: 'broadcast', entity_id: data.id, entity_name: subject, details: { audience_filter: audience_filter || { type: 'all' } } })
 
@@ -82,7 +122,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Broadcasts table not created yet. Run migration 007.' }, { status: 503 })
     }
     console.error('Broadcasts POST error:', err)
-    return NextResponse.json({ error: 'Failed to create broadcast' }, { status: 500 })
+    return NextResponse.json({ error: err.message || 'Failed to create broadcast' }, { status: 500 })
   }
 }
 
@@ -111,7 +151,6 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (send) {
-      const audienceFilter = existing.audience_filter as { type?: string } || { type: 'all' }
       let affiliateQuery = auth.admin
         .from('referral_links')
         .select('user_id')
@@ -137,15 +176,12 @@ export async function PATCH(request: NextRequest) {
         }
       }
 
-      await auth.admin
-        .from('affiliate_broadcasts')
-        .update({
-          status: 'sent',
-          sent_count: sentCount,
-          sent_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id)
+      await updateBroadcast(auth.admin, id, {
+        status: 'sent',
+        sent_count: sentCount,
+        sent_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
 
       logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'send', entity_type: 'broadcast', entity_id: id, entity_name: existing.subject, details: { sent_count: sentCount } })
 
@@ -157,15 +193,7 @@ export async function PATCH(request: NextRequest) {
     if (messageBody !== undefined) updates.body = messageBody
     if (audience_filter !== undefined) updates.audience_filter = audience_filter
 
-    const { error } = await auth.admin
-      .from('affiliate_broadcasts')
-      .update(updates)
-      .eq('id', id)
-
-    if (error) {
-      if (error.code === '42P01') return NextResponse.json({ error: 'Broadcasts table not created yet. Run migration 007.' }, { status: 503 })
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    await updateBroadcast(auth.admin, id, updates)
 
     logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'update', entity_type: 'broadcast', entity_id: id, entity_name: subject || existing.subject, details: updates })
 
@@ -175,7 +203,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Broadcasts table not created yet. Run migration 007.' }, { status: 503 })
     }
     console.error('Broadcasts PATCH error:', err)
-    return NextResponse.json({ error: 'Failed to update broadcast' }, { status: 500 })
+    return NextResponse.json({ error: err.message || 'Failed to update broadcast' }, { status: 500 })
   }
 }
 

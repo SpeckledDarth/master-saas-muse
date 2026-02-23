@@ -80,7 +80,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name, start_date, and end_date are required' }, { status: 400 })
     }
 
-    const { data, error } = await auth.admin
+    const now = new Date()
+    const startDt = new Date(start_date)
+    const endDt = new Date(end_date)
+    const autoStatus = now < startDt ? 'upcoming' : now > endDt ? 'completed' : 'active'
+
+    let data: any
+    let error: any
+
+    const fullInsert = await auth.admin
       .from('affiliate_contests')
       .insert({
         name,
@@ -90,9 +98,31 @@ export async function POST(request: NextRequest) {
         end_date,
         prize_description: prize_description || null,
         prize_amount_cents: prize_amount_cents || 0,
+        status: autoStatus,
       })
       .select()
       .single()
+
+    data = fullInsert.data
+    error = fullInsert.error
+
+    if (error && (error.message?.includes('status') || error.message?.includes('column'))) {
+      const retry = await auth.admin
+        .from('affiliate_contests')
+        .insert({
+          name,
+          description: description || null,
+          metric: metric || 'referrals',
+          start_date,
+          end_date,
+          prize_description: prize_description || null,
+          prize_amount_cents: prize_amount_cents || 0,
+        })
+        .select()
+        .single()
+      data = retry.data
+      error = retry.error
+    }
 
     if (error) {
       if (error.code === '42P01') return NextResponse.json({ error: 'Contests table not created yet. Run migration.' }, { status: 503 })

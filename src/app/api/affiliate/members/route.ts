@@ -97,7 +97,7 @@ export async function GET() {
       let status: string
       if (!link.is_affiliate) {
         status = 'inactive'
-      } else if (userData.lastSignIn) {
+      } else if (userData.lastSignIn || (link.signups && link.signups > 0) || appData?.status === 'approved') {
         status = 'active'
       } else {
         status = 'pending_setup'

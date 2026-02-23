@@ -16,7 +16,7 @@ import {
   Plus, Trash2, Pencil, Award, FileImage, FileText, Share2,
   CheckCircle, XCircle, Clock, Globe, UserPlus, Mail,
   Target, Send, BarChart3, Activity, Megaphone, Calendar, Package, RefreshCw,
-  ArrowUpDown, ArrowUp, ArrowDown, Search, Info, HelpCircle, ClipboardList,
+  ArrowUpDown, ArrowUp, ArrowDown, Search, Info, HelpCircle, ClipboardList, Trophy,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import DetailModal, { DetailField } from '@/components/admin/DetailModal'
@@ -1848,7 +1848,11 @@ export default function AffiliateSettingsPage() {
                             <p className="text-xs text-muted-foreground">{m.clicks} clicks</p>
                           </td>
                           <td className="py-3 px-3 text-right tabular-nums">
-                            <p className="font-medium">${((m.totalEarnings || 0) / 100).toFixed(2)}</p>
+                            {(m.totalEarnings || 0) > 0 ? (
+                              <p className="font-medium">${((m.totalEarnings || 0) / 100).toFixed(2)}</p>
+                            ) : (
+                              <p className="text-xs text-muted-foreground">—</p>
+                            )}
                             {(m.pendingEarnings || 0) > 0 && (
                               <p className="text-xs text-muted-foreground">${((m.pendingEarnings || 0) / 100).toFixed(2)} pending</p>
                             )}
@@ -1987,6 +1991,14 @@ export default function AffiliateSettingsPage() {
                               {ms.referral_threshold} referrals = ${(ms.bonus_amount_cents / 100).toFixed(2)} bonus
                             </p>
                             {ms.description && <p className="text-xs text-muted-foreground italic">{ms.description}</p>}
+                            {(() => {
+                              const earned = members.filter(m => m.isAffiliate && m.referrals >= ms.referral_threshold).length
+                              return (
+                                <p className={`text-xs mt-0.5 ${earned > 0 ? 'text-green-600' : 'text-muted-foreground'}`} data-testid={`text-milestone-earned-${ms.id}`}>
+                                  {earned} affiliate{earned !== 1 ? 's' : ''} earned
+                                </p>
+                              )
+                            })()}
                           </div>
                           <Badge variant={ms.is_active ? 'default' : 'outline'} className={ms.is_active ? 'text-xs bg-green-500/10 text-green-700 border-green-500/30' : 'text-xs'}>{ms.is_active ? 'Active' : 'Inactive'}</Badge>
                         </div>
@@ -2204,34 +2216,18 @@ export default function AffiliateSettingsPage() {
                         />
                       </div>
                       {network.is_active && (
-                        <div className="grid gap-3 sm:grid-cols-2" onClick={e => e.stopPropagation()}>
+                        <div className="grid gap-3 sm:grid-cols-2">
                           <div>
-                            <Label className="text-xs">Tracking ID</Label>
-                            <Input
-                              defaultValue={network.tracking_id || ''}
-                              placeholder="Your network tracking ID"
-                              onBlur={e => {
-                                if (e.target.value !== (network.tracking_id || '')) {
-                                  saveNetwork(network, { tracking_id: e.target.value || null })
-                                }
-                              }}
-                              className="text-xs h-8"
-                              data-testid={`input-tracking-${network.network_slug}`}
-                            />
+                            <Label className="text-xs text-muted-foreground">Tracking ID</Label>
+                            <p className="text-xs mt-0.5 truncate" data-testid={`text-tracking-${network.network_slug}`}>
+                              {network.tracking_id || <span className="text-muted-foreground italic">Not set</span>}
+                            </p>
                           </div>
                           <div>
-                            <Label className="text-xs">Postback URL</Label>
-                            <Input
-                              defaultValue={network.postback_url || ''}
-                              placeholder="https://network.com/postback?..."
-                              onBlur={e => {
-                                if (e.target.value !== (network.postback_url || '')) {
-                                  saveNetwork(network, { postback_url: e.target.value || null })
-                                }
-                              }}
-                              className="text-xs h-8"
-                              data-testid={`input-postback-${network.network_slug}`}
-                            />
+                            <Label className="text-xs text-muted-foreground">Postback URL</Label>
+                            <p className="text-xs mt-0.5 truncate" data-testid={`text-postback-${network.network_slug}`}>
+                              {network.postback_url || <span className="text-muted-foreground italic">Not set</span>}
+                            </p>
                           </div>
                         </div>
                       )}
@@ -2294,6 +2290,14 @@ export default function AffiliateSettingsPage() {
                               <span>Prize: ${(c.prize_amount_cents / 100).toFixed(2)}</span>
                               <span>{new Date(c.start_date).toLocaleDateString()} — {new Date(c.end_date).toLocaleDateString()}</span>
                             </div>
+                            {c.status === 'completed' && c.winner_user_id && (
+                              <div className="flex items-center gap-1 mt-1" data-testid={`text-contest-winner-${c.id}`}>
+                                <Trophy className="h-3 w-3 text-amber-500" />
+                                <span className="text-xs font-medium text-amber-600">
+                                  Winner: {members.find(m => m.userId === c.winner_user_id)?.email || c.winner_user_id}
+                                </span>
+                              </div>
+                            )}
                           </div>
                           <div className="flex gap-1 shrink-0">
                             <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setEditingContest(c); setContestForm({ name: c.name, description: c.description || '', metric: c.metric || 'referrals', start_date: c.start_date?.split('T')[0] || '', end_date: c.end_date?.split('T')[0] || '', prize_description: c.prize_description || '', prize_amount_cents: c.prize_amount_cents || 0 }); setContestDialog(true) }} data-testid={`button-edit-contest-${c.id}`}>

@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Loader2, RefreshCw } from 'lucide-react'
 
 interface AuditLog {
@@ -73,7 +74,7 @@ function getActionBadgeVariant(action: string): 'default' | 'secondary' | 'destr
   return 'outline'
 }
 
-export default function AuditLogsPage() {
+function AuditLogsContent() {
   const searchParams = useSearchParams()
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [loading, setLoading] = useState(true)
@@ -82,6 +83,7 @@ export default function AuditLogsPage() {
   const [total, setTotal] = useState(0)
   const [actionFilter, setActionFilter] = useState('all')
   const [categoryFilter, setCategoryFilter] = useState('all')
+  const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null)
 
   useEffect(() => {
     const cat = searchParams.get('category')
@@ -126,6 +128,33 @@ export default function AuditLogsPage() {
   const handleCategoryChange = (value: string) => {
     setCategoryFilter(value)
     setActionFilter('all')
+  }
+
+  const renderMetadataValue = (value: unknown, depth = 0): React.ReactNode => {
+    if (value === null || value === undefined) return <span className="text-muted-foreground">-</span>
+    if (typeof value === 'boolean') return <Badge variant={value ? 'default' : 'outline'}>{value ? 'Yes' : 'No'}</Badge>
+    if (typeof value === 'number') return <span>{value}</span>
+    if (typeof value === 'string') return <span className="break-all">{value}</span>
+    if (Array.isArray(value)) {
+      return (
+        <div className="flex flex-wrap gap-1">
+          {value.map((v, i) => <Badge key={i} variant="outline" className="text-xs">{String(v)}</Badge>)}
+        </div>
+      )
+    }
+    if (typeof value === 'object' && depth < 2) {
+      return (
+        <div className="space-y-1 pl-2 border-l">
+          {Object.entries(value as Record<string, unknown>).map(([k, v]) => (
+            <div key={k} className="text-xs">
+              <span className="font-medium text-muted-foreground">{k.replace(/_/g, ' ')}:</span>{' '}
+              {renderMetadataValue(v, depth + 1)}
+            </div>
+          ))}
+        </div>
+      )
+    }
+    return <span>{JSON.stringify(value)}</span>
   }
 
   return (
@@ -197,7 +226,12 @@ export default function AuditLogsPage() {
                   </TableHeader>
                   <TableBody>
                     {logs.map(log => (
-                      <TableRow key={log.id} data-testid={`row-audit-log-${log.id}`}>
+                      <TableRow
+                        key={log.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        data-testid={`row-audit-log-${log.id}`}
+                        onClick={() => setSelectedLog(log)}
+                      >
                         <TableCell className="text-sm text-muted-foreground whitespace-nowrap" data-testid={`text-time-${log.id}`}>
                           {new Date(log.created_at).toLocaleString()}
                         </TableCell>
@@ -252,6 +286,78 @@ export default function AuditLogsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={!!selectedLog} onOpenChange={(open) => { if (!open) setSelectedLog(null) }}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto" data-testid="dialog-audit-detail">
+          <DialogHeader>
+            <DialogTitle>Audit Log Detail</DialogTitle>
+          </DialogHeader>
+          {selectedLog && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+                <span className="font-medium text-muted-foreground">Time</span>
+                <span>{new Date(selectedLog.created_at).toLocaleString()}</span>
+
+                <span className="font-medium text-muted-foreground">User</span>
+                <span>{selectedLog.userEmail}</span>
+
+                <span className="font-medium text-muted-foreground">Category</span>
+                <span>{getCategoryLabel(selectedLog.action) || 'General'}</span>
+
+                <span className="font-medium text-muted-foreground">Action</span>
+                <Badge variant={getActionBadgeVariant(selectedLog.action)} className="capitalize w-fit">
+                  {formatAction(selectedLog.action)}
+                </Badge>
+
+                <span className="font-medium text-muted-foreground">Raw Action</span>
+                <code className="text-xs bg-muted px-1 py-0.5 rounded break-all">{selectedLog.action}</code>
+
+                {selectedLog.target_type && (
+                  <>
+                    <span className="font-medium text-muted-foreground">Target Type</span>
+                    <span>{selectedLog.target_type}</span>
+                  </>
+                )}
+
+                {selectedLog.target_id && (
+                  <>
+                    <span className="font-medium text-muted-foreground">Target ID</span>
+                    <code className="text-xs bg-muted px-1 py-0.5 rounded break-all">{selectedLog.target_id}</code>
+                  </>
+                )}
+              </div>
+
+              {(selectedLog.metadata || selectedLog.details) && (
+                <div className="border-t pt-3">
+                  <h4 className="font-medium text-sm mb-2">Metadata</h4>
+                  <div className="space-y-2 text-sm">
+                    {Object.entries((selectedLog.metadata || selectedLog.details) as Record<string, unknown>).map(([key, value]) => (
+                      <div key={key}>
+                        <span className="font-medium text-muted-foreground text-xs">{key.replace(/_/g, ' ')}</span>
+                        <div className="mt-0.5">{renderMetadataValue(value)}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  )
+}
+
+export default function AuditLogsPage() {
+  return (
+    <Suspense fallback={
+      <div className="py-8 px-6">
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    }>
+      <AuditLogsContent />
+    </Suspense>
   )
 }

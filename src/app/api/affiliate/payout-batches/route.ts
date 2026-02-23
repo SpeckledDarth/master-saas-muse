@@ -60,29 +60,52 @@ export async function POST(request: NextRequest) {
 
       const globalMinPayout = settings?.min_payout_cents ?? 5000
 
-      const { data: affiliates, error: affErr } = await auth.admin
+      let affiliates: any[] = []
+      const { data: links, error: linkErr } = await auth.admin
         .from('referral_links')
-        .select('user_id, pending_earnings_cents, tier_id')
+        .select('*')
         .eq('is_affiliate', true)
-        .gt('pending_earnings_cents', 0)
 
-      if (affErr) {
-        if (affErr.code === '42P01') return NextResponse.json({ error: 'referral_links table not created yet' }, { status: 503 })
-        return NextResponse.json({ error: affErr.message }, { status: 500 })
+      if (linkErr) {
+        if (linkErr.code === '42P01') return NextResponse.json({ error: 'referral_links table not created yet' }, { status: 503 })
+        return NextResponse.json({ error: linkErr.message }, { status: 500 })
       }
 
-      if (!affiliates || affiliates.length === 0) {
+      if (!links || links.length === 0) {
+        return NextResponse.json({ error: 'No affiliates found' }, { status: 400 })
+      }
+
+      const { data: commissions } = await auth.admin
+        .from('affiliate_commissions')
+        .select('affiliate_user_id, commission_amount_cents, status')
+        .eq('status', 'approved')
+
+      const pendingMap: Record<string, number> = {}
+      for (const c of commissions || []) {
+        if (!pendingMap[c.affiliate_user_id]) pendingMap[c.affiliate_user_id] = 0
+        pendingMap[c.affiliate_user_id] += c.commission_amount_cents
+      }
+
+      for (const link of links) {
+        const pendingFromCommissions = pendingMap[link.user_id] || 0
+        const pendingFromLink = link.pending_earnings_cents || 0
+        const pendingEarnings = Math.max(pendingFromCommissions, pendingFromLink)
+        if (pendingEarnings > 0) {
+          affiliates.push({ user_id: link.user_id, pending_earnings_cents: pendingEarnings, tier_id: link.tier_id })
+        }
+      }
+
+      if (affiliates.length === 0) {
         return NextResponse.json({ error: 'No affiliates with pending earnings' }, { status: 400 })
       }
 
       let tiers: any[] = []
-      const { data: tierData, error: tierErr } = await auth.admin
-        .from('affiliate_tiers')
-        .select('id, min_payout_cents')
-
-      if (!tierErr && tierData) {
-        tiers = tierData
-      }
+      try {
+        const { data: tierData } = await auth.admin
+          .from('affiliate_tiers')
+          .select('id, min_payout_cents')
+        if (tierData) tiers = tierData
+      } catch {}
 
       const tierMinPayoutMap = new Map<string, number>()
       for (const tier of tiers) {
@@ -104,22 +127,40 @@ export async function POST(request: NextRequest) {
 
       const totalCents = eligible.reduce((sum: number, a: any) => sum + a.pending_earnings_cents, 0)
 
-      const { data: batch, error: batchErr } = await auth.admin
+      const batchFields: Record<string, any> = {
+        batch_date: new Date().toISOString(),
+        status: 'pending',
+        total_amount_cents: totalCents,
+        total_affiliates: eligible.length,
+        notes: body.notes || null,
+      }
+
+      let batch: any
+      const { data: batchData, error: batchErr } = await auth.admin
         .from('affiliate_payout_batches')
-        .insert({
-          batch_date: new Date().toISOString(),
-          status: 'pending',
-          total_amount_cents: totalCents,
-          total_affiliates: eligible.length,
-          created_by: auth.user.id,
-          notes: body.notes || null,
-        })
+        .insert({ ...batchFields, created_by: auth.user.id })
         .select()
         .single()
 
       if (batchErr) {
-        if (batchErr.code === '42P01') return NextResponse.json({ error: 'affiliate_payout_batches table not created yet' }, { status: 503 })
-        return NextResponse.json({ error: batchErr.message }, { status: 500 })
+        if (batchErr.message?.includes('created_by') || batchErr.message?.includes('column')) {
+          const retry = await auth.admin
+            .from('affiliate_payout_batches')
+            .insert(batchFields)
+            .select()
+            .single()
+          if (retry.error) {
+            if (retry.error.code === '42P01') return NextResponse.json({ error: 'affiliate_payout_batches table not created yet' }, { status: 503 })
+            return NextResponse.json({ error: retry.error.message }, { status: 500 })
+          }
+          batch = retry.data
+        } else if (batchErr.code === '42P01') {
+          return NextResponse.json({ error: 'affiliate_payout_batches table not created yet' }, { status: 503 })
+        } else {
+          return NextResponse.json({ error: batchErr.message }, { status: 500 })
+        }
+      } else {
+        batch = batchData
       }
 
       const payoutRows = eligible.map((a: any) => ({
@@ -139,7 +180,23 @@ export async function POST(request: NextRequest) {
           await auth.admin.from('affiliate_payout_batches').delete().eq('id', batch.id)
           return NextResponse.json({ error: 'affiliate_payouts table not created yet' }, { status: 503 })
         }
-        return NextResponse.json({ error: payoutsErr.message }, { status: 500 })
+        if (payoutsErr.message?.includes('method') || payoutsErr.message?.includes('column')) {
+          const simpleRows = eligible.map((a: any) => ({
+            batch_id: batch.id,
+            affiliate_user_id: a.user_id,
+            amount_cents: a.pending_earnings_cents,
+            status: 'pending',
+          }))
+          const { error: retryErr } = await auth.admin
+            .from('affiliate_payouts')
+            .insert(simpleRows)
+          if (retryErr) {
+            await auth.admin.from('affiliate_payout_batches').delete().eq('id', batch.id)
+            return NextResponse.json({ error: retryErr.message }, { status: 500 })
+          }
+        } else {
+          return NextResponse.json({ error: payoutsErr.message }, { status: 500 })
+        }
       }
 
       logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'create', entity_type: 'payout_batch', entity_id: batch.id, entity_name: `Batch ${batch.id}`, details: { total_amount_cents: totalCents, affiliates_included: eligible.length, notes: body.notes } })
@@ -162,18 +219,31 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Status must be approved or rejected' }, { status: 400 })
       }
 
+      const updateFields: Record<string, any> = {
+        status: newStatus,
+        approved_by: auth.user.id,
+        approved_at: new Date().toISOString(),
+      }
+
       const { error: batchUpdateErr } = await auth.admin
         .from('affiliate_payout_batches')
-        .update({
-          status: newStatus,
-          approved_by: auth.user.id,
-          approved_at: new Date().toISOString(),
-        })
+        .update(updateFields)
         .eq('id', batch_id)
 
       if (batchUpdateErr) {
-        if (batchUpdateErr.code === '42P01') return NextResponse.json({ error: 'Table not created yet' }, { status: 503 })
-        return NextResponse.json({ error: batchUpdateErr.message }, { status: 500 })
+        if (batchUpdateErr.message?.includes('approved_by') || batchUpdateErr.message?.includes('approved_at') || batchUpdateErr.message?.includes('column')) {
+          const { error: retryErr } = await auth.admin
+            .from('affiliate_payout_batches')
+            .update({ status: newStatus })
+            .eq('id', batch_id)
+          if (retryErr) {
+            return NextResponse.json({ error: retryErr.message }, { status: 500 })
+          }
+        } else if (batchUpdateErr.code === '42P01') {
+          return NextResponse.json({ error: 'Table not created yet' }, { status: 503 })
+        } else {
+          return NextResponse.json({ error: batchUpdateErr.message }, { status: 500 })
+        }
       }
 
       if (newStatus === 'approved') {
@@ -184,7 +254,7 @@ export async function POST(request: NextRequest) {
           .eq('status', 'pending')
 
         if (payoutUpdateErr && payoutUpdateErr.code !== '42P01') {
-          return NextResponse.json({ error: payoutUpdateErr.message }, { status: 500 })
+          console.error('Failed to update payout statuses:', payoutUpdateErr)
         }
       }
 
@@ -196,7 +266,7 @@ export async function POST(request: NextRequest) {
           .eq('status', 'pending')
 
         if (payoutRejectErr && payoutRejectErr.code !== '42P01') {
-          return NextResponse.json({ error: payoutRejectErr.message }, { status: 500 })
+          console.error('Failed to update payout statuses:', payoutRejectErr)
         }
       }
 
@@ -211,7 +281,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Required tables not created yet' }, { status: 503 })
     }
     console.error('Payout batches POST error:', err)
-    return NextResponse.json({ error: 'Failed to process payout batch' }, { status: 500 })
+    return NextResponse.json({ error: err.message || 'Failed to process payout batch' }, { status: 500 })
   }
 }
 
@@ -275,14 +345,12 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Can only delete pending batches' }, { status: 400 })
     }
 
-    const { error: deletePayoutsErr } = await auth.admin
-      .from('affiliate_payouts')
-      .delete()
-      .eq('batch_id', id)
-
-    if (deletePayoutsErr && deletePayoutsErr.code !== '42P01') {
-      return NextResponse.json({ error: deletePayoutsErr.message }, { status: 500 })
-    }
+    try {
+      await auth.admin
+        .from('affiliate_payouts')
+        .delete()
+        .eq('batch_id', id)
+    } catch {}
 
     const { error: deleteBatchErr } = await auth.admin
       .from('affiliate_payout_batches')
