@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import crypto from 'crypto'
+import { getEmailClient } from '@/lib/email/client'
 
 export async function POST(request: NextRequest) {
   try {
@@ -112,16 +113,30 @@ export async function POST(request: NextRequest) {
 
     const referralCode = crypto.randomBytes(6).toString('hex')
 
-    const { error: linkError } = await admin
+    const { data: existingLink } = await admin
       .from('referral_links')
-      .insert({
-        user_id: affiliateUserId,
-        referral_code: referralCode,
-        affiliate_role: 'affiliate',
-      })
+      .select('id')
+      .eq('user_id', affiliateUserId)
+      .maybeSingle()
 
-    if (linkError && linkError.code !== '23505') {
-      console.error('Failed to create referral link:', linkError)
+    if (existingLink) {
+      await admin
+        .from('referral_links')
+        .update({ is_affiliate: true, affiliate_role: 'affiliate' })
+        .eq('user_id', affiliateUserId)
+    } else {
+      const { error: linkError } = await admin
+        .from('referral_links')
+        .insert({
+          user_id: affiliateUserId,
+          ref_code: referralCode,
+          is_affiliate: true,
+          affiliate_role: 'affiliate',
+        })
+
+      if (linkError) {
+        console.error('Failed to create referral link:', linkError)
+      }
     }
 
     const { data: existingRole } = await admin
@@ -160,6 +175,36 @@ export async function POST(request: NextRequest) {
         link: '/affiliate/dashboard',
       })
     } catch {}
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io'
+    try {
+      const { client: emailClient, fromEmail } = await getEmailClient()
+      await emailClient.emails.send({
+        from: fromEmail,
+        to: application.email,
+        subject: 'Your Affiliate Application Has Been Approved!',
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #333;">Welcome to the Affiliate Program!</h2>
+            <p>Hi ${application.name},</p>
+            <p>Great news — your affiliate application has been approved! You now have access to your personal affiliate dashboard where you can find your unique referral link, marketing materials, and track your earnings.</p>
+            <p><strong>To get started:</strong></p>
+            <ol>
+              <li>Go to <a href="${baseUrl}/affiliate/login">${baseUrl}/affiliate/login</a></li>
+              <li>Enter your email: <strong>${application.email}</strong></li>
+              <li>Click "Send Magic Link" — you'll receive a login link in your inbox</li>
+            </ol>
+            <p style="margin: 24px 0;">
+              <a href="${baseUrl}/affiliate/login" style="background-color: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">Go to Affiliate Login</a>
+            </p>
+            <p>Once logged in, you'll find your referral link, marketing assets, and real-time performance stats on your dashboard.</p>
+            <p>Thanks for joining,<br/>The Team</p>
+          </div>
+        `,
+      })
+    } catch (emailErr) {
+      console.error('Failed to send affiliate welcome email:', emailErr)
+    }
 
     return NextResponse.json({ success: true, action: 'approve' })
   } catch (err) {
