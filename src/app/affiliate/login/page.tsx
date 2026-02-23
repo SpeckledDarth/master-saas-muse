@@ -35,7 +35,7 @@ export default function AffiliateLoginPage() {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?redirectTo=/affiliate/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/affiliate/dashboard`,
         },
       })
 

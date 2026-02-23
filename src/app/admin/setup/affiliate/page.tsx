@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -244,6 +245,8 @@ export default function AffiliateSettingsPage() {
   const [broadcastDialog, setBroadcastDialog] = useState(false)
   const [broadcastForm, setBroadcastForm] = useState({ subject: '', body: '', audience_type: 'all' })
   const [sendingBroadcast, setSendingBroadcast] = useState<string | null>(null)
+  const [editingBroadcast, setEditingBroadcast] = useState<Broadcast | null>(null)
+  const [sendConfirmBroadcast, setSendConfirmBroadcast] = useState<Broadcast | null>(null)
 
   const [healthData, setHealthData] = useState<HealthData | null>(null)
 
@@ -265,6 +268,9 @@ export default function AffiliateSettingsPage() {
   const [deletingApp, setDeletingApp] = useState<string | null>(null)
 
   const { toast } = useToast()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const activeTab = searchParams.get('tab') || 'health'
 
   const fetchData = useCallback(async () => {
     try {
@@ -549,22 +555,42 @@ export default function AffiliateSettingsPage() {
       return
     }
     try {
+      const method = editingBroadcast ? 'PATCH' : 'POST'
+      const payload = editingBroadcast
+        ? { id: editingBroadcast.id, subject: broadcastForm.subject, body: broadcastForm.body, audience_filter: { type: broadcastForm.audience_type } }
+        : { subject: broadcastForm.subject, body: broadcastForm.body, audience_filter: { type: broadcastForm.audience_type } }
       const res = await fetch('/api/admin/affiliate/broadcasts', {
-        method: 'POST',
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subject: broadcastForm.subject,
-          body: broadcastForm.body,
-          audience_filter: { type: broadcastForm.audience_type },
-        }),
+        body: JSON.stringify(payload),
       })
       if (!res.ok) throw new Error('Failed')
-      toast({ title: 'Broadcast draft created' })
+      toast({ title: editingBroadcast ? 'Broadcast updated' : 'Broadcast draft created' })
       setBroadcastDialog(false)
+      setEditingBroadcast(null)
       setBroadcastForm({ subject: '', body: '', audience_type: 'all' })
       fetchData()
     } catch {
-      toast({ title: 'Error', description: 'Failed to create broadcast', variant: 'destructive' })
+      toast({ title: 'Error', description: `Failed to ${editingBroadcast ? 'update' : 'create'} broadcast`, variant: 'destructive' })
+    }
+  }
+
+  const sendBroadcast = async (bc: Broadcast) => {
+    setSendingBroadcast(bc.id)
+    try {
+      const res = await fetch('/api/admin/affiliate/broadcasts', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: bc.id, send: true }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      toast({ title: 'Broadcast sent', description: `"${bc.subject}" has been sent to affiliates.` })
+      setSendConfirmBroadcast(null)
+      fetchData()
+    } catch {
+      toast({ title: 'Error', description: 'Failed to send broadcast', variant: 'destructive' })
+    } finally {
+      setSendingBroadcast(null)
     }
   }
 
@@ -725,7 +751,7 @@ export default function AffiliateSettingsPage() {
         </Card>
       )}
 
-      <Tabs defaultValue="health" data-testid="tabs-affiliate-admin">
+      <Tabs value={activeTab} onValueChange={(value) => router.replace(`?tab=${value}`, { scroll: false })} data-testid="tabs-affiliate-admin">
         <TabsList className="flex-wrap">
           <TabsTrigger value="health" data-testid="tab-health">
             <Activity className="h-3.5 w-3.5 mr-1" /> Health
@@ -738,7 +764,7 @@ export default function AffiliateSettingsPage() {
           <TabsTrigger value="milestones" data-testid="tab-milestones">Milestones</TabsTrigger>
           <TabsTrigger value="assets" data-testid="tab-assets">Marketing Assets</TabsTrigger>
           <TabsTrigger value="broadcasts" data-testid="tab-broadcasts">Broadcasts</TabsTrigger>
-          <TabsTrigger value="affiliates" data-testid="tab-affiliates">Affiliates</TabsTrigger>
+          <TabsTrigger value="affiliates" data-testid="tab-affiliates">Members</TabsTrigger>
           <TabsTrigger value="networks" data-testid="tab-networks">Networks</TabsTrigger>
           <TabsTrigger value="contests" data-testid="tab-contests">
             <Calendar className="h-3.5 w-3.5 mr-1" /> Contests
@@ -852,12 +878,12 @@ export default function AffiliateSettingsPage() {
                 </Card>
               </div>
 
-              {healthData.topPerformers.length > 0 && (
-                <Card data-testid="health-top-performers">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Top Performers</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+              <Card data-testid="health-top-performers">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Top Performers</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {healthData.topPerformers.length > 0 ? (
                     <div className="space-y-2">
                       {healthData.topPerformers.map((tp, i) => (
                         <div key={tp.userId} className="flex items-center justify-between p-2 rounded border text-sm">
@@ -870,9 +896,11 @@ export default function AffiliateSettingsPage() {
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-              )}
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-performers">No performer data yet</p>
+                  )}
+                </CardContent>
+              </Card>
             </>
           ) : (
             <Card>
@@ -1239,7 +1267,7 @@ export default function AffiliateSettingsPage() {
                 <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-tiers">No tiers configured. Add tiers to reward top affiliates.</p>
               ) : (
                 <div className="space-y-2">
-                  {tiers.map(tier => (
+                  {[...tiers].sort((a, b) => a.min_referrals - b.min_referrals).map(tier => (
                     <div key={tier.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`tier-${tier.id}`}>
                       <div className="flex items-center gap-3">
                         <Award className="h-4 w-4 text-muted-foreground" />
@@ -1621,18 +1649,16 @@ export default function AffiliateSettingsPage() {
                 </CardTitle>
                 <CardDescription>Send announcements and updates to your affiliates</CardDescription>
               </div>
+              <Button size="sm" onClick={() => { setEditingBroadcast(null); setBroadcastForm({ subject: '', body: '', audience_type: 'all' }); setBroadcastDialog(true) }} data-testid="button-add-broadcast">
+                <Plus className="h-4 w-4 mr-1" /> New Broadcast
+              </Button>
               <Dialog open={broadcastDialog} onOpenChange={(open) => {
                 setBroadcastDialog(open)
-                if (!open) setBroadcastForm({ subject: '', body: '', audience_type: 'all' })
+                if (!open) { setEditingBroadcast(null); setBroadcastForm({ subject: '', body: '', audience_type: 'all' }) }
               }}>
-                <DialogTrigger asChild>
-                  <Button size="sm" data-testid="button-add-broadcast">
-                    <Plus className="h-4 w-4 mr-1" /> New Broadcast
-                  </Button>
-                </DialogTrigger>
                 <DialogContent className="max-w-lg" data-testid="dialog-broadcast-form">
                   <DialogHeader>
-                    <DialogTitle>Create Broadcast</DialogTitle>
+                    <DialogTitle>{editingBroadcast ? 'Edit Broadcast' : 'Create Broadcast'}</DialogTitle>
                     <DialogDescription>Compose an email to send to your affiliates.</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-3">
@@ -1658,7 +1684,7 @@ export default function AffiliateSettingsPage() {
                       <Textarea value={broadcastForm.body} onChange={e => setBroadcastForm(f => ({ ...f, body: e.target.value }))} placeholder="Write your message here..." rows={6} data-testid="input-broadcast-body" />
                     </div>
                     <Button onClick={saveBroadcast} className="w-full" data-testid="button-save-broadcast">
-                      Save as Draft
+                      {editingBroadcast ? 'Update Broadcast' : 'Save as Draft'}
                     </Button>
                   </div>
                 </DialogContent>
@@ -1693,9 +1719,17 @@ export default function AffiliateSettingsPage() {
                       </div>
                       <div className="flex items-center gap-1 shrink-0 ml-3">
                         {bc.status === 'draft' && (
-                          <Button variant="ghost" size="sm" onClick={() => deleteBroadcast(bc.id)} data-testid={`button-delete-broadcast-${bc.id}`}>
-                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                          </Button>
+                          <>
+                            <Button variant="ghost" size="sm" onClick={() => { setEditingBroadcast(bc); setBroadcastForm({ subject: bc.subject, body: bc.body, audience_type: bc.audience_filter?.type || 'all' }); setBroadcastDialog(true) }} data-testid={`button-edit-broadcast-${bc.id}`}>
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => setSendConfirmBroadcast(bc)} disabled={sendingBroadcast === bc.id} data-testid={`button-send-broadcast-${bc.id}`}>
+                              {sendingBroadcast === bc.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => deleteBroadcast(bc.id)} data-testid={`button-delete-broadcast-${bc.id}`}>
+                              <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                            </Button>
+                          </>
                         )}
                       </div>
                     </div>
@@ -1704,6 +1738,24 @@ export default function AffiliateSettingsPage() {
               )}
             </CardContent>
           </Card>
+
+          <Dialog open={!!sendConfirmBroadcast} onOpenChange={(open) => { if (!open) setSendConfirmBroadcast(null) }}>
+            <DialogContent data-testid="dialog-send-confirm">
+              <DialogHeader>
+                <DialogTitle>Send Broadcast</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to send &ldquo;{sendConfirmBroadcast?.subject}&rdquo; to your affiliates? This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setSendConfirmBroadcast(null)} data-testid="button-cancel-send">Cancel</Button>
+                <Button onClick={() => sendConfirmBroadcast && sendBroadcast(sendConfirmBroadcast)} disabled={!!sendingBroadcast} data-testid="button-confirm-send">
+                  {sendingBroadcast ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Send className="h-4 w-4 mr-1" />}
+                  Send Now
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         <TabsContent value="networks" className="space-y-4 mt-4">

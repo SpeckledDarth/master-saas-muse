@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendEmail } from '@/lib/email'
 
 async function requireAdmin() {
   const supabase = await createClient()
@@ -88,18 +89,62 @@ export async function PATCH(request: NextRequest) {
     if (!auth) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
 
     const body = await request.json()
-    const { id, subject, body: messageBody, audience_filter } = body
+    const { id, subject, body: messageBody, audience_filter, send } = body
 
     if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 })
 
     const { data: existing } = await auth.admin
       .from('affiliate_broadcasts')
-      .select('status')
+      .select('*')
       .eq('id', id)
       .maybeSingle()
 
-    if (existing?.status === 'sent') {
+    if (!existing) {
+      return NextResponse.json({ error: 'Broadcast not found' }, { status: 404 })
+    }
+
+    if (existing.status === 'sent') {
       return NextResponse.json({ error: 'Cannot edit a sent broadcast' }, { status: 400 })
+    }
+
+    if (send) {
+      const audienceFilter = existing.audience_filter as { type?: string } || { type: 'all' }
+      let affiliateQuery = auth.admin
+        .from('referral_links')
+        .select('user_id')
+        .eq('is_affiliate', true)
+
+      const { data: affiliateLinks } = await affiliateQuery
+      const affiliateIds = (affiliateLinks || []).map((a: any) => a.user_id)
+
+      let sentCount = 0
+      for (const userId of affiliateIds) {
+        try {
+          const { data: userData } = await auth.admin.auth.admin.getUserById(userId)
+          if (!userData?.user?.email) continue
+
+          await sendEmail({
+            to: userData.user.email,
+            subject: existing.subject,
+            html: existing.body,
+          })
+          sentCount++
+        } catch (err) {
+          console.error(`Failed to send broadcast to ${userId}:`, err)
+        }
+      }
+
+      await auth.admin
+        .from('affiliate_broadcasts')
+        .update({
+          status: 'sent',
+          sent_count: sentCount,
+          sent_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+
+      return NextResponse.json({ success: true, sent_count: sentCount })
     }
 
     const updates: Record<string, any> = { updated_at: new Date().toISOString() }

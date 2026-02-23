@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import crypto from 'crypto'
 import { getEmailClient } from '@/lib/email/client'
+import { sendEmail } from '@/lib/email/service'
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,6 +57,29 @@ export async function POST(request: NextRequest) {
 
       if (updateError) {
         return NextResponse.json({ error: updateError.message }, { status: 500 })
+      }
+
+      try {
+        const reasonText = reviewer_notes
+          ? `<p><strong>Reason:</strong> ${reviewer_notes}</p>`
+          : '<p>Unfortunately, your application did not meet our current requirements.</p>'
+
+        await sendEmail({
+          to: application.email,
+          subject: 'Affiliate Application Update',
+          html: `
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h2 style="color: #333;">Affiliate Application Update</h2>
+              <p>Hi ${application.name},</p>
+              <p>Thank you for your interest in our affiliate program. After reviewing your application, we're unable to approve it at this time.</p>
+              ${reasonText}
+              <p>You're welcome to re-apply in the future if your circumstances change. We appreciate your interest and wish you the best.</p>
+              <p>— The Team</p>
+            </div>
+          `,
+        })
+      } catch (emailErr) {
+        console.error('Failed to send rejection email:', emailErr)
       }
 
       return NextResponse.json({ success: true, action: 'reject' })

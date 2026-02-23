@@ -50,14 +50,28 @@ export async function POST() {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io'
 
     try {
-      await fetch(`${baseUrl}/api/affiliate/drip`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-internal-secret': process.env.SESSION_SECRET || '',
-        },
-        body: JSON.stringify({ userId: user.id }),
+      const { sendEmail } = await import('@/lib/email')
+      const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'there'
+      const dashboardUrl = `${baseUrl}/affiliate/dashboard`
+
+      await sendEmail({
+        to: user.email!,
+        subject: 'Welcome to our Affiliate Program!',
+        html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #6366f1;">Welcome aboard, ${name}!</h1>
+          <p>You're now part of our affiliate program. Here's your dashboard where you can track everything.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${dashboardUrl}" style="background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">View Dashboard</a>
+          </div>
+        </div>`,
       })
+
+      await admin.from('email_drip_log').insert({
+        user_id: user.id,
+        sequence_name: 'affiliate',
+        step: 1,
+        email_key: 'welcome',
+      }).then(() => {}).catch(() => {})
     } catch {}
 
     return NextResponse.json({

@@ -9,12 +9,15 @@ export async function middleware(request: NextRequest) {
   })
 
   const protectedPaths = ['/profile', '/dashboard', '/admin', '/billing', '/settings']
+  const affiliateProtectedPaths = ['/affiliate/dashboard', '/affiliate/set-password']
   const isProtectedPath = protectedPaths.some(path => 
     request.nextUrl.pathname.startsWith(path)
   )
+  const isAffiliateProtectedPath = affiliateProtectedPaths.some(path =>
+    request.nextUrl.pathname.startsWith(path)
+  )
 
-  // Only check auth for protected paths - this is the expensive operation
-  if (!isProtectedPath) {
+  if (!isProtectedPath && !isAffiliateProtectedPath) {
     return response
   }
 
@@ -38,6 +41,9 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
+    if (isAffiliateProtectedPath) {
+      return NextResponse.redirect(new URL('/affiliate/login', request.url))
+    }
     const redirectUrl = new URL('/login', request.url)
     redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)
