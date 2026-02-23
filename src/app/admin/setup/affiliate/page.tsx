@@ -262,6 +262,7 @@ export default function AffiliateSettingsPage() {
   const [memberSort, setMemberSort] = useState<{ key: string; dir: 'asc' | 'desc' }>({ key: 'totalEarnings', dir: 'desc' })
   const [deletingMember, setDeletingMember] = useState<string | null>(null)
   const [memberSearch, setMemberSearch] = useState('')
+  const [deletingApp, setDeletingApp] = useState<string | null>(null)
 
   const { toast } = useToast()
 
@@ -333,6 +334,26 @@ export default function AffiliateSettingsPage() {
       toast({ title: 'Error', description: 'Failed to delete affiliate', variant: 'destructive' })
     } finally {
       setDeletingMember(null)
+    }
+  }
+
+  const handleDeleteApplication = async (appId: string, email: string) => {
+    if (!confirm(`Delete the application from ${email}? This cannot be undone.`)) return
+
+    setDeletingApp(appId)
+    try {
+      const res = await fetch(`/api/affiliate/applications?id=${appId}`, { method: 'DELETE' })
+      if (res.ok) {
+        toast({ title: 'Application deleted', description: `Application from ${email} has been removed.` })
+        setApplications(prev => prev.filter(a => a.id !== appId))
+      } else {
+        const data = await res.json()
+        toast({ title: 'Error', description: data.error || 'Failed to delete application', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to delete application', variant: 'destructive' })
+    } finally {
+      setDeletingApp(null)
     }
   }
 
@@ -924,38 +945,51 @@ export default function AffiliateSettingsPage() {
                             <p className="text-xs text-muted-foreground mt-1">Notes: {app.reviewer_notes}</p>
                           )}
                         </div>
-                        {app.status === 'pending' && (
-                          <div className="flex flex-col gap-2 shrink-0">
-                            <div className="flex items-center gap-1">
-                              <Button
-                                size="sm"
-                                onClick={() => reviewApplication(app.id, 'approve')}
-                                disabled={reviewingApp === app.id}
-                                data-testid={`button-approve-${app.id}`}
-                              >
-                                {reviewingApp === app.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle className="h-3.5 w-3.5 mr-1" />}
-                                Approve
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => reviewApplication(app.id, 'reject')}
-                                disabled={reviewingApp === app.id}
-                                data-testid={`button-reject-${app.id}`}
-                              >
-                                <XCircle className="h-3.5 w-3.5 mr-1" />
-                                Reject
-                              </Button>
-                            </div>
-                            <Input
-                              placeholder="Reviewer notes (optional)"
-                              value={reviewNotes}
-                              onChange={e => setReviewNotes(e.target.value)}
-                              className="text-xs h-7"
-                              data-testid={`input-review-notes-${app.id}`}
-                            />
-                          </div>
-                        )}
+                        <div className="flex flex-col gap-2 shrink-0">
+                          {app.status === 'pending' && (
+                            <>
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  size="sm"
+                                  onClick={() => reviewApplication(app.id, 'approve')}
+                                  disabled={reviewingApp === app.id}
+                                  data-testid={`button-approve-${app.id}`}
+                                >
+                                  {reviewingApp === app.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle className="h-3.5 w-3.5 mr-1" />}
+                                  Approve
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => reviewApplication(app.id, 'reject')}
+                                  disabled={reviewingApp === app.id}
+                                  data-testid={`button-reject-${app.id}`}
+                                >
+                                  <XCircle className="h-3.5 w-3.5 mr-1" />
+                                  Reject
+                                </Button>
+                              </div>
+                              <Input
+                                placeholder="Reviewer notes (optional)"
+                                value={reviewNotes}
+                                onChange={e => setReviewNotes(e.target.value)}
+                                className="text-xs h-7"
+                                data-testid={`input-review-notes-${app.id}`}
+                              />
+                            </>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDeleteApplication(app.id, app.email)}
+                            disabled={deletingApp === app.id}
+                            data-testid={`button-delete-app-${app.id}`}
+                          >
+                            {deletingApp === app.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5 mr-1" />}
+                            Delete
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))}

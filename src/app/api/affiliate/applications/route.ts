@@ -128,3 +128,45 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to load applications' }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const admin = createAdminClient()
+
+    const { data: userRole } = await admin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (userRole?.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    }
+
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json({ error: 'Application id is required' }, { status: 400 })
+    }
+
+    const { error } = await admin
+      .from('affiliate_applications')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Delete application error:', error)
+      return NextResponse.json({ error: 'Failed to delete application' }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (err: any) {
+    console.error('Application DELETE error:', err)
+    return NextResponse.json({ error: 'Failed to delete application' }, { status: 500 })
+  }
+}
