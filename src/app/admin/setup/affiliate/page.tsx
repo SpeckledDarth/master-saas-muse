@@ -302,7 +302,10 @@ export default function AffiliateSettingsPage() {
       ])
 
       if (settingsData.settings) setSettings(s => ({ ...s, ...settingsData.settings }))
-      if (tiersData.tiers) setTiers(tiersData.tiers)
+      if (tiersData.tiers) setTiers((tiersData.tiers as any[]).map(t => ({
+        ...t,
+        perks: Array.isArray(t.perks) ? t.perks : typeof t.perks === 'string' && t.perks ? t.perks.split(',').map((s: string) => s.trim()) : [],
+      })))
       if (assetsData.assets) setAssets(assetsData.assets)
       if (referralsData.affiliates) setAffiliates(referralsData.affiliates)
       if (referralsData.stats) setStats(referralsData.stats)
@@ -1287,7 +1290,7 @@ export default function AffiliateSettingsPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => { setEditingTier(tier); setTierForm({ name: tier.name, min_referrals: tier.min_referrals, commission_rate: tier.commission_rate, sort_order: tier.sort_order, min_payout_cents: (tier as any).min_payout_cents || 0, perks: ((tier as any).perks || []).join(', ') }); setTierDialog(true) }} data-testid={`button-edit-tier-${tier.id}`}>
+                        <Button variant="ghost" size="sm" onClick={() => { setEditingTier(tier); setTierForm({ name: tier.name, min_referrals: tier.min_referrals, commission_rate: tier.commission_rate, sort_order: tier.sort_order, min_payout_cents: (tier as any).min_payout_cents || 0, perks: Array.isArray((tier as any).perks) ? (tier as any).perks.join(', ') : (tier as any).perks || '' }); setTierDialog(true) }} data-testid={`button-edit-tier-${tier.id}`}>
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => deleteTier(tier.id)} data-testid={`button-delete-tier-${tier.id}`}>
