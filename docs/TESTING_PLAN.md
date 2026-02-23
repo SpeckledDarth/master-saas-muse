@@ -1,7 +1,7 @@
 # PassivePost — Deep Testing Plan
 
 > **Created:** February 23, 2026
-> **Scope:** Phase 3 (Affiliate Core), Phase 3.5 (Open Affiliate Program), Phase 3.6 Sprint 1 (Revenue & Motivation), Phase 3.6 Sprint 2 (Tools & Analytics)
+> **Scope:** Phase 3 (Affiliate Core), Phase 3.5 (Open Affiliate Program), Phase 3.6 Sprint 1 (Revenue & Motivation), Phase 3.6 Sprint 2 (Tools & Analytics), Phase 3.6 Sprint 3 (Consolidation)
 > **Test on:** Live Vercel deployment (passivepost.io)
 
 ---
@@ -240,7 +240,7 @@ After testing, we'll fix all FAILs before moving to Sprint 4.
 
 ---
 
-## Testing Notes
+## Testing Notes (Round 2)
 
 **Round 2 Focus:**
 - Verify seeded test data displays correctly across all 11 tabs
@@ -264,6 +264,135 @@ After testing, we'll fix all FAILs before moving to Sprint 4.
 - ShareASale and Impact networks activated
 
 **Database check shortcut:** Check Supabase dashboard > Table Editor for affiliate_applications, referral_links, user_roles, affiliate_commissions, etc.
+
+---
+
+## ROUND 3: Consolidation & Centralized Systems
+
+> **Created:** February 23, 2026
+> **Goal:** Verify the architecture consolidation changes — affiliate audit tab now links to centralized audit logs, broadcasts can load from centralized email templates, and email templates support category tagging.
+> **Pre-requisite:** Round 3 code pushed to GitHub and deployed on Vercel. Admin logged in. Migration `006_email_template_category.sql` run in Supabase (adds `category` column to `email_templates` table).
+
+---
+
+### SECTION R3-1: Audit Tab Consolidation
+
+> **Where:** Admin > Setup > Affiliate > Audit tab
+> **What changed:** The old audit tab (with inline timeline, filters, and detail modals) has been replaced with a simple info card that links to the centralized audit logs page.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R3-1.1 | Audit tab still exists | Click the "Audit" tab on the affiliate page | Tab loads without error | |
+| R3-1.2 | Simple card displays | Check tab content | Shows a card with title "Audit Log", description text explaining all actions are tracked centrally, and a button | |
+| R3-1.3 | No inline audit timeline | Look at the tab content | There is NO timeline of audit entries, NO entity type dropdown, NO action dropdown, NO refresh button — just the info card | |
+| R3-1.4 | Link button works | Click "View Affiliate Audit Logs" button | Navigates to `/admin/audit-logs?category=affiliate` | |
+| R3-1.5 | Centralized page loads | After clicking the link | Audit Logs page opens and shows affiliate-related events (if any exist) | |
+| R3-1.6 | Category filter applied | Check the audit logs page after arriving via the link | The page should show only audit entries with affiliate-related actions (entries with `affiliate_` prefix in action names) | |
+
+---
+
+### SECTION R3-2: Centralized Audit Logs Page
+
+> **Where:** Admin > Audit Logs (`/admin/audit-logs`)
+> **What changed:** This page already existed. We're verifying it works correctly when accessed with the `?category=affiliate` filter.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R3-2.1 | Direct URL access | Go to `/admin/audit-logs` (no filter) | Page loads showing all audit log entries across all categories | |
+| R3-2.2 | Filtered URL access | Go to `/admin/audit-logs?category=affiliate` | Page loads showing only affiliate-category audit entries | |
+| R3-2.3 | Entries appear after actions | Go back to affiliate admin, make a change (e.g., edit a tier), then return to `/admin/audit-logs?category=affiliate` | The action you just performed appears in the log | |
+| R3-2.4 | Entry details | Click on any audit entry | Shows detail information (action, entity, admin, timestamp) | |
+| R3-2.5 | No filter shows everything | Visit `/admin/audit-logs` (no category param) | Shows entries from all sources, not just affiliate | |
+
+---
+
+### SECTION R3-3: Broadcast "Load from Template"
+
+> **Where:** Admin > Setup > Affiliate > Broadcasts tab > "New Broadcast" button
+> **What changed:** The create broadcast dialog now includes a "Load from Email Template" dropdown at the top. This pulls templates from the centralized email templates system.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R3-3.1 | Template dropdown visible | Click "New Broadcast" button | Dialog opens with a "Load from Email Template" dropdown above the Subject field | |
+| R3-3.2 | Templates listed | Click the template dropdown | Shows all email templates from the centralized system. Templates with a category (other than "general") show the category in parentheses | |
+| R3-3.3 | Loading a template | Select any template from the dropdown | The Subject and Body fields auto-fill with the selected template's content | |
+| R3-3.4 | Can still edit after loading | Load a template, then change the subject or body text | Changes are allowed — the template just pre-fills, it doesn't lock | |
+| R3-3.5 | Manage templates link | Look below the dropdown | Small text link says "Manage templates in Email Templates" — clicking it navigates to `/admin/email-templates` | |
+| R3-3.6 | Not shown when editing | Click edit (pencil icon) on an existing draft broadcast | Dialog opens WITHOUT the template dropdown (only shows when creating new) | |
+| R3-3.7 | Works without templates | If no email templates exist in the system | The dropdown section is hidden entirely — broadcast form works normally | |
+
+---
+
+### SECTION R3-4: Email Templates — Category Tagging
+
+> **Where:** Admin > Email Templates (`/admin/email-templates`)
+> **What changed:** Email templates now have a "Category" field. Available categories: General, Onboarding, Billing, Affiliate, Team, Notification. Categories appear as badges on template cards.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R3-4.1 | Page loads | Go to `/admin/email-templates` | Page loads with all existing templates | |
+| R3-4.2 | Category badges | Check existing template cards | Templates with a category other than "general" show a small category badge next to their name | |
+| R3-4.3 | Create with category | Click "Create Template", fill in name, description | A "Category" dropdown appears with options: General, Onboarding, Billing, Affiliate, Team, Notification | |
+| R3-4.4 | Category saves on create | Create a template with category set to "affiliate", save | Template appears in list with "affiliate" badge | |
+| R3-4.5 | Category in edit mode | Click edit on any existing template | A "Category" dropdown appears next to the Subject Line field | |
+| R3-4.6 | Category saves on edit | Change an existing template's category to "billing", save | Category badge updates on the card | |
+| R3-4.7 | Default category | Create a template without changing the category dropdown | Category defaults to "general" (no badge shown since general is the default) | |
+| R3-4.8 | Templates show in broadcast | Create a template with category "affiliate", then go to affiliate broadcasts and click "New Broadcast" | The newly created template appears in the "Load from Template" dropdown with "(affiliate)" label | |
+
+---
+
+### SECTION R3-5: General Regression
+
+> **Where:** Admin > Setup > Affiliate (all tabs)
+> **Goal:** Make sure the consolidation changes didn't break anything from Round 2.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R3-5.1 | All tabs load | Click through every tab on the affiliate admin page | All tabs load without errors (Health, Applications, Settings, Tiers, Milestones, Assets, Broadcasts, Members, Networks, Contests, Payout Runs, Audit) | |
+| R3-5.2 | Tab count | Count the tabs | 12 tabs total | |
+| R3-5.3 | Health tab still default | Navigate to `/admin/setup/affiliate` (no tab param) | Health tab loads as default | |
+| R3-5.4 | Tab persistence | Click "Tiers" tab, refresh page | Still on Tiers tab after reload | |
+| R3-5.5 | Broadcasts still work | Go to Broadcasts tab | Existing broadcasts display, New Broadcast button works | |
+| R3-5.6 | Detail modals still work | Click on any tier, milestone, contest, or broadcast entry | Detail modal opens with correct information | |
+| R3-5.7 | No console errors | Open browser console (F12), navigate through tabs | No red error messages in console | |
+
+---
+
+### SECTION R3-6: Database Migration Check
+
+> **Where:** Supabase dashboard
+> **Goal:** Verify the category column was added to email_templates.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R3-6.1 | Migration applied | Check `email_templates` table in Supabase Table Editor | A `category` column exists with type `text` | |
+| R3-6.2 | Default value | Check existing rows in email_templates | All pre-existing templates have `category = 'general'` | |
+| R3-6.3 | No data loss | Count rows in email_templates | Same number of templates as before the migration | |
+
+---
+
+## Testing Notes (Round 3)
+
+**Round 3 Focus:**
+- Architecture consolidation — systems are connected, not duplicated
+- Centralized audit logs work with affiliate category filter
+- Broadcast dialog integrates with email templates
+- Email templates support category tagging
+- No regressions from Round 2
+
+**Migration required before testing:**
+Run this SQL in Supabase SQL Editor:
+```sql
+ALTER TABLE email_templates ADD COLUMN IF NOT EXISTS category text DEFAULT 'general';
+CREATE INDEX IF NOT EXISTS idx_email_templates_category ON email_templates(category);
+```
+(File: `migrations/extensions/006_email_template_category.sql`)
+
+**When something fails:**
+1. Note the section number (R3-X.X) and what happened
+2. Take a screenshot if possible
+3. Check browser console for errors (F12 > Console)
+4. We'll batch all fixes together
 
 ---
 
