@@ -17,6 +17,7 @@ import {
   Plus, Trash2, Pencil, Award, FileImage, FileText, Share2,
   CheckCircle, XCircle, Clock, Eye, Globe, UserPlus, Mail,
   Target, Send, BarChart3, Activity, Megaphone, Calendar, Package, RefreshCw,
+  ArrowUpDown, ArrowUp, ArrowDown, Search,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -102,6 +103,26 @@ interface AffiliateData {
   locked_at: string | null
   is_affiliate: boolean
   user_id: string
+}
+
+interface AffiliateMember {
+  userId: string
+  email: string
+  name: string
+  refCode: string
+  isAffiliate: boolean
+  status: string
+  tier: string
+  referrals: number
+  clicks: number
+  totalEarnings: number
+  pendingEarnings: number
+  paidEarnings: number
+  lockedRate: number | null
+  lockedDuration: number | null
+  joinedAt: string
+  lastSignIn: string | null
+  applicationStatus: string | null
 }
 
 interface AdminStats {
@@ -236,6 +257,12 @@ export default function AffiliateSettingsPage() {
   const [payoutBatches, setPayoutBatches] = useState<any[]>([])
   const [generatingBatch, setGeneratingBatch] = useState(false)
 
+  const [members, setMembers] = useState<AffiliateMember[]>([])
+  const [memberFilter, setMemberFilter] = useState('all')
+  const [memberSort, setMemberSort] = useState<{ key: string; dir: 'asc' | 'desc' }>({ key: 'totalEarnings', dir: 'desc' })
+  const [deletingMember, setDeletingMember] = useState<string | null>(null)
+  const [memberSearch, setMemberSearch] = useState('')
+
   const { toast } = useToast()
 
   const fetchData = useCallback(async () => {
@@ -278,6 +305,7 @@ export default function AffiliateSettingsPage() {
 
       fetch('/api/affiliate/contests?admin=true').then(r => r.json()).then(d => setContests(d.contests || [])).catch(() => {})
       fetch('/api/affiliate/payout-batches').then(r => r.json()).then(d => setPayoutBatches(d.batches || [])).catch(() => {})
+      fetch('/api/affiliate/members').then(r => r.json()).then(d => setMembers(d.members || [])).catch(() => {})
     } catch (err) {
       console.error('Failed to load affiliate data:', err)
     } finally {
@@ -286,6 +314,50 @@ export default function AffiliateSettingsPage() {
   }, [])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  const handleDeleteMember = async (userId: string, email: string) => {
+    if (!confirm(`Are you sure you want to delete the affiliate record for ${email}? This will remove their referral link, commissions, referrals, and application data. This cannot be undone.`)) return
+
+    setDeletingMember(userId)
+    try {
+      const res = await fetch(`/api/affiliate/members?userId=${userId}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (res.ok) {
+        toast({ title: 'Affiliate deleted', description: `${email} has been removed from the affiliate program.` })
+        setMembers(prev => prev.filter(m => m.userId !== userId))
+        fetchData()
+      } else {
+        toast({ title: 'Error', description: data.error || 'Failed to delete affiliate', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to delete affiliate', variant: 'destructive' })
+    } finally {
+      setDeletingMember(null)
+    }
+  }
+
+  const sortedFilteredMembers = members
+    .filter(m => {
+      if (memberFilter !== 'all' && m.status !== memberFilter) return false
+      if (memberSearch) {
+        const q = memberSearch.toLowerCase()
+        return m.email.toLowerCase().includes(q) || m.name.toLowerCase().includes(q) || m.refCode.toLowerCase().includes(q)
+      }
+      return true
+    })
+    .sort((a, b) => {
+      const key = memberSort.key as keyof AffiliateMember
+      const aVal = a[key] ?? 0
+      const bVal = b[key] ?? 0
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return memberSort.dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+      }
+      return memberSort.dir === 'asc' ? Number(aVal) - Number(bVal) : Number(bVal) - Number(aVal)
+    })
+
+  const toggleMemberSort = (key: string) => {
+    setMemberSort(prev => prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'desc' })
+  }
 
   const saveSettings = async () => {
     setSaving(true)
@@ -1261,35 +1333,139 @@ export default function AffiliateSettingsPage() {
         <TabsContent value="affiliates" className="space-y-4 mt-4">
           <Card data-testid="card-affiliates-list">
             <CardHeader>
-              <CardTitle className="text-base">Affiliates ({affiliates.length})</CardTitle>
-              <CardDescription>All active affiliates, ranked by total earnings</CardDescription>
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <CardTitle className="text-base">Affiliate Members ({members.length})</CardTitle>
+                  <CardDescription>Manage all affiliates — view stats, filter by status, and remove records</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search by name, email, or code..."
+                      value={memberSearch}
+                      onChange={e => setMemberSearch(e.target.value)}
+                      className="pl-8 w-[220px] h-9"
+                      data-testid="input-member-search"
+                    />
+                  </div>
+                  <Select value={memberFilter} onValueChange={setMemberFilter}>
+                    <SelectTrigger className="w-[140px] h-9" data-testid="select-member-filter">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="pending_setup">Pending Setup</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              {affiliates.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-affiliates">No affiliates yet. Users become affiliates when they activate in their dashboard.</p>
+              {members.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-no-members">No affiliates yet. Approve applications to add affiliates.</p>
+              ) : sortedFilteredMembers.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">No affiliates match your current filters.</p>
               ) : (
-                <div className="space-y-2">
-                  {affiliates.map(aff => (
-                    <div key={aff.user_id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`affiliate-${aff.user_id}`}>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{aff.email}</p>
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <Badge variant="outline" className="text-xs">{aff.ref_code}</Badge>
-                          <span className="text-xs text-muted-foreground">{aff.signups} referrals</span>
-                          <span className="text-xs text-muted-foreground">{aff.clicks} clicks</span>
-                          {aff.locked_commission_rate && (
-                            <Badge variant="secondary" className="text-xs">{aff.locked_commission_rate}% for {aff.locked_duration_months}mo</Badge>
-                          )}
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0 ml-3">
-                        <p className="text-sm font-semibold">${((aff.total_earnings_cents || 0) / 100).toFixed(2)}</p>
-                        <p className="text-xs text-muted-foreground">
-                          ${((aff.pending_earnings_cents || 0) / 100).toFixed(2)} pending
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-left">
+                        <th className="pb-2 pr-3 font-medium">
+                          <button onClick={() => toggleMemberSort('name')} className="flex items-center gap-1 hover:text-foreground text-muted-foreground" data-testid="sort-name">
+                            Affiliate
+                            {memberSort.key === 'name' ? (memberSort.dir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
+                          </button>
+                        </th>
+                        <th className="pb-2 px-3 font-medium">Status</th>
+                        <th className="pb-2 px-3 font-medium">
+                          <button onClick={() => toggleMemberSort('tier')} className="flex items-center gap-1 hover:text-foreground text-muted-foreground" data-testid="sort-tier">
+                            Tier
+                            {memberSort.key === 'tier' ? (memberSort.dir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
+                          </button>
+                        </th>
+                        <th className="pb-2 px-3 font-medium text-right">
+                          <button onClick={() => toggleMemberSort('referrals')} className="flex items-center gap-1 hover:text-foreground text-muted-foreground ml-auto" data-testid="sort-referrals">
+                            Referrals
+                            {memberSort.key === 'referrals' ? (memberSort.dir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
+                          </button>
+                        </th>
+                        <th className="pb-2 px-3 font-medium text-right">
+                          <button onClick={() => toggleMemberSort('totalEarnings')} className="flex items-center gap-1 hover:text-foreground text-muted-foreground ml-auto" data-testid="sort-earnings">
+                            Earnings
+                            {memberSort.key === 'totalEarnings' ? (memberSort.dir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
+                          </button>
+                        </th>
+                        <th className="pb-2 px-3 font-medium text-right">
+                          <button onClick={() => toggleMemberSort('joinedAt')} className="flex items-center gap-1 hover:text-foreground text-muted-foreground ml-auto" data-testid="sort-joined">
+                            Joined
+                            {memberSort.key === 'joinedAt' ? (memberSort.dir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
+                          </button>
+                        </th>
+                        <th className="pb-2 pl-3 font-medium text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sortedFilteredMembers.map(m => (
+                        <tr key={m.userId} className="border-b last:border-0 hover:bg-muted/30" data-testid={`member-row-${m.userId}`}>
+                          <td className="py-3 pr-3">
+                            <div className="min-w-0">
+                              <p className="font-medium truncate">{m.name || m.email}</p>
+                              {m.name && <p className="text-xs text-muted-foreground truncate">{m.email}</p>}
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0">{m.refCode}</Badge>
+                                {m.lockedRate && (
+                                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{m.lockedRate}% locked</Badge>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 px-3">
+                            <Badge
+                              variant={m.status === 'active' ? 'default' : m.status === 'pending_setup' ? 'secondary' : 'outline'}
+                              className="text-xs"
+                              data-testid={`status-${m.userId}`}
+                            >
+                              {m.status === 'active' ? 'Active' : m.status === 'pending_setup' ? 'Pending Setup' : 'Inactive'}
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="text-xs">{m.tier}</span>
+                          </td>
+                          <td className="py-3 px-3 text-right tabular-nums">
+                            <p className="font-medium">{m.referrals}</p>
+                            <p className="text-xs text-muted-foreground">{m.clicks} clicks</p>
+                          </td>
+                          <td className="py-3 px-3 text-right tabular-nums">
+                            <p className="font-medium">${(m.totalEarnings / 100).toFixed(2)}</p>
+                            {m.pendingEarnings > 0 && (
+                              <p className="text-xs text-muted-foreground">${(m.pendingEarnings / 100).toFixed(2)} pending</p>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            <p className="text-xs text-muted-foreground">{new Date(m.joinedAt).toLocaleDateString()}</p>
+                            {m.lastSignIn && (
+                              <p className="text-[10px] text-muted-foreground">Last: {new Date(m.lastSignIn).toLocaleDateString()}</p>
+                            )}
+                          </td>
+                          <td className="py-3 pl-3 text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => handleDeleteMember(m.userId, m.email)}
+                              disabled={deletingMember === m.userId}
+                              data-testid={`button-delete-member-${m.userId}`}
+                            >
+                              {deletingMember === m.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </CardContent>
