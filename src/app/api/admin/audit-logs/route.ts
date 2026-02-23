@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100)
     const action = searchParams.get('action')
     const userId = searchParams.get('userId')
+    const category = searchParams.get('category')
     const offset = (page - 1) * limit
 
     let query = adminClient
@@ -40,6 +41,7 @@ export async function GET(request: NextRequest) {
 
     if (action) query = query.eq('action', action)
     if (userId) query = query.eq('user_id', userId)
+    if (category) query = query.like('action', `${category}_%`)
 
     const { data: logs, count, error } = await query
 
@@ -59,7 +61,7 @@ export async function GET(request: NextRequest) {
 
     const enrichedLogs = (logs || []).map(log => ({
       ...log,
-      userEmail: userMap[log.user_id] || 'Unknown',
+      userEmail: userMap[log.user_id] || log.metadata?.admin_email || 'Unknown',
     }))
 
     const total = count || 0

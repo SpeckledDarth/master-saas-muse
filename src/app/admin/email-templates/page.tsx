@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
@@ -18,6 +19,7 @@ interface EmailTemplate {
   subject: string
   body: string
   description: string
+  category?: string
 }
 
 const ALL_VARIABLES = [
@@ -65,6 +67,7 @@ export default function EmailTemplatesPage() {
     subject: '',
     body: '',
     description: '',
+    category: 'general',
   })
   const [isCreateMode, setIsCreateMode] = useState(false)
   const [deleting, setDeleting] = useState<number | null>(null)
@@ -98,6 +101,7 @@ export default function EmailTemplatesPage() {
       subject: template.subject,
       body: template.body,
       description: template.description,
+      category: template.category || 'general',
     })
     setPreviewTab('edit')
     setDialogOpen(true)
@@ -111,6 +115,7 @@ export default function EmailTemplatesPage() {
       subject: 'Welcome to {{appName}}',
       body: 'Hi {{name}},\n\nWelcome to {{appName}}! We\'re excited to have you on board.\n\nIf you have any questions, feel free to reach out to us at {{supportEmail}}.\n\nBest regards,\nThe {{appName}} Team',
       description: '',
+      category: 'general',
     })
     setPreviewTab('edit')
     setDialogOpen(true)
@@ -131,12 +136,14 @@ export default function EmailTemplatesPage() {
             subject: form.subject,
             body: form.body,
             description: form.description,
+            category: form.category,
           }
         : {
             id: editingTemplate?.id,
             subject: form.subject,
             body: form.body,
             description: form.description,
+            category: form.category,
           }
 
       const res = await fetch('/api/admin/email-templates', {
@@ -304,8 +311,11 @@ export default function EmailTemplatesPage() {
             <Card key={template.id} data-testid={`template-${template.name}`}>
               <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
                 <div className="min-w-0 flex-1">
-                  <CardTitle className="text-lg capitalize">
+                  <CardTitle className="text-lg capitalize flex items-center gap-2">
                     {template.name.replace(/_/g, ' ')}
+                    {template.category && template.category !== 'general' && (
+                      <Badge variant="outline" className="text-[10px] capitalize font-normal">{template.category}</Badge>
+                    )}
                   </CardTitle>
                   <CardDescription className="truncate">{template.description}</CardDescription>
                 </div>
@@ -386,7 +396,7 @@ export default function EmailTemplatesPage() {
             <TabsContent value="edit" className="flex-1 overflow-auto space-y-4 mt-4">
               {isCreateMode && (
                 <>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Template Name</Label>
                       <Input
@@ -407,19 +417,55 @@ export default function EmailTemplatesPage() {
                         data-testid="input-template-description"
                       />
                     </div>
+                    <div className="space-y-2">
+                      <Label>Category</Label>
+                      <Select value={form.category} onValueChange={v => setForm({ ...form, category: v })}>
+                        <SelectTrigger data-testid="select-template-category">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="general">General</SelectItem>
+                          <SelectItem value="onboarding">Onboarding</SelectItem>
+                          <SelectItem value="billing">Billing</SelectItem>
+                          <SelectItem value="affiliate">Affiliate</SelectItem>
+                          <SelectItem value="team">Team</SelectItem>
+                          <SelectItem value="notification">Notification</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </>
               )}
               
-              <div className="space-y-2">
-                <Label htmlFor="subject">Subject Line</Label>
-                <Input
-                  id="subject"
-                  value={form.subject}
-                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                  placeholder="Email subject..."
-                  data-testid="input-subject"
-                />
+              <div className="flex gap-4">
+                <div className="space-y-2 flex-1">
+                  <Label htmlFor="subject">Subject Line</Label>
+                  <Input
+                    id="subject"
+                    value={form.subject}
+                    onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                    placeholder="Email subject..."
+                    data-testid="input-subject"
+                  />
+                </div>
+                {!isCreateMode && (
+                  <div className="space-y-2 w-[160px]">
+                    <Label>Category</Label>
+                    <Select value={form.category} onValueChange={v => setForm({ ...form, category: v })}>
+                      <SelectTrigger data-testid="select-template-category-edit">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">General</SelectItem>
+                        <SelectItem value="onboarding">Onboarding</SelectItem>
+                        <SelectItem value="billing">Billing</SelectItem>
+                        <SelectItem value="affiliate">Affiliate</SelectItem>
+                        <SelectItem value="team">Team</SelectItem>
+                        <SelectItem value="notification">Notification</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
               
               <div className="space-y-2">

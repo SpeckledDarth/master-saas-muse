@@ -81,31 +81,35 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { id, name, subject, body: templateBody, description } = body
+    const { id, name, subject, body: templateBody, description, category } = body
 
     if (id) {
+      const updates: Record<string, any> = {
+        subject,
+        body: templateBody,
+        description,
+        updated_at: new Date().toISOString(),
+      }
+      if (category !== undefined) updates.category = category
       const { error } = await adminClient
         .from('email_templates')
-        .update({
-          subject,
-          body: templateBody,
-          description,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updates)
         .eq('id', id)
 
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     } else {
+      const insert: Record<string, any> = {
+        name,
+        subject,
+        body: templateBody,
+        description,
+      }
+      if (category) insert.category = category
       const { error } = await adminClient
         .from('email_templates')
-        .insert({
-          name,
-          subject,
-          body: templateBody,
-          description,
-        })
+        .insert(insert)
 
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 })

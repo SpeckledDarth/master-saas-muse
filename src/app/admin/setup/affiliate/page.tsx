@@ -248,6 +248,7 @@ export default function AffiliateSettingsPage() {
   const [sendingBroadcast, setSendingBroadcast] = useState<string | null>(null)
   const [editingBroadcast, setEditingBroadcast] = useState<Broadcast | null>(null)
   const [sendConfirmBroadcast, setSendConfirmBroadcast] = useState<Broadcast | null>(null)
+  const [emailTemplates, setEmailTemplates] = useState<{ id: number; name: string; subject: string; body: string; category: string }[]>([])
 
   const [healthData, setHealthData] = useState<HealthData | null>(null)
 
@@ -260,10 +261,6 @@ export default function AffiliateSettingsPage() {
   })
   const [payoutBatches, setPayoutBatches] = useState<any[]>([])
   const [generatingBatch, setGeneratingBatch] = useState(false)
-
-  const [auditLog, setAuditLog] = useState<any[]>([])
-  const [auditLoading, setAuditLoading] = useState(false)
-  const [auditFilter, setAuditFilter] = useState<{ entity_type: string; action: string }>({ entity_type: 'all', action: 'all' })
 
   const [members, setMembers] = useState<AffiliateMember[]>([])
   const [memberFilter, setMemberFilter] = useState('all')
@@ -295,26 +292,9 @@ export default function AffiliateSettingsPage() {
     if (tab) setActiveTab(tab)
   }, [])
 
-  const fetchAuditLog = useCallback(async () => {
-    setAuditLoading(true)
-    try {
-      const params = new URLSearchParams()
-      if (auditFilter.entity_type !== 'all') params.set('entity_type', auditFilter.entity_type)
-      if (auditFilter.action !== 'all') params.set('action', auditFilter.action)
-      params.set('limit', '100')
-      const res = await fetch(`/api/admin/affiliate/audit?${params}`)
-      const data = await res.json()
-      setAuditLog(data.entries || [])
-    } catch {
-      setAuditLog([])
-    } finally {
-      setAuditLoading(false)
-    }
-  }, [auditFilter])
-
   const fetchData = useCallback(async () => {
     try {
-      const [settingsRes, tiersRes, assetsRes, referralsRes, appsRes, networksRes, milestonesRes, broadcastsRes, healthRes] = await Promise.all([
+      const [settingsRes, tiersRes, assetsRes, referralsRes, appsRes, networksRes, milestonesRes, broadcastsRes, healthRes, emailTplRes] = await Promise.all([
         fetch('/api/affiliate/settings'),
         fetch('/api/affiliate/tiers'),
         fetch('/api/affiliate/assets'),
@@ -324,9 +304,10 @@ export default function AffiliateSettingsPage() {
         fetch('/api/affiliate/milestones?admin=true'),
         fetch('/api/admin/affiliate/broadcasts'),
         fetch('/api/admin/affiliate/health'),
+        fetch('/api/admin/email-templates'),
       ])
 
-      const [settingsData, tiersData, assetsData, referralsData, appsData, networksData, milestonesData, broadcastsData, healthResData] = await Promise.all([
+      const [settingsData, tiersData, assetsData, referralsData, appsData, networksData, milestonesData, broadcastsData, healthResData, emailTplData] = await Promise.all([
         settingsRes.json(),
         tiersRes.json(),
         assetsRes.json(),
@@ -336,6 +317,7 @@ export default function AffiliateSettingsPage() {
         milestonesRes.json(),
         broadcastsRes.json(),
         healthRes.json(),
+        emailTplRes.json(),
       ])
 
       if (settingsData.settings) setSettings(s => ({ ...s, ...settingsData.settings }))
@@ -352,6 +334,7 @@ export default function AffiliateSettingsPage() {
       if (milestonesData.milestones) setMilestones(milestonesData.milestones)
       if (broadcastsData.broadcasts) setBroadcasts(broadcastsData.broadcasts)
       if (healthResData.health) setHealthData(healthResData.health)
+      if (emailTplData.templates) setEmailTemplates(emailTplData.templates)
 
       fetch('/api/affiliate/contests?admin=true').then(r => r.json()).then(d => setContests(d.contests || [])).catch(() => {})
       fetch('/api/affiliate/payout-batches').then(r => r.json()).then(d => setPayoutBatches(d.batches || [])).catch(() => {})
@@ -364,7 +347,6 @@ export default function AffiliateSettingsPage() {
   }, [])
 
   useEffect(() => { fetchData() }, [fetchData])
-  useEffect(() => { if (activeTab === 'audit') fetchAuditLog() }, [activeTab, fetchAuditLog])
 
   const handleDeleteMember = async (userId: string, email: string) => {
     if (!confirm(`Are you sure you want to delete the affiliate record for ${email}? This will remove their referral link, commissions, referrals, and application data. This cannot be undone.`)) return
@@ -925,18 +907,6 @@ export default function AffiliateSettingsPage() {
           { label: 'Earnings', value: detailItem.earnings, type: 'currency' },
         ]
       }
-      case 'audit':
-        return [
-          { label: 'Action', value: detailItem.action === 'soft_delete' ? 'Archived' : detailItem.action, type: 'badge', badgeVariant: detailItem.action === 'delete' || detailItem.action === 'soft_delete' || detailItem.action === 'reject' ? 'destructive' : detailItem.action === 'create' || detailItem.action === 'approve' ? 'default' : 'outline' },
-          { label: 'Entity Type', value: detailItem.entity_type },
-          { label: 'Entity Name', value: detailItem.entity_name },
-          { label: 'Entity ID', value: detailItem.entity_id },
-          { label: 'Admin', value: detailItem.admin_email || detailItem.admin_user_id },
-          { label: 'Timestamp', value: detailItem.created_at, type: 'date' },
-          ...(detailItem.details && Object.keys(detailItem.details).length > 0
-            ? [{ label: 'Details', value: JSON.stringify(detailItem.details, null, 2), type: 'html' as const }]
-            : []),
-        ]
       default:
         return []
     }
@@ -954,7 +924,6 @@ export default function AffiliateSettingsPage() {
       case 'network': return detailItem.network_name || 'Network Details'
       case 'contest': return detailItem.name || 'Contest Details'
       case 'payout_batch': return 'Payout Batch Details'
-      case 'audit': return `Audit: ${detailItem.action} ${detailItem.entity_type}`
       case 'flagged_referral': return 'Flagged Referral Details'
       case 'top_performer': {
         const mi = members.find(m => m.userId === detailItem.userId)
@@ -2078,6 +2047,27 @@ export default function AffiliateSettingsPage() {
                     <DialogDescription>Compose an email to send to your affiliates.</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-3">
+                    {emailTemplates.length > 0 && !editingBroadcast && (
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Load from Email Template</Label>
+                        <Select onValueChange={v => {
+                          const tpl = emailTemplates.find(t => String(t.id) === v)
+                          if (tpl) setBroadcastForm(f => ({ ...f, subject: tpl.subject, body: tpl.body }))
+                        }}>
+                          <SelectTrigger data-testid="select-broadcast-template" className="h-9">
+                            <SelectValue placeholder="Choose a template..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {emailTemplates.map(t => (
+                              <SelectItem key={t.id} value={String(t.id)}>{t.name}{t.category && t.category !== 'general' ? ` (${t.category})` : ''}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-[11px] text-muted-foreground mt-1">
+                          Manage templates in <a href="/admin/email-templates" className="underline">Email Templates</a>
+                        </p>
+                      </div>
+                    )}
                     <div>
                       <Label>Subject</Label>
                       <Input value={broadcastForm.subject} onChange={e => setBroadcastForm(f => ({ ...f, subject: e.target.value }))} placeholder="e.g., New commission rate increase!" data-testid="input-broadcast-subject" />
@@ -2446,104 +2436,24 @@ export default function AffiliateSettingsPage() {
         <TabsContent value="audit" className="space-y-4 mt-4">
           <Card data-testid="card-audit-log">
             <CardHeader>
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <ClipboardList className="h-4 w-4" />
-                    Audit Log
-                    <HelpTooltip text="A read-only record of every admin action taken in the affiliate system. Use this to track who changed what and when. Entries cannot be edited or deleted." />
-                  </CardTitle>
-                  <CardDescription>Track all admin actions across the affiliate program</CardDescription>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Select value={auditFilter.entity_type} onValueChange={v => setAuditFilter(f => ({ ...f, entity_type: v }))}>
-                    <SelectTrigger className="w-[140px] h-9" data-testid="select-audit-entity-filter">
-                      <SelectValue placeholder="All Types" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
-                      <SelectItem value="tier">Tiers</SelectItem>
-                      <SelectItem value="milestone">Milestones</SelectItem>
-                      <SelectItem value="asset">Assets</SelectItem>
-                      <SelectItem value="broadcast">Broadcasts</SelectItem>
-                      <SelectItem value="application">Applications</SelectItem>
-                      <SelectItem value="contest">Contests</SelectItem>
-                      <SelectItem value="settings">Settings</SelectItem>
-                      <SelectItem value="network">Networks</SelectItem>
-                      <SelectItem value="payout_batch">Payouts</SelectItem>
-                      <SelectItem value="member">Members</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={auditFilter.action} onValueChange={v => setAuditFilter(f => ({ ...f, action: v }))}>
-                    <SelectTrigger className="w-[130px] h-9" data-testid="select-audit-action-filter">
-                      <SelectValue placeholder="All Actions" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Actions</SelectItem>
-                      <SelectItem value="create">Create</SelectItem>
-                      <SelectItem value="update">Update</SelectItem>
-                      <SelectItem value="delete">Delete</SelectItem>
-                      <SelectItem value="soft_delete">Soft Delete</SelectItem>
-                      <SelectItem value="approve">Approve</SelectItem>
-                      <SelectItem value="reject">Reject</SelectItem>
-                      <SelectItem value="send">Send</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button size="sm" variant="outline" onClick={fetchAuditLog} disabled={auditLoading} data-testid="button-refresh-audit">
-                    <RefreshCw className={`h-3.5 w-3.5 ${auditLoading ? 'animate-spin' : ''}`} />
-                  </Button>
-                </div>
-              </div>
+              <CardTitle className="text-base flex items-center gap-2">
+                <ClipboardList className="h-4 w-4" />
+                Audit Log
+              </CardTitle>
+              <CardDescription>
+                All affiliate admin actions are tracked in the centralized audit log.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              {auditLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                </div>
-              ) : auditLog.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-no-audit">
-                  No audit entries found. Actions will be logged here as admins make changes.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {auditLog.map(entry => (
-                    <div
-                      key={entry.id}
-                      className="flex items-start gap-3 p-3 rounded-md border cursor-pointer hover:bg-muted/30 transition-colors"
-                      onClick={() => { setDetailItem(entry); setDetailType('audit') }}
-                      data-testid={`audit-entry-${entry.id}`}
-                    >
-                      <div className="shrink-0 mt-0.5">
-                        <Badge
-                          variant={
-                            entry.action === 'delete' || entry.action === 'soft_delete' ? 'destructive' :
-                            entry.action === 'create' ? 'default' :
-                            entry.action === 'approve' ? 'secondary' :
-                            entry.action === 'reject' ? 'destructive' :
-                            entry.action === 'send' ? 'default' :
-                            'outline'
-                          }
-                          className="text-[10px] px-1.5 capitalize"
-                        >
-                          {entry.action === 'soft_delete' ? 'Archived' : entry.action}
-                        </Badge>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span className="text-sm font-medium capitalize">{entry.entity_type}</span>
-                          {entry.entity_name && (
-                            <span className="text-sm text-muted-foreground truncate">{entry.entity_name}</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>{entry.admin_email || entry.admin_user_id?.slice(0, 8)}</span>
-                          <span>{new Date(entry.created_at).toLocaleString()}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <p className="text-sm text-muted-foreground mb-4">
+                Every change to tiers, milestones, assets, broadcasts, applications, contests, settings, networks, and payouts is automatically recorded with the admin who made it.
+              </p>
+              <Button asChild data-testid="button-view-audit-logs">
+                <a href="/admin/audit-logs?category=affiliate">
+                  <ClipboardList className="h-4 w-4 mr-2" />
+                  View Affiliate Audit Logs
+                </a>
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
