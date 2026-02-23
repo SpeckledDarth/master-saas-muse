@@ -267,13 +267,13 @@ export default function AffiliateSettingsPage() {
   const [deletingApp, setDeletingApp] = useState<string | null>(null)
 
   const { toast } = useToast()
-  const [activeTab, setActiveTab] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search)
-      return params.get('tab') || 'health'
-    }
-    return 'health'
-  })
+  const [activeTab, setActiveTab] = useState('health')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab')
+    if (tab) setActiveTab(tab)
+  }, [])
 
   const fetchData = useCallback(async () => {
     try {
@@ -371,7 +371,7 @@ export default function AffiliateSettingsPage() {
       if (memberFilter !== 'all' && m.status !== memberFilter) return false
       if (memberSearch) {
         const q = memberSearch.toLowerCase()
-        return m.email.toLowerCase().includes(q) || m.name.toLowerCase().includes(q) || m.refCode.toLowerCase().includes(q)
+        return (m.email || '').toLowerCase().includes(q) || (m.name || '').toLowerCase().includes(q) || (m.refCode || '').toLowerCase().includes(q)
       }
       return true
     })
@@ -744,7 +744,7 @@ export default function AffiliateSettingsPage() {
                 <div key={ref.id} className="flex items-center gap-2 p-2 rounded border text-sm" data-testid={`fraud-alert-${ref.id}`}>
                   <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                   <div className="flex-1">
-                    {(ref.fraud_flags || []).map(f => FRAUD_FLAG_LABELS[f] || f).join(', ')}
+                    {(Array.isArray(ref.fraud_flags) ? ref.fraud_flags : []).map(f => FRAUD_FLAG_LABELS[f] || f).join(', ')}
                   </div>
                   <span className="text-xs text-muted-foreground">{new Date(ref.created_at).toLocaleDateString()}</span>
                 </div>
@@ -966,7 +966,7 @@ export default function AffiliateSettingsPage() {
                                 <Globe className="h-3 w-3" /> {app.website_url.replace(/^https?:\/\//, '').slice(0, 30)}
                               </a>
                             )}
-                            <span>{app.promotion_method.split(',').map(m => PROMOTION_LABELS[m.trim()] || m.trim()).join(', ')}</span>
+                            <span>{(app.promotion_method || '').split(',').filter(Boolean).map(m => PROMOTION_LABELS[m.trim()] || m.trim()).join(', ')}</span>
                             <span>{new Date(app.created_at).toLocaleDateString()}</span>
                           </div>
                           {app.message && (
@@ -1277,9 +1277,9 @@ export default function AffiliateSettingsPage() {
                         <div>
                           <p className="font-medium text-sm">{tier.name}</p>
                           <p className="text-xs text-muted-foreground">{tier.min_referrals}+ referrals = {tier.commission_rate}% commission</p>
-                          {(tier as any).perks && (tier as any).perks.length > 0 && (
+                          {Array.isArray((tier as any).perks) && (tier as any).perks.length > 0 && (
                             <div className="flex items-center gap-1 mt-1 flex-wrap">
-                              {(tier as any).perks.map((perk: string, i: number) => (
+                              {((tier as any).perks as string[]).map((perk: string, i: number) => (
                                 <Badge key={i} variant="outline" className="text-xs">{perk}</Badge>
                               ))}
                             </div>
@@ -1504,9 +1504,9 @@ export default function AffiliateSettingsPage() {
                             <p className="text-xs text-muted-foreground">{m.clicks} clicks</p>
                           </td>
                           <td className="py-3 px-3 text-right tabular-nums">
-                            <p className="font-medium">${(m.totalEarnings / 100).toFixed(2)}</p>
-                            {m.pendingEarnings > 0 && (
-                              <p className="text-xs text-muted-foreground">${(m.pendingEarnings / 100).toFixed(2)} pending</p>
+                            <p className="font-medium">${((m.totalEarnings || 0) / 100).toFixed(2)}</p>
+                            {(m.pendingEarnings || 0) > 0 && (
+                              <p className="text-xs text-muted-foreground">${((m.pendingEarnings || 0) / 100).toFixed(2)} pending</p>
                             )}
                           </td>
                           <td className="py-3 px-3 text-right">
