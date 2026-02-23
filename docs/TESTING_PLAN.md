@@ -1,7 +1,7 @@
 # PassivePost — Deep Testing Plan
 
 > **Created:** February 23, 2026
-> **Scope:** Phase 3 (Affiliate Core), Phase 3.5 (Open Affiliate Program), Phase 3.6 Sprint 1 (Revenue & Motivation), Phase 3.6 Sprint 2 (Tools & Analytics), Phase 3.6 Sprint 3 (Consolidation), Round 4 (Regression Fixes)
+> **Scope:** Phase 3 (Affiliate Core), Phase 3.5 (Open Affiliate Program), Phase 3.6 Sprint 1 (Revenue & Motivation), Phase 3.6 Sprint 2 (Tools & Analytics), Phase 3.6 Sprint 3 (Consolidation), Round 4 (Regression Fixes), Round 5 (11 Persistent Bug Fixes)
 > **Test on:** Live Vercel deployment (passivepost.io)
 
 ---
@@ -491,6 +491,169 @@ CREATE INDEX IF NOT EXISTS idx_email_templates_category ON email_templates(categ
 
 **When something fails:**
 1. Note the section number (R4-X.X) and what happened
+2. Take a screenshot if possible
+3. Check browser console for errors (F12 > Console)
+4. We'll batch all fixes together
+
+---
+
+## ROUND 5: Regression Tests for 11 Persistent Bug Fixes
+
+> **Created:** February 23, 2026
+> **Goal:** Verify the 11 fixes deployed after Rounds 2-4 testing. These bugs had persisted across multiple rounds (some reported 4+ times). This round confirms they are finally resolved.
+> **Pre-requisite:** Round 5 code pushed to GitHub and deployed on Vercel. Admin logged in. Seeded test data still present.
+
+---
+
+### SECTION R5-1: Networks — Read-Only Fields
+
+> **Where:** Admin > Setup > Affiliate > Networks tab
+> **What was fixed:** Tracking ID and postback URL were editable inline in the table, but changes weren't saving reliably. Now they display as read-only text in the table row and can only be edited via the detail dialog.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R5-1.1 | Fields are read-only in table | Go to Networks tab, look at ShareASale row | Tracking ID ("SAS-12345") and postback URL shown as plain text, NOT editable input fields | |
+| R5-1.2 | Edit via detail dialog | Click on the ShareASale row to open detail dialog | Dialog opens with editable fields for tracking ID and postback URL | |
+| R5-1.3 | Save from dialog | Change the tracking ID in the dialog, save | Value updates and persists on page reload | |
+
+---
+
+### SECTION R5-2: Members — Status Badges
+
+> **Where:** Admin > Setup > Affiliate > Members tab
+> **What was fixed:** All members were showing "Pending Setup" regardless of activity. Status now considers signups > 0 or approved application as "Active".
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R5-2.1 | Active affiliates show Active | Check status column for affiliates with referrals | Affiliates with signups/referrals show "Active" badge (green) | |
+| R5-2.2 | Dormant shows differently | Check status for dormant affiliate | Shows "Dormant" or different badge, not "Active" | |
+| R5-2.3 | No "Pending Setup" for active | Scan all member rows | No active affiliate with referrals shows "Pending Setup" | |
+
+---
+
+### SECTION R5-3: Members — Earnings Display
+
+> **Where:** Admin > Setup > Affiliate > Members tab
+> **What was fixed:** $0.00 was displaying for affiliates with no earnings. Now shows an em-dash (—) instead. Pending earnings still display when > $0 even if total is $0.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R5-3.1 | No $0.00 shown | Check earnings column for affiliates with no earnings | Shows "—" instead of "$0.00" | |
+| R5-3.2 | Real earnings display | Check earnings for affiliates with earnings | Dollar amounts shown correctly (e.g., "$125.00") | |
+| R5-3.3 | Pending earnings visible | Check for affiliates with pending commissions | "pending" line appears below the total (or below the em-dash if total is $0 but pending > $0) | |
+
+---
+
+### SECTION R5-4: Broadcasts — CRUD Operations
+
+> **Where:** Admin > Setup > Affiliate > Broadcasts tab
+> **What was fixed:** Create, send, and delete were all failing due to missing database columns. API now retries with minimal fields on column errors.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R5-4.1 | Create draft | Click "New Broadcast", fill in name and body, save | Draft created and appears in list | |
+| R5-4.2 | Edit draft | Click edit (pencil) on the draft, change the body, save | Changes saved successfully | |
+| R5-4.3 | Send broadcast | Click send (arrow) on a draft | Confirmation dialog appears. On confirm, status changes to "sent" | |
+| R5-4.4 | Delete broadcast | Delete any broadcast | Removed from list without error | |
+
+---
+
+### SECTION R5-5: Applications — Delete
+
+> **Where:** Admin > Setup > Affiliate > Applications tab
+> **What was fixed:** Delete was failing because it tried to soft-delete (set deleted_at column) which may not exist. Now falls back to hard delete.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R5-5.1 | Delete rejected application | Set filter to show rejected apps. Click delete on one. | Application removed from list without error | |
+| R5-5.2 | Delete pending application | Click delete on a pending application | Confirmation dialog, then application removed | |
+
+---
+
+### SECTION R5-6: Payout Runs — Full Functionality
+
+> **Where:** Admin > Setup > Affiliate > Payout Runs tab
+> **What was fixed:** Generate batch was crashing, approve/reject buttons were missing. Completely rewritten with column-resilient inserts and proper button rendering.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R5-6.1 | Batches display | Go to Payout Runs tab | Existing batches shown with status, amount, count, and date | |
+| R5-6.2 | Pending batch actions | Check a pending batch | "Approve" and "Reject" buttons visible | |
+| R5-6.3 | Approve batch | Click Approve on a pending batch | Status changes to "approved" | |
+| R5-6.4 | Generate new batch | Click "Generate Payout Batch" | New batch created (or message saying no pending commissions) | |
+
+---
+
+### SECTION R5-7: Contests — Create and Winner Display
+
+> **Where:** Admin > Setup > Affiliate > Contests tab
+> **What was fixed:** Contest create was failing due to missing status column. Now auto-determines status from dates. Completed contests now show winner info.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R5-7.1 | Create contest | Click "New Contest", fill in name, metric, prize, start/end dates. Save. | Contest created and appears in list | |
+| R5-7.2 | Auto status | Create a contest with start date in the future | Status automatically set to "upcoming" | |
+| R5-7.3 | Winner display | Check the completed contest | Shows a trophy icon with winner email/name | |
+| R5-7.4 | Edit contest | Edit any contest, change the prize amount, save | Updated value persists | |
+| R5-7.5 | Delete contest | Delete the contest you just created | Removed from list | |
+
+---
+
+### SECTION R5-8: Milestones — Earned Count
+
+> **Where:** Admin > Setup > Affiliate > Milestones tab
+> **What was fixed:** No count was shown for how many affiliates earned each milestone. Now displays "X affiliates earned" below each milestone.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R5-8.1 | Count always shown | Check each milestone | Every milestone shows "X affiliates earned" text (including "0 affiliates earned" for unearned ones) | |
+| R5-8.2 | Count styling | Compare earned vs unearned | Milestones with earners show green text; milestones with 0 show muted/gray text | |
+| R5-8.3 | Count accuracy | Cross-check with Members tab | The count matches the number of members whose referrals meet or exceed the milestone threshold | |
+
+---
+
+### SECTION R5-9: Audit Logs — Click-to-Expand and URL Filter
+
+> **Where:** Admin > Audit Logs (`/admin/audit-logs`)
+> **What was fixed:** Clicking an entry did nothing. URL category filter wasn't triggering. Audit events weren't recording because insert failed on missing columns.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R5-9.1 | Click to expand | Click on any audit log entry | A detail dialog opens showing action, entity, admin, timestamp, and any metadata | |
+| R5-9.2 | URL filter works | Navigate to `/admin/audit-logs?category=affiliate` | Page loads with only affiliate-category entries shown | |
+| R5-9.3 | Events record after actions | Perform an action (e.g., edit a tier on the affiliate page), then check audit logs | The action appears as a new entry | |
+| R5-9.4 | Close dialog | Click outside or press X on the detail dialog | Dialog closes cleanly | |
+
+---
+
+### SECTION R5-10: General Regression
+
+> **Where:** Admin > Setup > Affiliate (all tabs)
+> **Goal:** Confirm the 11 fixes didn't break anything else.
+
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|-----------------|--------|
+| R5-10.1 | All 12 tabs load | Click through every tab | All tabs load without errors or crashes | |
+| R5-10.2 | Tab persistence | Click "Contests" tab, refresh page | Still on Contests tab after reload | |
+| R5-10.3 | No console errors | Open browser console (F12), navigate through all tabs | No red error messages | |
+| R5-10.4 | Health tab KPIs | Check Health tab | KPI cards still display data correctly | |
+| R5-10.5 | Settings save | Go to Settings tab, change a value, save | Saves successfully | |
+
+---
+
+## Testing Notes (Round 5)
+
+**Round 5 Focus:**
+- These 35 tests cover the 11 bugs that persisted across Rounds 2-4
+- All fixes use column-resilient patterns (try full insert, retry with minimal fields on column errors)
+- If all pass, we move forward to the next development phase
+- If any fail, note the test number and what happened
+
+**Key architecture note:**
+The fixes use a "try → catch column error → retry with fewer fields" pattern. This means they work regardless of which optional columns exist in your Supabase database. You do NOT need to run any new migrations for these fixes.
+
+**When something fails:**
+1. Note the section number (R5-X.X) and what happened
 2. Take a screenshot if possible
 3. Check browser console for errors (F12 > Console)
 4. We'll batch all fixes together
