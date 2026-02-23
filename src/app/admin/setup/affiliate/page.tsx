@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -268,9 +267,13 @@ export default function AffiliateSettingsPage() {
   const [deletingApp, setDeletingApp] = useState<string | null>(null)
 
   const { toast } = useToast()
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const activeTab = searchParams.get('tab') || 'health'
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      return params.get('tab') || 'health'
+    }
+    return 'health'
+  })
 
   const fetchData = useCallback(async () => {
     try {
@@ -751,7 +754,7 @@ export default function AffiliateSettingsPage() {
         </Card>
       )}
 
-      <Tabs value={activeTab} onValueChange={(value) => router.replace(`?tab=${value}`, { scroll: false })} data-testid="tabs-affiliate-admin">
+      <Tabs value={activeTab} onValueChange={(value) => { setActiveTab(value); window.history.replaceState(null, '', `?tab=${value}`) }} data-testid="tabs-affiliate-admin">
         <TabsList className="flex-wrap">
           <TabsTrigger value="health" data-testid="tab-health">
             <Activity className="h-3.5 w-3.5 mr-1" /> Health
