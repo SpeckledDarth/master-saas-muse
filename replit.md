@@ -9,6 +9,7 @@
 5. **Product extensions add files, not modify core.** New features go in `migrations/extensions/`, `src/lib/<product>/`, dedicated route dirs.
 6. **Affiliate system is separate from product users.** Different login, dashboard, tables. No cross-pollination.
 7. **Update ROADMAP.md session log** at the end of every session.
+8. **ALWAYS self-test before handing work to the user.** See "Pre-Delivery Testing Checklist" below. The user should NEVER be the first person to discover a bug. If you skip this, you are wasting the user's time.
 
 ## Centralized Admin Systems (Do NOT Duplicate)
 
@@ -47,6 +48,19 @@ Preferred communication style: Simple, everyday language.
 - **Cognitive load**: Minimize decisions. Ask simple yes/no questions. Avoid jargon unless it affects a decision.
 - **Git Sync Responsibility**: Agent ensures Replit and GitHub repo stay in sync. Before ending sessions or after significant changes, agent verifies sync status and asks user to run push commands if needed. User executes git commands when requested.
 - **CRITICAL - Deployment**: This is a Next.js + Vercel project. The user NEVER uses the Replit preview/webview. All testing and viewing happens on the live Vercel deployment (triggered by git push to GitHub). Replit is used only as a code editor. Never suggest using the Replit preview panel.
+
+### Pre-Delivery Testing Checklist (MANDATORY before handing work to user)
+
+Every time code changes are made, the agent MUST complete these steps before telling the user the work is ready:
+
+1. **Check the Replit database schema** — Query the Replit Postgres to confirm all tables and columns the code expects actually exist. The Replit DB should mirror what Supabase has. If a column is missing here, it's missing on Supabase too.
+2. **Start the dev server** — Run `npm run dev` and confirm no build/compile errors in the logs.
+3. **Test API endpoints** — Use curl or fetch against the local dev server to hit every API route that was changed. Confirm they return 200 (not 500). Check the response body makes sense.
+4. **Check server logs** — Review the dev server console output for any errors, warnings, or stack traces while testing.
+5. **Trace the full path** — For each fix, mentally trace: frontend fetch call -> API route -> database query -> response handling. Confirm every step works, not just the spot that looked broken.
+6. **List required Supabase migrations** — If any fix depends on a table or column that might not exist in the user's Supabase instance, explicitly list the migration SQL the user needs to run BEFORE testing.
+
+**Why this exists:** The user's time is valuable. They should never be the first person to discover a bug. Repeated test-fix-test cycles on the same issues waste hours. The Replit environment runs the same Next.js code as Vercel — if it breaks here, it breaks there. Test here first.
 
 ### Session Start Protocol
 - **ALWAYS read `docs/ROADMAP.md` at the start of every session.** This file is the persistent project memory containing the multi-week development plan, decision log, open questions, and session history. If agent memory resets, this file restores full context.
