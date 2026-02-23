@@ -66,12 +66,14 @@ export async function POST() {
         </div>`,
       })
 
-      await admin.from('email_drip_log').insert({
-        user_id: user.id,
-        sequence_name: 'affiliate',
-        step: 1,
-        email_key: 'welcome',
-      }).then(() => {}).catch(() => {})
+      try {
+        await admin.from('email_drip_log').insert({
+          user_id: user.id,
+          sequence_name: 'affiliate',
+          step: 1,
+          email_key: 'welcome',
+        })
+      } catch {}
     } catch {}
 
     return NextResponse.json({
