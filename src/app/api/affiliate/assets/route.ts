@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logAuditEvent } from '@/lib/affiliate/audit'
 
 export async function GET() {
   try {
@@ -48,6 +49,8 @@ export async function POST(request: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+    logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'create', entity_type: 'asset', entity_id: data.id, entity_name: title, details: { asset_type, description, file_url, file_name } })
+
     return NextResponse.json({ asset: data })
   } catch (err) {
     console.error('Affiliate assets POST error:', err)
@@ -74,6 +77,8 @@ export async function PUT(request: NextRequest) {
     const { error } = await admin.from('affiliate_assets').update(updates).eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+    logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'update', entity_type: 'asset', entity_id: id, details: updates })
+
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error('Affiliate assets PUT error:', err)
@@ -97,6 +102,8 @@ export async function DELETE(request: NextRequest) {
 
     const { error } = await admin.from('affiliate_assets').delete().eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'delete', entity_type: 'asset', entity_id: id })
 
     return NextResponse.json({ success: true })
   } catch (err) {

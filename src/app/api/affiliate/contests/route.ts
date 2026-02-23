@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logAuditEvent } from '@/lib/affiliate/audit'
 
 async function requireAdmin() {
   const supabase = await createClient()
@@ -98,6 +99,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'create', entity_type: 'contest', entity_id: data.id, entity_name: name, details: { metric: metric || 'referrals', start_date, end_date, prize_description, prize_amount_cents } })
+
     return NextResponse.json({ contest: data })
   } catch (err: any) {
     if (err?.code === '42P01' || err?.message?.includes('does not exist')) {
@@ -138,6 +141,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'update', entity_type: 'contest', entity_id: id, entity_name: filtered.name, details: filtered })
+
     return NextResponse.json({ success: true })
   } catch (err: any) {
     if (err?.code === '42P01' || err?.message?.includes('does not exist')) {
@@ -166,6 +171,8 @@ export async function DELETE(request: NextRequest) {
       if (error.code === '42P01') return NextResponse.json({ error: 'Contests table not created yet. Run migration.' }, { status: 503 })
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'delete', entity_type: 'contest', entity_id: id })
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

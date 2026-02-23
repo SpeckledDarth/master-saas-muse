@@ -11,15 +11,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Progress } from '@/components/ui/progress'
 import {
   Loader2, Save, DollarSign, Users, TrendingUp, AlertTriangle,
   Plus, Trash2, Pencil, Award, FileImage, FileText, Share2,
-  CheckCircle, XCircle, Clock, Eye, Globe, UserPlus, Mail,
+  CheckCircle, XCircle, Clock, Globe, UserPlus, Mail,
   Target, Send, BarChart3, Activity, Megaphone, Calendar, Package, RefreshCw,
-  ArrowUpDown, ArrowUp, ArrowDown, Search,
+  ArrowUpDown, ArrowUp, ArrowDown, Search, Info, HelpCircle, ClipboardList,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import DetailModal, { DetailField } from '@/components/admin/DetailModal'
+import HelpTooltip from '@/components/admin/HelpTooltip'
+import SortableHeader from '@/components/admin/SortableHeader'
 
 interface Settings {
   commission_rate: number
@@ -259,12 +261,30 @@ export default function AffiliateSettingsPage() {
   const [payoutBatches, setPayoutBatches] = useState<any[]>([])
   const [generatingBatch, setGeneratingBatch] = useState(false)
 
+  const [auditLog, setAuditLog] = useState<any[]>([])
+  const [auditLoading, setAuditLoading] = useState(false)
+  const [auditFilter, setAuditFilter] = useState<{ entity_type: string; action: string }>({ entity_type: 'all', action: 'all' })
+
   const [members, setMembers] = useState<AffiliateMember[]>([])
   const [memberFilter, setMemberFilter] = useState('all')
   const [memberSort, setMemberSort] = useState<{ key: string; dir: 'asc' | 'desc' }>({ key: 'totalEarnings', dir: 'desc' })
   const [deletingMember, setDeletingMember] = useState<string | null>(null)
   const [memberSearch, setMemberSearch] = useState('')
   const [deletingApp, setDeletingApp] = useState<string | null>(null)
+
+  const [detailItem, setDetailItem] = useState<any>(null)
+  const [detailType, setDetailType] = useState<string>('')
+
+  const [tierSort, setTierSort] = useState<{ key: string; dir: 'asc' | 'desc' }>({ key: 'min_referrals', dir: 'asc' })
+  const [milestoneSort, setMilestoneSort] = useState<{ key: string; dir: 'asc' | 'desc' }>({ key: 'referral_threshold', dir: 'asc' })
+  const [milestoneFilter, setMilestoneFilter] = useState('all')
+  const [assetSort, setAssetSort] = useState<{ key: string; dir: 'asc' | 'desc' }>({ key: 'title', dir: 'asc' })
+  const [assetFilter, setAssetFilter] = useState('all')
+  const [broadcastFilter, setBroadcastFilter] = useState('all')
+  const [broadcastSort, setBroadcastSort] = useState<{ key: string; dir: 'asc' | 'desc' }>({ key: 'created_at', dir: 'desc' })
+  const [contestFilter, setContestFilter] = useState('all')
+  const [contestSort, setContestSort] = useState<{ key: string; dir: 'asc' | 'desc' }>({ key: 'start_date', dir: 'desc' })
+  const [batchFilter, setBatchFilter] = useState('all')
 
   const { toast } = useToast()
   const [activeTab, setActiveTab] = useState('health')
@@ -274,6 +294,23 @@ export default function AffiliateSettingsPage() {
     const tab = params.get('tab')
     if (tab) setActiveTab(tab)
   }, [])
+
+  const fetchAuditLog = useCallback(async () => {
+    setAuditLoading(true)
+    try {
+      const params = new URLSearchParams()
+      if (auditFilter.entity_type !== 'all') params.set('entity_type', auditFilter.entity_type)
+      if (auditFilter.action !== 'all') params.set('action', auditFilter.action)
+      params.set('limit', '100')
+      const res = await fetch(`/api/admin/affiliate/audit?${params}`)
+      const data = await res.json()
+      setAuditLog(data.entries || [])
+    } catch {
+      setAuditLog([])
+    } finally {
+      setAuditLoading(false)
+    }
+  }, [auditFilter])
 
   const fetchData = useCallback(async () => {
     try {
@@ -327,6 +364,7 @@ export default function AffiliateSettingsPage() {
   }, [])
 
   useEffect(() => { fetchData() }, [fetchData])
+  useEffect(() => { if (activeTab === 'audit') fetchAuditLog() }, [activeTab, fetchAuditLog])
 
   const handleDeleteMember = async (userId: string, email: string) => {
     if (!confirm(`Are you sure you want to delete the affiliate record for ${email}? This will remove their referral link, commissions, referrals, and application data. This cannot be undone.`)) return
@@ -391,6 +429,98 @@ export default function AffiliateSettingsPage() {
   const toggleMemberSort = (key: string) => {
     setMemberSort(prev => prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'desc' })
   }
+
+  const toggleTierSort = (key: string) => {
+    setTierSort(prev => prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'desc' })
+  }
+
+  const toggleMilestoneSort = (key: string) => {
+    setMilestoneSort(prev => prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'desc' })
+  }
+
+  const toggleAssetSort = (key: string) => {
+    setAssetSort(prev => prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'desc' })
+  }
+
+  const toggleBroadcastSort = (key: string) => {
+    setBroadcastSort(prev => prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'desc' })
+  }
+
+  const toggleContestSort = (key: string) => {
+    setContestSort(prev => prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'desc' })
+  }
+
+  const sortedTiers = [...tiers].sort((a, b) => {
+    const key = tierSort.key as keyof Tier
+    const aVal = a[key] ?? 0
+    const bVal = b[key] ?? 0
+    if (typeof aVal === 'string' && typeof bVal === 'string') {
+      return tierSort.dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+    }
+    return tierSort.dir === 'asc' ? Number(aVal) - Number(bVal) : Number(bVal) - Number(aVal)
+  })
+
+  const sortedFilteredMilestones = milestones
+    .filter(ms => {
+      if (milestoneFilter === 'active') return ms.is_active
+      if (milestoneFilter === 'inactive') return !ms.is_active
+      return true
+    })
+    .sort((a, b) => {
+      const key = milestoneSort.key
+      if (key === 'is_active') {
+        const aVal = a.is_active ? 1 : 0
+        const bVal = b.is_active ? 1 : 0
+        return milestoneSort.dir === 'asc' ? aVal - bVal : bVal - aVal
+      }
+      const aVal = (a as any)[key] ?? 0
+      const bVal = (b as any)[key] ?? 0
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return milestoneSort.dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+      }
+      return milestoneSort.dir === 'asc' ? Number(aVal) - Number(bVal) : Number(bVal) - Number(aVal)
+    })
+
+  const sortedFilteredAssets = assets
+    .filter(a => assetFilter === 'all' || a.asset_type === assetFilter)
+    .sort((a, b) => {
+      const key = assetSort.key as keyof Asset
+      const aVal = a[key] ?? ''
+      const bVal = b[key] ?? ''
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return assetSort.dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+      }
+      return assetSort.dir === 'asc' ? Number(aVal) - Number(bVal) : Number(bVal) - Number(aVal)
+    })
+
+  const sortedFilteredBroadcasts = broadcasts
+    .filter(bc => broadcastFilter === 'all' || bc.status === broadcastFilter)
+    .sort((a, b) => {
+      const key = broadcastSort.key
+      const aVal = (a as any)[key] ?? ''
+      const bVal = (b as any)[key] ?? ''
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return broadcastSort.dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+      }
+      return broadcastSort.dir === 'asc' ? Number(aVal) - Number(bVal) : Number(bVal) - Number(aVal)
+    })
+
+  const sortedFilteredContests = contests
+    .filter(c => {
+      if (contestFilter === 'all') return true
+      return c.status === contestFilter
+    })
+    .sort((a, b) => {
+      const key = contestSort.key
+      const aVal = (a as any)[key] ?? ''
+      const bVal = (b as any)[key] ?? ''
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return contestSort.dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+      }
+      return contestSort.dir === 'asc' ? Number(aVal) - Number(bVal) : Number(bVal) - Number(aVal)
+    })
+
+  const filteredBatches = payoutBatches.filter(b => batchFilter === 'all' || b.status === batchFilter)
 
   const saveSettings = async () => {
     setSaving(true)
@@ -679,6 +809,161 @@ export default function AffiliateSettingsPage() {
   const filteredApplications = applications.filter(a => appFilter === 'all' || a.status === appFilter)
   const pendingCount = applications.filter(a => a.status === 'pending').length
 
+  const getDetailFields = (): DetailField[] => {
+    if (!detailItem) return []
+    switch (detailType) {
+      case 'tier':
+        return [
+          { label: 'Name', value: detailItem.name },
+          { label: 'Min Referrals', value: detailItem.min_referrals },
+          { label: 'Commission Rate', value: detailItem.commission_rate, type: 'percentage' },
+          { label: 'Min Payout', value: detailItem.min_payout_cents || 0, type: 'currency' },
+          { label: 'Sort Order', value: detailItem.sort_order },
+          { label: 'Perks', value: Array.isArray(detailItem.perks) ? detailItem.perks : [], type: 'badges' },
+        ]
+      case 'milestone':
+        return [
+          { label: 'Name', value: detailItem.name },
+          { label: 'Referral Threshold', value: detailItem.referral_threshold },
+          { label: 'Bonus Amount', value: detailItem.bonus_amount_cents, type: 'currency' },
+          { label: 'Description', value: detailItem.description },
+          { label: 'Active', value: detailItem.is_active },
+          { label: 'Sort Order', value: detailItem.sort_order },
+        ]
+      case 'asset':
+        return [
+          { label: 'Title', value: detailItem.title },
+          { label: 'Type', value: ASSET_TYPES.find(t => t.value === detailItem.asset_type)?.label || detailItem.asset_type, type: 'badge' },
+          { label: 'Description', value: detailItem.description },
+          { label: 'Content', value: detailItem.content, type: 'html' },
+          { label: 'File URL', value: detailItem.file_url },
+          { label: 'Active', value: detailItem.active },
+        ]
+      case 'broadcast':
+        return [
+          { label: 'Subject', value: detailItem.subject },
+          { label: 'Status', value: detailItem.status, type: 'badge', badgeVariant: detailItem.status === 'sent' ? 'default' : 'outline' },
+          { label: 'Audience', value: detailItem.audience_filter?.type || 'all' },
+          { label: 'Body', value: detailItem.body, type: 'html' },
+          { label: 'Sent Count', value: detailItem.sent_count },
+          { label: 'Opened Count', value: detailItem.opened_count },
+          { label: 'Clicked Count', value: detailItem.clicked_count },
+          { label: 'Created', value: detailItem.created_at, type: 'date' },
+          { label: 'Sent At', value: detailItem.sent_at, type: 'date' },
+        ]
+      case 'member': {
+        return [
+          { label: 'Name', value: detailItem.name },
+          { label: 'Email', value: detailItem.email },
+          { label: 'Ref Code', value: detailItem.refCode },
+          { label: 'Status', value: detailItem.status === 'active' ? 'Active' : detailItem.status === 'pending_setup' ? 'Pending Setup' : 'Inactive', type: 'badge', badgeVariant: detailItem.status === 'active' ? 'default' : 'outline' },
+          { label: 'Tier', value: detailItem.tier },
+          { label: 'Referrals', value: detailItem.referrals },
+          { label: 'Clicks', value: detailItem.clicks },
+          { label: 'Total Earnings', value: detailItem.totalEarnings, type: 'currency' },
+          { label: 'Pending Earnings', value: detailItem.pendingEarnings, type: 'currency' },
+          { label: 'Paid Earnings', value: detailItem.paidEarnings, type: 'currency' },
+          { label: 'Locked Rate', value: detailItem.lockedRate, type: 'percentage' },
+          { label: 'Locked Duration', value: detailItem.lockedDuration ? `${detailItem.lockedDuration} months` : null },
+          { label: 'Joined', value: detailItem.joinedAt, type: 'date' },
+          { label: 'Last Sign In', value: detailItem.lastSignIn, type: 'date' },
+        ]
+      }
+      case 'application':
+        return [
+          { label: 'Name', value: detailItem.name },
+          { label: 'Email', value: detailItem.email },
+          { label: 'Website', value: detailItem.website_url },
+          { label: 'Promotion Methods', value: (detailItem.promotion_method || '').split(',').filter(Boolean).map((m: string) => PROMOTION_LABELS[m.trim()] || m.trim()).join(', ') },
+          { label: 'Message', value: detailItem.message, type: 'html' },
+          { label: 'Status', value: detailItem.status, type: 'badge', badgeVariant: detailItem.status === 'approved' ? 'secondary' : detailItem.status === 'rejected' ? 'destructive' : 'outline' },
+          { label: 'Reviewer Notes', value: detailItem.reviewer_notes },
+          { label: 'Applied', value: detailItem.created_at, type: 'date' },
+          { label: 'Reviewed', value: detailItem.reviewed_at, type: 'date' },
+        ]
+      case 'network':
+        return [
+          { label: 'Network Name', value: detailItem.network_name },
+          { label: 'Slug', value: detailItem.network_slug },
+          { label: 'Active', value: detailItem.is_active },
+          { label: 'Tracking ID', value: detailItem.tracking_id },
+          { label: 'Postback URL', value: detailItem.postback_url },
+        ]
+      case 'contest':
+        return [
+          { label: 'Name', value: detailItem.name },
+          { label: 'Description', value: detailItem.description },
+          { label: 'Status', value: detailItem.status, type: 'badge', badgeVariant: detailItem.status === 'active' ? 'default' : detailItem.status === 'completed' ? 'secondary' : 'outline' },
+          { label: 'Metric', value: detailItem.metric },
+          { label: 'Prize Amount', value: detailItem.prize_amount_cents, type: 'currency' },
+          { label: 'Prize Description', value: detailItem.prize_description },
+          { label: 'Start Date', value: detailItem.start_date, type: 'date' },
+          { label: 'End Date', value: detailItem.end_date, type: 'date' },
+          ...(detailItem.status === 'completed' && detailItem.winner ? [{ label: 'Winner', value: detailItem.winner }] : []),
+        ]
+      case 'payout_batch':
+        return [
+          { label: 'Status', value: detailItem.status, type: 'badge' as const, badgeVariant: (detailItem.status === 'approved' ? 'secondary' : detailItem.status === 'rejected' ? 'destructive' : 'outline') as any },
+          { label: 'Total Amount', value: detailItem.total_amount_cents || 0, type: 'currency' },
+          { label: 'Payout Count', value: detailItem.payout_count || 0 },
+          { label: 'Batch Date', value: detailItem.batch_date || detailItem.created_at, type: 'date' },
+          { label: 'Notes', value: detailItem.notes },
+        ]
+      case 'flagged_referral':
+        return [
+          { label: 'Affiliate User ID', value: detailItem.affiliate_user_id },
+          { label: 'Referred User ID', value: detailItem.referred_user_id },
+          { label: 'Fraud Flags', value: (Array.isArray(detailItem.fraud_flags) ? detailItem.fraud_flags : []).map((f: string) => FRAUD_FLAG_LABELS[f] || f), type: 'badges' },
+          { label: 'Created', value: detailItem.created_at, type: 'date' },
+        ]
+      case 'top_performer': {
+        const memberInfo = members.find(m => m.userId === detailItem.userId)
+        return [
+          { label: 'Name', value: memberInfo?.name || memberInfo?.email || detailItem.userId },
+          { label: 'User ID', value: detailItem.userId },
+          { label: 'Referrals', value: detailItem.referrals },
+          { label: 'Earnings', value: detailItem.earnings, type: 'currency' },
+        ]
+      }
+      case 'audit':
+        return [
+          { label: 'Action', value: detailItem.action === 'soft_delete' ? 'Archived' : detailItem.action, type: 'badge', badgeVariant: detailItem.action === 'delete' || detailItem.action === 'soft_delete' || detailItem.action === 'reject' ? 'destructive' : detailItem.action === 'create' || detailItem.action === 'approve' ? 'default' : 'outline' },
+          { label: 'Entity Type', value: detailItem.entity_type },
+          { label: 'Entity Name', value: detailItem.entity_name },
+          { label: 'Entity ID', value: detailItem.entity_id },
+          { label: 'Admin', value: detailItem.admin_email || detailItem.admin_user_id },
+          { label: 'Timestamp', value: detailItem.created_at, type: 'date' },
+          ...(detailItem.details && Object.keys(detailItem.details).length > 0
+            ? [{ label: 'Details', value: JSON.stringify(detailItem.details, null, 2), type: 'html' as const }]
+            : []),
+        ]
+      default:
+        return []
+    }
+  }
+
+  const getDetailTitle = (): string => {
+    if (!detailItem) return ''
+    switch (detailType) {
+      case 'tier': return detailItem.name || 'Tier Details'
+      case 'milestone': return detailItem.name || 'Milestone Details'
+      case 'asset': return detailItem.title || 'Asset Details'
+      case 'broadcast': return detailItem.subject || 'Broadcast Details'
+      case 'member': return detailItem.name || detailItem.email || 'Member Details'
+      case 'application': return detailItem.name || 'Application Details'
+      case 'network': return detailItem.network_name || 'Network Details'
+      case 'contest': return detailItem.name || 'Contest Details'
+      case 'payout_batch': return 'Payout Batch Details'
+      case 'audit': return `Audit: ${detailItem.action} ${detailItem.entity_type}`
+      case 'flagged_referral': return 'Flagged Referral Details'
+      case 'top_performer': {
+        const mi = members.find(m => m.userId === detailItem.userId)
+        return mi?.name || mi?.email || 'Top Performer Details'
+      }
+      default: return 'Details'
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]" data-testid="loading-affiliate">
@@ -739,12 +1024,13 @@ export default function AffiliateSettingsPage() {
             <CardTitle className="text-base flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-amber-500" />
               Fraud Alerts ({stats.flaggedCount})
+              <HelpTooltip text="Referrals automatically flagged by our fraud detection system. Common flags include self-referrals (affiliate referred themselves), same email domain (referred user shares the affiliate's email domain), and suspicious IP volume (many clicks from the same IP address). Review each flag and take action if needed." />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               {flaggedReferrals.slice(0, 5).map(ref => (
-                <div key={ref.id} className="flex items-center gap-2 p-2 rounded border text-sm" data-testid={`fraud-alert-${ref.id}`}>
+                <div key={ref.id} className="flex items-center gap-2 p-2 rounded border text-sm cursor-pointer" data-testid={`fraud-alert-${ref.id}`} onClick={() => { setDetailItem(ref); setDetailType('flagged_referral') }}>
                   <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                   <div className="flex-1">
                     {(Array.isArray(ref.fraud_flags) ? ref.fraud_flags : []).map(f => FRAUD_FLAG_LABELS[f] || f).join(', ')}
@@ -778,6 +1064,9 @@ export default function AffiliateSettingsPage() {
           <TabsTrigger value="payout-batches" data-testid="tab-payout-batches">
             <Package className="h-3.5 w-3.5 mr-1" /> Payout Runs
           </TabsTrigger>
+          <TabsTrigger value="audit" data-testid="tab-audit">
+            <ClipboardList className="h-3.5 w-3.5 mr-1" /> Audit Log
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="health" className="space-y-4 mt-4">
@@ -809,6 +1098,7 @@ export default function AffiliateSettingsPage() {
                     <div className="flex items-center gap-2">
                       <TrendingUp className="h-4 w-4 text-green-500" />
                       <span className="text-sm text-muted-foreground">Net ROI</span>
+                      <HelpTooltip text="Total revenue from referred customers minus all commissions paid and pending. This is your net profit from the affiliate program." />
                     </div>
                     <p className="text-2xl font-bold mt-1">${(healthData.revenue.netROI / 100).toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">revenue minus commissions</p>
@@ -819,6 +1109,7 @@ export default function AffiliateSettingsPage() {
                     <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4 text-blue-500" />
                       <span className="text-sm text-muted-foreground">Conversion Rate</span>
+                      <HelpTooltip text="The percentage of referral clicks that result in a paid customer signup." />
                     </div>
                     <p className="text-2xl font-bold mt-1">{healthData.growth.conversionRate}%</p>
                     <p className="text-xs text-muted-foreground">{healthData.growth.conversionsThisMonth} this month</p>
@@ -826,7 +1117,7 @@ export default function AffiliateSettingsPage() {
                 </Card>
               </div>
 
-              <div className="grid gap-4 lg:grid-cols-2">
+              <div className="grid gap-4 lg:grid-cols-3">
                 <Card data-testid="health-revenue-breakdown">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base">Revenue Impact</CardTitle>
@@ -847,6 +1138,26 @@ export default function AffiliateSettingsPage() {
                     <div className="flex justify-between text-sm border-t pt-2">
                       <span className="font-medium">Net profit from affiliates</span>
                       <span className="font-bold text-green-600">${(healthData.revenue.netROI / 100).toFixed(2)}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card data-testid="health-growth-metrics">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Growth Metrics</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">New affiliates this month</span>
+                      <span className="font-medium">{healthData.growth.newAffiliatesThisMonth}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Referrals this month</span>
+                      <span className="font-medium">{healthData.growth.referralsThisMonth}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Conversions this month</span>
+                      <span className="font-medium">{healthData.growth.conversionsThisMonth}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -886,21 +1197,28 @@ export default function AffiliateSettingsPage() {
 
               <Card data-testid="health-top-performers">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Top Performers</CardTitle>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    Top Performers
+                    <HelpTooltip text="Your highest-earning affiliates ranked by total commission earnings. Click any row for full details." />
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {healthData.topPerformers.length > 0 ? (
                     <div className="space-y-2">
-                      {healthData.topPerformers.map((tp, i) => (
-                        <div key={tp.userId} className="flex items-center justify-between p-2 rounded border text-sm">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-muted-foreground w-5">#{i + 1}</span>
-                            <span className="font-mono text-xs truncate max-w-[120px]">{tp.userId.slice(0, 8)}...</span>
-                            <span className="text-xs text-muted-foreground">{tp.referrals} referrals</span>
+                      {healthData.topPerformers.map((tp, i) => {
+                        const memberInfo = members.find(m => m.userId === tp.userId)
+                        const displayName = memberInfo?.name || memberInfo?.email || `${tp.userId.slice(0, 8)}...`
+                        return (
+                          <div key={tp.userId} className="flex items-center justify-between p-2 rounded border text-sm cursor-pointer" onClick={() => { setDetailItem(tp); setDetailType('top_performer') }}>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-muted-foreground w-5">#{i + 1}</span>
+                              <span className="text-sm truncate max-w-[180px]">{displayName}</span>
+                              <span className="text-xs text-muted-foreground">{tp.referrals} referrals</span>
+                            </div>
+                            <span className="font-medium">${(tp.earnings / 100).toFixed(2)}</span>
                           </div>
-                          <span className="font-medium">${(tp.earnings / 100).toFixed(2)}</span>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   ) : (
                     <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-performers">No performer data yet</p>
@@ -948,7 +1266,7 @@ export default function AffiliateSettingsPage() {
               ) : (
                 <div className="space-y-3">
                   {filteredApplications.map(app => (
-                    <div key={app.id} className="p-4 rounded-md border" data-testid={`application-${app.id}`}>
+                    <div key={app.id} className="p-4 rounded-md border cursor-pointer" data-testid={`application-${app.id}`} onClick={() => { setDetailItem(app); setDetailType('application') }}>
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -961,11 +1279,11 @@ export default function AffiliateSettingsPage() {
                             </Badge>
                           </div>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-                            <a href={`mailto:${app.email}`} className="hover:underline flex items-center gap-1">
+                            <a href={`mailto:${app.email}`} className="hover:underline flex items-center gap-1" onClick={e => e.stopPropagation()}>
                               <Mail className="h-3 w-3" /> {app.email}
                             </a>
                             {app.website_url && (
-                              <a href={app.website_url} target="_blank" rel="noopener noreferrer" className="hover:underline flex items-center gap-1">
+                              <a href={app.website_url} target="_blank" rel="noopener noreferrer" className="hover:underline flex items-center gap-1" onClick={e => e.stopPropagation()}>
                                 <Globe className="h-3 w-3" /> {app.website_url.replace(/^https?:\/\//, '').slice(0, 30)}
                               </a>
                             )}
@@ -985,7 +1303,7 @@ export default function AffiliateSettingsPage() {
                               <div className="flex items-center gap-1">
                                 <Button
                                   size="sm"
-                                  onClick={() => reviewApplication(app.id, 'approve')}
+                                  onClick={(e) => { e.stopPropagation(); reviewApplication(app.id, 'approve') }}
                                   disabled={reviewingApp === app.id}
                                   data-testid={`button-approve-${app.id}`}
                                 >
@@ -995,7 +1313,7 @@ export default function AffiliateSettingsPage() {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => reviewApplication(app.id, 'reject')}
+                                  onClick={(e) => { e.stopPropagation(); reviewApplication(app.id, 'reject') }}
                                   disabled={reviewingApp === app.id}
                                   data-testid={`button-reject-${app.id}`}
                                 >
@@ -1009,6 +1327,7 @@ export default function AffiliateSettingsPage() {
                                 onChange={e => setReviewNotes(e.target.value)}
                                 className="text-xs h-7"
                                 data-testid={`input-review-notes-${app.id}`}
+                                onClick={e => e.stopPropagation()}
                               />
                             </>
                           )}
@@ -1016,7 +1335,7 @@ export default function AffiliateSettingsPage() {
                             size="sm"
                             variant="ghost"
                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                            onClick={() => handleDeleteApplication(app.id, app.email)}
+                            onClick={(e) => { e.stopPropagation(); handleDeleteApplication(app.id, app.email) }}
                             disabled={deletingApp === app.id}
                             data-testid={`button-delete-app-${app.id}`}
                           >
@@ -1053,7 +1372,10 @@ export default function AffiliateSettingsPage() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="commission-rate">Commission Rate (%)</Label>
+                  <Label htmlFor="commission-rate" className="flex items-center gap-1">
+                    Commission Rate (%)
+                    <HelpTooltip text="The percentage of each payment from referred customers that goes to the affiliate. Changes only apply to new affiliates — existing affiliates keep their locked-in rate." />
+                  </Label>
                   <Input
                     id="commission-rate"
                     type="number"
@@ -1093,7 +1415,10 @@ export default function AffiliateSettingsPage() {
                   <p className="text-xs text-muted-foreground mt-1">Minimum balance before payout is available</p>
                 </div>
                 <div>
-                  <Label htmlFor="cookie-days">Cookie Duration (days)</Label>
+                  <Label htmlFor="cookie-days" className="flex items-center gap-1">
+                    Cookie Duration (days)
+                    <HelpTooltip text="How many days after clicking a referral link the affiliate gets credit for a signup. Longer durations are more affiliate-friendly." />
+                  </Label>
                   <Input
                     id="cookie-days"
                     type="number"
@@ -1107,7 +1432,10 @@ export default function AffiliateSettingsPage() {
                 </div>
               </div>
               <div className="border-t pt-4 mt-4">
-                <Label htmlFor="attribution-policy">Attribution Conflict Policy</Label>
+                <Label htmlFor="attribution-policy" className="flex items-center gap-1">
+                  Attribution Conflict Policy
+                  <HelpTooltip text="When a customer clicks one affiliate's referral link but uses a different affiliate's discount code, this policy decides who earns the commission." />
+                </Label>
                 <p className="text-xs text-muted-foreground mb-2">When both a referral cookie and a discount code point to different affiliates, who gets the commission?</p>
                 <Select value={settings.attribution_conflict_policy || 'cookie_wins'} onValueChange={v => setSettings(s => ({ ...s, attribution_conflict_policy: v }))}>
                   <SelectTrigger className="w-full sm:w-64" data-testid="select-attribution-policy">
@@ -1153,7 +1481,10 @@ export default function AffiliateSettingsPage() {
               </div>
 
               <div className="border-t pt-4 mt-4">
-                <h4 className="text-sm font-medium mb-3">Re-Engagement Settings</h4>
+                <h4 className="text-sm font-medium mb-3 flex items-center gap-1">
+                  Re-Engagement Settings
+                  <HelpTooltip text="Automated emails sent to dormant affiliates encouraging them to start promoting again." />
+                </h4>
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <Label>Re-Engagement Emails</Label>
@@ -1168,7 +1499,10 @@ export default function AffiliateSettingsPage() {
                 {settings.reengagement_enabled && (
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <Label>Dormancy Threshold (days)</Label>
+                      <Label className="flex items-center gap-1">
+                        Dormancy Threshold (days)
+                        <HelpTooltip text="Number of days without any referral activity before an affiliate is considered dormant and eligible for re-engagement emails." />
+                      </Label>
                       <Input type="number" min="7" max="180" value={settings.dormancy_threshold_days || ''} onChange={e => setSettings(s => ({ ...s, dormancy_threshold_days: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-dormancy-days" />
                       <p className="text-xs text-muted-foreground mt-1">Days of inactivity before sending re-engagement</p>
                     </div>
@@ -1210,10 +1544,12 @@ export default function AffiliateSettingsPage() {
                 )}
               </div>
 
-              <Button onClick={saveSettings} disabled={saving} data-testid="button-save-settings">
-                {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                Save Settings
-              </Button>
+              <div className="border-t pt-4 mt-4 sticky bottom-0 bg-background pb-2">
+                <Button onClick={saveSettings} disabled={saving} data-testid="button-save-settings" className="w-full sm:w-auto">
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                  Save Settings
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -1258,7 +1594,10 @@ export default function AffiliateSettingsPage() {
                       <Input type="number" min="0" step="5" value={tierForm.min_payout_cents ? tierForm.min_payout_cents / 100 : ''} onChange={e => setTierForm(f => ({ ...f, min_payout_cents: e.target.value === '' ? 0 : Math.round(parseFloat(e.target.value) * 100) }))} data-testid="input-tier-min-payout" />
                     </div>
                     <div>
-                      <Label>Perks (comma-separated)</Label>
+                      <Label className="flex items-center gap-1">
+                        Perks (comma-separated)
+                        <HelpTooltip text="Perks are benefits you offer to affiliates at each tier level. Examples: priority support, early access to features, custom banners, higher cookie duration. Affiliates see their tier perks on their dashboard as motivation to grow." />
+                      </Label>
                       <Input value={tierForm.perks} onChange={e => setTierForm(f => ({ ...f, perks: e.target.value }))} placeholder="e.g., Priority support, Early access, Custom banners" data-testid="input-tier-perks" />
                     </div>
                     <Button onClick={saveTier} className="w-full" data-testid="button-save-tier">
@@ -1272,34 +1611,41 @@ export default function AffiliateSettingsPage() {
               {tiers.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-tiers">No tiers configured. Add tiers to reward top affiliates.</p>
               ) : (
-                <div className="space-y-2">
-                  {[...tiers].sort((a, b) => a.min_referrals - b.min_referrals).map(tier => (
-                    <div key={tier.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`tier-${tier.id}`}>
-                      <div className="flex items-center gap-3">
-                        <Award className="h-4 w-4 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium text-sm">{tier.name}</p>
-                          <p className="text-xs text-muted-foreground">{tier.min_referrals}+ referrals = {tier.commission_rate}% commission</p>
-                          {Array.isArray((tier as any).perks) && (tier as any).perks.length > 0 && (
-                            <div className="flex items-center gap-1 mt-1 flex-wrap">
-                              {((tier as any).perks as string[]).map((perk: string, i: number) => (
-                                <Badge key={i} variant="outline" className="text-xs">{perk}</Badge>
-                              ))}
-                            </div>
-                          )}
+                <>
+                  <div className="flex items-center gap-3 mb-3 text-xs">
+                    <SortableHeader label="Name" sortKey="name" currentSort={tierSort} onSort={toggleTierSort} />
+                    <SortableHeader label="Min Referrals" sortKey="min_referrals" currentSort={tierSort} onSort={toggleTierSort} />
+                    <SortableHeader label="Commission Rate" sortKey="commission_rate" currentSort={tierSort} onSort={toggleTierSort} />
+                  </div>
+                  <div className="space-y-2">
+                    {sortedTiers.map(tier => (
+                      <div key={tier.id} className="flex items-center justify-between p-3 rounded-md border cursor-pointer" data-testid={`tier-${tier.id}`} onClick={() => { setDetailItem(tier); setDetailType('tier') }}>
+                        <div className="flex items-center gap-3">
+                          <Award className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="font-medium text-sm">{tier.name}</p>
+                            <p className="text-xs text-muted-foreground">{tier.min_referrals}+ referrals = {tier.commission_rate}% commission</p>
+                            {Array.isArray((tier as any).perks) && (tier as any).perks.length > 0 && (
+                              <div className="flex items-center gap-1 mt-1 flex-wrap">
+                                {((tier as any).perks as string[]).map((perk: string, i: number) => (
+                                  <Badge key={i} variant="outline" className="text-xs">{perk}</Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setEditingTier(tier); setTierForm({ name: tier.name, min_referrals: tier.min_referrals, commission_rate: tier.commission_rate, sort_order: tier.sort_order, min_payout_cents: (tier as any).min_payout_cents || 0, perks: Array.isArray((tier as any).perks) ? (tier as any).perks.join(', ') : (tier as any).perks || '' }); setTierDialog(true) }} data-testid={`button-edit-tier-${tier.id}`}>
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); deleteTier(tier.id) }} data-testid={`button-delete-tier-${tier.id}`}>
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => { setEditingTier(tier); setTierForm({ name: tier.name, min_referrals: tier.min_referrals, commission_rate: tier.commission_rate, sort_order: tier.sort_order, min_payout_cents: (tier as any).min_payout_cents || 0, perks: Array.isArray((tier as any).perks) ? (tier as any).perks.join(', ') : (tier as any).perks || '' }); setTierDialog(true) }} data-testid={`button-edit-tier-${tier.id}`}>
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => deleteTier(tier.id)} data-testid={`button-delete-tier-${tier.id}`}>
-                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -1312,87 +1658,108 @@ export default function AffiliateSettingsPage() {
                 <CardTitle className="text-base">Marketing Assets</CardTitle>
                 <CardDescription>Upload banners, email templates, and social post templates for affiliates</CardDescription>
               </div>
-              <Dialog open={assetDialog} onOpenChange={(open) => { setAssetDialog(open); if (!open) { setEditingAsset(null); setAssetForm({ title: '', description: '', asset_type: 'banner', content: '', file_url: '' }) } }}>
-                <DialogTrigger asChild>
-                  <Button size="sm" data-testid="button-add-asset">
-                    <Plus className="h-4 w-4 mr-1" /> Add Asset
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-lg" data-testid="dialog-asset-form">
-                  <DialogHeader>
-                    <DialogTitle>{editingAsset ? 'Edit Asset' : 'Add Asset'}</DialogTitle>
-                    <DialogDescription>Create a marketing asset for affiliates to use.</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-3">
-                    <div>
-                      <Label>Title</Label>
-                      <Input value={assetForm.title} onChange={e => setAssetForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g., Twitter Banner 1200x600" data-testid="input-asset-title" />
-                    </div>
-                    <div>
-                      <Label>Type</Label>
-                      <Select value={assetForm.asset_type} onValueChange={v => setAssetForm(f => ({ ...f, asset_type: v }))}>
-                        <SelectTrigger data-testid="select-asset-type">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ASSET_TYPES.map(t => (
-                            <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Description</Label>
-                      <Input value={assetForm.description} onChange={e => setAssetForm(f => ({ ...f, description: e.target.value }))} placeholder="Short description of this asset" data-testid="input-asset-description" />
-                    </div>
-                    {(['email_template', 'social_post', 'text_snippet', 'swipe_file', 'landing_page'].includes(assetForm.asset_type)) && (
-                      <div>
-                        <Label>Content</Label>
-                        <Textarea value={assetForm.content} onChange={e => setAssetForm(f => ({ ...f, content: e.target.value }))} placeholder="Paste your template content here..." rows={6} data-testid="input-asset-content" />
-                      </div>
-                    )}
-                    {(['banner', 'video', 'case_study', 'one_pager'].includes(assetForm.asset_type)) && (
-                      <div>
-                        <Label>{assetForm.asset_type === 'video' ? 'Video URL' : assetForm.asset_type === 'banner' ? 'Image URL' : 'File URL'}</Label>
-                        <Input value={assetForm.file_url} onChange={e => setAssetForm(f => ({ ...f, file_url: e.target.value }))} placeholder="https://..." data-testid="input-asset-file-url" />
-                      </div>
-                    )}
-                    <Button onClick={saveAsset} className="w-full" data-testid="button-save-asset">
-                      {editingAsset ? 'Update Asset' : 'Create Asset'}
+              <div className="flex items-center gap-2">
+                <Select value={assetFilter} onValueChange={setAssetFilter}>
+                  <SelectTrigger className="w-[160px]" data-testid="select-asset-filter">
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    {ASSET_TYPES.map(t => (
+                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Dialog open={assetDialog} onOpenChange={(open) => { setAssetDialog(open); if (!open) { setEditingAsset(null); setAssetForm({ title: '', description: '', asset_type: 'banner', content: '', file_url: '' }) } }}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" data-testid="button-add-asset">
+                      <Plus className="h-4 w-4 mr-1" /> Add Asset
                     </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-lg" data-testid="dialog-asset-form">
+                    <DialogHeader>
+                      <DialogTitle>{editingAsset ? 'Edit Asset' : 'Add Asset'}</DialogTitle>
+                      <DialogDescription>Create a marketing asset for affiliates to use.</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-3">
+                      <div>
+                        <Label>Title</Label>
+                        <Input value={assetForm.title} onChange={e => setAssetForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g., Twitter Banner 1200x600" data-testid="input-asset-title" />
+                      </div>
+                      <div>
+                        <Label>Type</Label>
+                        <Select value={assetForm.asset_type} onValueChange={v => setAssetForm(f => ({ ...f, asset_type: v }))}>
+                          <SelectTrigger data-testid="select-asset-type">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {ASSET_TYPES.map(t => (
+                              <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Description</Label>
+                        <Input value={assetForm.description} onChange={e => setAssetForm(f => ({ ...f, description: e.target.value }))} placeholder="Short description of this asset" data-testid="input-asset-description" />
+                      </div>
+                      {(['email_template', 'social_post', 'text_snippet', 'swipe_file', 'landing_page'].includes(assetForm.asset_type)) && (
+                        <div>
+                          <Label>Content</Label>
+                          <Textarea value={assetForm.content} onChange={e => setAssetForm(f => ({ ...f, content: e.target.value }))} placeholder="Paste your template content here..." rows={6} data-testid="input-asset-content" />
+                        </div>
+                      )}
+                      {(['banner', 'video', 'case_study', 'one_pager'].includes(assetForm.asset_type)) && (
+                        <div>
+                          <Label>{assetForm.asset_type === 'video' ? 'Video URL' : assetForm.asset_type === 'banner' ? 'Image URL' : 'File URL'}</Label>
+                          <Input value={assetForm.file_url} onChange={e => setAssetForm(f => ({ ...f, file_url: e.target.value }))} placeholder="https://..." data-testid="input-asset-file-url" />
+                        </div>
+                      )}
+                      <Button onClick={saveAsset} className="w-full" data-testid="button-save-asset">
+                        {editingAsset ? 'Update Asset' : 'Create Asset'}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardHeader>
             <CardContent>
               {assets.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-assets">No assets yet. Add banners, email templates, or social post templates.</p>
+              ) : sortedFilteredAssets.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">No assets match the selected filter.</p>
               ) : (
-                <div className="space-y-2">
-                  {assets.map(asset => {
-                    const typeIcon = asset.asset_type === 'banner' ? FileImage : FileText
-                    const TypeIcon = typeIcon
-                    return (
-                      <div key={asset.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`asset-${asset.id}`}>
-                        <div className="flex items-center gap-3">
-                          <TypeIcon className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <p className="font-medium text-sm">{asset.title}</p>
-                            <p className="text-xs text-muted-foreground">{ASSET_TYPES.find(t => t.value === asset.asset_type)?.label || asset.asset_type}</p>
+                <>
+                  <div className="flex items-center gap-3 mb-3 text-xs">
+                    <SortableHeader label="Title" sortKey="title" currentSort={assetSort} onSort={toggleAssetSort} />
+                    <SortableHeader label="Type" sortKey="asset_type" currentSort={assetSort} onSort={toggleAssetSort} />
+                  </div>
+                  <div className="space-y-2">
+                    {sortedFilteredAssets.map(asset => {
+                      const typeIcon = asset.asset_type === 'banner' ? FileImage : FileText
+                      const TypeIcon = typeIcon
+                      return (
+                        <div key={asset.id} className="flex items-center justify-between p-3 rounded-md border cursor-pointer" data-testid={`asset-${asset.id}`} onClick={() => { setDetailItem(asset); setDetailType('asset') }}>
+                          <div className="flex items-center gap-3">
+                            <TypeIcon className="h-4 w-4 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium text-sm">{asset.title}</p>
+                              <p className="text-xs text-muted-foreground">{ASSET_TYPES.find(t => t.value === asset.asset_type)?.label || asset.asset_type}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setEditingAsset(asset); setAssetForm({ title: asset.title, description: asset.description || '', asset_type: asset.asset_type, content: asset.content || '', file_url: asset.file_url || '' }); setAssetDialog(true) }} data-testid={`button-edit-asset-${asset.id}`}>
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); deleteAsset(asset.id) }} data-testid={`button-delete-asset-${asset.id}`}>
+                              <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" onClick={() => { setEditingAsset(asset); setAssetForm({ title: asset.title, description: asset.description || '', asset_type: asset.asset_type, content: asset.content || '', file_url: asset.file_url || '' }); setAssetDialog(true) }} data-testid={`button-edit-asset-${asset.id}`}>
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => deleteAsset(asset.id)} data-testid={`button-delete-asset-${asset.id}`}>
-                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                          </Button>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
+                      )
+                    })}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -1447,7 +1814,12 @@ export default function AffiliateSettingsPage() {
                             {memberSort.key === 'name' ? (memberSort.dir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
                           </button>
                         </th>
-                        <th className="pb-2 px-3 font-medium">Status</th>
+                        <th className="pb-2 px-3 font-medium">
+                          <span className="flex items-center gap-1">
+                            Status
+                            <HelpTooltip text="Active = logged in and generating referrals. Pending Setup = approved but hasn't completed their profile. Inactive = no activity for an extended period." />
+                          </span>
+                        </th>
                         <th className="pb-2 px-3 font-medium">
                           <button onClick={() => toggleMemberSort('tier')} className="flex items-center gap-1 hover:text-foreground text-muted-foreground" data-testid="sort-tier">
                             Tier
@@ -1477,7 +1849,7 @@ export default function AffiliateSettingsPage() {
                     </thead>
                     <tbody>
                       {sortedFilteredMembers.map(m => (
-                        <tr key={m.userId} className="border-b last:border-0 hover:bg-muted/30" data-testid={`member-row-${m.userId}`}>
+                        <tr key={m.userId} className="border-b last:border-0 hover:bg-muted/30 cursor-pointer" data-testid={`member-row-${m.userId}`} onClick={() => { setDetailItem(m); setDetailType('member') }}>
                           <td className="py-3 pr-3">
                             <div className="min-w-0">
                               <p className="font-medium truncate">{m.name || m.email}</p>
@@ -1523,7 +1895,7 @@ export default function AffiliateSettingsPage() {
                               variant="ghost"
                               size="sm"
                               className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                              onClick={() => handleDeleteMember(m.userId, m.email)}
+                              onClick={(e) => { e.stopPropagation(); handleDeleteMember(m.userId, m.email) }}
                               disabled={deletingMember === m.userId}
                               data-testid={`button-delete-member-${m.userId}`}
                             >
@@ -1560,86 +1932,112 @@ export default function AffiliateSettingsPage() {
           <Card data-testid="card-milestones">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
-                <CardTitle className="text-base">Milestone Bonuses</CardTitle>
+                <CardTitle className="text-base flex items-center gap-1">
+                  Milestone Bonuses
+                  <HelpTooltip text="One-time cash bonuses awarded when an affiliate reaches specific referral count milestones. Great for motivating early growth." />
+                </CardTitle>
                 <CardDescription>One-time bonuses when affiliates hit referral count thresholds</CardDescription>
               </div>
-              <Dialog open={milestoneDialog} onOpenChange={(open) => {
-                setMilestoneDialog(open)
-                if (!open) { setEditingMilestone(null); setMilestoneForm({ name: '', referral_threshold: 10, bonus_amount_cents: 5000, description: '', is_active: true, sort_order: 0 }) }
-              }}>
-                <DialogTrigger asChild>
-                  <Button size="sm" data-testid="button-add-milestone">
-                    <Plus className="h-4 w-4 mr-1" /> Add Milestone
-                  </Button>
-                </DialogTrigger>
-                <DialogContent data-testid="dialog-milestone-form">
-                  <DialogHeader>
-                    <DialogTitle>{editingMilestone ? 'Edit Milestone' : 'Add Milestone'}</DialogTitle>
-                    <DialogDescription>Set a bonus that affiliates earn when they reach a referral count.</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-3">
-                    <div>
-                      <Label>Name</Label>
-                      <Input value={milestoneForm.name} onChange={e => setMilestoneForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g., First 10 Referrals" data-testid="input-milestone-name" />
-                    </div>
-                    <div>
-                      <Label>Referral Threshold</Label>
-                      <Input type="number" min="1" value={milestoneForm.referral_threshold || ''} onChange={e => setMilestoneForm(f => ({ ...f, referral_threshold: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-milestone-threshold" />
-                    </div>
-                    <div>
-                      <Label>Bonus Amount ($)</Label>
-                      <Input type="number" min="0" step="5" value={milestoneForm.bonus_amount_cents ? milestoneForm.bonus_amount_cents / 100 : ''} onChange={e => setMilestoneForm(f => ({ ...f, bonus_amount_cents: e.target.value === '' ? 0 : Math.round(parseFloat(e.target.value) * 100) }))} data-testid="input-milestone-bonus" />
-                    </div>
-                    <div>
-                      <Label>Description</Label>
-                      <Input value={milestoneForm.description} onChange={e => setMilestoneForm(f => ({ ...f, description: e.target.value }))} placeholder="Shown to affiliates on their dashboard" data-testid="input-milestone-description" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Active</Label>
-                      <Switch checked={milestoneForm.is_active} onCheckedChange={v => setMilestoneForm(f => ({ ...f, is_active: v }))} data-testid="switch-milestone-active" />
-                    </div>
-                    <Button onClick={saveMilestone} className="w-full" data-testid="button-save-milestone">
-                      {editingMilestone ? 'Update Milestone' : 'Create Milestone'}
+              <div className="flex items-center gap-2">
+                <Select value={milestoneFilter} onValueChange={setMilestoneFilter}>
+                  <SelectTrigger className="w-[120px]" data-testid="select-milestone-filter">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Dialog open={milestoneDialog} onOpenChange={(open) => {
+                  setMilestoneDialog(open)
+                  if (!open) { setEditingMilestone(null); setMilestoneForm({ name: '', referral_threshold: 10, bonus_amount_cents: 5000, description: '', is_active: true, sort_order: 0 }) }
+                }}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" data-testid="button-add-milestone">
+                      <Plus className="h-4 w-4 mr-1" /> Add Milestone
                     </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                  </DialogTrigger>
+                  <DialogContent data-testid="dialog-milestone-form">
+                    <DialogHeader>
+                      <DialogTitle>{editingMilestone ? 'Edit Milestone' : 'Add Milestone'}</DialogTitle>
+                      <DialogDescription>Set a bonus that affiliates earn when they reach a referral count.</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-3">
+                      <div>
+                        <Label>Name</Label>
+                        <Input value={milestoneForm.name} onChange={e => setMilestoneForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g., First 10 Referrals" data-testid="input-milestone-name" />
+                      </div>
+                      <div>
+                        <Label>Referral Threshold</Label>
+                        <Input type="number" min="1" value={milestoneForm.referral_threshold || ''} onChange={e => setMilestoneForm(f => ({ ...f, referral_threshold: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-milestone-threshold" />
+                      </div>
+                      <div>
+                        <Label>Bonus Amount ($)</Label>
+                        <Input type="number" min="0" step="5" value={milestoneForm.bonus_amount_cents ? milestoneForm.bonus_amount_cents / 100 : ''} onChange={e => setMilestoneForm(f => ({ ...f, bonus_amount_cents: e.target.value === '' ? 0 : Math.round(parseFloat(e.target.value) * 100) }))} data-testid="input-milestone-bonus" />
+                      </div>
+                      <div>
+                        <Label>Description</Label>
+                        <Input value={milestoneForm.description} onChange={e => setMilestoneForm(f => ({ ...f, description: e.target.value }))} placeholder="Shown to affiliates on their dashboard" data-testid="input-milestone-description" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label>Active</Label>
+                        <Switch checked={milestoneForm.is_active} onCheckedChange={v => setMilestoneForm(f => ({ ...f, is_active: v }))} data-testid="switch-milestone-active" />
+                      </div>
+                      <Button onClick={saveMilestone} className="w-full" data-testid="button-save-milestone">
+                        {editingMilestone ? 'Update Milestone' : 'Create Milestone'}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardHeader>
             <CardContent>
               {milestones.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-milestones">
                   No milestones configured. Add milestones to motivate affiliates with bonus payouts at specific referral counts.
                 </p>
+              ) : sortedFilteredMilestones.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">No milestones match the selected filter.</p>
               ) : (
-                <div className="space-y-2">
-                  {milestones.map(ms => (
-                    <div key={ms.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`milestone-${ms.id}`}>
-                      <div className="flex items-center gap-3">
-                        <Target className="h-4 w-4 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium text-sm">{ms.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {ms.referral_threshold} referrals = ${(ms.bonus_amount_cents / 100).toFixed(2)} bonus
-                          </p>
-                          {ms.description && <p className="text-xs text-muted-foreground italic">{ms.description}</p>}
+                <>
+                  <div className="flex items-center gap-3 mb-3 text-xs">
+                    <SortableHeader label="Name" sortKey="name" currentSort={milestoneSort} onSort={toggleMilestoneSort} />
+                    <SortableHeader label="Threshold" sortKey="referral_threshold" currentSort={milestoneSort} onSort={toggleMilestoneSort} />
+                    <SortableHeader label="Bonus Amount" sortKey="bonus_amount_cents" currentSort={milestoneSort} onSort={toggleMilestoneSort} />
+                    <SortableHeader label="Status" sortKey="is_active" currentSort={milestoneSort} onSort={toggleMilestoneSort} />
+                  </div>
+                  <div className="space-y-2">
+                    {sortedFilteredMilestones.map(ms => (
+                      <div key={ms.id} className="flex items-center justify-between p-3 rounded-md border cursor-pointer" data-testid={`milestone-${ms.id}`} onClick={() => { setDetailItem(ms); setDetailType('milestone') }}>
+                        <div className="flex items-center gap-3">
+                          <Target className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="font-medium text-sm">{ms.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {ms.referral_threshold} referrals = ${(ms.bonus_amount_cents / 100).toFixed(2)} bonus
+                            </p>
+                            {ms.description && <p className="text-xs text-muted-foreground italic">{ms.description}</p>}
+                          </div>
+                          <Badge variant={ms.is_active ? 'default' : 'outline'} className={ms.is_active ? 'text-xs bg-green-500/10 text-green-700 border-green-500/30' : 'text-xs'}>{ms.is_active ? 'Active' : 'Inactive'}</Badge>
                         </div>
-                        {!ms.is_active && <Badge variant="outline" className="text-xs">Inactive</Badge>}
+                        <div className="flex items-center gap-1">
+                          <Button variant="ghost" size="sm" onClick={(e) => {
+                            e.stopPropagation()
+                            setEditingMilestone(ms)
+                            setMilestoneForm({ name: ms.name, referral_threshold: ms.referral_threshold, bonus_amount_cents: ms.bonus_amount_cents, description: ms.description || '', is_active: ms.is_active, sort_order: ms.sort_order })
+                            setMilestoneDialog(true)
+                          }} data-testid={`button-edit-milestone-${ms.id}`}>
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); deleteMilestone(ms.id) }} data-testid={`button-delete-milestone-${ms.id}`}>
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => {
-                          setEditingMilestone(ms)
-                          setMilestoneForm({ name: ms.name, referral_threshold: ms.referral_threshold, bonus_amount_cents: ms.bonus_amount_cents, description: ms.description || '', is_active: ms.is_active, sort_order: ms.sort_order })
-                          setMilestoneDialog(true)
-                        }} data-testid={`button-edit-milestone-${ms.id}`}>
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => deleteMilestone(ms.id)} data-testid={`button-delete-milestone-${ms.id}`}>
-                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -1655,9 +2053,21 @@ export default function AffiliateSettingsPage() {
                 </CardTitle>
                 <CardDescription>Send announcements and updates to your affiliates</CardDescription>
               </div>
-              <Button size="sm" onClick={() => { setEditingBroadcast(null); setBroadcastForm({ subject: '', body: '', audience_type: 'all' }); setBroadcastDialog(true) }} data-testid="button-add-broadcast">
-                <Plus className="h-4 w-4 mr-1" /> New Broadcast
-              </Button>
+              <div className="flex items-center gap-2">
+                <Select value={broadcastFilter} onValueChange={setBroadcastFilter}>
+                  <SelectTrigger className="w-[120px]" data-testid="select-broadcast-filter">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="sent">Sent</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button size="sm" onClick={() => { setEditingBroadcast(null); setBroadcastForm({ subject: '', body: '', audience_type: 'all' }); setBroadcastDialog(true) }} data-testid="button-add-broadcast">
+                  <Plus className="h-4 w-4 mr-1" /> New Broadcast
+                </Button>
+              </div>
               <Dialog open={broadcastDialog} onOpenChange={(open) => {
                 setBroadcastDialog(open)
                 if (!open) { setEditingBroadcast(null); setBroadcastForm({ subject: '', body: '', audience_type: 'all' }) }
@@ -1701,46 +2111,53 @@ export default function AffiliateSettingsPage() {
                 <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-broadcasts">
                   No broadcasts yet. Create one to communicate with your affiliates.
                 </p>
+              ) : sortedFilteredBroadcasts.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6">No broadcasts match the selected filter.</p>
               ) : (
-                <div className="space-y-2">
-                  {broadcasts.map(bc => (
-                    <div key={bc.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`broadcast-${bc.id}`}>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium text-sm truncate">{bc.subject}</p>
-                          <Badge variant={bc.status === 'sent' ? 'default' : 'outline'} className="text-xs capitalize">
-                            {bc.status}
-                          </Badge>
+                <>
+                  <div className="flex items-center gap-3 mb-3 text-xs">
+                    <SortableHeader label="Date" sortKey="created_at" currentSort={broadcastSort} onSort={toggleBroadcastSort} />
+                  </div>
+                  <div className="space-y-2">
+                    {sortedFilteredBroadcasts.map(bc => (
+                      <div key={bc.id} className="flex items-center justify-between p-3 rounded-md border cursor-pointer" data-testid={`broadcast-${bc.id}`} onClick={() => { setDetailItem(bc); setDetailType('broadcast') }}>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium text-sm truncate">{bc.subject}</p>
+                            <Badge variant={bc.status === 'sent' ? 'default' : 'outline'} className="text-xs capitalize">
+                              {bc.status}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                            <span>{new Date(bc.created_at).toLocaleDateString()}</span>
+                            {bc.status === 'sent' && (
+                              <>
+                                <span>Sent: {bc.sent_count}</span>
+                                <span>Opened: {bc.opened_count}</span>
+                                <span>Clicked: {bc.clicked_count}</span>
+                              </>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                          <span>{new Date(bc.created_at).toLocaleDateString()}</span>
-                          {bc.status === 'sent' && (
+                        <div className="flex items-center gap-1 shrink-0 ml-3">
+                          {bc.status === 'draft' && (
                             <>
-                              <span>Sent: {bc.sent_count}</span>
-                              <span>Opened: {bc.opened_count}</span>
-                              <span>Clicked: {bc.clicked_count}</span>
+                              <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setEditingBroadcast(bc); setBroadcastForm({ subject: bc.subject, body: bc.body, audience_type: bc.audience_filter?.type || 'all' }); setBroadcastDialog(true) }} data-testid={`button-edit-broadcast-${bc.id}`}>
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSendConfirmBroadcast(bc) }} disabled={sendingBroadcast === bc.id} data-testid={`button-send-broadcast-${bc.id}`}>
+                                {sendingBroadcast === bc.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); deleteBroadcast(bc.id) }} data-testid={`button-delete-broadcast-${bc.id}`}>
+                                <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                              </Button>
                             </>
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 shrink-0 ml-3">
-                        {bc.status === 'draft' && (
-                          <>
-                            <Button variant="ghost" size="sm" onClick={() => { setEditingBroadcast(bc); setBroadcastForm({ subject: bc.subject, body: bc.body, audience_type: bc.audience_filter?.type || 'all' }); setBroadcastDialog(true) }} data-testid={`button-edit-broadcast-${bc.id}`}>
-                              <Pencil className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => setSendConfirmBroadcast(bc)} disabled={sendingBroadcast === bc.id} data-testid={`button-send-broadcast-${bc.id}`}>
-                              {sendingBroadcast === bc.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => deleteBroadcast(bc.id)} data-testid={`button-delete-broadcast-${bc.id}`}>
-                              <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -1781,7 +2198,7 @@ export default function AffiliateSettingsPage() {
               ) : (
                 <div className="space-y-4">
                   {networks.map(network => (
-                    <div key={network.id} className="p-4 rounded-md border" data-testid={`network-${network.network_slug}`}>
+                    <div key={network.id} className="p-4 rounded-md border cursor-pointer" data-testid={`network-${network.network_slug}`} onClick={() => { setDetailItem(network); setDetailType('network') }}>
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <h4 className="font-medium text-sm">{network.network_name}</h4>
@@ -1793,10 +2210,11 @@ export default function AffiliateSettingsPage() {
                           checked={network.is_active}
                           onCheckedChange={() => toggleNetwork(network)}
                           data-testid={`switch-network-${network.network_slug}`}
+                          onClick={e => e.stopPropagation()}
                         />
                       </div>
                       {network.is_active && (
-                        <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="grid gap-3 sm:grid-cols-2" onClick={e => e.stopPropagation()}>
                           <div>
                             <Label className="text-xs">Tracking ID</Label>
                             <Input
@@ -1842,44 +2260,64 @@ export default function AffiliateSettingsPage() {
                 <CardTitle className="text-base">Quarterly Contests</CardTitle>
                 <CardDescription>Create competitions to motivate affiliates</CardDescription>
               </div>
-              <Button size="sm" onClick={() => { setEditingContest(null); setContestForm({ name: '', description: '', metric: 'referrals', start_date: '', end_date: '', prize_description: '', prize_amount_cents: 10000 }); setContestDialog(true) }} data-testid="button-add-contest">
-                <Plus className="h-3.5 w-3.5 mr-1" /> Add Contest
-              </Button>
+              <div className="flex items-center gap-2">
+                <Select value={contestFilter} onValueChange={setContestFilter}>
+                  <SelectTrigger className="w-[130px]" data-testid="select-contest-filter">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="upcoming">Upcoming</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button size="sm" onClick={() => { setEditingContest(null); setContestForm({ name: '', description: '', metric: 'referrals', start_date: '', end_date: '', prize_description: '', prize_amount_cents: 10000 }); setContestDialog(true) }} data-testid="button-add-contest">
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Add Contest
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {contests.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-contests">No contests created yet.</p>
+              ) : sortedFilteredContests.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6">No contests match the selected filter.</p>
               ) : (
-                <div className="space-y-3">
-                  {contests.map(c => (
-                    <div key={c.id} className="p-4 rounded-md border" data-testid={`contest-${c.id}`}>
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <p className="font-medium text-sm">{c.name}</p>
-                            <Badge variant={c.status === 'active' ? 'default' : c.status === 'completed' ? 'secondary' : 'outline'} className="text-xs capitalize">
-                              {c.status}
-                            </Badge>
+                <>
+                  <div className="flex items-center gap-3 mb-3 text-xs">
+                    <SortableHeader label="Date" sortKey="start_date" currentSort={contestSort} onSort={toggleContestSort} />
+                  </div>
+                  <div className="space-y-3">
+                    {sortedFilteredContests.map(c => (
+                      <div key={c.id} className="p-4 rounded-md border cursor-pointer" data-testid={`contest-${c.id}`} onClick={() => { setDetailItem(c); setDetailType('contest') }}>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="font-medium text-sm">{c.name}</p>
+                              <Badge variant={c.status === 'active' ? 'default' : c.status === 'completed' ? 'secondary' : 'outline'} className="text-xs capitalize">
+                                {c.status}
+                              </Badge>
+                            </div>
+                            {c.description && <p className="text-xs text-muted-foreground">{c.description}</p>}
+                            <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                              <span>Metric: {c.metric}</span>
+                              <span>Prize: ${(c.prize_amount_cents / 100).toFixed(2)}</span>
+                              <span>{new Date(c.start_date).toLocaleDateString()} — {new Date(c.end_date).toLocaleDateString()}</span>
+                            </div>
                           </div>
-                          {c.description && <p className="text-xs text-muted-foreground">{c.description}</p>}
-                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                            <span>Metric: {c.metric}</span>
-                            <span>Prize: ${(c.prize_amount_cents / 100).toFixed(2)}</span>
-                            <span>{new Date(c.start_date).toLocaleDateString()} — {new Date(c.end_date).toLocaleDateString()}</span>
+                          <div className="flex gap-1 shrink-0">
+                            <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setEditingContest(c); setContestForm({ name: c.name, description: c.description || '', metric: c.metric || 'referrals', start_date: c.start_date?.split('T')[0] || '', end_date: c.end_date?.split('T')[0] || '', prize_description: c.prize_description || '', prize_amount_cents: c.prize_amount_cents || 0 }); setContestDialog(true) }} data-testid={`button-edit-contest-${c.id}`}>
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); deleteContest(c.id) }} data-testid={`button-delete-contest-${c.id}`}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
                           </div>
-                        </div>
-                        <div className="flex gap-1 shrink-0">
-                          <Button variant="outline" size="sm" onClick={() => { setEditingContest(c); setContestForm({ name: c.name, description: c.description || '', metric: c.metric || 'referrals', start_date: c.start_date?.split('T')[0] || '', end_date: c.end_date?.split('T')[0] || '', prize_description: c.prize_description || '', prize_amount_cents: c.prize_amount_cents || 0 }); setContestDialog(true) }} data-testid={`button-edit-contest-${c.id}`}>
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => deleteContest(c.id)} data-testid={`button-delete-contest-${c.id}`}>
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -1945,18 +2383,34 @@ export default function AffiliateSettingsPage() {
                 <CardTitle className="text-base">Scheduled Payout Runs</CardTitle>
                 <CardDescription>Generate and approve batched payout runs</CardDescription>
               </div>
-              <Button size="sm" onClick={generatePayoutBatch} disabled={generatingBatch} data-testid="button-generate-batch">
-                {generatingBatch ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <RefreshCw className="h-3.5 w-3.5 mr-1" />}
-                Generate Batch
-              </Button>
+              <div className="flex items-center gap-2">
+                <Select value={batchFilter} onValueChange={setBatchFilter}>
+                  <SelectTrigger className="w-[130px]" data-testid="select-batch-filter">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="approved">Approved</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button size="sm" onClick={generatePayoutBatch} disabled={generatingBatch} data-testid="button-generate-batch">
+                  {generatingBatch ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <RefreshCw className="h-3.5 w-3.5 mr-1" />}
+                  Generate Batch
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {payoutBatches.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-batches">No payout batches yet. Generate one to get started.</p>
+              ) : filteredBatches.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6">No batches match the selected filter.</p>
               ) : (
                 <div className="space-y-3">
-                  {payoutBatches.map(b => (
-                    <div key={b.id} className="p-4 rounded-md border" data-testid={`batch-${b.id}`}>
+                  {filteredBatches.map(b => (
+                    <div key={b.id} className="p-4 rounded-md border cursor-pointer" data-testid={`batch-${b.id}`} onClick={() => { setDetailItem(b); setDetailType('payout_batch') }}>
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -1973,10 +2427,10 @@ export default function AffiliateSettingsPage() {
                         </div>
                         {b.status === 'pending' && (
                           <div className="flex gap-1 shrink-0">
-                            <Button size="sm" onClick={() => approveBatch(b.id, 'approved')} data-testid={`button-approve-batch-${b.id}`}>
+                            <Button size="sm" onClick={(e) => { e.stopPropagation(); approveBatch(b.id, 'approved') }} data-testid={`button-approve-batch-${b.id}`}>
                               <CheckCircle className="h-3.5 w-3.5 mr-1" /> Approve
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => approveBatch(b.id, 'rejected')} data-testid={`button-reject-batch-${b.id}`}>
+                            <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); approveBatch(b.id, 'rejected') }} data-testid={`button-reject-batch-${b.id}`}>
                               <XCircle className="h-3.5 w-3.5 mr-1" /> Reject
                             </Button>
                           </div>
@@ -1989,7 +2443,118 @@ export default function AffiliateSettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="audit" className="space-y-4 mt-4">
+          <Card data-testid="card-audit-log">
+            <CardHeader>
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <ClipboardList className="h-4 w-4" />
+                    Audit Log
+                    <HelpTooltip text="A read-only record of every admin action taken in the affiliate system. Use this to track who changed what and when. Entries cannot be edited or deleted." />
+                  </CardTitle>
+                  <CardDescription>Track all admin actions across the affiliate program</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Select value={auditFilter.entity_type} onValueChange={v => setAuditFilter(f => ({ ...f, entity_type: v }))}>
+                    <SelectTrigger className="w-[140px] h-9" data-testid="select-audit-entity-filter">
+                      <SelectValue placeholder="All Types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="tier">Tiers</SelectItem>
+                      <SelectItem value="milestone">Milestones</SelectItem>
+                      <SelectItem value="asset">Assets</SelectItem>
+                      <SelectItem value="broadcast">Broadcasts</SelectItem>
+                      <SelectItem value="application">Applications</SelectItem>
+                      <SelectItem value="contest">Contests</SelectItem>
+                      <SelectItem value="settings">Settings</SelectItem>
+                      <SelectItem value="network">Networks</SelectItem>
+                      <SelectItem value="payout_batch">Payouts</SelectItem>
+                      <SelectItem value="member">Members</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={auditFilter.action} onValueChange={v => setAuditFilter(f => ({ ...f, action: v }))}>
+                    <SelectTrigger className="w-[130px] h-9" data-testid="select-audit-action-filter">
+                      <SelectValue placeholder="All Actions" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Actions</SelectItem>
+                      <SelectItem value="create">Create</SelectItem>
+                      <SelectItem value="update">Update</SelectItem>
+                      <SelectItem value="delete">Delete</SelectItem>
+                      <SelectItem value="soft_delete">Soft Delete</SelectItem>
+                      <SelectItem value="approve">Approve</SelectItem>
+                      <SelectItem value="reject">Reject</SelectItem>
+                      <SelectItem value="send">Send</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button size="sm" variant="outline" onClick={fetchAuditLog} disabled={auditLoading} data-testid="button-refresh-audit">
+                    <RefreshCw className={`h-3.5 w-3.5 ${auditLoading ? 'animate-spin' : ''}`} />
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {auditLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : auditLog.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-no-audit">
+                  No audit entries found. Actions will be logged here as admins make changes.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {auditLog.map(entry => (
+                    <div
+                      key={entry.id}
+                      className="flex items-start gap-3 p-3 rounded-md border cursor-pointer hover:bg-muted/30 transition-colors"
+                      onClick={() => { setDetailItem(entry); setDetailType('audit') }}
+                      data-testid={`audit-entry-${entry.id}`}
+                    >
+                      <div className="shrink-0 mt-0.5">
+                        <Badge
+                          variant={
+                            entry.action === 'delete' || entry.action === 'soft_delete' ? 'destructive' :
+                            entry.action === 'create' ? 'default' :
+                            entry.action === 'approve' ? 'secondary' :
+                            entry.action === 'reject' ? 'destructive' :
+                            entry.action === 'send' ? 'default' :
+                            'outline'
+                          }
+                          className="text-[10px] px-1.5 capitalize"
+                        >
+                          {entry.action === 'soft_delete' ? 'Archived' : entry.action}
+                        </Badge>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-sm font-medium capitalize">{entry.entity_type}</span>
+                          {entry.entity_name && (
+                            <span className="text-sm text-muted-foreground truncate">{entry.entity_name}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>{entry.admin_email || entry.admin_user_id?.slice(0, 8)}</span>
+                          <span>{new Date(entry.created_at).toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
+
+      <DetailModal
+        open={!!detailItem}
+        onOpenChange={(open) => { if (!open) { setDetailItem(null); setDetailType('') } }}
+        title={getDetailTitle()}
+        fields={getDetailFields()}
+      />
     </div>
   )
 }

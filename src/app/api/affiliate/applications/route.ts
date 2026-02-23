@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendEmail } from '@/lib/email'
+import { logAuditEvent } from '@/lib/affiliate/audit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
       .from('affiliate_applications')
       .select('id, status')
       .eq('email', normalizedEmail)
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
@@ -198,6 +200,7 @@ export async function GET(request: NextRequest) {
     let query = admin
       .from('affiliate_applications')
       .select('*')
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
 
     if (status && status !== 'all') {
@@ -247,35 +250,28 @@ export async function DELETE(request: NextRequest) {
 
     const { data: app } = await admin
       .from('affiliate_applications')
-      .select('email, status')
+      .select('email, name, status')
       .eq('id', id)
       .maybeSingle()
 
-    if (app?.status === 'approved') {
-      try {
-        const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 })
-        const matchingUser = users?.find(u => u.email?.toLowerCase() === app.email.toLowerCase())
-        if (matchingUser) {
-          await admin.from('affiliate_commissions').delete().eq('affiliate_user_id', matchingUser.id)
-          await admin.from('affiliate_payouts').delete().eq('affiliate_user_id', matchingUser.id)
-          await admin.from('affiliate_referrals').delete().eq('affiliate_user_id', matchingUser.id)
-          await admin.from('referral_links').delete().eq('user_id', matchingUser.id)
-          await admin.from('user_roles').delete().eq('user_id', matchingUser.id).eq('role', 'affiliate')
-        }
-      } catch (cleanupErr) {
-        console.error('Affiliate cleanup error (non-fatal):', cleanupErr)
-      }
+    if (!app) {
+      return NextResponse.json({ error: 'Application not found' }, { status: 404 })
     }
 
     const { error } = await admin
       .from('affiliate_applications')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user.id,
+      })
       .eq('id', id)
 
     if (error) {
-      console.error('Delete application error:', error)
+      console.error('Soft-delete application error:', error)
       return NextResponse.json({ error: 'Failed to delete application' }, { status: 500 })
     }
+
+    logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'soft_delete', entity_type: 'application', entity_id: id, entity_name: app.name, details: { email: app.email, previous_status: app.status } })
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

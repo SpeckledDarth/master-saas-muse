@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logAuditEvent } from '@/lib/affiliate/audit'
 
 async function requireAdmin() {
   const supabase = await createClient()
@@ -141,6 +142,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: payoutsErr.message }, { status: 500 })
       }
 
+      logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'create', entity_type: 'payout_batch', entity_id: batch.id, entity_name: `Batch ${batch.id}`, details: { total_amount_cents: totalCents, affiliates_included: eligible.length, notes: body.notes } })
+
       return NextResponse.json({
         batch,
         affiliates_included: eligible.length,
@@ -196,6 +199,8 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: payoutRejectErr.message }, { status: 500 })
         }
       }
+
+      logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: newStatus === 'approved' ? 'approve' : 'reject', entity_type: 'payout_batch', entity_id: batch_id, entity_name: `Batch ${batch_id}`, details: { status: newStatus } })
 
       return NextResponse.json({ success: true, status: newStatus })
     }
@@ -288,6 +293,8 @@ export async function DELETE(request: NextRequest) {
       if (deleteBatchErr.code === '42P01') return NextResponse.json({ error: 'Table not created yet' }, { status: 503 })
       return NextResponse.json({ error: deleteBatchErr.message }, { status: 500 })
     }
+
+    logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'delete', entity_type: 'payout_batch', entity_id: id })
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

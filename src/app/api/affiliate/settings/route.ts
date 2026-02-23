@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logAuditEvent } from '@/lib/affiliate/audit'
 
 export async function GET() {
   try {
@@ -48,7 +49,7 @@ export async function PUT(request: NextRequest) {
 
     const { data: existing } = await admin
       .from('affiliate_program_settings')
-      .select('id')
+      .select('*')
       .limit(1)
       .maybeSingle()
 
@@ -92,6 +93,17 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     }
+
+    const oldValues: Record<string, any> = {}
+    const newValues: Record<string, any> = {}
+    const settingsFields = ['commission_rate', 'commission_duration_months', 'min_payout_cents', 'cookie_duration_days', 'program_active', 'attribution_conflict_policy', 'leaderboard_enabled', 'leaderboard_privacy_mode', 'auto_batch_enabled', 'payout_schedule_day', 'auto_approve_threshold_cents', 'reengagement_enabled', 'dormancy_threshold_days', 'max_reengagement_emails']
+    for (const field of settingsFields) {
+      if (body[field] !== undefined) {
+        oldValues[field] = existing?.[field] ?? null
+        newValues[field] = body[field]
+      }
+    }
+    logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'update', entity_type: 'settings', entity_id: existing?.id, entity_name: 'affiliate_program_settings', details: { old: oldValues, new: newValues } })
 
     return NextResponse.json({ success: true })
   } catch (err) {

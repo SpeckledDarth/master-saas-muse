@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logAuditEvent } from '@/lib/affiliate/audit'
 
 export async function GET() {
   try {
@@ -56,6 +57,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'create', entity_type: 'tier', entity_id: data.id, entity_name: name, details: { commission_rate, min_referrals: min_referrals || 0, sort_order: sort_order || 0, min_payout_cents, perks } })
+
     return NextResponse.json({ tier: data })
   } catch (err) {
     console.error('Affiliate tiers POST error:', err)
@@ -92,6 +95,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'update', entity_type: 'tier', entity_id: id, entity_name: name, details: updates })
+
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error('Affiliate tiers PUT error:', err)
@@ -115,6 +120,8 @@ export async function DELETE(request: NextRequest) {
 
     const { error } = await admin.from('affiliate_tiers').delete().eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'delete', entity_type: 'tier', entity_id: id })
 
     return NextResponse.json({ success: true })
   } catch (err) {

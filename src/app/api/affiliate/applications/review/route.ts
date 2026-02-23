@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import crypto from 'crypto'
 import { getEmailClient } from '@/lib/email/client'
 import { sendEmail } from '@/lib/email/service'
+import { logAuditEvent } from '@/lib/affiliate/audit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
       .eq('id', application_id)
       .single()
 
-    if (!application) {
+    if (!application || application.deleted_at) {
       return NextResponse.json({ error: 'Application not found' }, { status: 404 })
     }
 
@@ -81,6 +82,8 @@ export async function POST(request: NextRequest) {
       } catch (emailErr) {
         console.error('Failed to send rejection email:', emailErr)
       }
+
+      logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'reject', entity_type: 'application', entity_id: application_id, entity_name: application.name, details: { email: application.email, reviewer_notes } })
 
       return NextResponse.json({ success: true, action: 'reject' })
     }
@@ -230,6 +233,8 @@ export async function POST(request: NextRequest) {
     } catch (emailErr) {
       console.error('Failed to send affiliate welcome email:', emailErr)
     }
+
+    logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'approve', entity_type: 'application', entity_id: application_id, entity_name: application.name, details: { email: application.email, affiliate_user_id: affiliateUserId, reviewer_notes } })
 
     return NextResponse.json({ success: true, action: 'approve' })
   } catch (err) {
