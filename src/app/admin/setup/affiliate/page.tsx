@@ -394,7 +394,7 @@ export default function AffiliateSettingsPage() {
       if (memberFilter !== 'all' && m.status !== memberFilter) return false
       if (memberSearch) {
         const q = memberSearch.toLowerCase()
-        return (m.email || '').toLowerCase().includes(q) || (m.name || '').toLowerCase().includes(q) || (m.refCode || '').toLowerCase().includes(q)
+        return (m.email || '').toLowerCase().includes(q) || (m.name || '').toLowerCase().includes(q)
       }
       return true
     })
@@ -1746,7 +1746,7 @@ export default function AffiliateSettingsPage() {
                   <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search by name, email, or code..."
+                      placeholder="Search by name or email..."
                       value={memberSearch}
                       onChange={e => setMemberSearch(e.target.value)}
                       className="pl-8 w-[220px] h-9"
@@ -2069,7 +2069,7 @@ export default function AffiliateSettingsPage() {
                       </div>
                     )}
                     <div>
-                      <Label>Subject</Label>
+                      <Label>Broadcast Name</Label>
                       <Input value={broadcastForm.subject} onChange={e => setBroadcastForm(f => ({ ...f, subject: e.target.value }))} placeholder="e.g., New commission rate increase!" data-testid="input-broadcast-subject" />
                     </div>
                     <div>

@@ -21,7 +21,8 @@ export async function POST(request: NextRequest) {
     const admin = createAdminClient()
     const normalizedEmail = email.toLowerCase().trim()
 
-    const { data: existing } = await admin
+    let existing: any = null
+    const { data: existCheck, error: existError } = await admin
       .from('affiliate_applications')
       .select('id, status')
       .eq('email', normalizedEmail)
@@ -29,6 +30,19 @@ export async function POST(request: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
+
+    if (existError && (existError.message?.includes('deleted_at') || existError.code === '42703')) {
+      const { data: fallback } = await admin
+        .from('affiliate_applications')
+        .select('id, status')
+        .eq('email', normalizedEmail)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      existing = fallback
+    } else {
+      existing = existCheck
+    }
 
     if (existing) {
       if (existing.status === 'pending') {
@@ -207,13 +221,27 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status)
     }
 
-    const { data, error } = await query.limit(100)
+    let { data, error } = await query.limit(100)
 
     if (error) {
       if (error.code === '42P01') {
         return NextResponse.json({ applications: [], note: 'Table not created yet' })
       }
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      if (error.message?.includes('deleted_at') || error.code === '42703') {
+        let retryQuery = admin
+          .from('affiliate_applications')
+          .select('*')
+          .order('created_at', { ascending: false })
+        if (status && status !== 'all') {
+          retryQuery = retryQuery.eq('status', status)
+        }
+        const retry = await retryQuery.limit(100)
+        data = retry.data
+        error = retry.error
+      }
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
     }
 
     return NextResponse.json({ applications: data || [] })

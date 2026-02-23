@@ -157,8 +157,8 @@ export default function EmailTemplatesPage() {
         setDialogOpen(false)
         fetchTemplates()
       } else {
-        const error = await res.json()
-        toast({ title: 'Error', description: error.message, variant: 'destructive' })
+        const data = await res.json()
+        toast({ title: 'Error', description: data.error || 'Failed to save template', variant: 'destructive' })
       }
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to save template', variant: 'destructive' })

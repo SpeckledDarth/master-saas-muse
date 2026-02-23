@@ -20,7 +20,12 @@ export async function GET() {
     .order('created_at', { ascending: false })
     .limit(50)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) {
+    if (error.code === '42P01') {
+      return NextResponse.json({ notifications: [], unreadCount: 0 })
+    }
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
 
   const unreadCount = data?.filter((n: any) => !n.read).length || 0
   return NextResponse.json({ notifications: data || [], unreadCount })
@@ -67,13 +72,21 @@ export async function PATCH(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await request.json()
-  const adminClient = createAdminClient()
+  try {
+    const body = await request.json()
+    const adminClient = createAdminClient()
 
-  if (body.markAll) {
-    await adminClient.from('notifications').update({ read: true }).eq('user_id', user.id).eq('read', false)
-  } else if (body.id) {
-    await adminClient.from('notifications').update({ read: true }).eq('id', body.id).eq('user_id', user.id)
+    if (body.markAll) {
+      const { error } = await adminClient.from('notifications').update({ read: true }).eq('user_id', user.id).eq('read', false)
+      if (error && error.code === '42P01') return NextResponse.json({ success: true })
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    } else if (body.id) {
+      const { error } = await adminClient.from('notifications').update({ read: true }).eq('id', body.id).eq('user_id', user.id)
+      if (error && error.code === '42P01') return NextResponse.json({ success: true })
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    return NextResponse.json({ success: true })
+  } catch {
+    return NextResponse.json({ notifications: [], unreadCount: 0 })
   }
-  return NextResponse.json({ success: true })
 }

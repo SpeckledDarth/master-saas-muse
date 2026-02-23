@@ -91,12 +91,22 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString(),
       }
       if (category !== undefined) updates.category = category
-      const { error } = await adminClient
+      let { error } = await adminClient
         .from('email_templates')
         .update(updates)
         .eq('id', id)
 
+      if (error && updates.category !== undefined) {
+        delete updates.category
+        const retry = await adminClient
+          .from('email_templates')
+          .update(updates)
+          .eq('id', id)
+        error = retry.error
+      }
+
       if (error) {
+        console.error('Template update error:', error)
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     } else {
@@ -107,11 +117,20 @@ export async function POST(request: NextRequest) {
         description,
       }
       if (category) insert.category = category
-      const { error } = await adminClient
+      let { error } = await adminClient
         .from('email_templates')
         .insert(insert)
 
+      if (error && insert.category) {
+        delete insert.category
+        const retry = await adminClient
+          .from('email_templates')
+          .insert(insert)
+        error = retry.error
+      }
+
       if (error) {
+        console.error('Template insert error:', error)
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     }

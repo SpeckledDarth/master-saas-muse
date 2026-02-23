@@ -85,7 +85,10 @@ export default function AuditLogsPage() {
 
   useEffect(() => {
     const cat = searchParams.get('category')
-    if (cat) setCategoryFilter(cat)
+    if (cat) {
+      setCategoryFilter(cat)
+      setActionFilter('all')
+    }
   }, [searchParams])
 
   const fetchLogs = useCallback(async () => {
@@ -120,6 +123,11 @@ export default function AuditLogsPage() {
     setPage(1)
   }, [actionFilter, categoryFilter])
 
+  const handleCategoryChange = (value: string) => {
+    setCategoryFilter(value)
+    setActionFilter('all')
+  }
+
   return (
     <div className="py-8 px-6">
       <div className="space-y-6">
@@ -133,7 +141,7 @@ export default function AuditLogsPage() {
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <CardTitle>Activity Log</CardTitle>
               <div className="flex items-center gap-2">
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <Select value={categoryFilter} onValueChange={handleCategoryChange}>
                   <SelectTrigger className="w-[160px]" data-testid="select-category-filter">
                     <SelectValue placeholder="All categories" />
                   </SelectTrigger>
@@ -144,20 +152,22 @@ export default function AuditLogsPage() {
                     <SelectItem value="settings">Settings</SelectItem>
                   </SelectContent>
                 </Select>
-                <Select value={actionFilter} onValueChange={setActionFilter}>
-                  <SelectTrigger className="w-[200px]" data-testid="select-action-filter">
-                    <SelectValue placeholder="All actions" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Actions</SelectItem>
-                    <SelectItem value="settings_updated">Settings Updated</SelectItem>
-                    <SelectItem value="user_impersonation_started">Impersonation Started</SelectItem>
-                    <SelectItem value="user_impersonation_ended">Impersonation Ended</SelectItem>
-                    <SelectItem value="user_role_changed">Role Changed</SelectItem>
-                    <SelectItem value="user_invited">User Invited</SelectItem>
-                    <SelectItem value="user_removed">User Removed</SelectItem>
-                  </SelectContent>
-                </Select>
+                {categoryFilter === 'all' && (
+                  <Select value={actionFilter} onValueChange={setActionFilter}>
+                    <SelectTrigger className="w-[200px]" data-testid="select-action-filter">
+                      <SelectValue placeholder="All actions" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Actions</SelectItem>
+                      <SelectItem value="settings_updated">Settings Updated</SelectItem>
+                      <SelectItem value="user_impersonation_started">Impersonation Started</SelectItem>
+                      <SelectItem value="user_impersonation_ended">Impersonation Ended</SelectItem>
+                      <SelectItem value="user_role_changed">Role Changed</SelectItem>
+                      <SelectItem value="user_invited">User Invited</SelectItem>
+                      <SelectItem value="user_removed">User Removed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
                 <Button variant="outline" size="icon" onClick={fetchLogs} disabled={loading} data-testid="button-refresh-audit">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                 </Button>
