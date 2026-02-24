@@ -408,6 +408,151 @@ These require NO new tables — just wiring up existing systems.
 
 ---
 
+## Brainstorm Features — Invoicing & Financial Tools for Affiliates (109-132)
+
+### The Dogfooding Insight
+
+PassivePost is a content scheduling tool. Affiliates are content creators who need to grow their own business. They use PassivePost for THEMSELVES — to schedule posts, build audience, get followers. The affiliate program is a bonus layer: they're already power users, so recommending PassivePost is authentic, not a sales pitch.
+
+This creates a flywheel:
+- Affiliate uses PassivePost to grow their business → loves it
+- Recommends it authentically to their audience → earns commissions
+- Their followers sign up, some become affiliates → cycle repeats
+- Every feature improvement helps the user AND makes the affiliate a better promoter
+
+**The invoicing features aren't just admin tools. For affiliate-creators running lean businesses, clean earnings statements, tax summaries, and commission receipts ARE business value.**
+
+### Professional Earnings & Statements
+
+109. **Professional earnings statements** — Properly formatted document with PassivePost branding, legal name, address, period, itemized commissions, running total. Downloadable PDF. Monthly and annual versions. Looks like something their accountant would be proud of.
+
+110. **Real-time earnings dashboard "business mode"** — Toggle from gamified view to clean financial view. Revenue this quarter, expenses (subscription cost), net income, projected annual earnings. Makes them feel like a real business.
+
+111. **Automatic invoice generation for payouts** — When paid, they get a proper invoice/receipt: "Payment from PassivePost Inc. to [Legal Name] for affiliate commissions, period: Jan 1-31, 2026." For their own bookkeeping.
+
+112. **Expense offset visibility** — "Your subscription costs $49/month. Affiliate earnings this month: $340. Net profit: $291." Shows subscription literally pays for itself. Powerful retention.
+
+### Tax Time Made Easy
+
+113. **1099-ready annual summary** — One click: complete earnings summary for tax preparer. Total earnings, payout dates, methods, withholding. "Hand this to your accountant."
+
+114. **Quarterly estimated tax helper** — "Based on Q1 earnings ($2,400), set aside ~$600 for estimated taxes." Not tax advice — helpful reminder with calculation. Creators forget this and get burned.
+
+115. **W-9 collection and storage** — Collect W-9 info (tax_id field exists). Store securely. When 1099 time comes, everything ready. No chasing people in January.
+
+116. **Tax document download center** — One page: all tax docs. 1099 forms, annual summaries, payout receipts by year. "Tax Season? We've got you covered."
+
+### Financial Transparency
+
+117. **Commission lifecycle tracker** — For every commission, show full journey: "Referral clicked → Signed up (Day 1) → Trial (Day 3) → Converted (Day 12) → Invoice paid (Day 14) → Commission earned: $14.70 → Approved (Day 30) → In payout batch (Day 45) → Paid to PayPal (Day 47)." Complete transparency.
+
+118. **Projected future earnings** — "34 active referrals paying monthly. At current rates, ~$510/month for next 8 months." Shows residual income pipeline. The number that makes them think "I can't leave."
+
+119. **Earnings by referral** — "Customer Jane generated $280 in commissions over 9 months." Shows most valuable referrals. Maybe they want to thank Jane or target similar people.
+
+120. **Churn impact alerts** — "Referral John cancelled. Recurring commission of $14.70/month ended. Remaining active referrals: 33." Honest, transparent. They respect it.
+
+### Business Tools
+
+121. **Earnings export for bookkeeping** — CSV or QuickBooks-compatible format. Columns match accountant expectations: date, description, amount, category, tax year. One click import.
+
+122. **Multi-year financial history** — "2025: $4,200. 2026 (YTD): $3,100." Year-over-year comparison. Shows growth. Makes them feel like they're building something.
+
+123. **Payment method verification** — Before payouts: "Sending $340 to PayPal at alex@steele.com. Correct?" Prevents wrong-account problems.
+
+124. **Currency display preference** — International affiliates see earnings in local currency (converted at current rate) even if payouts in USD. Small touch, big impact.
+
+125. **Affiliate branded invoice for their clients** — If affiliate recommends PassivePost to their own clients as part of a service, give them a professional handoff document: "I set up PassivePost for you. Here's the cost, my referral link, your 40% discount."
+
+126. **ROI report for their clients** — "Since using PassivePost: 48 posts across 4 platforms, saving ~12 hours/month." If affiliate sells PassivePost as part of service package, proves value.
+
+### Notifications That Build Trust
+
+127. **Payout confirmation with receipt** — Instant notification + email when money lands. "Payout of $340.00 sent to PayPal (alex@steele.com). Receipt attached." Peace of mind.
+
+128. **Commission approval notifications** — "3 commissions totaling $44.10 approved, moved to pending payout balance." They see money moving through pipeline.
+
+129. **Annual earnings milestone emails** — "$5,000 lifetime!" "$10,000!" Genuine achievements. Celebrate them.
+
+130. **Upcoming payout preview** — "Next payout March 15. Estimated: $340 based on approved commissions." No surprises.
+
+---
+
+## Brainstorm Features — Partnership-Level Features (131-147)
+
+### Give Them Ownership
+
+131. **Affiliate revenue share dashboard** — Show like a partnership: "Revenue from your referrals: $3,400. Your share (30%): $1,020. PassivePost share: $2,380." Total transparency. No other program does this.
+
+132. **Lifetime value counter per referral** — "Sarah: 11 months, $539 revenue, $161.70 your earnings, $49.30 estimated remaining (1 month left)." Each referral as an asset, not a one-time event.
+
+133. **"My Portfolio" view** — Referrals as investment portfolio. Active, churned, in trial, total lifetime value, monthly recurring commission. "Portfolio: 34 active, 6 churned, 3 trial. Monthly recurring: $510."
+
+### Make Them Look Professional
+
+134. **Affiliate certification badge** — "Certified PassivePost Partner" badge for website, email signature, YouTube. Multiple sizes. Builds credibility with THEIR audience.
+
+135. **Custom referral landing page analytics** — For branded pages (`/ref/steele40`): visits, bounce rate, signups. Like their own mini-website analytics.
+
+136. **Co-branded case study** — "Alex Steele grew audience 40% using PassivePost." We write (or AI drafts), they approve, goes on OUR site and THEIRS. Both benefit.
+
+### Protect the Relationship
+
+137. **Commission dispute system** — Flag if commission was missed/incorrect. Simple form: "I believe referral X should have generated commission because..." Admin reviews, approves or explains. Transparent resolution. Builds trust even when answer is no.
+
+138. **Grace period on churn** — "Referral John cancelled. If they resubscribe within 30 days, your commission continues." Shown clearly. Reduces anxiety.
+
+139. **Rate lock guarantee visibility** — "Your 30% rate is locked until January 2027. Set when you joined, cannot be reduced." Front and center. Written like a promise, not fine print.
+
+### Passive Income Visibility
+
+140. **Earnings while you sleep counter** — Live ticker: "You earned $4.20 while you were away." Last login vs. commissions since. Reinforces "passive" in passive income.
+
+141. **Annual projection** — "At current $510/month, on track for $6,120 this year from PassivePost alone." Updates monthly. Makes opportunity feel real.
+
+142. **Compound growth visualization** — "Month 1: $50. Month 3: $180. Month 6: $510. Growing 25% month-over-month." Simple growth curve chart. Motivating.
+
+---
+
+## Brainstorm Features — Commission Renewal & Customer Success (143-150)
+
+### The Big Idea: Affiliates as Customer Success Partners
+
+Traditional model: Commission window ends after 12 months. Affiliate loses interest in that customer. SaaS keeps 100%.
+
+PassivePost model: Affiliate can EXTEND commission window by actively helping retain the customer. They become a mini customer success rep — not forced, but financially motivated.
+
+**Why it works for PassivePost:**
+- Customer retention goes UP (someone personally checking in on them)
+- Free customer success reps who are financially motivated
+- Retained customer at 20% commission is better than churned customer at 0%
+- Lower than acquisition cost of replacing a churned customer
+
+**Why it works for affiliates:**
+- Portfolio doesn't expire — ongoing asset they can maintain
+- 12-month income becomes potentially indefinite
+- Rewards affiliates who care about their referrals
+
+### Features
+
+143. **Commission renewal system** — At month 10-11, affiliate gets heads-up: "Sarah's commission window ends in 2 months. Want to extend it?" If affiliate does a check-in and customer stays active, window extends 6-12 months at slightly lower rate (30% → 20%).
+
+144. **Customer health indicators for referrals** — "Is Sarah logging in? Posting? Has usage dropped?" Visible in affiliate's portfolio view. Green/yellow/red status per referral.
+
+145. **Pre-written check-in templates** — "Hey Sarah, just wanted to see how PassivePost is working for you..." Affiliate personalizes and sends. Logged as renewal activity.
+
+146. **Issue flagging on behalf of referrals** — "Sarah mentioned trouble with Instagram posting." Goes to admin as support ticket FROM the affiliate. Affiliate becomes the customer's advocate.
+
+147. **Renewal activity log** — Affiliate logs outreach, both sides see effort. Shows PassivePost that affiliate is actively maintaining relationships.
+
+148. **Renewal dashboard** — "Sarah: window expires in 60 days. Status: Active, posting 3x/week. Renewal eligible: Yes. Complete a check-in to qualify."
+
+149. **Post-renewal confirmation** — "Sarah's commission extended 12 months at 20%. New expiration: March 2028." Clear, celebratory.
+
+150. **Renewal earnings projection** — "You have 12 referrals eligible for renewal next quarter. If all renew at 20%, that's ~$180/month continuing income you'd otherwise lose."
+
+---
+
 ## Affiliate Philosophy
 
 The best affiliate programs make affiliates feel three things:
@@ -415,11 +560,13 @@ The best affiliate programs make affiliates feel three things:
 2. **"I know exactly where I stand"** — transparent earnings, clear terms, real-time data
 3. **"I'm a partner, not a contractor"** — branded codes, personal pages, recognition, communication
 
+**PassivePost and affiliates are business partners.** We need promotion, they need revenue, they already have followers. Perfect match. The more thrilled they are, the more they promote. That helps PassivePost too. We are not a greedy company.
+
 ---
 
 ## Key Design Principle
 
-> Many PassivePost customers will ALSO be affiliates. The world-class UX/UI investment must carry across all three dashboards (Admin, Affiliate, User). Consistent components, consistent quality.
+> Many PassivePost customers will ALSO be affiliates. They use PassivePost to grow their own business, and promoting it as an affiliate is a natural bonus. The world-class UX/UI investment must carry across all three dashboards (Admin, Affiliate, User). Consistent components, consistent quality.
 
 ---
 
@@ -430,10 +577,26 @@ Full table structure brainstorm is saved at:
 
 ---
 
+## Feature Count Summary
+
+| Section | Features | Range |
+|---------|----------|-------|
+| Original Ideas (All User Types) | 41 | #1-41 |
+| Affiliate Delight & Relationship | 23 | #42-64 |
+| Marketing Resource Center | 16 | #65-80 |
+| AI-Powered Tools | 18 | #81-98 |
+| Surfacing Existing Admin Features | 10 | #99-108 |
+| Invoicing & Financial Tools | 22 | #109-130 |
+| Partnership-Level Features | 12 | #131-142 |
+| Commission Renewal & Customer Success | 8 | #143-150 |
+| **TOTAL** | **150** | |
+
+---
+
 ## Next Steps
 
 1. Continue brainstorming — add more ideas to this document
-2. Finalize which features to build
+2. Finalize which features to build (prioritize by impact vs. effort)
 3. Design final table schema
 4. Create session plan with exact tasks
 5. User approves → Build begins
