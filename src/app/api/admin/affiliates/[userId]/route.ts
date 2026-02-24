@@ -38,8 +38,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const admin = createAdminClient()
 
-    const safe = async <T>(fn: () => Promise<{ data: T | null }>): Promise<T | null> => {
-      try { const r = await fn(); return r.data; } catch { return null; }
+    const safe = async (fn: () => any): Promise<any> => {
+      try { const r = await fn(); return r.data ?? null; } catch { return null; }
     }
 
     const [profileRes, codesRes, transactionsRes, commissionsRes, payoutsRes, referralsRes, auditRes] = await Promise.all([
