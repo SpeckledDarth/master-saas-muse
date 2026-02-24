@@ -14,6 +14,33 @@ Preferred communication style: Simple, everyday language.
 - **Git Sync Responsibility**: Agent ensures Replit and GitHub repo stay in sync. Before ending sessions or after significant changes, agent verifies sync status and asks user to run push commands if needed. User executes git commands when requested.
 - **CRITICAL - Deployment**: This is a Next.js + Vercel project. The user NEVER uses the Replit preview/webview. All testing and viewing happens on the live Vercel deployment (triggered by git push to GitHub). Replit is used only as a code editor. Never suggest using the Replit preview panel.
 
+### Three-Environment Sync Protocol (CRITICAL)
+
+This project runs across THREE environments that MUST stay aligned. Most testing failures come from these being out of sync.
+
+| Environment | Purpose | Database | Code Source |
+|-------------|---------|----------|-------------|
+| **Replit** | Code editor + local dev server | Replit Postgres (local) | Local filesystem |
+| **GitHub** | Version control + Vercel trigger | N/A | Git repository |
+| **Vercel + Supabase** | Production (where user tests) | Supabase Postgres | Deployed from GitHub |
+
+**The Problem:** Agent tests against Replit Postgres + local dev server. User tests against Supabase + Vercel. If schemas or code differ, bugs appear only on one side and we waste hours debugging phantom issues.
+
+**Pre-Push Sync Checklist (MANDATORY before telling user to push to GitHub):**
+
+1. **Schema alignment** — Query Replit Postgres to confirm every table/column the code expects exists. If it exists here, list the migration SQL the user needs to run in Supabase. If a migration is needed, explicitly state: "Run this SQL in Supabase SQL Editor BEFORE testing on Vercel."
+2. **Code compiles clean** — Run `npm run dev` and confirm zero build errors in logs.
+3. **API smoke test** — curl every changed API route against the local dev server. Confirm no 500s.
+4. **Migration inventory** — List ALL migration files that need to be run on Supabase, in order, with the exact file paths. Don't assume the user has run previous migrations.
+5. **Environment variables** — If any new env vars are needed, list them for both Vercel AND Supabase dashboards.
+6. **Git status check** — Remind user to push to GitHub. Vercel auto-deploys from the GitHub repo.
+
+**Why This Matters:**
+- Agent sees Replit Postgres. User's app reads Supabase.
+- Agent tests on localhost:5000. User tests on Vercel deployment.
+- Code changes only reach Vercel after git push → GitHub → Vercel auto-deploy.
+- Missing a Supabase migration = user sees 500 errors that agent cannot reproduce locally.
+
 ### Pre-Delivery Testing Checklist (MANDATORY before handing work to user)
 Every time code changes are made, the agent MUST complete these steps before telling the user the work is ready:
 1. **Check the Replit database schema** — Query the Replit Postgres to confirm all tables and columns the code expects actually exist. The Replit DB should mirror what Supabase has. If a column is missing here, it's missing on Supabase too.
