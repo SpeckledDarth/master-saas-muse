@@ -553,6 +553,154 @@ PassivePost model: Affiliate can EXTEND commission window by actively helping re
 
 ---
 
+---
+
+## Brainstorm Features — Business Intelligence & Analytics (151-188)
+
+### Charts & Graphs Affiliates Expect
+
+151. **Earnings line chart** — X-axis time (daily/weekly/monthly toggle), Y-axis dollars. Multiple lines: Earned, Approved, Paid. Hover shows exact values per day. Shows the pipeline visually.
+
+152. **Clicks & conversions dual-axis chart** — Bar chart for clicks, line overlay for conversions. Volume AND quality together. "Tons of clicks March 5 but no conversions — what happened?"
+
+153. **Conversion funnel visualization** — Proper funnel graphic: wide at top (clicks), narrowing through signups, trials, paid. Percentages between stages. Color-coded. Exactly like Google Analytics funnels.
+
+154. **Revenue pie chart by source** — "YouTube: 45%, Email: 30%, Instagram: 15%, Twitter: 10%." Instant visual of where money comes from. Helps decide where to double down.
+
+155. **Earnings heatmap calendar** — Like GitHub's contribution graph but for earnings. Each day colored by amount earned. See patterns: "I earn more on weekdays" or "best days are after video uploads."
+
+156. **Referral retention curve** — Line chart: what % of referrals still active at month 1, 2, 3... 12. Classic cohort retention chart. If curve drops at month 3, they know where to focus.
+
+157. **Month-over-month comparison bars** — Side-by-side: this month vs. last month for clicks, signups, conversions, earnings. Immediate visual of growth or decline.
+
+158. **Cumulative earnings area chart** — Total lifetime earnings growing over time. The line that only goes up. Motivating.
+
+### Conversion Funnel Intelligence
+
+159. **Conversion rate by channel** — "YouTube links: 8%. Instagram bio: 3%. Email newsletter: 12%." Uses existing UTM/source tags. Tells them where to focus.
+
+160. **Conversion rate over time** — Trend line: "5% January → 7% February → 9% March." Are they improving? Data tells them.
+
+161. **Drop-off analysis** — "42 clicked, 18 signed up, 6 trialed, 3 paid." Make it actionable: "Biggest drop-off: trial → paid. 12 started trials but didn't convert."
+
+162. **Trial-to-paid benchmarks** — "Your trial conversion: 25%. Average across all affiliates: 35%." Motivating, not shaming. Shows room to improve.
+
+### Audience & Traffic Insights
+
+163. **Click heatmap by day/hour** — Calendar-style: "Most clicks on Tuesdays 10am and Thursdays 7pm." Tells them exactly when audience is responsive.
+
+164. **Geographic breakdown** — "68% US, 15% UK, 8% Canada." Helps tailor content and posting times.
+
+165. **Device breakdown** — "72% mobile, 28% desktop." Informs which platforms to focus on.
+
+166. **Repeat visitor tracking** — "15 people clicked your link multiple times before signing up." Shows some need multiple touches. Encourages persistence.
+
+167. **Referral source attribution** — "Top 3: YouTube description (40%), Twitter bio (25%), email signature (15%)." Shows where link placement works best.
+
+### Churn Intelligence
+
+168. **Churn rate for their referrals** — "3 of 37 churned this month (8%). Average: 6%." If high, something about audience fit or expectations is off.
+
+169. **Churn reasons** — "2 cited 'too expensive.' 1 cited 'didn't use enough.'" Surface Stripe exit survey data when available.
+
+170. **Churn timing patterns** — "Most churned in months 2-3." Suggests they need to follow up with referrals early.
+
+171. **At-risk referral alerts** — "Sarah hasn't logged in for 14 days. Unusual for her." Early warning for check-in. Ties to commission renewal system.
+
+172. **Net referral growth** — "This month: +5 new, -2 churned = net +3." Portfolio growing or shrinking?
+
+### Performance Benchmarks
+
+173. **Percentile ranking** — "Top 12% for conversion rate, top 25% for referrals, top 8% for earnings." Multiple dimensions so everyone finds a strength.
+
+174. **Month-over-month scorecard** — Key metrics with up/down arrows: "Clicks: 245 (+18%), Signups: 14 (+40%), Conversions: 6 (+20%), Earnings: $88.20 (+25%)."
+
+175. **Personal best tracking** — "Best month ever: February, 8 conversions, $117.60." Something to beat. "You're 2 away from a new record!"
+
+176. **Efficiency metrics** — "Earnings per click: $0.36. Earnings per signup: $6.30." Shows value of each interaction. Quality over quantity.
+
+### AI-Powered Analytics Suggestions
+
+177. **"Why conversions dropped" analysis** — AI analyzes changes: "Click volume up 30% but conversions flat. Suggests lower-quality traffic. Targeting right audience?"
+
+178. **Content type recommendations** — "Tutorial content converts 2.5x better than discount-only posts. Try 'How I use PassivePost.'"
+
+179. **Channel optimization** — "Email converts at 12% but you send 1 link/month. 2x email links could add ~$60/month."
+
+180. **Audience fit score** — AI estimates audience-product fit: "Your audience converts 2x average. Strong fit. Increase promotion frequency."
+
+181. **Seasonal trend predictions** — "Earnings spike 40% in January and September historically. Plan biggest pushes then."
+
+182. **Competitor displacement tips** — "Churned referrals commonly switched to [competitor]. Here are 3 talking points about why PassivePost is better."
+
+### Campaign-Level Tracking (Single Exposure Metrics)
+
+183. **Campaign creator** — Affiliate creates campaign: "Episode 47 - Tech Tools Review" with date, platform, notes. System generates unique tracking link: `passivepost.com/?ref=steele40&campaign=ep47`. Every promotion becomes measurable.
+
+184. **Campaign dashboard** — Each campaign gets own metrics card: clicks, signups, conversions, earnings. "Episode 47: 230 clicks, 12 signups, 4 paid, $58.80." Know exactly which content performs.
+
+185. **Campaign comparison table** — Side-by-side: "Ep 47: 4 conversions, $58.80. Ep 48: 1 conversion, $14.70. Blog March 5: 6 conversions, $88.20." Instantly see winners.
+
+186. **Campaign ROI calculator** — "Ep 47 took ~3 hours. Earned $58.80 = $19.60/hour. Still earning — 2 more signups this week."
+
+187. **Campaign timeline** — Visual timeline showing launch dates and click/conversion activity. Shows "long tail" — YouTube videos earning months later.
+
+188. **Campaign tagging on existing links** — Retroactively tag: "All clicks from YouTube March 1-7 = Episode 47 campaign." Uses existing UTM system.
+
+### Connected Analytics (External Platform Integration)
+
+189. **YouTube Analytics integration** — Connect YouTube (OAuth). Pull views, watch time. Show: "Video got 15,000 views. 230 clicked link (1.5%). 12 signed up. 4 paid. Video-to-customer: 0.027%." Gold.
+
+190. **Google Analytics integration** — Connect GA for their blog. "Blog post: 3,200 pageviews. 89 clicked through. 8 signed up."
+
+191. **Podcast analytics** — Connect Spotify/Apple Podcasts. "Episode 47: 5,400 downloads. 230 clicked (4.3%)." Shows reach-to-click efficiency.
+
+192. **Social media analytics** — Connect Instagram/Twitter/LinkedIn. "Instagram post reached 12,000. 180 clicked." Per-platform efficiency.
+
+193. **Merged analytics dashboard** — One page: external metrics (views, downloads, reach) NEXT TO affiliate metrics (clicks, signups, earnings). Full picture, one place.
+
+194. **Cross-platform performance comparison** — "YouTube: 0.027% viewer-to-customer. Podcast: 0.041%. Blog: 0.019%. Focus on podcast." Data-driven channel strategy.
+
+### Smart Insights From Connected Data
+
+195. **Content-to-revenue attribution** — "Top 3 revenue-generating content this quarter: 1) YouTube 'Creator Tools' ($240), 2) Podcast Ep 52 ($180), 3) Blog 'My Tech Stack' ($95)."
+
+196. **Audience overlap detection** — "72% of signups come within 48 hours of YouTube upload. Post affiliate link in first comment immediately."
+
+197. **Optimal promotion frequency** — "Every 3rd video mention earns 2.5x more than every-video mentions. Frequency fatigue is real."
+
+198. **Content format recommendations** — "Tutorials convert 3x vs. casual mentions. Your tutorials: 0.045% vs. mentions: 0.015%."
+
+### Reporting & Exports
+
+199. **Weekly performance email** — Monday morning: "45 clicks, 6 signups, 2 conversions, $29.40. Conversion rate: 7% (↑ from 5%)." Digestible, actionable.
+
+200. **Monthly business report PDF** — Comprehensive: all metrics, trends, top links, revenue breakdown, tax summary. Show-your-accountant quality.
+
+201. **Custom date range reports** — "Show me Black Friday through Cyber Monday." Pull any date range. Measure specific campaigns.
+
+202. **Comparison reports** — "Q1 vs Q2 side-by-side." Quarterly or monthly growth trajectory.
+
+203. **Scheduled report delivery** — "Send performance report every Monday 9am." Set and forget.
+
+### Analytics UX/UI Principles
+
+204. **Dashboard customization** — Drag/drop widgets. Some want earnings first, others want funnel. Their choice.
+
+205. **Global date range picker** — One selector filters everything. Last 7/30/90 days, this year, custom. Standard.
+
+206. **Real-time updates** — "Last updated: 2 minutes ago." They're used to YouTube Studio near-real-time.
+
+207. **Mobile-responsive analytics** — Check stats from phone. Swipeable cards, collapsible sections. Charts work on small screens.
+
+208. **Sparklines in table rows** — Tiny activity trend line in each referral row. Visual without taking space.
+
+209. **Tooltips on everything** — Hover any metric: plain-English explanation. "Conversion rate: percentage of clickers who became paying customers."
+
+210. **Export any chart** — Download as PNG (share on social: "look at my growth!") or CSV for their own analysis.
+
+---
+
 ## Affiliate Philosophy
 
 The best affiliate programs make affiliates feel three things:
@@ -589,7 +737,8 @@ Full table structure brainstorm is saved at:
 | Invoicing & Financial Tools | 22 | #109-130 |
 | Partnership-Level Features | 12 | #131-142 |
 | Commission Renewal & Customer Success | 8 | #143-150 |
-| **TOTAL** | **150** | |
+| Business Intelligence & Analytics | 60 | #151-210 |
+| **TOTAL** | **210** | |
 
 ---
 
