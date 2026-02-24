@@ -26,7 +26,7 @@ export default function AffiliateForgotPasswordPage() {
     const supabase = createClient()
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/affiliate/set-password`,
+      redirectTo: `${window.location.origin}/affiliate/set-password`,
     })
 
     if (error) {

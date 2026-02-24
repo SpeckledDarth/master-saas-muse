@@ -208,23 +208,27 @@ export async function POST(request: NextRequest) {
     let passwordSetupUrl = `${baseUrl}/affiliate/login`
 
     try {
-      const { data: linkData } = await admin.auth.admin.generateLink({
-        type: 'recovery',
+      const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+        type: 'magiclink',
         email: application.email,
         options: {
-          redirectTo: `${baseUrl}/auth/callback?next=/affiliate/set-password`,
+          redirectTo: `${baseUrl}/affiliate/set-password`,
         },
       })
 
-      if (linkData?.properties?.hashed_token) {
+      if (linkError) {
+        console.error('generateLink error:', linkError)
+      }
+
+      if (linkData?.properties?.action_link) {
+        passwordSetupUrl = linkData.properties.action_link
+      } else if (linkData?.properties?.hashed_token) {
         const token = linkData.properties.hashed_token
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-        passwordSetupUrl = `${supabaseUrl}/auth/v1/verify?token=${token}&type=recovery&redirect_to=${encodeURIComponent(`${baseUrl}/auth/callback?next=/affiliate/set-password`)}`
-      } else if (linkData?.properties?.action_link) {
-        const actionLink = new URL(linkData.properties.action_link)
-        actionLink.searchParams.set('redirect_to', `${baseUrl}/auth/callback?next=/affiliate/set-password`)
-        passwordSetupUrl = actionLink.toString()
+        passwordSetupUrl = `${supabaseUrl}/auth/v1/verify?token=${token}&type=magiclink&redirect_to=${encodeURIComponent(`${baseUrl}/affiliate/set-password`)}`
       }
+
+      console.log('Password setup URL generated:', passwordSetupUrl ? 'yes' : 'no (using fallback)')
     } catch (linkErr) {
       console.error('Failed to generate password setup link:', linkErr)
     }
