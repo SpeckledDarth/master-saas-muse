@@ -57,6 +57,34 @@ Every time code changes are made, the agent MUST complete these steps before tel
 - If working on CRM/invoicing features (Phases 5-7), also read `docs/CRM_INVOICING_BRAINSTORM.md` for the full 217-feature vision and dogfooding architecture.
 - If working on affiliate enhancements (Phase 3.6), also read `docs/musekit/AFFILIATE_ENHANCEMENTS.md` for detailed SQL schemas and API specs.
 - Update the Session Log in ROADMAP.md at the end of every session with what was accomplished.
+- Consult the **Key Documents** table below to know which docs to read for any given task.
+
+### Key Documents
+
+| Document | Path | Purpose | When to Read |
+|----------|------|---------|-------------|
+| **Development Roadmap** | `docs/ROADMAP.md` | Master execution tracker: phase status, sprint details, pending bugs, decision log, session history | **Every session** — read first, always |
+| **CRM & Invoicing Brainstorm** | `docs/CRM_INVOICING_BRAINSTORM.md` | Strategic vision: 217 features across all 3 dashboards, dogfooding architecture, cross-Muse strategy, gap analysis | When working on Phases 5-7 (CRM, dashboards, AI) |
+| **Affiliate Enhancements** | `docs/musekit/AFFILIATE_ENHANCEMENTS.md` | Implementation specs: SQL schemas, API endpoints, UI descriptions for 32 affiliate features | When working on Phase 3.6 (Sprints 1-4) |
+| **Affiliate System Guide** | `docs/musekit/AFFILIATE.md` | How the existing affiliate system works (Phases 3 + 3.5) | When debugging or extending core affiliate features |
+| **Architecture** | `docs/musekit/ARCHITECTURE.md` | System architecture, folder structure, tech stack reference | When making structural changes or onboarding |
+| **Master Plan** | `docs/musekit/MASTER_PLAN.md` | MuseKit overall strategy and product vision | For strategic context |
+| **Admin Guide** | `docs/musekit/ADMIN_GUIDE.md` | Admin dashboard features and configuration | When building admin UI features |
+| **Adding a Product** | `docs/musekit/ADDING_A_PRODUCT.md` | How to add a new Muse product to the template | When adding product-specific features |
+| **Muse Checklist** | `docs/musekit/MUSE_CHECKLIST.md` | Launch checklist for new Muse deployments | Before deploying a new product |
+| **Project Overview** | `docs/musekit/PROJECT_OVERVIEW.md` | High-level project summary | For quick context |
+| **Setup Guide** | `docs/musekit/SETUP_GUIDE.md` | Initial project setup and configuration | For environment setup |
+
+### Two-Document System (CRITICAL)
+
+The project uses two primary planning documents that serve different purposes. **Never merge them.**
+
+| Document | Role | Contains | Updates |
+|----------|------|----------|---------|
+| `docs/ROADMAP.md` | **Execution state** | Phase status, sprint tables, pending bugs, decision log, session history, file references | Every session — tracks what's done, what's next |
+| `docs/CRM_INVOICING_BRAINSTORM.md` | **Strategic vision** | 217-feature brainstorm, dogfooding architecture, cross-Muse strategy, gap analysis, build priority tiers | When planning new phases — the ideas pipeline |
+
+A third document, `docs/musekit/AFFILIATE_ENHANCEMENTS.md`, serves as **implementation specs** specifically for Phase 3.6's 32 affiliate features (SQL schemas, API endpoints, UI descriptions). It cross-references both the roadmap (for status tracking) and the brainstorm doc (for feature overlap mapping).
 
 ## System Architecture
 The project is built with Next.js 16+ (App Router), React 18+, and TypeScript. Styling is handled with Tailwind CSS, shadcn/ui, and next-themes, while TanStack Query manages server state. Supabase provides PostgreSQL, authentication, RLS, and storage, supporting multi-tenancy. Deployment is exclusively on Vercel.
