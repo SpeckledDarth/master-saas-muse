@@ -653,3 +653,108 @@ The fraud detection system automatically flags suspicious referrals (same email 
 
 **Q: Is the affiliate system part of MuseKit or specific to one product?**
 It's part of MuseKit core. Every product built on MuseKit gets the full affiliate system. The migrations live in `migrations/core/`, the library in `src/lib/affiliate/`, and the pages in `src/app/affiliate/`. Each product deployment has its own independent affiliate program with its own settings, tiers, and affiliates.
+
+---
+
+## External Networks Playbook
+
+This section covers how to integrate with third-party affiliate networks so you can recruit affiliates from established marketplaces alongside your own direct program.
+
+### Supported Networks
+
+| Network | Type | Best For |
+|---|---|---|
+| **ShareASale** | Large affiliate marketplace | Volume — thousands of bloggers, coupon sites, deal hunters |
+| **Impact** | Enterprise partnership platform | High-value partnerships, brand-to-brand deals, influencer programs |
+| **PartnerStack** | B2B SaaS-focused network | SaaS companies recruiting technology partners, consultants, resellers |
+
+### How Network Integration Works
+
+1. **You sign up as a merchant/advertiser** on the network's platform
+2. **You configure tracking** in the MuseKit admin at `/admin/setup/affiliate` under the "Networks" tab
+3. **Network affiliates find your program** through the network's marketplace
+4. **When a conversion happens** (Stripe `invoice.paid`), MuseKit fires a server-side postback to the network so they can attribute the sale
+
+### Configuration Fields
+
+For each network, you configure three fields in the admin dashboard:
+
+| Field | Purpose | Example |
+|---|---|---|
+| **Tracking ID** | Your merchant/advertiser ID on the platform | `MID-12345` |
+| **Postback URL** | The server-to-server URL the network provides for conversion tracking | `https://shareasale.com/sale.cfm?transtype=sale&amount={amount}&tracking={ref}` |
+| **API Key** | For advanced programmatic integration (optional) | `sk_live_abc123...` |
+
+### Postback URL Configuration
+
+Each network provides a specific postback URL format. When a Stripe conversion fires, MuseKit replaces placeholders in the URL with actual values:
+
+| Placeholder | Replaced With |
+|---|---|
+| `{amount}` | Invoice amount in dollars (e.g. `49.99`) |
+| `{ref}` | The affiliate's referral code |
+| `{order_id}` | The Stripe invoice ID |
+| `{commission}` | Commission amount in dollars |
+
+**ShareASale example:**
+```
+https://shareasale.com/sale.cfm?merchantID={tracking_id}&transtype=sale&amount={amount}&tracking={ref}&orderNumber={order_id}
+```
+
+**Impact example:**
+```
+https://api.impact.com/Advertisers/{tracking_id}/Conversions?CampaignId=12345&ActionTrackerId=1&OrderId={order_id}&Amount={amount}
+```
+
+**PartnerStack example:**
+```
+https://api.partnerstack.com/v1/transactions?key={api_key}&amount={amount}&external_key={ref}&transaction_key={order_id}
+```
+
+### Affiliate Onboarding Flow from Networks
+
+When affiliates join through an external network rather than your direct program:
+
+1. **Network routes traffic** — the affiliate promotes your product using the network's tracking link
+2. **Click lands on your site** — the network's click-tracking pixel or redirect handles attribution on their end
+3. **Customer signs up and pays** — Stripe processes the payment as normal
+4. **MuseKit fires postback** — on `invoice.paid`, the webhook handler checks if any network integrations are active and fires postback requests
+5. **Network credits the affiliate** — the network handles payout to their affiliate according to their own terms
+
+### Direct vs. Network Affiliates
+
+| Aspect | Direct (Your Program) | Network Affiliates |
+|---|---|---|
+| **Application** | Via `/affiliate/join` | Via the network's marketplace |
+| **Dashboard** | Full `/affiliate/dashboard` access | Network's own dashboard |
+| **Commission Rate** | Your configured rate + tiers | Negotiated via the network |
+| **Payouts** | You handle directly | Network handles payouts |
+| **Fraud Detection** | MuseKit fraud scoring | Network's fraud tools |
+| **Tracking** | Cookie-based (`pp_ref`) | Network's tracking pixel/redirect |
+
+### Best Practices
+
+1. **Start with your direct program first** — get the basics working before adding network complexity
+2. **Set competitive rates** — network affiliates compare programs; make sure your commission rate is attractive
+3. **Monitor postback delivery** — check your server logs for failed postback requests; networks may blacklist merchants with unreliable tracking
+4. **Avoid double-counting** — if an affiliate is in both your direct program AND a network, the cookie-based direct tracking takes priority; the postback only fires if no direct affiliate referral is found
+5. **Test with small amounts** — use the network's test/sandbox environment to verify postback URLs work before going live
+6. **Keep API keys secure** — network API keys are stored in your Supabase database; ensure your RLS policies and service role key access are properly configured
+
+### PartnerStack-Specific Notes
+
+PartnerStack is purpose-built for B2B SaaS and offers features beyond basic postback tracking:
+
+- **Partner types**: Technology partners, referral partners, reseller partners, affiliate partners
+- **Deal registration**: Partners can register deals before they close (relevant for enterprise sales)
+- **Co-selling**: PartnerStack supports shared pipeline visibility
+- **Marketplace listing**: Your product appears in the PartnerStack marketplace for partner discovery
+- **Automated payouts**: PartnerStack can handle partner payouts directly, reducing your operational overhead
+- **Onboarding automation**: Built-in partner onboarding flows with education content and certification
+
+To integrate with PartnerStack:
+1. Sign up at [partnerstack.com](https://partnerstack.com) and create a program
+2. Copy your Merchant ID and API key from the PartnerStack dashboard
+3. Enter them in MuseKit admin under Networks > PartnerStack
+4. Set the postback URL provided by PartnerStack in their integration docs
+5. Test with a sandbox transaction to verify tracking works end-to-end

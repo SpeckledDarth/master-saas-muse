@@ -313,6 +313,13 @@ export async function POST(request: NextRequest) {
             })
             .eq('user_id', referralRecord.affiliate_user_id);
 
+          const { data: newCommission } = await adminDb
+            .from('affiliate_commissions')
+            .select('id')
+            .eq('stripe_invoice_id', invoice.id)
+            .eq('affiliate_user_id', referralRecord.affiliate_user_id)
+            .maybeSingle();
+
           await createNotification(
             referralRecord.affiliate_user_id,
             'Commission Earned!',
@@ -322,6 +329,68 @@ export async function POST(request: NextRequest) {
           );
 
           console.log(`Affiliate commission created: $${(commissionCents / 100).toFixed(2)} for user ${referralRecord.affiliate_user_id}`);
+
+          try {
+            const { data: programSettings } = await adminDb
+              .from('affiliate_program_settings')
+              .select('two_tier_enabled, second_tier_commission_rate')
+              .limit(1)
+              .maybeSingle();
+
+            if (programSettings?.two_tier_enabled) {
+              const { data: tier2Link } = await adminDb
+                .from('referral_links')
+                .select('recruited_by_affiliate_id')
+                .eq('user_id', referralRecord.affiliate_user_id)
+                .maybeSingle();
+
+              if (tier2Link?.recruited_by_affiliate_id) {
+                const tier2Rate = programSettings.second_tier_commission_rate || 5;
+                const tier2Cents = Math.round(invoiceAmountCents * (tier2Rate / 100));
+
+                if (tier2Cents > 0) {
+                  await adminDb
+                    .from('affiliate_second_tier_commissions')
+                    .insert({
+                      tier1_affiliate_id: tier2Link.recruited_by_affiliate_id,
+                      tier2_affiliate_id: referralRecord.affiliate_user_id,
+                      original_commission_id: newCommission?.id || null,
+                      commission_rate: tier2Rate,
+                      commission_amount_cents: tier2Cents,
+                    });
+
+                  const { data: recruiterLink } = await adminDb
+                    .from('referral_links')
+                    .select('total_earnings_cents, pending_earnings_cents')
+                    .eq('user_id', tier2Link.recruited_by_affiliate_id)
+                    .maybeSingle();
+
+                  if (recruiterLink) {
+                    await adminDb
+                      .from('referral_links')
+                      .update({
+                        total_earnings_cents: (recruiterLink.total_earnings_cents || 0) + tier2Cents,
+                        pending_earnings_cents: (recruiterLink.pending_earnings_cents || 0) + tier2Cents,
+                        updated_at: new Date().toISOString(),
+                      })
+                      .eq('user_id', tier2Link.recruited_by_affiliate_id);
+                  }
+
+                  await createNotification(
+                    tier2Link.recruited_by_affiliate_id,
+                    'Second-Tier Commission!',
+                    `You earned $${(tier2Cents / 100).toFixed(2)} from a recruit's referral.`,
+                    'success',
+                    '/affiliate/dashboard?section=earnings'
+                  );
+
+                  console.log(`Second-tier commission: $${(tier2Cents / 100).toFixed(2)} for recruiter ${tier2Link.recruited_by_affiliate_id}`);
+                }
+              }
+            }
+          } catch (tier2Err) {
+            console.error('Second-tier commission error (non-critical):', tier2Err);
+          }
         } catch (affErr) {
           console.error('Affiliate commission processing error:', affErr);
         }

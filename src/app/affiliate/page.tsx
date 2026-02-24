@@ -7,6 +7,56 @@ import { Card, CardContent } from '@/components/ui/card'
 import { DollarSign, Users, BarChart, Megaphone, Clock, Shield, ArrowRight, CheckCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+function TestimonialsSection() {
+  const [testimonials, setTestimonials] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch('/api/affiliate/testimonials')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.testimonials?.length) setTestimonials(data.testimonials)
+      })
+      .catch(() => {})
+  }, [])
+
+  if (testimonials.length === 0) return null
+
+  return (
+    <section className="py-16 md:py-24" data-testid="section-testimonials">
+      <div className="container mx-auto px-4 md:px-8">
+        <h2 className="text-3xl font-bold text-center text-black dark:text-white mb-12">
+          What Our Affiliates Say
+        </h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {testimonials.map(t => (
+            <Card key={t.id} className="bg-white/10 border-gray-500/50" data-testid={`testimonial-${t.id}`}>
+              <CardContent className="pt-6 pb-4 px-6">
+                <p className="text-sm text-muted-foreground mb-4 italic">&ldquo;{t.quote}&rdquo;</p>
+                <div className="flex items-center gap-3">
+                  {t.avatar_url ? (
+                    <img src={t.avatar_url} alt={t.name} className="w-8 h-8 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center">
+                      <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">{t.name.charAt(0).toUpperCase()}</span>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-medium text-black dark:text-white">{t.name}</p>
+                    <div className="flex items-center gap-2">
+                      {t.tier_name && <span className="text-xs text-muted-foreground">{t.tier_name}</span>}
+                      {t.earnings_display && <span className="text-xs text-muted-foreground">{t.earnings_display}</span>}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function AffiliateLandingPage() {
   const { settings } = useSettings()
   const appName = settings?.branding?.appName || 'Our Product'
@@ -138,6 +188,8 @@ export default function AffiliateLandingPage() {
           </div>
         </div>
       </section>
+
+      <TestimonialsSection />
 
       <section className="py-20 md:py-28">
         <div className="container mx-auto px-4 md:px-8 text-center">

@@ -7,7 +7,7 @@ import { logAuditEvent } from '@/lib/affiliate/audit'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, email, website_url, promotion_method, message } = body
+    const { name, email, website_url, promotion_method, message, agreed_to_terms, terms_version } = body
 
     if (!name || !email || !promotion_method) {
       return NextResponse.json({ error: 'Name, email, and promotion method are required' }, { status: 400 })
@@ -77,18 +77,39 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const { data, error } = await admin
+    const insertRow: Record<string, any> = {
+      name: name.trim(),
+      email: normalizedEmail,
+      website_url: website_url?.trim() || null,
+      promotion_method,
+      message: message?.trim() || null,
+      status: 'pending',
+    }
+    if (agreed_to_terms !== undefined) insertRow.agreed_to_terms = !!agreed_to_terms
+    if (terms_version) insertRow.terms_version = terms_version
+
+    let data: any = null
+    let error: any = null
+
+    const firstTry = await admin
       .from('affiliate_applications')
-      .insert({
-        name: name.trim(),
-        email: normalizedEmail,
-        website_url: website_url?.trim() || null,
-        promotion_method,
-        message: message?.trim() || null,
-        status: 'pending',
-      })
+      .insert(insertRow)
       .select('id')
       .single()
+
+    data = firstTry.data
+    error = firstTry.error
+
+    if (error && error.code === '42703') {
+      const { agreed_to_terms: _a, terms_version: _t, ...fallbackRow } = insertRow
+      const retry = await admin
+        .from('affiliate_applications')
+        .insert(fallbackRow)
+        .select('id')
+        .single()
+      data = retry.data
+      error = retry.error
+    }
 
     if (error) {
       if (error.code === '42P01') {

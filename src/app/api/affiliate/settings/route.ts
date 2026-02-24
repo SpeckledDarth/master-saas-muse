@@ -45,7 +45,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { commission_rate, commission_duration_months, min_payout_cents, cookie_duration_days, program_active, attribution_conflict_policy, leaderboard_enabled, leaderboard_privacy_mode, auto_batch_enabled, payout_schedule_day, auto_approve_threshold_cents, reengagement_enabled, dormancy_threshold_days, max_reengagement_emails } = body
+    const { commission_rate, commission_duration_months, min_payout_cents, cookie_duration_days, program_active, attribution_conflict_policy, leaderboard_enabled, leaderboard_privacy_mode, auto_batch_enabled, payout_schedule_day, auto_approve_threshold_cents, reengagement_enabled, dormancy_threshold_days, max_reengagement_emails, two_tier_enabled, second_tier_commission_rate } = body
 
     const { data: existing } = await admin
       .from('affiliate_program_settings')
@@ -72,6 +72,8 @@ export async function PUT(request: NextRequest) {
     if (reengagement_enabled !== undefined) updates.reengagement_enabled = reengagement_enabled
     if (dormancy_threshold_days !== undefined) updates.dormancy_threshold_days = dormancy_threshold_days
     if (max_reengagement_emails !== undefined) updates.max_reengagement_emails = max_reengagement_emails
+    if (two_tier_enabled !== undefined) updates.two_tier_enabled = two_tier_enabled
+    if (second_tier_commission_rate !== undefined) updates.second_tier_commission_rate = second_tier_commission_rate
 
     if (existing) {
       const { error } = await admin
@@ -96,7 +98,7 @@ export async function PUT(request: NextRequest) {
 
     const oldValues: Record<string, any> = {}
     const newValues: Record<string, any> = {}
-    const settingsFields = ['commission_rate', 'commission_duration_months', 'min_payout_cents', 'cookie_duration_days', 'program_active', 'attribution_conflict_policy', 'leaderboard_enabled', 'leaderboard_privacy_mode', 'auto_batch_enabled', 'payout_schedule_day', 'auto_approve_threshold_cents', 'reengagement_enabled', 'dormancy_threshold_days', 'max_reengagement_emails']
+    const settingsFields = ['commission_rate', 'commission_duration_months', 'min_payout_cents', 'cookie_duration_days', 'program_active', 'attribution_conflict_policy', 'leaderboard_enabled', 'leaderboard_privacy_mode', 'auto_batch_enabled', 'payout_schedule_day', 'auto_approve_threshold_cents', 'reengagement_enabled', 'dormancy_threshold_days', 'max_reengagement_emails', 'two_tier_enabled', 'second_tier_commission_rate']
     for (const field of settingsFields) {
       if (body[field] !== undefined) {
         oldValues[field] = existing?.[field] ?? null

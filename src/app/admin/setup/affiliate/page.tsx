@@ -17,6 +17,7 @@ import {
   CheckCircle, XCircle, Clock, Globe, UserPlus, Mail,
   Target, Send, BarChart3, Activity, Megaphone, Calendar, Package, RefreshCw,
   ArrowUpDown, ArrowUp, ArrowDown, Search, Info, HelpCircle, ClipboardList, Trophy,
+  MessageSquare, Star, Eye, Shield,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import DetailModal, { DetailField } from '@/components/admin/DetailModal'
@@ -114,6 +115,10 @@ interface AffiliateMember {
   refCode: string
   isAffiliate: boolean
   status: string
+  suspended: boolean
+  suspensionReason: string | null
+  fraudScore: number
+  fraudScoreUpdatedAt: string | null
   tier: string
   referrals: number
   clicks: number
@@ -201,6 +206,323 @@ const FRAUD_FLAG_LABELS: Record<string, string> = {
   self_referral: 'Self-referral attempt',
 }
 
+function AdminMessagesTab() {
+  const [threads, setThreads] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedThread, setSelectedThread] = useState<string | null>(null)
+  const [threadMessages, setThreadMessages] = useState<any[]>([])
+  const [reply, setReply] = useState('')
+  const [sending, setSending] = useState(false)
+  const { toast } = useToast()
+
+  const loadThreads = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/affiliate/messages')
+      if (!res.ok) { setThreads([]); return }
+      const data = await res.json()
+      setThreads(data.threads || [])
+    } catch { setThreads([]) }
+    finally { setLoading(false) }
+  }, [])
+
+  useEffect(() => { loadThreads() }, [loadThreads])
+
+  const openThread = async (affiliateId: string) => {
+    setSelectedThread(affiliateId)
+    try {
+      const res = await fetch(`/api/admin/affiliate/messages/${affiliateId}`)
+      if (res.ok) {
+        const data = await res.json()
+        setThreadMessages(data.messages || [])
+        loadThreads()
+      }
+    } catch {}
+  }
+
+  const sendReply = async () => {
+    if (!reply.trim() || !selectedThread) return
+    setSending(true)
+    try {
+      const res = await fetch(`/api/admin/affiliate/messages/${selectedThread}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ body: reply })
+      })
+      if (res.ok) {
+        setReply('')
+        openThread(selectedThread)
+        toast({ title: 'Message sent' })
+      }
+    } catch { toast({ title: 'Failed to send', variant: 'destructive' }) }
+    finally { setSending(false) }
+  }
+
+  if (loading) return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+
+  return (
+    <div className="grid gap-4 md:grid-cols-3">
+      <Card className="md:col-span-1">
+        <CardHeader><CardTitle className="text-base">Affiliate Threads</CardTitle></CardHeader>
+        <CardContent className="p-0">
+          {threads.length === 0 ? (
+            <p className="text-sm text-muted-foreground p-4">No messages yet.</p>
+          ) : (
+            <div className="divide-y max-h-[500px] overflow-auto">
+              {threads.map((t: any) => (
+                <button key={t.affiliate_user_id} onClick={() => openThread(t.affiliate_user_id)}
+                  className={`w-full text-left p-3 hover:bg-muted/50 transition ${selectedThread === t.affiliate_user_id ? 'bg-muted' : ''}`}
+                  data-testid={`thread-${t.affiliate_user_id}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium truncate">{t.ref_code || t.affiliate_user_id.slice(0, 8)}</span>
+                    {t.unread_count > 0 && <Badge variant="destructive" className="text-[10px]">{t.unread_count}</Badge>}
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate mt-0.5">{t.last_message}</p>
+                </button>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      <Card className="md:col-span-2">
+        <CardHeader><CardTitle className="text-base">{selectedThread ? 'Conversation' : 'Select a thread'}</CardTitle></CardHeader>
+        <CardContent>
+          {selectedThread ? (
+            <>
+              <div className="space-y-2 max-h-[400px] overflow-auto mb-4">
+                {threadMessages.map((m: any) => (
+                  <div key={m.id} className={`p-2 rounded text-sm max-w-[80%] ${m.sender_role === 'admin' ? 'ml-auto bg-primary/10' : 'bg-muted'}`}>
+                    <p>{m.body}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">{new Date(m.created_at).toLocaleString()}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input value={reply} onChange={e => setReply(e.target.value)} placeholder="Type a reply..."
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply() } }}
+                  data-testid="input-admin-reply" />
+                <Button onClick={sendReply} disabled={sending || !reply.trim()} data-testid="button-admin-send">
+                  {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-8">Select an affiliate thread to view messages.</p>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+function AdminTestimonialsTab() {
+  const [testimonials, setTestimonials] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [form, setForm] = useState({ name: '', quote: '', earnings_display: '', tier_name: '', avatar_url: '', is_featured: false })
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const { toast } = useToast()
+
+  const loadTestimonials = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/affiliate/testimonials')
+      if (res.ok) { const data = await res.json(); setTestimonials(data.testimonials || []) }
+      else setTestimonials([])
+    } catch { setTestimonials([]) }
+    finally { setLoading(false) }
+  }, [])
+
+  useEffect(() => { loadTestimonials() }, [loadTestimonials])
+
+  const saveTestimonial = async () => {
+    if (!form.name || !form.quote) { toast({ title: 'Name and quote required', variant: 'destructive' }); return }
+    setSaving(true)
+    try {
+      const method = editingId ? 'PATCH' : 'POST'
+      const body = editingId ? { ...form, id: editingId } : form
+      const res = await fetch('/api/admin/affiliate/testimonials', {
+        method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      })
+      if (res.ok) {
+        toast({ title: editingId ? 'Testimonial updated' : 'Testimonial added' })
+        setForm({ name: '', quote: '', earnings_display: '', tier_name: '', avatar_url: '', is_featured: false })
+        setEditingId(null)
+        loadTestimonials()
+      }
+    } catch { toast({ title: 'Failed to save', variant: 'destructive' }) }
+    finally { setSaving(false) }
+  }
+
+  const deleteTestimonial = async (id: string) => {
+    try {
+      const res = await fetch('/api/admin/affiliate/testimonials', {
+        method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id })
+      })
+      if (res.ok) { toast({ title: 'Testimonial deleted' }); loadTestimonials() }
+    } catch { toast({ title: 'Failed to delete', variant: 'destructive' }) }
+  }
+
+  if (loading) return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader><CardTitle className="text-base">{editingId ? 'Edit Testimonial' : 'Add Testimonial'}</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label>Name</Label>
+              <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Jane Smith" data-testid="input-testimonial-name" />
+            </div>
+            <div>
+              <Label>Earnings Display</Label>
+              <Input value={form.earnings_display} onChange={e => setForm(f => ({ ...f, earnings_display: e.target.value }))} placeholder="$2,000+ earned" data-testid="input-testimonial-earnings" />
+            </div>
+          </div>
+          <div>
+            <Label>Quote</Label>
+            <Textarea value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} placeholder="I earned $2,000 in my first 3 months..." data-testid="input-testimonial-quote" />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label>Tier Name</Label>
+              <Input value={form.tier_name} onChange={e => setForm(f => ({ ...f, tier_name: e.target.value }))} placeholder="Gold" data-testid="input-testimonial-tier" />
+            </div>
+            <div>
+              <Label>Avatar URL</Label>
+              <Input value={form.avatar_url} onChange={e => setForm(f => ({ ...f, avatar_url: e.target.value }))} placeholder="https://..." data-testid="input-testimonial-avatar" />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch checked={form.is_featured} onCheckedChange={v => setForm(f => ({ ...f, is_featured: v }))} data-testid="switch-testimonial-featured" />
+            <Label>Featured</Label>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={saveTestimonial} disabled={saving} data-testid="button-save-testimonial">
+              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Save className="h-4 w-4 mr-1" />}
+              {editingId ? 'Update' : 'Add'}
+            </Button>
+            {editingId && <Button variant="ghost" onClick={() => { setEditingId(null); setForm({ name: '', quote: '', earnings_display: '', tier_name: '', avatar_url: '', is_featured: false }) }}>Cancel</Button>}
+          </div>
+        </CardContent>
+      </Card>
+      {testimonials.length > 0 && (
+        <Card>
+          <CardHeader><CardTitle className="text-base">Existing Testimonials ({testimonials.length})</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            <div className="divide-y">
+              {testimonials.map((t: any) => (
+                <div key={t.id} className="p-3 flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-sm">{t.name}</p>
+                      {t.is_featured && <Badge variant="default" className="text-[10px]">Featured</Badge>}
+                      {!t.is_active && <Badge variant="secondary" className="text-[10px]">Hidden</Badge>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">"{t.quote}"</p>
+                    {t.earnings_display && <p className="text-xs text-muted-foreground">{t.earnings_display}</p>}
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <Button variant="ghost" size="sm" onClick={() => { setEditingId(t.id); setForm({ name: t.name, quote: t.quote, earnings_display: t.earnings_display || '', tier_name: t.tier_name || '', avatar_url: t.avatar_url || '', is_featured: t.is_featured }) }} data-testid={`button-edit-testimonial-${t.id}`}>
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => deleteTestimonial(t.id)} data-testid={`button-delete-testimonial-${t.id}`}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+function AdminTaxInfoTab() {
+  const [submissions, setSubmissions] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [verifying, setVerifying] = useState<string | null>(null)
+  const { toast } = useToast()
+
+  const loadSubmissions = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/affiliate/tax-info')
+      if (res.ok) { const data = await res.json(); setSubmissions(data.submissions || []) }
+      else setSubmissions([])
+    } catch { setSubmissions([]) }
+    finally { setLoading(false) }
+  }, [])
+
+  useEffect(() => { loadSubmissions() }, [loadSubmissions])
+
+  const verifyTax = async (id: string) => {
+    setVerifying(id)
+    try {
+      const res = await fetch(`/api/admin/affiliate/tax-info/${id}/verify`, { method: 'PATCH' })
+      if (res.ok) { toast({ title: 'Tax info verified' }); loadSubmissions() }
+    } catch { toast({ title: 'Failed to verify', variant: 'destructive' }) }
+    finally { setVerifying(null) }
+  }
+
+  if (loading) return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Tax Submissions ({submissions.length})</CardTitle>
+        <CardDescription>Review and verify affiliate tax information before processing payouts.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {submissions.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-8">No tax submissions yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-left">
+                  <th className="py-2 px-2 font-medium">Affiliate</th>
+                  <th className="py-2 px-2 font-medium">Legal Name</th>
+                  <th className="py-2 px-2 font-medium">Form</th>
+                  <th className="py-2 px-2 font-medium">Country</th>
+                  <th className="py-2 px-2 font-medium">Status</th>
+                  <th className="py-2 px-2 font-medium">Submitted</th>
+                  <th className="py-2 px-2 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {submissions.map((s: any) => (
+                  <tr key={s.id} data-testid={`tax-row-${s.id}`}>
+                    <td className="py-2 px-2 text-xs">{s.ref_code || s.affiliate_user_id?.slice(0, 8)}</td>
+                    <td className="py-2 px-2">{s.legal_name}</td>
+                    <td className="py-2 px-2 uppercase">{s.form_type}</td>
+                    <td className="py-2 px-2">{s.address_country}</td>
+                    <td className="py-2 px-2">
+                      {s.verified ? (
+                        <Badge variant="default" className="text-[10px]"><CheckCircle className="h-3 w-3 mr-0.5" /> Verified</Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-[10px]"><Clock className="h-3 w-3 mr-0.5" /> Pending</Badge>
+                      )}
+                    </td>
+                    <td className="py-2 px-2 text-xs text-muted-foreground">{new Date(s.submitted_at).toLocaleDateString()}</td>
+                    <td className="py-2 px-2">
+                      {!s.verified && (
+                        <Button variant="outline" size="sm" onClick={() => verifyTax(s.id)} disabled={verifying === s.id} data-testid={`button-verify-tax-${s.id}`}>
+                          {verifying === s.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle className="h-3 w-3 mr-1" />}
+                          Verify
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
 export default function AffiliateSettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -273,6 +595,8 @@ export default function AffiliateSettingsPage() {
   const [memberFilter, setMemberFilter] = useState('all')
   const [memberSort, setMemberSort] = useState<{ key: string; dir: 'asc' | 'desc' }>({ key: 'totalEarnings', dir: 'desc' })
   const [deletingMember, setDeletingMember] = useState<string | null>(null)
+  const [suspendingMember, setSuspendingMember] = useState<string | null>(null)
+  const [recalcFraud, setRecalcFraud] = useState<string | null>(null)
   const [memberSearch, setMemberSearch] = useState('')
   const [deletingApp, setDeletingApp] = useState<string | null>(null)
 
@@ -376,6 +700,60 @@ export default function AffiliateSettingsPage() {
     }
   }
 
+  const handleSuspendMember = async (userId: string, email: string, suspend: boolean) => {
+    const actionLabel = suspend ? 'suspend' : 'unsuspend'
+    const reason = suspend ? prompt(`Reason for suspending ${email}:`, 'Policy violation') : undefined
+    if (suspend && reason === null) return
+
+    setSuspendingMember(userId)
+    try {
+      const res = await fetch('/api/affiliate/members', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: suspend ? 'suspend' : 'unsuspend', reason }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        toast({ title: suspend ? 'Affiliate Suspended' : 'Affiliate Restored', description: `${email} has been ${actionLabel}ed.` })
+        setMembers(prev => prev.map(m => m.userId === userId ? { ...m, suspended: suspend, suspensionReason: suspend ? (reason || 'Suspended by admin') : null } : m))
+        if (detailItem?.userId === userId) {
+          setDetailItem((prev: any) => ({ ...prev, suspended: suspend, suspensionReason: suspend ? (reason || 'Suspended by admin') : null }))
+        }
+      } else {
+        toast({ title: 'Error', description: data.error || `Failed to ${actionLabel}`, variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: `Failed to ${actionLabel}`, variant: 'destructive' })
+    } finally {
+      setSuspendingMember(null)
+    }
+  }
+
+  const handleRecalcFraud = async (userId: string, email: string) => {
+    setRecalcFraud(userId)
+    try {
+      const res = await fetch('/api/affiliate/members', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'recalculate_fraud' }),
+      })
+      const data = await res.json()
+      if (res.ok && data.fraudScore) {
+        toast({ title: 'Fraud Score Updated', description: `${email}: score is now ${data.fraudScore.score}. ${data.fraudScore.autoPaused ? 'Auto-paused due to high score.' : ''}` })
+        setMembers(prev => prev.map(m => m.userId === userId ? { ...m, fraudScore: data.fraudScore.score, fraudScoreUpdatedAt: new Date().toISOString(), suspended: data.fraudScore.autoPaused ? true : m.suspended } : m))
+        if (detailItem?.userId === userId) {
+          setDetailItem((prev: any) => ({ ...prev, fraudScore: data.fraudScore.score, fraudScoreUpdatedAt: new Date().toISOString(), suspended: data.fraudScore.autoPaused ? true : prev.suspended }))
+        }
+      } else {
+        toast({ title: 'Error', description: data.error || 'Failed to recalculate fraud score', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to recalculate fraud score', variant: 'destructive' })
+    } finally {
+      setRecalcFraud(null)
+    }
+  }
+
   const handleDeleteApplication = async (appId: string, email: string) => {
     if (!confirm(`Delete the application from ${email}? This cannot be undone.`)) return
 
@@ -398,7 +776,8 @@ export default function AffiliateSettingsPage() {
 
   const sortedFilteredMembers = members
     .filter(m => {
-      if (memberFilter !== 'all' && m.status !== memberFilter) return false
+      if (memberFilter === 'suspended' && !m.suspended) return false
+      else if (memberFilter !== 'all' && memberFilter !== 'suspended' && m.status !== memberFilter) return false
       if (memberSearch) {
         const q = memberSearch.toLowerCase()
         return (m.email || '').toLowerCase().includes(q) || (m.name || '').toLowerCase().includes(q)
@@ -845,7 +1224,9 @@ export default function AffiliateSettingsPage() {
           { label: 'Name', value: detailItem.name },
           { label: 'Email', value: detailItem.email },
           { label: 'Ref Code', value: detailItem.refCode },
-          { label: 'Status', value: detailItem.status === 'active' ? 'Active' : detailItem.status === 'pending_setup' ? 'Pending Setup' : 'Inactive', type: 'badge', badgeVariant: detailItem.status === 'active' ? 'default' : 'outline' },
+          { label: 'Status', value: detailItem.suspended ? 'Suspended' : detailItem.status === 'active' ? 'Active' : detailItem.status === 'pending_setup' ? 'Pending Setup' : 'Inactive', type: 'badge', badgeVariant: detailItem.suspended ? 'destructive' : detailItem.status === 'active' ? 'default' : 'outline' },
+          ...(detailItem.suspended && detailItem.suspensionReason ? [{ label: 'Suspension Reason', value: detailItem.suspensionReason }] : []),
+          { label: 'Fraud Score', value: `${detailItem.fraudScore || 0}${detailItem.fraudScore >= 60 ? ' (High Risk)' : detailItem.fraudScore >= 30 ? ' (Medium Risk)' : ''}`, type: 'badge' as const, badgeVariant: (detailItem.fraudScore >= 60 ? 'destructive' : detailItem.fraudScore >= 30 ? 'secondary' : 'outline') as any },
           { label: 'Tier', value: detailItem.tier },
           { label: 'Referrals', value: detailItem.referrals },
           { label: 'Clicks', value: detailItem.clicks },
@@ -1042,6 +1423,15 @@ export default function AffiliateSettingsPage() {
           </TabsTrigger>
           <TabsTrigger value="audit" data-testid="tab-audit">
             <ClipboardList className="h-3.5 w-3.5 mr-1" /> Audit Log
+          </TabsTrigger>
+          <TabsTrigger value="messages" data-testid="tab-messages">
+            <MessageSquare className="h-3.5 w-3.5 mr-1" /> Messages
+          </TabsTrigger>
+          <TabsTrigger value="testimonials" data-testid="tab-testimonials">
+            <Star className="h-3.5 w-3.5 mr-1" /> Testimonials
+          </TabsTrigger>
+          <TabsTrigger value="tax-info" data-testid="tab-tax-info">
+            <FileText className="h-3.5 w-3.5 mr-1" /> Tax Info
           </TabsTrigger>
         </TabsList>
 
@@ -1520,6 +1910,59 @@ export default function AffiliateSettingsPage() {
                 )}
               </div>
 
+              <div className="border-t pt-4 mt-4">
+                <h4 className="text-sm font-medium mb-3">Two-Tier Referrals</h4>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <Label>Enable Two-Tier Commissions</Label>
+                    <p className="text-xs text-muted-foreground">Affiliates earn a percentage when their recruited affiliates make sales</p>
+                  </div>
+                  <Switch
+                    checked={settings.two_tier_enabled}
+                    onCheckedChange={(v) => setSettings(s => ({ ...s, two_tier_enabled: v }))}
+                    data-testid="switch-two-tier-enabled"
+                  />
+                </div>
+                {settings.two_tier_enabled && (
+                  <div>
+                    <Label>Second-Tier Commission Rate (%)</Label>
+                    <Input type="number" min="0" max="50" step="0.5" value={settings.second_tier_commission_rate || ''} onChange={e => setSettings(s => ({ ...s, second_tier_commission_rate: e.target.value === '' ? 0 : parseFloat(e.target.value) }))} data-testid="input-second-tier-rate" className="w-full sm:w-32" />
+                    <p className="text-xs text-muted-foreground mt-1">Percentage of recruited affiliate's commission paid to recruiter</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t pt-4 mt-4">
+                <h4 className="text-sm font-medium mb-3">Fraud Detection</h4>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <Label>Enable Fraud Scoring</Label>
+                    <p className="text-xs text-muted-foreground">Automatically score affiliates for suspicious behavior</p>
+                  </div>
+                  <Switch
+                    checked={settings.fraud_scoring_enabled}
+                    onCheckedChange={(v) => setSettings(s => ({ ...s, fraud_scoring_enabled: v }))}
+                    data-testid="switch-fraud-scoring"
+                  />
+                </div>
+                {settings.fraud_scoring_enabled && (
+                  <div>
+                    <Label>Auto-Pause Threshold (0-100)</Label>
+                    <Input type="number" min="0" max="100" value={settings.fraud_auto_pause_threshold || ''} onChange={e => setSettings(s => ({ ...s, fraud_auto_pause_threshold: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-fraud-threshold" className="w-full sm:w-32" />
+                    <p className="text-xs text-muted-foreground mt-1">Affiliates with fraud score above this are auto-paused (default: 60)</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t pt-4 mt-4">
+                <h4 className="text-sm font-medium mb-3">Surveys</h4>
+                <div>
+                  <Label>Survey Interval (days)</Label>
+                  <Input type="number" min="30" max="365" value={settings.survey_interval_days || ''} onChange={e => setSettings(s => ({ ...s, survey_interval_days: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-survey-interval" className="w-full sm:w-32" />
+                  <p className="text-xs text-muted-foreground mt-1">How often affiliates are prompted to complete a satisfaction survey</p>
+                </div>
+              </div>
+
               <div className="border-t pt-4 mt-4 sticky bottom-0 bg-background pb-2">
                 <Button onClick={saveSettings} disabled={saving} data-testid="button-save-settings" className="w-full sm:w-auto">
                   {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
@@ -1769,6 +2212,7 @@ export default function AffiliateSettingsPage() {
                       <SelectItem value="active">Active</SelectItem>
                       <SelectItem value="pending_setup">Pending Setup</SelectItem>
                       <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="suspended">Suspended</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1839,13 +2283,20 @@ export default function AffiliateSettingsPage() {
                             </div>
                           </td>
                           <td className="py-3 px-3">
-                            <Badge
-                              variant={m.status === 'active' ? 'default' : m.status === 'pending_setup' ? 'secondary' : 'outline'}
-                              className="text-xs"
-                              data-testid={`status-${m.userId}`}
-                            >
-                              {m.status === 'active' ? 'Active' : m.status === 'pending_setup' ? 'Pending Setup' : 'Inactive'}
-                            </Badge>
+                            <div className="flex flex-col gap-1">
+                              <Badge
+                                variant={m.suspended ? 'destructive' : m.status === 'active' ? 'default' : m.status === 'pending_setup' ? 'secondary' : 'outline'}
+                                className="text-xs"
+                                data-testid={`status-${m.userId}`}
+                              >
+                                {m.suspended ? 'Suspended' : m.status === 'active' ? 'Active' : m.status === 'pending_setup' ? 'Pending Setup' : 'Inactive'}
+                              </Badge>
+                              {(m.fraudScore || 0) >= 30 && (
+                                <Badge variant={m.fraudScore >= 60 ? 'destructive' : 'secondary'} className="text-[10px] px-1.5 py-0" data-testid={`fraud-score-${m.userId}`}>
+                                  Fraud: {m.fraudScore}
+                                </Badge>
+                              )}
+                            </div>
                           </td>
                           <td className="py-3 px-3">
                             <span className="text-xs">{m.tier}</span>
@@ -1871,16 +2322,38 @@ export default function AffiliateSettingsPage() {
                             )}
                           </td>
                           <td className="py-3 pl-3 text-right">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                              onClick={(e) => { e.stopPropagation(); handleDeleteMember(m.userId, m.email) }}
-                              disabled={deletingMember === m.userId}
-                              data-testid={`button-delete-member-${m.userId}`}
-                            >
-                              {deletingMember === m.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                            </Button>
+                            <div className="flex items-center justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => { e.stopPropagation(); handleSuspendMember(m.userId, m.email, !m.suspended) }}
+                                disabled={suspendingMember === m.userId}
+                                data-testid={`button-suspend-member-${m.userId}`}
+                                title={m.suspended ? 'Unsuspend' : 'Suspend'}
+                              >
+                                {suspendingMember === m.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : m.suspended ? <CheckCircle className="h-4 w-4 text-green-600" /> : <AlertTriangle className="h-4 w-4 text-amber-500" />}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => { e.stopPropagation(); handleRecalcFraud(m.userId, m.email) }}
+                                disabled={recalcFraud === m.userId}
+                                data-testid={`button-recalc-fraud-${m.userId}`}
+                                title="Recalculate Fraud Score"
+                              >
+                                {recalcFraud === m.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive"
+                                onClick={(e) => { e.stopPropagation(); handleDeleteMember(m.userId, m.email) }}
+                                disabled={deletingMember === m.userId}
+                                data-testid={`button-delete-member-${m.userId}`}
+                              >
+                                {deletingMember === m.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -2531,6 +3004,18 @@ export default function AffiliateSettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="messages" className="space-y-4 mt-4">
+          <AdminMessagesTab />
+        </TabsContent>
+
+        <TabsContent value="testimonials" className="space-y-4 mt-4">
+          <AdminTestimonialsTab />
+        </TabsContent>
+
+        <TabsContent value="tax-info" className="space-y-4 mt-4">
+          <AdminTaxInfoTab />
+        </TabsContent>
+
       </Tabs>
 
       <DetailModal
@@ -2538,7 +3023,32 @@ export default function AffiliateSettingsPage() {
         onOpenChange={(open) => { if (!open) { setDetailItem(null); setDetailType('') } }}
         title={getDetailTitle()}
         fields={getDetailFields()}
-      />
+      >
+        {detailType === 'member' && detailItem && (
+          <div className="flex items-center flex-wrap gap-2 pt-3 border-t mt-2">
+            <Button
+              variant={detailItem.suspended ? 'default' : 'destructive'}
+              size="sm"
+              onClick={() => handleSuspendMember(detailItem.userId, detailItem.email, !detailItem.suspended)}
+              disabled={suspendingMember === detailItem.userId}
+              data-testid="button-detail-suspend"
+            >
+              {suspendingMember === detailItem.userId ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : detailItem.suspended ? <CheckCircle className="mr-1 h-3 w-3" /> : <AlertTriangle className="mr-1 h-3 w-3" />}
+              {detailItem.suspended ? 'Unsuspend' : 'Suspend'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleRecalcFraud(detailItem.userId, detailItem.email)}
+              disabled={recalcFraud === detailItem.userId}
+              data-testid="button-detail-recalc-fraud"
+            >
+              {recalcFraud === detailItem.userId ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <RefreshCw className="mr-1 h-3 w-3" />}
+              Recalculate Fraud
+            </Button>
+          </div>
+        )}
+      </DetailModal>
     </div>
   )
 }

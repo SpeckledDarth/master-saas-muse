@@ -31,6 +31,7 @@ export default function AffiliateJoinPage() {
   const [websiteUrl, setWebsiteUrl] = useState('')
   const [promotionMethods, setPromotionMethods] = useState<string[]>([])
   const [message, setMessage] = useState('')
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -50,6 +51,8 @@ export default function AffiliateJoinPage() {
           website_url: websiteUrl || null,
           promotion_method: promotionMethods.join(','),
           message: message || null,
+          agreed_to_terms: agreedToTerms,
+          terms_version: '1.0',
         }),
       })
 
@@ -181,13 +184,26 @@ export default function AffiliateJoinPage() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <label className="flex items-start gap-2 cursor-pointer text-sm text-black dark:text-white" data-testid="checkbox-agree-terms">
+                  <Checkbox
+                    checked={agreedToTerms}
+                    onCheckedChange={(checked) => setAgreedToTerms(!!checked)}
+                    className="mt-0.5"
+                  />
+                  <span>
+                    I agree to the <Link href="/terms" className="text-primary-600 hover:underline" target="_blank">Terms of Service</Link> and <Link href="/privacy" className="text-primary-600 hover:underline" target="_blank">Privacy Policy</Link>, including the affiliate program rules and anti-spam guidelines. *
+                  </span>
+                </label>
+              </div>
+
               {error && (
                 <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3" data-testid="text-error">
                   {error}
                 </div>
               )}
 
-              <Button type="submit" className="w-full" size="lg" disabled={loading || !name || !email || promotionMethods.length === 0} data-testid="button-submit-application">
+              <Button type="submit" className="w-full" size="lg" disabled={loading || !name || !email || promotionMethods.length === 0 || !agreedToTerms} data-testid="button-submit-application">
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Submit Application
               </Button>

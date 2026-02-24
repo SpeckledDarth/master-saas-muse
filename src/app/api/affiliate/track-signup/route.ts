@@ -84,6 +84,26 @@ export async function POST(request: NextRequest) {
       })
       .eq('id', affiliateLink.id)
 
+    try {
+      const { data: newUserLink } = await admin
+        .from('referral_links')
+        .select('id, recruited_by_affiliate_id')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (newUserLink && !newUserLink.recruited_by_affiliate_id) {
+        await admin
+          .from('referral_links')
+          .update({
+            recruited_by_affiliate_id: affiliateLink.user_id,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', newUserLink.id)
+      }
+    } catch (tierErr) {
+      console.error('Two-tier tracking (non-critical):', tierErr)
+    }
+
     if (!affiliateLink.locked_at) {
       await lockInAffiliateTerms(affiliateLink.user_id)
     }

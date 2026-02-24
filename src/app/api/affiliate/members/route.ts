@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getAffiliateTiers, getCurrentTier } from '@/lib/affiliate'
+import { logAuditEvent } from '@/lib/affiliate/audit'
+import { calculateFraudScore } from '@/lib/affiliate/fraud'
 
 async function requireAdmin() {
   const supabase = await createClient()
@@ -111,6 +113,10 @@ export async function GET() {
         refCode: link.ref_code,
         isAffiliate: link.is_affiliate || false,
         status,
+        suspended: link.suspended || false,
+        suspensionReason: link.suspension_reason || null,
+        fraudScore: link.fraud_score || 0,
+        fraudScoreUpdatedAt: link.fraud_score_updated_at || null,
         tier: currentTier?.name || 'None',
         referrals: link.signups || 0,
         clicks: link.clicks || 0,
@@ -177,5 +183,96 @@ export async function DELETE(request: NextRequest) {
     }
     console.error('Affiliate member DELETE error:', err)
     return NextResponse.json({ error: 'Failed to delete affiliate' }, { status: 500 })
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const auth = await requireAdmin()
+    if (!auth) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+
+    const { admin, user } = auth
+    const body = await request.json()
+    const { userId, action, reason } = body
+
+    if (!userId || !action) {
+      return NextResponse.json({ error: 'userId and action are required' }, { status: 400 })
+    }
+
+    if (action === 'suspend') {
+      const { error } = await admin
+        .from('referral_links')
+        .update({
+          suspended: true,
+          suspension_reason: reason || 'Suspended by admin',
+        })
+        .eq('user_id', userId)
+
+      if (error) {
+        if (error.code === '42703') {
+          return NextResponse.json({ error: 'Suspension columns not yet available. Run migration 010.' }, { status: 503 })
+        }
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+
+      logAuditEvent({
+        admin_user_id: user.id,
+        admin_email: user.email!,
+        action: 'update',
+        entity_type: 'member',
+        entity_id: userId,
+        details: { action: 'suspend', reason },
+      })
+
+      return NextResponse.json({ success: true, action: 'suspended' })
+    }
+
+    if (action === 'unsuspend') {
+      const { error } = await admin
+        .from('referral_links')
+        .update({
+          suspended: false,
+          suspension_reason: null,
+        })
+        .eq('user_id', userId)
+
+      if (error) {
+        if (error.code === '42703') {
+          return NextResponse.json({ error: 'Suspension columns not yet available. Run migration 010.' }, { status: 503 })
+        }
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+
+      logAuditEvent({
+        admin_user_id: user.id,
+        admin_email: user.email!,
+        action: 'update',
+        entity_type: 'member',
+        entity_id: userId,
+        details: { action: 'unsuspend' },
+      })
+
+      return NextResponse.json({ success: true, action: 'unsuspended' })
+    }
+
+    if (action === 'recalculate_fraud') {
+      const result = await calculateFraudScore(userId)
+
+      logAuditEvent({
+        admin_user_id: user.id,
+        admin_email: user.email!,
+        action: 'update',
+        entity_type: 'member',
+        entity_id: userId,
+        details: { action: 'recalculate_fraud', score: result.score, signals: result.signals.map(s => s.signal) },
+      })
+
+      return NextResponse.json({ success: true, fraudScore: result })
+    }
+
+    return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 })
+  } catch (err: any) {
+    console.error('Affiliate member PATCH error:', err)
+    return NextResponse.json({ error: 'Failed to update affiliate' }, { status: 500 })
   }
 }

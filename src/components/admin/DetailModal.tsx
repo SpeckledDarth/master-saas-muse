@@ -17,6 +17,7 @@ interface DetailModalProps {
   title: string
   description?: string
   fields: DetailField[]
+  children?: React.ReactNode
 }
 
 function formatValue(field: DetailField): React.ReactNode {
@@ -61,7 +62,7 @@ function formatValue(field: DetailField): React.ReactNode {
   }
 }
 
-export default function DetailModal({ open, onOpenChange, title, description, fields }: DetailModalProps) {
+export default function DetailModal({ open, onOpenChange, title, description, fields, children }: DetailModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md sm:max-w-lg" data-testid="dialog-detail-modal">
@@ -77,6 +78,7 @@ export default function DetailModal({ open, onOpenChange, title, description, fi
                 <div>{formatValue(field)}</div>
               </div>
             ))}
+            {children}
           </div>
         </ScrollArea>
       </DialogContent>

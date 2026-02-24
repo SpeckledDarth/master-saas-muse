@@ -18,7 +18,8 @@ import {
   ExternalLink, Clock, CheckCircle, LogOut, Target, Zap, Lock,
   Link2, Trophy, BarChart3, ArrowDown, ArrowUp, Calendar, Gift,
   LayoutDashboard, Settings, Receipt, Megaphone, HelpCircle,
-  Bell, Bookmark, Download, QrCode,
+  Bell, Bookmark, Download, QrCode, Key, Trash2, Eye, EyeOff, Globe, Palette,
+  Webhook, Send, AlertTriangle, RefreshCw, MessageSquare,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -74,7 +75,17 @@ interface AffiliateDashboardData {
   }>
   settings: {
     minPayoutCents: number
+    twoTierEnabled?: boolean
+    secondTierCommissionRate?: number
   }
+  secondTierCommissions?: Array<{
+    id: string
+    tier2_affiliate_id: string
+    commission_rate: number
+    commission_amount_cents: number
+    created_at: string
+  }>
+  secondTierTotal?: number
 }
 
 interface MarketingAsset {
@@ -174,7 +185,7 @@ const DEEP_LINK_PAGES = [
   { label: 'About', path: '/about' },
 ]
 
-type DashboardSection = 'overview' | 'referrals' | 'earnings' | 'payouts' | 'assets' | 'tools' | 'announcements' | 'account' | 'support'
+type DashboardSection = 'overview' | 'referrals' | 'earnings' | 'payouts' | 'assets' | 'tools' | 'announcements' | 'messages' | 'account' | 'support'
 
 const NAV_ITEMS: { key: DashboardSection; label: string; icon: any }[] = [
   { key: 'overview', label: 'Dashboard', icon: LayoutDashboard },
@@ -184,6 +195,7 @@ const NAV_ITEMS: { key: DashboardSection; label: string; icon: any }[] = [
   { key: 'assets', label: 'Resources', icon: Bookmark },
   { key: 'tools', label: 'Tools', icon: Link2 },
   { key: 'announcements', label: 'News', icon: Megaphone },
+  { key: 'messages', label: 'Messages', icon: MessageSquare },
   { key: 'account', label: 'Account', icon: Settings },
   { key: 'support', label: 'Support', icon: HelpCircle },
 ]
@@ -247,6 +259,21 @@ function StandaloneAffiliateDashboard() {
   const [profileLoading, setProfileLoading] = useState(false)
   const [profileSaving, setProfileSaving] = useState(false)
 
+  const [taxInfo, setTaxInfo] = useState<Record<string, any> | null>(null)
+  const [taxInfoLoading, setTaxInfoLoading] = useState(false)
+  const [taxInfoSaving, setTaxInfoSaving] = useState(false)
+  const [taxForm, setTaxForm] = useState<Record<string, any>>({
+    legal_name: '',
+    tax_id_type: 'ssn',
+    tax_id_last4: '',
+    address_line1: '',
+    address_city: '',
+    address_state: '',
+    address_zip: '',
+    address_country: 'US',
+    form_type: 'w9',
+  })
+
   const [discountCodes, setDiscountCodes] = useState<any[]>([])
   const [codeRequests, setCodeRequests] = useState<any[]>([])
   const [newCodeRequest, setNewCodeRequest] = useState('')
@@ -255,8 +282,58 @@ function StandaloneAffiliateDashboard() {
   const [linkPresets, setLinkPresets] = useState<any[]>([])
   const [presetName, setPresetName] = useState('')
 
+  const [apiKeys, setApiKeys] = useState<any[]>([])
+  const [apiKeysLoading, setApiKeysLoading] = useState(false)
+  const [newKeyName, setNewKeyName] = useState('')
+  const [generatingKey, setGeneratingKey] = useState(false)
+  const [newlyGeneratedKey, setNewlyGeneratedKey] = useState<string | null>(null)
+  const [copiedApiKey, setCopiedApiKey] = useState(false)
+
+  const [landingPage, setLandingPage] = useState<any>(null)
+  const [landingPageLoading, setLandingPageLoading] = useState(false)
+  const [landingPageSaving, setLandingPageSaving] = useState(false)
+  const [lpHeadline, setLpHeadline] = useState('')
+  const [lpBio, setLpBio] = useState('')
+  const [lpPhotoUrl, setLpPhotoUrl] = useState('')
+  const [lpCta, setLpCta] = useState('Get Started')
+  const [lpThemeColor, setLpThemeColor] = useState('#6366f1')
+  const [lpActive, setLpActive] = useState(true)
+
+  const [promoGenerating, setPromoGenerating] = useState(false)
+  const [promoContent, setPromoContent] = useState('')
+  const [promoPlatform, setPromoPlatform] = useState('twitter')
+  const [promoTone, setPromoTone] = useState('professional')
+  const [promoCopied, setPromoCopied] = useState(false)
+
+  const [messages, setMessages] = useState<any[]>([])
+  const [messagesLoading, setMessagesLoading] = useState(false)
+  const [messageBody, setMessageBody] = useState('')
+  const [messageSending, setMessageSending] = useState(false)
+  const [unreadMessages, setUnreadMessages] = useState(0)
+
   const [showTour, setShowTour] = useState(false)
   const [tourStep, setTourStep] = useState(0)
+
+  const [webhooks, setWebhooks] = useState<any[]>([])
+  const [webhooksLoading, setWebhooksLoading] = useState(false)
+  const [webhookUrl, setWebhookUrl] = useState('')
+  const [webhookEvents, setWebhookEvents] = useState<string[]>(['affiliate.commission', 'affiliate.payout'])
+  const [webhookCreating, setWebhookCreating] = useState(false)
+  const [webhookSecret, setWebhookSecret] = useState<string | null>(null)
+  const [webhookDeliveries, setWebhookDeliveries] = useState<Record<string, any[]>>({})
+  const [webhookDeliveriesOpen, setWebhookDeliveriesOpen] = useState<string | null>(null)
+  const [webhookTesting, setWebhookTesting] = useState<string | null>(null)
+
+  const [surveyRating, setSurveyRating] = useState(0)
+  const [surveyFeedback, setSurveyFeedback] = useState('')
+  const [surveyTestimonialOptIn, setSurveyTestimonialOptIn] = useState(false)
+  const [surveySubmitting, setSurveySubmitting] = useState(false)
+  const [surveyData, setSurveyData] = useState<{ surveys: any[]; canTakeSurvey: boolean; lastSurveyAt: string | null } | null>(null)
+
+  const [earnedBadges, setEarnedBadges] = useState<any[]>([])
+  const [badgeTiers, setBadgeTiers] = useState<any[]>([])
+  const [badgesLoading, setBadgesLoading] = useState(false)
+  const [copiedEmbed, setCopiedEmbed] = useState<string | null>(null)
 
   const [referralFilter, setReferralFilter] = useState('all')
   const [referralSort, setReferralSort] = useState<'newest' | 'oldest'>('newest')
@@ -377,6 +454,114 @@ function StandaloneAffiliateDashboard() {
     setProfileSaving(false)
   }
 
+  const fetchApiKeys = useCallback(async () => {
+    setApiKeysLoading(true)
+    try {
+      const res = await fetch('/api/affiliate/api-keys')
+      if (res.ok) {
+        const d = await res.json()
+        setApiKeys(d.keys || [])
+      }
+    } catch {}
+    setApiKeysLoading(false)
+  }, [])
+
+  const generateNewApiKey = async () => {
+    setGeneratingKey(true)
+    setNewlyGeneratedKey(null)
+    try {
+      const res = await fetch('/api/affiliate/api-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newKeyName || 'Default' }),
+      })
+      if (res.ok) {
+        const d = await res.json()
+        setNewlyGeneratedKey(d.key.fullKey)
+        setNewKeyName('')
+        fetchApiKeys()
+        toast({ title: 'API Key Generated', description: 'Save this key now. It will not be shown again.' })
+      } else {
+        const d = await res.json()
+        toast({ title: 'Error', description: d.error || 'Failed to generate key.', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to generate API key.', variant: 'destructive' })
+    }
+    setGeneratingKey(false)
+  }
+
+  const revokeApiKey = async (keyId: string) => {
+    try {
+      const res = await fetch(`/api/affiliate/api-keys?id=${keyId}`, { method: 'DELETE' })
+      if (res.ok) {
+        fetchApiKeys()
+        toast({ title: 'Revoked', description: 'API key has been revoked.' })
+      } else {
+        toast({ title: 'Error', description: 'Failed to revoke key.', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to revoke key.', variant: 'destructive' })
+    }
+  }
+
+  const fetchTaxInfo = useCallback(async () => {
+    setTaxInfoLoading(true)
+    try {
+      const res = await fetch('/api/affiliate/tax-info')
+      if (res.ok) {
+        const d = await res.json()
+        if (d.taxInfo) {
+          setTaxInfo(d.taxInfo)
+          setTaxForm({
+            legal_name: d.taxInfo.legal_name || '',
+            tax_id_type: d.taxInfo.tax_id_type || 'ssn',
+            tax_id_last4: d.taxInfo.tax_id_last4 || '',
+            address_line1: d.taxInfo.address_line1 || '',
+            address_city: d.taxInfo.address_city || '',
+            address_state: d.taxInfo.address_state || '',
+            address_zip: d.taxInfo.address_zip || '',
+            address_country: d.taxInfo.address_country || 'US',
+            form_type: d.taxInfo.form_type || 'w9',
+          })
+        }
+      }
+    } catch {}
+    setTaxInfoLoading(false)
+  }, [])
+
+  const saveTaxInfo = async () => {
+    setTaxInfoSaving(true)
+    try {
+      if (!taxForm.legal_name) {
+        toast({ title: 'Error', description: 'Legal name is required.', variant: 'destructive' })
+        setTaxInfoSaving(false)
+        return
+      }
+      if (taxForm.form_type === 'w9' && !taxForm.tax_id_last4) {
+        toast({ title: 'Error', description: 'Last 4 digits of SSN/EIN required for W-9.', variant: 'destructive' })
+        setTaxInfoSaving(false)
+        return
+      }
+      const res = await fetch('/api/affiliate/tax-info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(taxForm),
+      })
+      if (res.ok) {
+        const d = await res.json()
+        setTaxInfo(d.taxInfo)
+        toast({ title: 'Saved', description: 'Your tax information has been submitted.' })
+      } else {
+        const err = await res.json()
+        toast({ title: 'Error', description: err.error || 'Failed to save tax info.', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save tax info.', variant: 'destructive' })
+    }
+    setTaxInfoSaving(false)
+  }
+
   const fetchDiscountCodes = useCallback(async () => {
     try {
       const res = await fetch('/api/affiliate/discount-codes')
@@ -466,6 +651,71 @@ function StandaloneAffiliateDashboard() {
     toast({ title: 'Loaded', description: `Preset "${preset.name}" loaded into link generator.` })
   }
 
+  const fetchLandingPage = useCallback(async () => {
+    setLandingPageLoading(true)
+    try {
+      const res = await fetch('/api/affiliate/landing-page')
+      if (res.ok) {
+        const data = await res.json()
+        if (data.page) {
+          setLandingPage(data.page)
+          setLpHeadline(data.page.headline || '')
+          setLpBio(data.page.bio || '')
+          setLpPhotoUrl(data.page.photo_url || '')
+          setLpCta(data.page.custom_cta || 'Get Started')
+          setLpThemeColor(data.page.theme_color || '#6366f1')
+          setLpActive(data.page.is_active !== false)
+        }
+      }
+    } catch {}
+    setLandingPageLoading(false)
+  }, [])
+
+  const saveLandingPage = async () => {
+    setLandingPageSaving(true)
+    try {
+      const payload = {
+        headline: lpHeadline,
+        bio: lpBio,
+        photo_url: lpPhotoUrl,
+        custom_cta: lpCta,
+        theme_color: lpThemeColor,
+        is_active: lpActive,
+      }
+
+      if (landingPage) {
+        const res = await fetch('/api/affiliate/landing-page', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setLandingPage(data.page)
+          toast({ title: 'Saved', description: 'Landing page updated.' })
+        } else {
+          toast({ title: 'Error', description: 'Failed to update landing page.', variant: 'destructive' })
+        }
+      } else {
+        const res = await fetch('/api/affiliate/landing-page', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setLandingPage(data.page)
+          toast({ title: 'Created', description: 'Your landing page is live!' })
+        } else {
+          toast({ title: 'Error', description: 'Failed to create landing page.', variant: 'destructive' })
+        }
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save landing page.', variant: 'destructive' })
+    }
+    setLandingPageSaving(false)
+  }
+
   const fetchNotifications = useCallback(async () => {
     try {
       const res = await fetch('/api/affiliate/notifications')
@@ -476,15 +726,79 @@ function StandaloneAffiliateDashboard() {
     } catch {}
   }, [])
 
+  const fetchSurveys = useCallback(async () => {
+    try {
+      const res = await fetch('/api/affiliate/surveys')
+      if (!res.ok) return
+      const data = await res.json()
+      setSurveyData(data)
+    } catch {}
+  }, [])
+
+  const fetchBadges = useCallback(async () => {
+    setBadgesLoading(true)
+    try {
+      const res = await fetch('/api/affiliate/badges')
+      if (!res.ok) return
+      const data = await res.json()
+      setEarnedBadges(data.badges || [])
+      setBadgeTiers(data.tiers || [])
+    } catch {}
+    setBadgesLoading(false)
+  }, [])
+
+  const submitSurvey = async () => {
+    if (surveyRating === 0) {
+      toast({ title: 'Rating Required', description: 'Please select a star rating.', variant: 'destructive' })
+      return
+    }
+    setSurveySubmitting(true)
+    try {
+      const res = await fetch('/api/affiliate/surveys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rating: surveyRating,
+          feedback: surveyFeedback || null,
+          can_use_as_testimonial: surveyTestimonialOptIn,
+        }),
+      })
+      if (res.ok) {
+        toast({ title: 'Thank you!', description: 'Your feedback has been submitted.' })
+        setSurveyRating(0)
+        setSurveyFeedback('')
+        setSurveyTestimonialOptIn(false)
+        fetchSurveys()
+      } else {
+        const data = await res.json()
+        toast({ title: 'Error', description: data.error || 'Failed to submit survey.', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to submit survey.', variant: 'destructive' })
+    }
+    setSurveySubmitting(false)
+  }
+
   useEffect(() => {
     if (!authChecking) {
       fetchData()
       fetchNotifications()
       fetchProfile()
+      fetchTaxInfo()
       fetchDiscountCodes()
       fetchLinkPresets()
+      fetchLandingPage()
+      fetchApiKeys()
+      fetchSurveys()
+      fetchBadges()
+      fetch('/api/affiliate/messages').then(r => r.ok ? r.json() : null).then(d => {
+        if (d?.messages) {
+          setMessages(d.messages)
+          setUnreadMessages(d.messages.filter((m: any) => m.sender_role === 'admin' && !m.is_read).length)
+        }
+      }).catch(() => {})
     }
-  }, [authChecking, fetchData, fetchNotifications, fetchProfile, fetchDiscountCodes, fetchLinkPresets])
+  }, [authChecking, fetchData, fetchNotifications, fetchProfile, fetchTaxInfo, fetchDiscountCodes, fetchLinkPresets, fetchLandingPage, fetchApiKeys, fetchSurveys, fetchBadges])
 
   useEffect(() => {
     if (!authChecking && !loading) fetchLeaderboard()
@@ -540,6 +854,37 @@ function StandaloneAffiliateDashboard() {
     }
 
     return `${baseDomain}${cleanPath}?${params.toString()}`
+  }
+
+  const generatePromoPost = async () => {
+    setPromoGenerating(true)
+    setPromoContent('')
+    setPromoCopied(false)
+    try {
+      const res = await fetch('/api/affiliate/auto-promo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform: promoPlatform, tone: promoTone, productName: appName }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to generate')
+      setPromoContent(json.content)
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to generate promo post', variant: 'destructive' })
+    } finally {
+      setPromoGenerating(false)
+    }
+  }
+
+  const copyPromoContent = async () => {
+    try {
+      await navigator.clipboard.writeText(promoContent)
+      setPromoCopied(true)
+      setTimeout(() => setPromoCopied(false), 2000)
+      toast({ title: 'Copied!', description: 'Promo post copied to clipboard' })
+    } catch {
+      toast({ title: 'Error', description: 'Could not copy to clipboard', variant: 'destructive' })
+    }
   }
 
   const handleCopyDeepLink = async () => {
@@ -1222,6 +1567,57 @@ function StandaloneAffiliateDashboard() {
           )}
         </CardContent>
       </Card>
+
+      {data.settings.twoTierEnabled && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Second-Tier Earnings
+            </CardTitle>
+            <CardDescription>
+              Earn {data.settings.secondTierCommissionRate || 5}% from affiliates you recruited
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-3">
+              <span className="text-xs text-muted-foreground">Total Second-Tier Earnings</span>
+              <p className="text-xl font-bold" data-testid="text-second-tier-total">
+                ${((data.secondTierTotal || 0) / 100).toFixed(2)}
+              </p>
+            </div>
+            {(data.secondTierCommissions?.length || 0) === 0 ? (
+              <div className="text-center py-6" data-testid="text-no-second-tier">
+                <Users className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  No second-tier commissions yet. Share your affiliate link with potential partners to start earning!
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {data.secondTierCommissions!.map(stc => (
+                  <div key={stc.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`second-tier-commission-${stc.id}`}>
+                    <div className="flex items-center gap-3">
+                      <Badge variant="secondary" className="text-xs">
+                        Tier 2
+                      </Badge>
+                      <div>
+                        <p className="text-sm font-medium">${(stc.commission_amount_cents / 100).toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {stc.commission_rate}% second-tier rate
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(stc.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 
@@ -1380,6 +1776,170 @@ function StandaloneAffiliateDashboard() {
       </div>
     )
   }
+
+  const loadWebhooks = useCallback(async () => {
+    setWebhooksLoading(true)
+    try {
+      const res = await fetch('/api/affiliate/webhooks')
+      if (res.ok) {
+        const d = await res.json()
+        setWebhooks(d.webhooks || [])
+      }
+    } catch (e) {
+      console.error('Failed to load webhooks:', e)
+    } finally {
+      setWebhooksLoading(false)
+    }
+  }, [])
+
+  const createWebhook = async () => {
+    if (!webhookUrl.trim()) return
+    setWebhookCreating(true)
+    try {
+      const res = await fetch('/api/affiliate/webhooks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: webhookUrl, events: webhookEvents }),
+      })
+      const d = await res.json()
+      if (res.ok) {
+        setWebhookSecret(d.secret)
+        setWebhookUrl('')
+        setWebhookEvents(['affiliate.commission', 'affiliate.payout'])
+        await loadWebhooks()
+        toast({ title: 'Webhook Created', description: 'Copy the signing secret below — it will only be shown once.' })
+      } else {
+        toast({ title: 'Error', description: d.error || 'Failed to create webhook', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to create webhook', variant: 'destructive' })
+    } finally {
+      setWebhookCreating(false)
+    }
+  }
+
+  const deleteWebhook = async (id: string) => {
+    try {
+      const res = await fetch(`/api/affiliate/webhooks/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setWebhooks(prev => prev.filter(w => w.id !== id))
+        toast({ title: 'Deleted', description: 'Webhook removed.' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to delete webhook', variant: 'destructive' })
+    }
+  }
+
+  const testWebhook = async (id: string) => {
+    setWebhookTesting(id)
+    try {
+      const res = await fetch(`/api/affiliate/webhooks/${id}/test`, { method: 'POST' })
+      const d = await res.json()
+      if (d.success) {
+        toast({ title: 'Test Sent', description: `Response: ${d.status} OK` })
+      } else {
+        toast({ title: 'Test Failed', description: `Status: ${d.status || 'N/A'} — ${d.body?.slice(0, 100) || 'No response'}`, variant: 'destructive' })
+      }
+      await loadWebhookDeliveries(id)
+    } catch {
+      toast({ title: 'Error', description: 'Failed to send test', variant: 'destructive' })
+    } finally {
+      setWebhookTesting(null)
+    }
+  }
+
+  const loadWebhookDeliveries = async (webhookId: string) => {
+    try {
+      const res = await fetch(`/api/affiliate/webhooks/${webhookId}/deliveries`)
+      if (res.ok) {
+        const d = await res.json()
+        setWebhookDeliveries(prev => ({ ...prev, [webhookId]: d.deliveries || [] }))
+      }
+    } catch (e) {
+      console.error('Failed to load deliveries:', e)
+    }
+  }
+
+  const toggleWebhookEvent = (event: string) => {
+    setWebhookEvents(prev =>
+      prev.includes(event) ? prev.filter(e => e !== event) : [...prev, event]
+    )
+  }
+
+  const AVAILABLE_WEBHOOK_EVENTS = [
+    { value: 'affiliate.click', label: 'Click Tracked' },
+    { value: 'affiliate.signup', label: 'Signup' },
+    { value: 'affiliate.commission', label: 'Commission Earned' },
+    { value: 'affiliate.payout', label: 'Payout Processed' },
+    { value: 'affiliate.tier_change', label: 'Tier Change' },
+    { value: 'affiliate.milestone', label: 'Milestone Reached' },
+  ]
+
+  useEffect(() => {
+    if (section === 'tools' && webhooks.length === 0 && !webhooksLoading) {
+      loadWebhooks()
+    }
+  }, [section, loadWebhooks])
+
+  const loadMessages = useCallback(async () => {
+    setMessagesLoading(true)
+    try {
+      const res = await fetch('/api/affiliate/messages')
+      if (res.ok) {
+        const json = await res.json()
+        setMessages(json.messages || [])
+        const unread = (json.messages || []).filter((m: any) => m.sender_role === 'admin' && !m.is_read).length
+        setUnreadMessages(unread)
+      }
+    } catch (err) {
+      console.error('Failed to load messages:', err)
+    } finally {
+      setMessagesLoading(false)
+    }
+  }, [])
+
+  const sendMessage = async () => {
+    if (!messageBody.trim() || messageSending) return
+    setMessageSending(true)
+    try {
+      const res = await fetch('/api/affiliate/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ body: messageBody.trim() }),
+      })
+      if (res.ok) {
+        setMessageBody('')
+        await loadMessages()
+        toast({ title: 'Sent', description: 'Your message has been sent.' })
+      } else {
+        const json = await res.json()
+        toast({ title: 'Error', description: json.error || 'Failed to send message', variant: 'destructive' })
+      }
+    } catch (err) {
+      toast({ title: 'Error', description: 'Failed to send message', variant: 'destructive' })
+    } finally {
+      setMessageSending(false)
+    }
+  }
+
+  const markMessagesRead = async () => {
+    try {
+      await fetch('/api/affiliate/messages/read', { method: 'PATCH' })
+      setUnreadMessages(0)
+      setMessages(prev => prev.map(m => m.sender_role === 'admin' ? { ...m, is_read: true } : m))
+    } catch (err) {
+      console.error('Failed to mark messages read:', err)
+    }
+  }
+
+  useEffect(() => {
+    if (section === 'messages' && messages.length === 0 && !messagesLoading) {
+      loadMessages()
+    }
+    if (section === 'messages' && unreadMessages > 0) {
+      markMessagesRead()
+    }
+  }, [section, loadMessages])
 
   const renderTools = () => (
     <div className="space-y-6">
@@ -1607,6 +2167,378 @@ function StandaloneAffiliateDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      <Card data-testid="card-landing-page-editor">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Globe className="h-4 w-4" />
+            Co-Branded Landing Page
+          </CardTitle>
+          <CardDescription>Create a personalized landing page with your branding and referral link built in</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {landingPageLoading ? (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label className="text-xs">Headline</Label>
+                  <Input
+                    value={lpHeadline}
+                    onChange={e => setLpHeadline(e.target.value)}
+                    placeholder="Your personalized headline"
+                    className="mt-1"
+                    data-testid="input-lp-headline"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Call to Action Button Text</Label>
+                  <Input
+                    value={lpCta}
+                    onChange={e => setLpCta(e.target.value)}
+                    placeholder="Get Started"
+                    className="mt-1"
+                    data-testid="input-lp-cta"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label className="text-xs">Bio / Description</Label>
+                <Input
+                  value={lpBio}
+                  onChange={e => setLpBio(e.target.value)}
+                  placeholder="Tell visitors why they should sign up through you"
+                  className="mt-1"
+                  data-testid="input-lp-bio"
+                />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label className="text-xs">Photo URL</Label>
+                  <Input
+                    value={lpPhotoUrl}
+                    onChange={e => setLpPhotoUrl(e.target.value)}
+                    placeholder="https://example.com/your-photo.jpg"
+                    className="mt-1"
+                    data-testid="input-lp-photo"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs flex items-center gap-1"><Palette className="h-3 w-3" /> Theme Color</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <input
+                      type="color"
+                      value={lpThemeColor}
+                      onChange={e => setLpThemeColor(e.target.value)}
+                      className="w-9 h-9 rounded-md border cursor-pointer"
+                      data-testid="input-lp-color"
+                    />
+                    <Input
+                      value={lpThemeColor}
+                      onChange={e => setLpThemeColor(e.target.value)}
+                      className="flex-1 font-mono text-xs"
+                      data-testid="input-lp-color-text"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="lp-active-toggle"
+                  checked={lpActive}
+                  onChange={e => setLpActive(e.target.checked)}
+                  className="rounded"
+                  data-testid="checkbox-lp-active"
+                />
+                <Label htmlFor="lp-active-toggle" className="text-xs cursor-pointer">Page is active and publicly visible</Label>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button size="sm" onClick={saveLandingPage} disabled={landingPageSaving} data-testid="button-save-landing-page">
+                  {landingPageSaving ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : null}
+                  {landingPage ? 'Save Changes' : 'Create Landing Page'}
+                </Button>
+                {landingPage?.slug && (
+                  <Button variant="outline" size="sm" asChild data-testid="button-preview-landing-page">
+                    <a href={`/partner/${landingPage.slug}`} target="_blank" rel="noopener noreferrer">
+                      <Eye className="h-4 w-4 mr-1" /> Preview
+                    </a>
+                  </Button>
+                )}
+              </div>
+              {landingPage?.slug && (
+                <div className="p-3 rounded-md bg-muted/40 space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">Your Landing Page URL</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={`${typeof window !== 'undefined' ? window.location.origin : ''}/partner/${landingPage.slug}`}
+                      readOnly
+                      className="font-mono text-xs"
+                      data-testid="input-lp-url"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleCopy(`${window.location.origin}/partner/${landingPage.slug}`)}
+                      data-testid="button-copy-lp-url"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {landingPage.views !== undefined && (
+                    <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                      <Eye className="h-3 w-3" /> {landingPage.views} view{landingPage.views !== 1 ? 's' : ''}
+                    </p>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-auto-promo">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Zap className="h-4 w-4" />
+            Generate Promo Post
+          </CardTitle>
+          <CardDescription>Use AI to create a ready-to-share promotional post with your referral link embedded</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label className="text-xs">Platform</Label>
+              <Select value={promoPlatform} onValueChange={setPromoPlatform}>
+                <SelectTrigger className="mt-1" data-testid="select-promo-platform">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="twitter">Twitter / X</SelectItem>
+                  <SelectItem value="linkedin">LinkedIn</SelectItem>
+                  <SelectItem value="facebook">Facebook</SelectItem>
+                  <SelectItem value="instagram">Instagram</SelectItem>
+                  <SelectItem value="email">Email</SelectItem>
+                  <SelectItem value="blog">Blog Snippet</SelectItem>
+                  <SelectItem value="general">General</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Tone</Label>
+              <Select value={promoTone} onValueChange={setPromoTone}>
+                <SelectTrigger className="mt-1" data-testid="select-promo-tone">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="casual">Casual</SelectItem>
+                  <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
+                  <SelectItem value="educational">Educational</SelectItem>
+                  <SelectItem value="storytelling">Storytelling</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button onClick={generatePromoPost} disabled={promoGenerating} data-testid="button-generate-promo">
+            {promoGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            {promoGenerating ? 'Generating...' : 'Generate Promo Post'}
+          </Button>
+          {promoContent && (
+            <div className="space-y-2">
+              <div className="p-3 rounded-md bg-muted/40 text-sm whitespace-pre-wrap" data-testid="text-promo-content">
+                {promoContent}
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button variant="outline" size="sm" onClick={copyPromoContent} data-testid="button-copy-promo">
+                  {promoCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                  {promoCopied ? 'Copied!' : 'Copy to Clipboard'}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={generatePromoPost} disabled={promoGenerating} data-testid="button-regenerate-promo">
+                  <Zap className="h-4 w-4 mr-1" /> Regenerate
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-webhooks">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Webhook className="h-4 w-4" />
+            Webhooks
+          </CardTitle>
+          <CardDescription>Receive real-time notifications when events occur on your affiliate account</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {webhookSecret && (
+            <div className="p-3 rounded-md bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800 space-y-2">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">Signing Secret (copy now — shown only once)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input value={webhookSecret} readOnly className="font-mono text-xs" data-testid="input-webhook-secret" />
+                <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(webhookSecret); toast({ title: 'Copied!', description: 'Webhook secret copied.' }) }} data-testid="button-copy-webhook-secret">
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+              <Button variant="ghost" size="sm" className="text-xs" onClick={() => setWebhookSecret(null)} data-testid="button-dismiss-secret">
+                Dismiss
+              </Button>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs">Endpoint URL</Label>
+              <Input
+                value={webhookUrl}
+                onChange={e => setWebhookUrl(e.target.value)}
+                placeholder="https://your-server.com/webhook"
+                className="mt-1 font-mono text-xs"
+                data-testid="input-webhook-url"
+              />
+            </div>
+            <div>
+              <Label className="text-xs mb-1.5 block">Events to Subscribe</Label>
+              <div className="flex flex-wrap gap-1.5">
+                {AVAILABLE_WEBHOOK_EVENTS.map(evt => (
+                  <Badge
+                    key={evt.value}
+                    variant={webhookEvents.includes(evt.value) ? 'default' : 'outline'}
+                    className="cursor-pointer text-xs"
+                    onClick={() => toggleWebhookEvent(evt.value)}
+                    data-testid={`badge-event-${evt.value}`}
+                  >
+                    {evt.label}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <Button size="sm" onClick={createWebhook} disabled={webhookCreating || !webhookUrl.trim()} data-testid="button-create-webhook">
+              {webhookCreating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Webhook className="h-4 w-4 mr-2" />}
+              Add Webhook
+            </Button>
+          </div>
+
+          {webhooksLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : webhooks.length > 0 ? (
+            <div className="space-y-2 border-t pt-3">
+              <Label className="text-xs text-muted-foreground">Your Webhooks</Label>
+              {webhooks.map(wh => (
+                <div key={wh.id} className="rounded-md bg-muted/40 p-3 space-y-2" data-testid={`webhook-${wh.id}`}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-mono truncate">{wh.url}</p>
+                      <div className="flex flex-wrap items-center gap-1 mt-1">
+                        <Badge variant={wh.is_active ? 'secondary' : 'outline'} className="text-[10px]">
+                          {wh.is_active ? 'Active' : 'Disabled'}
+                        </Badge>
+                        {wh.failure_count > 0 && (
+                          <Badge variant="destructive" className="text-[10px]">
+                            {wh.failure_count} failures
+                          </Badge>
+                        )}
+                        {wh.events?.map((e: string) => (
+                          <Badge key={e} variant="outline" className="text-[10px]">{e.replace('affiliate.', '')}</Badge>
+                        ))}
+                      </div>
+                      {wh.last_triggered_at && (
+                        <p className="text-[10px] text-muted-foreground mt-1">
+                          Last triggered: {new Date(wh.last_triggered_at).toLocaleString()}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => testWebhook(wh.id)}
+                        disabled={webhookTesting === wh.id}
+                        data-testid={`button-test-webhook-${wh.id}`}
+                      >
+                        {webhookTesting === wh.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          if (webhookDeliveriesOpen === wh.id) {
+                            setWebhookDeliveriesOpen(null)
+                          } else {
+                            setWebhookDeliveriesOpen(wh.id)
+                            loadWebhookDeliveries(wh.id)
+                          }
+                        }}
+                        data-testid={`button-deliveries-webhook-${wh.id}`}
+                      >
+                        <BarChart3 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive"
+                        onClick={() => deleteWebhook(wh.id)}
+                        data-testid={`button-delete-webhook-${wh.id}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {webhookDeliveriesOpen === wh.id && (
+                    <div className="border-t pt-2 mt-2 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-muted-foreground">Delivery Log</Label>
+                        <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => loadWebhookDeliveries(wh.id)} data-testid={`button-refresh-deliveries-${wh.id}`}>
+                          <RefreshCw className="h-3 w-3 mr-1" /> Refresh
+                        </Button>
+                      </div>
+                      {(webhookDeliveries[wh.id] || []).length === 0 ? (
+                        <p className="text-xs text-muted-foreground text-center py-2">No deliveries yet</p>
+                      ) : (
+                        <div className="max-h-48 overflow-y-auto space-y-1">
+                          {(webhookDeliveries[wh.id] || []).map((del: any) => (
+                            <div key={del.id} className="flex items-center justify-between text-xs px-2 py-1 rounded bg-background" data-testid={`delivery-${del.id}`}>
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className={`w-2 h-2 rounded-full shrink-0 ${del.delivered_at ? 'bg-green-500' : 'bg-red-500'}`} />
+                                <span className="font-medium truncate">{del.event_type}</span>
+                                <span className="text-muted-foreground">#{del.attempt}</span>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                {del.response_status ? (
+                                  <Badge variant={del.delivered_at ? 'secondary' : 'destructive'} className="text-[10px]">
+                                    {del.response_status}
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="destructive" className="text-[10px]">Failed</Badge>
+                                )}
+                                <span className="text-[10px] text-muted-foreground">
+                                  {new Date(del.created_at).toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground text-center py-2">No webhooks configured yet.</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 
@@ -1817,6 +2749,333 @@ function StandaloneAffiliateDashboard() {
 
       <Card>
         <CardHeader>
+          <CardTitle className="text-base">Tax Information</CardTitle>
+          <CardDescription>
+            Required for payouts. Submit your W-9 (US) or W-8BEN (non-US) information.
+            {taxInfo?.verified && (
+              <Badge variant="default" className="ml-2 text-xs">Verified</Badge>
+            )}
+            {taxInfo && !taxInfo.verified && (
+              <Badge variant="outline" className="ml-2 text-xs">Pending Verification</Badge>
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {taxInfoLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <>
+              <div>
+                <Label className="text-xs">Form Type</Label>
+                <Select value={taxForm.form_type} onValueChange={v => setTaxForm(prev => ({ ...prev, form_type: v, tax_id_type: v === 'w9' ? 'ssn' : 'foreign_id' }))}>
+                  <SelectTrigger className="mt-1" data-testid="select-tax-form-type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="w9">W-9 (US Person)</SelectItem>
+                    <SelectItem value="w8ben">W-8BEN (Non-US Person)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Legal Name (as shown on tax return)</Label>
+                <Input value={taxForm.legal_name} onChange={e => setTaxForm(prev => ({ ...prev, legal_name: e.target.value }))} placeholder="Full legal name" className="mt-1" data-testid="input-tax-legal-name" />
+              </div>
+              {taxForm.form_type === 'w9' && (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label className="text-xs">Tax ID Type</Label>
+                    <Select value={taxForm.tax_id_type} onValueChange={v => setTaxForm(prev => ({ ...prev, tax_id_type: v }))}>
+                      <SelectTrigger className="mt-1" data-testid="select-tax-id-type">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ssn">SSN</SelectItem>
+                        <SelectItem value="ein">EIN</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Last 4 Digits of {taxForm.tax_id_type === 'ein' ? 'EIN' : 'SSN'}</Label>
+                    <Input value={taxForm.tax_id_last4} onChange={e => setTaxForm(prev => ({ ...prev, tax_id_last4: e.target.value.replace(/\D/g, '').slice(0, 4) }))} placeholder="XXXX" maxLength={4} className="mt-1" data-testid="input-tax-id-last4" />
+                  </div>
+                </div>
+              )}
+              <div>
+                <Label className="text-xs">Address</Label>
+                <Input value={taxForm.address_line1} onChange={e => setTaxForm(prev => ({ ...prev, address_line1: e.target.value }))} placeholder="Street address" className="mt-1" data-testid="input-tax-address" />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div>
+                  <Label className="text-xs">City</Label>
+                  <Input value={taxForm.address_city} onChange={e => setTaxForm(prev => ({ ...prev, address_city: e.target.value }))} className="mt-1" data-testid="input-tax-city" />
+                </div>
+                <div>
+                  <Label className="text-xs">State</Label>
+                  <Input value={taxForm.address_state} onChange={e => setTaxForm(prev => ({ ...prev, address_state: e.target.value }))} className="mt-1" data-testid="input-tax-state" />
+                </div>
+                <div>
+                  <Label className="text-xs">ZIP / Postal Code</Label>
+                  <Input value={taxForm.address_zip} onChange={e => setTaxForm(prev => ({ ...prev, address_zip: e.target.value }))} className="mt-1" data-testid="input-tax-zip" />
+                </div>
+              </div>
+              <div>
+                <Label className="text-xs">Country</Label>
+                <Input value={taxForm.address_country} onChange={e => setTaxForm(prev => ({ ...prev, address_country: e.target.value }))} className="mt-1" data-testid="input-tax-country" />
+              </div>
+              <div className="flex items-center gap-3 pt-2">
+                <Button onClick={saveTaxInfo} disabled={taxInfoSaving} size="sm" data-testid="button-save-tax-info">
+                  {taxInfoSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                  {taxInfo ? 'Update Tax Info' : 'Submit Tax Info'}
+                </Button>
+                {taxInfo && (
+                  <span className="text-xs text-muted-foreground">
+                    Submitted {new Date(taxInfo.submitted_at).toLocaleDateString()}
+                    {taxInfo.verified && ` \u00b7 Verified ${new Date(taxInfo.verified_at).toLocaleDateString()}`}
+                  </span>
+                )}
+              </div>
+              {!taxInfo && (
+                <p className="text-xs text-muted-foreground border-t pt-3">
+                  Tax information is required before payouts can be processed. Please complete and submit this form.
+                </p>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Key className="h-4 w-4" /> API Keys
+          </CardTitle>
+          <CardDescription>Generate API keys to access your affiliate data programmatically</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-end gap-2">
+            <div className="flex-1">
+              <Label className="text-xs">Key Name</Label>
+              <Input
+                value={newKeyName}
+                onChange={e => setNewKeyName(e.target.value)}
+                placeholder="e.g. My Integration"
+                className="mt-1"
+                data-testid="input-api-key-name"
+              />
+            </div>
+            <Button
+              onClick={generateNewApiKey}
+              disabled={generatingKey}
+              size="sm"
+              data-testid="button-generate-api-key"
+            >
+              {generatingKey ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Key className="h-4 w-4 mr-2" />}
+              Generate Key
+            </Button>
+          </div>
+
+          {newlyGeneratedKey && (
+            <div className="p-3 rounded-md bg-muted/50 border border-primary/20">
+              <Label className="text-xs font-medium text-primary">New API Key (copy now, shown only once)</Label>
+              <div className="flex items-center gap-2 mt-1">
+                <code className="text-xs font-mono flex-1 break-all" data-testid="text-new-api-key">{newlyGeneratedKey}</code>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    navigator.clipboard.writeText(newlyGeneratedKey)
+                    setCopiedApiKey(true)
+                    setTimeout(() => setCopiedApiKey(false), 2000)
+                    toast({ title: 'Copied', description: 'API key copied to clipboard.' })
+                  }}
+                  data-testid="button-copy-api-key"
+                >
+                  {copiedApiKey ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {apiKeysLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : apiKeys.length === 0 ? (
+            <p className="text-xs text-muted-foreground text-center py-3" data-testid="text-no-api-keys">No API keys yet. Generate one to get started.</p>
+          ) : (
+            <div className="space-y-2">
+              {apiKeys.map(k => (
+                <div key={k.id} className="flex items-center justify-between p-2 rounded-md bg-muted/30" data-testid={`api-key-${k.id}`}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium">{k.name}</span>
+                      <Badge variant={k.is_active ? 'secondary' : 'outline'} className="text-[10px]">
+                        {k.is_active ? 'Active' : 'Revoked'}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                      <code className="text-[10px] font-mono text-muted-foreground">{k.api_key_prefix}...</code>
+                      <span className="text-[10px] text-muted-foreground">
+                        Created {new Date(k.created_at).toLocaleDateString()}
+                      </span>
+                      {k.last_used_at && (
+                        <span className="text-[10px] text-muted-foreground">
+                          Last used {new Date(k.last_used_at).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {k.is_active && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => revokeApiKey(k.id)}
+                      data-testid={`button-revoke-key-${k.id}`}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="pt-3 border-t">
+            <p className="text-[10px] text-muted-foreground mb-1">API Endpoints (use X-API-Key header):</p>
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-mono text-muted-foreground">GET /api/affiliate/v1/stats</p>
+              <p className="text-[10px] font-mono text-muted-foreground">GET /api/affiliate/v1/referrals?page=1&limit=50</p>
+              <p className="text-[10px] font-mono text-muted-foreground">GET /api/affiliate/v1/commissions?page=1&limit=50</p>
+              <p className="text-[10px] font-mono text-muted-foreground">GET /api/affiliate/v1/earnings</p>
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-1">Rate limit: 100 requests/hour per key</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-earned-badges">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Award className="h-4 w-4" />
+            Your Badges
+          </CardTitle>
+          <CardDescription>Verified earnings badges you can embed on your website</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {badgesLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : earnedBadges.length > 0 ? (
+            <div className="space-y-3">
+              {earnedBadges.map(badge => {
+                const label = badge.badge_type.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())
+                const verifyUrl = typeof window !== 'undefined' ? `${window.location.origin}/partner/verify/${badge.verification_code}` : `/partner/verify/${badge.verification_code}`
+                const embedCode = `<a href="${verifyUrl}" target="_blank" rel="noopener">${label} - Verified</a>`
+                return (
+                  <div key={badge.id} className="p-3 rounded-md bg-muted/40 space-y-2" data-testid={`badge-${badge.id}`}>
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center gap-2">
+                        <Award className="h-4 w-4 text-primary" />
+                        <span className="font-medium text-sm">{label}</span>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">${(badge.threshold_cents / 100).toLocaleString()} earned</Badge>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>Awarded {new Date(badge.awarded_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(embedCode); setCopiedEmbed(badge.id); setTimeout(() => setCopiedEmbed(null), 2000); toast({ title: 'Copied!', description: 'Embed code copied to clipboard.' }) }} data-testid={`button-copy-embed-${badge.id}`}>
+                        {copiedEmbed === badge.id ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                        Copy Embed
+                      </Button>
+                      <Button variant="ghost" size="sm" asChild data-testid={`link-verify-${badge.id}`}>
+                        <a href={verifyUrl} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-3 w-3 mr-1" /> Verify
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground">No badges earned yet. Keep growing your earnings!</p>
+              {badgeTiers.length > 0 && (
+                <div className="mt-3 space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">Badge Milestones:</p>
+                  {badgeTiers.map(tier => (
+                    <p key={tier.id} className="text-xs text-muted-foreground">{tier.name} — ${(tier.threshold_cents / 100).toLocaleString()}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {surveyData?.canTakeSurvey && (
+        <Card data-testid="card-survey">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              How are we doing?
+            </CardTitle>
+            <CardDescription>Share your feedback about the affiliate program</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label className="text-xs mb-2 block">Rating</Label>
+              <div className="flex items-center gap-1" data-testid="survey-rating-stars">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <button
+                    key={star}
+                    onClick={() => setSurveyRating(star)}
+                    className={`text-2xl transition-colors ${star <= surveyRating ? 'text-yellow-500' : 'text-muted-foreground/30'}`}
+                    data-testid={`button-star-${star}`}
+                  >
+                    &#9733;
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Feedback (optional)</Label>
+              <textarea
+                value={surveyFeedback}
+                onChange={e => setSurveyFeedback(e.target.value)}
+                placeholder="Tell us what you love or what we can improve..."
+                className="mt-1 w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                data-testid="textarea-survey-feedback"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="testimonial-opt-in"
+                checked={surveyTestimonialOptIn}
+                onChange={e => setSurveyTestimonialOptIn(e.target.checked)}
+                className="rounded"
+                data-testid="checkbox-testimonial-optin"
+              />
+              <Label htmlFor="testimonial-opt-in" className="text-xs cursor-pointer">
+                You may use my feedback as a testimonial
+              </Label>
+            </div>
+            <Button onClick={submitSurvey} disabled={surveySubmitting || surveyRating === 0} size="sm" data-testid="button-submit-survey">
+              {surveySubmitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Submit Feedback
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
           <CardTitle className="text-base">Reports & Downloads</CardTitle>
           <CardDescription>Download your earnings data and tax documents</CardDescription>
         </CardHeader>
@@ -1869,6 +3128,79 @@ function StandaloneAffiliateDashboard() {
           >
             <Download className="h-4 w-4 mr-2" /> Tax Summary (1099-ready)
           </Button>
+        </CardContent>
+      </Card>
+    </div>
+  )
+
+  const renderMessages = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <h2 className="text-lg font-semibold" data-testid="text-messages-heading">Messages</h2>
+        <Button variant="outline" size="sm" onClick={loadMessages} disabled={messagesLoading} data-testid="button-refresh-messages">
+          <RefreshCw className={`h-4 w-4 mr-2 ${messagesLoading ? 'animate-spin' : ''}`} /> Refresh
+        </Button>
+      </div>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            Conversation with Admin
+          </CardTitle>
+          <CardDescription>Send and receive messages from the program administrators</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {messagesLoading && messages.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="text-center py-8 text-sm text-muted-foreground" data-testid="text-no-messages">
+              No messages yet. Start a conversation by sending a message below.
+            </div>
+          ) : (
+            <div className="space-y-3 max-h-96 overflow-y-auto mb-4 pr-1" data-testid="container-messages-thread">
+              {messages.map((msg: any) => (
+                <div
+                  key={msg.id}
+                  className={`flex ${msg.sender_role === 'affiliate' ? 'justify-end' : 'justify-start'}`}
+                  data-testid={`message-item-${msg.id}`}
+                >
+                  <div className={`max-w-[80%] rounded-md p-3 text-sm ${
+                    msg.sender_role === 'affiliate'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
+                  }`}>
+                    <p className="whitespace-pre-wrap break-words">{msg.body}</p>
+                    <p className={`text-xs mt-1 ${
+                      msg.sender_role === 'affiliate' ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                    }`}>
+                      {msg.sender_role === 'admin' ? 'Admin' : 'You'} &middot; {new Date(msg.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex gap-2 pt-2 border-t">
+            <Input
+              placeholder="Type your message..."
+              value={messageBody}
+              onChange={e => setMessageBody(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
+              disabled={messageSending}
+              data-testid="input-message-body"
+            />
+            <Button
+              onClick={sendMessage}
+              disabled={!messageBody.trim() || messageSending}
+              data-testid="button-send-message"
+            >
+              {messageSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -1990,6 +3322,7 @@ function StandaloneAffiliateDashboard() {
       case 'assets': return renderAssets()
       case 'tools': return renderTools()
       case 'announcements': return renderAnnouncements()
+      case 'messages': return renderMessages()
       case 'account': return renderAccount()
       case 'support': return renderSupport()
       default: return renderOverview()
@@ -2062,6 +3395,9 @@ function StandaloneAffiliateDashboard() {
                   {item.label}
                   {item.key === 'announcements' && unreadCount > 0 && (
                     <Badge variant="destructive" className="ml-auto text-[10px] px-1.5 py-0">{unreadCount}</Badge>
+                  )}
+                  {item.key === 'messages' && unreadMessages > 0 && (
+                    <Badge variant="destructive" className="ml-auto text-[10px] px-1.5 py-0" data-testid="badge-unread-messages">{unreadMessages}</Badge>
                   )}
                 </button>
               )

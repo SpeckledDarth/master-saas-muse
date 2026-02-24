@@ -55,6 +55,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Affiliate user and amount required' }, { status: 400 })
     }
 
+    try {
+      const { data: taxInfo } = await admin
+        .from('affiliate_tax_info')
+        .select('id, verified')
+        .eq('affiliate_user_id', affiliate_user_id)
+        .maybeSingle()
+
+      if (!taxInfo) {
+        return NextResponse.json({ error: 'Tax information must be submitted before payouts can be processed. The affiliate needs to complete their W-9 or W-8BEN form.' }, { status: 400 })
+      }
+    } catch (taxCheckErr: any) {
+      if (!taxCheckErr?.message?.includes('42P01')) {
+        console.warn('Tax info check failed (table may not exist yet):', taxCheckErr)
+      }
+    }
+
     const { data, error } = await admin
       .from('affiliate_payouts')
       .insert({ affiliate_user_id, amount_cents, method: method || 'manual', notes, status: 'pending' })

@@ -46,9 +46,24 @@ export async function GET() {
 
     const { data: settings } = await admin
       .from('affiliate_program_settings')
-      .select('cookie_duration_days, min_payout_cents')
+      .select('cookie_duration_days, min_payout_cents, two_tier_enabled, second_tier_commission_rate')
       .limit(1)
       .maybeSingle()
+
+    let secondTierCommissions: any[] = []
+    let secondTierTotal = 0
+    try {
+      if (settings?.two_tier_enabled) {
+        const { data: tier2 } = await admin
+          .from('affiliate_second_tier_commissions')
+          .select('*')
+          .eq('tier1_affiliate_id', user.id)
+          .order('created_at', { ascending: false })
+
+        secondTierCommissions = tier2 || []
+        secondTierTotal = secondTierCommissions.reduce((sum: number, c: any) => sum + (c.commission_amount_cents || 0), 0)
+      }
+    } catch {}
 
     const totalReferrals = referrals?.length || 0
     const conversions = referrals?.filter((r: any) => r.status === 'converted').length || 0
@@ -90,7 +105,11 @@ export async function GET() {
         payouts: payouts || [],
         settings: {
           minPayoutCents: settings?.min_payout_cents || 5000,
+          twoTierEnabled: settings?.two_tier_enabled || false,
+          secondTierCommissionRate: settings?.second_tier_commission_rate || 5,
         },
+        secondTierCommissions,
+        secondTierTotal,
       },
     })
   } catch (err: any) {
