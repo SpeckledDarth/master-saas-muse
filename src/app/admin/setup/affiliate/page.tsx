@@ -39,6 +39,11 @@ interface Settings {
   reengagement_enabled: boolean
   dormancy_threshold_days: number
   max_reengagement_emails: number
+  two_tier_enabled: boolean
+  second_tier_commission_rate: number
+  fraud_scoring_enabled: boolean
+  fraud_auto_pause_threshold: number
+  survey_interval_days: number
 }
 
 interface Milestone {
@@ -541,6 +546,11 @@ export default function AffiliateSettingsPage() {
     reengagement_enabled: false,
     dormancy_threshold_days: 30,
     max_reengagement_emails: 3,
+    two_tier_enabled: false,
+    second_tier_commission_rate: 5,
+    fraud_scoring_enabled: false,
+    fraud_auto_pause_threshold: 60,
+    survey_interval_days: 90,
   })
   const [tiers, setTiers] = useState<Tier[]>([])
   const [assets, setAssets] = useState<Asset[]>([])
