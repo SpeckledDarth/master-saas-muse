@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useSettings } from '@/hooks/use-settings'
@@ -11,8 +11,17 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, CheckCircle, ArrowLeft, Lock } from 'lucide-react'
 
-export default function AffiliateSetPasswordPage() {
+export default function AffiliateSetPasswordPageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+      <AffiliateSetPasswordPage />
+    </Suspense>
+  )
+}
+
+function AffiliateSetPasswordPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { settings } = useSettings()
   const appName = settings?.branding?.appName || 'Our Product'
 
@@ -20,22 +29,44 @@ export default function AffiliateSetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [checkingSession, setCheckingSession] = useState(true)
+  const [hasSession, setHasSession] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   useEffect(() => {
-    async function checkSession() {
+    async function initSession() {
       const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
 
-      if (!session) {
-        router.push('/affiliate/login')
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        setHasSession(true)
+        setCheckingSession(false)
         return
+      }
+
+      const hash = window.location.hash
+      if (hash && (hash.includes('access_token') || hash.includes('type=recovery'))) {
+        const params = new URLSearchParams(hash.substring(1))
+        const accessToken = params.get('access_token')
+        const refreshToken = params.get('refresh_token')
+
+        if (accessToken && refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          })
+          if (!error) {
+            setHasSession(true)
+            setCheckingSession(false)
+            window.history.replaceState(null, '', window.location.pathname)
+            return
+          }
+        }
       }
 
       setCheckingSession(false)
     }
-    checkSession()
-  }, [router])
+    initSession()
+  }, [])
 
   const handleSetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -81,6 +112,37 @@ export default function AffiliateSetPasswordPage() {
             <Loader2 className="h-6 w-6 animate-spin" />
           </CardContent>
         </Card>
+      </div>
+    )
+  }
+
+  if (!hasSession) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Card className="bg-white/10 border-gray-500/50">
+            <CardHeader className="text-center">
+              <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mx-auto mb-2">
+                <Lock className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              </div>
+              <CardTitle className="text-2xl text-black dark:text-white" data-testid="text-expired-title">Link Expired or Invalid</CardTitle>
+              <CardDescription>
+                The password setup link has expired or is no longer valid. No worries — you can request a new one.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button asChild className="w-full" size="lg" data-testid="button-forgot-password">
+                <Link href="/affiliate/forgot-password">Request New Password Link</Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full" size="lg" data-testid="button-go-login">
+                <Link href="/affiliate/login">Go to Login</Link>
+              </Button>
+              <p className="text-xs text-center text-muted-foreground">
+                You can also use the magic link option on the login page to sign in without a password.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     )
   }

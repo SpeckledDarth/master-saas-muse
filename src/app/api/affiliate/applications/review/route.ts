@@ -205,16 +205,28 @@ export async function POST(request: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io'
 
+    let passwordSetupUrl = `${baseUrl}/affiliate/login`
+
     try {
-      await admin.auth.admin.generateLink({
+      const { data: linkData } = await admin.auth.admin.generateLink({
         type: 'recovery',
         email: application.email,
         options: {
           redirectTo: `${baseUrl}/auth/callback?next=/affiliate/set-password`,
         },
       })
+
+      if (linkData?.properties?.hashed_token) {
+        const token = linkData.properties.hashed_token
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+        passwordSetupUrl = `${supabaseUrl}/auth/v1/verify?token=${token}&type=recovery&redirect_to=${encodeURIComponent(`${baseUrl}/auth/callback?next=/affiliate/set-password`)}`
+      } else if (linkData?.properties?.action_link) {
+        const actionLink = new URL(linkData.properties.action_link)
+        actionLink.searchParams.set('redirect_to', `${baseUrl}/auth/callback?next=/affiliate/set-password`)
+        passwordSetupUrl = actionLink.toString()
+      }
     } catch (linkErr) {
-      console.error('Failed to generate password reset link:', linkErr)
+      console.error('Failed to generate password setup link:', linkErr)
     }
 
     try {
@@ -222,20 +234,20 @@ export async function POST(request: NextRequest) {
       await emailClient.emails.send({
         from: fromEmail,
         to: application.email,
-        subject: 'Your Affiliate Application Has Been Approved — Set Your Password',
+        subject: 'You\'re In! Set Your Password to Get Started',
         html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #333;">Welcome to the Affiliate Program!</h2>
             <p>Hi ${application.name},</p>
-            <p>Great news — your affiliate application has been approved! You now have access to your personal affiliate dashboard where you can find your unique referral link, marketing materials, and track your earnings.</p>
-            <p><strong>To get started, set your password:</strong></p>
-            <p>Check your inbox for a password reset email from Supabase — click the link in that email to set your password. Once set, you can log in anytime at:</p>
+            <p>Great news — your affiliate application has been approved! You now have access to your personal affiliate dashboard where you can track your referrals, earnings, and access marketing materials.</p>
+            <p><strong>Click below to set your password and access your dashboard:</strong></p>
             <p style="margin: 24px 0;">
-              <a href="${baseUrl}/affiliate/login" style="background-color: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">Go to Affiliate Login</a>
+              <a href="${passwordSetupUrl}" style="background-color: #2563eb; color: #fff; padding: 14px 28px; border-radius: 6px; text-decoration: none; display: inline-block; font-weight: 600;">Set Your Password &amp; Get Started</a>
             </p>
-            <p>Your login email: <strong>${application.email}</strong></p>
-            <p>Once logged in, you'll find your referral link, marketing assets, and real-time performance stats on your dashboard.</p>
-            <p>Thanks for joining,<br/>The Team</p>
+            <p style="color: #666; font-size: 14px;">Your login email: <strong>${application.email}</strong></p>
+            <p style="color: #666; font-size: 14px;">After setting your password, you can always log in at: <a href="${baseUrl}/affiliate/login" style="color: #2563eb;">${baseUrl}/affiliate/login</a></p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
+            <p style="color: #999; font-size: 12px;">This link expires in 24 hours. If it has expired, visit <a href="${baseUrl}/affiliate/forgot-password" style="color: #2563eb;">the password reset page</a> to get a new one.</p>
           </div>
         `,
       })
