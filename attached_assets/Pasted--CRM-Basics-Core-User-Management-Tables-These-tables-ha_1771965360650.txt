@@ -1,0 +1,482 @@
+# CRM Basics...
+
+### Core User Management Tables
+
+These tables handle authentication, roles, and profiles for all user types (users, affiliates, admins, team admins). I've assumed a role-based access control (RBAC) system to differentiate access levels, especially since admins and team admins share a dashboard.
+
+#### Users Table
+
+Stores basic user authentication and role information. All user types inherit from this table.
+
+- id: Primary key, auto-incrementing integer.
+- username: String, unique.
+- email: String, unique.
+- password_hash: String (hashed password).
+- role: Enum ('user', 'affiliate', 'admin', 'team_admin').
+- status: Enum ('active', 'inactive', 'suspended').
+- created_at: Timestamp.
+- updated_at: Timestamp.
+- last_login: Timestamp.
+- team_id: Foreign key to Teams table (for team admins and members).
+
+#### UserProfiles Table
+
+One-to-one relationship with Users for extended personal details.
+
+- user_id: Foreign key to Users, primary key.
+- first_name: String.
+- last_name: String.
+- phone: String.
+- address: String.
+- city: String.
+- state: String.
+- country: String.
+- zip_code: String.
+- avatar_url: String (profile picture).
+- bio: Text.
+
+#### Roles Table
+
+Defines roles for finer-grained permissions (beyond the basic enum in Users).
+
+- id: Primary key, auto-incrementing integer.
+- name: String (e.g., 'user', 'affiliate', 'admin', 'team_admin').
+- description: Text.
+
+#### UserRoles Table
+
+Many-to-many junction for users and roles (allows multiple roles per user if needed).
+
+- user_id: Foreign key to Users.
+- role_id: Foreign key to Roles.
+- Composite primary key: (user_id, role_id).
+
+#### Permissions Table
+
+Defines specific permissions (e.g., for dashboard access).
+
+- id: Primary key, auto-incrementing integer.
+- name: String (e.g., 'view_admin_dashboard', 'manage_affiliates').
+- description: Text.
+
+#### RolePermissions Table
+
+Many-to-many junction for roles and permissions.
+
+- role_id: Foreign key to Roles.
+- permission_id: Foreign key to Permissions.
+- Composite primary key: (role_id, permission_id).
+
+### Team and Organization Management Tables
+
+These support team admins managing groups (e.g., in a multi-tenant SaaS setup).
+
+#### Teams Table
+
+Represents organizations or teams.
+
+- id: Primary key, auto-incrementing integer.
+- name: String.
+- description: Text.
+- admin_user_id: Foreign key to Users (the team admin).
+- created_at: Timestamp.
+- updated_at: Timestamp.
+- subscription_plan: Enum ('free', 'basic', 'premium').
+- subscription_status: Enum ('active', 'expired', 'canceled').
+- member_limit: Integer (max users per team).
+
+#### TeamMembers Table
+
+Many-to-many junction for users belonging to teams.
+
+- team_id: Foreign key to Teams.
+- user_id: Foreign key to Users.
+- joined_at: Timestamp.
+- Composite primary key: (team_id, user_id).
+
+### Affiliate Management Tables
+
+Dedicated tables for affiliate-specific features like referrals and commissions.
+
+#### Affiliates Table
+
+One-to-one with Users for affiliate details (only for role='affiliate').
+
+- user_id: Foreign key to Users, primary key.
+- referral_code: String, unique.
+- commission_rate: Decimal (e.g., percentage).
+- total_earnings: Decimal.
+- approved: Boolean (admin approval status).
+- created_at: Timestamp.
+
+#### AffiliateReferrals Table
+
+Tracks referrals made by affiliates.
+
+- id: Primary key, auto-incrementing integer.
+- affiliate_user_id: Foreign key to Users.
+- referred_user_id: Foreign key to Users.
+- status: Enum ('pending', 'converted', 'rejected').
+- commission_amount: Decimal.
+- referred_at: Timestamp.
+
+#### AffiliatePayouts Table
+
+Records payouts to affiliates.
+
+- id: Primary key, auto-incrementing integer.
+- affiliate_user_id: Foreign key to Users.
+- amount: Decimal.
+- payout_method: Enum ('paypal', 'bank', 'crypto').
+- status: Enum ('pending', 'paid', 'failed').
+- payout_date: Timestamp.
+
+### CRM Core Tables (Customer Relationship Management)
+
+These provide comprehensive CRM functionality to manage leads, contacts, deals, and interactions. Admins/team admins can oversee everything, affiliates might track their referrals here, and users could view their own interactions.
+
+#### Contacts Table
+
+Stores individual contacts (e.g., leads or customers).
+
+- id: Primary key, auto-incrementing integer.
+- first_name: String.
+- last_name: String.
+- email: String.
+- phone: String.
+- company_id: Foreign key to Accounts (optional).
+- owner_user_id: Foreign key to Users (e.g., assigned sales rep or affiliate).
+- source: Enum ('website', 'affiliate', 'email_campaign').
+- status: Enum ('lead', 'qualified', 'customer', 'lost').
+- created_at: Timestamp.
+- updated_at: Timestamp.
+
+#### Accounts Table
+
+Represents companies or organizations associated with contacts.
+
+- id: Primary key, auto-incrementing integer.
+- name: String.
+- industry: String.
+- website: String.
+- address: String.
+- city: String.
+- state: String.
+- country: String.
+- zip_code: String.
+- owner_user_id: Foreign key to Users.
+- created_at: Timestamp.
+- updated_at: Timestamp.
+
+#### Opportunities Table
+
+Tracks sales deals or opportunities.
+
+- id: Primary key, auto-incrementing integer.
+- name: String (deal name).
+- account_id: Foreign key to Accounts.
+- contact_id: Foreign key to Contacts.
+- stage: Enum ('prospect', 'proposal', 'negotiation', 'closed_won', 'closed_lost').
+- amount: Decimal (expected value).
+- close_date: Date.
+- owner_user_id: Foreign key to Users.
+- created_at: Timestamp.
+- updated_at: Timestamp.
+
+#### Activities Table
+
+Logs interactions like calls, emails, meetings.
+
+- id: Primary key, auto-incrementing integer.
+- type: Enum ('call', 'email', 'meeting', 'task', 'note').
+- subject: String.
+- description: Text.
+- contact_id: Foreign key to Contacts (optional).
+- opportunity_id: Foreign key to Opportunities (optional).
+- user_id: Foreign key to Users (who performed the activity).
+- due_date: Timestamp.
+- completed_at: Timestamp.
+- status: Enum ('pending', 'completed', 'overdue').
+
+#### Campaigns Table
+
+For marketing campaigns (e.g., email blasts, affiliate promotions).
+
+- id: Primary key, auto-incrementing integer.
+- name: String.
+- type: Enum ('email', 'social', 'affiliate').
+- status: Enum ('draft', 'active', 'completed').
+- start_date: Date.
+- end_date: Date.
+- budget: Decimal.
+- owner_user_id: Foreign key to Users.
+- created_at: Timestamp.
+
+#### CampaignContacts Table
+
+Many-to-many junction for campaigns and contacts.
+
+- campaign_id: Foreign key to Campaigns.
+- contact_id: Foreign key to Contacts.
+- Composite primary key: (campaign_id, contact_id).
+
+### Support and Interaction Tables
+
+For customer support features in the CRM.
+
+#### Tickets Table
+
+Support tickets raised by users.
+
+- id: Primary key, auto-incrementing integer.
+- subject: String.
+- description: Text.
+- status: Enum ('open', 'in_progress', 'resolved', 'closed').
+- priority: Enum ('low', 'medium', 'high', 'urgent').
+- contact_id: Foreign key to Contacts.
+- assigned_user_id: Foreign key to Users (e.g., team admin).
+- created_at: Timestamp.
+- updated_at: Timestamp.
+
+#### TicketComments Table
+
+Comments on tickets.
+
+- id: Primary key, auto-incrementing integer.
+- ticket_id: Foreign key to Tickets.
+- user_id: Foreign key to Users.
+- comment: Text.
+- created_at: Timestamp.
+
+### Analytics and Dashboard Support Tables
+
+These log data for dashboards (e.g., metrics for admin/affiliate/user views).
+
+#### AuditLogs Table
+
+Tracks user actions for security and analytics.
+
+- id: Primary key, auto-incrementing integer.
+- user_id: Foreign key to Users.
+- action: String (e.g., 'login', 'update_contact').
+- entity_type: String (e.g., 'contact', 'opportunity').
+- entity_id: Integer.
+- details: JSON (additional data).
+- timestamp: Timestamp.
+
+#### Metrics Table
+
+Pre-computed metrics for fast dashboard loading (optional, can be views instead).
+
+- id: Primary key, auto-incrementing integer.
+- metric_name: String (e.g., 'total_leads', 'affiliate_conversions').
+- value: Decimal or Integer.
+- team_id: Foreign key to Teams (optional).
+- user_id: Foreign key to Users (optional).
+- date: Date (for time-series).
+
+### Additional Considerations
+
+- **Relationships**: Use foreign keys for integrity. For example, affiliates link back to users.
+- **Indexing**: Add indexes on frequently queried fields like email, role, team_id.
+- **Security**: Store passwords hashed (e.g., bcrypt). Use JWT or sessions for auth.
+- **Scalability**: For a SaaS, consider sharding by team_id if growth is expected.
+- **Dashboards**:
+    - Admin/Team Admin: Views all tables, analytics.
+    - Affiliate: Limited to Affiliates, Referrals, their Contacts/Opportunities.
+    - User: Personal profile, their Tickets, Activities.
+
+----
+# INVOCINIG BASICS...
+
+### Core Invoicing Tables
+
+These tables handle invoice creation, items, and statuses. Invoices are linked to customers from the CRM (e.g., Contacts or Accounts) and owned by users (e.g., admins or team admins).
+
+#### Invoices Table
+
+Stores main invoice details.
+
+- id: Primary key, auto-incrementing integer.
+- invoice_number: String, unique (e.g., auto-generated like 'INV-0001').
+- customer_id: Foreign key to Contacts (or Accounts if B2B).
+- owner_user_id: Foreign key to Users (e.g., admin who created it).
+- team_id: Foreign key to Teams (for multi-tenant visibility).
+- issue_date: Date.
+- due_date: Date.
+- status: Enum ('draft', 'sent', 'paid', 'partially_paid', 'overdue', 'voided').
+- subtotal: Decimal.
+- tax_amount: Decimal.
+- discount_amount: Decimal.
+- total_amount: Decimal.
+- currency: String (e.g., 'USD').
+- notes: Text.
+- created_at: Timestamp.
+- updated_at: Timestamp.
+
+#### InvoiceItems Table
+
+Line items for each invoice (e.g., products/services).
+
+- id: Primary key, auto-incrementing integer.
+- invoice_id: Foreign key to Invoices.
+- description: String.
+- quantity: Integer.
+- unit_price: Decimal.
+- tax_rate: Decimal (percentage).
+- discount_rate: Decimal (percentage).
+- subtotal: Decimal (calculated).
+- line_total: Decimal (after tax/discount).
+
+#### InvoiceTemplates Table
+
+For reusable invoice templates (optional, for admins).
+
+- id: Primary key, auto-incrementing integer.
+- name: String.
+- team_id: Foreign key to Teams.
+- header: Text (e.g., company logo/info).
+- footer: Text (terms and conditions).
+- default_tax_rate: Decimal.
+- default_currency: String.
+- created_at: Timestamp.
+- updated_at: Timestamp.
+
+### Payment Management Tables
+
+These provide transaction-level visibility for payments made, due, etc. Payments link to invoices and support partial payments.
+
+#### Payments Table
+
+Records individual payment transactions.
+
+- id: Primary key, auto-incrementing integer.
+- invoice_id: Foreign key to Invoices.
+- customer_id: Foreign key to Contacts.
+- amount: Decimal.
+- payment_date: Date.
+- payment_method: Enum ('credit_card', 'bank_transfer', 'paypal', 'crypto', 'cash').
+- transaction_id: String (from payment gateway).
+- status: Enum ('pending', 'completed', 'failed', 'refunded').
+- currency: String.
+- notes: Text.
+- created_at: Timestamp.
+- updated_at: Timestamp.
+
+#### PaymentGateways Table
+
+Stores configured payment providers (for admins).
+
+- id: Primary key, auto-incrementing integer.
+- name: String (e.g., 'Stripe', 'PayPal').
+- team_id: Foreign key to Teams.
+- api_key: String (encrypted).
+- is_active: Boolean.
+- created_at: Timestamp.
+- updated_at: Timestamp.
+
+#### Refunds Table
+
+Tracks refunds linked to payments.
+
+- id: Primary key, auto-incrementing integer.
+- payment_id: Foreign key to Payments.
+- amount: Decimal.
+- refund_date: Date.
+- reason: Text.
+- status: Enum ('pending', 'processed', 'denied').
+- created_at: Timestamp.
+- updated_at: Timestamp.
+
+### Affiliate Payout and Earnings Tables
+
+Dedicated to affiliates: Track earnings (e.g., from referrals), payouts, and earned but not paid amounts at a transaction level.
+
+#### AffiliateEarnings Table
+
+Transaction-level records of earnings (e.g., per referral conversion).
+
+- id: Primary key, auto-incrementing integer.
+- affiliate_user_id: Foreign key to Users (role='affiliate').
+- referral_id: Foreign key to AffiliateReferrals (from CRM).
+- amount: Decimal (earned commission).
+- description: String (e.g., 'Commission from user signup').
+- earn_date: Date.
+- status: Enum ('pending', 'approved', 'paid', 'forfeited').
+- invoice_id: Foreign key to Invoices (if tied to a customer invoice).
+- created_at: Timestamp.
+- updated_at: Timestamp.
+
+#### AffiliatePayouts Table
+
+(Expanded from CRM suggestion) Tracks payouts to affiliates, linking to earnings.
+
+- id: Primary key, auto-incrementing integer.
+- affiliate_user_id: Foreign key to Users.
+- amount: Decimal.
+- payout_method: Enum ('paypal', 'bank', 'crypto').
+- transaction_id: String.
+- status: Enum ('pending', 'paid', 'failed').
+- payout_date: Date.
+- notes: Text.
+- created_at: Timestamp.
+- updated_at: Timestamp.
+
+#### AffiliatePayoutItems Table
+
+Many-to-many junction for payouts and earnings (for visibility of which earnings are paid).
+
+- payout_id: Foreign key to AffiliatePayouts.
+- earning_id: Foreign key to AffiliateEarnings.
+- Composite primary key: (payout_id, earning_id).
+
+### Reporting and Visibility Tables
+
+For transaction-level visibility across payments, dues, payouts. These can be used for dashboards (e.g., admin views all, affiliates view their own).
+
+#### InvoicePayments Table
+
+Junction for partial payments (many payments per invoice).
+
+- invoice_id: Foreign key to Invoices.
+- payment_id: Foreign key to Payments.
+- amount_applied: Decimal.
+- Composite primary key: (invoice_id, payment_id).
+
+#### AuditLogs Table
+
+(Shared with CRM) Extended for invoicing actions.
+
+- id: Primary key, auto-incrementing integer.
+- user_id: Foreign key to Users.
+- action: String (e.g., 'create_invoice', 'process_payment', 'approve_payout').
+- entity_type: String (e.g., 'invoice', 'payment', 'affiliate_earning').
+- entity_id: Integer.
+- details: JSON (before/after changes).
+- timestamp: Timestamp.
+
+#### Metrics Table
+
+(Shared with CRM) Pre-computed for fast queries (e.g., payments due, earned not paid).
+
+- id: Primary key, auto-incrementing integer.
+- metric_name: String (e.g., 'total_payments_made', 'payments_due', 'affiliate_earned_unpaid').
+- value: Decimal or Integer.
+- team_id: Foreign key to Teams (optional).
+- user_id: Foreign key to Users (optional, e.g., per affiliate).
+- date: Date (for time-series, e.g., monthly dues).
+
+### Additional Considerations
+
+- **Integration with CRM**: Link invoices to CRM entities (e.g., Opportunities convert to Invoices). Affiliates' earnings tie to Referrals.
+- **Visibility by User Type**:
+    - Admin/Team Admin: Full access to all tables, reports on payments made/due, affiliate payouts/earned unpaid.
+    - Affiliate: Read-only on their AffiliateEarnings, Payouts (e.g., via dashboard showing transaction history).
+    - User: If users are customers, they can view their own Invoices and Payments.
+- **Calculations**: Use views or triggers for derived fields like 'amount_due' (total - sum(payments)).
+    - For affiliates: 'earned_unpaid' = sum(approved earnings) - sum(paid payouts).
+- **Security**: Encrypt sensitive data (e.g., payment details). Role-based access via Permissions from CRM.
+- **Scalability**: Index on dates, statuses, user_ids for quick queries. Consider archiving old invoices.
+- **Extensions**: Add tables for recurring invoices (Subscriptions), tax rules (Taxes table), or integrations (e.g., EmailLogs for sent invoices).
+
+This schema complements the CRM one, providing granular transaction tracking. Adjust fields as needed for your SaaS specifics.
