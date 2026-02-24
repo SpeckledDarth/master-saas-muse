@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -168,7 +168,15 @@ const NAV_ITEMS: { key: DashboardSection; label: string; icon: any }[] = [
   { key: 'support', label: 'Support', icon: HelpCircle },
 ]
 
-export default function StandaloneAffiliateDashboard() {
+export default function StandaloneAffiliateDashboardPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+      <StandaloneAffiliateDashboard />
+    </Suspense>
+  )
+}
+
+function StandaloneAffiliateDashboard() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { settings: appSettings } = useSettings()
