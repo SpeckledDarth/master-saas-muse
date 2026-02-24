@@ -226,7 +226,7 @@ export async function POST(request: NextRequest) {
           type: 'magiclink',
           email: application.email,
           options: {
-            redirectTo: `${baseUrl}/auth/callback?next=/affiliate/set-password`,
+            redirectTo: `${baseUrl}/affiliate/set-password`,
           },
         })
 
@@ -234,12 +234,11 @@ export async function POST(request: NextRequest) {
           console.error('generateLink error:', linkError)
         }
 
-        if (linkData?.properties?.action_link) {
-          emailActionUrl = linkData.properties.action_link
-        } else if (linkData?.properties?.hashed_token) {
+        if (linkData?.properties?.hashed_token) {
           const token = linkData.properties.hashed_token
-          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-          emailActionUrl = `${supabaseUrl}/auth/v1/verify?token=${token}&type=magiclink&redirect_to=${encodeURIComponent(`${baseUrl}/auth/callback?next=/affiliate/set-password`)}`
+          emailActionUrl = `${baseUrl}/auth/callback?token_hash=${token}&type=magiclink&next=/affiliate/set-password`
+        } else if (linkData?.properties?.action_link) {
+          emailActionUrl = linkData.properties.action_link
         }
       } catch (linkErr) {
         console.error('Failed to generate password setup link:', linkErr)

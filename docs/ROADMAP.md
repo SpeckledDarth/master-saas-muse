@@ -21,7 +21,7 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 | 2 | Connect Real Platform APIs & Full Testing | Complete (All batches, engagement metrics, posting, guides) | Week 2-3 |
 | 3 | Affiliate Marketing Features | Complete | Week 3-4 |
 | 3.5 | Open Affiliate Program (Public Signup) | Complete | Week 3-4 |
-| 3.6 | Affiliate Enhancements & Discount Codes | Sprint 2 Complete + Audit System — 3 bug fixes pending (BF1-BF3), Sprints 3-4 not started (21/32 features) | Week 4-6 |
+| 3.6 | Affiliate Enhancements & Discount Codes | Sprint 2 Complete + Audit System + Bug Fixes (BF1-BF3) done — Sprints 3-4 not started (21/32 features) | Week 4-6 |
 | 4 | Mobile App (PWA First) | Deprioritized | TBD |
 | **5** | **CRM & Invoicing Foundation (Data Layer)** | **Not Started** | **Week 7-9** |
 | **6** | **Dashboard Enhancements (UI Layer)** | **Not Started** | **Week 9-11** |
@@ -287,13 +287,13 @@ A `/api/social/preflight` endpoint validates all prerequisites before attempting
 
 ## Pending Bug Fixes (Must Complete Before Phase 3.6 is Fully Done)
 
-These bugs were identified during Phase 3.5/3.6 testing but NOT yet fixed. Any session working on affiliate features should fix these first.
+All previously pending bugs have been resolved.
 
-| # | Bug | Details | Files |
-|---|-----|---------|-------|
-| BF1 | Affiliate name not showing in Members table | When an existing Supabase user is approved as affiliate, their name from the application isn't updated in the Members tab. The user_metadata or display name doesn't get set for pre-existing users. | `src/app/api/affiliate/applications/review/route.ts` |
-| BF2 | Approval email PKCE redirect broken | Approval email sends link directly to `/affiliate/dashboard` or `/affiliate/set-password`. But Supabase magic links use PKCE flow which requires routing through `/auth/callback` server route first. Client pages cannot do the PKCE exchange. Fix: approval email link must go through `/auth/callback?redirect=/affiliate/dashboard`. | `src/app/api/affiliate/applications/review/route.ts`, `src/app/auth/callback/route.ts` |
-| BF3 | Conditional email logic for new vs existing users | When approving an affiliate, the system should send different emails: new users get a "set your password" email with magic link; existing users get a "you're approved, log in" email without magic link. Currently sends the same email to both. | `src/app/api/affiliate/applications/review/route.ts` |
+| # | Bug | Status | Fix Summary |
+|---|-----|--------|-------------|
+| BF1 | Affiliate name not showing in Members table | **Fixed** | Members API now fetches `name` from `affiliate_applications` as fallback when `user_metadata` has no name. File: `src/app/api/affiliate/members/route.ts` |
+| BF2 | Approval email PKCE redirect broken | **Fixed** | Magic link now uses `token_hash` approach instead of `action_link`. Auth callback (`/auth/callback`) handles both PKCE `code` exchange AND `token_hash` + `type` via `verifyOtp`. Files: `src/app/api/affiliate/applications/review/route.ts`, `src/app/auth/callback/route.ts` |
+| BF3 | Conditional email logic for new vs existing users | **Fixed** | Was already implemented in code (lines 226-258 of review route). BF2 fix ensures the magic link for new users actually works, making the conditional emails function correctly. |
 
 ---
 

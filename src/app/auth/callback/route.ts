@@ -6,18 +6,32 @@ import { cookies } from 'next/headers'
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+  const tokenHash = requestUrl.searchParams.get('token_hash')
+  const type = requestUrl.searchParams.get('type') as 'magiclink' | 'email' | 'signup' | 'invite' | 'recovery' | undefined
   const next = requestUrl.searchParams.get('next') || requestUrl.searchParams.get('redirectTo') || '/'
   
   const sanitizedNext = next.startsWith('/') && !next.startsWith('//') ? next : '/'
   
-  if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    
+  let authenticated = false
+  const supabase = await createClient()
+
+  if (tokenHash && type) {
+    const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
     if (error) {
-      console.error('Auth callback error:', error)
+      console.error('Auth callback verifyOtp error:', error)
       return NextResponse.redirect(new URL('/login?error=auth_failed', request.url))
     }
+    authenticated = true
+  } else if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      console.error('Auth callback code exchange error:', error)
+      return NextResponse.redirect(new URL('/login?error=auth_failed', request.url))
+    }
+    authenticated = true
+  }
+
+  if (authenticated) {
 
     try {
       const { data: { user } } = await supabase.auth.getUser()

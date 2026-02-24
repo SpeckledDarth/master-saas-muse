@@ -58,12 +58,13 @@ export async function GET() {
 
     const { data: applications } = await admin
       .from('affiliate_applications')
-      .select('email, status, reviewed_at')
+      .select('email, name, status, reviewed_at')
       .in('status', ['approved', 'pending', 'rejected'])
 
-    const appMap: Record<string, { status: string; reviewedAt: string | null }> = {}
+    const appMap: Record<string, { name: string; status: string; reviewedAt: string | null }> = {}
     for (const app of applications || []) {
       appMap[app.email.toLowerCase()] = {
+        name: app.name || '',
         status: app.status,
         reviewedAt: app.reviewed_at,
       }
@@ -106,7 +107,7 @@ export async function GET() {
       return {
         userId: link.user_id,
         email: userData.email,
-        name: userData.name,
+        name: userData.name || appData?.name || '',
         refCode: link.ref_code,
         isAffiliate: link.is_affiliate || false,
         status,
