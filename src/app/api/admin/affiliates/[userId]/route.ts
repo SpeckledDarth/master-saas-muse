@@ -38,14 +38,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const admin = createAdminClient()
 
+    const safe = async <T>(fn: () => Promise<{ data: T | null }>): Promise<T | null> => {
+      try { const r = await fn(); return r.data; } catch { return null; }
+    }
+
     const [profileRes, codesRes, transactionsRes, commissionsRes, payoutsRes, referralsRes, auditRes] = await Promise.all([
-      admin.from('affiliate_profiles').select('*').eq('user_id', userId).maybeSingle().then(r => r.data).catch(() => null),
-      admin.from('affiliate_discount_codes').select('*').eq('affiliate_user_id', userId).order('created_at', { ascending: false }).then(r => r.data || []).catch(() => []),
-      admin.from('affiliate_transactions').select('*').eq('affiliate_user_id', userId).order('created_at', { ascending: false }).limit(20).then(r => r.data || []).catch(() => []),
-      admin.from('affiliate_commissions').select('*').eq('affiliate_user_id', userId).order('created_at', { ascending: false }).limit(20).then(r => r.data || []).catch(() => []),
-      admin.from('affiliate_payouts').select('*').eq('affiliate_user_id', userId).order('created_at', { ascending: false }).limit(10).then(r => r.data || []).catch(() => []),
-      admin.from('affiliate_referrals').select('*').eq('affiliate_user_id', userId).order('created_at', { ascending: false }).limit(20).then(r => r.data || []).catch(() => []),
-      admin.from('audit_logs').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10).then(r => r.data || []).catch(() => []),
+      safe(() => admin.from('affiliate_profiles').select('*').eq('user_id', userId).maybeSingle()),
+      safe(() => admin.from('affiliate_discount_codes').select('*').eq('affiliate_user_id', userId).order('created_at', { ascending: false })),
+      safe(() => admin.from('affiliate_transactions').select('*').eq('affiliate_user_id', userId).order('created_at', { ascending: false }).limit(20)),
+      safe(() => admin.from('affiliate_commissions').select('*').eq('affiliate_user_id', userId).order('created_at', { ascending: false }).limit(20)),
+      safe(() => admin.from('affiliate_payouts').select('*').eq('affiliate_user_id', userId).order('created_at', { ascending: false }).limit(10)),
+      safe(() => admin.from('affiliate_referrals').select('*').eq('affiliate_user_id', userId).order('created_at', { ascending: false }).limit(20)),
+      safe(() => admin.from('audit_logs').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10)),
     ])
 
     return NextResponse.json({
