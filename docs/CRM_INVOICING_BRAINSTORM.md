@@ -6,6 +6,40 @@
 
 ---
 
+## Related Documents
+
+| Document | Path | Relationship |
+|----------|------|-------------|
+| **Affiliate Enhancements** | `docs/musekit/AFFILIATE_ENHANCEMENTS.md` | Detailed implementation specs (SQL schemas, API endpoints, UI descriptions) for the 32 affiliate features in Phase 3.6. Many features here overlap — see the overlap map below. |
+| **Affiliate System Guide** | `docs/musekit/AFFILIATE.md` | Complete guide to the existing affiliate system (Phases 3 + 3.5). What's already built. |
+| **Development Roadmap** | `docs/ROADMAP.md` | Master execution tracker. This brainstorm doc feeds into Phases 5-7. |
+
+**This document's role:** Strategic vision document with 217 features across all three dashboards (Admin, Affiliate, User). Covers CRM, invoicing, analytics, AI, and the dogfooding architecture. Use this for planning and prioritization. For affiliate-specific implementation details, see the Enhancements doc.
+
+### Feature Overlap Map
+
+Features in this document that have detailed implementation specs in `AFFILIATE_ENHANCEMENTS.md`:
+
+| Brainstorm # | Brainstorm Feature | Enhancements # | Status |
+|---|---|---|---|
+| #42 | Earnings milestones with real rewards | E1: Milestone Bonuses | Built (Sprint 1) |
+| #14 | Branded discount codes | E3: Discount Code System | Built (Sprint 1) |
+| #9 | "My Links" performance dashboard | E4: Deep Link Generator | Built (Sprint 2) |
+| #10 | Commission calculator widget | E5: Real-Time Earnings Widget | Built (Sprint 1) |
+| #17 | Performance comparison | E2: Affiliate Leaderboard | Built (Sprint 2) |
+| #15 | Real-time notifications when code used | E5 + existing notifications | Built |
+| #19 | Branded landing page | E23: Co-Branded Landing Pages | Not Started (Sprint 4) |
+| #20 | Affiliate onboarding checklist | E11: 7-Day Onboarding Sequence | Not Started (Sprint 3) |
+| #16 | Shareable earnings milestone badges | E31: Verified Earnings Badges | Not Started (Sprint 4) |
+| #39 | In-app messaging | E28: In-Dashboard Messaging | Not Started (Sprint 4) |
+| #41 | Knowledge base / FAQ | E12: Affiliate Resource Center | Not Started (Sprint 3) |
+| #18 | Seasonal/promo code boosts | E10: Quarterly Contests | Not Started (Sprint 3) |
+| #48 | Feedback/suggestion box | E29: Affiliate Satisfaction Surveys | Not Started (Sprint 4) |
+
+Features NOT in the Enhancements doc (new in this brainstorm): #1-8, #11-13, #21-38, #40, #42-217. These cover CRM, invoicing, user dashboard, admin CRM views, AI tools, analytics, and the unified BI vision — all part of the broader Phases 5-7 plan.
+
+---
+
 ## MuseKit vs. PassivePost
 
 - **MuseKit** = the reusable SaaS template/framework (auth, billing, admin, affiliate, teams, CRM, invoicing). The engine.

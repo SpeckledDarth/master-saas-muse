@@ -6,6 +6,18 @@
 
 ---
 
+## Related Documents
+
+| Document | Path | Relationship |
+|----------|------|-------------|
+| **CRM & Invoicing Brainstorm** | `docs/CRM_INVOICING_BRAINSTORM.md` | Broader 217-feature vision covering ALL three dashboards (Admin, Affiliate, User) plus CRM, invoicing, analytics, and AI tools. Many features here appear in expanded form there. That doc covers Phases 5-7 in the roadmap. |
+| **Affiliate System Guide** | `docs/musekit/AFFILIATE.md` | Complete guide to the existing affiliate system (Phases 3 + 3.5). How it works today. |
+| **Development Roadmap** | `docs/ROADMAP.md` | Master execution tracker. This document's 32 features map to Phase 3.6 (Sprints 1-4). |
+
+**This document's role:** Implementation-ready specs with detailed SQL schemas, API endpoints, and UI descriptions for the 32 affiliate enhancements in Phase 3.6. Use this for building. Use the brainstorm doc for strategic context and the bigger vision.
+
+---
+
 ## Feature Summary
 
 | # | Feature | Priority | Category | Complexity |
