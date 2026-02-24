@@ -1898,7 +1898,7 @@ export default function StandaloneAffiliateDashboard() {
     { id: 'five_referrals', label: 'Growing Network', icon: TrendingUp, description: 'Reached 5 referrals', check: () => data.stats.totalReferrals >= 5 },
     { id: 'ten_referrals', label: 'Super Referrer', icon: Award, description: 'Reached 10 referrals', check: () => data.stats.totalReferrals >= 10 },
     { id: 'first_payout', label: 'Payday', icon: Receipt, description: 'Received your first payout', check: () => data.payouts.some((p: any) => p.status === 'completed') },
-    { id: 'hundred_clicks', label: 'Traffic Driver', icon: MousePointerClick, description: '100+ clicks on your link', check: () => data.stats.totalClicks >= 100 },
+    { id: 'hundred_clicks', label: 'Traffic Driver', icon: MousePointerClick, description: '100+ clicks on your link', check: () => data.stats.clicks >= 100 },
     { id: 'profile_complete', label: 'Profile Pro', icon: Settings, description: 'Completed your profile', check: () => profile.display_name && profile.payout_method },
   ]
 
