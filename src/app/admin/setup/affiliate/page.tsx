@@ -236,6 +236,9 @@ export default function AffiliateSettingsPage() {
   const [reviewNotes, setReviewNotes] = useState('')
 
   const [networks, setNetworks] = useState<NetworkSetting[]>([])
+  const [networkEditDialog, setNetworkEditDialog] = useState(false)
+  const [editingNetwork, setEditingNetwork] = useState<NetworkSetting | null>(null)
+  const [networkForm, setNetworkForm] = useState({ tracking_id: '', postback_url: '', api_key: '' })
 
   const [milestones, setMilestones] = useState<Milestone[]>([])
   const [milestoneDialog, setMilestoneDialog] = useState(false)
@@ -885,7 +888,7 @@ export default function AffiliateSettingsPage() {
         ]
       case 'payout_batch':
         return [
-          { label: 'Status', value: detailItem.status, type: 'badge' as const, badgeVariant: (detailItem.status === 'approved' ? 'secondary' : detailItem.status === 'rejected' ? 'destructive' : 'outline') as any },
+          { label: 'Status', value: detailItem.status, type: 'badge' as const, badgeVariant: (detailItem.status === 'approved' || detailItem.status === 'completed' ? 'default' : detailItem.status === 'rejected' ? 'destructive' : 'outline') as any },
           { label: 'Total Amount', value: detailItem.total_amount_cents || 0, type: 'currency' },
           { label: 'Payout Count', value: detailItem.payout_count || 0 },
           { label: 'Batch Date', value: detailItem.batch_date || detailItem.created_at, type: 'date' },
@@ -2200,7 +2203,7 @@ export default function AffiliateSettingsPage() {
               ) : (
                 <div className="space-y-4">
                   {networks.map(network => (
-                    <div key={network.id} className="p-4 rounded-md border cursor-pointer" data-testid={`network-${network.network_slug}`} onClick={() => { setDetailItem(network); setDetailType('network') }}>
+                    <div key={network.id} className="p-4 rounded-md border cursor-pointer" data-testid={`network-${network.network_slug}`} onClick={() => { setEditingNetwork(network); setNetworkForm({ tracking_id: network.tracking_id || '', postback_url: network.postback_url || '', api_key: network.api_key || '' }); setNetworkEditDialog(true) }}>
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <h4 className="font-medium text-sm">{network.network_name}</h4>
@@ -2238,6 +2241,67 @@ export default function AffiliateSettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <Dialog open={networkEditDialog} onOpenChange={setNetworkEditDialog}>
+          <DialogContent className="max-w-md" data-testid="dialog-network-edit">
+            <DialogHeader>
+              <DialogTitle>{editingNetwork?.network_name || 'Network'} Settings</DialogTitle>
+              <DialogDescription>Configure tracking and integration settings for this affiliate network.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div>
+                <Label>Tracking ID</Label>
+                <Input
+                  value={networkForm.tracking_id}
+                  onChange={e => setNetworkForm(f => ({ ...f, tracking_id: e.target.value }))}
+                  placeholder="Your tracking/publisher ID"
+                  className="mt-1"
+                  data-testid="input-network-tracking-id"
+                />
+              </div>
+              <div>
+                <Label>Postback URL</Label>
+                <Input
+                  value={networkForm.postback_url}
+                  onChange={e => setNetworkForm(f => ({ ...f, postback_url: e.target.value }))}
+                  placeholder="https://network.example.com/postback?click_id={click_id}"
+                  className="mt-1"
+                  data-testid="input-network-postback-url"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">Server-to-server postback URL for conversion tracking</p>
+              </div>
+              <div>
+                <Label>API Key</Label>
+                <Input
+                  value={networkForm.api_key}
+                  onChange={e => setNetworkForm(f => ({ ...f, api_key: e.target.value }))}
+                  placeholder="Optional API key for this network"
+                  className="mt-1"
+                  type="password"
+                  data-testid="input-network-api-key"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setNetworkEditDialog(false)} data-testid="button-network-cancel">Cancel</Button>
+              <Button
+                onClick={async () => {
+                  if (!editingNetwork) return
+                  await saveNetwork(editingNetwork, {
+                    tracking_id: networkForm.tracking_id || null,
+                    postback_url: networkForm.postback_url || null,
+                    api_key: networkForm.api_key || null,
+                  })
+                  setNetworkEditDialog(false)
+                  fetchData()
+                }}
+                data-testid="button-network-save"
+              >
+                Save Settings
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         <TabsContent value="contests" className="space-y-4 mt-4">
           <Card data-testid="card-contests">
@@ -2300,9 +2364,11 @@ export default function AffiliateSettingsPage() {
                             )}
                           </div>
                           <div className="flex gap-1 shrink-0">
-                            <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setEditingContest(c); setContestForm({ name: c.name, description: c.description || '', metric: c.metric || 'referrals', start_date: c.start_date?.split('T')[0] || '', end_date: c.end_date?.split('T')[0] || '', prize_description: c.prize_description || '', prize_amount_cents: c.prize_amount_cents || 0 }); setContestDialog(true) }} data-testid={`button-edit-contest-${c.id}`}>
-                              <Pencil className="h-3.5 w-3.5" />
-                            </Button>
+                            {c.status !== 'completed' && (
+                              <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setEditingContest(c); setContestForm({ name: c.name, description: c.description || '', metric: c.metric || 'referrals', start_date: c.start_date?.split('T')[0] || '', end_date: c.end_date?.split('T')[0] || '', prize_description: c.prize_description || '', prize_amount_cents: c.prize_amount_cents || 0 }); setContestDialog(true) }} data-testid={`button-edit-contest-${c.id}`}>
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
                             <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); deleteContest(c.id) }} data-testid={`button-delete-contest-${c.id}`}>
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
@@ -2408,7 +2474,7 @@ export default function AffiliateSettingsPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <Badge variant={b.status === 'pending' ? 'outline' : b.status === 'approved' ? 'secondary' : 'destructive'} className="text-xs capitalize">
+                            <Badge variant={b.status === 'pending' ? 'outline' : b.status === 'rejected' ? 'destructive' : 'default'} className={`text-xs capitalize ${b.status === 'approved' || b.status === 'completed' ? 'bg-green-600 hover:bg-green-700' : ''}`}>
                               {b.status}
                             </Badge>
                             <span className="text-sm font-medium">${((b.total_amount_cents || 0) / 100).toFixed(2)}</span>

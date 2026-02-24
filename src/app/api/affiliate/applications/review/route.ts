@@ -204,28 +204,37 @@ export async function POST(request: NextRequest) {
     } catch {}
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io'
+
+    try {
+      await admin.auth.admin.generateLink({
+        type: 'recovery',
+        email: application.email,
+        options: {
+          redirectTo: `${baseUrl}/auth/callback?next=/affiliate/set-password`,
+        },
+      })
+    } catch (linkErr) {
+      console.error('Failed to generate password reset link:', linkErr)
+    }
+
     try {
       const { client: emailClient, fromEmail } = await getEmailClient()
       await emailClient.emails.send({
         from: fromEmail,
         to: application.email,
-        subject: 'Your Affiliate Application Has Been Approved!',
+        subject: 'Your Affiliate Application Has Been Approved — Set Your Password',
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #333;">Welcome to the Affiliate Program!</h2>
             <p>Hi ${application.name},</p>
             <p>Great news — your affiliate application has been approved! You now have access to your personal affiliate dashboard where you can find your unique referral link, marketing materials, and track your earnings.</p>
-            <p><strong>To get started:</strong></p>
-            <ol>
-              <li>Go to <a href="${baseUrl}/affiliate/login">${baseUrl}/affiliate/login</a></li>
-              <li>Enter your email: <strong>${application.email}</strong></li>
-              <li>Click <strong>"Send Login Link"</strong> — you'll receive a one-time login link in your inbox</li>
-              <li>Once logged in, you can <a href="${baseUrl}/affiliate/set-password">set a password</a> so you can log in directly next time</li>
-            </ol>
+            <p><strong>To get started, set your password:</strong></p>
+            <p>Check your inbox for a password reset email from Supabase — click the link in that email to set your password. Once set, you can log in anytime at:</p>
             <p style="margin: 24px 0;">
               <a href="${baseUrl}/affiliate/login" style="background-color: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">Go to Affiliate Login</a>
             </p>
-            <p>Once logged in, you'll find your referral link, marketing assets, and real-time performance stats on your dashboard. We recommend setting a password so you can log in easily in the future.</p>
+            <p>Your login email: <strong>${application.email}</strong></p>
+            <p>Once logged in, you'll find your referral link, marketing assets, and real-time performance stats on your dashboard.</p>
             <p>Thanks for joining,<br/>The Team</p>
           </div>
         `,

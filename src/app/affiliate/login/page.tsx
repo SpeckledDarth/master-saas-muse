@@ -22,7 +22,7 @@ export default function AffiliateLoginPage() {
   const [magicLinkLoading, setMagicLinkLoading] = useState(false)
   const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [mode, setMode] = useState<'password' | 'magic'>('magic')
+  const [mode, setMode] = useState<'password' | 'magic'>('password')
 
   async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault()
