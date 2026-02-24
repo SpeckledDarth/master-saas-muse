@@ -144,6 +144,26 @@ const ASSET_TYPE_ICONS: Record<string, any> = {
   one_pager: FileText,
   swipe_file: FileText,
   landing_page: FileText,
+  faq: HelpCircle,
+  video_tutorial: FileImage,
+  best_practice: Bookmark,
+  guide: FileText,
+}
+
+const ASSET_TYPE_LABELS: Record<string, string> = {
+  banner: 'Banner Image',
+  email_template: 'Email Template',
+  social_post: 'Social Post',
+  text_snippet: 'Text Snippet',
+  video: 'Video',
+  case_study: 'Case Study',
+  one_pager: 'One-Pager / PDF',
+  swipe_file: 'Swipe File',
+  landing_page: 'Landing Page',
+  faq: 'FAQ',
+  video_tutorial: 'Video Tutorial',
+  best_practice: 'Best Practice',
+  guide: 'Guide',
 }
 
 const DEEP_LINK_PAGES = [
@@ -161,7 +181,7 @@ const NAV_ITEMS: { key: DashboardSection; label: string; icon: any }[] = [
   { key: 'referrals', label: 'Referrals', icon: Users },
   { key: 'earnings', label: 'Earnings', icon: DollarSign },
   { key: 'payouts', label: 'Payouts', icon: Receipt },
-  { key: 'assets', label: 'Marketing', icon: FileImage },
+  { key: 'assets', label: 'Resources', icon: Bookmark },
   { key: 'tools', label: 'Tools', icon: Link2 },
   { key: 'announcements', label: 'News', icon: Megaphone },
   { key: 'account', label: 'Account', icon: Settings },
@@ -196,6 +216,9 @@ function StandaloneAffiliateDashboard() {
   const [earnings, setEarnings] = useState<{ today: number; thisWeek: number; thisMonth: number; allTime: number } | null>(null)
   const [earningsPeriod, setEarningsPeriod] = useState<'today' | 'thisWeek' | 'thisMonth'>('today')
   const [milestoneData, setMilestoneData] = useState<{ milestones: any[]; currentReferrals: number; totalBonusEarned: number } | null>(null)
+
+  const [assetTypeFilter, setAssetTypeFilter] = useState('all')
+  const [assetSearch, setAssetSearch] = useState('')
 
   const [deepLinkPage, setDeepLinkPage] = useState('/')
   const [customPath, setCustomPath] = useState('')
@@ -1247,68 +1270,116 @@ function StandaloneAffiliateDashboard() {
     </div>
   )
 
-  const renderAssets = () => (
-    <div className="space-y-4">
-      <h2 className="text-lg font-semibold" data-testid="text-assets-heading">Marketing Materials</h2>
-      <p className="text-sm text-muted-foreground -mt-2">Ready-to-use assets to help you promote and earn more</p>
+  const renderAssets = () => {
+    const availableTypes = [...new Set(assets.map(a => a.asset_type))]
+    const filteredAssets = assets
+      .filter(a => assetTypeFilter === 'all' || a.asset_type === assetTypeFilter)
+      .filter(a => {
+        if (!assetSearch.trim()) return true
+        const q = assetSearch.toLowerCase()
+        return (a.title?.toLowerCase().includes(q)) || (a.description?.toLowerCase().includes(q))
+      })
 
-      {assets.length === 0 ? (
-        <Card>
-          <CardContent className="pt-4">
-            <div className="text-center py-8" data-testid="text-no-assets">
-              <FileImage className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">No marketing assets available yet.</p>
+    return (
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold" data-testid="text-assets-heading">Resource Center</h2>
+        <p className="text-sm text-muted-foreground -mt-2">Swipe files, templates, guides, and more to help you promote and earn</p>
+
+        {assets.length > 0 && (
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="relative flex-1">
+              <Input
+                placeholder="Search resources..."
+                value={assetSearch}
+                onChange={e => setAssetSearch(e.target.value)}
+                data-testid="input-asset-search"
+              />
             </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          {assets.map(asset => {
-            const Icon = ASSET_TYPE_ICONS[asset.asset_type] || FileText
-            return (
-              <Card key={asset.id} data-testid={`asset-${asset.id}`}>
-                <CardContent className="pt-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3">
-                      <Icon className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
-                      <div>
-                        <p className="font-medium text-sm">{asset.title}</p>
-                        {asset.description && (
-                          <p className="text-xs text-muted-foreground mt-0.5">{asset.description}</p>
+            <Select value={assetTypeFilter} onValueChange={setAssetTypeFilter}>
+              <SelectTrigger className="w-full sm:w-[180px]" data-testid="select-asset-type-filter">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types ({assets.length})</SelectItem>
+                {availableTypes.map(type => (
+                  <SelectItem key={type} value={type}>
+                    {ASSET_TYPE_LABELS[type] || type.replace('_', ' ')} ({assets.filter(a => a.asset_type === type).length})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {assets.length === 0 ? (
+          <Card>
+            <CardContent className="pt-4">
+              <div className="text-center py-8" data-testid="text-no-assets">
+                <FileImage className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">No marketing assets available yet.</p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : filteredAssets.length === 0 ? (
+          <Card>
+            <CardContent className="pt-4">
+              <div className="text-center py-8">
+                <p className="text-sm text-muted-foreground">No resources match your filter.</p>
+                <Button variant="ghost" size="sm" className="mt-2" onClick={() => { setAssetTypeFilter('all'); setAssetSearch('') }} data-testid="button-clear-asset-filters">
+                  Clear Filters
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {filteredAssets.map(asset => {
+              const Icon = ASSET_TYPE_ICONS[asset.asset_type] || FileText
+              return (
+                <Card key={asset.id} data-testid={`asset-${asset.id}`}>
+                  <CardContent className="pt-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <Icon className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
+                        <div>
+                          <p className="font-medium text-sm">{asset.title}</p>
+                          {asset.description && (
+                            <p className="text-xs text-muted-foreground mt-0.5">{asset.description}</p>
+                          )}
+                          <Badge variant="outline" className="text-[10px] mt-1 capitalize">
+                            {ASSET_TYPE_LABELS[asset.asset_type] || asset.asset_type.replace('_', ' ')}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {asset.content && (
+                          <Button variant="outline" size="sm" onClick={() => handleCopy(asset.content!, asset.id)} data-testid={`button-copy-asset-${asset.id}`}>
+                            {copiedAsset === asset.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                          </Button>
                         )}
-                        <Badge variant="outline" className="text-[10px] mt-1 capitalize">
-                          {asset.asset_type.replace('_', ' ')}
-                        </Badge>
+                        {asset.file_url && (
+                          <Button variant="outline" size="sm" asChild data-testid={`button-download-asset-${asset.id}`}>
+                            <a href={asset.file_url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          </Button>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      {asset.content && (
-                        <Button variant="outline" size="sm" onClick={() => handleCopy(asset.content!, asset.id)} data-testid={`button-copy-asset-${asset.id}`}>
-                          {copiedAsset === asset.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                        </Button>
-                      )}
-                      {asset.file_url && (
-                        <Button variant="outline" size="sm" asChild data-testid={`button-download-asset-${asset.id}`}>
-                          <a href={asset.file_url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-3.5 w-3.5" />
-                          </a>
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                  {asset.content && (
-                    <pre className="mt-3 p-3 rounded bg-muted text-xs overflow-auto max-h-32 whitespace-pre-wrap" data-testid={`content-asset-${asset.id}`}>
-                      {asset.content}
-                    </pre>
-                  )}
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-      )}
-    </div>
-  )
+                    {asset.content && (
+                      <pre className="mt-3 p-3 rounded bg-muted text-xs overflow-auto max-h-32 whitespace-pre-wrap" data-testid={`content-asset-${asset.id}`}>
+                        {asset.content}
+                      </pre>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   const renderTools = () => (
     <div className="space-y-6">

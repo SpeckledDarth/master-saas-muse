@@ -178,6 +178,10 @@ const ASSET_TYPES = [
   { value: 'one_pager', label: 'One-Pager / PDF' },
   { value: 'swipe_file', label: 'Swipe File' },
   { value: 'landing_page', label: 'Landing Page Template' },
+  { value: 'faq', label: 'FAQ' },
+  { value: 'video_tutorial', label: 'Video Tutorial' },
+  { value: 'best_practice', label: 'Best Practice Guide' },
+  { value: 'guide', label: 'Getting Started Guide' },
 ]
 
 const PROMOTION_LABELS: Record<string, string> = {
@@ -1675,15 +1679,15 @@ export default function AffiliateSettingsPage() {
                         <Label>Description</Label>
                         <Input value={assetForm.description} onChange={e => setAssetForm(f => ({ ...f, description: e.target.value }))} placeholder="Short description of this asset" data-testid="input-asset-description" />
                       </div>
-                      {(['email_template', 'social_post', 'text_snippet', 'swipe_file', 'landing_page'].includes(assetForm.asset_type)) && (
+                      {(['email_template', 'social_post', 'text_snippet', 'swipe_file', 'landing_page', 'faq', 'best_practice', 'guide'].includes(assetForm.asset_type)) && (
                         <div>
                           <Label>Content</Label>
                           <Textarea value={assetForm.content} onChange={e => setAssetForm(f => ({ ...f, content: e.target.value }))} placeholder="Paste your template content here..." rows={6} data-testid="input-asset-content" />
                         </div>
                       )}
-                      {(['banner', 'video', 'case_study', 'one_pager'].includes(assetForm.asset_type)) && (
+                      {(['banner', 'video', 'video_tutorial', 'case_study', 'one_pager'].includes(assetForm.asset_type)) && (
                         <div>
-                          <Label>{assetForm.asset_type === 'video' ? 'Video URL' : assetForm.asset_type === 'banner' ? 'Image URL' : 'File URL'}</Label>
+                          <Label>{(assetForm.asset_type === 'video' || assetForm.asset_type === 'video_tutorial') ? 'Video URL' : assetForm.asset_type === 'banner' ? 'Image URL' : 'File URL'}</Label>
                           <Input value={assetForm.file_url} onChange={e => setAssetForm(f => ({ ...f, file_url: e.target.value }))} placeholder="https://..." data-testid="input-asset-file-url" />
                         </div>
                       )}
