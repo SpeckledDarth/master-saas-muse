@@ -128,7 +128,7 @@ export default function AdminLayout({
               )}
               {(isAppAdmin || permissions?.canEditSettings) && (
                 <Button 
-                  variant={pathname === '/admin/setup' ? 'secondary' : 'ghost'} 
+                  variant={pathname.startsWith('/admin/setup') ? 'secondary' : 'ghost'} 
                   size="sm" 
                   asChild
                 >

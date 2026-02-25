@@ -81,7 +81,7 @@ export function useSetupSettings(): UseSetupSettingsReturn {
       const { data: { user } } = await supabase.auth.getUser()
 
       if (!user) {
-        router.push('/login')
+        setLoading(false)
         return
       }
 

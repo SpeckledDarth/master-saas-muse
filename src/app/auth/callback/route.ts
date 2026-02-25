@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
@@ -12,8 +11,27 @@ export async function GET(request: NextRequest) {
   
   const sanitizedNext = next.startsWith('/') && !next.startsWith('//') ? next : '/'
   
+  const redirectUrl = new URL(sanitizedNext, request.url)
+  const response = NextResponse.redirect(redirectUrl)
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options)
+          })
+        },
+      },
+    }
+  )
+
   let authenticated = false
-  const supabase = await createClient()
 
   if (tokenHash && type) {
     const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
@@ -32,12 +50,10 @@ export async function GET(request: NextRequest) {
   }
 
   if (authenticated) {
-
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        const cookieStore = await cookies()
-        const refCode = cookieStore.get('pp_ref')?.value
+        const refCode = request.cookies.get('pp_ref')?.value
         if (refCode) {
           const admin = createAdminClient()
           const { data: existing } = await admin
@@ -76,5 +92,5 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(new URL(sanitizedNext, request.url))
+  return response
 }
