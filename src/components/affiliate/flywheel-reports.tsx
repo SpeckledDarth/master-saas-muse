@@ -32,9 +32,17 @@ interface ContentIntelligenceData {
   aiRecommendations: string;
 }
 
+interface CustomRangePeriodData {
+  period: { start: string; end: string };
+  summary: { totalClicks: number; totalSignups: number; totalConversions: number; totalEarnings: number; convRate: number };
+  topSources: { source: string; clicks: number; conversions: number }[];
+  dailyClicks: { date: string; count: number }[];
+  commissionBreakdown: { paid: number; approved: number; pending: number };
+}
+
 interface CustomRangeData {
-  primary: { period: { start: string; end: string }; summary: { totalClicks: number; totalSignups: number; totalConversions: number; totalEarnings: number; convRate: number }; topSources: { source: string; clicks: number; conversions: number }[]; dailyClicks: { date: string; count: number }[]; commissionBreakdown: { paid: number; approved: number; pending: number } };
-  comparison: typeof CustomRangeData.prototype.primary | null;
+  primary: CustomRangePeriodData;
+  comparison: CustomRangePeriodData | null;
   delta: { clicks: number; clicksPct: number; conversions: number; conversionsPct: number; earnings: number; earningsPct: number; convRate: number } | null;
 }
 
