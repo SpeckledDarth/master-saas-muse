@@ -1,7 +1,7 @@
 # MuseKit.io - Master SaaS Muse Template
 
 ## Overview
-MuseKit.io is a production-ready, full-stack SaaS starter template designed to accelerate the launch of new SaaS products. It provides a comprehensive, high-quality starting point, significantly reducing development time. Each SaaS product deployed using MuseKit operates with its own independent deployment, repository, database, and Stripe account, ensuring clean P&L, independent scaling, and zero cross-pollination risk. The platform includes robust authentication, Stripe-powered billing with feature gating, team collaboration with role-based permissions, an administrative dashboard, pluggable AI integrations, webhook support, monitoring, analytics, E2E testing, and SEO optimization.
+MuseKit.io is a production-ready, full-stack SaaS starter template designed to accelerate the launch of new SaaS products. Each SaaS product deployed using MuseKit operates with its own independent deployment, repository, database, and Stripe account, ensuring clean P&L, independent scaling, and zero cross-pollination risk. The platform includes robust authentication, Stripe-powered billing with feature gating, team collaboration with role-based permissions, an administrative dashboard, pluggable AI integrations, webhook support, monitoring, analytics, E2E testing, and SEO optimization. The project's vision is a closed-loop business intelligence platform for content creators, with a rich set of 217 features intended to be a competitive moat, rather than a generic SaaS template.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -37,7 +37,7 @@ This project runs across THREE environments that MUST stay aligned. Most testing
 
 **Why This Matters:**
 - Agent sees Replit Postgres. User's app reads Supabase.
-- Agent tests on localhost:5000. User tests on Vercel deployment.
+- Agent tests on localhost:5500. User tests on Vercel deployment.
 - Code changes only reach Vercel after git push → GitHub → Vercel auto-deploy.
 - Missing a Supabase migration = user sees 500 errors that agent cannot reproduce locally.
 
@@ -50,68 +50,65 @@ Every time code changes are made, the agent MUST complete these steps before tel
 5. **Trace the full path** — For each fix, mentally trace: frontend fetch call -> API route -> database query -> response handling. Confirm every step works, not just the spot that looked broken.
 6. **List required Supabase migrations** — If any fix depends on a table or column that might not exist in the user's Supabase instance, explicitly list the migration SQL the user needs to run BEFORE testing.
 
-### Session Start Protocol
-- **ALWAYS read `docs/ROADMAP.md` at the start of every session.** This file is the persistent project memory containing the multi-week development plan, decision log, open questions, and session history. If agent memory resets, this file restores full context.
-- After reading the roadmap, check the **Pending Bug Fixes** section — fix those before starting new features.
-- Check the **Phase Overview** table to see current phase and resume from there.
-- If working on CRM/invoicing features (Phases 5-7), also read `docs/CRM_INVOICING_BRAINSTORM.md` for the full 217-feature vision and dogfooding architecture.
-- If working on affiliate enhancements (Phase 3.6), also read `docs/musekit/AFFILIATE_ENHANCEMENTS.md` for detailed SQL schemas and API specs.
-- Update the Session Log in ROADMAP.md at the end of every session with what was accomplished.
-- Consult the **Key Documents** table below to know which docs to read for any given task.
+### Session Start Protocol (MANDATORY — DO NOT SKIP)
+
+Every session MUST follow these steps IN ORDER before writing any code:
+
+1. **Read `docs/PRODUCT_IDENTITY.md`** — Understand what PassivePost actually is. This is a closed-loop business intelligence platform for content creators, NOT a generic SaaS template. The 217-feature vision is intentional. Never suggest cutting features or simplifying the affiliate program. The feature richness IS the moat.
+2. **Read `docs/FEATURE_INVENTORY.md`** — Know what's already built. Search for keywords related to what you're about to build. If something similar exists, EXTEND it — don't create a parallel system.
+3. **Read `docs/LESSONS_LEARNED.md`** — Know the anti-patterns and technical gotchas. Follow the rules to avoid repeating past mistakes.
+4. **Read `docs/ROADMAP.md`** — Know what's in progress and what's next. Check the Phase Overview table. Check the Pending Bug Fixes section — fix those before new features.
+5. **Plan with integration requirements** — For every feature you plan to build, list which existing systems it connects to. If you can't name at least one integration point, rethink the feature.
+6. **Update Session Log** in ROADMAP.md at end of every session with what was accomplished.
+
+### Integration-First Development Rules (NON-NEGOTIABLE)
+
+These rules apply to EVERY session, EVERY feature, no exceptions:
+
+1. **No Standalone Features** — Every new feature MUST connect to at least one existing system. If your feature doesn't reference existing database tables, API routes, or UI components, you're building it wrong.
+2. **Check Before You Build** — Search `docs/FEATURE_INVENTORY.md` for related features. If something similar exists, extend it. Never create parallel logic.
+3. **Data Must Flow** — New features should both CONSUME existing data AND PRODUCE data that other features can use. A feature that only displays its own data is an island, not part of the flywheel.
+4. **AI Must Use Real Context** — Every AI feature must pull real data (commissions, referrals, tiers, contests, milestones, leaderboard position, content calendar, connected analytics). Never generate advice in a vacuum.
+5. **Cross-Dashboard Awareness** — If a feature affects one dashboard, consider how it surfaces in the others. Admin creates contest → Affiliate sees it → AI coach references it → Predictions factor it in.
+6. **Document Connections** — In your session plan, explicitly list which existing features each new feature connects to. This is how we verify integration-first development.
 
 ### Key Documents
 
 | Document | Path | Purpose | When to Read |
 |----------|------|---------|-------------|
-| **Development Roadmap** | `docs/ROADMAP.md` | Master execution tracker: phase status, sprint details, pending bugs, decision log, session history | **Every session** — read first, always |
-| **CRM & Invoicing Brainstorm** | `docs/CRM_INVOICING_BRAINSTORM.md` | Strategic vision: 217 features across all 3 dashboards, dogfooding architecture, cross-Muse strategy, gap analysis | When working on Phases 5-7 (CRM, dashboards, AI) |
-| **Affiliate Enhancements** | `docs/musekit/AFFILIATE_ENHANCEMENTS.md` | Implementation specs: SQL schemas, API endpoints, UI descriptions for 32 affiliate features | When working on Phase 3.6 (Sprints 1-4) |
+| **Product Identity** | `docs/PRODUCT_IDENTITY.md` | What we're building and why. The closed-loop vision. Integration rules. | **Every session** — read FIRST, before anything else |
+| **Feature Inventory** | `docs/FEATURE_INVENTORY.md` | Complete inventory of everything built, organized by system, with files/tables/APIs | **Every session** — read BEFORE planning any features |
+| **Lessons Learned** | `docs/LESSONS_LEARNED.md` | Technical anti-patterns, integration anti-patterns, deployment gotchas | **Every session** — read to avoid repeating mistakes |
+| **Development Roadmap** | `docs/ROADMAP.md` | Master execution tracker: phase status, sprint details, pending bugs, session history | **Every session** — read after identity/inventory/lessons |
+| **CRM & Invoicing Brainstorm** | `docs/CRM_INVOICING_BRAINSTORM.md` | Strategic vision: 217 features, dogfooding architecture, gap analysis | When planning new features — the ideas pipeline |
+| **Affiliate Enhancements** | `docs/musekit/AFFILIATE_ENHANCEMENTS.md` | Implementation specs: SQL schemas, API endpoints for 32 affiliate features | When working on affiliate features |
 
-### Two-Document System (CRITICAL)
+### Document System
 
-The project uses two primary planning documents that serve different purposes. **Never merge them.**
+The project uses multiple planning documents that serve different purposes. **Never merge them.**
 
-| Document | Role | Contains | Updates |
-|----------|------|----------|---------|
-| `docs/ROADMAP.md` | **Execution state** | Phase status, sprint tables, pending bugs, decision log, session history, file references | Every session — tracks what's done, what's next |
-| `docs/CRM_INVOICING_BRAINSTORM.md` | **Strategic vision** | 217-feature brainstorm, dogfooding architecture, cross-Muse strategy, gap analysis, build priority tiers | When planning new phases — the ideas pipeline |
-
-A third document, `docs/musekit/AFFILIATE_ENHANCEMENTS.md`, serves as **implementation specs** specifically for Phase 3.6's 32 affiliate features (SQL schemas, API endpoints, UI descriptions). It cross-references both the roadmap (for status tracking) and the brainstorm doc (for feature overlap mapping).
+| Document | Role | Updates |
+|----------|------|---------|
+| `PRODUCT_IDENTITY.md` | **Product soul** — what we're building and why | Rarely — only when vision evolves |
+| `FEATURE_INVENTORY.md` | **What exists** — complete map of built features | Every session — add new features |
+| `LESSONS_LEARNED.md` | **What we've learned** — anti-patterns and rules | Every session — add new lessons |
+| `ROADMAP.md` | **Execution state** — what's done, what's next | Every session — update progress |
+| `CRM_INVOICING_BRAINSTORM.md` | **Strategic vision** — 217-feature pipeline | When planning new phases |
 
 ## System Architecture
 The project is built with Next.js 16+ (App Router), React 18+, and TypeScript. Styling is handled with Tailwind CSS, shadcn/ui, and next-themes, while TanStack Query manages server state. Supabase provides PostgreSQL, authentication, RLS, and storage, supporting multi-tenancy. Deployment is exclusively on Vercel.
 
 **UI/UX Decisions:**
-The UI emphasizes dynamic branding, configurable navigation, customizable sections (hero, logo marquee, animated counters, testimonial carousels), dark/light mode, and a comprehensive admin dashboard. The admin dashboard features a full-width layout, task-based setup navigation, and a dedicated branding page for color palette management, background overrides, font selection, and logo variants. Dark mode employs a distinct six-layer depth system. All marketing and public pages are fully responsive. Header and footer styling are highly configurable through the admin UI, supporting various layouts, background options, and automatic contrast adjustments. Landing page components are modular and toggleable, including a Founder Letter, Comparison Bars, Product Showcase, Bottom Hero CTA, Photo Collage Hero, and Image Collage Section. Color models for cards use a 950-scale for consistency across light and dark modes.
+The UI emphasizes dynamic branding, configurable navigation, customizable sections (hero, logo marquee, animated counters, testimonial carousels), dark/light mode, and a comprehensive admin dashboard. The admin dashboard features a full-width layout, task-based setup navigation, and a dedicated branding page for color palette management, background overrides, font selection, and logo variants. Dark mode employs a distinct six-layer depth system. All marketing and public pages are fully responsive. Header and footer styling are highly configurable through the admin UI, supporting various layouts, background options, and automatic contrast adjustments. Landing page components are modular and toggleable. Color models for cards use a 950-scale for consistency across light and dark modes.
 
 **Technical Implementations:**
-- **Authentication**: Supports email/password, multiple OAuth providers, SSO/SAML, protected routes, and profile management.
-- **Admin Features**: Dashboard with analytics, user management, role-based access control, organization settings, audit logging, onboarding wizard, and enhanced setup UX, including user impersonation.
-- **Billing**: Stripe integration for subscriptions, checkout, customer portal, and feature gating.
-- **Email System**: Resend integration for transactional emails with editable templates and category tagging.
-- **Team/Organization System**: Multi-user organizations with role hierarchies and invitations.
-- **AI Integration**: Pluggable system for xAI, OpenAI, and Anthropic.
-- **Webhook Integration**: Event-driven system with HMAC-SHA256 signing, retry logic, and admin UI.
-- **Content Management**: Markdown-based blog/changelog with public display and admin CRUD.
-- **Marketing Tools**: Waitlist mode, in-app feedback widget, and customizable marketing pages.
-- **Security**: Supabase RLS, Zod validation, rate limiting, and security headers.
-- **Monitoring**: Sentry for error tracking and Plausible for analytics.
-- **Queue Infrastructure**: BullMQ with Upstash Redis for core and product-specific job types.
-- **Rate Limiting**: Upstash Redis sliding window with in-memory fallback.
-- **In-App Notifications**: Bell icon with unread badges and popover list.
-- **Metrics & Reporting**: Admin dashboard for KPIs, scheduled reports, and alerts.
-- **Database Backup Configuration**: Admin UI for setting backup notification preferences.
-- **API Token Rotation**: Automated webhook secret rotation.
+- **Core Platform Features**: Authentication, Admin Dashboard (analytics, user/role management, audit logging, onboarding, user impersonation), Stripe Billing, Resend Email System, Team/Organization System, Pluggable AI Integration, Webhook Integration, Markdown-based Blog/Changelog, Marketing Tools, Security (Supabase RLS, Zod, rate limiting), Monitoring (Sentry, Plausible), Queue Infrastructure (BullMQ with Upstash Redis), Rate Limiting (Upstash Redis sliding window), In-App Notifications, Metrics & Reporting, Database Backup Configuration, API Token Rotation.
 - **Product Registry**: Supports multiple SaaS products via dedicated database tables for product-scoped features.
-- **Blog Publishing**: Cross-platform system with SEO preview, Markdown editor, AI repurpose engine, and calendar integration.
-- **Flywheel System**: Comprehensive content flywheel across 7 phases.
-- **Bonus Features**: AI Hashtag Suggestions, Gig Lead Notifications, AI Voice Fine-Tuner, and a Lead CRM Mini.
-- **Testimonial Management**: Admin CRUD for testimonials with public display on a "Wall of Love" page and social proof popups on the landing page.
-- **Affiliate System**: Complete affiliate marketing infrastructure with tracked referral links, commission tracking on Stripe events, fraud detection, performance tiers, marketing assets, and payout management. Includes public signup, application, separate login, and standalone dashboard for affiliates. Admin manages applications, networks, and all affiliate settings.
-- **CRM & Invoicing Foundation**: Universal user profiles, local invoice/payment records synced from Stripe webhooks, affiliate payout item tracking, support ticket system, CRM activity log, marketing campaign tracking with UTM attribution, and contract/agreement management with signing flow and version history.
-- **Dashboard Enhancements**: Admin CRM card, revenue attribution report, bulk payout processing, affiliate health scores, quick notes. Affiliate earnings statements, portfolio view, commission lifecycle tracker, contract view with signing, tax summary, campaign creator with UTM. User billing page, support ticket submission/history, account security, affiliate invitation prompt.
-- **Flywheel Accelerators**: Churn intelligence suite, cohort analysis, revenue analytics, traffic insights, AI analytics intelligence, AI posting strategy, AI conversion insights, connected analytics dashboard, cross-platform comparison, unified financial view, predictive intelligence, content intelligence, custom date range reports with period comparison, weekly affiliate digest emails, admin program intelligence, MetricTooltip, LastUpdated, Sparkline, CSV export utilities.
-- **Product Extension Design Rules**: Emphasizes adding new files and tables for product-specific features (`migrations/extensions/`, `/dashboard/social/`, `src/lib/<product>/`), using plugin patterns for queue jobs, and minimizing core file modifications.
+- **Content & Affiliate Flywheel**: Includes a cross-platform blog publishing system with SEO, AI repurposing, calendar integration, and a comprehensive 7-phase content flywheel. A complete affiliate marketing infrastructure features tracked referral links, commission tracking, fraud detection, performance tiers, marketing assets, and payout management, with separate interfaces for affiliates and administrators.
+- **CRM & Invoicing Foundation**: Universal user profiles, local invoice/payment records, affiliate payout tracking, support ticket system, CRM activity log, marketing campaign tracking, and contract/agreement management.
+- **Dashboard Enhancements**: Admin CRM card, revenue attribution, bulk payouts, affiliate health scores, quick notes. Affiliate earnings statements, portfolio view, commission lifecycle, contract view, tax summary, campaign creator. User billing page, support tickets, account security, affiliate invitation.
+- **Flywheel Accelerators**: Churn intelligence, cohort analysis, revenue analytics, traffic insights, AI analytics/posting/conversion strategies, connected analytics dashboard, cross-platform comparison, unified financial view, predictive intelligence, content intelligence, custom date reports, weekly affiliate digest, admin program intelligence.
+- **Product Extension Design Rules**: Emphasizes adding new files and tables for product-specific features, using plugin patterns for queue jobs, and minimizing core file modifications.
 
 ## External Dependencies
 - **Supabase**: PostgreSQL database, Authentication, Row Level Security (RLS), Storage.

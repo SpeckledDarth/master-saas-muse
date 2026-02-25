@@ -1,8 +1,9 @@
 # CRM & Invoicing Brainstorm — PassivePost
 
-> **Status:** Phase 5 (Data Layer) COMPLETE. Phase 6 (Dashboard UI) is next. This doc remains the strategic vision — consult it when planning Phase 6-7 features.
+> **Status:** Phases 5-8.5 ALL COMPLETE. ~45 features remain across Sessions C-F. This doc is the strategic 217-feature vision. Before building any feature from this list, check `docs/FEATURE_INVENTORY.md` to see if something similar already exists.
 > **Created:** February 24, 2026
 > **Last Updated:** February 25, 2026
+> **Related:** Read `docs/PRODUCT_IDENTITY.md` first to understand why the feature richness matters. Read `docs/FEATURE_INVENTORY.md` to see what's already built. Read `docs/LESSONS_LEARNED.md` for integration rules.
 
 ---
 
@@ -10,11 +11,14 @@
 
 | Document | Path | Relationship |
 |----------|------|-------------|
-| **Affiliate Enhancements** | `docs/musekit/AFFILIATE_ENHANCEMENTS.md` | Detailed implementation specs (SQL schemas, API endpoints, UI descriptions) for the 32 affiliate features in Phase 3.6. Many features here overlap — see the overlap map below. |
-| **Affiliate System Guide** | `docs/musekit/AFFILIATE.md` | Complete guide to the existing affiliate system (Phases 3 + 3.5). What's already built. |
-| **Development Roadmap** | `docs/ROADMAP.md` | Master execution tracker. This brainstorm doc feeds into Phases 5-7. |
+| **Product Identity** | `docs/PRODUCT_IDENTITY.md` | **READ FIRST** — Defines what PassivePost is (closed-loop BI platform) and why feature richness is the moat |
+| **Feature Inventory** | `docs/FEATURE_INVENTORY.md` | **CHECK BEFORE BUILDING** — Complete inventory of everything already built, with files/tables/APIs |
+| **Lessons Learned** | `docs/LESSONS_LEARNED.md` | Anti-patterns and rules from past mistakes. Integration-first development rules. |
+| **Affiliate Enhancements** | `docs/musekit/AFFILIATE_ENHANCEMENTS.md` | Implementation specs (SQL schemas, API endpoints) for 32 affiliate features in Phase 3.6. |
+| **Affiliate System Guide** | `docs/musekit/AFFILIATE.md` | Guide to the existing affiliate system (Phases 3 + 3.5). |
+| **Development Roadmap** | `docs/ROADMAP.md` | Master execution tracker with integration requirements for remaining sessions. |
 
-**This document's role:** Strategic vision document with 217 features across all three dashboards (Admin, Affiliate, User). Covers CRM, invoicing, analytics, AI, and the dogfooding architecture. Use this for planning and prioritization. For affiliate-specific implementation details, see the Enhancements doc.
+**This document's role:** Strategic vision document with 217 features across all three dashboards (Admin, Affiliate, User). Covers CRM, invoicing, analytics, AI, and the dogfooding architecture. Use this for planning and prioritization. **Always cross-reference with FEATURE_INVENTORY.md** to avoid building features that already exist.
 
 ### Feature Overlap Map
 
@@ -49,49 +53,51 @@ Features NOT in the Enhancements doc (new in this brainstorm): #1-8, #11-13, #21
 
 ---
 
-## Core Problem Statement
+## Core Problem Statement (HISTORICAL — Written Before Phase 5)
 
-Every dashboard (Admin, Affiliate, User) needs CRM-style account management and transaction-level financial visibility. The current codebase has affiliate-specific tables and APIs, but lacks:
-1. A universal profile system (only affiliates have profiles today)
-2. Local invoicing/payment records (Stripe handles payments but no local records exist)
-3. Support ticket system
-4. Contract/agreement tracking
-5. Admin CRM view showing full account picture for any user type
+> **NOTE:** This section was written before Phases 5-7 were built. Most gaps listed below have been filled. See `docs/FEATURE_INVENTORY.md` for current state. Kept for historical context only.
+
+~~Every dashboard (Admin, Affiliate, User) needs CRM-style account management and transaction-level financial visibility. The current codebase has affiliate-specific tables and APIs, but lacks:~~
+1. ~~A universal profile system~~ → **BUILT** (`user_profiles` table, migration 011)
+2. ~~Local invoicing/payment records~~ → **BUILT** (`invoices`, `invoice_items`, `payments` tables, migration 011)
+3. ~~Support ticket system~~ → **BUILT** (`tickets`, `ticket_comments` tables, migration 011)
+4. ~~Contract/agreement tracking~~ → **BUILT** (`contracts`, `contract_versions` tables, migration 011)
+5. ~~Admin CRM view~~ → **BUILT** (Admin CRM card with full affiliate profile view)
 
 ---
 
-## Gap Analysis: What Exists vs. What's Needed
+## Gap Analysis (HISTORICAL — Updated with Current Status)
 
 ### CRM Tables
 
-| Table | Exists? | Notes |
-|-------|---------|-------|
-| Users | Yes | Supabase auth.users + user_roles + team_members |
-| UserProfiles (universal) | PARTIAL | Only `affiliate_profiles` exists. No profile for regular users or admins. |
-| Roles / UserRoles | PARTIAL | `user_roles` exists but simple strings, no permissions table |
-| Permissions / RolePermissions | NO | Hardcoded in code |
-| Teams / Organizations | Yes | `organizations` table exists |
-| TeamMembers | Yes | `team_members` table exists |
-| Contacts (CRM leads/customers) | NO | |
-| Accounts (companies) | NO | |
-| Opportunities (deals/pipeline) | NO | |
-| Activities (calls/meetings/tasks/notes) | NO | Audit log tracks admin actions, not CRM activities |
-| Campaigns (marketing) | PARTIAL | `affiliate_broadcasts` covers email to affiliates only |
-| Tickets (support) | NO | |
-| TicketComments | NO | |
+| Table | Status | Notes |
+|-------|--------|-------|
+| Users | **EXISTS** | Supabase auth.users + user_roles + team_members |
+| UserProfiles (universal) | **BUILT** | `user_profiles` table — universal for all user types (migration 011) |
+| Roles / UserRoles | **EXISTS** | `user_roles` exists, permissions hardcoded |
+| Permissions / RolePermissions | NOT BUILT | Hardcoded in code — Tier 3 priority |
+| Teams / Organizations | **EXISTS** | `organizations` table exists |
+| TeamMembers | **EXISTS** | `team_members` table exists |
+| Contacts (CRM leads/customers) | NOT BUILT | Tier 3 priority |
+| Accounts (companies) | NOT BUILT | Tier 3 priority |
+| Opportunities (deals/pipeline) | NOT BUILT | Tier 3 priority |
+| Activities (calls/meetings/tasks/notes) | **BUILT** | `activities` table (migration 011) |
+| Campaigns (marketing) | **BUILT** | `campaigns` table with UTM tracking (migration 011) |
+| Tickets (support) | **BUILT** | `tickets` + `ticket_comments` (migration 011) |
+| TicketComments | **BUILT** | Part of tickets system |
 
 ### Invoicing Tables
 
-| Table | Exists? | Notes |
-|-------|---------|-------|
-| Invoices | NO | Stripe processes payments but no local invoice records |
-| InvoiceItems | NO | |
-| InvoiceTemplates | NO | |
-| Payments (local records) | NO | No local payment transaction records |
-| Refunds | NO | |
-| AffiliateEarnings | PARTIAL | `affiliate_commissions` is similar but less granular |
-| AffiliatePayoutItems (junction) | NO | Can't see which earnings were in which payout |
-| InvoicePayments (partial payment junction) | NO | |
+| Table | Status | Notes |
+|-------|--------|-------|
+| Invoices | **BUILT** | `invoices` table synced from Stripe (migration 011) |
+| InvoiceItems | **BUILT** | `invoice_items` table (migration 011) |
+| InvoiceTemplates | NOT BUILT | Tier 3 priority |
+| Payments (local records) | **BUILT** | `payments` table (migration 011) |
+| Refunds | NOT BUILT | Tier 3 priority |
+| AffiliateEarnings | **EXISTS** | `affiliate_commissions` table |
+| AffiliatePayoutItems (junction) | **BUILT** | `affiliate_payout_items` table (migration 011) |
+| InvoicePayments (partial payment junction) | NOT BUILT | Tier 3 priority |
 
 ### Reporting Tables
 

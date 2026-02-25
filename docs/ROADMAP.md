@@ -2,15 +2,15 @@
 
 > **Revision:** 1.6 | **Last Updated:** February 25, 2026 | **Created:** February 20, 2026
 
-> **IMPORTANT — READ THIS FILE AT THE START OF EVERY SESSION.** This is the single source of truth for the multi-week development plan. If agent memory resets, this file restores full context.
+> **IMPORTANT — READ `docs/PRODUCT_IDENTITY.md` AND `docs/FEATURE_INVENTORY.md` BEFORE THIS FILE.** Then read this roadmap. This is the execution tracker. If agent memory resets, the three docs together restore full context. Also read `docs/LESSONS_LEARNED.md` for anti-patterns.
 
 ---
 
-## ALL PHASES COMPLETE — Ready for Testing & Launch
+## Build Phases 1-8.5 COMPLETE — Sessions C-F Remain (~45 features)
 
-**Where we are:** ALL build phases (1-3.6, 5, 6, 7) are COMPLETE. Phase 4 (Mobile PWA) was deprioritized.
+**Where we are:** All numbered build phases (1-3.6, 5, 6, 7, 8, 8.5) are COMPLETE. Phase 4 (Mobile PWA) was deprioritized. Sessions A and B (Flywheel Accelerators) are done.
 
-**What's next:** Session A (Flywheel Accelerators) complete. Sessions B-F remain (~53 features). See Phase 8 below.
+**What's next:** Sessions C-F remain (~45 features of active feature development). These are NOT polish — they are new feature delivery with mandatory integration requirements. See Phase 8 section for details.
 
 **Summary of what's built:**
 - **Phases 1-3.6:** 42 PassivePost features + 32 affiliate enhancements + audit system
@@ -18,8 +18,8 @@
 - **Phase 6:** Dashboard UI layer (16 features across Admin/Affiliate/User dashboards)
 - **Phase 7:** AI & cross-dashboard features (6 features: AI post writer, AI coach, commission renewals, YouTube analytics, earnings charts/analytics suite, dashboard customization)
 
-**Migrations run on Supabase:** 001-013
-**Migrations needed on Supabase:** 012 (commission_renewals), 014 (analytics columns: country/device_type on referral_clicks, churned_at/churn_reason/last_active_at on affiliate_referrals)
+**Migrations run on Supabase:** 001-014 (all complete)
+**Migrations needed on Supabase:** None — all caught up
 
 **Launch target:** April 1, 2026
 
@@ -677,13 +677,48 @@ Key files for each phase, so agents can find relevant code quickly.
 - Dashboard wiring: FlywheelAnalyticsSection imported and rendered in Analytics tab of `src/app/affiliate/dashboard/page.tsx`
 - Seed data: Expanded `scripts/seed-affiliate-data.ts` with 12-month historical clicks (geo/device), churned referrals, trial referrals, 12-month commission history, 90-day connected platform metrics, goals, disputes, announcements, spotlight, short links, email preferences, asset usage
 
+**Integration Debt (Fix in next session that touches these systems):**
+1. Contests → AI Coach: AI coaching should reference active contests and affiliate's standing
+2. Milestones → Predictions: Predictive intelligence should mention upcoming milestone bonuses
+3. Leaderboard → AI Insights: AI should reference current leaderboard rank
+4. Content Intelligence → Marketing Toolkit: AI content recs should link to existing tools (Post Writer, Email Drafter, Deep Link Generator)
+5. Financial Overview → Payout Schedule: Should reuse payout schedule logic instead of calculating separately
+6. Weekly Digest → Contest Standings: Monday email should include contest positions
+7. Broadcasts → In-App Notifications: Broadcasts should create in-app notifications, not just emails
+
 **Remaining Sessions (C-F):**
+
 | Session | Tier | Features | Focus |
 |---------|------|----------|-------|
 | C | Retention Deepeners | ~15 | Tax center, earnings projections, payout history export, commission renewal polish |
 | D | Retention Deepeners cont. | ~10 | Resource center, knowledge base, swipe files, content calendar |
 | E | Delight Multipliers | ~12 | Challenges, directory, case studies, quiz, analyze-audience |
-| F | Polish & External | ~8 | Mobile responsive, OAuth integrations, final polish |
+| F | Polish & External + Integration Debt | ~8+7 | Mobile responsive, fix integration debt items 1-7, final polish |
+
+**Session Integration Requirements (MANDATORY — every feature must connect to existing systems):**
+
+**Session C Integration Map:**
+- Tax center → MUST use existing `affiliate_tax_info`, `affiliate_commissions`, `invoices`, `affiliate_payouts` tables
+- Earnings projections → MUST use existing `forecast/` API and `predictions/` API data, not create parallel logic
+- Payout history export → MUST use existing `ExportButton` CSV utility from flywheel-reports.tsx
+- Commission renewal polish → MUST extend existing `renewals/` API and renewal UI in dashboard
+
+**Session D Integration Map:**
+- Resource center → MUST extend existing `affiliate_assets` table and Assets tab, not create new asset system
+- Knowledge base → MUST connect to existing support ticket system for deflection tracking
+- Swipe files → MUST use existing email templates system and marketing toolkit components
+- Content calendar suggestions → MUST pull from existing content scheduling system (PassivePost social APIs)
+
+**Session E Integration Map:**
+- Challenges → MUST use existing `affiliate_contests` table, leaderboard API, and badges system
+- Directory → MUST pull from existing `affiliate_profiles`, `affiliate_tiers`, and leaderboard data
+- Case studies → MUST connect to existing testimonial system and success story submissions
+- Analyze-audience → MUST use existing connected analytics data and AI provider pattern
+
+**Session F Integration Map:**
+- Mobile responsive → Apply to existing dashboard components, not rebuild
+- Fix all 7 integration debt items listed above
+- Final polish → Audit all AI features for real data context (tiers, contests, milestones, leaderboard)
 
 ### Phase 8.5 (Flywheel Accelerators — Session B)
 - Connected Analytics API: `src/app/api/affiliate/analytics/connected-overview/route.ts` — merged platform metrics + affiliate data, cross-platform comparison (#193, #194)
