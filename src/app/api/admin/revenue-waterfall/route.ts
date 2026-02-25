@@ -26,12 +26,20 @@ export async function GET() {
     const isAdmin = userRole?.role === 'admin' || teamMember?.role === 'owner' || teamMember?.role === 'manager'
     if (!isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
 
-    const [subscriptionsRes, commissionsRes, payoutsRes, refundsRes] = await Promise.all([
-      admin.from('invoices').select('amount_cents, status, created_at').catch(() => ({ data: [] })),
-      admin.from('affiliate_commissions').select('commission_amount_cents, status, created_at').catch(() => ({ data: [] })),
-      admin.from('affiliate_payouts').select('total_amount_cents, status, created_at').catch(() => ({ data: [] })),
-      admin.from('invoices').select('amount_cents').eq('status', 'refunded').catch(() => ({ data: [] })),
-    ])
+    let subscriptionsRes: any = { data: [] }
+    let commissionsRes: any = { data: [] }
+    let payoutsRes: any = { data: [] }
+    let refundsRes: any = { data: [] }
+    try {
+      [subscriptionsRes, commissionsRes, payoutsRes, refundsRes] = await Promise.all([
+        admin.from('invoices').select('amount_cents, status, created_at'),
+        admin.from('affiliate_commissions').select('commission_amount_cents, status, created_at'),
+        admin.from('affiliate_payouts').select('total_amount_cents, status, created_at'),
+        admin.from('invoices').select('amount_cents').eq('status', 'refunded'),
+      ])
+    } catch {
+      // Tables may not exist yet — use empty defaults
+    }
 
     const invoices = (subscriptionsRes as any)?.data || []
     const commissions = (commissionsRes as any)?.data || []
