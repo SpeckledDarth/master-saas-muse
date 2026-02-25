@@ -15,28 +15,32 @@ export async function GET() {
     const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
     const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59).toISOString()
 
-    const [postsThisMonth, postsLastMonth, ticketsRes, activitiesRes] = await Promise.all([
-      admin.from('social_posts')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gte('created_at', thisMonthStart)
-        .catch(() => ({ count: 0 })),
-      admin.from('social_posts')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gte('created_at', lastMonthStart)
-        .lte('created_at', lastMonthEnd)
-        .catch(() => ({ count: 0 })),
-      admin.from('support_tickets')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .catch(() => ({ count: 0 })),
-      admin.from('activities')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gte('created_at', thisMonthStart)
-        .catch(() => ({ count: 0 })),
-    ])
+    let postsThisMonth: any = { count: 0 }
+    let postsLastMonth: any = { count: 0 }
+    let ticketsRes: any = { count: 0 }
+    let activitiesRes: any = { count: 0 }
+    try {
+      [postsThisMonth, postsLastMonth, ticketsRes, activitiesRes] = await Promise.all([
+        admin.from('social_posts')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gte('created_at', thisMonthStart),
+        admin.from('social_posts')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gte('created_at', lastMonthStart)
+          .lte('created_at', lastMonthEnd),
+        admin.from('support_tickets')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id),
+        admin.from('activities')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gte('created_at', thisMonthStart),
+      ])
+    } catch {
+      // Tables may not exist yet
+    }
 
     const postsThisMonthCount = (postsThisMonth as any)?.count || 0
     const postsLastMonthCount = (postsLastMonth as any)?.count || 0
