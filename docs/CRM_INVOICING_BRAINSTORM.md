@@ -1,823 +1,586 @@
-# CRM & Invoicing Brainstorm — PassivePost
+# PassivePost — Strategic Feature Pipeline
 
-> **Status:** Phases 5-8.5 ALL COMPLETE. ~45 features remain across Sessions C-F. This doc is the strategic 217-feature vision. Before building any feature from this list, check `docs/FEATURE_INVENTORY.md` to see if something similar already exists.
-> **Created:** February 24, 2026
-> **Last Updated:** February 25, 2026
-> **Related:** Read `docs/PRODUCT_IDENTITY.md` first to understand why the feature richness matters. Read `docs/FEATURE_INVENTORY.md` to see what's already built. Read `docs/LESSONS_LEARNED.md` for integration rules.
-
----
-
-## Related Documents
-
-| Document | Path | Relationship |
-|----------|------|-------------|
-| **Product Identity** | `docs/PRODUCT_IDENTITY.md` | **READ FIRST** — Defines what PassivePost is (closed-loop BI platform) and why feature richness is the moat |
-| **Feature Inventory** | `docs/FEATURE_INVENTORY.md` | **CHECK BEFORE BUILDING** — Complete inventory of everything already built, with files/tables/APIs |
-| **Lessons Learned** | `docs/LESSONS_LEARNED.md` | Anti-patterns and rules from past mistakes. Integration-first development rules. |
-| **Affiliate Enhancements** | `docs/musekit/AFFILIATE_ENHANCEMENTS.md` | Implementation specs (SQL schemas, API endpoints) for 32 affiliate features in Phase 3.6. |
-| **Affiliate System Guide** | `docs/musekit/AFFILIATE.md` | Guide to the existing affiliate system (Phases 3 + 3.5). |
-| **Development Roadmap** | `docs/ROADMAP.md` | Master execution tracker with integration requirements for remaining sessions. |
-
-**This document's role:** Strategic vision document with 217 features across all three dashboards (Admin, Affiliate, User). Covers CRM, invoicing, analytics, AI, and the dogfooding architecture. Use this for planning and prioritization. **Always cross-reference with FEATURE_INVENTORY.md** to avoid building features that already exist.
-
-### Feature Overlap Map
-
-Features in this document that have detailed implementation specs in `AFFILIATE_ENHANCEMENTS.md`:
-
-| Brainstorm # | Brainstorm Feature | Enhancements # | Status |
-|---|---|---|---|
-| #42 | Earnings milestones with real rewards | E1: Milestone Bonuses | Built (Sprint 1) |
-| #14 | Branded discount codes | E3: Discount Code System | Built (Sprint 1) |
-| #9 | "My Links" performance dashboard | E4: Deep Link Generator | Built (Sprint 2) |
-| #10 | Commission calculator widget | E5: Real-Time Earnings Widget | Built (Sprint 1) |
-| #17 | Performance comparison | E2: Affiliate Leaderboard | Built (Sprint 2) |
-| #15 | Real-time notifications when code used | E5 + existing notifications | Built |
-| #19 | Branded landing page | E23: Co-Branded Landing Pages | Not Started (Sprint 4) |
-| #20 | Affiliate onboarding checklist | E11: 7-Day Onboarding Sequence | Not Started (Sprint 3) |
-| #16 | Shareable earnings milestone badges | E31: Verified Earnings Badges | Not Started (Sprint 4) |
-| #39 | In-app messaging | E28: In-Dashboard Messaging | Not Started (Sprint 4) |
-| #41 | Knowledge base / FAQ | E12: Affiliate Resource Center | Not Started (Sprint 3) |
-| #18 | Seasonal/promo code boosts | E10: Quarterly Contests | Not Started (Sprint 3) |
-| #48 | Feedback/suggestion box | E29: Affiliate Satisfaction Surveys | Not Started (Sprint 4) |
-
-Features NOT in the Enhancements doc (new in this brainstorm): #1-8, #11-13, #21-38, #40, #42-217. These cover CRM, invoicing, user dashboard, admin CRM views, AI tools, analytics, and the unified BI vision — all part of the broader Phases 5-7 plan.
+> **What is this document?** This is the strategic feature pipeline for PassivePost, a closed-loop business intelligence platform for content creators. It contains 217 features across three dashboards (Admin, Affiliate, User) covering CRM, invoicing, analytics, AI tools, and the platform's unique dogfooding architecture. Features are organized by category with status markers showing what has been built, what is in progress, and what remains planned for future development.
+>
+> **How to read status markers:**
+> - **BUILT** = Feature is live and functional in the current platform
+> - **IN PROGRESS** = Feature is partially built or under active development
+> - **PLANNED** = Feature has been designed but not yet built
+>
+> **Related Documents:**
+> - [FEATURE_INVENTORY.md](./FEATURE_INVENTORY.md) — Complete inventory of everything built, with files, tables, and APIs
+> - [PRODUCT_IDENTITY.md](./PRODUCT_IDENTITY.md) — Defines what PassivePost is and why feature richness is the competitive moat
+> - [TESTING_PLAN.md](./TESTING_PLAN.md) — QA testing reference organized by dashboard area
 
 ---
 
-## MuseKit vs. PassivePost
+## Table of Contents
 
-- **MuseKit** = the reusable SaaS template/framework (auth, billing, admin, affiliate, teams, CRM, invoicing). The engine.
-- **PassivePost** = a specific product built ON MuseKit (content scheduling/flywheel SaaS). One deployment with its own repo, database, Stripe account, branding.
-- Every new SaaS product gets its own MuseKit deployment. Clean P&L, independent scaling, zero cross-pollination.
-- CRM/invoicing features go into MuseKit (the template), so every future product gets them too.
-
----
-
-## Core Problem Statement (HISTORICAL — Written Before Phase 5)
-
-> **NOTE:** This section was written before Phases 5-7 were built. Most gaps listed below have been filled. See `docs/FEATURE_INVENTORY.md` for current state. Kept for historical context only.
-
-~~Every dashboard (Admin, Affiliate, User) needs CRM-style account management and transaction-level financial visibility. The current codebase has affiliate-specific tables and APIs, but lacks:~~
-1. ~~A universal profile system~~ → **BUILT** (`user_profiles` table, migration 011)
-2. ~~Local invoicing/payment records~~ → **BUILT** (`invoices`, `invoice_items`, `payments` tables, migration 011)
-3. ~~Support ticket system~~ → **BUILT** (`tickets`, `ticket_comments` tables, migration 011)
-4. ~~Contract/agreement tracking~~ → **BUILT** (`contracts`, `contract_versions` tables, migration 011)
-5. ~~Admin CRM view~~ → **BUILT** (Admin CRM card with full affiliate profile view)
+1. [Platform Overview](#platform-overview)
+2. [What Has Been Built](#what-has-been-built)
+3. [Feature Pipeline by Category](#feature-pipeline-by-category)
+   - [Original Ideas (1-41)](#original-ideas-1-41)
+   - [Affiliate Delight & Relationship (42-64)](#affiliate-delight--relationship-42-64)
+   - [Marketing Resource Center (65-80)](#marketing-resource-center-65-80)
+   - [AI-Powered Tools (81-98)](#ai-powered-tools-81-98)
+   - [Surfacing Existing Admin Features (99-108)](#surfacing-existing-admin-features-99-108)
+   - [Invoicing & Financial Tools (109-130)](#invoicing--financial-tools-109-130)
+   - [Partnership-Level Features (131-142)](#partnership-level-features-131-142)
+   - [Commission Renewal & Customer Success (143-150)](#commission-renewal--customer-success-143-150)
+   - [Business Intelligence & Analytics (151-210)](#business-intelligence--analytics-151-210)
+   - [Unified BI Vision (211-217)](#unified-bi-vision-211-217)
+4. [Dogfooding Architecture](#the-dogfooding-architecture)
+5. [Feature Count Summary](#feature-count-summary)
 
 ---
 
-## Gap Analysis (HISTORICAL — Updated with Current Status)
+## Platform Overview
 
-### CRM Tables
+PassivePost is a content scheduling SaaS built on MuseKit, a reusable SaaS template. The platform has three user-facing dashboards:
 
-| Table | Status | Notes |
-|-------|--------|-------|
-| Users | **EXISTS** | Supabase auth.users + user_roles + team_members |
-| UserProfiles (universal) | **BUILT** | `user_profiles` table — universal for all user types (migration 011) |
-| Roles / UserRoles | **EXISTS** | `user_roles` exists, permissions hardcoded |
-| Permissions / RolePermissions | NOT BUILT | Hardcoded in code — Tier 3 priority |
-| Teams / Organizations | **EXISTS** | `organizations` table exists |
-| TeamMembers | **EXISTS** | `team_members` table exists |
-| Contacts (CRM leads/customers) | NOT BUILT | Tier 3 priority |
-| Accounts (companies) | NOT BUILT | Tier 3 priority |
-| Opportunities (deals/pipeline) | NOT BUILT | Tier 3 priority |
-| Activities (calls/meetings/tasks/notes) | **BUILT** | `activities` table (migration 011) |
-| Campaigns (marketing) | **BUILT** | `campaigns` table with UTM tracking (migration 011) |
-| Tickets (support) | **BUILT** | `tickets` + `ticket_comments` (migration 011) |
-| TicketComments | **BUILT** | Part of tickets system |
+- **Admin Dashboard** — Platform management, affiliate program administration, reporting, CRM
+- **Affiliate Dashboard** — Standalone dashboard for affiliate partners with 11+ navigation tabs
+- **User Dashboard** — Customer self-service for billing, support, security, and usage insights
 
-### Invoicing Tables
-
-| Table | Status | Notes |
-|-------|--------|-------|
-| Invoices | **BUILT** | `invoices` table synced from Stripe (migration 011) |
-| InvoiceItems | **BUILT** | `invoice_items` table (migration 011) |
-| InvoiceTemplates | NOT BUILT | Tier 3 priority |
-| Payments (local records) | **BUILT** | `payments` table (migration 011) |
-| Refunds | NOT BUILT | Tier 3 priority |
-| AffiliateEarnings | **EXISTS** | `affiliate_commissions` table |
-| AffiliatePayoutItems (junction) | **BUILT** | `affiliate_payout_items` table (migration 011) |
-| InvoicePayments (partial payment junction) | NOT BUILT | Tier 3 priority |
-
-### Reporting Tables
-
-| Table | Exists? | Notes |
-|-------|---------|-------|
-| AuditLogs | Yes | `affiliate_audit_log` + centralized audit system |
-| Metrics (pre-computed) | NO | Currently calculated on every page load |
+The relationship between MuseKit and PassivePost:
+- **MuseKit** = the reusable SaaS template/framework (auth, billing, admin, affiliate, teams, CRM, invoicing)
+- **PassivePost** = a specific product built ON MuseKit (content scheduling/flywheel SaaS)
+- Every new SaaS product gets its own MuseKit deployment with clean P&L and independent scaling
 
 ---
 
-## What Admin Can Create vs. What Affiliates Actually See
+## What Has Been Built
 
-| Admin Feature | Affiliate Can See? | How? | Gap |
-|---|---|---|---|
-| **Tiers** (Bronze → Gold → Platinum) | YES | Progress bar on Overview, current/next tier, perks | Could add tier comparison table, promotion celebrations |
-| **Milestones** (one-time bonuses) | YES | Cards with progress bars, checkmarks | Could add visual roadmap, countdown banners |
-| **Contests** (competitions) | YES | Active/upcoming on Overview with countdown | Could add live contest leaderboard, past results |
-| **Marketing Assets** (9 types) | YES | Marketing tab with copy/download | Could auto-insert affiliate's code/link, add collections |
-| **Broadcasts** (email to affiliates) | PARTIAL | Email only, NOT in-app | Should ALSO create in-app notification |
-| **Discount Codes** | PARTIAL | Can request codes | Can't customize code name (branded codes) |
-| **Program Settings** | NO | Only sees own locked rate | Should show "My Terms" contract view |
-| **Health Dashboard** | NO | Admin only | Makes sense |
-| **Networks** | NO | Admin only | Makes sense |
-| **Payout Runs** | NO | Sees individual payouts only | Could show payout schedule + in-progress notifications |
-| **Fraud Flags** | NO | Admin only | Makes sense |
-| **Audit Log** | NO | Admin only | Makes sense |
+The following major systems are fully built and operational. See [FEATURE_INVENTORY.md](./FEATURE_INVENTORY.md) for detailed file paths, database tables, and API routes.
 
----
-
-## Build Priority Tiers
-
-### Tier 1: Must-Have (Makes dashboards functional)
-- Universal `user_profiles` table (replaces affiliate-only profiles)
-- `invoices` + `invoice_items` (local records of Stripe transactions)
-- `payments` table (local payment records synced from Stripe)
-- `affiliate_payout_items` junction (which earnings are in which payout)
-- Expand admin affiliate detail view to show full CRM data
-- Contract/agreement system
-- Branded discount codes for affiliates
-
-### Tier 2: Should-Have (Makes it a real SaaS template)
-- `tickets` + `ticket_comments` (basic support system)
-- `activities` table (log calls, notes, tasks)
-- `contacts` table (CRM contact records)
-- In-app messaging between affiliate and admin
-
-### Tier 3: Nice-to-Have (Can be added later)
-- `accounts` / `opportunities` (full sales pipeline)
-- `campaigns` / `campaign_contacts` (marketing automation)
-- `permissions` / `role_permissions` (database-driven RBAC)
-- `invoice_templates`, `payment_gateways`, `refunds`
-- Pre-computed `metrics` table
+| System | Status | Key Capabilities |
+|--------|--------|-----------------|
+| Authentication & User Management | **BUILT** | Email/password, OAuth social login, SSO/SAML, role-based access, user impersonation |
+| Billing & Subscriptions | **BUILT** | Stripe checkout, subscription management, feature gating, local invoice records, branded receipts |
+| Affiliate Program (Core) | **BUILT** | Public signup, admin review, standalone dashboard, referral links, cookie attribution, commission tracking, rate lock-in, fraud detection |
+| Tiers, Gamification & Challenges | **BUILT** | Performance tiers, milestone bonuses, contests, leaderboards, badges, earnings goals, weekly challenges |
+| Marketing Toolkit | **BUILT** | Deep links, QR codes, link shortener, media kit, sharing cards, co-branded pages, discount codes, email templates, swipe files, knowledge base, promotional calendar |
+| Communication & Engagement | **BUILT** | Broadcasts, in-app messaging, drip sequences, announcements, spotlight, what's new digest, surveys, testimonials |
+| Payouts & Financial Tools | **BUILT** | Payout lifecycle, batch processing, tax info collection, tax summary, 1099 export, earnings statements, commission renewals, earnings forecast |
+| Analytics & Intelligence | **BUILT** | Churn, cohort, revenue, traffic, AI analytics, connected analytics, content intelligence, predictions, custom reports, heatmap, sparklines |
+| AI-Powered Tools (14 features) | **BUILT** | Post writer, email drafter, blog outline, video script, objection handler, coach, ad copy, pitch customizer, audience content, promo ideas, onboarding advisor, conversion optimizer, promotion quiz, audience analyzer |
+| CRM & Support | **BUILT** | Universal profiles, tickets, activity log, campaigns, contracts, admin CRM card, quick notes, health scores |
+| Content Scheduling | **BUILT** | 7-phase flywheel, 8 social + 2 blog platforms, AI grader, topic fatigue, content DNA, calendar autopilot, recycling, streaks, approval portal, ROI calculator |
+| Email & Notifications | **BUILT** | Transactional emails, editable templates, drip sequences, weekly digests, trial alerts, notification bell, preferences center |
+| Admin Dashboard | **BUILT** | Setup wizard, user management, revenue attribution, revenue waterfall, scheduled reports, metrics alerts, audit logging, queue management |
+| User Dashboard | **BUILT** | Invoice history, subscription management, support tickets, account security, usage insights, affiliate invitation, email preferences |
+| Social Proof | **BUILT** | Case study library, public affiliate directory, AI case study drafting |
 
 ---
 
-## Brainstorm Features — Original Ideas (1-41)
+## Feature Pipeline by Category
 
-### For Everyone (All User Types)
+### Original Ideas (1-41)
 
-1. **Unified profile with completion meter** — "Your profile is 70% complete" with a progress ring. Nudges to add phone, address, avatar. Same component across all dashboards.
+#### For Everyone (All User Types)
 
-2. **Activity timeline** — Chronological feed of all account events. "Commission earned," "Payout processed," "Invoice paid," "Password changed." One component, filtered by role.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 1 | Unified profile with completion meter | **BUILT** | "Your profile is 70% complete" with a progress ring. Nudges to add phone, address, avatar. Same component across all dashboards. |
+| 2 | Activity timeline | **BUILT** | Chronological feed of all account events. "Commission earned," "Payout processed," "Invoice paid," "Password changed." One component, filtered by role. |
+| 3 | Email preferences center | **BUILT** | Users choose what emails they get (weekly digest, payout notifications, announcements). |
+| 4 | Export anything to CSV | **BUILT** | One shared export utility. Any table view (commissions, payments, referrals, invoices) gets a download button. |
+| 5 | Dark mode | **BUILT** | Works across all dashboards. |
 
-3. **Email preferences center** — Users choose what emails they get (weekly digest, payout notifications, announcements). Simple preferences table.
+#### For Affiliates
 
-4. **Export anything to CSV** — One shared export utility. Any table view (commissions, payments, referrals, invoices) gets a download button.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 6 | Downloadable tax summary (1099-ready PDF) | **BUILT** | Year filter, totals, payout history. Tax center panel with estimated withholding and monthly breakdown. |
+| 7 | Monthly earnings statement (emailed) | **BUILT** | Automated email on 1st of each month with formatted earnings summary. |
+| 8 | Payout receipt emails with line items | **BUILT** | When admin processes payout, affiliate gets email receipt showing which commissions were included. |
+| 9 | "My Links" performance dashboard | **BUILT** | Deep link generator with UTM parameters and source-level tracking. Click-through rates per link over time. |
+| 10 | Commission calculator widget | **BUILT** | Commission split estimator showing how earnings are split across tiers, products, and time periods. |
+| 11 | Referral sharing cards | **BUILT** | Pre-designed social media images with referral code baked in. Uses existing assets system. |
+| 12 | Pending payout tracker | **BUILT** | Payout schedule widget with next payout date, minimum threshold progress, and pending balance. |
+| 13 | Contract/agreement system | **BUILT** | Affiliates view their locked-in terms. Contract creation with signing workflow and version history. |
+| 14 | Branded discount codes | **BUILT** | 6 discount types including percentage, fixed, free trial, and bundle. Synced with Stripe. Affiliate can customize code name. |
+| 15 | Real-time notifications when code used | **BUILT** | In-app notification bell with unread badges visible on every page. |
+| 16 | Shareable earnings milestone badges | **BUILT** | Visual badges earned for accomplishments ("First Sale", "Top 10%", "100 Referrals"). Displayed on profile. |
+| 17 | Performance comparison | **BUILT** | Leaderboards ranked by referrals, earnings, or conversion rate. Percentile benchmarks showing where affiliate ranks. |
+| 18 | Seasonal/promo code boosts | **BUILT** | Contests with time-bound competitions, prizes, and countdown timers. Promotional calendar with linked assets. |
+| 19 | Branded landing page | **BUILT** | Co-branded landing pages at `/partner/[slug]` featuring affiliate branding alongside the product. |
+| 20 | Affiliate onboarding checklist | **BUILT** | Drip sequences with 3-email onboarding series plus AI onboarding advisor for first-week guidance. |
 
-5. **Dark mode** — Already works across all dashboards.
+#### For Product Users (Customers)
 
-### For Affiliates
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 21 | Invoice history page | **BUILT** | List of all invoices with status filters, pagination, detail view, and PDF download. |
+| 22 | Subscription management self-service | **BUILT** | Shows current plan, billing cycle, and status with one-click link to Stripe customer portal. |
+| 23 | Usage/feature access summary | **BUILT** | Feature gating by plan with upgrade prompts on premium features. |
+| 24 | Support ticket submission | **BUILT** | Full ticket system with Open, In Progress, Resolved, Closed workflow. Comments thread for back-and-forth. |
+| 25 | Account security page | **BUILT** | Password change, active session management, and 2FA preparation. |
+| 26 | Referral program invitation | **BUILT** | "Earn 30% commission" card on the billing page linking to the affiliate application. |
+| 27 | Payment receipt emails with branding | **BUILT** | Branded receipt emails sent after successful payments through Stripe webhooks. |
+| 28 | Upcoming billing reminder | **BUILT** | Trial expiry alerts when free trials are about to end. |
+| 29 | Usage insights | **BUILT** | Activity metrics like "You published 12 posts this month" with trends. |
 
-6. **Downloadable tax summary (1099-ready PDF)** — Button already exists in dashboard. Needs real invoice/payment data to populate. Year filter, totals, payout history.
+#### For Admins
 
-7. **Monthly earnings statement (emailed)** — Automated email on 1st of each month: "Here's what you earned in January." Pulls from commissions + payouts.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 30 | Affiliate "at a glance" CRM card | **BUILT** | Click affiliate name, see full profile drawer with earnings, payouts, tickets, activities, and notes. |
+| 31 | Bulk payout processing with receipts | **BUILT** | Batch processing with auto receipt emails when batch is processed. |
+| 32 | Revenue attribution report | **BUILT** | Shows how much revenue came from affiliate referrals vs direct signups with visual charts. |
+| 33 | Scheduled email reports | **BUILT** | Automated weekly revenue and activity digest emails sent to admins. |
+| 34 | Quick notes on any account | **BUILT** | Internal notes on any account, visible only to administrators. |
+| 35 | Affiliate health score | **BUILT** | Auto-calculated green/yellow/red indicators based on activity recency, conversion rate, and fraud score. |
+| 36 | Revenue waterfall | **BUILT** | Visual waterfall chart showing revenue flow from gross to net after commissions, refunds, and fees. |
+| 37 | One-click impersonation from CRM | **BUILT** | User impersonation allowing admins to view the platform as any user. |
+| 38 | Automated fraud flags with context | **BUILT** | Fraud detection with automated scoring for suspicious patterns. Flags visible to admins. |
 
-8. **Payout receipt emails with line items** — When admin processes payout, affiliate gets email receipt showing which commissions were included. Requires `affiliate_payout_items` junction.
+#### Cross-Dashboard
 
-9. **"My Links" performance dashboard** — Already partially built. With activities table, can show click-through rates per link over time.
-
-10. **Commission calculator widget** — "If you refer X users at $Y/month, you'd earn $Z/year." Pure frontend math, no data needed.
-
-11. **Referral sharing cards** — Pre-designed social media images with referral code baked in. Uses existing assets system.
-
-12. **Pending payout tracker** — "You've earned $X. Need $Y more to hit minimum. At your pace, you'll hit it by [date]." Forecast API already does similar math.
-
-13. **Contract/agreement system** — Affiliates can view their locked-in terms (e.g., 30% residual for 12 months). Even if admin changes program terms later, the affiliate's locked terms are honored and visible. Both sides have a record. Admin can see all active agreements. History of term changes preserved.
-
-14. **Branded discount codes** — Admin creates discount code config (discount %, duration, etc.), but affiliate can customize the code name. Example: YouTuber Alex Steele changes code from "GnYY67h" to "STEELE40" for 40% off. Makes affiliates feel like partners, not numbers.
-
-15. **Real-time notifications when someone uses your code** — "Someone just signed up with STEELE40!" Push notification or email. Trigger on existing referral tracking.
-
-16. **Shareable earnings milestone badges** — "I've earned $1,000 with PassivePost!" — downloadable/shareable image for social proof.
-
-17. **Performance comparison** — "You're in the top 15% of affiliates this month." Percentile from leaderboard data.
-
-18. **Seasonal/promo code boosts** — Admin creates limited-time "double commission" period. Affiliates see banner: "2X commissions through March 31!"
-
-19. **Branded landing page** — Each affiliate gets customizable page at `/ref/steele40`. Shows their name, short pitch, and discount. Feels like THEIR promotion.
-
-20. **Affiliate onboarding checklist** — "Set up profile, customize discount code, share first link, earn first commission." Gamified persistent progress.
-
-### For Product Users (Customers)
-
-21. **Invoice history page** — Every payment, downloadable as PDF. Stripe data synced locally.
-
-22. **Subscription management self-service** — Already via Stripe portal, but add local "billing" tab showing plan, next billing date, payment method, past invoices.
-
-23. **Usage/feature access summary** — "Your plan includes X, Y, Z. Upgrade to get A, B, C." Feature gating already exists — this is a view of it.
-
-24. **Support ticket submission** — Simple form: subject, description, priority. User sees ticket history and status.
-
-25. **Account security page** — Change password, active sessions, 2FA (future). Supabase auth features in clean UI.
-
-26. **Referral program invitation** — Subtle prompt: "Love PassivePost? Become an affiliate and earn 30%." One-click to apply since many customers become affiliates.
-
-27. **Payment receipt emails with branding** — Branded receipt on payment, not just Stripe default. Uses invoice table + email templates.
-
-28. **Upcoming billing reminder** — "Your next payment of $X is March 1." 3-day advance email. Reduces failed payments.
-
-29. **Usage insights** — "You published 12 posts this month, up from 8 last month." Simple product usage stats.
-
-### For Admins
-
-30. **Affiliate "at a glance" CRM card** — Click affiliate name, see EVERYTHING: contact info, earnings, payouts, tickets, activity log, notes. One page.
-
-31. **Bulk payout processing with receipts** — Payout batches table exists. Add auto receipt emails when batch processed.
-
-32. **Revenue attribution report** — "How much revenue from affiliates vs. direct?" Pulls from invoices + referrals.
-
-33. **Scheduled email reports** — Weekly revenue summary, affiliate activity digest, ticket status. Email + queue infrastructure exists.
-
-34. **Quick notes on any account** — Admin adds internal notes to any user/affiliate record. Simple activities/notes entry.
-
-35. **Affiliate health score** — Auto-calculated from: profile completeness, recent activity, conversion rate, support tickets. Red/yellow/green indicator. Admin instantly sees who needs attention.
-
-36. **Revenue waterfall** — Visual: "Total revenue → Affiliate commissions → Net revenue." Chart showing program cost vs. value.
-
-37. **One-click impersonation from CRM** — Impersonation exists, but add single button on affiliate detail: "See what Alex sees."
-
-38. **Automated fraud flags with context** — Fraud flags exist on referrals. Surface as actionable alerts: "Same IP as 3 other signups." Admin can dismiss or investigate.
-
-### Cross-Dashboard
-
-39. **In-app messaging** — Simple message thread between affiliate and admin. Conversation log on the account. Both sides see it. Not a full chat system.
-
-40. **Announcement banner system** — Admin posts announcement, shows as dismissible banner on all dashboards. Uses existing notification system.
-
-41. **Knowledge base / FAQ** — Static searchable help pages. Admin writes, everyone searches. Reduces support load.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 39 | In-app messaging | **BUILT** | Two-way message threads between admin and individual affiliates with unread indicators. |
+| 40 | Announcement banner system | **BUILT** | Admin-created news items that appear on the affiliate dashboard. |
+| 41 | Knowledge base / FAQ | **BUILT** | Searchable help articles organized by category with view tracking. Admin creates and manages content. |
 
 ---
 
-## Brainstorm Features — Affiliate Delight & Relationship (42-58)
+### Affiliate Delight & Relationship (42-64)
 
-### Earnings & Money Features
+#### Earnings & Money Features
 
-42. **Earnings milestones with real rewards** — Not just badges. "Hit $500? Your rate goes from 30% to 35%." Tier system already exists — add celebration animations and congratulations emails on tier jumps.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 42 | Earnings milestones with real rewards | **BUILT** | Tier system with automatic rate increases. Milestone bonuses as one-time cash awards at referral thresholds. |
+| 43 | Earnings goal setter | **BUILT** | Affiliates set personal monthly targets with visual progress bars and pace indicators. |
+| 44 | Commission split estimator | **BUILT** | Calculator showing long-term value of each referral and how earnings split across tiers and products. |
+| 45 | "Fastest to $X" recognition | **BUILT** | Speed-based awards for affiliates who reach earnings milestones fastest. |
 
-43. **Earnings goal setter** — Affiliate sets personal monthly goal: "$1,000 this month." Dashboard shows progress bar. "You're 67% to your goal with 12 days left."
+#### Relationship & Communication
 
-44. **Commission split estimator** — "If this customer stays 12 months at $49/month, you'll earn $176.40 total." Shows long-term value of each referral. Makes affiliates think about retention.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 46 | Dedicated affiliate manager contact | PLANNED | Show a face and name on dashboard. "Your affiliate manager: Sarah." Makes it personal, not automated. |
+| 47 | Quarterly performance review email | **BUILT** | Weekly and monthly performance emails already deliver detailed summaries. Quarterly is covered by the monthly system. |
+| 48 | Feedback/suggestion box | **BUILT** | Satisfaction surveys with star ratings and open feedback. Configurable frequency. |
+| 49 | Birthday/anniversary recognition | **BUILT** | Anniversary recognition system with automated emails. |
 
-45. **"Fastest to $X" recognition** — "You hit $1,000 faster than 90% of affiliates." One-time recognition moment. Shareable.
+#### Tools That Save Them Time
 
-### Relationship & Communication
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 50 | Link shortener built in | **BUILT** | Clean short links. Professional-looking URLs that get more clicks. |
+| 51 | QR code with branding | **BUILT** | Branded QR codes containing the affiliate's referral link. Downloadable for print materials. |
+| 52 | Auto-generated "media kit" page | **BUILT** | One-click professional partner page showcasing brand, stats, and promotional materials. |
+| 53 | UTM builder with presets | **BUILT** | Deep link generator with source tags and UTM parameters for targeted promotion. |
 
-46. **Dedicated affiliate manager contact** — Show a face and name on dashboard. "Your affiliate manager: Sarah." Makes it personal, not automated.
+#### Education & Enablement
 
-47. **Quarterly performance review email** — "Here's your Q1 summary: 45 referrals, $3,200 earned, best month was March." Professional, partner-level communication.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 54 | "How top affiliates promote" guide | **BUILT** | Program intelligence with anonymized aggregate data pushed as coaching tips. |
+| 55 | Video tutorials library | PLANNED | Short walkthroughs for common promotion tasks. Admin uploads, affiliates watch. |
+| 56 | Promotion idea generator | **BUILT** | AI promo ideas generator based on trends, holidays, and seasonal opportunities. |
+| 57 | Monthly "what's new" digest | **BUILT** | Feature update notifications for affiliates when new tools or improvements are released. |
 
-48. **Feedback/suggestion box** — "What would help you promote better?" Simple text form. Admin sees submissions. Affiliates feel heard.
+#### Social & Community
 
-49. **Birthday/anniversary recognition** — "Happy 1-year anniversary! You've earned $8,400 and referred 112 customers." Automated email, zero effort, huge goodwill.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 58 | Affiliate directory (opt-in) | **BUILT** | Public page at `/partners` listing affiliates with tier badges, bio, and social links. Searchable and filterable. |
+| 59 | Referral of the month spotlight | **BUILT** | Monthly featured affiliate recognition displayed on the dashboard. |
+| 60 | Affiliate-to-affiliate referrals | **BUILT** | Second-tier commissions — affiliates earn a percentage when recruited affiliates generate sales. |
 
-### Tools That Save Them Time
+#### Smart Notifications That Drive Action
 
-50. **Link shortener built in** — Clean short links: `ppost.co/steele`. Looks better in videos and social posts. We control the redirect.
-
-51. **QR code with branding** — QR codes exist. Add PassivePost logo in center and affiliate's discount code below. Downloadable PNG. Perfect for videos, business cards, flyers.
-
-52. **Auto-generated "media kit" page** — One-click page affiliate shares with sponsors: "I'm an official PassivePost partner. Stats, discount code, what PassivePost does." Professional credibility.
-
-53. **UTM builder with presets** — "YouTube video," "Instagram bio," "Email newsletter," "Blog post" — one click, link tagged with right UTM params. No manual entry.
-
-### Education & Enablement
-
-54. **"How top affiliates promote" guide** — Anonymized tips from best performers. "Affiliates who post 3x/week earn 4x more." Data-driven advice from real program data.
-
-55. **Video tutorials library** — Short walkthroughs: "How to add your link to YouTube description," "How to write a promotional email." Admin uploads, affiliates binge.
-
-56. **Promotion idea generator** — AI-powered. "Give me 5 ways to promote PassivePost to my audience of [fitness coaches]." Personalized to their niche.
-
-57. **Monthly "what's new" digest** — When new features ship, affiliates get digest: "PassivePost launched [feature]. Here's how to pitch it." Fresh talking points.
-
-### Social & Community
-
-58. **Affiliate directory (opt-in)** — Public page listing top affiliates with links to their content. "Our Partners." Social proof for you, exposure for them.
-
-59. **Referral of the month spotlight** — Admin picks one affiliate monthly to feature. Story, stats (with permission), tips. On dashboard and maybe public site.
-
-60. **Affiliate-to-affiliate referrals** — "Know a great affiliate? Refer them, earn a bonus when they hit $100." Grows affiliate program through word of mouth.
-
-### Smart Notifications That Drive Action
-
-61. **"You're close" nudges** — "2 referrals away from next tier!" or "3 more conversions to unlock Gold badge." Timely, specific, actionable.
-
-62. **Dormancy re-engagement with carrot** — Already have re-engagement system. Add incentive: "2x commission boost for the next 7 days to get you back."
-
-63. **Trial expiry alerts** — "Your referral John is on day 12 of 14 trial. Hasn't upgraded yet." Gives affiliate a chance to follow up personally.
-
-64. **Weekly performance snapshot** — Every Monday: "Last week: 12 clicks, 3 signups, $45 earned. Best day was Thursday." Quick, digestible, keeps them engaged.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 61 | "You're close" nudges | **BUILT** | Predictive intelligence with tier trajectory forecasting and milestone proximity alerts. |
+| 62 | Dormancy re-engagement with carrot | **BUILT** | Re-engagement system with configurable dormancy thresholds. |
+| 63 | Trial expiry alerts | **BUILT** | Automated alerts when free trials are about to end. |
+| 64 | Weekly performance snapshot | **BUILT** | Automated weekly email summarizing clicks, signups, and earnings. |
 
 ---
 
-## Brainstorm Features — Marketing Resource Center (65-80)
+### Marketing Resource Center (65-80)
 
-### Make the Assets Library a Toolkit
+#### Make the Assets Library a Toolkit
 
-65. **"What's working" badges on assets** — Tag most-used or highest-converting assets. "Top Performer" badge. Affiliates gravitate toward proven materials.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 65 | "What's working" badges on assets | **BUILT** | Top performer badges on assets that have driven the most conversions. |
+| 66 | Asset usage tracking | **BUILT** | Tracks downloads, copies, and views for every marketing asset. Shows which assets perform best. |
+| 67 | Categorized asset library with filters | **BUILT** | 9 asset types organized by purpose with the marketing toolkit. |
+| 68 | Copy-paste social captions | **BUILT** | Pre-written social media posts with affiliate's referral link auto-inserted. One-click copy. |
+| 69 | Customizable templates | **BUILT** | Email templates with merge tags for personalization ({affiliate_name}, {referral_link}, {discount_code}). |
 
-66. **Asset usage tracking** — Log when affiliate downloads/copies asset. Show admins most-used assets. Show affiliates: "You've used 4 of 12 available assets."
+#### Case Studies & Social Proof
 
-67. **Categorized asset library with filters** — Organize by purpose (social, email, website), format (image, text, video), campaign/season. "Holiday 2026 Promo Kit" as grouped collection.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 70 | Case study library as rich cards | **BUILT** | Rich case study cards with headline, key metric, customer quote, and share button. AI can auto-generate drafts. |
+| 71 | Success story submissions | **BUILT** | Affiliates submit their own success stories. Admin approves and publishes as testimonials. |
+| 72 | Testimonial clips | **BUILT** | Testimonial management system with admin moderation and display on landing pages. |
 
-68. **Copy-paste social captions** — Pre-written post text with affiliate's referral link auto-inserted. One-click copy. "Share on Twitter" opens compose window with text pre-filled. Branded code auto-inserted.
+#### Email & Content Tools
 
-69. **Customizable templates** — Email templates where affiliate swaps in their name, story, discount code before copying. "Hi, I'm Alex Steele and I use PassivePost for..."
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 73 | Email swipe file library | **BUILT** | Pre-written email sequences with merge tags that auto-fill with affiliate info. |
+| 74 | Content calendar suggestions | **BUILT** | Promotional calendar with admin-set upcoming campaigns, countdown timers, and linked assets. |
 
-### Case Studies & Social Proof
+#### Gamified Engagement
 
-70. **Case study library as rich cards** — Not just PDF downloads. Show headline, key metric, customer quote, "Share This Story" button.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 75 | Weekly challenges | **BUILT** | Micro-challenges with specific tasks, progress bars, badge rewards, and countdown timers. |
+| 76 | New asset notifications | **BUILT** | Notification system alerts when new content is available. |
+| 77 | "Starter Kit" for new affiliates | **BUILT** | Curated bundle of essential materials for new affiliates with quick-start guide. |
+| 78 | Promotional calendar with countdown timers | **BUILT** | Admin-set upcoming campaigns with countdowns, content suggestions, and linked assets. |
 
-71. **Success story submissions** — Affiliates submit their own success stories. "I made $2,000 in my first month." Admin approves and publishes. Social proof for other affiliates.
+#### Analytics on Assets
 
-72. **Testimonial clips** — Short video testimonials or quote cards affiliates can embed or share. Admin uploads, affiliate grabs.
-
-### Email & Content Tools
-
-73. **Email swipe file library** — Pre-written email sequences: "First introduction," "Follow-up after trial," "Limited time offer." Affiliate copies, personalizes, sends. Discount code auto-inserted.
-
-74. **Content calendar suggestions** — "This week, post about [topic]. Here's a template." Tied to seasonal promotions or new features. Admin sets calendar, affiliates see suggestions.
-
-### Gamified Engagement
-
-75. **Weekly challenges** — "Share 3 posts this week using a new asset, earn a bonus badge." Tracked via asset usage.
-
-76. **New asset notifications** — When admin uploads materials, affiliates get notification: "New swipe file added: Holiday Promo Kit." Drives them back to dashboard.
-
-77. **"Starter Kit" for new affiliates** — Curated bundle of 5 best assets for getting started. Shown during onboarding. "Step 1: Grab your starter kit."
-
-78. **Promotional calendar with countdown timers** — "Black Friday promo starts in 12 days. Here are your assets." Creates urgency, gives prep time.
-
-### Analytics on Assets
-
-79. **"Which asset drove my conversions?"** — Track which asset affiliate used before referral converted. "Your top asset was Instagram banner — 8 conversions." Powerful.
-
-80. **A/B guidance** — "Affiliates who use email templates convert 3x better than link-only." Data-driven nudges to use more of the toolkit.
-
----
-
-## Brainstorm Features — AI-Powered Tools (81-98)
-
-### Content Generation
-
-81. **AI Social Post Writer** — Pick platform (Twitter/LinkedIn/Instagram/Facebook), tone (casual/professional/urgent/storytelling), describe audience. AI generates 3 post variations with discount code and referral link embedded. One-click copy.
-
-82. **AI Email Draft Generator** — "Write an email to my subscribers introducing PassivePost." Input: audience type, length, angle (pain point/benefit/urgency). AI generates complete email with branded code and link.
-
-83. **AI Blog Post Outline** — "Give me a blog outline about why creators need scheduling tools." Generates headings, key points, CTA with affiliate link.
-
-84. **AI Video Script Generator** — "Write a 60-second YouTube script reviewing PassivePost." Includes hook, features to mention, CTA with discount code. Perfect for YouTubers.
-
-85. **AI Ad Copy Generator** — Short-form for paid ads. "Write a Facebook ad targeting small business owners." Headline, body, CTA variations.
-
-### Personalization & Audience Targeting
-
-86. **Audience-aware content** — Affiliate sets niche in profile (e.g., "fitness coaches"). All AI content auto-tailors: "PassivePost helps fitness coaches schedule content while they focus on clients."
-
-87. **AI pitch customizer** — Paste potential customer's website/social URL. AI analyzes and generates personalized pitch. Like having a sales coach.
-
-88. **Objection handler** — "My audience says scheduling tools are too expensive." AI generates 3 responses using PassivePost's pricing and features. Common objections pre-loaded, custom ones accepted.
-
-### Performance Intelligence
-
-89. **AI Weekly Coach** — Every Monday, AI analyzes performance data and sends personalized tip: "Your LinkedIn posts convert 4x better than Twitter. Double down on LinkedIn this week."
-
-90. **AI-suggested best time to post** — Based on when referral clicks happen most. "Your audience clicks most 9-11am EST on weekdays."
-
-91. **AI conversion optimizer** — "3 of your last 10 referrals signed up but didn't convert. Here are talking points for follow-up."
-
-92. **"Why they didn't convert" insights** — When trial expires without converting, AI suggests reasons and gives follow-up template. "They never connected a social account. Try this message..."
-
-### Smart Automation
-
-93. **Auto-generated promotional calendar** — AI creates month-long posting plan based on upcoming features, seasonal events, audience, past performance. "Week 1: Feature spotlight. Week 2: Success story. Week 3: Discount push."
-
-94. **AI hashtag suggestions** — For each generated post, relevant hashtags for the platform. Already in bonus features list.
-
-95. **Smart notification copywriting** — System notifications are AI-polished to feel warm and motivating, not robotic.
-
-### Affiliate Onboarding AI
-
-96. **AI onboarding advisor** — First week guided assistant: "I see you haven't set up your branded code. Want me to suggest names based on your name and niche?"
-
-97. **"Analyze my audience" tool** — Input social handle or website URL. AI summarizes: "Your audience is 25-35, interested in photography. Top 3 features to highlight for them."
-
-98. **Promotion strategy quiz** — Short interactive quiz: "How do you reach your audience? What's your content style?" AI generates personalized promotion playbook. "You're a Video-First Promoter. Here's your 30-day plan."
-
-### AI Differentiation
-
-**Why this is better than "just use ChatGPT":**
-- Affiliate's discount code auto-inserted in every generation
-- Referral link auto-inserted
-- Audience/niche remembered from profile
-- Performance data informs suggestions
-- PassivePost features and pricing baked into every prompt
-- No context-setting needed — the AI just knows
-
-### AI Cost Control
-- Daily generation limit by tier (Free: 5/day, Gold: 20/day, Platinum: unlimited)
-- Cache popular prompts — serve cached variations for common requests
-- Short completions — social posts and ad copy cost pennies per generation
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 79 | "Which asset drove my conversions?" | **BUILT** | Asset analytics connecting to commission data to show ROI per asset. |
+| 80 | A/B guidance | **BUILT** | Content intelligence analyzing promotion frequency and content type performance correlation with sales. |
 
 ---
 
-## Brainstorm Features — Surfacing Existing Admin Features (99-108)
+### AI-Powered Tools (81-98)
 
-These require NO new tables — just wiring up existing systems.
+#### Content Generation
 
-99. **Broadcasts → also in-app notification** — When admin sends broadcast email, also create notification record for each recipient. Nearly free — one line in broadcast send logic.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 81 | AI Social Post Writer | **BUILT** | Generates platform-specific posts (7 platforms, 5 tones) with referral link automatically embedded. |
+| 82 | AI Email Draft Generator | **BUILT** | Creates professional email sequences for promoting the product to the affiliate's audience. |
+| 83 | AI Blog Post Outline | **BUILT** | Creates structured blog post outlines with SEO-friendly headings and talking points. |
+| 84 | AI Video Script Generator | **BUILT** | Produces video scripts tailored to the platform (YouTube, TikTok, Instagram Reels). |
+| 85 | AI Ad Copy Generator | **BUILT** | Creates promotional ad text for paid advertising campaigns. |
 
-100. **New asset upload → trigger affiliate notification** — "New marketing asset available: Spring Promo Banner." Drives affiliates back to toolkit.
+#### Personalization & Audience Targeting
 
-101. **Auto-insert affiliate code/link into text assets** — Before affiliate copies email template or social post, auto-replace placeholders with their specific code and link. Zero manual work.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 86 | Audience-aware content | **BUILT** | AI audience content suggests ideas matched to affiliate's specific audience demographics and interests. |
+| 87 | AI pitch customizer | **BUILT** | Generates tailored pitches for different audience types (developers, marketers, small business owners). |
+| 88 | Objection handler | **BUILT** | Generates responses to common objections using PassivePost's pricing and features. |
 
-102. **Tier promotion celebration** — Confetti animation + congratulations card when affiliate reaches new tier. Automated email: "You hit Gold! Commission now 35%."
+#### Performance Intelligence
 
-103. **Live contest leaderboard** — During active contest, show real-time ranking. "You're 3rd. 2 more referrals to take 2nd." Leaderboard API already exists.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 89 | AI Weekly Coach | **BUILT** | Personalized performance tips based on actual data: commissions, tier progress, contests, connected platform metrics, leaderboard position. |
+| 90 | AI-suggested best time to post | **BUILT** | AI posting strategy recommends best times based on engagement patterns and promotional calendar events. |
+| 91 | AI conversion optimizer | **BUILT** | Analyzes conversion funnel and suggests specific improvements to increase conversion rate. |
+| 92 | AI-powered analytics dashboard | **BUILT** | Six AI-generated insight types: conversion drops, content recommendations, channel optimization, audience fit, seasonal trends, competitive tips. |
 
-104. **"My Terms" formal contract view** — Show locked-in agreement: commission rate, duration, cookie days, minimum payout. Data already in referral_links table.
+#### Smart Automation
 
-105. **Terms changelog** — "Program default changed from 30% to 25% on March 1. Your locked rate of 30% is unaffected." Builds massive trust.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 93 | Auto-generated promotional calendar | **BUILT** | Calendar autopilot and promotional calendar system with content suggestions. |
+| 94 | AI hashtag suggestions | **BUILT** | Hashtag suggestions integrated into content intelligence and social posting features. |
+| 95 | Smart notification copywriting | PLANNED | System notifications are AI-polished to feel warm and motivating, not robotic. |
 
-106. **Payout schedule display** — "Next batch runs March 15. You have $340 pending." Data in program settings already.
+#### Affiliate Onboarding AI
 
-107. **Payout in-progress notifications** — "Your payout of $340 has been approved and is being processed." Status updates through existing notification system.
-
-108. **Milestone countdown as persistent banner** — "You're 3 referrals away from the $200 bonus!" Not buried in overview — visible everywhere.
-
----
-
-## Brainstorm Features — Invoicing & Financial Tools for Affiliates (109-132)
-
-### The Dogfooding Insight
-
-PassivePost is a content scheduling tool. Affiliates are content creators who need to grow their own business. They use PassivePost for THEMSELVES — to schedule posts, build audience, get followers. The affiliate program is a bonus layer: they're already power users, so recommending PassivePost is authentic, not a sales pitch.
-
-This creates a flywheel:
-- Affiliate uses PassivePost to grow their business → loves it
-- Recommends it authentically to their audience → earns commissions
-- Their followers sign up, some become affiliates → cycle repeats
-- Every feature improvement helps the user AND makes the affiliate a better promoter
-
-**The invoicing features aren't just admin tools. For affiliate-creators running lean businesses, clean earnings statements, tax summaries, and commission receipts ARE business value.**
-
-### Professional Earnings & Statements
-
-109. **Professional earnings statements** — Properly formatted document with PassivePost branding, legal name, address, period, itemized commissions, running total. Downloadable PDF. Monthly and annual versions. Looks like something their accountant would be proud of.
-
-110. **Real-time earnings dashboard "business mode"** — Toggle from gamified view to clean financial view. Revenue this quarter, expenses (subscription cost), net income, projected annual earnings. Makes them feel like a real business.
-
-111. **Automatic invoice generation for payouts** — When paid, they get a proper invoice/receipt: "Payment from PassivePost Inc. to [Legal Name] for affiliate commissions, period: Jan 1-31, 2026." For their own bookkeeping.
-
-112. **Expense offset visibility** — "Your subscription costs $49/month. Affiliate earnings this month: $340. Net profit: $291." Shows subscription literally pays for itself. Powerful retention.
-
-### Tax Time Made Easy
-
-113. **1099-ready annual summary** — One click: complete earnings summary for tax preparer. Total earnings, payout dates, methods, withholding. "Hand this to your accountant."
-
-114. **Quarterly estimated tax helper** — "Based on Q1 earnings ($2,400), set aside ~$600 for estimated taxes." Not tax advice — helpful reminder with calculation. Creators forget this and get burned.
-
-115. **W-9 collection and storage** — Collect W-9 info (tax_id field exists). Store securely. When 1099 time comes, everything ready. No chasing people in January.
-
-116. **Tax document download center** — One page: all tax docs. 1099 forms, annual summaries, payout receipts by year. "Tax Season? We've got you covered."
-
-### Financial Transparency
-
-117. **Commission lifecycle tracker** — For every commission, show full journey: "Referral clicked → Signed up (Day 1) → Trial (Day 3) → Converted (Day 12) → Invoice paid (Day 14) → Commission earned: $14.70 → Approved (Day 30) → In payout batch (Day 45) → Paid to PayPal (Day 47)." Complete transparency.
-
-118. **Projected future earnings** — "34 active referrals paying monthly. At current rates, ~$510/month for next 8 months." Shows residual income pipeline. The number that makes them think "I can't leave."
-
-119. **Earnings by referral** — "Customer Jane generated $280 in commissions over 9 months." Shows most valuable referrals. Maybe they want to thank Jane or target similar people.
-
-120. **Churn impact alerts** — "Referral John cancelled. Recurring commission of $14.70/month ended. Remaining active referrals: 33." Honest, transparent. They respect it.
-
-### Business Tools
-
-121. **Earnings export for bookkeeping** — CSV or QuickBooks-compatible format. Columns match accountant expectations: date, description, amount, category, tax year. One click import.
-
-122. **Multi-year financial history** — "2025: $4,200. 2026 (YTD): $3,100." Year-over-year comparison. Shows growth. Makes them feel like they're building something.
-
-123. **Payment method verification** — Before payouts: "Sending $340 to PayPal at alex@steele.com. Correct?" Prevents wrong-account problems.
-
-124. **Currency display preference** — International affiliates see earnings in local currency (converted at current rate) even if payouts in USD. Small touch, big impact.
-
-125. **Affiliate branded invoice for their clients** — If affiliate recommends PassivePost to their own clients as part of a service, give them a professional handoff document: "I set up PassivePost for you. Here's the cost, my referral link, your 40% discount."
-
-126. **ROI report for their clients** — "Since using PassivePost: 48 posts across 4 platforms, saving ~12 hours/month." If affiliate sells PassivePost as part of service package, proves value.
-
-### Notifications That Build Trust
-
-127. **Payout confirmation with receipt** — Instant notification + email when money lands. "Payout of $340.00 sent to PayPal (alex@steele.com). Receipt attached." Peace of mind.
-
-128. **Commission approval notifications** — "3 commissions totaling $44.10 approved, moved to pending payout balance." They see money moving through pipeline.
-
-129. **Annual earnings milestone emails** — "$5,000 lifetime!" "$10,000!" Genuine achievements. Celebrate them.
-
-130. **Upcoming payout preview** — "Next payout March 15. Estimated: $340 based on approved commissions." No surprises.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 96 | AI onboarding advisor | **BUILT** | Getting-started guidance for new affiliates covering first steps, quick wins, and common mistakes to avoid. |
+| 97 | "Analyze my audience" tool | **BUILT** | Audience analyzer using referral clicks and connected platform metrics to generate AI-powered audience persona. |
+| 98 | Promotion strategy quiz | **BUILT** | Interactive 6-question quiz generating personalized 30-day promotional playbook. Results saved for future AI coaching. |
 
 ---
 
-## Brainstorm Features — Partnership-Level Features (131-147)
+### Surfacing Existing Admin Features (99-108)
 
-### Give Them Ownership
+These features wire up existing systems to create new value with minimal new code.
 
-131. **Affiliate revenue share dashboard** — Show like a partnership: "Revenue from your referrals: $3,400. Your share (30%): $1,020. PassivePost share: $2,380." Total transparency. No other program does this.
-
-132. **Lifetime value counter per referral** — "Sarah: 11 months, $539 revenue, $161.70 your earnings, $49.30 estimated remaining (1 month left)." Each referral as an asset, not a one-time event.
-
-133. **"My Portfolio" view** — Referrals as investment portfolio. Active, churned, in trial, total lifetime value, monthly recurring commission. "Portfolio: 34 active, 6 churned, 3 trial. Monthly recurring: $510."
-
-### Make Them Look Professional
-
-134. **Affiliate certification badge** — "Certified PassivePost Partner" badge for website, email signature, YouTube. Multiple sizes. Builds credibility with THEIR audience.
-
-135. **Custom referral landing page analytics** — For branded pages (`/ref/steele40`): visits, bounce rate, signups. Like their own mini-website analytics.
-
-136. **Co-branded case study** — "Alex Steele grew audience 40% using PassivePost." We write (or AI drafts), they approve, goes on OUR site and THEIRS. Both benefit.
-
-### Protect the Relationship
-
-137. **Commission dispute system** — Flag if commission was missed/incorrect. Simple form: "I believe referral X should have generated commission because..." Admin reviews, approves or explains. Transparent resolution. Builds trust even when answer is no.
-
-138. **Grace period on churn** — "Referral John cancelled. If they resubscribe within 30 days, your commission continues." Shown clearly. Reduces anxiety.
-
-139. **Rate lock guarantee visibility** — "Your 30% rate is locked until January 2027. Set when you joined, cannot be reduced." Front and center. Written like a promise, not fine print.
-
-### Passive Income Visibility
-
-140. **Earnings while you sleep counter** — Live ticker: "You earned $4.20 while you were away." Last login vs. commissions since. Reinforces "passive" in passive income.
-
-141. **Annual projection** — "At current $510/month, on track for $6,120 this year from PassivePost alone." Updates monthly. Makes opportunity feel real.
-
-142. **Compound growth visualization** — "Month 1: $50. Month 3: $180. Month 6: $510. Growing 25% month-over-month." Simple growth curve chart. Motivating.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 99 | Broadcasts also create in-app notification | **BUILT** | In-app notification bell system alongside email broadcasts. |
+| 100 | New asset upload triggers affiliate notification | **BUILT** | Notification system supports asset update alerts. |
+| 101 | Auto-insert affiliate code/link into text assets | **BUILT** | Swipe files and email templates use merge tags that auto-fill with affiliate's specific code and link. |
+| 102 | Tier promotion celebration | **BUILT** | Milestone bonuses and tier system with automated notifications on tier changes. |
+| 103 | Live contest leaderboard | **BUILT** | Leaderboard API shows real-time ranking during active contests. |
+| 104 | "My Terms" formal contract view | **BUILT** | Contract system with locked-in agreement display: commission rate, duration, cookie days, minimum payout. |
+| 105 | Terms changelog | **BUILT** | Terms changelog endpoint showing program changes and how locked rates are unaffected. |
+| 106 | Payout schedule display | **BUILT** | Payout schedule widget showing next batch date and pending balance. |
+| 107 | Payout in-progress notifications | **BUILT** | Payout lifecycle with status visibility at each stage (Pending, Approved, Paid). |
+| 108 | Milestone countdown as persistent banner | **BUILT** | Predictive intelligence includes milestone proximity alerts and tier trajectory. |
 
 ---
 
-## Brainstorm Features — Commission Renewal & Customer Success (143-150)
+### Invoicing & Financial Tools (109-130)
 
-### The Big Idea: Affiliates as Customer Success Partners
+#### Professional Earnings & Statements
 
-Traditional model: Commission window ends after 12 months. Affiliate loses interest in that customer. SaaS keeps 100%.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 109 | Professional earnings statements | **BUILT** | PDF-style downloadable statements with period selection (current month, last month, custom range). |
+| 110 | Real-time earnings dashboard "business mode" | **BUILT** | Financial overview with earnings vs costs, ROI calculations, break-even analysis, and forward projections. |
+| 111 | Automatic invoice generation for payouts | **BUILT** | Payout receipt emails with line items when admin processes batch. |
+| 112 | Expense offset visibility | **BUILT** | Financial overview shows unified view including subscription costs vs. affiliate earnings. |
 
-PassivePost model: Affiliate can EXTEND commission window by actively helping retain the customer. They become a mini customer success rep — not forced, but financially motivated.
+#### Tax Time Made Easy
 
-**Why it works for PassivePost:**
-- Customer retention goes UP (someone personally checking in on them)
-- Free customer success reps who are financially motivated
-- Retained customer at 20% commission is better than churned customer at 0%
-- Lower than acquisition cost of replacing a churned customer
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 113 | 1099-ready annual summary | **BUILT** | Tax center panel with year selector, estimated withholding calculator, and downloadable tax report. |
+| 114 | Quarterly estimated tax helper | **BUILT** | Tax summary with estimated withholding (self-employment + federal) and monthly breakdown. |
+| 115 | W-9 collection and storage | **BUILT** | Tax info collection for W-9 (US) and W-8BEN (international) with admin verification. |
+| 116 | Tax document download center | **BUILT** | Tax center panel with all tax documents accessible from one place. |
 
-**Why it works for affiliates:**
-- Portfolio doesn't expire — ongoing asset they can maintain
-- 12-month income becomes potentially indefinite
-- Rewards affiliates who care about their referrals
+#### Financial Transparency
 
-### Features
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 117 | Commission lifecycle tracker | **BUILT** | Visual 7-step journey: Click, Signup, Trial, Paid, Commission Created, Approved, Paid Out. |
+| 118 | Projected future earnings | **BUILT** | Multi-month forward projections (3, 6, 12 months), annual forecast, and goal progress tracking. |
+| 119 | Earnings by referral | **BUILT** | Revenue analytics with per-referral earnings data and cohort analysis. |
+| 120 | Churn impact alerts | **BUILT** | Churn intelligence tracking churn rate, reasons, timing patterns, and at-risk referrals. |
 
-143. **Commission renewal system** — At month 10-11, affiliate gets heads-up: "Sarah's commission window ends in 2 months. Want to extend it?" If affiliate does a check-in and customer stays active, window extends 6-12 months at slightly lower rate (30% → 20%).
+#### Business Tools
 
-144. **Customer health indicators for referrals** — "Is Sarah logging in? Posting? Has usage dropped?" Visible in affiliate's portfolio view. Green/yellow/red status per referral.
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 121 | Earnings export for bookkeeping | **BUILT** | CSV export available for any data table in the dashboard. |
+| 122 | Multi-year financial history | **BUILT** | Enhanced payout history with filterable, paginated records and summary statistics. |
+| 123 | Payment method verification | PLANNED | Before payouts: confirmation prompt showing destination account. |
+| 124 | Currency display preference | PLANNED | International affiliates see earnings in local currency with conversion. |
+| 125 | Affiliate branded invoice for clients | PLANNED | Professional handoff document for affiliates selling PassivePost as part of a service. |
+| 126 | ROI report for their clients | **BUILT** | Content ROI calculator tracking cost per post and correlating effort with results. |
 
-145. **Pre-written check-in templates** — "Hey Sarah, just wanted to see how PassivePost is working for you..." Affiliate personalizes and sends. Logged as renewal activity.
+#### Notifications That Build Trust
 
-146. **Issue flagging on behalf of referrals** — "Sarah mentioned trouble with Instagram posting." Goes to admin as support ticket FROM the affiliate. Affiliate becomes the customer's advocate.
-
-147. **Renewal activity log** — Affiliate logs outreach, both sides see effort. Shows PassivePost that affiliate is actively maintaining relationships.
-
-148. **Renewal dashboard** — "Sarah: window expires in 60 days. Status: Active, posting 3x/week. Renewal eligible: Yes. Complete a check-in to qualify."
-
-149. **Post-renewal confirmation** — "Sarah's commission extended 12 months at 20%. New expiration: March 2028." Clear, celebratory.
-
-150. **Renewal earnings projection** — "You have 12 referrals eligible for renewal next quarter. If all renew at 20%, that's ~$180/month continuing income you'd otherwise lose."
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 127 | Payout confirmation with receipt | **BUILT** | Batch processing with auto receipt emails when batch is processed. |
+| 128 | Commission approval notifications | **BUILT** | Payout lifecycle with visibility at each stage (Pending, Approved, Paid). |
+| 129 | Annual earnings milestone emails | **BUILT** | Milestone bonuses with automated recognition at earnings thresholds. |
+| 130 | Upcoming payout preview | **BUILT** | Payout schedule widget showing next payout date and estimated amount. |
 
 ---
 
----
-
-## Brainstorm Features — Business Intelligence & Analytics (151-188)
-
-### Charts & Graphs Affiliates Expect
-
-151. **Earnings line chart** — X-axis time (daily/weekly/monthly toggle), Y-axis dollars. Multiple lines: Earned, Approved, Paid. Hover shows exact values per day. Shows the pipeline visually.
-
-152. **Clicks & conversions dual-axis chart** — Bar chart for clicks, line overlay for conversions. Volume AND quality together. "Tons of clicks March 5 but no conversions — what happened?"
-
-153. **Conversion funnel visualization** — Proper funnel graphic: wide at top (clicks), narrowing through signups, trials, paid. Percentages between stages. Color-coded. Exactly like Google Analytics funnels.
-
-154. **Revenue pie chart by source** — "YouTube: 45%, Email: 30%, Instagram: 15%, Twitter: 10%." Instant visual of where money comes from. Helps decide where to double down.
-
-155. **Earnings heatmap calendar** — Like GitHub's contribution graph but for earnings. Each day colored by amount earned. See patterns: "I earn more on weekdays" or "best days are after video uploads."
-
-156. **Referral retention curve** — Line chart: what % of referrals still active at month 1, 2, 3... 12. Classic cohort retention chart. If curve drops at month 3, they know where to focus.
-
-157. **Month-over-month comparison bars** — Side-by-side: this month vs. last month for clicks, signups, conversions, earnings. Immediate visual of growth or decline.
-
-158. **Cumulative earnings area chart** — Total lifetime earnings growing over time. The line that only goes up. Motivating.
-
-### Conversion Funnel Intelligence
-
-159. **Conversion rate by channel** — "YouTube links: 8%. Instagram bio: 3%. Email newsletter: 12%." Uses existing UTM/source tags. Tells them where to focus.
-
-160. **Conversion rate over time** — Trend line: "5% January → 7% February → 9% March." Are they improving? Data tells them.
-
-161. **Drop-off analysis** — "42 clicked, 18 signed up, 6 trialed, 3 paid." Make it actionable: "Biggest drop-off: trial → paid. 12 started trials but didn't convert."
-
-162. **Trial-to-paid benchmarks** — "Your trial conversion: 25%. Average across all affiliates: 35%." Motivating, not shaming. Shows room to improve.
-
-### Audience & Traffic Insights
-
-163. **Click heatmap by day/hour** — Calendar-style: "Most clicks on Tuesdays 10am and Thursdays 7pm." Tells them exactly when audience is responsive.
-
-164. **Geographic breakdown** — "68% US, 15% UK, 8% Canada." Helps tailor content and posting times.
-
-165. **Device breakdown** — "72% mobile, 28% desktop." Informs which platforms to focus on.
-
-166. **Repeat visitor tracking** — "15 people clicked your link multiple times before signing up." Shows some need multiple touches. Encourages persistence.
-
-167. **Referral source attribution** — "Top 3: YouTube description (40%), Twitter bio (25%), email signature (15%)." Shows where link placement works best.
-
-### Churn Intelligence
-
-168. **Churn rate for their referrals** — "3 of 37 churned this month (8%). Average: 6%." If high, something about audience fit or expectations is off.
-
-169. **Churn reasons** — "2 cited 'too expensive.' 1 cited 'didn't use enough.'" Surface Stripe exit survey data when available.
-
-170. **Churn timing patterns** — "Most churned in months 2-3." Suggests they need to follow up with referrals early.
-
-171. **At-risk referral alerts** — "Sarah hasn't logged in for 14 days. Unusual for her." Early warning for check-in. Ties to commission renewal system.
-
-172. **Net referral growth** — "This month: +5 new, -2 churned = net +3." Portfolio growing or shrinking?
-
-### Performance Benchmarks
-
-173. **Percentile ranking** — "Top 12% for conversion rate, top 25% for referrals, top 8% for earnings." Multiple dimensions so everyone finds a strength.
-
-174. **Month-over-month scorecard** — Key metrics with up/down arrows: "Clicks: 245 (+18%), Signups: 14 (+40%), Conversions: 6 (+20%), Earnings: $88.20 (+25%)."
-
-175. **Personal best tracking** — "Best month ever: February, 8 conversions, $117.60." Something to beat. "You're 2 away from a new record!"
-
-176. **Efficiency metrics** — "Earnings per click: $0.36. Earnings per signup: $6.30." Shows value of each interaction. Quality over quantity.
-
-### AI-Powered Analytics Suggestions
-
-177. **"Why conversions dropped" analysis** — AI analyzes changes: "Click volume up 30% but conversions flat. Suggests lower-quality traffic. Targeting right audience?"
-
-178. **Content type recommendations** — "Tutorial content converts 2.5x better than discount-only posts. Try 'How I use PassivePost.'"
-
-179. **Channel optimization** — "Email converts at 12% but you send 1 link/month. 2x email links could add ~$60/month."
-
-180. **Audience fit score** — AI estimates audience-product fit: "Your audience converts 2x average. Strong fit. Increase promotion frequency."
-
-181. **Seasonal trend predictions** — "Earnings spike 40% in January and September historically. Plan biggest pushes then."
-
-182. **Competitor displacement tips** — "Churned referrals commonly switched to [competitor]. Here are 3 talking points about why PassivePost is better."
-
-### Campaign-Level Tracking (Single Exposure Metrics)
-
-183. **Campaign creator** — Affiliate creates campaign: "Episode 47 - Tech Tools Review" with date, platform, notes. System generates unique tracking link: `passivepost.com/?ref=steele40&campaign=ep47`. Every promotion becomes measurable.
-
-184. **Campaign dashboard** — Each campaign gets own metrics card: clicks, signups, conversions, earnings. "Episode 47: 230 clicks, 12 signups, 4 paid, $58.80." Know exactly which content performs.
-
-185. **Campaign comparison table** — Side-by-side: "Ep 47: 4 conversions, $58.80. Ep 48: 1 conversion, $14.70. Blog March 5: 6 conversions, $88.20." Instantly see winners.
-
-186. **Campaign ROI calculator** — "Ep 47 took ~3 hours. Earned $58.80 = $19.60/hour. Still earning — 2 more signups this week."
-
-187. **Campaign timeline** — Visual timeline showing launch dates and click/conversion activity. Shows "long tail" — YouTube videos earning months later.
-
-188. **Campaign tagging on existing links** — Retroactively tag: "All clicks from YouTube March 1-7 = Episode 47 campaign." Uses existing UTM system.
-
-### Connected Analytics (External Platform Integration)
-
-189. **YouTube Analytics integration** — Connect YouTube (OAuth). Pull views, watch time. Show: "Video got 15,000 views. 230 clicked link (1.5%). 12 signed up. 4 paid. Video-to-customer: 0.027%." Gold.
-
-190. **Google Analytics integration** — Connect GA for their blog. "Blog post: 3,200 pageviews. 89 clicked through. 8 signed up."
-
-191. **Podcast analytics** — Connect Spotify/Apple Podcasts. "Episode 47: 5,400 downloads. 230 clicked (4.3%)." Shows reach-to-click efficiency.
-
-192. **Social media analytics** — Connect Instagram/Twitter/LinkedIn. "Instagram post reached 12,000. 180 clicked." Per-platform efficiency.
-
-193. **Merged analytics dashboard** — One page: external metrics (views, downloads, reach) NEXT TO affiliate metrics (clicks, signups, earnings). Full picture, one place.
-
-194. **Cross-platform performance comparison** — "YouTube: 0.027% viewer-to-customer. Podcast: 0.041%. Blog: 0.019%. Focus on podcast." Data-driven channel strategy.
-
-### Smart Insights From Connected Data
-
-195. **Content-to-revenue attribution** — "Top 3 revenue-generating content this quarter: 1) YouTube 'Creator Tools' ($240), 2) Podcast Ep 52 ($180), 3) Blog 'My Tech Stack' ($95)."
-
-196. **Audience overlap detection** — "72% of signups come within 48 hours of YouTube upload. Post affiliate link in first comment immediately."
-
-197. **Optimal promotion frequency** — "Every 3rd video mention earns 2.5x more than every-video mentions. Frequency fatigue is real."
-
-198. **Content format recommendations** — "Tutorials convert 3x vs. casual mentions. Your tutorials: 0.045% vs. mentions: 0.015%."
-
-### Reporting & Exports
-
-199. **Weekly performance email** — Monday morning: "45 clicks, 6 signups, 2 conversions, $29.40. Conversion rate: 7% (↑ from 5%)." Digestible, actionable.
-
-200. **Monthly business report PDF** — Comprehensive: all metrics, trends, top links, revenue breakdown, tax summary. Show-your-accountant quality.
-
-201. **Custom date range reports** — "Show me Black Friday through Cyber Monday." Pull any date range. Measure specific campaigns.
-
-202. **Comparison reports** — "Q1 vs Q2 side-by-side." Quarterly or monthly growth trajectory.
-
-203. **Scheduled report delivery** — "Send performance report every Monday 9am." Set and forget.
-
-### Analytics UX/UI Principles
-
-204. **Dashboard customization** — Drag/drop widgets. Some want earnings first, others want funnel. Their choice.
-
-205. **Global date range picker** — One selector filters everything. Last 7/30/90 days, this year, custom. Standard.
-
-206. **Real-time updates** — "Last updated: 2 minutes ago." They're used to YouTube Studio near-real-time.
-
-207. **Mobile-responsive analytics** — Check stats from phone. Swipeable cards, collapsible sections. Charts work on small screens.
-
-208. **Sparklines in table rows** — Tiny activity trend line in each referral row. Visual without taking space.
-
-209. **Tooltips on everything** — Hover any metric: plain-English explanation. "Conversion rate: percentage of clickers who became paying customers."
-
-210. **Export any chart** — Download as PNG (share on social: "look at my growth!") or CSV for their own analysis.
+### Partnership-Level Features (131-142)
+
+#### Give Them Ownership
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 131 | Affiliate revenue share dashboard | **BUILT** | Financial overview showing revenue breakdown with earnings vs costs and ROI calculations. |
+| 132 | Lifetime value counter per referral | **BUILT** | Cohort analysis tracking per-referral retention and lifetime value over time. |
+| 133 | "My Portfolio" view | **BUILT** | Referral tracking showing active, churned, in-trial status with net growth metrics. |
+
+#### Make Them Look Professional
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 134 | Affiliate certification badge | **BUILT** | Verified earnings badges that are shareable and verifiable. Displayed on profile and directory. |
+| 135 | Custom referral landing page analytics | **BUILT** | Co-branded landing pages with traffic tracking and performance data. |
+| 136 | Co-branded case study | **BUILT** | Case study library with AI-generated drafts from real affiliate performance data. Admin and affiliate collaboration. |
+
+#### Protect the Relationship
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 137 | Commission dispute system | **BUILT** | Dispute system for flagging missed or incorrect commissions. |
+| 138 | Grace period on churn | **BUILT** | Commission renewals extending the commission window when referred customers check in or renew. |
+| 139 | Rate lock guarantee visibility | **BUILT** | Rate lock-in (grandfathering) system with visible locked terms in contracts. |
+
+#### Passive Income Visibility
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 140 | Earnings while you sleep counter | PLANNED | Live ticker showing earnings since last login. |
+| 141 | Annual projection | **BUILT** | Earnings projections with multi-month forward projections and annual forecast. |
+| 142 | Compound growth visualization | **BUILT** | Earnings heatmap (GitHub-style contribution graph) and trend charts showing growth over time. |
 
 ---
 
----
+### Commission Renewal & Customer Success (143-150)
 
-## The Unified Business Intelligence Vision (211-217)
+This section covers the system where affiliates can extend their commission window by actively helping retain referred customers.
 
-### The Closed-Loop System
-
-Every feature we've brainstormed connects to a larger system. This is not a collection of features — it's a **closed-loop business intelligence engine** where:
-
-1. **The product generates data** (what users/affiliates do)
-2. **The CRM organizes relationships** (who everyone is and how they connect)
-3. **The invoicing tracks money** (what moved, where, why)
-4. **The analytics turn it into insight** (what's working, what's not)
-5. **The AI turns insight into action** (specific things to do right now)
-6. **The actions generate new data** (and the loop continues)
-
-Every feature participates in this loop. The more features active, the smarter the whole system gets.
-
-### Big Picture Connections
-
-211. **Affiliate-as-Customer Feedback Loop** — When an affiliate uses PassivePost to schedule their promotional posts about PassivePost, we can close the loop entirely: we know WHEN they posted (content calendar), WHERE (platform), WHAT they said (content), and the RESULT (clicks, signups, conversions from affiliate tracking). We can tell them: "Your Tuesday 9am Instagram 'How I plan my content week' post generated 45 clicks and 3 signups. Your Thursday LinkedIn post got 12 clicks and 0 signups. Instagram + personal stories = your winning formula." **No other platform can do this** because no other platform is both the content tool AND the affiliate program.
-
-212. **Admin Intelligence That Flows to Affiliates** — Admin sees ALL affiliates. Aggregate data flows back anonymously: "Affiliates who post 3x/week earn 4x more." "Top content type this month: video tutorials." "Email newsletter referrals have 60% lower churn than social." "Average click-to-conversion time: 8 days." Admin gets "Program Intelligence" dashboard; best insights push to affiliates as coaching tips.
-
-213. **Referral Health → Affiliate Coaching → Customer Retention Triangle** — Customer usage data shows if referral is thriving or at risk → flows to affiliate as health indicators → affiliate checks in (commission renewal system) → customer retention improves → more revenue for PassivePost AND more commissions → activity data flows to admin showing which affiliates are best customer success partners. Three-way feedback loop: Admin ↔ Affiliate ↔ Customer.
-
-214. **Content Performance Intelligence** — Since PassivePost IS the content tool, we know what the affiliate creates for their OWN business. With opt-in: "Your most engaging topics: [X, Y, Z]. Create PassivePost promos around those." "You scheduled 45 posts, 3 mentioned PassivePost. Affiliates mentioning PassivePost in 10% of posts earn 2x more." The product KNOWS their content patterns and can suggest natural affiliate integration.
-
-215. **Unified Financial View** — For customer-affiliates: "Subscription: $49/month. Affiliate earnings: $340/month. Net income from PassivePost: +$291." Break-even tracker: "Subscription free since month 3. Total cost: $294. Total earned: $2,040. Net: +$1,746." Tax consolidation: one document with expense (subscription) AND income (commissions). ROI of upgrading: "Pro plan affiliates earn 35% more on average."
-
-216. **Community Intelligence** — Affiliate feedback, success stories, support tickets help everyone: Admin → prioritize product dev. Affiliates → motivation from peers. Customers → confidence in product. Marketing → real stories and testimonials from genuine users.
-
-217. **Predictive Intelligence** — With enough data: "Likely to hit Gold tier by June — here's how to accelerate." "Your referrals typically churn at month 4 — check in at month 3 to reduce churn 40%." "Earnings dip in summer — build evergreen content now." "3 referrals have usage patterns of likely upgraders — send this Pro features message."
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 143 | Commission renewal system | **BUILT** | Commission renewals extending the window. Bulk renewal support for up to 50 at once. |
+| 144 | Customer health indicators for referrals | **BUILT** | Churn intelligence with at-risk referral alerts and usage pattern tracking. |
+| 145 | Pre-written check-in templates | **BUILT** | Swipe files and email templates with merge tags for personalized outreach. |
+| 146 | Issue flagging on behalf of referrals | **BUILT** | Support ticket system allows affiliates to submit issues on behalf of referrals. |
+| 147 | Renewal activity log | **BUILT** | CRM activity log records calls, notes, tasks, and meetings associated with any account. |
+| 148 | Renewal dashboard | **BUILT** | Commission renewal interface with eligibility tracking and bulk renewal capabilities. |
+| 149 | Post-renewal confirmation | **BUILT** | Renewal system with performance stats (success rate, average extension, revenue saved). |
+| 150 | Renewal earnings projection | **BUILT** | Earnings projections incorporating renewal scenarios into forward projections. |
 
 ---
 
-## The Dogfooding Architecture (CRITICAL — Read Every Session)
+### Business Intelligence & Analytics (151-210)
 
-### Three Layers of Dogfooding
+#### Charts & Graphs
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 151 | Earnings line chart | **BUILT** | Revenue analytics with cumulative earnings over time charts. |
+| 152 | Clicks & conversions dual-axis chart | **BUILT** | Analytics charts with click and conversion tracking. |
+| 153 | Conversion funnel visualization | **BUILT** | Revenue analytics with conversion dropoff funnel. |
+| 154 | Revenue pie chart by source | **BUILT** | Revenue breakdown by source (direct vs affiliate) with visual charts. |
+| 155 | Earnings heatmap calendar | **BUILT** | GitHub-style contribution heatmap showing 52 weeks of daily earnings activity. |
+| 156 | Referral retention curve | **BUILT** | Cohort analysis grouping referrals by signup month and tracking retention over time. |
+| 157 | Month-over-month comparison bars | **BUILT** | Custom range reports with period-over-period comparison. |
+| 158 | Cumulative earnings area chart | **BUILT** | Revenue analytics with cumulative earnings visualization. |
+
+#### Conversion Funnel Intelligence
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 159 | Conversion rate by channel | **BUILT** | Traffic insights with source-level attribution and conversion rates. |
+| 160 | Conversion rate over time | **BUILT** | Analytics tracking conversion trends over configurable time periods. |
+| 161 | Drop-off analysis | **BUILT** | Revenue analytics with conversion dropoff funnel showing where potential revenue is lost. |
+| 162 | Trial-to-paid benchmarks | **BUILT** | Cohort analysis with trial benchmarks and conversion trends. |
+
+#### Audience & Traffic Insights
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 163 | Click heatmap by day/hour | **BUILT** | Earnings heatmap showing activity patterns by time period. |
+| 164 | Geographic breakdown | **BUILT** | Traffic insights with country-level geographic breakdown. |
+| 165 | Device breakdown | **BUILT** | Traffic insights with device type breakdown (desktop/mobile/tablet). |
+| 166 | Repeat visitor tracking | **BUILT** | Traffic insights with repeat visitor analysis. |
+| 167 | Referral source attribution | **BUILT** | Connected analytics merging data from multiple platforms with affiliate performance data. |
+
+#### Churn Intelligence
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 168 | Churn rate for their referrals | **BUILT** | Churn intelligence tracking churn rate with net growth calculation. |
+| 169 | Churn reasons | **BUILT** | Churn intelligence tracking reasons and patterns. |
+| 170 | Churn timing patterns | **BUILT** | Churn intelligence with timing pattern analysis. |
+| 171 | At-risk referral alerts | **BUILT** | Churn intelligence with at-risk referral identification. |
+| 172 | Net referral growth | **BUILT** | Churn intelligence showing net growth (new signups minus churned). |
+
+#### Performance Benchmarks
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 173 | Percentile ranking | **BUILT** | Percentile benchmarks showing where affiliate ranks compared to all others. |
+| 174 | Month-over-month scorecard | **BUILT** | Custom range reports with period-over-period comparison metrics. |
+| 175 | Personal best tracking | PLANNED | Track and display personal best records for key metrics. |
+| 176 | Efficiency metrics | **BUILT** | Analytics tracking earnings per click, earnings per signup, and other efficiency ratios. |
+
+#### AI-Powered Analytics Suggestions
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 177 | "Why conversions dropped" analysis | **BUILT** | AI analytics intelligence with conversion drop analysis. |
+| 178 | Content type recommendations | **BUILT** | Content intelligence analyzing content type performance correlation with sales. |
+| 179 | Channel optimization | **BUILT** | AI analytics with channel optimization recommendations. |
+| 180 | Audience fit score | **BUILT** | AI analytics with audience fit assessment. |
+| 181 | Seasonal trend predictions | **BUILT** | Predictive intelligence with seasonal pattern detection. |
+| 182 | Competitor displacement tips | **BUILT** | AI analytics with competitive tips. |
+
+#### Campaign-Level Tracking
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 183 | Campaign creator | **BUILT** | Marketing campaigns with UTM attribution and unique tracking links. |
+| 184 | Campaign dashboard | **BUILT** | Campaign tracking with performance counters (clicks, signups, conversions). |
+| 185 | Campaign comparison table | **BUILT** | Custom range reports with comparison capabilities. |
+| 186 | Campaign ROI calculator | **BUILT** | Content ROI calculator correlating effort with business results. |
+| 187 | Campaign timeline | PLANNED | Visual timeline showing launch dates and click/conversion activity over time. |
+| 188 | Campaign tagging on existing links | **BUILT** | Deep link generator with UTM parameters and source tags for any link. |
+
+#### Connected Analytics (External Platform Integration)
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 189 | YouTube Analytics integration | **BUILT** | Connected analytics with YouTube data merged into affiliate performance. |
+| 190 | Google Analytics integration | PLANNED | Connect GA for blog traffic correlation with affiliate performance. |
+| 191 | Podcast analytics | PLANNED | Connect Spotify/Apple Podcasts download data with affiliate click-through rates. |
+| 192 | Social media analytics | **BUILT** | Connected analytics for 8 social platforms with real OAuth connections. |
+| 193 | Merged analytics dashboard | **BUILT** | Connected analytics dashboard merging external platform data with affiliate metrics in unified view. |
+| 194 | Cross-platform performance comparison | **BUILT** | Content intelligence with platform-by-platform correlation analysis. |
+
+#### Smart Insights From Connected Data
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 195 | Content-to-revenue attribution | **BUILT** | Content intelligence analyzing promotion frequency and content type performance correlation with sales. |
+| 196 | Audience overlap detection | **BUILT** | AI conversion insights analyzing cross-platform correlation. |
+| 197 | Optimal promotion frequency | **BUILT** | Content intelligence analyzing promotion frequency impact on sales. |
+| 198 | Content format recommendations | **BUILT** | AI analytics with content recommendations based on real performance data. |
+
+#### Reporting & Exports
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 199 | Weekly performance email | **BUILT** | Automated weekly email summarizing clicks, signups, and earnings. |
+| 200 | Monthly business report PDF | **BUILT** | Monthly earnings statements with formatted earnings summary. |
+| 201 | Custom date range reports | **BUILT** | Any date range analysis with period-over-period comparison. |
+| 202 | Comparison reports | **BUILT** | Custom range reports with side-by-side period comparison. |
+| 203 | Scheduled report delivery | **BUILT** | Scheduled reports via cron system with configurable delivery. |
+
+#### Analytics UX/UI Principles
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 204 | Dashboard customization | PLANNED | Drag/drop widgets for personalized dashboard layout. |
+| 205 | Global date range picker | **BUILT** | Analytics with configurable time period filters (7/30/90 days, year, custom). |
+| 206 | Real-time updates | **BUILT** | Dashboard data refreshes with latest data on each visit. |
+| 207 | Mobile-responsive analytics | **BUILT** | All 14 grid layouts in the affiliate dashboard adapt to phone screens. |
+| 208 | Sparklines in table rows | **BUILT** | Mini trend charts embedded in referral rows showing recent performance direction. |
+| 209 | Tooltips on everything | **BUILT** | Hover explanations on every metric describing what it measures and how it's calculated. |
+| 210 | Export any chart | **BUILT** | CSV export available for any data table in the dashboard. |
+
+---
+
+### Unified BI Vision (211-217)
+
+These features represent the strategic long-term vision for PassivePost as a closed-loop business intelligence engine.
+
+| # | Feature | Status | Description |
+|---|---------|--------|-------------|
+| 211 | Affiliate-as-Customer Feedback Loop | **BUILT** | The content scheduling tool IS the affiliate's promotion tool. Connected analytics merge content performance with affiliate earnings. |
+| 212 | Admin Intelligence That Flows to Affiliates | **BUILT** | Program intelligence dashboard for admins with aggregate insights pushed to affiliates as coaching tips via AI coach. |
+| 213 | Referral Health / Affiliate Coaching / Retention Triangle | **BUILT** | Churn intelligence feeds to affiliates as health indicators. Commission renewal system enables check-ins. Three-way feedback loop. |
+| 214 | Content Performance Intelligence | **BUILT** | Content intelligence analyzing what affiliates create and correlating with sales performance. |
+| 215 | Unified Financial View | **BUILT** | Financial overview showing subscription costs vs. affiliate earnings with break-even analysis and ROI. |
+| 216 | Community Intelligence | **BUILT** | Surveys, testimonials, case studies, and support tickets create feedback loops across all user types. |
+| 217 | Predictive Intelligence | **BUILT** | Tier trajectory forecasting, churn window predictions, and seasonal pattern detection. |
+
+---
+
+## The Dogfooding Architecture
+
+PassivePost has a unique three-layer dogfooding system that creates a competitive moat no standalone affiliate platform can replicate.
+
+### Three Layers
 
 **Layer 1: PassivePost the company uses PassivePost.**
-PassivePost uses its own product to schedule and publish its own marketing content across social platforms. Every feature built is used internally. Every bug found is found as a real user. The company is its own best case study.
+PassivePost uses its own product to schedule and publish marketing content. Every feature is tested internally. Every bug is found as a real user.
 
 **Layer 2: Affiliates use PassivePost to promote PassivePost.**
-Affiliates are content creators who need to grow their own business — scheduling posts, building audience, getting followers. That's exactly what PassivePost does. So they use PassivePost for THEMSELVES, and promoting it to their audience is an authentic recommendation, not a sales pitch. The product they sell is the product they use to sell it.
+Affiliates are content creators who use PassivePost to grow their own business. Promoting it to their audience is an authentic recommendation because they actually use the product.
 
 **Layer 3: Customers become affiliates who use PassivePost.**
-Product customers love PassivePost → become affiliates → use PassivePost to promote PassivePost → their followers sign up → some become affiliates → cycle repeats. Self-reinforcing flywheel.
+Product customers become affiliates, use PassivePost to promote PassivePost, their followers sign up, some become affiliates, and the cycle repeats.
 
 ### Why This Creates a Moat
 
-- **Authenticity drives conversions** — Affiliates who are power users are the most credible promoters. They show their own dashboard, their own results.
-- **Zero acquisition cost on many affiliates** — They signed up for the product. The affiliate program is a natural extension.
-- **Dual retention** — Customer-affiliates have TWO reasons to stay: product value AND commission income. Churn drops dramatically.
-- **Every improvement helps twice** — Better scheduling features help the user AND make the affiliate a better promoter. One investment, double return.
-- **Invoicing = business value** — Clean earnings statements, tax summaries, commission receipts aren't just nice features. For affiliate-creators running lean businesses, they ARE business value. Hard to leave.
+- **Authenticity drives conversions** — Affiliates who are power users are the most credible promoters
+- **Zero acquisition cost on many affiliates** — They signed up for the product first
+- **Dual retention** — Customer-affiliates have TWO reasons to stay: product value AND commission income
+- **Every improvement helps twice** — Better scheduling features help the user AND make the affiliate a better promoter
+- **Invoicing = business value** — Clean earnings statements, tax summaries, commission receipts are genuine business tools for affiliate-creators
 
 ### Cross-Muse Strategy
 
-**MuseKit is the engine. Every Muse gets the full system.**
-
-- **MuseKit** = reusable SaaS template (auth, billing, admin, affiliate, CRM, invoicing, analytics, AI). Built once.
-- **PassivePost** = content scheduling Muse. Has special dogfooding synergy.
-- **Future Muses** (e.g., PiggyBalance — kids financial literacy for homeschoolers) = different products, same MuseKit engine, same world-class affiliate system.
-
-**The architecture is three layers:**
-
-1. **MuseKit Core** — CRM, invoicing, analytics, affiliate dashboard, AI tools. Universal. Every Muse gets it for free.
-2. **Product-Specific Synergy** — How the specific Muse's product enhances the affiliate experience. PassivePost: content scheduling helps promotion. PiggyBalance: might offer teaching resources, lesson plans. Each Muse finds its own angle.
-3. **Cross-Muse Network** (future vision) — Affiliates across all Muses form a broader partner ecosystem. PiggyBalance affiliates are content creators who need PassivePost. PassivePost affiliates might have audiences interested in PiggyBalance.
-
-**The cross-pollination:**
-- Every Muse creates a new affiliate pool
-- Every affiliate pool contains content creators who need PassivePost
-- PassivePost becomes connective tissue across all Muses
-- An affiliate promoting PiggyBalance today might promote PassivePost tomorrow, and a future Muse after that
-
-**All affiliates need PassivePost. All Muses need affiliates. PassivePost is a customer of itself.**
+MuseKit is the reusable engine. Every new SaaS product (called a "Muse") gets the full system:
+- **MuseKit Core** — CRM, invoicing, analytics, affiliate dashboard, AI tools. Universal.
+- **Product-Specific Synergy** — How each specific product enhances the affiliate experience.
+- **Cross-Muse Network** (future vision) — Affiliates across all products form a broader partner ecosystem.
 
 ---
 
@@ -828,48 +591,43 @@ The best affiliate programs make affiliates feel three things:
 2. **"I know exactly where I stand"** — transparent earnings, clear terms, real-time data
 3. **"I'm a partner, not a contractor"** — branded codes, personal pages, recognition, communication
 
-**PassivePost and affiliates are business partners.** We need promotion, they need revenue, they already have followers. Perfect match. The more thrilled they are, the more they promote. That helps PassivePost too. We are not a greedy company.
-
----
-
-## Key Design Principle
-
-> Many PassivePost customers will ALSO be affiliates. They use PassivePost to grow their own business, and promoting it as an affiliate is a natural bonus. The world-class UX/UI investment must carry across all three dashboards (Admin, Affiliate, User). Consistent components, consistent quality.
-
----
-
-## User's Reference Schema
-
-Full table structure brainstorm is saved at:
-`attached_assets/Pasted--CRM-Basics-Core-User-Management-Tables-These-tables-ha_1771965360650.txt`
+PassivePost and affiliates are business partners. Consistent quality across all three dashboards (Admin, Affiliate, User).
 
 ---
 
 ## Feature Count Summary
 
-| Section | Features | Range |
-|---------|----------|-------|
-| Original Ideas (All User Types) | 41 | #1-41 |
-| Affiliate Delight & Relationship | 23 | #42-64 |
-| Marketing Resource Center | 16 | #65-80 |
-| AI-Powered Tools | 18 | #81-98 |
-| Surfacing Existing Admin Features | 10 | #99-108 |
-| Invoicing & Financial Tools | 22 | #109-130 |
-| Partnership-Level Features | 12 | #131-142 |
-| Commission Renewal & Customer Success | 8 | #143-150 |
-| Business Intelligence & Analytics | 60 | #151-210 |
-| Unified BI Vision & Big Picture | 7 | #211-217 |
-| **TOTAL** | **217** | |
+| Section | Features | Range | Built | Planned |
+|---------|----------|-------|-------|---------|
+| Original Ideas (All User Types) | 41 | #1-41 | 41 | 0 |
+| Affiliate Delight & Relationship | 23 | #42-64 | 22 | 1 |
+| Marketing Resource Center | 16 | #65-80 | 16 | 0 |
+| AI-Powered Tools | 18 | #81-98 | 17 | 1 |
+| Surfacing Existing Admin Features | 10 | #99-108 | 10 | 0 |
+| Invoicing & Financial Tools | 22 | #109-130 | 19 | 3 |
+| Partnership-Level Features | 12 | #131-142 | 11 | 1 |
+| Commission Renewal & Customer Success | 8 | #143-150 | 8 | 0 |
+| Business Intelligence & Analytics | 60 | #151-210 | 55 | 5 |
+| Unified BI Vision & Big Picture | 7 | #211-217 | 7 | 0 |
+| **TOTAL** | **217** | | **206** | **11** |
+
+### Remaining Planned Features
+
+| # | Feature | Category |
+|---|---------|----------|
+| 46 | Dedicated affiliate manager contact | Relationship |
+| 55 | Video tutorials library | Education |
+| 95 | Smart notification copywriting | AI Automation |
+| 123 | Payment method verification | Financial Tools |
+| 124 | Currency display preference | Financial Tools |
+| 125 | Affiliate branded invoice for clients | Financial Tools |
+| 140 | Earnings while you sleep counter | Passive Income |
+| 175 | Personal best tracking | Benchmarks |
+| 187 | Campaign timeline | Campaign Tracking |
+| 190 | Google Analytics integration | Connected Analytics |
+| 191 | Podcast analytics | Connected Analytics |
+| 204 | Dashboard customization (drag/drop) | Analytics UX |
 
 ---
 
-## Next Steps
-
-1. Finalize which features to build (prioritize by impact vs. effort)
-2. Design final table schema
-3. Create session plan with exact tasks
-4. User approves → Build begins
-
----
-
-*This document must be preserved across sessions. It is the single source of truth for CRM/Invoicing planning until a build plan is approved.*
+*This document is the strategic feature pipeline for PassivePost. It serves as the single source of truth for planning, prioritization, and tracking of all CRM, invoicing, analytics, AI, and platform features.*

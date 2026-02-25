@@ -1,81 +1,98 @@
 # PassivePost — Product Overview
 
-> **Revision:** 2 | **Last Updated:** February 20, 2026 | **Created:** February 20, 2026
+**PassivePost is a closed-loop business intelligence platform for content creators.**
 
-**AI-Powered Social Media Scheduling for Solopreneurs and Small Businesses**
-
----
-
-## What is PassivePost?
-
-PassivePost is a SaaS tool that helps solopreneurs, gig workers, and small business owners manage their social media presence without the cost of hiring a social media manager. It uses AI to generate on-brand content, schedule posts across 10 platforms, track engagement, and surface leads — all from a single dashboard.
-
-Think of it as a personal social media assistant: you tell it about your business, your voice, and your audience, and it handles the rest.
+It brings content scheduling, affiliate marketing, connected analytics, and AI coaching together into a single system where every piece feeds the others.
 
 ---
 
-## The Problem
+## What PassivePost Does
 
-Small business owners know they should be active on social media, but most don't have:
+PassivePost is built for content creators, affiliates, agencies, and small businesses who want to grow their audience, track revenue, and improve their content strategy from one place.
 
-- **Time** to create content consistently
-- **Budget** to hire a social media manager ($3,000–$5,000/month)
-- **Expertise** to know what to post, when to post, and where to post
-- **Tools** that are affordable and simple enough for a one-person operation
-
-The result? Inconsistent posting, missed opportunities, and a social media presence that doesn't reflect the quality of their work.
-
----
-
-## The Solution
-
-PassivePost solves this by combining:
-
-1. **AI content generation** — Creates posts tailored to your business niche, brand voice, and audience
-2. **Multi-platform scheduling** — Manages content across Twitter/X, LinkedIn, Facebook, Instagram, YouTube, TikTok, Reddit, Pinterest, Snapchat, and Discord
-3. **Smart automation** — Queues, calendars, and scheduled publishing keep your accounts active without daily effort
-4. **Engagement analytics** — See what's working, what's not, and where your audience is growing
-5. **Lead tracking** — Surface potential customers from social interactions
-6. **Blog cross-posting** — Publish long-form content to Medium, WordPress, LinkedIn Articles, Ghost, and Substack, then auto-generate social snippets to drive traffic back
-7. **Content flywheel** — A 38-feature system across 7 phases that makes your content marketing smarter, more automated, and more profitable over time
-8. **Revenue & ROI tracking** — Measure the actual business value of your social media efforts
-9. **Team collaboration** — Client approval portals and shared content workflows for agencies
+Unlike tools that only handle scheduling or only handle affiliate tracking, PassivePost connects the dots between what you publish, how your audience responds, what revenue it generates, and what you should do next. The AI coaching layer uses your real data to give specific, personalized advice rather than generic tips.
 
 ---
 
 ## Who It's For
 
-### Primary Audience
+### Content Creators & Affiliates
+Bloggers, YouTubers, podcasters, and social media influencers who promote products and want a professional dashboard to track performance, earnings, and audience growth.
 
-| Segment | Description |
-|---------|-------------|
-| **Solopreneurs** | One-person businesses that need social media but can't hire for it |
-| **Gig Workers** | Rideshare drivers, freelancers, and contractors building a personal brand |
-| **Small Business Owners** | Local service businesses (plumbers, electricians, landscapers, etc.) |
-| **Content Creators** | Photographers, fitness coaches, tutors, and artists who need scheduling tools |
+### Solopreneurs & Small Businesses
+One-person operations and small teams who need social media management, content scheduling, and lead tracking without enterprise complexity or pricing.
 
-### Supported Business Niches
+### Agencies & Freelancers
+Teams managing content for clients who need approval workflows, white-label reporting, and multi-account management.
 
-PassivePost includes built-in AI prompt guidance for 14 industry niches. Each niche shapes how the AI writes content — matching the tone, vocabulary, and concerns of that industry:
+### Program Administrators
+SaaS founders and marketing teams running affiliate programs who need application management, commission processing, fraud detection, and program analytics.
 
-| Niche | AI Voice Style |
-|-------|---------------|
-| Plumbing | Casual, local, common household problems |
-| HVAC | Trusted technician, seasonal comfort |
-| Electrical | Safety-first, home reliability |
-| Landscaping | Visual, seasonal, curb appeal |
-| Cleaning | Friendly, relatable, busy schedules |
-| Real Estate | Market-savvy, approachable, local insights |
-| Rideshare | Down-to-earth, hustle and city life |
-| Freelance | Authentic, independent work experiences |
-| Photography | Visual storytelling, behind-the-scenes |
-| Fitness | Motivating without preaching, practical tips |
-| Food & Restaurant | Warm, inviting, flavors and community |
-| Beauty | Confident, inclusive, self-care |
-| Tutoring | Encouraging, study tips, success stories |
-| Pet Care | Warm, playful, practical care tips |
+---
 
-Admins can add, edit, or remove niches at any time from the admin dashboard — no code changes needed.
+## The Problem
+
+Content creators and small business owners face a fragmented tooling landscape:
+
+- **Scheduling tools** don't know anything about revenue
+- **Affiliate platforms** don't connect to content performance
+- **Analytics tools** show data but don't tell you what to do next
+- **AI assistants** give generic advice because they don't have your real data
+
+The result is context-switching between 4-5 different tools, manual data correlation, and gut-feel decisions about content strategy.
+
+---
+
+## The Solution
+
+PassivePost creates a closed loop:
+
+1. **Content Scheduling** — Create, schedule, and publish across 8 social platforms and 2 blog platforms from a single calendar
+2. **Affiliate Marketing** — Full-featured affiliate program with referral tracking, commission management, tiered rewards, contests, and payouts
+3. **Connected Analytics** — Merge data from connected platforms (YouTube, social media) with affiliate performance and financial data in a unified view
+4. **AI Coaching** — Every AI feature pulls real user data to give personalized, actionable advice using the xAI Grok model
+5. **Content Flywheel** — A 7-phase system that makes content creation, intelligence, automation, distribution, revenue tracking, engagement, and collaboration feed into each other
+
+Each system feeds the others. Content performance informs AI coaching. AI coaching improves content quality. Better content drives more affiliate revenue. Revenue data feeds back into analytics. The loop gets smarter the more you use it.
+
+---
+
+## The Three Dashboards
+
+PassivePost is organized into three separate dashboards, each designed for a different role:
+
+### Admin Dashboard — Program Management
+The control center for platform owners. Admins configure the affiliate program, manage users, set up billing tiers, review applications, process payouts, monitor program health, and run the business side of the operation. Covers branding, compliance, revenue attribution, and audit logging.
+
+### Affiliate Dashboard — Business Command Center
+A standalone dashboard for content creators who promote PassivePost. Affiliates get referral link generation, commission tracking, performance analytics, AI coaching, marketing toolkits, discount code management, contest participation, and financial tools including tax preparation and earnings forecasting. The affiliate dashboard has 11 navigation tabs and is completely separate from the main product interface.
+
+### User Dashboard — Customer Self-Service & Billing
+For customers who subscribe to the product. Invoice history, subscription management via Stripe, support tickets, account security, usage insights, and email preferences. The user dashboard also includes a gateway to become an affiliate.
+
+---
+
+## Connected Platforms
+
+PassivePost connects to 8 social media platforms and 2 blog publishing platforms:
+
+### Social Platforms (8)
+| Platform | Connection Type |
+|----------|----------------|
+| Twitter/X | OAuth 2.0 with PKCE |
+| LinkedIn | OAuth 2.0 with PKCE |
+| Facebook | OAuth 2.0 (Page access) |
+| Instagram | OAuth integration |
+| Reddit | OAuth integration |
+| Discord | OAuth integration |
+| YouTube | OAuth integration |
+| Pinterest | OAuth integration |
+
+### Blog Platforms (2)
+| Platform | Connection Type |
+|----------|----------------|
+| WordPress | REST API + App Passwords |
+| Ghost | Admin API Key |
 
 ---
 
@@ -83,151 +100,93 @@ Admins can add, edit, or remove niches at any time from the admin dashboard — 
 
 | Feature | Description |
 |---------|-------------|
-| AI Post Generation | One-click content creation using your brand voice and niche |
-| 10-Platform Support | Twitter/X, LinkedIn, Facebook, Instagram, YouTube, TikTok, Reddit, Pinterest, Snapchat, Discord |
-| Post Queue & Calendar | Visual scheduling with drag-and-drop queue management |
-| Engagement Analytics | Charts and metrics showing likes, shares, comments, and reach |
-| Lead Tracking | Surfaces potential customers from social interactions |
-| Brand Voice System | Configurable tone, audience, goals, frequency, and niche |
-| Trend Alerts | Monitors trending topics and suggests timely content |
-| Bulk Import | Import multiple posts at once for batch scheduling |
-| Quick Generate FAB | Floating button for instant AI content from any page |
-| Coaching Tips | Rotating motivational tips and strategy advice on the dashboard |
-| Upgrade Prompts | Contextual upgrade banners when approaching tier limits |
-| n8n Automation | Pre-built workflow templates for RSS auto-posting, trend monitoring, and more |
-| Blog Cross-Posting | Publish to Medium, WordPress, LinkedIn Articles, Ghost, Substack |
-| Content Intelligence | AI-powered analysis of your content: grading, DNA patterns, topic fatigue, engagement prediction |
-| Content Flywheel | 38-feature system automating content recycling, repurposing, scheduling, and optimization |
-| Revenue & ROI | Track cost per post, calculate content ROI, generate client reports |
-| Team Collaboration | Client approval portals, shared content libraries, team workflows |
-| AI Voice Fine-Tuner | Paste writing samples to teach AI your unique voice |
-| Lead CRM | Tag, note, and export leads from social interactions |
+| AI Content Generation | One-click post creation using your brand voice, niche, and the xAI Grok model |
+| 8-Platform Scheduling | Twitter/X, LinkedIn, Facebook, Instagram, Reddit, Discord, YouTube, Pinterest |
+| Blog Cross-Posting | Publish to WordPress and Ghost, then auto-generate social snippets |
+| Full Affiliate Program | Referral tracking, commission management, tiered rewards, contests, and payouts |
+| 14+ AI Tools | Post writer, email drafter, blog outliner, video scripts, objection handler, coach, and more |
+| Connected Analytics | Merge content performance with affiliate earnings and platform data |
+| Content Flywheel | 7-phase system for continuous content improvement |
+| Revenue & ROI Tracking | Cost per post, ROI calculator, monthly report cards, white-label exports |
+| Lead CRM | Tag, note, and export leads discovered through social engagement |
+| Client Approval Portal | External clients review and approve content without needing an account |
+| Gamification | Tiers, badges, contests, leaderboards, milestones, streaks, and challenges |
+| Financial Tools | Earnings forecasts, tax preparation, commission tracking, payout management |
+| Marketing Toolkit | Deep links, QR codes, link shortener, media kit, sharing cards, discount codes |
 
 ---
 
-## Pricing Tiers
+## AI Architecture
 
-PassivePost uses a 3-tier subscription model integrated with Stripe:
+All AI features use the **xAI Grok model** (`grok-3-mini-fast`) and follow a critical design principle: **every AI feature pulls real user data**.
+
+This means:
+- The **AI Coach** knows your actual commission history, tier progress, active contests, and connected platform metrics before giving advice
+- The **AI Post Writer** uses your brand voice settings, niche guidance, and audience data to generate content
+- The **AI Analytics** features analyze your real engagement patterns, conversion rates, and revenue attribution
+- The **Promotion Strategy Quiz** saves results to your profile so future AI interactions have richer context
+
+The AI is not a generic chatbot — it is a personalized business intelligence copilot.
+
+---
+
+## Pricing & Tier System
+
+PassivePost uses a tiered subscription model integrated with Stripe:
 
 | | Starter | Basic | Premium |
 |---|---------|-------|---------|
-| **Price** | Free / Low | Mid | Full |
-| **Daily AI Generations** | 5 | 10 | 100 |
-| **Daily Posts** | 1 | 2 | Unlimited |
-| **Monthly Posts** | 15 | 30 | Unlimited |
-| **Connected Platforms** | 2 | 3 | 10 |
+| Daily AI Generations | 5 | 10 | 100 |
+| Daily Posts | 1 | 2 | Unlimited |
+| Monthly Posts | 15 | 30 | Unlimited |
+| Connected Platforms | 2 | 3 | 8 |
 
 Tier limits are enforced automatically. When a user reaches 80% of any limit, an upgrade banner appears across the dashboard. Admins can customize tier names, limits, and pricing from the admin dashboard.
 
+Affiliates progress through performance tiers (Bronze, Silver, Gold, Platinum) based on referral count, earning higher commission rates and unlocking perks at each level.
+
 ---
 
-## What Makes PassivePost Different
+## The Content Flywheel
 
-### 1. Built for Non-Technical Users
-No complex setup, no API keys to manage, no learning curve. Connect your accounts, set your brand voice, and start generating content.
-
-### 2. Industry-Specific AI
-Generic social media tools generate generic content. PassivePost's niche guidance system produces content that sounds like it was written by someone who actually works in your industry.
-
-### 3. Affordable for Solo Operators
-Enterprise social media tools start at $99/month and up. PassivePost is designed to be accessible for businesses with tighter budgets.
-
-### 4. Complete Workflow
-Most tools do either content creation OR scheduling OR analytics. PassivePost covers the entire workflow: generate → schedule → publish → analyze → improve.
-
-### 5. Passive Content Growth (The Blog-to-Social Flywheel)
-Write one blog post, and PassivePost automatically generates 5-7 social media snippets with links back to the article. Your blog drives social engagement, and social drives blog traffic — a self-reinforcing growth loop. The key insight: **blog content works for you passively**. A single article, once repurposed, generates weeks of social posts without additional effort. Plus, 38 intelligent features across content grading, automation, distribution optimization, ROI tracking, and team collaboration make your entire content strategy smarter over time.
-
-### The Content Flywheel (How It All Connects)
+The Content Flywheel is the core differentiator. It is a 7-phase system that creates a self-reinforcing loop:
 
 ```
-                    ┌─────────────────┐
-                    │   BLOG CONTENT  │
-                    │  (Write Once)   │
-                    └────────┬────────┘
-                             │
-                    ┌────────▼────────┐
-                    │   REPURPOSE     │
-                    │  (AI generates  │
-                    │   5-7 snippets) │
-                    └────────┬────────┘
-                             │
-              ┌──────────────┼──────────────┐
-              ▼              ▼              ▼
-        ┌──────────┐  ┌──────────┐  ┌──────────┐
-        │ Twitter  │  │ LinkedIn │  │ Facebook │
-        │ threads  │  │ articles │  │ posts    │
-        └─────┬────┘  └─────┬────┘  └─────┬────┘
-              │              │              │
-              └──────────────┼──────────────┘
-                             │
-                    ┌────────▼────────┐
-                    │   ENGAGEMENT    │
-                    │  (Likes, shares,│
-                    │   comments)     │
-                    └────────┬────────┘
-                             │
-              ┌──────────────┼──────────────┐
-              ▼              ▼              ▼
-        ┌──────────┐  ┌──────────┐  ┌──────────┐
-        │ INTEL-   │  │ AUTOMATE │  │ REVENUE  │
-        │ LIGENCE  │  │ (Recycle,│  │ (ROI,    │
-        │ (Grade,  │  │  schedule│  │  reports) │
-        │  predict)│  │  optimize│  │          │
-        └─────┬────┘  └─────┬────┘  └─────┬────┘
-              │              │              │
-              └──────────────┼──────────────┘
-                             │
-                    ┌────────▼────────┐
-                    │  BETTER CONTENT │
-                    │  (Informed by   │
-                    │   data + AI)    │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    (Back to BLOG CONTENT)
+    CONTENT CREATION
+         |
+    INTELLIGENCE (grade, predict, analyze)
+         |
+    AUTOMATION (recycle, repurpose, schedule)
+         |
+    DISTRIBUTION (timing, hashtags, personas)
+         |
+    REVENUE TRACKING (ROI, cost per post, reports)
+         |
+    ENGAGEMENT (streaks, digest, templates)
+         |
+    COLLABORATION (approval portal, team queues)
+         |
+    (Back to CONTENT CREATION, now informed by data)
 ```
 
-Each cycle produces better content, more engagement, and more passive growth — the system gets smarter the more you use it.
+Each cycle produces better content, more engagement, and more revenue. The system gets smarter the more it is used.
 
 ---
 
 ## Technology
 
-PassivePost is built on the MuseKit SaaS template, which provides:
-
-- **Authentication**: Email/password, OAuth, SSO/SAML via Supabase
-- **Billing**: Stripe subscriptions with automatic tier resolution
-- **Admin Dashboard**: Full configuration without code changes
-- **Email**: Transactional emails via Resend
-- **Queue System**: BullMQ with Upstash Redis for background jobs
-- **Database**: PostgreSQL via Supabase with Row Level Security
-- **Deployment**: Vercel with auto-deploy on git push
-
-PassivePost adds its own layer on top: social platform API clients, AI content generation, engagement analytics, and the brand voice system. All PassivePost code is cleanly separated from the MuseKit core, making it easy to maintain and extend.
-
----
-
-## Current Status
-
-- 3 platforms with full OAuth: Twitter/X, LinkedIn, Facebook
-- 7 platforms with stubbed API clients ready for integration
-- AI content generation with multimodal image support
-- Complete dashboard with 17+ pages
-- Blog publishing to Medium, WordPress, Ghost, LinkedIn Articles, and Substack
-- Content flywheel system: 38 features across 7 phases (all complete)
-- Content intelligence: AI grading, DNA analysis, topic fatigue, engagement prediction
-- Advanced automation: calendar autopilot, content recycling, repurpose chains
-- Distribution intelligence: platform timing, hashtag tracking, audience personas
-- Revenue & ROI: cost tracking, ROI calculator, client reports
-- Engagement & retention: streaks, digest, templates, leaderboard
-- Team collaboration: client approval portal, shared content library
-- Bonus features: AI hashtag suggestions, gig lead scanner, voice fine-tuner, lead CRM
-- Engagement analytics with Recharts charts
-- Lead tracking with CRM capabilities
-- Brand voice configuration with 14 niches + AI voice fine-tuning
-- Trend alerts and monitoring
-- n8n automation templates
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16+ (App Router) with TypeScript |
+| Frontend | React, Tailwind CSS, shadcn/ui, Recharts |
+| Database | PostgreSQL via Supabase with Row Level Security |
+| Authentication | Supabase Auth (email, OAuth, SSO/SAML) |
+| Payments | Stripe (subscriptions, webhooks, customer portal) |
+| Email | Resend (transactional, drip sequences, digests) |
+| AI | xAI Grok (`grok-3-mini-fast`) |
+| Queue | BullMQ with Upstash Redis |
+| Rate Limiting | Upstash Redis sliding window + in-memory fallback |
+| Deployment | Vercel |
 
 ---
 
@@ -235,13 +194,8 @@ PassivePost adds its own layer on top: social platform API clients, AI content g
 
 | Document | What It Covers |
 |----------|---------------|
-| [FEATURES.md](./FEATURES.md) | Deep dive into every feature with details and mechanics |
+| [FEATURES.md](./FEATURES.md) | Detailed breakdown of every feature |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Technical blueprint: database, APIs, OAuth, queue system |
-| [SITEMAP.md](./SITEMAP.md) | Every page and URL in the application |
-| [USER_GUIDE.md](./USER_GUIDE.md) | Step-by-step guide for using PassivePost |
-| [PRODUCT_GUIDE.md](./PRODUCT_GUIDE.md) | Combined reference (original comprehensive doc) |
 | [BLOG_PUBLISHING.md](./BLOG_PUBLISHING.md) | Blog cross-posting feature details |
-| [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md) | Complete 38-feature flywheel system: phases, APIs, dashboards |
 
 ---
-

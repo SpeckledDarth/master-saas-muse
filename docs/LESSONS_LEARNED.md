@@ -1,157 +1,146 @@
-# PassivePost — Lessons Learned & Anti-Patterns
+# Technical Reference & Development Guidelines
 
-> **Last Updated:** February 25, 2026
-> **Purpose:** Concrete rules from real bugs and wasted work. Read this before every session. Follow these rules to avoid repeating mistakes.
-
----
-
-## Session Continuity Problems
-
-### Problem: Sessions Start Blind
-**What happened:** New sessions assumed they were the first. They didn't read existing docs, didn't understand the product vision, and built features that conflicted with the architecture.
-
-**Rule:** Every session MUST follow the Session Start Protocol in `replit.md`:
-1. Read `docs/PRODUCT_IDENTITY.md` — understand what we're building
-2. Read `docs/FEATURE_INVENTORY.md` — understand what's already built
-3. Read `docs/ROADMAP.md` — understand what's in progress
-4. Check Pending Bug Fixes — fix those before new features
-5. Plan with integration requirements
-
-### Problem: Sessions Give Wrong Advice
-**What happened:** Sessions treated PassivePost as a generic SaaS template and gave advice like "you don't need this many features" or "simplify the affiliate program." This directly contradicts the product strategy — the feature richness IS the moat.
-
-**Rule:** Read `docs/PRODUCT_IDENTITY.md` first. This is a closed-loop business intelligence platform. The 217-feature vision is intentional, not scope creep. Never suggest cutting features or simplifying the affiliate program.
-
-### Problem: Standalone Feature Development
-**What happened:** New features were built as isolated modules that didn't reference existing systems. This created duplicate data views, parallel logic, and a fragmented user experience.
-
-**Rule:** Every new feature must connect to at least one existing system. Before building, search `docs/FEATURE_INVENTORY.md`. Document integration points in the session plan.
+> **Purpose:** Essential patterns, anti-patterns, and architectural rules for working with this codebase. Read this before making any changes. These guidelines prevent real bugs that have occurred in production.
 
 ---
 
-## Technical Anti-Patterns
+## 1. Tech Stack Overview
 
-### Anti-Pattern: `.catch()` on Supabase Query Builders
-**What happened:** Routes like `revenue-waterfall`, `scheduled-reports`, and `usage-insights` chained `.catch()` on Supabase query builders. Supabase query builders return `{ data, error }` — they don't throw. `.catch()` silently swallows nothing and the actual error in `error` goes unhandled.
+This is a full-stack SaaS application built with the following technologies:
 
-**Rule:** Always use this pattern:
+| Layer | Technology | Role |
+|-------|-----------|------|
+| **Framework** | Next.js 16+ (App Router) | Server-side rendering, API routes, file-based routing |
+| **UI** | React 18 + TypeScript | Component library with strict typing |
+| **Styling** | Tailwind CSS | Utility-first CSS framework |
+| **Database** | Supabase (PostgreSQL) | Primary data store with Row Level Security (RLS) |
+| **Auth** | Supabase Auth | User authentication, session management, OAuth |
+| **Payments** | Stripe | Subscriptions, checkout, billing portal |
+| **Hosting** | Vercel | Production deployment (auto-deploys from GitHub) |
+| **Email** | Resend | Transactional and marketing emails |
+| **AI** | xAI / Grok | AI-powered features (coaching, analytics, content generation) |
+| **Cache/Rate Limiting** | Upstash Redis | Rate limiting, caching, queues |
+
+**Key architectural concept:** This is a closed-loop business intelligence platform with a rich affiliate program. The extensive feature set (200+ features) is intentional — it is the product's competitive moat. Do not suggest cutting features or simplifying the affiliate program.
+
+---
+
+## 2. Database Patterns
+
+### Supabase Query Error Handling
+
+Supabase query builders do **not** throw JavaScript exceptions. They return a `{ data, error }` object. If you chain `.catch()` on a query builder, it will silently do nothing — the actual error in the `error` field goes completely unhandled, and your route will appear to succeed while returning `null` data.
+
 ```typescript
-// CORRECT
+// CORRECT — always destructure and check the error field
 const { data, error } = await supabase.from('table').select('*');
 if (error) throw error;
 
-// WRONG — NEVER DO THIS
+// WRONG — .catch() does nothing because Supabase queries don't throw
 const { data } = await supabase.from('table').select('*').catch(() => ({ data: null }));
+// The `error` field is never checked. If the query fails, `data` is null
+// and you have no idea why.
 ```
 
-### Anti-Pattern: Missing `systemPrompt` in AISettings
-**What happened:** AI routes crashed because the `AISettings` type requires a `systemPrompt: string` field, but it was omitted.
+**Why this matters:** Routes that use `.catch()` will return empty/null data to the frontend with a 200 status code. The user sees a blank page or missing data, and there is no error in the logs to debug. Always destructure `{ data, error }` and handle the `error` explicitly.
 
-**Rule:** Every call to `chatCompletion()` must include `systemPrompt` in the settings object:
+### Handling Missing Tables Gracefully
+
+Supabase returns two different error codes when a table doesn't exist:
+- `42P01` — PostgreSQL "relation does not exist" (table was never created)
+- `PGRST205` — PostgREST schema cache miss (table was just created but PostgREST hasn't refreshed its cache yet)
+
+Both must be caught and handled gracefully. If you only handle one, the other will cause a 500 error in production. Return an empty result set instead of crashing.
+
+### Reusing Computed Data
+
+Before computing derived data (e.g., payout projections, earnings summaries), check if another component or API endpoint already computes it. Duplicate calculations lead to inconsistent numbers across different parts of the UI, confusing users and creating maintenance burden. Reuse existing API endpoints or extract shared logic into utility functions.
+
+---
+
+## 3. API Route Patterns
+
+### TypeScript Strictness: Interfaces vs. Values
+
+TypeScript interfaces exist only at compile time — they have no runtime representation. If you write `typeof SomeInterface.prototype.property`, the build will fail because interfaces don't have prototypes.
+
 ```typescript
-const result = await chatCompletion({
-  systemPrompt: 'You are an affiliate marketing advisor...', // REQUIRED
-  userPrompt: '...',
-  model: 'grok-3-mini-fast',
-});
-```
-
-### Anti-Pattern: `typeof Interface.prototype.property`
-**What happened:** TypeScript build failed on Vercel because code used `typeof CustomRangeData.prototype.primary` — but interfaces don't have prototypes. They're compile-time only.
-
-**Rule:** Extract shared shapes into named types:
-```typescript
-// CORRECT
+// CORRECT — extract shared shapes into named types
 interface PeriodData { start: string; end: string; }
 interface RangeData {
   primary: PeriodData;
   comparison: PeriodData | null;
 }
 
-// WRONG — interfaces have no prototype
+// WRONG — interfaces have no prototype; this compiles in dev but fails in production build
 interface RangeData {
   primary: { start: string; end: string; };
-  comparison: typeof RangeData.prototype.primary | null; // BUILD ERROR
+  comparison: typeof RangeData.prototype.primary | null; // BUILD ERROR on Vercel
 }
 ```
 
-### Anti-Pattern: Boolean Expression Errors in JSX
-**What happened:** A component had a broken boolean expression that caused rendering issues. JSX boolean logic must be explicit.
+**Why this matters:** The dev server (Turbopack) is more lenient than `next build` (the production TypeScript checker). Code that compiles locally may fail on Vercel. Always verify TypeScript correctness — interfaces can't be used as values, all types must be properly imported, and generic constraints must be satisfied.
 
-**Rule:** Always use explicit ternary or `&&` with proper parentheses in JSX conditionals.
+### JSX Boolean Expressions
+
+Boolean logic in JSX must be explicit. Broken boolean expressions cause rendering issues that are hard to debug because the component may partially render or render unexpected content.
+
+**Rule:** Always use explicit ternary operators or `&&` with proper parentheses in JSX conditionals.
+
+### Self-Contained UI Components
+
+Large dashboard files (thousands of lines) are fragile. New feature panels should be fully self-contained — they fetch their own data, handle their own loading/error states, and render independently. Dashboard integration should be minimal (import + render). This keeps the dashboard stable while adding new features.
 
 ---
 
-## Integration Anti-Patterns
+## 4. AI Integration Patterns
 
-### Anti-Pattern: Parallel Data Views
-**What happened:** The financial overview panel calculated its own payout projections separately from the existing payout schedule widget, which already has that logic.
+### Required Fields for AI Calls
 
-**Rule:** Before computing derived data, check if another component already computes it. Reuse existing API endpoints or extract shared logic into utility functions.
+The `chatCompletion()` function requires a `systemPrompt` field. If you omit it, the AI route will crash at runtime.
 
-### Anti-Pattern: AI Without Context
-**What happened:** Some AI coaching features generated generic advice instead of pulling the affiliate's actual contests, milestones, tier progress, and leaderboard position.
+```typescript
+import { chatCompletion } from '@/lib/ai/provider';
 
-**Rule:** AI features must query the user's real data:
+const result = await chatCompletion({
+  systemPrompt: 'You are an affiliate marketing advisor...', // REQUIRED — omitting this crashes the route
+  userPrompt: `Based on this data: ${JSON.stringify(realData)}...`,
+  model: 'grok-3-mini-fast',
+});
+```
+
+### AI Must Use Real User Data
+
+AI features must query the user's actual data before generating responses. Generic advice is useless and undermines the product's value proposition. Every AI feature should pull:
+
 - Current tier and progress to next tier
-- Active contests and their standing
+- Active contests and the user's standing
 - Upcoming milestones
 - Leaderboard rank
 - Recent commission trends
 - Connected platform performance
 
-### Anti-Pattern: Adding Features Without Cross-Dashboard Awareness
-**What happened:** Features were added to one dashboard without considering how they should appear in others. Admin creates a contest → affiliate dashboard shows it → but AI coach doesn't mention it and predictions don't factor it in.
+**Why this matters:** The product is a closed-loop intelligence platform. AI features that don't reference real data feel like generic chatbots. The AI's value comes from personalized, data-driven insights.
 
-**Rule:** For every feature, ask:
+### Cross-Dashboard Awareness for New Features
+
+Every new feature should be evaluated against all parts of the system. Ask:
+
 1. Does the admin need to see/manage this?
 2. Does the affiliate need to see/use this?
-3. Does the AI need to know about this?
+3. Does the AI need to know about this? (e.g., AI coach should mention active contests)
 4. Does the prediction/intelligence system need this data?
 
----
-
-## Deployment Anti-Patterns
-
-### THE #1 PROBLEM: Replit Is Not the Production Environment
-
-**What happened (repeatedly):** Agent tested only within Replit (local dev server + Replit Postgres) and declared work "done." User then tested on the actual production environment (Vercel + Supabase) and hit errors that were invisible to the agent. Days were wasted debugging errors the user could see but the agent could not reproduce — because the agent was only looking at its own tools, not the real deployment.
-
-**The fundamental truth:**
-- This is a **Next.js + Vercel + Supabase** stack
-- The user NEVER tests in Replit. The user tests on Vercel.
-- Replit is a **code editor only**. The Replit preview/webview is never used.
-- If something works in Replit but breaks in Vercel, the user sees the breakage and the agent doesn't
-- **The agent must test as if it were deploying to Vercel**, not as if Replit is the target
-
-**Rules:**
-1. **Replit Postgres and Supabase Postgres must be synced at all times.** Every table, every column, every migration. If a migration runs on Replit, list the exact SQL the user needs to run on Supabase BEFORE testing.
-2. **Replit code and GitHub must be synced at all times.** The user pushes to GitHub (which triggers Vercel deploy). The agent must remind the user to push and must not declare work done until the code is committed.
-3. **Before handoff, the agent must do a full E2E test locally** — compile the code, hit every changed API route, check for errors in the response bodies, verify database schema matches. Fix all errors BEFORE giving work to the user.
-4. **Never suggest using the Replit preview panel.** It does not represent the production experience.
-5. **If the user reports a Vercel error**, do NOT dismiss it because "it works in Replit." The Vercel environment is the source of truth. Investigate the difference (TypeScript strictness, missing env vars, schema drift, etc.).
-
-### Anti-Pattern: Three-Environment Desync
-**What happened:** Agent tests against Replit Postgres + local dev server. User tests against Supabase + Vercel. Schemas drifted, causing 500 errors that one side couldn't reproduce.
-
-**Rule:** Follow the Pre-Push Sync Checklist in `replit.md`:
-1. Schema alignment — confirm tables/columns exist in Replit Postgres AND list migrations for Supabase
-2. Code compiles clean — `npm run dev` with zero errors
-3. API smoke test — curl every changed route, check response bodies (not just status codes)
-4. Migration inventory — list ALL migrations needed on Supabase, in order, with exact SQL
-5. Environment variables — list any new ones needed for both Vercel AND Supabase
-6. Git push reminder — user pushes to GitHub, Vercel auto-deploys
-
-### Anti-Pattern: Turbopack vs Production Build Differences
-**What happened:** Dev server (Turbopack) compiled without errors but `next build` (production TypeScript check) found type errors. Vercel runs the production build, which is stricter.
-
-**Rule:** Turbopack (dev mode) is more lenient than `next build` (production). Vercel runs the production build. If you're making type-level changes or adding new interfaces, be aware that code that compiles in dev may fail in production. When in doubt, mentally verify TypeScript correctness — interfaces can't be used as values, all types must be properly imported, etc.
+Failing to do this creates "integration debt" where features exist in isolation. For example, if an admin creates a contest but the AI coach doesn't mention it and predictions don't factor it in, the user experience feels disconnected.
 
 ---
 
-## Specific Codebase Patterns
+## 5. Authentication Patterns
 
-### Admin Auth Check Pattern
+### Admin Auth Check
+
+Admin routes use a two-tier authorization check. First, check the `user_roles` table. If the user isn't found there, fall back to `organization_members` with owner/manager roles. If neither check passes, return 401.
+
 ```typescript
 // Check user_roles table first, fall back to organization_members
 const { data: role } = await supabase
@@ -171,18 +160,12 @@ if (role?.role !== 'admin') {
 }
 ```
 
-### AI Route Pattern
-```typescript
-import { chatCompletion } from '@/lib/ai/provider';
+**Why this matters:** The application supports both direct admin roles and organization-based roles. Checking only one table would lock out legitimate admins who are authorized through the other system.
 
-const result = await chatCompletion({
-  systemPrompt: 'You are...', // REQUIRED
-  userPrompt: `Based on this data: ${JSON.stringify(realData)}...`,
-  model: 'grok-3-mini-fast',
-});
-```
+### Affiliate Auth Check
 
-### Affiliate Auth Check Pattern
+Affiliate routes require both authentication (is the user logged in?) and authorization (is the user an affiliate?). Always check both.
+
 ```typescript
 const { data: { user } } = await supabase.auth.getUser();
 if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -195,33 +178,73 @@ const { data: profile } = await supabase
 if (!profile) return NextResponse.json({ error: 'Not an affiliate' }, { status: 403 });
 ```
 
----
-
-## Integration Debt — ALL RESOLVED (Feb 25, 2026)
-
-All 7 integration gaps identified in the Session A/B audit have been fixed:
-
-1. ~~Contests → AI Coach~~ — FIXED
-2. ~~Milestones → Predictions~~ — FIXED
-3. ~~Leaderboard → AI Insights~~ — FIXED
-4. ~~Content Intelligence → Marketing Toolkit~~ — FIXED
-5. ~~Financial Overview → Payout Schedule~~ — FIXED
-6. ~~Weekly Digest → Contest Standings~~ — FIXED
-7. ~~Broadcasts → In-App Notifications~~ — Already working
-
-### Lesson: Fix integration debt BEFORE building new features
-The integration debt fix session was highly efficient (6 surgical changes, no new tables, no new routes). Every new AI feature now references the full context — contests, milestones, leaderboard rank, existing tools, payout schedule. This is how closed-loop architecture works: fix connections first, add features second.
+**Why this matters:** A logged-in user is not necessarily an affiliate. Skipping the profile check would expose affiliate-only data and features to regular users.
 
 ---
 
-## Session D Lessons (Feb 25, 2026)
+## 6. Deployment Patterns
 
-### Lesson: Handle BOTH Supabase error codes for new tables
-Supabase returns `42P01` (table not found) when a table doesn't exist, but returns `PGRST205` (schema cache miss) on the FIRST request after a table is created. Both must be handled gracefully. All Session D routes use a pattern that catches both codes and returns an empty result set instead of a 500.
+### The Three-Environment Architecture
 
-### Lesson: Self-contained UI components minimize dashboard risk
-The ~7000-line dashboard file is fragile. Session D components (KnowledgeBasePanel, SwipeFileLibrary, PromotionalCalendarPanel) are fully self-contained — they fetch their own data, handle their own loading/error states, and render independently. Dashboard wiring is just 3 import lines + 3 render calls. This pattern keeps the dashboard stable while adding new features.
+This project uses three distinct environments. Understanding their roles is critical:
+
+| Environment | Role | Database | URL |
+|-------------|------|----------|-----|
+| **Replit** | Code editor and development server | Replit Postgres (local dev only) | Not used for testing |
+| **GitHub** | Version control, triggers deployments | N/A | Repository URL |
+| **Vercel + Supabase** | Production hosting + production database | Supabase PostgreSQL | Production URL |
+
+**The critical rule:** Replit is a code editor, not the production environment. The Replit preview/webview should never be used for testing. Users test on Vercel. If something works in Replit but breaks on Vercel, the Vercel behavior is the source of truth.
+
+### Why This Architecture Causes Bugs
+
+The most common source of production bugs is **environment desync**:
+
+1. **Schema drift:** A migration runs on Replit Postgres but not on Supabase. The code references a column that exists locally but not in production, causing 500 errors on Vercel that cannot be reproduced in Replit.
+
+2. **Build differences:** The dev server (Turbopack) is more lenient than `next build` (which Vercel runs). Type errors, missing imports, and interface misuse may compile locally but fail in production.
+
+3. **Environment variable gaps:** A new env var is added to `.env` locally but not configured in Vercel's environment settings.
+
+### Pre-Deployment Checklist
+
+Before declaring work complete:
+
+1. **Schema alignment** — Confirm all tables/columns exist in both Replit Postgres AND Supabase. List the exact SQL migrations needed on Supabase.
+2. **Clean compilation** — Run `npm run dev` with zero errors.
+3. **API smoke test** — Test every changed route. Check response bodies, not just status codes. A 200 with `{ data: null }` is still a bug.
+4. **Migration inventory** — List ALL migrations needed on Supabase, in order, with exact SQL.
+5. **Environment variables** — List any new variables needed in both Vercel and Supabase.
+6. **Git push** — Code must be committed and pushed to GitHub. Vercel auto-deploys from GitHub.
+
+### Turbopack vs. Production Build
+
+The development server uses Turbopack, which is faster but more permissive than the production TypeScript compiler. Vercel runs `next build`, which performs strict type checking.
+
+Common issues that pass in dev but fail in production:
+- Using interfaces as runtime values (`typeof Interface.prototype.x`)
+- Missing type imports
+- Implicit `any` types
+- Unused variables (depending on tsconfig strictness)
+
+**Rule:** When making type-level changes or adding new interfaces, mentally verify TypeScript correctness. If in doubt, the production build is the authority.
 
 ---
 
-*This document grows with every session. Add new lessons as they're discovered.*
+## 7. Common Mistakes
+
+| Mistake | What Breaks | How to Avoid |
+|---------|-------------|--------------|
+| Chaining `.catch()` on Supabase queries | Errors are silently swallowed; routes return null data with 200 status | Always destructure `{ data, error }` and check `error` explicitly |
+| Omitting `systemPrompt` in `chatCompletion()` | AI route crashes at runtime | Always include `systemPrompt` in the settings object |
+| Using `typeof Interface.prototype.x` | Build fails on Vercel (interfaces have no runtime representation) | Extract shared shapes into named type aliases |
+| Testing only in Replit | Bugs appear on Vercel that can't be reproduced locally | Follow the pre-deployment checklist; treat Vercel as source of truth |
+| Running migrations only on Replit Postgres | Schema drift causes 500 errors in production | Always provide exact SQL for Supabase migrations |
+| Building features in isolation | Disconnected UX; AI coach doesn't know about new features | Evaluate every feature against admin, affiliate, AI, and prediction systems |
+| Handling only one Supabase error code for missing tables | Intermittent 500 errors after table creation | Handle both `42P01` and `PGRST205` error codes |
+| Computing derived data that another component already computes | Inconsistent numbers across the UI | Search existing endpoints before creating new calculations |
+| Ignoring Vercel-reported errors because "it works in Replit" | Production stays broken | Vercel is the source of truth; investigate environment differences |
+
+---
+
+*This document captures architectural patterns and anti-patterns for this codebase. Update it when new patterns are discovered or existing ones change.*

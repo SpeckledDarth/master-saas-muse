@@ -1,8 +1,12 @@
-# MuseKit Architecture: Option B (Separate Deployments)
+# MuseKit Architecture
 
-> **Revision:** 5.0 | **Last Updated:** February 20, 2026 | **Created:** February 2026
+## What is MuseKit?
 
-**Decision Date**: February 2026
+MuseKit is a production-ready SaaS template built with Next.js 16+, React 18, TypeScript, Tailwind CSS, shadcn/ui, Supabase, Stripe, Vercel, Resend, and xAI/Grok. It provides all the common infrastructure every SaaS product needs (auth, billing, admin dashboard, affiliate program, email, CRM, etc.) so you can focus on building your unique product features.
+
+This document describes how MuseKit is structured, how products are built on top of it, and the rules for keeping the codebase clean and maintainable.
+
+---
 
 ## Deployment Model
 
@@ -19,19 +23,17 @@ Each SaaS product built on MuseKit gets its own **independent deployment**:
 
 ### Why Separate Deployments?
 
-- **Clean P&L**: Each product's revenue and costs are naturally separated. No allocation formulas needed.
-- **Independent scaling**: One product's traffic spike doesn't affect another.
-- **Zero cross-pollination**: No risk of data or subscription leakage between products.
-- **Sellable**: Any product can be sold or shut down independently.
-- **Simple metrics**: Each deployment's Stripe dashboard IS that product's revenue report.
+- **Clean P&L**: Each product's revenue and costs are naturally separated
+- **Independent scaling**: One product's traffic spike doesn't affect another
+- **Zero cross-pollination**: No risk of data or subscription leakage between products
+- **Sellable**: Any product can be sold or shut down independently
+- **Simple metrics**: Each deployment's Stripe dashboard IS that product's revenue report
 
 ### Cost Per SaaS
 
 Starting: **$0-1/mo** on free tiers (Supabase Free, Vercel Hobby, Stripe pay-per-transaction).
 
 At scale: **~$50-75/mo** (Supabase Pro $25, Vercel Pro $20, Resend $20, Upstash ~$10).
-
-Negligible compared to even modest SaaS revenue.
 
 ---
 
@@ -47,21 +49,95 @@ MuseKit is the **reusable template**, not a deployed product itself.
 4. Deploy independently with its own Supabase, Stripe, domain
 5. When MuseKit core gets improvements, **pull updates via git merge**
 
-### Future: MuseKit HQ (Franchise Dashboard)
+---
 
-A lightweight app that connects to each deployed SaaS via their APIs (Stripe, Supabase, Vercel) and shows:
-- Combined revenue across all products
-- Per-product P&L side by side
-- User growth trends per product
-- Infrastructure health and costs
+## Technology Stack
 
-Build this when managing 3+ products. Not urgent before then.
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| Frontend | Next.js 16+ (App Router), React 18, TypeScript | Server-rendered React framework |
+| Styling | Tailwind CSS + shadcn/ui + next-themes | Utility-first CSS with component library |
+| Database | Supabase (PostgreSQL + Auth + RLS + Storage) | Managed database with built-in auth |
+| Hosting | Vercel | Production deployment with CDN |
+| Payments | Stripe | Subscription billing and checkout |
+| Email | Resend | Transactional and marketing emails |
+| AI | xAI (Grok), OpenAI, Anthropic | Pluggable AI provider system |
+| Queue | BullMQ + Upstash Redis | Background job processing |
+| Rate Limiting | Upstash Redis | Sliding window rate limiter |
+| Monitoring | Sentry | Error tracking (server + browser) |
+| Analytics | Plausible | Privacy-friendly web analytics |
+| State | TanStack Query | Server state management |
+| Validation | Zod | Schema validation |
+
+---
+
+## Directory Structure
+
+```
+src/
+├── app/
+│   ├── (auth)/                    # Login, signup, password reset
+│   ├── (dashboard)/               # User-facing pages (profile, billing, security, support)
+│   ├── (marketing)/               # Public pages (about, pricing, features, legal pages, etc.)
+│   ├── admin/                     # Admin dashboard and setup pages
+│   │   └── setup/                 # 15+ setup sub-pages (branding, content, pricing, etc.)
+│   ├── affiliate/                 # Affiliate portal (join, login, dashboard)
+│   ├── api/                       # All API routes
+│   │   ├── admin/                 # Admin API endpoints
+│   │   ├── affiliate/             # Affiliate API (100+ endpoints)
+│   │   ├── ai/                    # AI chat and provider config
+│   │   ├── social/                # PassivePost API (50+ endpoints)
+│   │   ├── stripe/                # Checkout, portal, webhook
+│   │   ├── cron/                  # Scheduled tasks
+│   │   └── ...                    # Other API routes
+│   ├── blog/                      # Public blog
+│   ├── changelog/                 # Public changelog
+│   ├── checkout/                  # Checkout flow
+│   ├── dashboard/social/          # PassivePost dashboard (15+ pages)
+│   ├── partner/                   # Co-branded affiliate landing pages
+│   └── testimonials/              # Public testimonials
+├── components/
+│   ├── ui/                        # shadcn/ui components
+│   ├── landing/                   # 17 reusable marketing components
+│   ├── layout/                    # Header, footer
+│   ├── admin/                     # Admin-specific components
+│   ├── affiliate/                 # Affiliate portal components
+│   ├── social/                    # PassivePost components
+│   ├── auth/                      # Auth components
+│   ├── branding/                  # Dynamic branding
+│   ├── subscription/              # Upgrade banners
+│   └── analytics/                 # Analytics components
+├── lib/
+│   ├── supabase/                  # Database client (client, server, admin)
+│   ├── stripe/                    # Payment integration
+│   ├── products/                  # Product registry (generic, multi-product)
+│   ├── email/                     # Email service (Resend)
+│   ├── ai/                        # AI provider abstraction
+│   ├── affiliate/                 # Affiliate program system
+│   ├── queue/                     # BullMQ job queue
+│   ├── webhooks/                  # Webhook dispatcher (HMAC, retry)
+│   ├── sso/                       # SSO/SAML provider
+│   ├── rate-limit/                # Upstash Redis rate limiting
+│   ├── redis/                     # Redis utilities
+│   ├── config/                    # Centralized API key management
+│   ├── settings/                  # Settings utilities
+│   ├── validation/                # Zod schemas
+│   ├── logging/                   # Structured logging
+│   ├── social/                    # PassivePost business logic (product-specific)
+│   └── admin-notes/               # Admin notes system
+├── hooks/                         # React hooks
+└── types/                         # TypeScript type definitions
+
+migrations/
+├── core/                          # Core MuseKit database tables (16 files)
+└── extensions/                    # Product-specific tables (7 files)
+```
 
 ---
 
 ## Merge-Friendly Architecture Rules
 
-These rules minimize git merge conflicts when pulling MuseKit core updates into product repos. **Every future session must follow these rules.**
+These rules minimize git merge conflicts when pulling MuseKit core updates into product repos.
 
 ### Rule 1: Add, Don't Modify Core Files
 
@@ -77,8 +153,8 @@ BAD:  Add social types to src/types/settings.ts
 Core MuseKit schema lives in `migrations/core/`. Product-specific tables go in `migrations/extensions/`.
 
 ```
-GOOD: migrations/extensions/social_accounts.sql
-BAD:  migrations/core/003_social_accounts.sql
+GOOD: migrations/extensions/001_myproduct_tables.sql
+BAD:  migrations/core/020_myproduct_tables.sql
 ```
 
 ### Rule 3: Product Pages in Scoped Directories
@@ -106,7 +182,6 @@ Product-specific BullMQ job types should be defined in `src/lib/<product>/` and 
 
 ```
 GOOD: src/lib/social/queue-jobs.ts (defines social job types and processors)
-      src/lib/queue/index.ts imports a generic plugin registry
 BAD:  Adding social job types directly to src/lib/queue/types.ts
 ```
 
@@ -114,8 +189,8 @@ BAD:  Adding social job types directly to src/lib/queue/types.ts
 
 Sometimes you genuinely need to modify a core file (e.g., adding a nav item). In that case:
 - Keep changes **minimal and isolated**
-- Add a comment: `// PRODUCT: PassivePost`
-- Document the change in this file under "Known Core File Modifications"
+- Add a comment: `// PRODUCT: MyProduct`
+- Document the change
 
 ---
 
@@ -136,32 +211,70 @@ This means:
 
 Core MuseKit files are everything that is NOT product-specific:
 
-- `src/lib/supabase/` - Database client
-- `src/lib/stripe/` - Payment integration
-- `src/lib/products/` - Product registry (generic, not product-specific)
-- `src/lib/queue/` - Queue infrastructure (generic job types only)
-- `src/types/settings.ts` - Core SaaS settings
-- `src/app/admin/` - Admin dashboard (generic)
-- `src/app/api/stripe/` - Stripe endpoints
-- `src/app/api/admin/` - Admin API
-- `migrations/core/` - Core database schema
+- `src/lib/supabase/` — Database client
+- `src/lib/stripe/` — Payment integration
+- `src/lib/products/` — Product registry (generic, not product-specific)
+- `src/lib/queue/` — Queue infrastructure (generic job types only)
+- `src/lib/affiliate/` — Affiliate program system
+- `src/lib/ai/` — AI provider abstraction
+- `src/lib/email/` — Email service
+- `src/lib/webhooks/` — Webhook dispatcher
+- `src/lib/sso/` — SSO/SAML provider
+- `src/lib/rate-limit/` — Rate limiting
+- `src/lib/redis/` — Redis utilities
+- `src/lib/config/` — API key management
+- `src/types/settings.ts` — Core SaaS settings
+- `src/app/admin/` — Admin dashboard (generic)
+- `src/app/affiliate/` — Affiliate portal
+- `src/app/api/stripe/` — Stripe endpoints
+- `src/app/api/admin/` — Admin API
+- `src/app/api/affiliate/` — Affiliate API
+- `migrations/core/` — Core database schema
 
 ### What is "Product"?
 
-Product-specific files live in isolated directories:
+Product-specific files live in isolated directories. Using PassivePost as an example:
 
-- `src/lib/social/` - PassivePost business logic
-- `src/app/dashboard/social/` - PassivePost UI pages
-- `src/app/api/social/` - PassivePost API routes
-- `src/app/admin/setup/passivepost/` - PassivePost admin config
-- `migrations/extensions/` - PassivePost database tables
-- `docs/passivepost/PRODUCT_GUIDE.md` - PassivePost product documentation
+- `src/lib/social/` — PassivePost business logic
+- `src/app/dashboard/social/` — PassivePost UI pages
+- `src/app/api/social/` — PassivePost API routes
+- `src/app/admin/setup/passivepost/` — PassivePost admin config
+- `src/components/social/` — PassivePost UI components
+- `migrations/extensions/` — PassivePost database tables
+- `docs/passivepost/` — PassivePost documentation
+
+---
+
+## Core Database Schema
+
+MuseKit core includes these migration files in `migrations/core/`:
+
+| Migration | Purpose |
+|-----------|---------|
+| `001_social_tables.sql` | Social platform account connections |
+| `002_product_registry.sql` | Multi-product support tables |
+| `003_testimonials.sql` | Testimonial management |
+| `004_launch_kit.sql` | Drip campaigns, referral tracking, onboarding funnel |
+| `005_affiliate_system.sql` | Core affiliate program tables |
+| `006_affiliate_applications.sql` | Affiliate application workflow |
+| `007_affiliate_enhancements_p1.sql` | Milestones, discount codes, broadcasts |
+| `008_affiliate_enhancements_p2.sql` | Tiers, payouts, contests, source tags |
+| `009_affiliate_enhancements_p3.sql` | Co-branded pages, tax info, fraud scoring, API keys, webhooks, messaging |
+| `010_affiliate_sprint4.sql` | Additional affiliate features |
+| `011_crm_foundation.sql` | CRM tables (tickets, activities, campaigns, contracts) |
+| `012_commission_renewals.sql` | Recurring commission tracking |
+| `013_delight_features.sql` | Additional engagement features |
+| `014_analytics_columns.sql` | Analytics tracking columns |
+| `015_session_d_tables.sql` | Extended session tables |
+| `016_session_e_tables.sql` | Further session extensions |
+
+Plus core tables for: `profiles`, `user_roles`, `organization_settings`, `audit_logs`, `organizations`, `organization_members`, `invitations`, `admin_notes`, `tickets`, `activities`, `campaigns`, `contracts`, `user_profiles`, and more.
 
 ---
 
 ## Landing Page Component Architecture
 
-MuseKit includes 16 reusable landing page components in `src/components/landing/`. These are core MuseKit components, not product-specific.
+MuseKit includes 17 reusable landing page components in `src/components/landing/`. These are core MuseKit components, not product-specific.
 
 ### Components
 
@@ -183,6 +296,7 @@ MuseKit includes 16 reusable landing page components in `src/components/landing/
 | Image Collage Section | `image-collage-section.tsx` |
 | Image Text Section | `image-text-section.tsx` |
 | Announcement Bar | `announcement-bar.tsx` |
+| Social Proof Popup | `social-proof-popup.tsx` |
 
 ### Configuration
 
@@ -190,7 +304,7 @@ All landing page sections are toggleable via the `ContentSettings` interface in 
 
 - **Section Ordering**: `ContentSettings.sectionOrder` array controls the display order of sections on the landing page.
 - **Per-Section Background Colors**: `ContentSettings.sectionColors` allows each section to have a custom background color.
-- **Feature Sub-Page System**: Feature sub-pages are served at `/features/[slug]` and configured via the `featureSubPages` array in content settings. Each entry defines a dedicated feature detail page accessible from the main features listing.
+- **Feature Sub-Page System**: Feature sub-pages are served at `/features/[slug]` and configured via the `featureSubPages` array in content settings.
 
 ---
 
@@ -218,10 +332,6 @@ CSS variables `--primary-*` are defined at 11 scale stops: **50, 100, 200, 300, 
 - Icon backgrounds (light mode): randomized from primary scale shades `100`, `200`, `300`
 - Icon backgrounds (dark mode): randomized from primary scale shades `700`, `800`, `900`
 
-### Avatar Fallback
-
-Avatar fallback backgrounds use the same randomized pattern as icon backgrounds, selecting from primary scale light shades in light mode and dark shades in dark mode.
-
 ---
 
 ## Interactive State System
@@ -237,16 +347,10 @@ CSS utility classes are defined in `src/app/globals.css` to provide consistent i
 | `toggle-elevate` | Prepares an element for toggle state management |
 | `toggle-elevated` | Applied alongside `toggle-elevate` to indicate the "on" state |
 
-### Theme-Aware Colors
-
-- **Light mode**: `--primary-100`/`--primary-200` backgrounds, `--primary-600` borders
-- **Dark mode**: `--primary-900`/`--primary-800` backgrounds, `--primary-400` borders
-
 ### Usage Notes
 
 - **Buttons and Badges** handle their own hover/active states internally. Do not apply `hover-elevate` or `active-elevate-2` to these components.
-- These utilities are applied to **17+ files** across the codebase for all clickable non-Button elements (cards, sidebar items, list rows, toggles, etc.).
-- The classes compose with any background color and respect the current dark/light theme.
+- These utilities compose with any background color and respect the current dark/light theme.
 
 ---
 
@@ -263,30 +367,26 @@ Header and footer styling is configurable through the admin UI and stored in set
 
 - Header style is set via `NavigationSettings.headerStyle`
 - Footer style is set via `NavigationSettings.footerStyle`
-- Both are configurable through the admin UI at the branding setup page (`/admin/setup/branding`)
-- Defaults to the branding primary color with auto-computed contrast text color for readability
+- Both are configurable through the admin UI at `/admin/setup/branding`
+- Defaults to the branding primary color with auto-computed contrast text color
 
 ---
 
 ## Known Separation Issues
 
-These work fine in the current combined repo but should be cleaned up before creating a truly clean MuseKit template for others. All issues below are documented for future cleanup.
+These work fine in the current combined repo but should be cleaned up before creating a truly clean MuseKit template for distribution.
 
 ### 1. Queue Types (src/lib/queue/types.ts)
 
-**Issue**: Social job types (`social-post`, `social-health-check`, `social-trend-monitor`, `social-engagement-pull`) and their interfaces are defined directly in the core queue types file.
+**Issue**: Social job types (`social-post`, `social-health-check`, `social-trend-monitor`, `social-engagement-pull`) are defined directly in the core queue types file.
 
-**Fix**: Move social job type definitions to `src/lib/social/queue-jobs.ts`. Refactor `src/lib/queue/types.ts` to use a plugin/registry pattern where products register their own job types.
+**Fix**: Move social job type definitions to `src/lib/social/queue-jobs.ts`. Refactor `src/lib/queue/types.ts` to use a plugin/registry pattern.
 
 ### 2. Queue Processors (src/lib/queue/index.ts)
 
 **Issue**: Core queue processor imports from `@/lib/social/client` and `@/lib/social/types`. This violates the one-way dependency rule.
 
-**Fix**: Implement a job processor registry where products register their own processors. Core queue dispatches to registered handlers without knowing about product internals.
-
-### 3. Admin Setup Nav (src/app/admin/setup/layout.tsx)
-
-**Status**: The "Social" tab (line 15) refers to the generic social links configuration page (Twitter/LinkedIn/GitHub URLs for the company footer), NOT PassivePost. This is core MuseKit functionality. No issue here.
+**Fix**: Implement a job processor registry where products register their own processors.
 
 ---
 
@@ -298,16 +398,6 @@ When pulling MuseKit core updates into a product repo:
 2. `git fetch musekit main`
 3. `git merge musekit/main` (or create a branch first for review)
 4. Resolve any conflicts (should be minimal if rules are followed)
-
-### Conflict-Prone Areas to Watch
-
-| File | Risk | Reason |
-|------|------|--------|
-| `src/lib/queue/types.ts` | HIGH | Social jobs mixed with core (known issue) |
-| `src/lib/queue/index.ts` | HIGH | Social imports in core (known issue) |
-| `src/app/admin/setup/layout.tsx` | LOW | Only if nav tabs change |
-| `package.json` | LOW | Only if dependencies diverge |
-| `src/types/settings.ts` | LOW | Only generic social links, no product code |
 
 ### Pre-Fork Checklist
 

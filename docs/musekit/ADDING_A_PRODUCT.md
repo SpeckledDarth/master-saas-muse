@@ -1,10 +1,8 @@
 # Adding a New Product to MuseKit
 
-> **Revision:** 5.0 | **Last Updated:** February 20, 2026 | **Created:** February 2026
-
 ## Overview
 
-MuseKit is a multi-product SaaS foundation. Instead of building every SaaS from scratch, you clone MuseKit (which provides auth, billing, admin, email, etc.) and layer your own product on top. The **Product Registry** system lets you run multiple products within a single MuseKit instance, each with its own Stripe billing, tier system, and feature limits.
+MuseKit is a multi-product SaaS foundation. Rather than building every SaaS from scratch, you clone MuseKit (which provides auth, billing, admin, affiliate program, email, CRM, and more) and layer your own product on top. The **Product Registry** system lets you run multiple products within a single MuseKit instance, each with its own Stripe billing, tier system, and feature limits.
 
 Each product you add gets its own:
 
@@ -14,7 +12,7 @@ Each product you add gets its own:
 - **Library code** in `src/lib/{product}/`
 - **Stripe Product** with its own pricing tiers and metadata
 
-MuseKit core handles the plumbing (user auth, Stripe webhooks, subscription tracking, admin UI) so your product code only needs to define its tiers, tables, and business logic.
+MuseKit core handles all the plumbing (user auth, Stripe webhooks, subscription tracking, admin UI, affiliate program, email system) so your product code only needs to define its tiers, tables, and business logic.
 
 ## Prerequisites
 
@@ -33,7 +31,7 @@ Before adding a product, make sure you have:
 2. Set the product name (e.g., "KidVault")
 3. Add a **metadata key** on the product that your tier resolver will use. The key name should be unique to your product (e.g., `kidvault_tier`). Set the value to match one of your planned tier definitions (e.g., `pro`, `team`)
 4. Create **Price** objects for each paid tier (e.g., $9/mo for Pro, $29/mo for Team)
-5. Note the **Product ID** (`prod_xxx`) and each **Price ID** (`price_xxx`) — you will need these
+5. Note the **Product ID** (`prod_xxx`) and each **Price ID** (`price_xxx`)
 
 **Example Stripe product metadata:**
 
@@ -43,7 +41,7 @@ Before adding a product, make sure you have:
 
 If you have multiple tiers, create separate Price objects. The metadata value on the Stripe Product tells MuseKit which tier the subscriber should receive.
 
-### Step 2: Register in the MuseKit Product Registry
+### Step 2: Register in the Product Registry
 
 You have two options:
 
@@ -317,7 +315,7 @@ The `productSlug` gets stored in the Stripe subscription's metadata as `muse_pro
 
 3. **Own your types**: Product-specific types go in `src/lib/{product}/types.ts`, not in `src/types/settings.ts` or any other core type file.
 
-4. **Prefix tables**: Use a unique prefix for all your database tables (e.g., `kv_` for KidVault, `fin_` for a finance product). This prevents collisions and makes it clear which tables belong to which product.
+4. **Prefix tables**: Use a unique prefix for all your database tables (e.g., `kv_` for KidVault). This prevents collisions and makes it clear which tables belong to which product.
 
 5. **Scoped metadata**: Use a unique metadata key for your Stripe product (e.g., `kidvault_tier`). Never reuse another product's metadata key.
 
@@ -336,7 +334,7 @@ PassivePost is registered with slug `passive-post` and uses the metadata key `mu
 ### Database Tables
 
 - **Core tables** (in `migrations/core/001_social_tables.sql`): `social_accounts`, `social_posts` — shared social infrastructure
-- **Extension tables** (in `migrations/extensions/001_passivepost_tables.sql`): `brand_preferences`, `alert_logs`, plus additional columns on `social_posts` (`trend_source`, `niche_triggered`)
+- **Extension tables** (in `migrations/extensions/`): `brand_preferences`, `alert_logs`, blog publishing tables, and additional columns on `social_posts`
 
 ### Code Structure
 
@@ -345,20 +343,40 @@ src/lib/social/                  # Business logic
   types.ts                       # PassivePost-specific types & tier definitions
   user-tier.ts                   # Tier resolution wrapper using getUserProductTier
   client.ts                      # Social platform API clients
-  posts.sql                      # SQL queries for post management
 
-src/app/api/social/              # API routes
+src/app/api/social/              # API routes (50+ routes)
   posts/route.ts                 # CRUD for social posts
   accounts/route.ts              # Social account management
   tier/route.ts                  # Tier info endpoint
   generate-post/route.ts         # AI post generation
+  blog/                          # Blog-to-social repurposing
+  engagement/                    # Engagement analytics
+  intelligence/                  # Content intelligence
+  automation/                    # Calendar autopilot, recycling, etc.
+  distribution/                  # Audience personas, hashtag tracking
+  leads/                         # Lead generation
+  collaboration/                 # Client approval portal
+  revenue/                       # ROI calculator, revenue reports
 
 src/app/dashboard/social/        # Dashboard pages
-  page.tsx                       # Main social dashboard
+  page.tsx                       # Accounts page
+  overview/page.tsx              # Main dashboard
   posts/page.tsx                 # Post management
   calendar/page.tsx              # Content calendar
   brand/page.tsx                 # Brand preferences
   queue/page.tsx                 # Post queue
+  engagement/page.tsx            # Engagement analytics
+  intelligence/page.tsx          # Content intelligence
+  leads/page.tsx                 # Lead generation
+  collaboration/page.tsx         # Client approval portal
+  automation/page.tsx            # Automation workflows
+  distribution/page.tsx          # Content distribution
+  revenue/page.tsx               # Revenue analytics
+  retention/page.tsx             # Retention insights
+  blog/                          # Blog management
+  affiliate/                     # Affiliate integration
+  settings/page.tsx              # Product settings
+  onboarding/page.tsx            # User onboarding
 ```
 
 ### Tier Resolution Usage
@@ -379,7 +397,7 @@ export async function getUserSocialTier(userId: string) {
 
 This pattern (a thin wrapper around the core tier resolver) is recommended for all products.
 
-For complete PassivePost documentation including all dashboard pages, API routes, OAuth flows, and tier details, see `docs/passivepost/PRODUCT_GUIDE.md`.
+For complete PassivePost documentation, see `docs/passivepost/PRODUCT_GUIDE.md`.
 
 ## File Reference
 
@@ -396,5 +414,3 @@ For complete PassivePost documentation including all dashboard pages, API routes
 | `src/app/admin/setup/products/page.tsx` | Admin UI for managing the product registry |
 | `migrations/core/002_product_registry.sql` | Database tables: `muse_products`, `muse_product_subscriptions` |
 | `migrations/extensions/` | Directory for product-specific migration files |
-| `scripts/seed-products.ts` | Example script for seeding Stripe products |
-

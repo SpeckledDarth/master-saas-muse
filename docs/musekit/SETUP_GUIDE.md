@@ -1,10 +1,6 @@
-# Master SaaS Muse Template - Setup Guide
+# MuseKit — Setup Guide
 
-> **Revision:** 5.0 | **Last Updated:** February 20, 2026 | **Created:** February 2026
-
-This guide walks you through creating a new SaaS from the Master SaaS Muse Template.
-
-**Template Status: MVP COMPLETE + Full Feature Set + PassivePost Extension + Marketing Components + UI Polish (February 2026)**
+This guide walks you through creating a new SaaS from the MuseKit template.
 
 ---
 
@@ -28,17 +24,14 @@ If you're cloning the completed template:
 
 ### 1. Clone Repository
 ```bash
-# Clone from GitHub
-git clone https://github.com/SpeckledDarth/master-saas-muse.git my-new-saas
+git clone <your-musekit-repo-url> my-new-saas
 cd my-new-saas
 
-# Install dependencies
 npm install
 ```
 
 ### 2. Create Environment File
 ```bash
-# Copy template
 cp .env.template .env.local
 
 # Edit with your values
@@ -46,16 +39,16 @@ nano .env.local
 ```
 
 ### 3. Set Up Supabase
-- Create new Supabase project
-- Run SQL from [Database Tables](#database-tables) section
-- If using PassivePost, also run [PassivePost Extension Tables](#passivepost-extension-tables)
-- Copy credentials to `.env.local`
+- Create a new Supabase project at [supabase.com](https://supabase.com)
+- Run the core SQL migrations from `migrations/core/` in order (001 through 016) in the Supabase SQL Editor
+- If using PassivePost, also run extension migrations from `migrations/extensions/`
+- Copy your Supabase credentials to `.env.local`
 
 ### 4. Set Up Stripe
-- Create products in Stripe Dashboard
+- Create products and prices in your Stripe Dashboard
 - Copy API keys to `.env.local`
-- Set up webhook endpoint
-- If using PassivePost, add tier metadata to products (see [Stripe Configuration](#stripe-configuration))
+- Set up the webhook endpoint (see [Stripe Configuration](#stripe-configuration))
+- If using PassivePost, add tier metadata to products
 
 ### 5. Deploy to Vercel
 ```bash
@@ -76,8 +69,8 @@ If creating a fresh Next.js project:
 ### Step 1: Create Next.js Project
 
 ```bash
-npx create-next-app@latest master-saas-muse --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
-cd master-saas-muse
+npx create-next-app@latest my-saas --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
+cd my-saas
 ```
 
 ### Step 2: Initialize Git and Push to GitHub
@@ -85,8 +78,8 @@ cd master-saas-muse
 ```bash
 git init
 git add .
-git commit -m "Initial Next.js 16 setup"
-git remote add origin https://github.com/YOUR_USERNAME/master-saas-muse.git
+git commit -m "Initial Next.js setup"
+git remote add origin https://github.com/YOUR_USERNAME/my-saas.git
 git branch -M main
 git push -u origin main
 ```
@@ -103,7 +96,6 @@ git push -u origin main
 ```bash
 npx shadcn@latest init
 
-# Install components
 npx shadcn@latest add button card input label toast avatar badge dialog dropdown-menu separator tabs switch select textarea scroll-area form alert
 ```
 
@@ -131,14 +123,14 @@ Create `.env.local` with these values:
 
 ```bash
 # ===================
-# SUPABASE
+# SUPABASE (Required)
 # ===================
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 # ===================
-# STRIPE
+# STRIPE (Required)
 # ===================
 STRIPE_SECRET_KEY=sk_test_...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
@@ -149,477 +141,270 @@ STRIPE_PRO_PRICE_ID=price_...
 STRIPE_TEAM_PRICE_ID=price_...
 
 # ===================
-# EMAIL (Resend)
+# EMAIL (Required - Resend)
 # ===================
 RESEND_API_KEY=re_...
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 
 # ===================
-# ANALYTICS (Optional)
-# ===================
-NEXT_PUBLIC_PLAUSIBLE_DOMAIN=yourdomain.com
-
-# Sentry Error Tracking
-NEXT_PUBLIC_SENTRY_DSN=https://...@o123.ingest.sentry.io/456
-SENTRY_ORG=your-org-slug
-SENTRY_PROJECT=your-project-slug
-SENTRY_AUTH_TOKEN=sntrys_...
-
-# ===================
-# AI (Optional - set one based on chosen provider)
+# AI (Optional - xAI is the default provider)
 # ===================
 XAI_API_KEY=xai-...
 # OPENAI_API_KEY=sk-...
 # ANTHROPIC_API_KEY=sk-ant-...
 
 # ===================
-# QUEUE & RATE LIMITING (Optional)
+# QUEUE & RATE LIMITING (Optional - Upstash Redis)
 # ===================
 UPSTASH_REDIS_REST_URL=https://...upstash.io
 UPSTASH_REDIS_REST_TOKEN=AX...
+
+# ===================
+# MONITORING (Optional)
+# ===================
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=yourdomain.com
+
+NEXT_PUBLIC_SENTRY_DSN=https://...@o123.ingest.sentry.io/456
+SENTRY_ORG=your-org-slug
+SENTRY_PROJECT=your-project-slug
+SENTRY_AUTH_TOKEN=sntrys_...
 
 # ===================
 # APP
 # ===================
 NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 SESSION_SECRET=your-session-secret
-
-# ===================
-# PASSIVEPOST (Optional)
-# ===================
-# MUSE_DEBUG_MODE=true  # Enable beta debug mode with mock data
 ```
+
+### Required vs. Optional Services
+
+| Service | Required? | Purpose |
+|---------|-----------|---------|
+| Supabase | Yes | Database, authentication, storage |
+| Stripe | Yes | Subscription billing, checkout |
+| Resend | Yes | Transactional email |
+| xAI / OpenAI / Anthropic | No | AI features (chat, content generation) |
+| Upstash Redis | No | Background jobs, rate limiting |
+| Sentry | No | Error tracking |
+| Plausible | No | Web analytics |
 
 ---
 
 ## Project Structure
 
 ```
-master-saas-muse/
-├── src/
-│   ├── app/
-│   │   ├── (auth)/
-│   │   │   ├── login/page.tsx
-│   │   │   ├── signup/page.tsx
-│   │   │   ├── reset-password/page.tsx
-│   │   │   └── update-password/page.tsx
-│   │   ├── (dashboard)/
-│   │   │   ├── profile/page.tsx
-│   │   │   ├── billing/page.tsx
-│   │   │   └── social/page.tsx
-│   │   ├── (marketing)/
-│   │   │   ├── about/page.tsx
-│   │   │   ├── contact/page.tsx
-│   │   │   ├── docs/page.tsx
-│   │   │   ├── faq/page.tsx
-│   │   │   ├── features/page.tsx
-│   │   │   ├── pricing/page.tsx
-│   │   │   ├── privacy/page.tsx
-│   │   │   ├── terms/page.tsx
-│   │   │   ├── cookie-policy/page.tsx
-│   │   │   ├── acceptable-use/page.tsx
-│   │   │   ├── accessibility/page.tsx
-│   │   │   ├── data-handling/page.tsx
-│   │   │   ├── dmca/page.tsx
-│   │   │   ├── ai-data-usage/page.tsx
-│   │   │   ├── security-policy/page.tsx
-│   │   │   ├── features/[slug]/page.tsx   # Feature sub-pages
-│   │   │   └── p/[slug]/page.tsx
-│   │   ├── admin/
-│   │   │   ├── page.tsx (dashboard)
-│   │   │   ├── analytics/page.tsx
-│   │   │   ├── audit-logs/page.tsx
-│   │   │   ├── blog/page.tsx
-│   │   │   ├── email-templates/page.tsx
-│   │   │   ├── feedback/page.tsx
-│   │   │   ├── metrics/page.tsx
-│   │   │   ├── onboarding/page.tsx
-│   │   │   ├── queue/page.tsx
-│   │   │   ├── settings/page.tsx
-│   │   │   ├── sso/page.tsx
-│   │   │   ├── setup/
-│   │   │   │   ├── layout.tsx
-│   │   │   │   ├── branding/page.tsx
-│   │   │   │   ├── compliance/page.tsx
-│   │   │   │   ├── content/page.tsx
-│   │   │   │   ├── features/page.tsx
-│   │   │   │   ├── integrations/page.tsx
-│   │   │   │   ├── passivepost/page.tsx
-│   │   │   │   ├── pages/page.tsx
-│   │   │   │   ├── pricing/page.tsx
-│   │   │   │   ├── security/page.tsx
-│   │   │   │   ├── social/page.tsx
-│   │   │   │   └── support/page.tsx
-│   │   │   ├── team/page.tsx
-│   │   │   ├── users/page.tsx
-│   │   │   └── waitlist/page.tsx
-│   │   ├── dashboard/
-│   │   │   └── social/
-│   │   │       ├── layout.tsx
-│   │   │       ├── page.tsx             # Accounts page
-│   │   │       ├── overview/page.tsx
-│   │   │       ├── posts/page.tsx
-│   │   │       ├── queue/page.tsx
-│   │   │       ├── calendar/page.tsx
-│   │   │       ├── engagement/page.tsx
-│   │   │       ├── leads/page.tsx
-│   │   │       ├── brand/page.tsx
-│   │   │       ├── settings/page.tsx
-│   │   │       └── onboarding/page.tsx
-│   │   ├── api/
-│   │   │   ├── admin/ (setup, stats, metrics, posts, users, users/[userId], notes, team, invitations, email-templates, webhooks, sso, notifications, queue, integrations)
-│   │   │   ├── ai/ (chat, providers)
-│   │   │   ├── social/ (accounts, posts, generate-post, health, connect, callback/[platform], tier, brand-preferences, debug)
-│   │   │   ├── auth/sso/check/
-│   │   │   ├── stripe/ (checkout, portal, products, subscription, webhook)
-│   │   │   ├── email/send/
-│   │   │   ├── feedback/
-│   │   │   ├── invite/[token]/ (validate, accept)
-│   │   │   ├── contact/
-│   │   │   ├── public/settings/
-│   │   │   ├── user/membership/
-│   │   │   └── waitlist/
-│   │   ├── auth/callback/route.ts
-│   │   ├── blog/ (listing + [slug])
-│   │   ├── changelog/
-│   │   ├── checkout/success/
-│   │   ├── invite/[token]/
-│   │   ├── monitoring/route.ts (Sentry tunnel)
-│   │   ├── globals.css
-│   │   └── layout.tsx
-│   ├── components/
-│   │   ├── ui/ (70+ shadcn components)
-│   │   ├── layout/ (header, footer)
-│   │   ├── landing/ # 16 reusable marketing components (hero, marquee, counters, founder-letter, comparison-bars, product-showcase, bottom-hero-cta, image-collage, image-text, etc.)
-│   │   ├── branding/ (dynamic branding)
-│   │   ├── auth/ (UserNav)
-│   │   ├── admin/ (image-upload)
-│   │   ├── subscription/ (UpgradeBanner)
-│   │   ├── social/          # PassivePost social dashboard components
-│   │   ├── analytics/ (plausible)
-│   │   ├── feedback-widget.tsx
-│   │   ├── help-widget.tsx
-│   │   ├── notification-bell.tsx
-│   │   ├── social-upgrade-banner.tsx
-│   │   └── waitlist-form.tsx
-│   ├── lib/
-│   │   ├── supabase/ (client, server, admin)
-│   │   ├── stripe/ (client, service, feature-gate, webhook-handlers)
-│   │   ├── email/ (client, service, template)
-│   │   ├── ai/ (provider - xAI, OpenAI, Anthropic)
-│   │   ├── webhooks/ (dispatcher - HMAC, retry, fire-and-forget)
-│   │   ├── sso/ (provider - SAML SSO management)
-│   │   ├── queue/ (index - BullMQ job queue with 10 job types, types)
-│   │   ├── social/ (types, client, user-tier, rate-limits, api-rate-limiter, token-refresh, queue-jobs, trend-alerts, email-notifications, crypto, debug, demo-data, n8n-templates/)
-│   │   ├── config/ (secrets, ensure-table - centralized API key management)
-│   │   ├── validation/ (schemas, index)
-│   │   ├── rate-limit/ (index - Upstash Redis sliding window)
-│   │   ├── logging/
-│   │   ├── notifications/ (server-side notification utility)
-│   │   ├── settings/
-│   │   └── team-permissions.ts
-│   ├── hooks/
-│   │   ├── use-setup-settings.ts
-│   │   └── use-setup-settings-context.tsx
-│   ├── types/
-│   │   └── settings.ts (all settings interfaces)
-│   ├── instrumentation-client.ts (Sentry client)
-│   └── instrumentation.ts (Sentry server + queue worker)
-├── migrations/
-│   ├── core/                          # Core MuseKit tables
-│   └── extensions/                    # PassivePost extension tables
-│       ├── 001_passivepost_tables.sql
-│       └── 002_engagement_metrics_placeholder.sql
-├── tests/
-│   ├── auth.setup.ts
-│   ├── blog.spec.ts
-│   ├── e2e-full.spec.ts
-│   ├── waitlist.spec.ts
-│   ├── feedback.spec.ts
-│   ├── email-templates.spec.ts
-│   └── run-tests.sh
-├── docs/
-│   ├── ADMIN_GUIDE.md
-│   ├── MASTER_PLAN.md
-│   ├── MUSE_CHECKLIST.md
-│   ├── PROJECT_OVERVIEW.md
-│   ├── PASSIVEPOST.md
-│   ├── ADDING_A_PRODUCT.md
-│   ├── ARCHITECTURE.md
-│   └── SETUP_GUIDE.md
-├── middleware.ts
-├── next.config.ts
-├── playwright.config.ts
-├── sentry.server.config.ts
-├── sentry.edge.config.ts
-├── .env.template
-└── package.json
+src/
+├── app/
+│   ├── (auth)/                         # Auth pages
+│   │   ├── login/page.tsx
+│   │   ├── signup/page.tsx
+│   │   ├── reset-password/page.tsx
+│   │   └── update-password/page.tsx
+│   ├── (dashboard)/                    # User dashboard pages
+│   │   ├── billing/page.tsx
+│   │   ├── profile/page.tsx
+│   │   ├── security/page.tsx
+│   │   └── support/page.tsx
+│   ├── (marketing)/                    # Public marketing pages
+│   │   ├── about/page.tsx
+│   │   ├── contact/page.tsx
+│   │   ├── docs/page.tsx
+│   │   ├── faq/page.tsx
+│   │   ├── features/page.tsx
+│   │   ├── features/[slug]/page.tsx    # Feature sub-pages
+│   │   ├── pricing/page.tsx
+│   │   ├── privacy/page.tsx
+│   │   ├── terms/page.tsx
+│   │   ├── cookie-policy/page.tsx
+│   │   ├── acceptable-use/page.tsx
+│   │   ├── accessibility/page.tsx
+│   │   ├── data-handling/page.tsx
+│   │   ├── dmca/page.tsx
+│   │   ├── ai-data-usage/page.tsx
+│   │   ├── security-policy/page.tsx
+│   │   └── p/[slug]/page.tsx          # Custom pages
+│   ├── admin/                          # Admin dashboard
+│   │   ├── page.tsx                    # Admin home
+│   │   ├── analytics/page.tsx
+│   │   ├── audit-logs/page.tsx
+│   │   ├── blog/page.tsx
+│   │   ├── email-templates/page.tsx
+│   │   ├── feedback/page.tsx
+│   │   ├── metrics/page.tsx
+│   │   ├── onboarding/page.tsx
+│   │   ├── queue/page.tsx
+│   │   ├── settings/page.tsx
+│   │   ├── sso/page.tsx
+│   │   ├── team/page.tsx
+│   │   ├── users/page.tsx
+│   │   ├── waitlist/page.tsx
+│   │   └── setup/                      # Setup sub-pages
+│   │       ├── branding/page.tsx
+│   │       ├── compliance/page.tsx
+│   │       ├── content/page.tsx
+│   │       ├── features/page.tsx
+│   │       ├── integrations/page.tsx
+│   │       ├── pages/page.tsx
+│   │       ├── pricing/page.tsx
+│   │       ├── security/page.tsx
+│   │       ├── social/page.tsx
+│   │       ├── support/page.tsx
+│   │       ├── affiliate/page.tsx
+│   │       ├── discount-codes/page.tsx
+│   │       ├── funnel/page.tsx
+│   │       ├── palette/page.tsx
+│   │       ├── passivepost/page.tsx
+│   │       ├── products/page.tsx
+│   │       ├── testimonials/page.tsx
+│   │       └── watermark/page.tsx
+│   ├── affiliate/                      # Affiliate portal
+│   │   ├── join/page.tsx
+│   │   ├── login/page.tsx
+│   │   ├── dashboard/page.tsx
+│   │   ├── forgot-password/page.tsx
+│   │   ├── set-password/page.tsx
+│   │   └── test-links/page.tsx
+│   ├── dashboard/social/              # PassivePost dashboard (product-specific)
+│   │   ├── overview/page.tsx
+│   │   ├── posts/page.tsx
+│   │   ├── queue/page.tsx
+│   │   ├── calendar/page.tsx
+│   │   ├── engagement/page.tsx
+│   │   ├── leads/page.tsx
+│   │   ├── brand/page.tsx
+│   │   ├── intelligence/page.tsx
+│   │   ├── automation/page.tsx
+│   │   ├── collaboration/page.tsx
+│   │   ├── distribution/page.tsx
+│   │   ├── revenue/page.tsx
+│   │   ├── retention/page.tsx
+│   │   ├── affiliate/page.tsx
+│   │   ├── blog/
+│   │   ├── settings/page.tsx
+│   │   └── onboarding/page.tsx
+│   ├── api/                            # API routes
+│   │   ├── admin/                      # Admin API endpoints
+│   │   ├── affiliate/                  # Affiliate API (100+ endpoints)
+│   │   ├── ai/                         # AI chat and provider config
+│   │   ├── social/                     # PassivePost API (50+ endpoints)
+│   │   ├── stripe/                     # Checkout, portal, webhook
+│   │   ├── cron/                       # Scheduled tasks
+│   │   ├── email/                      # Email sending
+│   │   ├── support/                    # Support chat
+│   │   ├── tickets/                    # Ticket management
+│   │   ├── user/                       # User profile and settings
+│   │   └── ...                         # Other API routes
+│   ├── blog/                           # Public blog pages
+│   ├── changelog/                      # Public changelog
+│   ├── checkout/                       # Checkout flow
+│   ├── partner/                        # Co-branded affiliate pages
+│   ├── testimonials/                   # Public testimonials
+│   ├── auth/callback/route.ts          # OAuth callback
+│   ├── monitoring/route.ts             # Sentry tunnel
+│   ├── globals.css                     # Global styles + color system
+│   └── layout.tsx                      # Root layout
+├── components/
+│   ├── ui/                             # shadcn/ui components
+│   ├── landing/                        # 17 reusable marketing components
+│   ├── layout/                         # Header, footer
+│   ├── admin/                          # Admin components
+│   ├── affiliate/                      # Affiliate portal components
+│   ├── social/                         # PassivePost components
+│   ├── auth/                           # Auth components (UserNav)
+│   ├── branding/                       # Dynamic branding
+│   ├── subscription/                   # Upgrade banners
+│   └── analytics/                      # Plausible analytics
+├── lib/
+│   ├── supabase/                       # Database client (client, server, admin)
+│   ├── stripe/                         # Payment integration
+│   ├── products/                       # Product registry (multi-product tier resolution)
+│   ├── email/                          # Email service (Resend)
+│   ├── ai/                             # AI provider abstraction
+│   ├── affiliate/                      # Affiliate program logic
+│   ├── queue/                          # BullMQ job queue
+│   ├── webhooks/                       # Webhook dispatcher (HMAC, retry)
+│   ├── sso/                            # SSO/SAML provider
+│   ├── rate-limit/                     # Upstash Redis rate limiting
+│   ├── redis/                          # Redis utilities
+│   ├── config/                         # Centralized API key management
+│   ├── settings/                       # Settings utilities
+│   ├── validation/                     # Zod schemas
+│   ├── logging/                        # Structured logging
+│   ├── social/                         # PassivePost business logic (product-specific)
+│   └── admin-notes/                    # Admin notes system
+├── hooks/                              # React hooks
+├── types/
+│   └── settings.ts                     # Core settings interfaces
+├── instrumentation-client.ts           # Sentry client
+└── instrumentation.ts                  # Sentry server + queue worker
+
+migrations/
+├── core/                               # Core MuseKit tables (16 migration files)
+│   ├── 001_social_tables.sql
+│   ├── 002_product_registry.sql
+│   ├── 003_testimonials.sql
+│   ├── ...
+│   └── 016_session_e_tables.sql
+└── extensions/                         # Product-specific tables (7 migration files)
+    ├── 001_passivepost_tables.sql
+    ├── ...
+    └── 007_affiliate_profiles_and_codes.sql
+
+tests/                                  # Playwright E2E tests
+docs/
+├── musekit/                            # MuseKit documentation
+└── passivepost/                        # PassivePost documentation
 ```
 
 ---
 
 ## Database Tables
 
-Run this SQL in Supabase SQL Editor:
+Run the core migration files from `migrations/core/` in order (001 through 016) in your Supabase SQL Editor. The key tables created include:
 
-```sql
--- ===================
--- PROFILES (extends auth.users)
--- ===================
-CREATE TABLE profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  full_name TEXT,
-  avatar_url TEXT,
-  stripe_customer_id TEXT,
-  stripe_subscription_id TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+### Core Tables
 
--- ===================
--- USER ROLES
--- ===================
-CREATE TABLE user_roles (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
-  app_id TEXT DEFAULT 'default',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(user_id, app_id)
-);
+| Table | Purpose |
+|-------|---------|
+| `profiles` | Extends `auth.users` with full name, avatar, and Stripe customer IDs |
+| `user_roles` | Maps users to roles (admin, member) per app |
+| `organization_settings` | JSON settings blob for app configuration |
+| `audit_logs` | Tracks admin actions for compliance |
+| `organizations` | Team/organization records |
+| `organization_members` | Maps users to organizations with roles (owner, manager, member, viewer) |
+| `invitations` | Email invitations with tokens and expiry |
+| `admin_notes` | Internal notes on users (visible only to admins) |
+| `social_accounts` | Social platform connections |
+| `social_posts` | Social media posts |
+| `muse_products` | Product registry for multi-product support |
+| `muse_product_subscriptions` | Per-product subscription tracking |
+| `testimonials` | Customer testimonials |
+| `tickets` | Support tickets |
+| `activities` | CRM activity log |
+| `campaigns` | Marketing campaigns |
+| `contracts` | Agreements and contracts |
+| `user_profiles` | Extended user profile data |
 
--- ===================
--- ORGANIZATION SETTINGS
--- ===================
-CREATE TABLE organization_settings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  app_id TEXT NOT NULL DEFAULT 'default' UNIQUE,
-  settings JSONB NOT NULL DEFAULT '{
-    "organizationName": "My SaaS",
-    "supportEmail": "support@example.com",
-    "allowNewSignups": true,
-    "maintenanceMode": false,
-    "requireEmailVerification": false,
-    "enableGoogleSignIn": true
-  }'::jsonb,
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+All tables have **Row Level Security (RLS)** enabled. Access to organization tables is controlled server-side via the Supabase admin client (service role) in API routes.
 
--- Insert default settings
-INSERT INTO organization_settings (app_id) VALUES ('default');
+### Important RLS Note
 
--- ===================
--- AUDIT LOGS
--- ===================
-CREATE TABLE audit_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id),
-  action TEXT NOT NULL,
-  details JSONB,
-  app_id TEXT DEFAULT 'default',
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ===================
--- ORGANIZATIONS (for team collaboration)
--- ===================
-CREATE TABLE organizations (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL DEFAULT 'Default Organization',
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Insert default organization
-INSERT INTO organizations (name) VALUES ('Default Organization');
-
--- ===================
--- ORGANIZATION MEMBERS
--- ===================
-CREATE TABLE organization_members (
-  id SERIAL PRIMARY KEY,
-  organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('owner', 'manager', 'member', 'viewer')),
-  joined_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(organization_id, user_id)
-);
-
--- ===================
--- INVITATIONS
--- ===================
-CREATE TABLE invitations (
-  id SERIAL PRIMARY KEY,
-  organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-  email TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('owner', 'manager', 'member', 'viewer')),
-  token TEXT NOT NULL UNIQUE,
-  invited_by UUID NOT NULL REFERENCES auth.users(id),
-  expires_at TIMESTAMPTZ NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  accepted_at TIMESTAMPTZ
-);
-
--- ===================
--- ADMIN NOTES (for customer service)
--- ===================
-CREATE TABLE IF NOT EXISTS admin_notes (
-  id SERIAL PRIMARY KEY,
-  user_id UUID NOT NULL,
-  note TEXT NOT NULL,
-  created_by UUID NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-CREATE INDEX IF NOT EXISTS idx_admin_notes_user_id ON admin_notes(user_id);
-
--- ===================
--- ENABLE RLS
--- ===================
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE organization_settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE organization_members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE invitations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE admin_notes ENABLE ROW LEVEL SECURITY;
-
--- ===================
--- RLS POLICIES
--- ===================
-
--- Profiles
-CREATE POLICY "Users can view own profile" ON profiles
-  FOR SELECT USING (auth.uid() = id);
-  
-CREATE POLICY "Users can update own profile" ON profiles
-  FOR UPDATE USING (auth.uid() = id);
-
-CREATE POLICY "Users can insert own profile" ON profiles
-  FOR INSERT WITH CHECK (auth.uid() = id);
-
-CREATE POLICY "Admins can view all profiles" ON profiles
-  FOR SELECT USING (
-    EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')
-  );
-
--- User Roles
-CREATE POLICY "Users can view own role" ON user_roles
-  FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Admins can view all roles" ON user_roles
-  FOR SELECT USING (
-    EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')
-  );
-
-CREATE POLICY "Admins can manage roles" ON user_roles
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')
-  );
-
--- Organization Settings
-CREATE POLICY "Anyone can read settings" ON organization_settings
-  FOR SELECT USING (true);
-
-CREATE POLICY "Admins can update settings" ON organization_settings
-  FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')
-  );
-
--- Audit Logs
-CREATE POLICY "Admins can view audit logs" ON audit_logs
-  FOR SELECT USING (
-    EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')
-  );
-
-CREATE POLICY "Users can insert own audit logs" ON audit_logs
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
-
--- Organizations (service role manages, users can read their org)
-CREATE POLICY "Service role full access orgs" ON organizations
-  FOR ALL USING (true);
-
--- Organization Members (service role manages via admin client)
-CREATE POLICY "Service role full access org_members" ON organization_members
-  FOR ALL USING (true);
-
--- Invitations (service role manages via admin client)
-CREATE POLICY "Service role full access invitations" ON invitations
-  FOR ALL USING (true);
-
--- Admin Notes (service role only)
-CREATE POLICY "Service role full access admin_notes" ON admin_notes
-  FOR ALL USING (true) WITH CHECK (true);
-```
-
-> **Important RLS Note**: The policies above for organization tables use `FOR ALL USING (true)` which is permissive. **Access is controlled server-side** by using the Supabase admin client (service role) in API routes, not by RLS. This means:
-> - Client-side queries to these tables may fail or return empty results
-> - All team operations go through server API endpoints that use the admin client
-> - For stricter RLS, add policies that check `auth.uid()` membership in organization_members
+The RLS policies for organization tables use `FOR ALL USING (true)` which is permissive. Access is controlled server-side by using the Supabase admin client (service role) in API routes, not by RLS. This means:
+- Client-side queries to these tables may fail or return empty results
+- All team operations go through server API endpoints that use the admin client
+- For stricter RLS, add policies that check `auth.uid()` membership in `organization_members`
 
 ---
 
 ## PassivePost Extension Tables
 
-If you're using the PassivePost extension, run this SQL **after** the core tables. These tables are specific to PassivePost and would NOT exist in other Muse clones.
+If you're using the PassivePost extension, run the migration files from `migrations/extensions/` **after** the core tables. These tables are specific to PassivePost and would NOT exist in other MuseKit clones.
 
-The migration files are located in `migrations/extensions/`.
-
-```sql
--- PassivePost Extension Tables
--- Run AFTER core social tables (migrations/core/001_social_tables.sql)
-
--- Enable UUID generation if not already enabled
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-
--- 1. Extend social_posts with PassivePost-specific columns
-ALTER TABLE social_posts ADD COLUMN IF NOT EXISTS trend_source TEXT;
-ALTER TABLE social_posts ADD COLUMN IF NOT EXISTS niche_triggered TEXT;
-
--- Expanded status values: 'queued' (BullMQ), 'approved' (user approved AI), 'ignored' (user rejected)
--- Composite index for fast queue views
-CREATE INDEX IF NOT EXISTS idx_social_posts_user_status ON social_posts(user_id, status);
-
--- 2. Brand Preferences table
-CREATE TABLE IF NOT EXISTS brand_preferences (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  org_id UUID NULL,
-  tone TEXT NOT NULL DEFAULT 'professional',
-  niche TEXT NOT NULL DEFAULT 'other',
-  location TEXT,
-  sample_urls TEXT[] DEFAULT '{}',
-  target_audience TEXT,
-  posting_goals TEXT,
-  preferred_platforms TEXT[] DEFAULT '{}',
-  post_frequency TEXT DEFAULT 'daily',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE UNIQUE INDEX IF NOT EXISTS idx_brand_preferences_user_id ON brand_preferences(user_id);
-CREATE INDEX IF NOT EXISTS idx_brand_preferences_org_id ON brand_preferences(org_id);
-
--- 3. Alert Logs table
-CREATE TABLE IF NOT EXISTS alert_logs (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  org_id UUID NULL,
-  trend_text TEXT NOT NULL,
-  suggested_post_id UUID REFERENCES social_posts(id) ON DELETE SET NULL,
-  action_taken TEXT,
-  platform TEXT NOT NULL,
-  source_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_alert_logs_user_created ON alert_logs(user_id, created_at DESC);
-
--- 4. Triggers (reuses update_updated_at_column() from core migration)
-DROP TRIGGER IF EXISTS brand_preferences_updated_at ON brand_preferences;
-CREATE TRIGGER brand_preferences_updated_at
-  BEFORE UPDATE ON brand_preferences
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-```
+Key extension tables include:
+- **`brand_preferences`** — User brand voice and content preferences
+- **`alert_logs`** — Trend alert history
+- **Blog publishing tables** — Blog connections and cross-linking
+- **Audit and email extensions** — Additional tracking columns
 
 ---
 
@@ -632,7 +417,7 @@ CREATE TRIGGER brand_preferences_updated_at
    - `https://your-app.vercel.app/*`
    - `http://localhost:3000/*`
 
-### Storage Bucket
+### Storage Buckets
 1. Create bucket named `avatars` (public)
 2. Create bucket named `branding` (public)
 3. Add policies for authenticated upload/update and public read
@@ -653,21 +438,18 @@ The template supports 5 OAuth providers, all configurable via Admin Dashboard:
 1. Get credentials from the provider's developer console
 2. Enable in Supabase **Authentication > Providers > [Provider]**
 3. Paste Client ID and Secret
-4. Enable the provider toggle in Admin Dashboard > Setup > Features tab
+4. Enable the provider toggle in Admin Dashboard > Setup > Features
 
-**Admin Controls:**
-- Login/signup pages only show OAuth buttons that are enabled in Features settings
+**Admin control:**
 - Toggle providers on/off without code changes
-- Changes take effect immediately (no caching delay)
+- Changes take effect immediately
 
 ---
 
 ## Stripe Configuration
 
 ### Products & Prices
-Create in Stripe Dashboard:
-- **Pro Plan**: $29/month
-- **Team Plan**: $99/month
+Create products and prices in your Stripe Dashboard. They will automatically appear on your `/pricing` page.
 
 ### PassivePost Tiers (Optional)
 
@@ -679,7 +461,7 @@ If using PassivePost, create additional products with these metadata values:
 | Passive Basic | `muse_tier` | `tier_2` | 20 posts/day, 15 AI gen/day |
 | Passive Premium | `muse_tier` | `tier_3` | 100 posts/day, 50 AI gen/day |
 
-The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these metadata values to rate limits. Tier definitions (display names, metadata values, and rate limits) are admin-configurable from the PassivePost setup page (`/admin/setup/passivepost`). Admins can add or remove tiers as needed.
+Tier definitions (display names, metadata values, and rate limits) are admin-configurable from the PassivePost setup page (`/admin/setup/passivepost`).
 
 ### Webhook Endpoint
 - URL: `https://your-app.vercel.app/api/stripe/webhook`
@@ -700,18 +482,8 @@ The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these met
 | `npm run dev` | Start development server (localhost:3000) |
 | `npm run build` | Build for production |
 | `npm run start` | Start production server |
-| `npx playwright test` | Run E2E tests (92 tests across 7 files) |
+| `npx playwright test` | Run E2E tests |
 | `git push` | Deploy to Vercel (auto-deploy) |
-
-### Documentation Reference
-- `docs/musekit/SETUP_GUIDE.md` - This file (setup & configuration)
-- `docs/musekit/ADMIN_GUIDE.md` - Admin dashboard usage
-- `docs/passivepost/PRODUCT_GUIDE.md` - PassivePost extension guide
-- `docs/musekit/ADDING_A_PRODUCT.md` - How to add new products
-- `docs/musekit/ARCHITECTURE.md` - System architecture overview
-- `docs/musekit/MASTER_PLAN.md` - Project roadmap
-- `docs/musekit/MUSE_CHECKLIST.md` - Feature checklist
-- `docs/musekit/PROJECT_OVERVIEW.md` - Project overview
 
 ---
 
@@ -720,63 +492,23 @@ The `getUserSocialTier` function in `src/lib/social/user-tier.ts` maps these met
 - [Supabase Dashboard](https://supabase.com/dashboard)
 - [Stripe Dashboard](https://dashboard.stripe.com)
 - [Vercel Dashboard](https://vercel.com/dashboard)
-- [Google Cloud Console](https://console.cloud.google.com)
 - [Resend Dashboard](https://resend.com)
-- [Plausible Dashboard](https://plausible.io)
-- [Upstash Console](https://console.upstash.com)
+- [Google Cloud Console](https://console.cloud.google.com) (for Google OAuth)
+- [Plausible Dashboard](https://plausible.io) (if using analytics)
+- [Upstash Console](https://console.upstash.com) (if using Redis)
 
 ---
 
-## What's Included (Full Feature Set)
+## Documentation Reference
 
-| Feature | Status |
-|---------|--------|
-| Email/Password Auth | Complete |
-| 5 OAuth Providers (Google, GitHub, Apple, X, Magic Link) | Complete |
-| OAuth Admin Controls (enable/disable from dashboard) | Complete |
-| Profile with Avatar + Connected Providers | Complete |
-| Admin Dashboard with Metrics | Complete |
-| Metrics Dashboard (10 KPIs + NPS + Alerts) | Complete |
-| User Management | Complete |
-| User Impersonation | Complete |
-| Setup Dashboard (11 Sub-Pages: Branding, Compliance, Content, Features, Integrations, PassivePost, Pages, Pricing, Security, Social, Support) | Complete |
-| Onboarding Wizard (4-step guided setup) | Complete |
-| Stripe Billing + Feature Gating | Complete |
-| Customer Portal | Complete |
-| Team Collaboration (Owner/Manager/Member/Viewer) | Complete |
-| Email Invitations | Complete |
-| Email Template Editor + Test Sending | Complete |
-| Blog/Changelog System (Markdown) | Complete |
-| Waitlist Mode + CSV Export | Complete |
-| Feedback Widget + NPS Rating | Complete |
-| Help Widget (AI Support Chatbot) | Complete |
-| In-App Notifications | Complete |
-| Audit Log Viewer | Complete |
-| AI Integration (xAI Grok, OpenAI, Anthropic) | Complete |
-| Webhook/n8n Automation (8 events, HMAC signing) | Complete |
-| Sentry Error Tracking (Server + Browser) | Complete |
-| Plausible Analytics | Complete |
-| E2E Testing (92 Playwright Tests, 7 Files) | Complete |
-| SEO/Sitemap | Complete |
-| Row Level Security (RLS) | Complete |
-| Rate Limiting + Security Headers | Complete |
-| Structured Logging | Complete |
-| Dark/Light Mode | Complete |
-| Custom Pages System | Complete |
-| Announcement Bar | Complete |
-| SSO/SAML Enterprise Auth | Complete |
-| Queue Infrastructure (BullMQ + Upstash, 10 Job Types) | Complete |
-| Rate Limiting (Upstash Redis) | Complete |
-| Customer Service Tools | Complete |
-| Admin Setup UX (11 Sub-Pages) | Complete |
-| Legal & Compliance Pages (9 pages + cookie consent) | Complete |
-| Scheduled Metrics Reports | Complete |
-| Metrics Alerts (Churn Rate + User Growth) | Complete |
-| Database Backup Configuration | Complete |
-| API Token Rotation | Complete |
-| PassivePost Module (10 platforms, 2 tiers) | Complete |
-| Centralized API Keys & Integrations | Complete |
-| PassivePost Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
-
----
-
+| Document | Purpose |
+|----------|---------|
+| `docs/musekit/SETUP_GUIDE.md` | This file — setup and configuration |
+| `docs/musekit/PROJECT_OVERVIEW.md` | High-level project overview |
+| `docs/musekit/ADMIN_GUIDE.md` | Admin dashboard usage guide |
+| `docs/musekit/ARCHITECTURE.md` | System architecture and merge rules |
+| `docs/musekit/ADDING_A_PRODUCT.md` | How to add new products |
+| `docs/musekit/MUSE_CHECKLIST.md` | Launch readiness checklist |
+| `docs/musekit/MASTER_PLAN.md` | Technical specifications |
+| `docs/musekit/AFFILIATE.md` | Affiliate system guide |
+| `docs/passivepost/PRODUCT_GUIDE.md` | PassivePost extension guide |

@@ -1,420 +1,320 @@
 # PassivePost — Sitemap
 
-> **Revision:** 2 | **Last Updated:** February 20, 2026 | **Created:** February 20, 2026
-
-A complete reference of every page, API endpoint, and route in PassivePost.
+PassivePost is a closed-loop business intelligence platform for content creators that combines content scheduling (8 social platforms + 2 blog platforms), affiliate marketing (3 dashboards), connected analytics, and AI coaching. This document is a complete reference of every page, API endpoint, and route in the application.
 
 ---
 
 ## Table of Contents
 
-1. [Dashboard Pages](#1-dashboard-pages)
-2. [Public Pages](#2-public-pages)
-3. [Admin Pages](#3-admin-pages)
-4. [API Endpoints](#4-api-endpoints)
-5. [Shared Pages (MuseKit Core)](#5-shared-pages-musekit-core)
+1. [Admin Dashboard Pages](#1-admin-dashboard-pages)
+2. [Affiliate Dashboard Pages](#2-affiliate-dashboard-pages)
+3. [User Dashboard Pages](#3-user-dashboard-pages)
+4. [Social Scheduling Pages](#4-social-scheduling-pages)
+5. [Public Pages](#5-public-pages)
+6. [Authentication Pages](#6-authentication-pages)
+7. [Marketing Pages](#7-marketing-pages)
+8. [API Endpoints](#8-api-endpoints)
+9. [Visual Sitemap](#9-visual-sitemap)
 
 ---
 
-## 1. Dashboard Pages
+## 1. Admin Dashboard Pages
 
-All user-facing PassivePost pages live under `/dashboard/social/`. The dashboard uses a dedicated sidebar layout with navigation grouped into Dashboard, Blog, Automation, Insights, Collaborate, and Setup sections.
+The admin dashboard provides full control over the platform, affiliate program, and business operations.
+
+| Route | Page Name | Description |
+|-------|-----------|-------------|
+| `/admin` | **Admin Home** | Overview with key metrics and quick actions |
+| `/admin/analytics` | **Analytics** | Platform-wide analytics and reporting |
+| `/admin/audit-logs` | **Audit Logs** | Record of every admin action with timestamps |
+| `/admin/blog` | **Blog Management** | Manage public blog posts |
+| `/admin/email-templates` | **Email Templates** | Customize all email templates |
+| `/admin/feedback` | **Feedback** | View user feedback and suggestions |
+| `/admin/metrics` | **Metrics & KPIs** | Configurable alerts and health dashboards |
+| `/admin/onboarding` | **Onboarding Funnel** | Track user drop-off at each setup step |
+| `/admin/queue` | **Queue Management** | View and manage background job queues |
+| `/admin/settings` | **Settings** | Platform-wide settings |
+| `/admin/sso` | **SSO Configuration** | Enterprise SSO/SAML setup |
+| `/admin/team` | **Team Management** | Manage admin and team member accounts |
+| `/admin/users` | **User Management** | View, search, filter, and manage all user accounts |
+| `/admin/waitlist` | **Waitlist** | Manage pre-launch or beta waitlist |
+
+### Admin Setup Wizard (`/admin/setup/`)
+
+| Route | Tab | Description |
+|-------|-----|-------------|
+| `/admin/setup/affiliate` | **Affiliate Program** | Commission rates, tiers, contests, payout settings (15+ sub-tabs) |
+| `/admin/setup/branding` | **Branding** | Logo, colors, company name |
+| `/admin/setup/compliance` | **Compliance** | Legal and regulatory settings |
+| `/admin/setup/content` | **Content** | Default content settings |
+| `/admin/setup/discount-codes` | **Discount Codes** | Create and manage Stripe-synced discount codes |
+| `/admin/setup/features` | **Features** | Enable/disable platform features |
+| `/admin/setup/funnel` | **Funnel** | Conversion funnel configuration |
+| `/admin/setup/integrations` | **Integrations** | Third-party integration settings |
+| `/admin/setup/pages` | **Pages** | Marketing page configuration |
+| `/admin/setup/palette` | **Color Palette** | Theme and color customization |
+| `/admin/setup/passivepost` | **PassivePost Config** | Social module settings, platform toggles, niche guidance, tier definitions |
+| `/admin/setup/pricing` | **Pricing** | Subscription plan configuration |
+| `/admin/setup/products` | **Products** | Product registry management |
+| `/admin/setup/security` | **Security** | Security policies and settings |
+| `/admin/setup/social` | **Social** | Social media platform configuration |
+| `/admin/setup/support` | **Support** | Support system configuration |
+| `/admin/setup/testimonials` | **Testimonials** | Manage customer testimonials |
+| `/admin/setup/watermark` | **Watermark** | Content watermark settings |
+
+---
+
+## 2. Affiliate Dashboard Pages
+
+The affiliate dashboard is a standalone experience for content creators who promote PassivePost as affiliates.
+
+| Route | Page Name | Description |
+|-------|-----------|-------------|
+| `/affiliate/dashboard` | **Affiliate Dashboard** | Main dashboard with 11 navigation tabs: Overview, Links, Analytics, Marketing, Resources, Earnings, Contests, Settings, Messages, Support, What's New |
+| `/affiliate/join` | **Application** | Public affiliate application form |
+| `/affiliate/login` | **Affiliate Login** | Dedicated login page |
+| `/affiliate/forgot-password` | **Forgot Password** | Password recovery |
+| `/affiliate/set-password` | **Set Password** | Initial password setup after approval |
+| `/affiliate/test-links` | **Test Links** | Validate referral link tracking |
+
+---
+
+## 3. User Dashboard Pages
+
+The user dashboard provides customer self-service and billing management.
+
+| Route | Page Name | Description |
+|-------|-----------|-------------|
+| `/dashboard` | **Main Dashboard** | User home with product access and account overview |
+| `/billing` | **Billing** | Subscription management, Stripe customer portal |
+| `/profile` | **Profile** | Display name, avatar, email management |
+| `/security` | **Security** | Password change and account security |
+| `/support` | **Support** | Submit and track support tickets |
+
+---
+
+## 4. Social Scheduling Pages
+
+All social scheduling pages live under `/dashboard/social/` with a dedicated sidebar layout.
 
 ### Navigation Structure
 
 ```
-PassivePost Dashboard
-├── Dashboard
-│   ├── Overview        /dashboard/social/overview
-│   ├── Posts            /dashboard/social/posts
-│   ├── Queue            /dashboard/social/queue
-│   └── Calendar         /dashboard/social/calendar
-├── Blog
-│   ├── Blog Home        /dashboard/social/blog
-│   ├── Compose          /dashboard/social/blog/compose
-│   └── Articles         /dashboard/social/blog/posts
-├── Automation           /dashboard/social/automation
-├── Insights
-│   ├── Engagement       /dashboard/social/engagement
-│   ├── Intelligence     /dashboard/social/intelligence
-│   ├── Distribution     /dashboard/social/distribution
-│   ├── Revenue & ROI    /dashboard/social/revenue
-│   ├── Retention        /dashboard/social/retention
-│   └── Leads            /dashboard/social/leads
-├── Collaborate
-│   └── Approvals        /dashboard/social/collaboration
-└── Setup
-    ├── Brand Voice      /dashboard/social/brand
-    ├── Accounts         /dashboard/social
-    └── Settings         /dashboard/social/settings
+PassivePost Social Dashboard
++-- Dashboard
+|   +-- Overview        /dashboard/social/overview
+|   +-- Posts            /dashboard/social/posts
+|   +-- Queue            /dashboard/social/queue
+|   +-- Calendar         /dashboard/social/calendar
++-- Blog
+|   +-- Blog Home        /dashboard/social/blog
+|   +-- Compose          /dashboard/social/blog/compose
+|   +-- Articles         /dashboard/social/blog/posts
++-- Automation           /dashboard/social/automation
++-- Insights
+|   +-- Engagement       /dashboard/social/engagement
+|   +-- Intelligence     /dashboard/social/intelligence
+|   +-- Distribution     /dashboard/social/distribution
+|   +-- Revenue & ROI    /dashboard/social/revenue
+|   +-- Retention        /dashboard/social/retention
+|   +-- Leads            /dashboard/social/leads
++-- Collaborate
+|   +-- Approvals        /dashboard/social/collaboration
++-- Setup
+    +-- Brand Voice      /dashboard/social/brand
+    +-- Accounts         /dashboard/social
+    +-- Settings         /dashboard/social/settings
 ```
 
 ### Page Details
 
 | Route | Page Name | Access Level | Description |
 |-------|-----------|-------------|-------------|
-| `/dashboard/social/overview` | **Overview** | All tiers | Main landing page. Usage progress bars, quick stats (posts created, accounts connected, AI generations used), coaching card with rotating tips, and Quick Generate button. |
-| `/dashboard/social/posts` | **Posts** | All tiers | Post management hub. Filter by platform, status, and date range. Bulk actions (delete, reschedule). Click any post to open the detail dialog. |
-| `/dashboard/social/queue` | **Queue** | All tiers | Scheduled posts waiting to publish, ordered by time. Reorder, edit, or cancel queued posts. |
-| `/dashboard/social/calendar` | **Calendar** | All tiers | Month-grid calendar showing scheduled and published posts. Hover tooltips show per-platform counts per day. |
-| `/dashboard/social/blog` | **Blog Home** | All tiers | Blog publishing dashboard with flywheel metrics, connected blog platform management, and blog-to-social content pipeline overview. |
-| `/dashboard/social/blog/compose` | **Blog Compose** | All tiers | Full Markdown editor with live SEO preview, meta tag editing, and one-click publish to connected blog platforms. |
-| `/dashboard/social/blog/posts` | **Blog Articles** | All tiers | List of all blog posts with status filtering (draft, published, scheduled), search, and bulk actions. |
-| `/dashboard/social/automation` | **Automation** | Basic+ | Advanced automation hub: calendar autopilot, batch repurpose, content recycling, evergreen content identifier, blog-to-thread converter, cross-post timing optimizer, repurpose chains, draft expiration warnings, and content decay alerts. |
-| `/dashboard/social/engagement` | **Engagement** | All tiers | Analytics dashboard with Recharts charts. Engagement metrics (likes, shares, comments), per-platform breakdowns, best-performing content. |
-| `/dashboard/social/intelligence` | **Content Intelligence** | Basic+ | AI-powered content analysis: content grader, content DNA analyzer, topic fatigue detection, content mix optimizer, tone drift monitor, cannibalization detector, engagement prediction, and content brief generator. |
-| `/dashboard/social/distribution` | **Distribution Intelligence** | Premium | Platform-specific timing optimizer, hashtag performance tracker, audience persona builder, and competitor content gap analysis. |
-| `/dashboard/social/revenue` | **Revenue & ROI** | Premium | Content ROI calculator, cost per post tracking, monthly content report card, and white-label report exports. |
-| `/dashboard/social/retention` | **Retention** | All tiers | Streak system, weekly flywheel digest preview, content templates library, and leaderboard. |
-| `/dashboard/social/leads` | **Leads** | Basic+ | Lead tracking from social engagement. Contact info, source platform, engagement history, gig scanner, reply templates, lead CRM, and CSV export. |
-| `/dashboard/social/collaboration` | **Collaboration** | Premium | Team workflows, client approval queue, and shared content library. Manage content review and approval workflows with external clients. |
-| `/dashboard/social/brand` | **Brand Voice** | All tiers | Brand identity configuration: tone, niche, location, sample URLs, audience, goals, platforms, frequency. |
-| `/dashboard/social` | **Accounts** | All tiers | Connected account management. Connect/disconnect social accounts, validate credentials, view connection status. |
-| `/dashboard/social/settings` | **Settings** | All tiers | PassivePost-specific settings: notification preferences, module configuration. |
-| `/dashboard/social/onboarding` | **Onboarding** | All tiers | Guided setup wizard for new users: connect first account, set brand voice, generate first post. |
-
-**Access Level Key:**
-- **All tiers** — Available to Starter, Basic, and Premium users
-- **Basic+** — Requires Basic or Premium subscription
-- **Premium** — Requires Premium subscription only
-
-### Layout
-
-All dashboard pages share a common layout (`src/app/dashboard/social/layout.tsx`) that includes:
-- Social sidebar (left)
-- Main content area (right)
-- Quick Generate floating action button (bottom-right)
-- Upgrade banner (top, conditional — appears when usage is 80%+ of any tier limit)
+| `/dashboard/social/overview` | **Overview** | All tiers | Main landing page with usage progress bars, quick stats, coaching card, flywheel health score, Quick Generate button |
+| `/dashboard/social/posts` | **Posts** | All tiers | Post management hub with filtering by platform, status, and date range; bulk actions and detail dialogs |
+| `/dashboard/social/queue` | **Queue** | All tiers | Scheduled posts ordered by time with reorder, edit, and cancel options |
+| `/dashboard/social/calendar` | **Calendar** | All tiers | Month-grid calendar with social and blog posts and per-platform count tooltips |
+| `/dashboard/social/blog` | **Blog Home** | All tiers | Blog dashboard with flywheel metrics, connected platforms (WordPress, Ghost), and content pipeline |
+| `/dashboard/social/blog/compose` | **Blog Compose** | All tiers | Markdown editor with SEO preview and one-click publish to connected blog platforms |
+| `/dashboard/social/blog/posts` | **Blog Articles** | All tiers | Blog post list with status filtering and search |
+| `/dashboard/social/automation` | **Automation** | Basic+ | Calendar autopilot, batch repurpose, content recycling, evergreen content, blog-to-thread, cross-post timing, repurpose chains, draft warnings, content decay alerts |
+| `/dashboard/social/engagement` | **Engagement** | All tiers | Analytics with Recharts charts, per-platform breakdowns, and best-performing content |
+| `/dashboard/social/intelligence` | **Intelligence** | Basic+ | AI content grader, DNA analyzer, topic fatigue, content mix, tone drift, cannibalization, engagement prediction, content briefs |
+| `/dashboard/social/distribution` | **Distribution** | Premium | Platform timing optimizer, hashtag tracker, audience personas, competitor gap analysis |
+| `/dashboard/social/revenue` | **Revenue & ROI** | Premium | ROI calculator, cost per post, monthly report card, white-label report exports |
+| `/dashboard/social/retention` | **Retention** | All tiers | Posting streaks, weekly digest preview, content templates, leaderboard |
+| `/dashboard/social/leads` | **Leads** | Basic+ | Lead tracking, gig scanner, reply templates, mini CRM, CSV export |
+| `/dashboard/social/collaboration` | **Collaboration** | Premium | Client approval queue and team approval workflows |
+| `/dashboard/social/brand` | **Brand Voice** | All tiers | Brand identity settings: tone, niche, location, audience, goals, platforms, frequency, and voice fine-tuner |
+| `/dashboard/social` | **Accounts** | All tiers | Connect and disconnect social accounts, validate credentials |
+| `/dashboard/social/settings` | **Settings** | All tiers | Notification preferences and module settings |
+| `/dashboard/social/onboarding` | **Onboarding** | All tiers | Guided setup wizard for new users |
+| `/dashboard/social/affiliate` | **Affiliate** | All tiers | Affiliate integration within social dashboard |
 
 ---
 
-## 2. Public Pages
+## 5. Public Pages
 
-These pages are accessible without authentication.
+Pages accessible without authentication.
 
 | Route | Page Name | Description |
 |-------|-----------|-------------|
-| `/approve/[token]` | **Client Approval Portal** | Public page where external clients can review, approve, or reject content submitted for approval. No login required — authenticated via unique token. |
+| `/approve/[token]` | **Client Approval Portal** | External clients review and approve content via unique token |
+| `/partner/[slug]` | **Partner Landing Page** | Co-branded affiliate landing pages |
+| `/partner/verify/[code]` | **Badge Verification** | Verify affiliate badges |
+| `/partners` | **Affiliate Directory** | Public opt-in directory of affiliates with tier badges |
+| `/testimonials` | **Testimonials** | Customer and affiliate success stories |
+| `/changelog` | **Changelog** | Product update history |
+| `/blog` | **Blog** | Public blog |
+| `/blog/[slug]` | **Blog Post** | Individual blog articles |
 
 ---
 
-## 3. Admin Pages
-
-PassivePost admin configuration is accessible to users with admin roles.
+## 6. Authentication Pages
 
 | Route | Page Name | Description |
 |-------|-----------|-------------|
-| `/admin/setup/passivepost` | **PassivePost Config** | Full admin control panel. Module toggle, platform enables/disables, API credentials, niche guidance editor, tier definitions, engagement settings, health checker config. |
-
-### Admin Config Sections
-
-The admin page at `/admin/setup/passivepost` includes these configuration sections:
-
-| Section | What It Controls |
-|---------|-----------------|
-| Module Toggle | Enable/disable the entire PassivePost module |
-| Default Tier | Which tier new users start on |
-| Platform Toggles | Enable/disable individual social platforms |
-| Platform API Credentials | API keys and secrets for each platform's OAuth |
-| Niche Guidance Editor | Add/edit/remove niche-specific AI prompt entries |
-| Tier Definitions | Customize tier names and usage limits |
-| Engagement Pull Settings | Pull frequency (1–168 hours) and lookback window |
-| API Health Checker | Enable/disable, failure threshold, alert settings |
+| `/login` | **Login** | Email/password and OAuth login |
+| `/signup` | **Sign Up** | New account registration |
+| `/reset-password` | **Reset Password** | Password recovery |
+| `/update-password` | **Update Password** | Set new password from reset link |
+| `/auth/callback` | **Auth Callback** | OAuth callback handler |
+| `/invite/[token]` | **Invitation** | Accept team or organization invitation |
 
 ---
 
-## 4. API Endpoints
-
-All PassivePost API routes are under `/api/social/`.
-
-### Post Management
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET` | `/api/social/posts` | List posts (supports filters: platform, status, date range) |
-| `POST` | `/api/social/posts` | Create a new post |
-| `GET` | `/api/social/posts/[id]` | Get a single post by ID |
-| `PUT` | `/api/social/posts/[id]` | Update a post |
-| `DELETE` | `/api/social/posts/[id]` | Delete a post |
-| `POST` | `/api/social/bulk-import` | Bulk import multiple posts |
-
-### Account Management
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET` | `/api/social/accounts` | List all connected social accounts |
-| `DELETE` | `/api/social/accounts/[id]` | Disconnect a social account |
-| `POST` | `/api/social/accounts/validate` | Validate account credentials are still valid |
-| `POST` | `/api/social/connect` | Start OAuth connection flow for a platform |
-| `GET` | `/api/social/callback/[platform]` | Handle OAuth callback after user authorization |
-
-### AI & Content Generation
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `POST` | `/api/social/generate-post` | Generate AI-powered post content using brand voice |
-
-### User Configuration
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET` | `/api/social/tier` | Get current user's tier info, limits, and usage |
-| `GET` | `/api/social/brand-preferences` | Retrieve brand voice settings |
-| `PUT` | `/api/social/brand-preferences` | Update brand voice settings |
-| `GET` | `/api/social/posting-preferences` | Retrieve posting schedule preferences |
-| `PUT` | `/api/social/posting-preferences` | Update posting schedule preferences |
-
-### Monitoring & Debug
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET` | `/api/social/health` | Platform API health status for all connected platforms |
-| `GET` | `/api/social/debug` | Internal debug data (requires `MUSE_DEBUG_MODE=true`) |
-
-### Trend Alerts
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET` | `/api/social/trend-alerts` | List all trend alerts for the current user |
-| `POST` | `/api/social/trend-alerts` | Create or manage trend alert subscriptions |
-| `POST` | `/api/social/trend-alerts/generate` | Generate an AI post from a trending topic |
-
-### Cron Jobs (Vercel Scheduled)
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET` | `/api/social/cron/process-scheduled` | Process posts with past `scheduled_at` timestamps |
-| `GET` | `/api/social/cron/pull-engagement` | Pull engagement metrics from platform APIs |
-
-### Blog Publishing
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET` | `/api/social/blog/connections` | List blog platform connections |
-| `POST` | `/api/social/blog/connections` | Connect a blog platform |
-| `DELETE` | `/api/social/blog/connections/[id]` | Disconnect a blog platform |
-| `GET` | `/api/social/blog/posts` | List blog posts |
-| `POST` | `/api/social/blog/posts` | Create blog post |
-| `GET` | `/api/social/blog/posts/[id]` | Get blog post |
-| `PATCH` | `/api/social/blog/posts/[id]` | Update blog post |
-| `DELETE` | `/api/social/blog/posts/[id]` | Delete blog post |
-| `POST` | `/api/social/blog/repurpose` | AI-generate social snippets from blog post |
-| `POST` | `/api/social/blog/schedule-snippets` | Schedule repurposed snippets |
-| `GET` | `/api/social/blog/[id]/snippets` | Get snippets for a blog post |
-
-### Flywheel
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET` | `/api/social/flywheel/metrics` | Flywheel health scores and velocity |
-
-### Content Intelligence (Phase 2)
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `POST` | `/api/social/intelligence/grade` | AI content grader |
-| `GET` | `/api/social/intelligence/content-dna` | Best performing content DNA |
-| `GET` | `/api/social/intelligence/topic-fatigue` | Topic fatigue detection |
-| `GET` | `/api/social/intelligence/content-mix` | Content mix optimizer |
-| `GET` | `/api/social/intelligence/tone-drift` | Tone drift monitor |
-| `GET` | `/api/social/intelligence/cannibalization` | Content cannibalization detector |
-| `POST` | `/api/social/intelligence/engagement-prediction` | Engagement prediction |
-| `POST` | `/api/social/intelligence/brief` | Content brief generator |
-
-### Advanced Automation (Phase 3)
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `POST` | `/api/social/automation/calendar-autopilot` | Calendar autopilot |
-| `POST` | `/api/social/automation/batch-repurpose` | Batch repurpose |
-| `GET` | `/api/social/automation/recycling-queue` | Content recycling queue |
-| `GET` | `/api/social/automation/evergreen-scan` | Evergreen content identifier |
-| `POST` | `/api/social/automation/blog-to-thread` | Blog-to-thread converter |
-| `GET` | `/api/social/automation/crosspost-timing` | Cross-post timing optimizer |
-| `POST` | `/api/social/automation/repurpose-chains` | Repurpose chains |
-| `GET` | `/api/social/automation/draft-warnings` | Draft expiration warnings |
-| `GET` | `/api/social/automation/content-decay` | Content decay alerts |
-
-### Distribution Intelligence (Phase 4)
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET` | `/api/social/distribution/platform-timing` | Platform-specific timing optimizer |
-| `GET` | `/api/social/distribution/hashtag-tracker` | Hashtag performance tracker |
-| `POST` | `/api/social/distribution/audience-personas` | Audience persona builder |
-| `POST` | `/api/social/distribution/competitor-gap` | Competitor content gap analysis |
-
-### Revenue & ROI (Phase 5)
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET/POST` | `/api/social/revenue/roi-calculator` | Content ROI calculator |
-| `GET` | `/api/social/revenue/cost-per-post` | Cost per post tracking |
-| `GET` | `/api/social/revenue/report-card` | Monthly content report card |
-| `POST` | `/api/social/revenue/export-report` | White-label report export |
-
-### Engagement & Retention (Phase 6)
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET` | `/api/social/engagement/streak` | Streak system |
-| `GET` | `/api/social/engagement/digest-preview` | Weekly flywheel digest |
-| `GET` | `/api/social/engagement/templates` | Content templates library (public) |
-| `GET` | `/api/social/engagement/scorecard/[username]` | Public content scorecard |
-
-### Collaboration (Phase 7)
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET/POST` | `/api/social/collaboration/approval-portal` | Client approval portal |
-| `POST` | `/api/social/collaboration/approval-action` | Approve/reject content |
-
-### Bonus Features
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `POST` | `/api/social/automation/hashtag-suggest` | AI hashtag suggestions |
-| `GET/POST` | `/api/social/leads/gig-scanner` | Gig lead scanner |
-| `GET/POST` | `/api/social/leads/reply-templates` | Lead reply templates |
-| `GET/POST` | `/api/social/brand-voice/fine-tune` | AI voice fine-tuner |
-| `GET/POST/PATCH` | `/api/social/leads/manage` | Lead CRM (CRUD) |
-| `GET` | `/api/social/leads/export` | Lead CSV export |
-
----
-
-## 5. Shared Pages (MuseKit Core)
-
-PassivePost users also interact with these MuseKit core pages:
+## 7. Marketing Pages
 
 | Route | Page Name | Description |
 |-------|-----------|-------------|
 | `/` | **Home** | Marketing landing page |
-| `/login` | **Login** | Authentication page |
-| `/signup` | **Sign Up** | Registration page |
-| `/dashboard` | **Main Dashboard** | MuseKit core dashboard (PassivePost is accessible from here) |
-| `/profile` | **Profile** | User profile management |
-| `/billing` | **Billing** | Stripe customer portal, subscription management |
-| `/admin` | **Admin Dashboard** | Admin overview and setup pages |
-
-### Navigation Between Core and PassivePost
-
-- From the **Main Dashboard** (`/dashboard`): Users navigate to PassivePost via a product card or menu link
-- From **PassivePost Sidebar**: "Back to Dashboard" link returns to `/dashboard`
-- From **PassivePost Sidebar User Menu**: Links to Profile (`/profile`), Billing (`/billing`), Main Site (`/`), and Log Out
+| `/about` | **About** | Company information |
+| `/contact` | **Contact** | Contact form |
+| `/faq` | **FAQ** | Frequently asked questions |
+| `/features` | **Features** | Feature overview |
+| `/features/[slug]` | **Feature Detail** | Individual feature pages |
+| `/pricing` | **Pricing** | Subscription plan comparison |
+| `/docs` | **Documentation** | Public documentation |
+| `/privacy` | **Privacy Policy** | Privacy policy |
+| `/terms` | **Terms of Service** | Terms and conditions |
+| `/acceptable-use` | **Acceptable Use** | Acceptable use policy |
+| `/accessibility` | **Accessibility** | Accessibility statement |
+| `/ai-data-usage` | **AI Data Usage** | AI data handling policy |
+| `/cookie-policy` | **Cookie Policy** | Cookie usage policy |
+| `/data-handling` | **Data Handling** | Data processing information |
+| `/dmca` | **DMCA** | DMCA policy |
+| `/security-policy` | **Security Policy** | Security practices |
 
 ---
 
-## Visual Sitemap
+## 8. API Endpoints
+
+### Social Scheduling API (`/api/social/`)
+
+| Category | Key Routes |
+|----------|-----------|
+| Posts | `posts`, `posts/[id]`, `bulk-import`, `preflight` |
+| Accounts | `accounts`, `accounts/[id]`, `accounts/validate`, `connect`, `callback/[platform]`, `redirect` |
+| AI | `generate-post` |
+| Configuration | `tier`, `brand-preferences`, `posting-preferences`, `brand-voice`, `brand-voice/fine-tune`, `watermark` |
+| Blog | `blog/connections`, `blog/connections/[id]`, `blog/connections/validate`, `blog/posts`, `blog/posts/[id]`, `blog/posts/publish`, `blog/repurpose`, `blog/schedule-snippets`, `blog/[id]/snippets` |
+| Flywheel | `flywheel/metrics` |
+| Intelligence | `intelligence/grade`, `intelligence/content-dna`, `intelligence/topic-fatigue`, `intelligence/content-mix`, `intelligence/tone-drift`, `intelligence/cannibalization`, `intelligence/engagement-prediction`, `intelligence/brief` |
+| Automation | `automation/calendar-autopilot`, `automation/batch-repurpose`, `automation/recycling-queue`, `automation/evergreen-scan`, `automation/blog-to-thread`, `automation/crosspost-timing`, `automation/repurpose-chains`, `automation/draft-warnings`, `automation/content-decay`, `automation/hashtag-suggest` |
+| Distribution | `distribution/platform-timing`, `distribution/hashtag-tracker`, `distribution/audience-personas`, `distribution/competitor-gap` |
+| Revenue | `revenue/roi-calculator`, `revenue/cost-per-post`, `revenue/report-card`, `revenue/export-report` |
+| Engagement | `engagement/streak`, `engagement/digest-preview`, `engagement/templates`, `engagement/scorecard/[username]`, `engagement/summary`, `engagement/pull` |
+| Collaboration | `collaboration/approval-portal`, `collaboration/approval-action` |
+| Leads | `leads/gig-scanner`, `leads/reply-templates`, `leads/manage`, `leads/export` |
+| Trends | `trend-alerts`, `trend-alerts/generate` |
+| Monitoring | `health`, `debug` |
+| Cron | `cron/process-scheduled`, `cron/pull-engagement` |
+
+### Affiliate API (`/api/affiliate/`)
+
+| Category | Key Routes |
+|----------|-----------|
+| Dashboard | `dashboard`, `profile`, `settings`, `notifications` |
+| AI Tools | `ai-coach`, `ai-post-writer`, `ai-email-draft`, `ai-blog-outline`, `ai-video-script`, `ai-objection-handler`, `ai-ad-copy`, `ai-pitch-customizer`, `ai-audience-content`, `ai-promo-ideas`, `ai-onboarding-advisor`, `ai-conversion-optimizer`, `ai-analytics`, `ai-posting-strategy`, `ai-conversion-insights` |
+| Analytics | `analytics`, `analytics/charts`, `analytics/churn`, `analytics/cohort`, `analytics/sources`, `analytics/connected-overview`, `analytics/content-intelligence`, `analytics/financial-overview`, `analytics/predictions`, `analytics/expanded`, `analytics/youtube`, `analytics/earnings-projections` |
+| Financial | `earnings`, `earnings-statement`, `commissions`, `payouts`, `payout-history`, `payout-schedule`, `payout-batches`, `forecast`, `financial-tools`, `renewals`, `tax-info`, `tax-summary`, `invoice` |
+| Marketing | `link-presets`, `link-shortener`, `assets`, `asset-analytics`, `swipe-files`, `sharing-cards`, `media-kit`, `email-templates`, `promotional-calendar`, `discount-codes`, `landing-page`, `landing-page/[slug]` |
+| Gamification | `contests`, `contest-leaderboard`, `challenges`, `milestones`, `leaderboard`, `badges`, `badges/verify`, `badges/verify/[code]`, `goals`, `tiers`, `fastest-recognition`, `anniversary` |
+| Communication | `messages`, `messages/read`, `notifications`, `whats-new`, `surveys`, `testimonials`, `announcements` |
+| Other | `api-keys`, `webhooks`, `webhooks/[id]`, `webhooks/[id]/deliveries`, `webhooks/[id]/test`, `export-csv`, `reports`, `reports/custom-range`, `terms-changelog`, `promotion-quiz`, `analyze-audience`, `auto-promo`, `track-signup`, `transactions`, `referrals`, `members`, `funnel`, `disputes`, `case-studies`, `knowledge-base`, `drip`, `connected-analytics`, `reengagement`, `applications`, `applications/review`, `activate` |
+| v1 API | `v1/commissions`, `v1/earnings`, `v1/referrals`, `v1/stats` |
+
+### Admin API (`/api/admin/`)
+
+| Category | Key Routes |
+|----------|-----------|
+| Users | `users`, `users/[userId]`, `users/[userId]/profile`, `team`, `invitations` |
+| Affiliates | `affiliates`, `affiliates/[userId]`, `affiliate/broadcasts`, `affiliate/messages`, `affiliate/messages/[affiliate_id]`, `affiliate/health`, `affiliate/program-intelligence`, `affiliate/payout-receipt`, `affiliate/tax-export`, `affiliate/tax-info`, `affiliate/tax-info/[id]`, `affiliate/tax-info/[id]/verify`, `affiliate/testimonials` |
+| Financial | `payouts`, `payouts/[id]`, `payouts/[id]/items`, `invoices`, `invoices/[id]`, `renewals`, `revenue-attribution`, `revenue-waterfall`, `discount-codes` |
+| Content | `posts`, `products`, `products/[slug]`, `campaigns`, `case-studies`, `contracts`, `knowledge-base`, `testimonials`, `announcements`, `spotlight` |
+| System | `setup`, `settings`, `stats`, `metrics`, `metrics/alerts`, `metrics/report`, `audit-logs`, `queue`, `onboarding`, `email-templates`, `email-templates/test`, `webhooks`, `webhooks/test`, `sso`, `impersonate`, `impersonate/status`, `notes`, `tickets`, `feedback` |
+
+### Other API Routes
+
+| Category | Key Routes |
+|----------|-----------|
+| Stripe | `stripe/checkout`, `stripe/portal`, `stripe/products`, `stripe/publishable-key`, `stripe/subscription`, `stripe/webhook` |
+| Auth | `auth/sso`, `auth/sso/check` |
+| AI | `ai/chat`, `ai/providers` |
+| Email | `email/send`, `email/drip`, `email/branded-receipt` |
+| User | `user/profile`, `user/email-preferences`, `user/invoices`, `user/invoices/[id]`, `user/membership`, `user/payments`, `user/usage-insights` |
+| Support | `tickets`, `tickets/[id]`, `tickets/[id]/comments`, `support/chat`, `contact`, `feedback` |
+| Public | `public/settings`, `public/stats`, `public/testimonials`, `public/changelog`, `public/affiliate-directory` |
+| Cron | `cron/anniversary`, `cron/monthly-earnings`, `cron/scheduled-reports`, `cron/trial-alerts`, `cron/weekly-affiliate-digest`, `cron/weekly-coach`, `cron/weekly-performance`, `cron/weekly-stats`, `cron/whats-new` |
+
+---
+
+## 9. Visual Sitemap
 
 ```
 / (Landing Page)
-├── /login
-├── /signup
-├── /profile
-├── /billing
-├── /approve/[token] (Public Client Approval Portal)
-├── /dashboard (Main Dashboard)
-│   └── /dashboard/social (PassivePost)
-│       ├── /dashboard/social/overview
-│       ├── /dashboard/social/posts
-│       ├── /dashboard/social/queue
-│       ├── /dashboard/social/calendar
-│       ├── /dashboard/social/blog
-│       │   ├── /dashboard/social/blog/compose
-│       │   └── /dashboard/social/blog/posts
-│       ├── /dashboard/social/automation
-│       ├── /dashboard/social/engagement
-│       ├── /dashboard/social/intelligence
-│       ├── /dashboard/social/distribution
-│       ├── /dashboard/social/revenue
-│       ├── /dashboard/social/retention
-│       ├── /dashboard/social/leads
-│       ├── /dashboard/social/collaboration
-│       ├── /dashboard/social/brand
-│       ├── /dashboard/social/settings
-│       └── /dashboard/social/onboarding
-├── /admin
-│   └── /admin/setup/passivepost
-└── /api/social/
-    ├── Posts & Bulk
-    │   ├── /api/social/posts
-    │   ├── /api/social/posts/[id]
-    │   └── /api/social/bulk-import
-    ├── Accounts & OAuth
-    │   ├── /api/social/accounts
-    │   ├── /api/social/accounts/[id]
-    │   ├── /api/social/accounts/validate
-    │   ├── /api/social/connect
-    │   └── /api/social/callback/[platform]
-    ├── AI & Generation
-    │   └── /api/social/generate-post
-    ├── Configuration
-    │   ├── /api/social/tier
-    │   ├── /api/social/brand-preferences
-    │   ├── /api/social/posting-preferences
-    │   └── /api/social/brand-voice/fine-tune
-    ├── Trend Alerts
-    │   ├── /api/social/trend-alerts
-    │   └── /api/social/trend-alerts/generate
-    ├── Blog Publishing
-    │   ├── /api/social/blog/connections
-    │   ├── /api/social/blog/connections/[id]
-    │   ├── /api/social/blog/posts
-    │   ├── /api/social/blog/posts/[id]
-    │   ├── /api/social/blog/repurpose
-    │   ├── /api/social/blog/schedule-snippets
-    │   └── /api/social/blog/[id]/snippets
-    ├── Flywheel
-    │   └── /api/social/flywheel/metrics
-    ├── Content Intelligence
-    │   ├── /api/social/intelligence/grade
-    │   ├── /api/social/intelligence/content-dna
-    │   ├── /api/social/intelligence/topic-fatigue
-    │   ├── /api/social/intelligence/content-mix
-    │   ├── /api/social/intelligence/tone-drift
-    │   ├── /api/social/intelligence/cannibalization
-    │   ├── /api/social/intelligence/engagement-prediction
-    │   └── /api/social/intelligence/brief
-    ├── Advanced Automation
-    │   ├── /api/social/automation/calendar-autopilot
-    │   ├── /api/social/automation/batch-repurpose
-    │   ├── /api/social/automation/recycling-queue
-    │   ├── /api/social/automation/evergreen-scan
-    │   ├── /api/social/automation/blog-to-thread
-    │   ├── /api/social/automation/crosspost-timing
-    │   ├── /api/social/automation/repurpose-chains
-    │   ├── /api/social/automation/draft-warnings
-    │   ├── /api/social/automation/content-decay
-    │   └── /api/social/automation/hashtag-suggest
-    ├── Distribution Intelligence
-    │   ├── /api/social/distribution/platform-timing
-    │   ├── /api/social/distribution/hashtag-tracker
-    │   ├── /api/social/distribution/audience-personas
-    │   └── /api/social/distribution/competitor-gap
-    ├── Revenue & ROI
-    │   ├── /api/social/revenue/roi-calculator
-    │   ├── /api/social/revenue/cost-per-post
-    │   ├── /api/social/revenue/report-card
-    │   └── /api/social/revenue/export-report
-    ├── Engagement & Retention
-    │   ├── /api/social/engagement/streak
-    │   ├── /api/social/engagement/digest-preview
-    │   ├── /api/social/engagement/templates
-    │   └── /api/social/engagement/scorecard/[username]
-    ├── Collaboration
-    │   ├── /api/social/collaboration/approval-portal
-    │   └── /api/social/collaboration/approval-action
-    ├── Leads
-    │   ├── /api/social/leads/gig-scanner
-    │   ├── /api/social/leads/reply-templates
-    │   ├── /api/social/leads/manage
-    │   └── /api/social/leads/export
-    ├── Monitoring & Debug
-    │   ├── /api/social/health
-    │   └── /api/social/debug
-    └── Cron Jobs
-        ├── /api/social/cron/process-scheduled
-        └── /api/social/cron/pull-engagement
++-- /login, /signup, /reset-password
++-- /about, /contact, /faq, /features, /pricing, /docs
++-- /privacy, /terms, /accessibility, /security-policy, etc.
++-- /blog, /blog/[slug]
++-- /changelog, /testimonials
++-- /partners (Affiliate Directory)
++-- /partner/[slug] (Co-branded Pages)
++-- /approve/[token] (Client Approval Portal)
++-- /invite/[token]
+|
++-- /affiliate/ (Affiliate Dashboard)
+|   +-- /affiliate/join
+|   +-- /affiliate/login
+|   +-- /affiliate/dashboard (11 tabs)
+|
++-- /dashboard/ (User Dashboard)
+|   +-- /billing, /profile, /security, /support
+|   +-- /dashboard/social/ (Social Scheduling - 20+ pages)
+|       +-- /overview, /posts, /queue, /calendar
+|       +-- /blog, /blog/compose, /blog/posts
+|       +-- /automation
+|       +-- /engagement, /intelligence, /distribution
+|       +-- /revenue, /retention, /leads
+|       +-- /collaboration
+|       +-- /brand, /settings, /onboarding
+|       +-- /affiliate
+|
++-- /admin/ (Admin Dashboard)
+|   +-- /analytics, /audit-logs, /blog
+|   +-- /email-templates, /feedback, /metrics
+|   +-- /onboarding, /queue, /settings
+|   +-- /sso, /team, /users, /waitlist
+|   +-- /setup/ (18 configuration tabs)
+|
++-- /api/ (200+ API routes)
+    +-- /api/social/ (60+ routes)
+    +-- /api/affiliate/ (80+ routes)
+    +-- /api/admin/ (40+ routes)
+    +-- /api/stripe/, /api/ai/, /api/email/
+    +-- /api/user/, /api/tickets/
+    +-- /api/public/, /api/cron/
+    +-- /api/auth/, /api/social/cron/
 ```
 
 ---
@@ -423,12 +323,8 @@ PassivePost users also interact with these MuseKit core pages:
 
 | Document | What It Covers |
 |----------|---------------|
-| [OVERVIEW.md](./OVERVIEW.md) | Elevator pitch, target audience, pricing |
-| [FEATURES.md](./FEATURES.md) | Deep dive into every feature |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | Technical blueprint: database, APIs, OAuth |
-| [USER_GUIDE.md](./USER_GUIDE.md) | How to use PassivePost |
-| [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md) | Content flywheel strategy, phases, and metrics |
-| [BLOG_PUBLISHING.md](./BLOG_PUBLISHING.md) | Blog publishing pipeline and platform integrations |
+| [PRODUCT_GUIDE.md](./PRODUCT_GUIDE.md) | Complete product reference |
+| [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md) | Content flywheel strategy and all 42 features |
+| [USER_GUIDE.md](./USER_GUIDE.md) | Step-by-step end-user documentation |
 
 ---
-

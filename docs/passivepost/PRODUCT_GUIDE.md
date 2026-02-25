@@ -1,654 +1,306 @@
-# PassivePost -- Comprehensive Product Guide
+# PassivePost — Product Guide
 
-> **Revision:** 2 | **Last Updated:** February 20, 2026 | **Created:** February 20, 2026
-
-**AI-Powered Social Media Scheduling for Solopreneurs and Gig Workers**
+PassivePost is a closed-loop business intelligence platform for content creators. It brings together content scheduling across 8 social platforms and 2 blog platforms, a full affiliate marketing program spanning 3 dashboards, connected analytics that merge content performance with revenue data, and AI coaching powered by xAI Grok. This guide is a complete reference for understanding what PassivePost is, how it works, and how all its systems connect.
 
 ---
 
-## 1. What is PassivePost
+## 1. What PassivePost Does
 
-PassivePost is an AI-powered social media scheduling tool built on the MuseKit SaaS foundation. It enables solopreneurs, gig workers, and small business owners to maintain a consistent social media presence without the cost of hiring a social media manager.
+PassivePost connects the dots between what you publish, how your audience responds, what revenue it generates, and what you should do next. Unlike single-purpose tools, PassivePost ties content creation directly to business outcomes.
 
-PassivePost is built using the MuseKit **database extension pattern**, meaning it layers product-specific functionality on top of the core MuseKit infrastructure (authentication, billing, admin tools, email) without modifying any core code. This makes it both a fully functional product and a reference implementation for how to build products on MuseKit.
-
-Key capabilities:
-
-- AI-generated social media posts tailored to your business niche and brand voice
-- Scheduling and queue management across 10 social platforms
-- Engagement analytics and lead tracking
-- Tier-based access control integrated with Stripe subscriptions
-- Admin-configurable settings for platforms, tiers, and niche-specific AI prompts
+**Core capabilities:**
+- **Content Scheduling**: Create, schedule, and publish across 8 social platforms (Twitter/X, LinkedIn, Facebook, Instagram, Reddit, Discord, YouTube, Pinterest) and 2 blog platforms (WordPress, Ghost)
+- **Affiliate Marketing**: A 32-feature affiliate program with referral tracking, commissions, performance tiers, and payouts managed across 3 separate dashboards (Admin, Affiliate, User)
+- **Connected Analytics**: Merge content performance data with affiliate earnings and platform engagement metrics in unified views
+- **AI Coaching**: 14+ AI tools using xAI Grok (`grok-3-mini-fast`) that pull real user data to deliver personalized, actionable advice
+- **Content Flywheel**: A 42-feature system across 7 phases that creates a self-reinforcing loop of content creation, intelligence, automation, distribution, revenue tracking, engagement, and collaboration
 
 ---
 
-## 2. Who It's For
+## 2. The Three Dashboards
 
-PassivePost is designed for individuals and small businesses who need social media content but lack the time, budget, or expertise to manage it manually.
+PassivePost is organized into three separate dashboard experiences, each designed for a different user role.
 
-**Target users:**
+### Admin Dashboard (`/admin/`)
+The control center for platform owners and administrators.
+- User management with role assignment (user, affiliate, admin)
+- Affiliate program configuration with 15+ setup tabs (commission rates, tiers, contests, payout rules)
+- Revenue attribution and waterfall reports
+- Audit logging, metrics alerts, and KPI monitoring
+- Email template management and queue monitoring
+- SSO/SAML configuration for enterprise customers
 
-- Solopreneurs running a one-person business
-- Gig workers building a personal brand
-- Small business owners in service-based industries
+### Affiliate Dashboard (`/affiliate/dashboard`)
+A standalone dashboard for content creators who promote PassivePost as affiliates.
+- 11 navigation tabs: Overview, Links, Analytics, Marketing, Resources, Earnings, Contests, Settings, Messages, Support, What's New
+- Performance analytics with charts, sparklines, and heatmaps
+- 14+ AI-powered business tools (AI Coach, Post Writer, Analytics, Conversion Optimizer, and more)
+- Marketing toolkit: deep links, QR codes, media kit, sharing cards, co-branded landing pages, discount codes
+- Financial tools: payouts, tax preparation (W-9/W-8BEN), earnings forecasts, commission tracking
+- Gamification: contests, challenges, leaderboards, badges, milestone bonuses, earnings goals
+- Knowledge base and promotional calendar
 
-**Supported niches (with built-in AI prompt guidance):**
-
-| Niche | Description |
-|-------|-------------|
-| Plumbing | Casual, local tone focused on common household problems |
-| HVAC | Trusted technician voice referencing seasonal comfort concerns |
-| Electrical | Safety-first messaging about home electrical reliability |
-| Landscaping | Visual, seasonal content about curb appeal and outdoor living |
-| Cleaning | Friendly tone about the relief of a clean home |
-| Real Estate | Market-savvy but approachable local insights |
-| Rideshare | Down-to-earth hustle and city life content |
-| Freelance | Authentic independent work experiences and lessons |
-| Photography | Visual storytelling and behind-the-scenes insights |
-| Fitness | Motivating without being preachy, practical tips |
-| Food / Restaurant | Warm, inviting content about flavors and community |
-| Beauty | Confident, inclusive self-care and transformation content |
-| Tutoring | Encouraging study tips and learning success stories |
-| Pet Care | Warm, playful content about pets and practical care tips |
-
-Each niche has an admin-editable prompt guidance entry that shapes how the AI generates content for that industry. A default brand voice fallback is used when no niche is selected.
-
----
-
-## 3. Dashboard Pages
-
-The PassivePost social dashboard lives at `/dashboard/social/` and uses a dedicated sidebar layout with 17+ pages covering content management, blog publishing, content intelligence, automation, distribution, revenue tracking, retention, and team collaboration.
-
-### Overview (`/dashboard/social/overview`)
-
-The main landing page after login. Displays usage progress bars showing how close the user is to their tier limits, quick stats (posts created, accounts connected, AI generations used), and a Quick Generate button for instant AI content creation.
-
-### Posts (`/dashboard/social/posts`)
-
-Post management hub with filtering by platform, status, and date range. Supports bulk actions (delete, reschedule) and includes a post detail dialog for viewing full post content, platform targets, and scheduling details.
-
-### Queue (`/dashboard/social/queue`)
-
-Displays all scheduled posts waiting to be published, ordered by scheduled time. Users can reorder, edit, or cancel queued posts before they are delivered to platform APIs.
-
-### Calendar (`/dashboard/social/calendar`)
-
-A month-grid calendar view showing scheduled and published posts by date. Hovering over a date shows per-platform count tooltips so users can see their posting distribution at a glance.
-
-### Engagement (`/dashboard/social/engagement`)
-
-Analytics dashboard powered by Recharts charts. Displays engagement metrics (likes, shares, comments) pulled from connected platform APIs. Helps users understand which content performs best.
-
-### Leads (`/dashboard/social/leads`)
-
-Lead tracking from social engagement. Surfaces potential customers or contacts generated through social media interactions.
-
-### Brand Voice (`/dashboard/social/brand`)
-
-Brand preferences configuration page where users set their tone, niche, location, sample URLs, target audience, posting goals, preferred platforms, and post frequency (daily, weekly, etc.). These preferences shape AI-generated content.
-
-### Accounts (`/dashboard/social/`)
-
-Connected social account management. Users can connect, disconnect, and validate their social media accounts. Shows connection status and last validation time for each account.
-
-### Settings (`/dashboard/social/settings`)
-
-PassivePost-specific settings for the current user, including notification preferences and module-specific configuration.
-
-### Onboarding (`/dashboard/social/onboarding`)
-
-A guided setup wizard for new users that walks them through connecting their first social account, setting up brand preferences, and generating their first AI post.
+### User Dashboard (`/dashboard/`)
+The customer hub for subscribers using the product.
+- Invoice history and Stripe subscription management
+- Support tickets with comment threads
+- Account security settings
+- Usage insights and email preferences
+- Social scheduling access at `/dashboard/social/`
 
 ---
 
-## 4. Sidebar Navigation
+## 3. Connected Platforms
 
-The social dashboard sidebar is implemented in `src/components/social/social-sidebar.tsx` and organizes navigation into three groups:
+### Social Platforms (8)
+| Platform | Connection Type |
+|----------|----------------|
+| Twitter/X | OAuth 2.0 with PKCE |
+| LinkedIn | OAuth 2.0 with PKCE |
+| Facebook | OAuth 2.0 (Page access) |
+| Instagram | OAuth integration |
+| Reddit | OAuth integration |
+| Discord | OAuth integration |
+| YouTube | OAuth integration |
+| Pinterest | OAuth integration |
+
+### Blog Platforms (2)
+| Platform | Connection Type |
+|----------|----------------|
+| WordPress | REST API + App Passwords |
+| Ghost | Admin API Key |
+
+---
+
+## 4. Social Scheduling Dashboard
+
+The social scheduling dashboard lives at `/dashboard/social/` and uses a dedicated sidebar layout with the following navigation structure:
 
 **Dashboard**
-- Overview
-- Posts
-- Queue
-- Calendar
+- Overview: Usage progress bars, quick stats, AI coaching card, flywheel health score, Quick Generate button
+- Posts: Post management with filtering by platform/status/date, bulk actions, and detail dialogs
+- Queue: Scheduled posts ordered by time with reorder and cancel options
+- Calendar: Month-grid view of all scheduled and published content with per-platform count tooltips
+
+**Blog**
+- Blog Home: Flywheel metrics, connected blog platform management (WordPress, Ghost), content pipeline overview
+- Compose: Markdown editor with SEO preview and one-click publish
+- Articles: Blog post list with status filtering and search
+
+**Automation**
+- Autopilot: Calendar autopilot, batch repurpose, content recycling, evergreen content finder, blog-to-thread converter, cross-post timing optimizer, repurpose chains, draft warnings, content decay alerts
 
 **Insights**
-- Engagement
-- Leads
+- Engagement: Analytics with Recharts charts, per-platform breakdowns, best-performing content
+- Intelligence: AI content grader, DNA analyzer, topic fatigue, content mix, tone drift, cannibalization detector, engagement prediction, content briefs
+- Distribution: Platform timing optimizer, hashtag tracker, audience personas, competitor gap analysis
+- Revenue & ROI: ROI calculator, cost per post, monthly report card, white-label report exports
+- Retention: Posting streaks, weekly digest preview, content templates, leaderboard
+- Leads: Lead tracking, gig scanner, reply templates, mini CRM, CSV export
+
+**Collaborate**
+- Approvals: Client approval queue and shared content workflows with token-based external review
 
 **Setup**
-- Brand Voice
-- Accounts
-- Settings
-
-**Footer section:**
-- Back to Dashboard link (returns to the main MuseKit dashboard)
-- User menu with avatar, display name, and tier badge (Starter, Basic, or Premium)
-- Dropdown with links to Profile, Billing, Main Site, and Log Out
-
-The sidebar is responsive and collapses on mobile devices, with a toggle trigger in the header.
+- Brand Voice: Tone, niche, location, audience, goals, platforms, posting frequency, voice fine-tuner
+- Accounts: Connect and disconnect social and blog accounts, validate credentials
+- Settings: Notification preferences and module settings
 
 ---
 
-## 5. Tier System
+## 5. AI Architecture
 
-PassivePost uses a 3-tier subscription system. Tiers are admin-configurable and resolved via Stripe subscription metadata using the MuseKit Product Registry.
+All AI features use the **xAI Grok model** (`grok-3-mini-fast`) and follow a critical design principle: every AI feature pulls real user data rather than generating generic advice.
 
-### Default Tier Definitions
+### Content AI
+- Post generation uses brand voice settings, niche guidance, and platform-specific constraints
+- Voice fine-tuner analyzes 3-15 writing samples to create a reusable voice profile
+- Content grader scores drafts on engagement potential, readability, and brand alignment
 
-| Tier | ID | Daily AI Generations | Daily Posts | Monthly Posts | Max Platforms |
-|------|----|---------------------|-------------|---------------|---------------|
-| Starter | `tier_1` | 5 | 1 | 15 | 2 |
-| Basic | `tier_2` | 10 | 2 | 30 | 3 |
-| Premium | `tier_3` | 100 | 10,000 | 999,999 | 10 |
-
-### How Tier Resolution Works
-
-1. The user's Stripe subscription is checked for a `muse_tier` metadata key
-2. The metadata value is matched against the tier definitions registered in the MuseKit Product Registry
-3. The corresponding `TierLimits` object is returned, containing the user's allowed usage
-4. If no subscription is found, the user defaults to the first tier (Starter)
-
-Tier resolution is handled by `src/lib/social/user-tier.ts`, which wraps the core MuseKit `getUserProductTier` function from `src/lib/products/`.
-
-### Upgrade Banner
-
-When a user reaches 80% or more of any tier limit, an upgrade banner appears across all social dashboard pages (implemented in `src/components/social-upgrade-banner.tsx`).
-
----
-
-## 6. Supported Platforms
-
-PassivePost supports 10 social media platforms:
-
-| Platform | OAuth Support | API Status |
-|----------|--------------|------------|
-| Twitter/X | Full (PKCE) | Implemented |
-| LinkedIn | Full (PKCE) | Implemented |
-| Facebook | Full (Page) | Implemented |
-| Instagram | -- | Stubbed |
-| YouTube | -- | Stubbed |
-| TikTok | -- | Stubbed |
-| Reddit | -- | Stubbed |
-| Pinterest | -- | Stubbed |
-| Snapchat | -- | Stubbed |
-| Discord | -- | Stubbed |
-
-Twitter/X, LinkedIn, and Facebook have full OAuth connection flows. The remaining 7 platforms have stubbed API client methods ready for real integration. All 10 platforms can be enabled or disabled by an admin.
-
-Platform-specific icons with color coding are provided by `src/components/social/platform-icon.tsx`.
-
----
-
-## 7. AI Post Generation
-
-PassivePost uses AI to generate social media content customized to the user's brand voice and business niche.
-
-### How It Works
-
-1. The user's brand preferences (tone, niche, location, audience) are loaded
-2. If a niche is selected, the corresponding niche guidance prompt is included in the AI request
-3. If no niche is selected, a default brand voice fallback is used
-4. The AI generates platform-appropriate content
-5. The user can edit, schedule, or post immediately
-
-### Quick Generate FAB
-
-A floating action button (FAB) labeled Quick Generate is available on all social dashboard pages. It opens a dialog where users can generate AI content on demand, preview it, and copy it to clipboard or schedule it directly.
-
-Implemented in `src/components/social/quick-generate-fab.tsx`.
-
-### Niche Guidance
-
-There are 15 admin-editable niche-specific prompt guidance entries stored in the module settings. Each entry consists of a key, label, and guidance text. Admins can add, edit, or remove entries from `/admin/setup/passivepost`.
-
-### Multimodal Support
-
-AI post generation supports multimodal image input, allowing users to include images that the AI can reference when generating captions and content.
-
----
-
-## 8. Brand Preferences System
-
-Users configure their brand identity through the Brand Voice page (`/dashboard/social/brand`). These preferences are stored in the `brand_preferences` database table and used to shape AI-generated content.
-
-### Configurable Fields
-
-| Field | Description |
-|-------|-------------|
-| Tone | The voice and style of generated content (e.g., professional, casual, friendly) |
-| Niche | Business category from the supported niche list |
-| Location | Geographic area for local-focused content |
-| Sample URLs | Example content or website URLs for reference |
-| Target Audience | Description of the ideal customer or follower |
-| Posting Goals | What the user wants to achieve (brand awareness, leads, engagement) |
-| Preferred Platforms | Which platforms to prioritize |
-| Post Frequency | How often to post (daily, weekly, etc.) |
-
-### API Endpoints
-
-- `GET /api/social/brand-preferences` -- Retrieve current brand preferences
-- `PUT /api/social/brand-preferences` -- Update brand preferences
-- `GET /api/social/posting-preferences` -- Retrieve posting schedule preferences
-- `PUT /api/social/posting-preferences` -- Update posting schedule preferences
-
----
-
-## 9. OAuth and Account Connection
-
-PassivePost supports OAuth flows for connecting social media accounts.
-
-### Supported OAuth Flows
-
-- **Facebook Page** -- OAuth 2.0 for page-level access
-- **LinkedIn** -- OAuth 2.0 with PKCE
-- **Twitter/X** -- OAuth 2.0 with PKCE
-
-### Endpoints
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/social/connect` | POST | Initiate an OAuth connection flow for a platform |
-| `/api/social/callback/[platform]` | GET | Handle the OAuth callback after user authorization |
-| `/api/social/accounts/validate` | POST | Validate that connected account credentials are still valid |
-| `/api/social/accounts` | GET | List all connected social accounts |
-| `/api/social/accounts/[id]` | DELETE | Disconnect a social account |
-
-### Token Management
-
-OAuth tokens are encrypted before storage using utilities in `src/lib/social/crypto.ts`. Token refresh logic is handled by `src/lib/social/token-refresh.ts`, which automatically refreshes expired tokens when platform API calls are made.
-
----
-
-## 10. Admin Configuration
-
-Admins configure PassivePost from `/admin/setup/passivepost`. This page provides full control over the module without requiring code changes.
-
-### Configuration Options
-
-| Setting | Description |
-|---------|-------------|
-| Module Toggle | Enable or disable the entire PassivePost module |
-| Default Tier | Select which tier new users start on |
-| Platform Toggles | Enable or disable individual social platforms |
-| Platform API Credentials | Configure API keys and secrets for each platform |
-| Niche Guidance | Add, edit, or remove niche-specific AI prompt entries (key/label/guidance triplets) |
-| Engagement Pull Interval | How often to fetch engagement metrics (1-168 hours) |
-| Engagement Lookback Window | How far back to look when pulling engagement data (1-168 hours) |
-| API Health Checker | Enable/disable, alert on repeated failures, set failure threshold |
-| Tier Definitions | Add, remove, or edit tier names and their associated limits |
-
----
-
-## 11. Background Jobs (BullMQ)
-
-PassivePost uses 4 social-specific job types processed via BullMQ with Upstash Redis as the queue backend.
-
-### Job Types
-
-| Job Type | Purpose | Retry Policy |
-|----------|---------|--------------|
-| `social-post` | Deliver scheduled posts to platform APIs | 3 retries, exponential backoff |
-| `social-health-check` | Monitor platform API connectivity and uptime | Standard retry |
-| `social-trend-monitor` | Track trending topics across connected platforms | Standard retry |
-| `social-engagement-pull` | Fetch likes, shares, and comments from platform APIs | Standard retry |
-
-Job definitions and processors are in `src/lib/social/queue-jobs.ts`.
-
-### Cron Endpoints (Vercel Deployment)
-
-For serverless deployments where persistent workers are not available, two cron endpoints provide the same functionality:
-
-| Endpoint | Purpose |
-|----------|---------|
-| `/api/social/cron/process-scheduled` | Process scheduled posts that are due for publishing |
-| `/api/social/cron/pull-engagement` | Pull engagement metrics from connected platform APIs |
-
----
-
-## 12. API Routes
-
-All PassivePost API routes are under `/api/social/`.
-
-### Post Management
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/social/posts` | List posts with optional filters |
-| POST | `/api/social/posts` | Create a new post |
-| GET | `/api/social/posts/[id]` | Get a single post by ID |
-| PUT | `/api/social/posts/[id]` | Update a post |
-| DELETE | `/api/social/posts/[id]` | Delete a post |
-| POST | `/api/social/bulk-import` | Bulk import multiple posts |
-
-### Account Management
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/social/accounts` | List connected social accounts |
-| DELETE | `/api/social/accounts/[id]` | Disconnect a social account |
-| POST | `/api/social/accounts/validate` | Validate account credentials |
-| POST | `/api/social/connect` | Initiate OAuth connection flow |
-| GET | `/api/social/callback/[platform]` | OAuth callback handler |
-
-### AI and Content
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/social/generate-post` | Generate AI-powered post content |
-
-### User Configuration
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/social/tier` | Get the current user's tier info and limits |
-| GET | `/api/social/brand-preferences` | Retrieve brand preferences |
-| PUT | `/api/social/brand-preferences` | Update brand preferences |
-| GET | `/api/social/posting-preferences` | Retrieve posting preferences |
-| PUT | `/api/social/posting-preferences` | Update posting preferences |
-
-### Monitoring and Debug
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/social/health` | Platform API health status |
-| GET | `/api/social/debug` | Debug mode data (beta only, requires `MUSE_DEBUG_MODE=true`) |
-
-### Trend Alerts
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/social/trend-alerts` | List trend alerts |
-| POST | `/api/social/trend-alerts` | Create or manage trend alerts |
-| POST | `/api/social/trend-alerts/generate` | Generate a post based on a trending topic |
-
-### Cron Jobs
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/social/cron/process-scheduled` | Process scheduled posts |
-| GET | `/api/social/cron/pull-engagement` | Pull engagement metrics |
-
----
-
-## 13. Database Tables (Extension Pattern)
-
-PassivePost follows the MuseKit database extension pattern. Core tables live in `migrations/core/` and are shared infrastructure. Extension tables live in `migrations/extensions/` and are specific to PassivePost.
-
-### Core Tables (`migrations/core/`)
-
-| Table | File | Description |
-|-------|------|-------------|
-| `social_accounts` | `001_social_tables.sql` | Connected social media accounts with encrypted tokens |
-| `social_posts` | `001_social_tables.sql` | Social media posts with content, platform, status, and scheduling |
-
-### Extension Tables (`migrations/extensions/`)
-
-| Table / Change | File | Description |
-|----------------|------|-------------|
-| `social_posts` extensions | `001_passivepost_tables.sql` | Added `trend_source` and `niche_triggered` columns to the core `social_posts` table |
-| `brand_preferences` | `001_passivepost_tables.sql` | User brand configuration (tone, niche, location, audience, goals, frequency) |
-| `alert_logs` | `001_passivepost_tables.sql` | Trend alert history and notification logs |
-
-This separation means PassivePost can be included or excluded from a MuseKit clone by simply including or removing the extension migration files.
-
----
-
-## 14. Components
-
-### Social Dashboard Components (`src/components/social/`)
-
-| Component | File | Description |
-|-----------|------|-------------|
-| Social Sidebar | `social-sidebar.tsx` | Dashboard sidebar with navigation groups, user menu, and tier badge |
-| Post Detail Dialog | `post-detail-dialog.tsx` | Full-content post detail view in a dialog overlay |
-| Post Preview | `post-preview.tsx` | Compact post content preview for lists and cards |
-| Quick Generate FAB | `quick-generate-fab.tsx` | Floating action button for on-demand AI post generation |
-| Platform Icon | `platform-icon.tsx` | Platform-specific icons with color coding for all 10 platforms |
-| Bulk Import | `bulk-import.tsx` | UI for importing multiple posts at once |
-
-### Other Components
-
-| Component | File | Description |
-|-----------|------|-------------|
-| Upgrade Banner | `src/components/social-upgrade-banner.tsx` | Banner shown across all dashboard pages when usage reaches 80% or more of any tier limit |
-
----
-
-## 15. Library Code
-
-All PassivePost business logic lives in `src/lib/social/`.
-
-| File | Description |
+### Affiliate AI (14+ tools)
+| Tool | Data Sources |
 |------|-------------|
-| `types.ts` | All TypeScript types including `SocialPlatform`, `TierLimits`, `TierDefinition`, `NicheGuidanceEntry`, `SocialModuleSettings`, and default tier/settings definitions |
-| `client.ts` | Social platform API clients for all 10 platforms (3 implemented, 7 stubbed) |
-| `user-tier.ts` | Tier resolution wrapper that calls the MuseKit Product Registry's `getUserProductTier` |
-| `rate-limits.ts` | Tier-based rate limiting logic that enforces daily and monthly usage caps |
-| `api-rate-limiter.ts` | API-level rate limiting for social endpoints |
-| `token-refresh.ts` | OAuth token refresh logic for maintaining valid platform connections |
-| `queue-jobs.ts` | BullMQ job type definitions and processor functions for all 4 social job types |
-| `trend-alerts.ts` | Trend monitoring and alert logic for tracking platform trends |
-| `email-notifications.ts` | Social-specific email notifications (post failures, trend alerts, usage warnings) |
-| `crypto.ts` | Encryption utilities for securely storing social account OAuth tokens |
-| `debug.ts` | Beta debug mode support, gated by `MUSE_DEBUG_MODE` environment variable |
-| `demo-data.ts` | Demo and mock data for development and testing |
-| `n8n-templates/index.ts` | n8n workflow templates: `auto-post-rss`, `ai-generate-and-schedule`, `engagement-monitor` |
+| AI Coach | Commissions, tiers, contests, milestones, leaderboard, connected platforms |
+| AI Post Writer | Brand voice, referral links, platform conventions |
+| AI Analytics | Conversion rates, revenue attribution, traffic patterns |
+| AI Conversion Optimizer | Funnel data, referral performance, platform correlations |
+| Promotion Quiz | 6-question assessment saved for future AI context |
+| Audience Analyzer | Click data, device types, geography, traffic sources |
+
+Additional AI tools include email draft generator, blog outline creator, video script writer, objection handler, ad copy generator, pitch customizer, audience content advisor, promo idea generator, onboarding advisor, posting strategy optimizer, and conversion insights analyzer.
 
 ---
 
-## 16. UI Features
+## 6. Affiliate Program
 
-### Dark/Light Mode
+The affiliate program is PassivePost's growth engine with 32 features across the 3 dashboards.
 
-A theme toggle in the dashboard header allows users to switch between dark and light modes. The toggle persists the user's preference.
+### Application & Onboarding
+- Public application at `/affiliate/join` (no existing account required)
+- Admin review with approve/reject workflow and notes
+- Automated 3-email drip sequence for new affiliates (Welcome, Tips at 24h, Strategy at 72h)
+- AI onboarding advisor for personalized getting-started guidance
 
-### Upgrade Banner
+### Referral Tracking
+- Unique referral codes with `?ref=CODE` format
+- Cookie-based attribution (30-day default, configurable)
+- Automatic commission calculation on referred customer payments
+- Rate lock-in: commission terms are permanently locked at activation time
 
-When any tier limit reaches 80% or more usage (daily AI generations, daily posts, monthly posts, or connected platforms), an upgrade banner appears at the top of every social dashboard page encouraging the user to upgrade their plan.
+### Performance Tiers
+Bronze, Silver, Gold, and Platinum progression based on referral count. Higher tiers earn higher commission rates and unlock exclusive perks.
 
-### Quick Generate FAB
+### Gamification
+- Milestone bonuses at referral thresholds
+- Time-bound contests with prizes and leaderboards
+- Weekly challenges with progress bars and badge rewards
+- Badges for achievements ("First Sale", "Top 10%", etc.)
+- Self-set earnings goals with visual progress tracking
 
-A floating action button is present on all social dashboard pages, providing one-click access to AI post generation without navigating away from the current page.
+### Marketing Tools
+Deep links, QR codes, link shortener, media kit, co-branded landing pages, discount codes (6 types, Stripe-synced), swipe files, sharing cards, email templates, promotional calendar, and asset usage analytics.
 
-### Responsive Sidebar
-
-The sidebar collapses on mobile devices and can be toggled via a hamburger button in the header. On desktop, it remains expanded.
-
-### Post Detail Dialog
-
-Clicking on any post opens a dialog with the full post content, platform targets, scheduling details, and engagement metrics (if published).
-
-### Bulk Import
-
-Users can import multiple posts at once using the bulk import feature, which accepts structured post data and creates entries for scheduling.
-
-### Platform Icons
-
-Each of the 10 supported platforms has a dedicated icon component with platform-specific color coding for easy visual identification throughout the dashboard.
-
----
-
-## 17. How PassivePost Demonstrates the MuseKit Extension Pattern
-
-PassivePost serves as the reference implementation for building products on top of MuseKit. It demonstrates several key architectural principles:
-
-### Scoped Directories
-
-All PassivePost code lives in clearly scoped directories:
-
-- Dashboard pages: `src/app/dashboard/social/`
-- API routes: `src/app/api/social/`
-- Components: `src/components/social/`
-- Library code: `src/lib/social/`
-- Admin config: `src/app/admin/setup/passivepost/`
-- Extension migrations: `migrations/extensions/`
-
-### One-Way Dependency
-
-PassivePost imports from MuseKit core modules (`@/lib/products`, `@/lib/supabase`, `@/lib/stripe`, `@/lib/queue`), but core MuseKit never imports from PassivePost code. This ensures the core remains product-agnostic.
-
-### Clean Removal
-
-To clone MuseKit without PassivePost, delete the `/social/` directories and the extension migration files. No core files need to be modified. The result is a clean MuseKit instance ready for a different product.
-
-### Product-Scoped Types
-
-All PassivePost TypeScript types are defined in `src/lib/social/types.ts`, not in core type files like `src/types/settings.ts`. This prevents type pollution and keeps the product boundary clean.
-
-### Extension Migrations
-
-Database changes specific to PassivePost are in `migrations/extensions/`, separate from core MuseKit tables in `migrations/core/`. Extension migrations can add new tables or extend existing core tables with additional columns.
+### Financial Tools
+Payout lifecycle (Pending -> Approved -> Paid), batch processing, tax info collection (W-9/W-8BEN), annual tax summaries, downloadable earnings statements, commission lifecycle tracker, second-tier commissions, renewals, forecasts, and projections.
 
 ---
 
-## 18. Development and Testing
+## 7. Content Flywheel
 
-### Beta Debug Mode
+The 7-phase flywheel system creates a self-reinforcing loop where each phase feeds data and insights into the next:
 
-Set the environment variable `MUSE_DEBUG_MODE=true` to enable debug mode. This exposes the `/api/social/debug` endpoint, which returns internal state information useful during development.
+| Phase | Name | Features | Purpose |
+|-------|------|----------|---------|
+| 1 | Flywheel Foundation | 5 | Blog-to-social pipeline, metrics, cross-linking |
+| 2 | Content Intelligence | 8 | AI-powered content analysis and optimization |
+| 3 | Advanced Automation | 9 | Content workflows, recycling, transformation |
+| 4 | Distribution Intelligence | 4 | Platform timing, hashtags, audience personas |
+| 5 | Revenue & ROI | 4 | ROI calculation, cost tracking, reporting |
+| 6 | Engagement & Retention | 6 | Streaks, digests, templates, gamification |
+| 7 | Collaboration | 2 | Client approval portals, team queues |
+| Bonus | Extra Features | 4 | Hashtags, gig leads, voice tuner, lead CRM |
 
-### Demo Data
+**Total: 42 features across all phases**
 
-The file `src/lib/social/demo-data.ts` provides mock data for development and testing, including sample posts, accounts, and engagement metrics. This data is used when real platform connections are not available.
-
-### End-to-End Tests
-
-PassivePost includes 8 Playwright E2E tests in `tests/passivepost.spec.ts`. These tests cover:
-
-- Dashboard page loading and navigation
-- Post creation and management
-- Brand preferences configuration
-- Tier display and enforcement
-- Quick Generate functionality
-
-Run tests with:
-
-```bash
-npx playwright test tests/passivepost.spec.ts
-```
-
-### Unit Testing Areas
-
-The following areas are recommended for unit test coverage when extending PassivePost:
-
-| Area | What to Test | Key Files |
-|------|-------------|-----------|
-| AI Prompt Construction | Verify niche guidance is injected correctly, brand voice fields are included, platform constraints are applied | `src/app/api/social/generate-post/route.ts` |
-| Tier Resolution | Test fallback to Starter tier, metadata parsing, limit enforcement at boundaries | `src/lib/social/user-tier.ts`, `src/lib/social/rate-limits.ts` |
-| Queue Job Processing | Test retry logic (3 retries, exponential backoff), failure handling, "no posts" info logging | `src/lib/social/queue-jobs.ts` |
-| Token Encryption | Verify encrypt/decrypt round-trip, invalid key handling | `src/lib/social/crypto.ts` |
-| Blog Repurpose Engine | Test snippet count (5-7), platform targeting, `[BLOG_LINK]` placeholder inclusion | `src/app/api/social/blog/repurpose/route.ts` |
-| Flywheel Metrics | Test score calculation, velocity tracking, phase health aggregation | `src/app/api/social/flywheel/metrics/route.ts` |
-| Lead CRM Scoping | Verify user isolation (users can only see their own leads) | `src/app/api/social/leads/manage/route.ts` |
-
-### Deployment Guide (Vercel)
-
-PassivePost is designed for deployment on Vercel. Follow these steps:
-
-**1. Prerequisites**
-- GitHub repository connected to Vercel
-- Supabase project with database tables created (run all migrations in `migrations/core/` and `migrations/extensions/`)
-- Stripe account with products and pricing configured
-- Resend account for transactional emails
-
-**2. Environment Variables**
-
-Set these in Vercel's project settings (Settings > Environment Variables):
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anonymous/public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (server-side only) |
-| `STRIPE_SECRET_KEY` | Yes | Stripe secret key for billing |
-| `SESSION_SECRET` | Yes | Random string for session encryption |
-| `SOCIAL_ENCRYPTION_KEY` | Yes | 32-byte hex key for encrypting OAuth tokens |
-| `RESEND_API_KEY` | Yes | Resend API key for emails |
-| `UPSTASH_REDIS_REST_URL` | Yes | Upstash Redis URL for BullMQ queues |
-| `UPSTASH_REDIS_REST_TOKEN` | Yes | Upstash Redis token |
-| `XAI_API_KEY` | Recommended | xAI API key for AI content generation |
-| `NEXT_PUBLIC_SENTRY_DSN` | Optional | Sentry DSN for error tracking |
-| `MUSE_DEBUG_MODE` | Optional | Set to `true` to enable debug endpoints |
-
-**3. Deploy**
-```bash
-git push origin main
-```
-Vercel auto-deploys on push. The build command (`next build`) and output directory are auto-detected.
-
-**4. Cron Jobs**
-Configure Vercel Cron in `vercel.json` for scheduled tasks:
-```json
-{
-  "crons": [
-    { "path": "/api/social/cron/process-scheduled", "schedule": "*/5 * * * *" },
-    { "path": "/api/social/cron/pull-engagement", "schedule": "0 */6 * * *" }
-  ]
-}
-```
-
-**5. Post-Deploy Checklist**
-- Verify OAuth callback URLs are set correctly for each platform (must use production domain)
-- Test Stripe webhook endpoint is receiving events
-- Confirm cron jobs are running (check Vercel dashboard > Cron Jobs)
-- Validate `SOCIAL_ENCRYPTION_KEY` matches across environments (tokens encrypted with one key can't be decrypted with another)
+See [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md) for the complete specification of each feature.
 
 ---
 
-## 19. Content Flywheel System
+## 8. Subscription Tiers
 
-PassivePost includes a complete 38-feature content flywheel across 7 phases, plus 4 bonus features (42 total). The flywheel transforms PassivePost from a simple scheduling tool into a comprehensive content marketing platform.
+### Content Scheduling Tiers
 
-### Phases Overview
+| Limit | Starter | Basic | Premium |
+|-------|---------|-------|---------|
+| Daily AI Generations | 5 | 10 | 100 |
+| Daily Posts | 1 | 2 | Unlimited |
+| Monthly Posts | 15 | 30 | Unlimited |
+| Connected Platforms | 2 | 3 | 8 |
 
-| Phase | Name | Features |
-|-------|------|----------|
-| 1 | Flywheel Foundation | Blog publishing, repurpose engine, flywheel metrics |
-| 2 | Content Intelligence | AI grader, content DNA, topic fatigue, content mix, tone drift, cannibalization, engagement prediction, brief generator |
-| 3 | Advanced Automation | Calendar autopilot, batch repurpose, content recycling, evergreen finder, blog-to-thread, cross-post timing, repurpose chains, draft warnings, content decay |
-| 4 | Distribution Intelligence | Platform timing, hashtag tracker, audience personas, competitor gap |
-| 5 | Revenue & ROI | ROI calculator, cost per post, report card, white-label exports |
-| 6 | Engagement & Retention | Streaks, digest, next best action, templates, scorecard, leaderboard |
-| 7 | Collaboration | Client approval portal, approval queue |
+Tiers are resolved via Stripe subscription metadata. Admins can customize tier names, limits, and pricing through the admin setup wizard.
 
-### Bonus Features
-
-- **AI Hashtag Suggestions** — Button in post composer generates relevant hashtags using AI
-- **Gig Lead Notifications** — Keyword scanner finds potential clients on social platforms
-- **AI Voice Fine-Tuner** — Paste writing samples to teach AI your unique voice patterns
-- **Lead CRM Mini** — Tags, notes, status tracking, and CSV export for leads
-
-For complete details on every feature, see [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md).
+### Affiliate Performance Tiers
+Bronze, Silver, Gold, and Platinum based on referral count. Each tier unlocks higher commission rates and exclusive perks.
 
 ---
 
-## 20. Roadmap / Future
+## 9. Analytics & Intelligence
 
-The following features are planned for future development:
+### Connected Analytics
+Merges data from connected social and blog platforms with affiliate performance data:
+- Content performance correlated with affiliate earnings
+- Platform-by-platform revenue attribution
+- Cross-platform engagement comparison
 
-### Dynamic Tiers from Admin Dashboard
-
-Currently, PassivePost ships with 3 default tiers (Starter, Basic, Premium). A future update will allow admins to create unlimited custom tiers with arbitrary limit definitions directly from the admin dashboard.
-
-### Real Platform API Integration
-
-Of the 10 supported platforms, 3 have full API integration (Twitter/X, LinkedIn, Facebook). The remaining 7 platforms (YouTube, TikTok, Reddit, Pinterest, Snapchat, Discord, Instagram) have stubbed API client methods that are ready for real implementation as platform APIs are integrated.
+### Analytics Features
+- Churn intelligence with at-risk referral identification
+- Cohort analysis grouping referrals by signup month
+- Revenue breakdown by source (direct vs affiliate)
+- Geographic and device type traffic insights
+- Predictive intelligence for tier trajectory and seasonal patterns
+- Custom range reports with period-over-period comparison
+- Earnings heatmap
+- Percentile benchmarks across the affiliate program
 
 ---
 
-## 21. Related Documentation
+## 10. Communication & Engagement
 
-This Product Guide is the original comprehensive reference. For focused documentation, see:
+### Admin-to-Affiliate Communication
+- Broadcast emails to all or segmented affiliates
+- In-app messaging threads with unread indicators
+- Announcements on the affiliate dashboard
+- Monthly affiliate spotlight recognition
+
+### Automated Communication
+- 3-email drip sequence for new affiliates
+- Weekly performance emails
+- Monthly earnings statements
+- Weekly affiliate digest with contest standings and tips
+- Trial expiry alerts
+- What's New feature update notifications
+
+### Feedback Loop
+- Satisfaction surveys with star ratings
+- Testimonial submissions for social proof
+- Knowledge base with searchable help articles
+
+---
+
+## 11. CRM & Support
+
+| Feature | Description |
+|---------|-------------|
+| Universal User Profiles | Unified view of every user with contact info and activity history |
+| Support Tickets | Full workflow: Open -> In Progress -> Resolved -> Closed |
+| CRM Activity Log | Calls, notes, tasks, meetings per user account |
+| Marketing Campaigns | UTM attribution and performance tracking |
+| Contracts | Creation, signing workflow, version history |
+| Admin CRM Card | 360-degree affiliate view in a single drawer |
+| Health Scores | Auto-calculated green/yellow/red based on activity and conversion |
+
+---
+
+## 12. Technology Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js (App Router) with TypeScript |
+| Frontend | React, Tailwind CSS, shadcn/ui, Recharts |
+| Database | PostgreSQL via Supabase with Row Level Security |
+| Auth | Supabase Auth (email, OAuth, SSO/SAML) |
+| Payments | Stripe (subscriptions, webhooks, customer portal) |
+| Email | Resend (transactional, drip, digests) |
+| AI | xAI Grok (`grok-3-mini-fast`) |
+| Queue | BullMQ with Upstash Redis |
+| Rate Limiting | Upstash Redis sliding window + in-memory fallback |
+
+---
+
+## 13. Security
+
+### Token Encryption
+All OAuth tokens and API keys are encrypted with AES-256-GCM before database storage. The encryption key is stored as an environment variable.
+
+### Row Level Security
+All user-facing database tables have RLS enabled. Users can only access their own data, enforced at the database level by Supabase.
+
+### Fraud Detection
+Automated scoring for affiliate referrals, checking for suspicious patterns like same email domains, high-volume IP addresses, and self-referrals.
+
+### Rate Limiting
+- Tier-based usage limits on posts and AI generations
+- API endpoint rate limiting with Redis sliding window
+- In-memory fallback when Redis is unavailable
+
+---
+
+## Related Documentation
 
 | Document | What It Covers |
 |----------|---------------|
-| [OVERVIEW.md](./OVERVIEW.md) | Elevator pitch, target audience, pricing, differentiators — ideal for sharing with AI assistants or non-technical stakeholders |
-| [FEATURES.md](./FEATURES.md) | Deep dive into every feature with mechanics and details |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | Technical blueprint: database schema, API routes, OAuth flows, queue system |
-| [SITEMAP.md](./SITEMAP.md) | Every page, route, and API endpoint in the application |
+| [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md) | Content flywheel strategy and all 42 features |
+| [SITEMAP.md](./SITEMAP.md) | Every page and URL in the application |
 | [USER_GUIDE.md](./USER_GUIDE.md) | Step-by-step guide for end users |
-| [BLOG_PUBLISHING.md](./BLOG_PUBLISHING.md) | Blog cross-posting feature details |
-| [FLYWHEEL_MASTER_PLAN.md](./FLYWHEEL_MASTER_PLAN.md) | Complete 38-feature flywheel system: phases, APIs, dashboards |
 
 ---
-

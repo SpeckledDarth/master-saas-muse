@@ -1,7 +1,5 @@
 # MuseKit Admin Guide
 
-> **Revision:** 5.0 | **Last Updated:** February 20, 2026 | **Created:** February 2026
-
 A complete guide for managing your MuseKit-powered application. Written for team members who manage the platform day-to-day — no coding knowledge required.
 
 ---
@@ -20,19 +18,18 @@ A complete guide for managing your MuseKit-powered application. Written for team
    - [Features & Integrations](#features--integrations)
    - [API Keys & Integrations](#api-keys--integrations)
    - [PassivePost](#passivepost)
+   - [Products](#products)
+   - [Testimonials](#testimonials)
+   - [Discount Codes](#discount-codes)
+   - [Affiliate](#affiliate)
 5. [User Management](#user-management)
    - [Customer Service Tools](#customer-service-tools)
    - [User Impersonation](#user-impersonation)
 6. [Team Management](#team-management)
 7. [Blog & Changelog](#blog--changelog)
 8. [Metrics Dashboard](#metrics-dashboard)
-   - [KPI Cards](#kpi-cards)
-   - [NPS Score](#nps-score)
-   - [Alert Thresholds](#alert-thresholds)
-   - [Action Buttons](#action-buttons)
 9. [Analytics](#analytics)
 10. [Feedback](#feedback)
-    - [NPS Score Tracking](#nps-score-tracking)
 11. [Waitlist](#waitlist)
 12. [Email Templates](#email-templates)
 13. [Job Queue](#job-queue)
@@ -45,11 +42,10 @@ A complete guide for managing your MuseKit-powered application. Written for team
 20. [Audit Log Viewer](#audit-log-viewer)
 21. [Legal & Compliance Pages](#legal--compliance-pages)
 22. [Landing Page Components](#landing-page-components)
-23. [Header & Footer Styling](#header--footer-styling)
-24. [Section Ordering](#section-ordering)
-25. [PassivePost (Social Media Management)](#passivepost-social-media-management)
-26. [Feature Toggles Reference](#feature-toggles-reference)
-27. [Public Pages Your Visitors See](#public-pages-your-visitors-see)
+23. [PassivePost (Social Media Management)](#passivepost-social-media-management)
+24. [Feature Toggles Reference](#feature-toggles-reference)
+25. [Public Pages Your Visitors See](#public-pages-your-visitors-see)
+26. [Tips & Best Practices](#tips--best-practices)
 
 ---
 
@@ -61,7 +57,7 @@ Navigate to `/admin` on your site (e.g., `https://yoursite.com/admin`). You must
 
 ### Who Can Access What
 
-MuseKit uses a role-based permission system with four levels:
+MuseKit uses a role-based permission system with five levels:
 
 | Role | What They Can Do |
 |------|-----------------|
@@ -110,7 +106,7 @@ You only need to complete this once. After that, use the Setup Dashboard for ong
 
 **Where:** `/admin/setup`
 
-The Setup Dashboard is your master control panel for configuring every aspect of your site. It's split into 11 focused sub-pages, each accessible from a sidebar navigation menu. Each sub-page handles only its own section, making it faster to load and easier to navigate.
+The Setup Dashboard is your master control panel for configuring every aspect of your site. It is split into focused sub-pages, each accessible from a sidebar navigation menu. Sub-pages include: Branding, Content, Pages, Pricing, Social Links, Features, Integrations, PassivePost, Products, Testimonials, Discount Codes, Affiliate, Compliance, Security, Support, Funnel, Palette, and Watermark.
 
 ### Branding
 
@@ -131,9 +127,9 @@ Controls the visual identity of your site:
 - **Pattern/Texture** — A repeating pattern overlaid on a gradient
 - **Floating Mockup** — A product image that appears to float over a gradient
 
-**Header Styling** — Configure header background color, text color, background opacity, sticky/relative positioning, transparent mode, and bottom border toggle. Colors use color pickers and opacity sliders. Default behavior uses your branding primary color with auto-computed contrast text.
+**Header Styling** — Configure header background color, text color, background opacity, sticky/relative positioning, transparent mode, and bottom border toggle.
 
-**Footer Styling** — Configure footer background color, text color, optional background image (with automatic dark gradient overlay), and layout mode. Three layout modes: default (4-column grid), minimal (single-row), or centered (stacked). Background image can be uploaded via the image upload component.
+**Footer Styling** — Configure footer background color, text color, optional background image (with automatic dark gradient overlay), and layout mode. Three layout modes: default (4-column grid), minimal (single-row), or centered (stacked).
 
 **Theme Colors** — Customize colors for both light and dark modes:
 - Primary Color — Your main brand color (buttons, links)
@@ -153,18 +149,20 @@ Controls the homepage sections. Each section can be independently turned on or o
 - **Features Section** — Highlight what your product does. Add cards with icons, titles, and descriptions.
 - **Testimonials** — Customer quotes. Display as a grid or carousel.
 - **FAQ** — Frequently asked questions with expandable answers.
-- **Call to Action (CTA)** — The final prompt on the page encouraging signups. Set the headline, description, and button text/link.
+- **Call to Action (CTA)** — The final prompt on the page encouraging signups.
 - **Trusted By / Logo Marquee** — Scrolling logos of companies that use your product.
-- **Metrics / Counters** — Animated numbers (e.g., "10,000+ Users"). Set value, prefix, and suffix.
+- **Metrics / Counters** — Animated numbers (e.g., "10,000+ Users").
 - **Process Steps** — A numbered sequence showing how your product works.
 - **Customer Stories** — Longer-form testimonials with photos.
 - **Image + Text Blocks** — Alternating image and text sections for detailed feature explanations.
+- **Founder Letter** — A personal letter from the founder with portrait and signature.
+- **Comparison Bars** — Animated horizontal progress bars.
+- **Product Showcase** — App screenshot with shadow/border over background.
+- **Bottom Hero CTA** — Closing call-to-action section.
+- **Image Collage** — Fan-style overlapping images with hover animation.
 - **Section Backgrounds** — Choose a background style (transparent, muted, gradient, mesh) for each section independently.
 
-**Section Ordering** — Homepage sections can be reordered from this page. Use the arrow buttons next to each section to move it up or down. New sections are automatically added to the end of the order. Each section can also have a custom background color via the color picker.
-
-**Default section order:**
-Hero > Logo Marquee > Metrics > Features > Testimonials > Process Steps > Customer Stories > Founder Letter > Comparison Bars > Product Showcase > Bottom Hero CTA > Image Collage > Image + Text Blocks > FAQ > CTA
+**Section Ordering** — Homepage sections can be reordered. Use the arrow buttons next to each section to move it up or down. Each section can also have a custom background color via the color picker.
 
 ### Pages
 
@@ -178,7 +176,7 @@ Configure the content for individual pages on your site:
 - **Privacy Policy** — Your privacy policy (supports Markdown formatting)
 - **Pricing Page** — Headline and hero image for the pricing page
 - **FAQ Page** — Headline and hero image for the standalone FAQ page
-- **Custom Pages** — Create up to 4 additional pages with custom URLs, headlines, and Markdown content
+- **Custom Pages** — Create additional pages with custom URLs, headlines, and Markdown content
 
 ### Pricing
 
@@ -206,7 +204,7 @@ Add links to your social media profiles. These appear in your site's footer:
 
 Toggle features on and off, and configure AI and webhook integrations. This page also includes:
 
-- **Security settings** — Configure metrics alert thresholds (churn rate, minimum new users), API token rotation intervals, and database backup preferences
+- **Security settings** — Configure metrics alert thresholds, API token rotation intervals, and database backup preferences
 - **Compliance settings** — Enable/disable legal pages (Cookie Policy, Acceptable Use, etc.) and configure the cookie consent banner
 - **Support settings** — Configure the floating support chatbot widget, set the fallback email, and customize the chatbot's system prompt
 
@@ -236,19 +234,39 @@ Manage all your third-party service API keys from one centralized page. Keys are
 - **Source badges** indicate whether a key is stored in the Dashboard (database) or comes from an Environment Variable on your hosting platform
 - Format validation catches common errors when saving (e.g., Stripe keys must start with `sk_`)
 
-**Note:** Social platform API keys are managed on the PassivePost setup page instead, so they only appear when the social module is enabled.
-
 ### PassivePost
 
 **Where:** `/admin/setup/passivepost`
 
-Configure the PassivePost social media management module. See [PassivePost Module](#passivepost-module) for full details.
+Configure the PassivePost social media management module. This page includes:
 
-This page also includes:
+- **Niche Guidance** — Admin-editable entries for AI prompt customization
+- **Engagement Pull Configuration** — Set the interval for how often the system fetches engagement metrics from platform APIs
+- **API Health Checker** — Configure status monitoring for social platform API connections
 
-- **Niche Guidance** — Admin-editable entries for AI prompt customization (key/label/guidance triplets). Empty entries are automatically filtered on save.
-- **Engagement Pull Configuration** — Set the interval (1-168 hours) for how often the system fetches engagement metrics from platform APIs, and the lookback window for which posts to check.
-- **API Health Checker** — Configure status monitoring for social platform API connections, with alerts for repeated failures.
+### Products
+
+**Where:** `/admin/setup/products`
+
+Manage the Product Registry. Add, edit, and remove products that run on top of MuseKit. Each product has its own Stripe integration, tier definitions, and feature limits. See [Adding a Product](ADDING_A_PRODUCT.md) for the full walkthrough.
+
+### Testimonials
+
+**Where:** `/admin/setup/testimonials`
+
+Manage customer testimonials that appear on your landing page. Add, edit, and remove quotes with author names, titles, and photos.
+
+### Discount Codes
+
+**Where:** `/admin/setup/discount-codes`
+
+Create and manage discount codes that sync with Stripe coupons. Configure percentage or fixed-amount discounts, expiration dates, and usage limits.
+
+### Affiliate
+
+**Where:** `/admin/setup/affiliate`
+
+Configure the affiliate/partner program. Set commission rates, tier thresholds, payout schedules, marketing assets, and application requirements. The affiliate system has its own dedicated documentation.
 
 ---
 
@@ -273,7 +291,7 @@ Click the **eye icon** on any user row to open their detailed profile. The detai
 - Full user profile (name, email, avatar, provider, phone, join date, last login)
 - Subscription details (plan tier, status, renewal date, cancel status)
 - Quick actions:
-  - **Manage in Stripe** — Opens the Stripe Customer Portal for that user (manage their subscription, payment method, invoices)
+  - **Manage in Stripe** — Opens the Stripe Customer Portal for that user
   - **Send Email** — Opens your email client pre-addressed to that user
 
 **Invoices Tab:**
@@ -370,15 +388,15 @@ A dedicated card shows your **Net Promoter Score** — a measure of how likely u
 
 Configurable alerts let you know when key metrics need attention:
 
-- **Churn Rate Alert** — Set a maximum churn rate threshold. When exceeded, you'll see a warning on the card and can receive email alerts.
+- **Churn Rate Alert** — Set a maximum churn rate threshold. When exceeded, you'll see a warning and can receive email alerts.
 - **Minimum New Users Alert** — Set a minimum number of new users per month. If growth drops below this, you'll be notified.
 
 Configure alert thresholds in Admin > Setup > Features > Security section.
 
 ### Action Buttons
 
-- **Email Report** — Send a KPI summary email to yourself or your team. Uses the scheduled report system to compile and deliver key metrics.
-- **Check Alerts** — Manually trigger an alert check against your configured thresholds. Shows a notification if any thresholds are exceeded.
+- **Email Report** — Send a KPI summary email to yourself or your team
+- **Check Alerts** — Manually trigger an alert check against your configured thresholds
 
 The dashboard also includes **User Growth** and **Revenue Growth** line charts showing trends over time.
 
@@ -473,7 +491,7 @@ Monitor the background job processing system. Jobs are tasks that run behind the
 - **Token rotation jobs** — Automated webhook secret rotation at configured intervals
 - **Social post jobs** — Delivering scheduled social media posts to platforms
 - **Social health check jobs** — Monitoring social platform API connectivity
-- **Social trend monitor jobs** — Tracking trends across platforms (Power tier)
+- **Social trend monitor jobs** — Tracking trends across platforms
 - **Social engagement pull jobs** — Fetching likes, shares, and comments from platform APIs
 
 **Dashboard shows:**
@@ -539,11 +557,6 @@ Billing is powered by Stripe. Here's how the pieces fit together:
 - Customers can manage their own subscription (upgrade, downgrade, cancel, update payment method) through the Stripe Customer Portal, accessible from their billing page (`/billing`)
 - You can view and manage all subscriptions in your Stripe Dashboard
 
-**Webhook events:**
-- `subscription.created` — Fired when someone subscribes
-- `subscription.updated` — Fired when a plan changes
-- `subscription.cancelled` — Fired when someone cancels
-
 ---
 
 ## Webhooks & Automation
@@ -587,7 +600,7 @@ Webhooks let you connect your platform to automation tools like n8n, Zapier, or 
 When AI Features are enabled, your platform includes an AI chat assistant. The AI system supports multiple providers:
 
 **Supported Providers:**
-- **xAI (Grok)** — xAI's Grok models
+- **xAI (Grok)** — xAI's Grok models (default)
 - **OpenAI** — GPT models
 - **Anthropic** — Claude models
 
@@ -599,7 +612,7 @@ When AI Features are enabled, your platform includes an AI chat assistant. The A
 5. Set Max Tokens (maximum length of AI responses)
 6. Write a System Prompt (instructions that guide the AI's behavior)
 
-**API Keys:** Each provider requires its own API key, set as an environment variable on your hosting platform (not in the admin dashboard for security).
+**API Keys:** Each provider requires its own API key, configured via environment variables or the Integrations page.
 
 ---
 
@@ -666,17 +679,17 @@ MuseKit includes a comprehensive set of legal pages that are automatically avail
 | AI Data Usage | `/ai-data-usage` |
 | Security Policy | `/security-policy` |
 
-**Cookie Consent Banner:** A configurable cookie consent banner can be enabled via Admin > Setup > Features > Compliance. When enabled, visitors see a banner at the bottom of the page asking them to accept or decline cookies.
+**Cookie Consent Banner:** A configurable cookie consent banner can be enabled via Admin > Setup > Compliance. When enabled, visitors see a banner at the bottom of the page asking them to accept or decline cookies.
 
-**Configuration:** Legal and compliance settings are managed in Admin > Setup > Features, including toggles for individual legal pages, cookie consent, MFA requirements, and password requirements.
+**Configuration:** Legal and compliance settings are managed in Admin > Setup, including toggles for individual legal pages, cookie consent, MFA requirements, and password requirements.
 
 ---
 
 ## Landing Page Components
 
-The landing page is built from 16 reusable components, all configurable from the Content settings page:
+The landing page is built from reusable components, all configurable from the Content settings page:
 
-- **Hero** — Main banner with 6 style options (full-width, split, video, pattern, floating mockup, photo collage)
+- **Hero** — Main banner with multiple style options (full-width, split, video, pattern, floating mockup, photo collage)
 - **Logo Marquee** — Scrolling partner/client logos
 - **Animated Counters** — Key metrics with counting animation
 - **Feature Cards** — Product feature highlights with icons
@@ -688,12 +701,13 @@ The landing page is built from 16 reusable components, all configurable from the
 - **Comparison Bars** — Animated horizontal progress bars with entrance animation
 - **Product Showcase** — App screenshot with shadow/border over background image or gradient
 - **Bottom Hero CTA** — Closing call-to-action section matching hero visual weight
-- **Image Collage** — Fan-style overlapping images (up to 5) with hover animation
+- **Image Collage** — Fan-style overlapping images with hover animation
 - **Image + Text Blocks** — Alternating image and text sections for detailed features
 - **Gradient Text** — Animated gradient text effect for headlines
 - **Announcement Bar** — Top banner for promotions or important messages
+- **Social Proof Popup** — Notification-style popups showing recent activity
 
-Each component can be toggled on/off independently. Toggle names follow the pattern `{componentName}Enabled` in the Content settings.
+Each component can be toggled on/off independently from the Content settings.
 
 **Feature Sub-Pages** — Create dedicated pages for individual features at `/features/{slug}`. Each page can have a hero section with background image and screenshot, alternating image/text blocks, and a closing CTA.
 
@@ -708,7 +722,7 @@ PassivePost is a separate product built on MuseKit. For complete documentation i
 - User dashboard: `/dashboard/social/overview`
 - 3 tiers: Starter, Basic, Premium (configurable)
 - 10 social platforms supported
-- AI post generation with 15 niche-specific prompts
+- AI post generation with niche-specific prompts
 
 ---
 
@@ -766,8 +780,12 @@ These are the pages your customers and visitors can access:
 | **Signup** | `/signup` | New account registration |
 | **Billing** | `/billing` | Subscription management (logged-in users) |
 | **Profile** | `/profile` | User profile settings (logged-in users) |
-| **Custom Pages** | `/p/{slug}` | Up to 4 custom pages you create |
+| **Security** | `/security` | Security settings (logged-in users) |
+| **Support** | `/support` | Support center (logged-in users) |
+| **Custom Pages** | `/p/{slug}` | Custom pages you create |
 | **Social Dashboard** | `/dashboard/social/*` | Social media management (when PassivePost is enabled) |
+| **Partner Pages** | `/partner/{slug}` | Co-branded affiliate landing pages |
+| **Testimonials** | `/testimonials` | Public testimonials page |
 
 All pages automatically support dark/light mode and are responsive on mobile devices.
 
@@ -776,19 +794,12 @@ All pages automatically support dark/light mode and are responsive on mobile dev
 ## Tips & Best Practices
 
 - **Always click Save** — Changes in Setup Dashboard aren't applied until you click the "Save Changes" button
-- **Changes take effect immediately** — After saving, settings are applied on the next page load (no caching delay)
+- **Changes take effect immediately** — After saving, settings are applied on the next page load
 - **Test after changes** — After saving, visit your public pages to verify changes look correct
 - **Use the onboarding wizard first** — If this is a new setup, complete the onboarding wizard before diving into the Setup Dashboard
-- **Keep your Stripe Dashboard in sync** — Pricing plans are managed in Stripe, not in MuseKit. If plans look wrong, check Stripe first.
+- **Keep your Stripe Dashboard in sync** — Pricing plans are managed in Stripe, not in MuseKit. If plans look wrong, check Stripe first
 - **Monitor the Job Queue** — If emails aren't being sent or engagement data isn't updating, check the Queue dashboard for failed jobs
 - **Test webhooks** — Use the "Test Webhook" button before relying on webhook integrations
 - **Check the Metrics Dashboard regularly** — Monitor KPIs and set up alert thresholds to catch issues early
 - **Review the Audit Log** — Periodically check the audit log for unexpected admin actions
-- **Backup before major changes** — The platform supports checkpoints, but it's good practice to note your current settings before making sweeping changes
 - **API Keys page first** — After initial setup, configure your required API keys on the Integrations page to ensure all services are connected
-- **PassivePost setup** — If using social features, enable the module first, then configure platforms and API keys on the same page
-- **PassivePost tiers** — Set up Stripe products with metadata key `muse_tier` and values (`tier_1`, `tier_2`, `tier_3`) to enable per-user tier resolution. Tier definitions are admin-configurable from the PassivePost setup page
-- **Engagement pull settings** — Adjust the engagement pull interval based on your API rate limits and how frequently you need updated metrics
-
----
-

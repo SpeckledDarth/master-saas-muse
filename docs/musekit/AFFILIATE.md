@@ -1,64 +1,64 @@
 # Affiliate System — Complete Guide
 
-This document explains the entire Affiliate System built into MuseKit. It covers what it is, how it works, the architecture, every route, every database table, and how all the pieces connect. Written for someone reading about this for the first time.
+This document explains the entire Affiliate System built into MuseKit. It covers what it is, how it works, the architecture, every route, every database table, and how all the pieces connect.
 
 ---
 
 ## Table of Contents
 
 1. [What Is the Affiliate System?](#what-is-the-affiliate-system)
-2. [Key Architecture Decision: Separation from Product Users](#key-architecture-decision-separation-from-product-users)
-3. [Sitemap — All Affiliate Routes](#sitemap--all-affiliate-routes)
+2. [Architecture: Separation from Product Users](#architecture-separation-from-product-users)
+3. [All Affiliate Routes](#all-affiliate-routes)
 4. [How It Works — End to End](#how-it-works--end-to-end)
 5. [Feature Breakdown](#feature-breakdown)
-   - [Public Landing Page](#1-public-landing-page)
-   - [Application Form](#2-application-form)
-   - [Admin Application Review](#3-admin-application-review)
-   - [Affiliate Login](#4-affiliate-login)
-   - [Affiliate Dashboard](#5-affiliate-dashboard)
-   - [Referral Link & Cookie Tracking](#6-referral-link--cookie-tracking)
-   - [Signup Attribution](#7-signup-attribution)
-   - [Commission Tracking (Stripe)](#8-commission-tracking-stripe)
-   - [Performance Tiers](#9-performance-tiers)
-   - [Grandfathering / Rate Lock-In](#10-grandfathering--rate-lock-in)
-   - [Fraud Detection](#11-fraud-detection)
-   - [Payouts](#12-payouts)
-   - [Marketing Assets](#13-marketing-assets)
-   - [Email Drip Sequence](#14-email-drip-sequence)
-   - [Notifications](#15-notifications)
-   - [External Network Integrations](#16-external-network-integrations)
-6. [Database Schema](#database-schema)
-7. [API Endpoints](#api-endpoints)
-8. [Key Files](#key-files)
-9. [Admin Management](#admin-management)
-10. [Glossary](#glossary)
-11. [Testing Checklist](#testing-checklist)
-12. [FAQ](#faq)
+6. [Tiers, Gamification & Challenges](#tiers-gamification--challenges)
+7. [Marketing Toolkit & Resource Center](#marketing-toolkit--resource-center)
+8. [Communication & Engagement](#communication--engagement)
+9. [Payouts & Financial Tools](#payouts--financial-tools)
+10. [Analytics & Intelligence](#analytics--intelligence)
+11. [AI-Powered Tools](#ai-powered-tools)
+12. [Social Proof & Directory](#social-proof--directory)
+13. [Database Schema](#database-schema)
+14. [API Endpoints](#api-endpoints)
+15. [Admin Management](#admin-management)
+16. [Testing Checklist](#testing-checklist)
 
 ---
 
 ## What Is the Affiliate System?
 
-The Affiliate System lets you run a partner/referral program for your SaaS product. People (affiliates) sign up, get a unique referral link, and earn a percentage of every subscription payment made by someone they referred. It's a marketing channel where you only pay when you make money.
+The Affiliate System lets you run a partner/referral program for your SaaS product. People (affiliates) sign up, get a unique referral link, and earn a percentage of every subscription payment made by someone they referred. It is a marketing channel where you only pay when you make money.
 
 **What's included:**
 - A public-facing affiliate program page anyone can find
 - An application form so anyone can apply (no account needed)
 - An admin review workflow to approve or reject applicants
-- A standalone affiliate dashboard where affiliates track clicks, signups, earnings, and payouts
-- Cookie-based referral tracking (30-day window by default)
+- A standalone affiliate dashboard with 11+ navigation tabs where affiliates track clicks, signups, earnings, payouts, contests, and more
+- Cookie-based referral tracking (30-day window by default, configurable)
 - Automatic commission calculation when referred users pay via Stripe
-- Performance tiers that unlock higher commission rates
+- Performance tiers (Bronze, Silver, Gold, Platinum) that unlock higher commission rates
 - Rate lock-in (grandfathering) so affiliates keep their terms even if you change the program later
-- Fraud detection (same email domain, suspicious IP volume, self-referral)
-- Payout management (pending → approved → paid)
-- A library of marketing assets (banners, email templates, social posts)
-- A 3-email onboarding drip sequence for new affiliates
+- Milestone bonuses, contests, leaderboards, weekly challenges, and badges
+- Deep link generator with UTM parameters and QR codes
+- Co-branded landing pages at `/partner/[slug]`
+- Discount codes with dual-attribution (cookie + code tracking)
+- Marketing toolkit with swipe files, email templates, sharing cards, and starter kits
+- Knowledge base and promotional calendar
+- 14 AI-powered tools (coach, post writer, email drafter, video scripts, and more)
+- Tax compliance tools (W-9/W-8BEN collection, 1099 export)
+- Payout management with batch processing and receipt emails
+- In-app messaging between admin and affiliates
+- Broadcasts, drip sequences, surveys, and testimonials
+- Public partner directory and case study library
+- Fraud detection and automated scoring
+- Affiliate API access and webhook notifications
 - External affiliate network support (ShareASale, Impact, PartnerStack)
+
+For detailed technical specifications of all 32 enhancement features, see `docs/musekit/AFFILIATE_ENHANCEMENTS.md`.
 
 ---
 
-## Key Architecture Decision: Separation from Product Users
+## Architecture: Separation from Product Users
 
 **Affiliates and product users are completely separate.** This is a deliberate design choice.
 
@@ -68,7 +68,7 @@ The Affiliate System lets you run a partner/referral program for your SaaS produ
 | **Dashboard** | `/dashboard` (with sidebar) | `/affiliate/dashboard` (standalone, no sidebar) |
 | **Purpose** | Use the product | Promote the product and earn commissions |
 | **Account creation** | Self-service signup | Admin-approved application |
-| **Navigation** | Full product sidebar | Minimal header with logout |
+| **Navigation** | Full product sidebar | Minimal header with logout + 11 tab navigation |
 
 **Why separate?**
 - Affiliates don't need access to the product itself — they just need their referral link, stats, and payouts.
@@ -83,36 +83,33 @@ The Affiliate System lets you run a partner/referral program for your SaaS produ
 
 ---
 
-## Sitemap — All Affiliate Routes
+## All Affiliate Routes
 
 ### Public Pages (no login required)
 
 | Route | Purpose |
 |---|---|
-| `/affiliate` | Landing page — program overview, commission rates, benefits, "How It Works", audience types, CTAs |
+| `/affiliate` | Landing page — program overview, commission rates, benefits, "How It Works", audience types, testimonials, CTAs |
 | `/affiliate/join` | Application form — name, email, website, promotion methods (multi-select), message |
 | `/affiliate/login` | Affiliate-only login — magic link or password |
-| `/affiliate/test-links` | **Temporary** — developer quick-links page for testing (remove before launch) |
+| `/affiliate/forgot-password` | Password reset for affiliates |
+| `/affiliate/set-password` | Set initial password after approval |
+| `/partners` | Public affiliate directory — opt-in profiles with tier badges, bio, social links |
+| `/partner/[slug]` | Co-branded landing page for individual affiliates |
+| `/partner/verify/[code]` | Badge verification page — confirms affiliate badges are legitimate |
 
 ### Affiliate Dashboard (requires affiliate login)
 
 | Route | Purpose |
 |---|---|
-| `/affiliate/dashboard` | Standalone dashboard — referral link, stats, earnings, payouts, tier progress, marketing assets |
+| `/affiliate/dashboard` | Standalone dashboard with 11+ tabs — referral link, stats, earnings, payouts, marketing toolkit, analytics, AI tools, messages, contests, and more |
 
 ### Admin Pages (requires admin login)
 
 | Route | Purpose |
 |---|---|
-| `/admin/setup/affiliate` | Full affiliate management — tabs for Settings, Tiers, Assets, Management, Applications, Networks |
-
-### Product-Side References
-
-| Route | Purpose |
-|---|---|
-| `/dashboard/social/affiliate` | Legacy in-app affiliate page for product users who activated the affiliate program from within the product (before the open program existed) |
-| Footer → "Affiliate Program" | Link in the website footer pointing to `/affiliate` |
-| Sidebar → Earn → Affiliate | Link in the product sidebar pointing to `/affiliate` |
+| `/admin/setup/affiliate` | Full affiliate management — 15+ tabs for Settings, Tiers, Assets, Management, Applications, Networks, Broadcasts, Contests, Badges, and more |
+| `/admin/setup/discount-codes` | Discount code management |
 
 ---
 
@@ -121,7 +118,7 @@ The Affiliate System lets you run a partner/referral program for your SaaS produ
 Here's the complete lifecycle, from a stranger finding your affiliate program to getting paid:
 
 ### Step 1: Discovery
-A blogger, influencer, or anyone visits `/affiliate` and reads about the program — commission rates, cookie window, benefits, and who can join.
+A blogger, influencer, or anyone visits `/affiliate` and reads about the program — commission rates, cookie window, benefits, testimonials, and who can join.
 
 ### Step 2: Application
 They click "Apply Now" and fill out the form at `/affiliate/join`. They provide their name, email, website/channel URL, how they plan to promote, and an optional message. No account is needed.
@@ -131,19 +128,18 @@ The application appears in the admin dashboard at `/admin/setup/affiliate` under
 
 ### Step 4: Account Provisioning (on approval)
 When an admin approves an application, the system automatically:
-1. Creates a Supabase user account with the applicant's email (or finds an existing one if the email is already registered)
+1. Creates a Supabase user account with the applicant's email (or finds an existing one)
 2. Generates a unique referral code (random hex string)
 3. Creates a referral link record with `affiliate_role = 'affiliate'`
 4. Assigns the `affiliate` role in the `user_roles` table
 5. Sends an in-app notification welcoming them
-
-Note: Commission rate lock-in (grandfathering) happens separately when the affiliate first activates through the dashboard via `/api/affiliate/activate`. At that point, the current program commission rate and duration are saved to their referral link record.
+6. Starts the 3-email drip onboarding sequence
 
 ### Step 5: Affiliate Login
 The approved affiliate receives a login link (magic link via email) or can set a password. They log in at `/affiliate/login` and are taken to `/affiliate/dashboard`.
 
 ### Step 6: Sharing
-From the dashboard, the affiliate copies their unique referral link (e.g., `https://yourapp.com/?ref=a1b2c3d4e5f6`) and shares it with their audience — in blog posts, YouTube descriptions, newsletters, social media, etc.
+From the dashboard, the affiliate copies their unique referral link (e.g., `https://yourapp.com/?ref=a1b2c3d4e5f6`) and shares it. They can also use the deep link generator to create links to specific pages, generate QR codes, create short links, or use discount codes.
 
 ### Step 7: Cookie Tracking
 When someone clicks the referral link, the `ReferralTracker` component on your marketing pages:
@@ -151,6 +147,7 @@ When someone clicks the referral link, the `ReferralTracker` component on your m
 2. Sets a `pp_ref` cookie that lasts 30 days (configurable)
 3. Stores the code in `localStorage` as a backup
 4. Sends a click-tracking request to the API (increments the link's click count)
+5. Records the landing page and source tag if present
 
 ### Step 8: Signup Attribution
 When the visitor signs up as a product user:
@@ -165,263 +162,238 @@ When the referred user subscribes and Stripe processes the payment:
 1. Stripe sends an `invoice.paid` webhook
 2. The webhook handler looks up the paying customer's Supabase user ID
 3. Checks `affiliate_referrals` for a matching record
-4. If found, calculates the commission: invoice amount × affiliate's commission rate
+4. If found, calculates the commission: invoice amount x affiliate's commission rate
 5. Creates a record in `affiliate_commissions` with status `pending`
-6. Updates the affiliate's running totals on their referral link
+6. Checks for milestone bonuses and awards them if thresholds are met
 7. Sends a notification to the affiliate: "You earned $X.XX commission!"
 
 ### Step 10: Payout
 When the affiliate's balance reaches the minimum payout threshold ($50 by default):
-1. Admin creates a payout record with status `pending`
+1. Admin creates a payout batch (can batch multiple affiliates at once)
 2. Admin processes the payment (manually via PayPal, bank transfer, etc.)
 3. Admin marks the payout as `paid`
-4. The affiliate sees the payout in their dashboard history
+4. System auto-sends payout receipt emails
+5. The affiliate sees the payout in their dashboard history
 
 ---
 
 ## Feature Breakdown
 
-### 1. Public Landing Page
+### Public Landing Page
 **Route:** `/affiliate`
 
-The public-facing marketing page for the affiliate program. Pulls live data from the program settings API so commission rates and durations always reflect current configuration.
+The public-facing marketing page for the affiliate program. Pulls live data from the program settings API so commission rates and durations always reflect current configuration. Includes testimonials from successful affiliates and a "How It Works" section.
 
-**Sections:**
-- Hero with headline ("Earn X% Recurring Commissions") and CTAs
-- "How It Works" — 3-step cards (Apply → Share → Earn)
-- "Why Partner With Us" — 6 benefit cards (recurring commissions, 30-day cookie, real-time dashboard, marketing materials, locked-in rates, performance tiers)
-- "Who Can Be an Affiliate?" — audience types (bloggers, YouTubers, newsletter writers, podcasters, influencers, experts, course creators, freelancers, community leaders)
-- Bottom CTA — "Ready to Start Earning?"
-
-### 2. Application Form
+### Application Form
 **Route:** `/affiliate/join`
 
-A simple form anyone can fill out — no account required.
+A simple form anyone can fill out — no account required. Fields: Full Name, Email, Website/Channel URL, Promotion Methods (multi-select checkboxes), Additional Message. Checks for duplicate applications by email.
 
-**Fields:**
-- Full Name (required)
-- Email Address (required)
-- Website / Channel URL (optional)
-- Promotion Methods (required, multi-select checkboxes — select all that apply): Blog/Website, YouTube, Social Media, Newsletter, Podcast, Online Course/Community, Consulting/Freelance, Other. Stored as comma-separated string.
-- Additional Message (optional)
-
-**Behavior:**
-- Checks for duplicate applications by email. If a pending or approved application exists, shows an error instead of creating a duplicate.
-- On success, shows a confirmation screen: "We'll review your application and get back to you within 24-48 hours."
-
-### 3. Admin Application Review
-**Route:** `/admin/setup/affiliate` → Applications tab
-
-Admins see a table of all applications with status badges (pending/approved/rejected), applicant details, and action buttons.
-
-**Approve flow:**
-1. Tries to create a new Supabase user with the applicant's email
-2. If the email is already registered, finds the existing user instead
-3. Generates a unique referral code
-4. Creates the referral link and assigns the affiliate role
-5. Only marks the application as "approved" after all provisioning succeeds
-6. If any step fails, the application stays "pending" so the admin can retry
-
-**Reject flow:**
-- Simply marks the application as "rejected" with optional reviewer notes
-
-### 4. Affiliate Login
-**Route:** `/affiliate/login`
-
-A standalone login page completely separate from the product login (`/login`).
-
-**Two modes:**
-- **Magic Link (default):** Enter email, receive a one-time login link via email, click it to access the dashboard. The redirect URL is set to `/affiliate/dashboard`.
-- **Password:** Enter email and password for direct login. Redirects to `/affiliate/dashboard` on success.
-
-**Links:**
-- "Use password instead" / "Use magic link instead" to toggle between modes
-- "Not an affiliate yet? Apply here" links to `/affiliate/join`
-- Back arrow links to `/affiliate`
-
-### 5. Affiliate Dashboard
+### Affiliate Dashboard
 **Route:** `/affiliate/dashboard`
 
-A standalone page with its own minimal header (app name + email + logout). No product sidebar, no product header/footer. This is the affiliate's home base.
+A standalone page with its own minimal header (app name + email + logout). No product sidebar. Contains 11+ tabs:
 
-**Sections:**
-- **Referral Link Card** — displays the full URL with copy button, shows locked-in terms badge
-- **Stats Grid** — 4 cards: Link Clicks, Signups (with conversion rate), Pending Earnings, Total Earned
-- **Tier Progress** — current tier name, commission rate, progress bar toward next tier
-- **Tabbed Content:**
-  - **Referrals** — list of all referred signups with status (signed_up, converted, churned) and date
-  - **Earnings** — list of all commissions with amount, rate, status (pending, approved, paid), and breakdown (pending/approved/paid totals + minimum payout threshold)
-  - **Payouts** — list of all payouts with amount, method, status, and date
-  - **Marketing** — grid of available marketing assets (banners, email templates, social posts, text snippets) with copy/download buttons
+- **Overview** — Referral link card, stats grid (clicks, signups, earnings), tier progress, recent activity
+- **Referrals** — List of all referred signups with status and commission lifecycle tracker
+- **Earnings** — Commission history with pending/approved/paid totals
+- **Marketing** — Full marketing toolkit (links, QR codes, assets, swipe files, sharing cards)
+- **Analytics** — Churn intelligence, cohort analysis, traffic insights, content intelligence, heatmap
+- **AI Tools** — 14 AI-powered tools (coach, post writer, email drafter, video scripts, and more)
+- **Contests** — Active contests, leaderboards, challenges, badges
+- **Messages** — Direct messaging with admin
+- **Payouts** — Payout history, schedule, tax information
+- **Resources** — Knowledge base, promotional calendar, starter kit
+- **Settings** — Profile, notification preferences, webhooks, API keys
 
-**Auth check:** On load, checks Supabase auth. If not logged in, redirects to `/affiliate/login`. If logged in but not an affiliate (`is_affiliate` is false), shows a "Not an Affiliate Yet" card with an apply button.
-
-### 6. Referral Link & Cookie Tracking
+### Referral Link & Cookie Tracking
 **Component:** `src/components/referral-tracker.tsx`
 
-A client-side component placed on marketing pages. When a visitor arrives with `?ref=CODE` in the URL:
+A client-side component placed on marketing pages. Uses last-touch attribution — if a visitor clicks a different affiliate's link later, the cookie is overwritten. Click tracking is deduplicated per session via `sessionStorage`.
 
-1. Fetches the cookie duration from program settings (default: 30 days)
-2. Sets a `pp_ref` cookie with the referral code, lasting the configured number of days
-3. Stores the code in `localStorage` as `ref_code` (backup)
-4. Sends a POST to `/api/referral` to increment the click count (deduplicated per session via `sessionStorage`)
+### Commission Tracking (Stripe)
+**Webhook:** `POST /api/stripe/webhook` -> `invoice.paid` event
 
-The cookie uses last-touch attribution — if a visitor clicks a different affiliate's link later, the cookie is overwritten with the new affiliate's code. However, click tracking is deduplicated per session (via `sessionStorage`), so the same referral code won't be tracked multiple times in a single browsing session.
+Automatic commission calculation using the affiliate's effective rate (considers tier and locked rate, uses whichever is higher). Deduplication via unique index on `stripe_invoice_id`. Supports second-tier commissions (earning from affiliates you recruited) and commission renewals.
 
-### 7. Signup Attribution
-**API:** `POST /api/affiliate/track-signup`
-
-Called by the signup page after a new user creates their account:
-1. Reads the referral code from the `pp_ref` cookie
-2. Looks up the referral link to find the affiliate
-3. Creates an `affiliate_referrals` record linking the affiliate to the new user
-4. Runs fraud detection checks
-5. Increments the affiliate's signup count
-6. Sends a notification to the affiliate
-
-### 8. Commission Tracking (Stripe)
-**Webhook:** `POST /api/stripe/webhook` → `invoice.paid` event
-
-When Stripe reports a successful payment:
-1. Finds the Supabase user tied to the Stripe customer
-2. Checks `affiliate_referrals` for a record where this user was referred
-3. If the referral exists and is within the commission window:
-   - Gets the affiliate's effective commission rate (considers tier and locked rate)
-   - Calculates: `commission = invoice_amount × rate / 100`
-   - Creates an `affiliate_commissions` record (status: `pending`)
-   - Updates the affiliate's `total_earnings_cents` and `pending_earnings_cents`
-   - Sends a notification
-4. Deduplication: A unique index on `stripe_invoice_id` prevents double-counting
-
-### 9. Performance Tiers
-**Tables:** `affiliate_tiers`
-
-Tiers reward high-performing affiliates with higher commission rates. Default tiers:
-
-| Tier | Minimum Referrals | Commission Rate |
-|---|---|---|
-| Bronze | 0 | 20% |
-| Silver | 25 | 25% |
-| Gold | 100 | 30% |
-
-Tiers are fully configurable by the admin (name, threshold, rate). The system always uses the best rate available to the affiliate — either their locked-in rate or their tier rate, whichever is higher.
-
-### 10. Grandfathering / Rate Lock-In
-When an affiliate explicitly activates via the `/api/affiliate/activate` endpoint (typically triggered from the dashboard), the current program terms are "locked in" on their referral link record:
-- `locked_commission_rate` — the program's commission rate at the time of activation
-- `locked_duration_months` — how long commissions last per referral
-- `locked_at` — timestamp of when terms were locked
-
-If you later lower the default commission rate from 20% to 15%, activated affiliates keep their original 20%. The system uses whichever is higher — the locked-in rate or the affiliate's current tier rate. If an affiliate has no locked rate and no applicable tier, the system falls back to a hardcoded default of 20%.
-
-**Important:** Lock-in happens on activation, not on approval. An approved affiliate who hasn't yet activated does not have locked terms.
-
-### 11. Fraud Detection
+### Fraud Detection
 **Function:** `checkFraudFlags()` in `src/lib/affiliate/index.ts`
 
-Runs automatically when a new referral is attributed. Checks for:
+Automated scoring system checks for:
+- Same email domain between affiliate and referred user
+- High-volume IP addresses (3+ signups from same IP hash within 1 hour)
+- Self-referral (same user ID)
+- Additional automated fraud scoring with configurable thresholds
 
-| Flag | What It Detects |
-|---|---|
-| `same_email_domain` | The affiliate and the referred user share the same email domain (e.g., both use @company.com) |
-| `suspicious_ip_volume` | More than 3 signups from the same IP hash within 1 hour, all attributed to the same affiliate |
-| `self_referral` | The affiliate referred themselves (same user ID) |
+Flags are informational — admins review them to make decisions.
 
-Fraud flags are stored as a JSON array on each `affiliate_referrals` record. They don't automatically block commissions — they're informational flags that admins can review.
+---
 
-### 12. Payouts
-**Table:** `affiliate_payouts`
+## Tiers, Gamification & Challenges
 
-Payout lifecycle:
-1. **Pending** — admin creates a payout batch for an affiliate whose balance exceeds the minimum threshold
-2. **Approved** — admin confirms the payout amount
-3. **Paid** — admin marks it as paid after sending the payment (via PayPal, bank transfer, etc.)
+| Feature | Description |
+|---------|-------------|
+| **Performance Tiers** | Bronze, Silver, Gold, Platinum — escalating commission rates based on referral count. Fully configurable by admin. |
+| **Milestone Bonuses** | One-time cash bonuses at referral count thresholds (e.g., $50 at 10 referrals). Progress bar on dashboard. |
+| **Contests** | Time-bound competitions with prizes, leaderboards, and countdown timers. |
+| **Leaderboards** | Ranked lists by referrals, earnings, or conversion rate. Filterable by time period. Privacy modes available. |
+| **Badges & Achievements** | Visual badges for accomplishments ("First Sale", "Top 10%", "100 Referrals"). Verifiable at `/partner/verify/[code]`. |
+| **Earnings Goals** | Self-set monthly targets with progress tracking. |
+| **"Fastest to $X" Recognition** | Speed-based awards for reaching earnings milestones fastest. |
+| **Weekly Challenges** | Micro-challenges with specific tasks, progress bars, badge rewards, and countdown timers. |
 
-Default minimum payout: $50.00 (5000 cents). Configurable in admin settings.
+---
 
-### 13. Marketing Assets
-**Table:** `affiliate_assets`
+## Marketing Toolkit & Resource Center
 
-A library of ready-to-use promotional materials that affiliates can copy or download from their dashboard.
+| Feature | Description |
+|---------|-------------|
+| **Deep Link Generator** | Create referral-tracked links to any page with source tags and UTM parameters. |
+| **QR Code Generator** | Branded QR codes containing the affiliate's referral link. |
+| **Link Shortener** | Clean short links (e.g., `ppost.co/steele`). |
+| **Media Kit Page** | One-click professional partner page. |
+| **Copy-Paste Captions** | Pre-written social media posts with referral link auto-inserted. |
+| **Sharing Cards** | Pre-designed social media images with referral code embedded. |
+| **Co-Branded Landing Pages** | Customizable partner pages at `/partner/[slug]`. |
+| **Discount Codes** | Branded coupon codes synced with Stripe. 6 discount types including percentage, fixed, free trial, and bundle. Dual-attribution with cookie tracking. |
+| **Email Templates** | Pre-written email sequences with merge tags for personalization. |
+| **Swipe Files** | Ready-to-use promotional emails with auto-filled merge tags. |
+| **Starter Kit** | Curated bundle of essential materials for new affiliates. |
+| **Knowledge Base** | Searchable help articles organized by category. |
+| **Promotional Calendar** | Admin-set upcoming campaigns with countdown timers and linked assets. |
+| **Asset Usage Analytics** | Tracks downloads, copies, and views for every marketing asset. |
 
-**Asset types:**
-- `banner` — image banners for websites/blogs
-- `email_template` — pre-written email copy
-- `social_post` — ready-to-share social media posts
-- `text_snippet` — text blurbs, testimonials, or talking points
+---
 
-Admins create and manage assets from the admin panel. Each asset can have text content (copyable), a file URL (downloadable), or both.
+## Communication & Engagement
 
-### 14. Email Drip Sequence
-**API:** `POST /api/affiliate/drip`
+| Feature | Description |
+|---------|-------------|
+| **Broadcasts** | Admin sends email announcements to all affiliates or segments with open/click tracking. |
+| **In-App Messaging** | Two-way message threads between admin and individual affiliates. |
+| **Drip Sequences** | 3-email automated onboarding: Welcome (immediate), Tips (24h), Strategy (72h). |
+| **Announcements** | Admin-created news items on the affiliate dashboard. |
+| **Affiliate Spotlight** | Monthly featured affiliate recognition. |
+| **What's New Digest** | Feature update notifications. |
+| **Surveys** | Satisfaction surveys with star ratings. Positive reviews can auto-convert to testimonials. |
+| **Testimonials** | Success story submissions. Displayed on the affiliate landing page. |
 
-A 3-email onboarding sequence sent to new affiliates via Resend. The endpoint is called with a `userId` and an internal secret. It checks which emails have already been sent (via the `email_drip_log` table) and sends the next one if the delay has elapsed:
+---
 
-1. **Welcome email** (step 1, sent immediately) — "You're In!" with referral link and dashboard link
-2. **Tips email** (step 2, sent 24 hours after step 1) — "How top affiliates earn the most" with promotion tactics
-3. **Strategy email** (step 3, sent 72 hours after step 1) — "Your first-week affiliate strategy" with the story formula
+## Payouts & Financial Tools
 
-The drip endpoint is designed to be called by a cron job or queue worker. Each call checks timing and deduplication, so it's safe to call repeatedly — it won't double-send.
+| Feature | Description |
+|---------|-------------|
+| **Payout Lifecycle** | Pending -> Approved -> Paid with visibility for both admin and affiliate. |
+| **Batch Processing** | Process multiple payouts at once with auto-sent receipt emails. |
+| **Payout Schedule Widget** | Shows next payout date, threshold progress, and pending balance. |
+| **Tax Info Collection** | W-9 (US) and W-8BEN (international) tax form submission. Admin verification. |
+| **Tax Summary** | Annual summary with estimated withholding and monthly breakdown. |
+| **Admin 1099 Tax Export** | Year-end CSV of affiliates earning over $600. |
+| **Earnings Statements** | Downloadable statements with period selection. |
+| **Commission Lifecycle Tracker** | 7-step visual journey: Click -> Signup -> Trial -> Paid -> Commission -> Approved -> Paid Out. |
+| **Second-Tier Commissions** | Earn percentage when recruited affiliates generate sales. |
+| **Commission Renewals** | Extend commission window when referred customers renew. Bulk renewal support. |
+| **Earnings Forecast** | Projected monthly earnings with optimistic/pessimistic range. |
+| **Earnings Projections** | Multi-month projections (3, 6, 12 months) with goal progress tracking. |
+| **Enhanced Payout History** | Filterable, paginated history with CSV export and summary statistics. |
 
-### 15. Notifications
-In-app notifications are created at key events:
-- Application approved → "Welcome to the Affiliate Program!"
-- New referral signup → "New signup from your referral!"
-- Commission earned → "You earned $X.XX commission!"
-- Payout processed → "Your payout of $X.XX has been processed!"
+---
 
-Notifications appear in the affiliate dashboard and in the bell icon notification system.
+## Analytics & Intelligence
 
-### 16. External Network Integrations
-**Table:** `affiliate_network_settings`
+| Feature | Description |
+|---------|-------------|
+| **Churn Intelligence** | Churn rate, reasons, timing patterns, and at-risk referrals. |
+| **Cohort Analysis** | Groups referrals by signup month, tracks retention over time. |
+| **Revenue Analytics** | Revenue by source, cumulative earnings, conversion funnel. |
+| **Traffic Insights** | Geographic breakdown, device types, repeat visitor analysis. |
+| **Connected Analytics** | Merges data from connected platforms with affiliate performance. |
+| **Content Intelligence** | Promotion frequency, content type performance, platform correlation. |
+| **Financial Overview** | Earnings vs costs, ROI, break-even analysis, projections. |
+| **Predictive Intelligence** | Tier trajectory, churn predictions, seasonal patterns. |
+| **Custom Range Reports** | Any date range with period-over-period comparison. |
+| **Earnings Heatmap** | GitHub-style 52-week heatmap of daily earnings activity. |
+| **Percentile Benchmarks** | Where an affiliate ranks vs all others in the program. |
+| **Sparklines** | Mini trend charts in referral rows. |
+| **Export Buttons** | CSV download for any data table. |
 
-Support for three external affiliate platforms:
+---
 
-| Network | Purpose |
-|---|---|
-| **ShareASale** | Large affiliate marketplace |
-| **Impact** | Enterprise partnership platform |
-| **PartnerStack** | B2B SaaS-focused affiliate network |
+## AI-Powered Tools
 
-Each network can be toggled on/off and configured with:
-- **Tracking ID** — your merchant/advertiser ID on the platform
-- **Postback URL** — the URL to ping when a conversion happens (server-side postback)
-- **API Key** — for advanced integrations
+All AI features pull real data from the affiliate's actual performance, connected platforms, and program context.
 
-When a Stripe conversion happens, the system can fire server-side postback requests to these networks so they track the sale on their end too. This lets you recruit affiliates through these established marketplaces in addition to your own program.
+| Tool | Description |
+|------|-------------|
+| **AI Coach** | Personalized tips based on commissions, tier progress, contests, leaderboard position. |
+| **AI Post Writer** | Platform-specific social media posts (7 platforms, 5 tones) with referral link embedded. |
+| **AI Email Drafter** | Professional email sequences for audience promotion. |
+| **AI Blog Outline** | Structured blog post outlines with SEO-friendly headings. |
+| **AI Video Script** | Video talking points for YouTube, TikTok, Instagram Reels. |
+| **AI Objection Handler** | Responses to common objections ("too expensive", "use competitor X"). |
+| **AI Ad Copy** | Promotional ad text for paid advertising. |
+| **AI Pitch Customizer** | Tailored pitches for different audience types. |
+| **AI Audience Content** | Content ideas matched to affiliate's audience demographics. |
+| **AI Promo Ideas** | Creative promotion suggestions based on trends and seasons. |
+| **AI Onboarding Advisor** | Getting-started guidance for new affiliates. |
+| **AI Conversion Optimizer** | Funnel analysis with specific improvement suggestions. |
+| **Promotion Strategy Quiz** | 6-question interactive quiz that generates a 30-day playbook. |
+| **Audience Analyzer** | Audience demographics analysis with AI-generated persona. |
+
+**AI Provider:** xAI (Grok) via `grok-3-mini-fast` model, configurable via admin settings.
+
+---
+
+## Social Proof & Directory
+
+| Feature | Description |
+|---------|-------------|
+| **Case Study Library** | Rich case studies with metrics, quotes, and share buttons. AI can auto-generate drafts from affiliate data. |
+| **Public Affiliate Directory** | Opt-in public page at `/partners` with tier badges, bio, social links. Searchable and filterable. |
+| **Verified Earnings Badges** | Embeddable badges at earning thresholds ($500+, $2,500+, $10,000+). Verifiable at `/partner/verify/[code]`. |
 
 ---
 
 ## Database Schema
 
-### Core Tables (Migration 005)
+### Core Tables (Migrations 005-009)
 
 | Table | Purpose |
 |---|---|
-| `affiliate_program_settings` | Single-row global config: commission rate, duration, min payout, cookie days, active flag |
-| `affiliate_tiers` | Performance tiers: name, minimum referrals, commission rate, sort order |
-| `affiliate_referrals` | Each referred signup: affiliate ID, referred user ID, ref code, IP hash, status, fraud flags |
-| `affiliate_commissions` | Each commission event: affiliate ID, referral ID, Stripe invoice ID, amounts, rate, status |
-| `affiliate_payouts` | Payout batches: affiliate ID, amount, method, status, processing info |
-| `affiliate_assets` | Marketing materials: title, type, content/file URL, active flag |
-
-### Referral Links Upgrades (Migrations 005 + 006)
-
-Added columns to the existing `referral_links` table:
-- `is_affiliate` (boolean) — whether this link is an active affiliate link
-- `locked_commission_rate` — grandfathered rate
-- `locked_duration_months` — grandfathered commission window
-- `locked_at` — when terms were locked
-- `current_tier_id` — FK to affiliate_tiers
-- `total_earnings_cents`, `paid_earnings_cents`, `pending_earnings_cents` — running totals
-- `affiliate_role` — 'user' or 'affiliate' (distinguishes product-user affiliates from open-program affiliates)
-
-### Open Program Tables (Migration 006)
-
-| Table | Purpose |
-|---|---|
-| `affiliate_applications` | Applications from the public form: name, email, website, method, status, reviewer info |
-| `affiliate_network_settings` | External network configs: name, slug, active flag, tracking ID, postback URL, API key |
+| `affiliate_profiles` | Extended affiliate data: quiz results, directory opt-in, health scores |
+| `affiliate_settings` | Global config: commission rate, duration, min payout, cookie days |
+| `affiliate_tiers` | Performance tiers: name, threshold, rate, perks, min payout override |
+| `affiliate_referrals` | Each referred signup: affiliate ID, referred user, status, fraud flags, source tag |
+| `affiliate_commissions` | Each commission: affiliate ID, Stripe invoice, amounts, rate, status |
+| `affiliate_payouts` | Payout batches: affiliate ID, amount, method, status |
+| `affiliate_payout_items` | Individual items within payout batches |
+| `affiliate_assets` | Marketing materials: title, type, content/file URL |
+| `affiliate_applications` | Applications from public form: name, email, website, status |
+| `affiliate_milestones` | Milestone definitions: threshold, bonus amount |
+| `affiliate_milestone_awards` | Awarded milestones per affiliate |
+| `affiliate_contests` | Contest definitions: dates, metric, prizes |
+| `affiliate_contest_entries` | Contest participation records |
+| `affiliate_broadcasts` | Admin broadcast emails |
+| `affiliate_broadcast_receipts` | Per-recipient delivery tracking |
+| `affiliate_messages` | Admin-affiliate messaging threads |
+| `affiliate_surveys` | Satisfaction survey responses |
+| `affiliate_landing_pages` | Co-branded landing page content |
+| `affiliate_short_links` | Shortened referral URLs |
+| `affiliate_badges` | Earned badges per affiliate |
+| `affiliate_badge_tiers` | Badge tier definitions |
+| `affiliate_webhooks` | Affiliate-registered webhook URLs |
+| `affiliate_webhook_deliveries` | Webhook delivery log |
+| `affiliate_tax_info` | W-9/W-8BEN tax form data |
+| `affiliate_network_settings` | External network configs |
+| `discount_codes` | Promotional codes with Stripe integration |
+| `discount_code_redemptions` | Code usage records with attribution |
+| `referral_clicks` | Click tracking with landing page and source tag |
+| `challenge_progress` | Weekly challenge completion tracking |
+| `commission_renewals` | Extended commission windows |
+| `case_studies` | Success story content |
+| `knowledge_base_articles` | Help articles for affiliates |
+| `promotional_calendar` | Upcoming campaigns and events |
 
 ### Row Level Security (RLS)
 
@@ -436,325 +408,138 @@ All affiliate tables have RLS enabled:
 ## API Endpoints
 
 ### Public (no auth required)
+
 | Method | Endpoint | Purpose |
 |---|---|---|
-| GET | `/api/affiliate/settings` | Get program settings (commission rate, cookie days, etc.) |
-| POST | `/api/affiliate/applications` | Submit a new affiliate application |
+| GET | `/api/affiliate/settings` | Get program settings |
+| POST | `/api/affiliate/applications` | Submit affiliate application |
+| GET | `/api/public/affiliate-directory` | Public partner directory |
+| GET | `/api/affiliate/badges/verify/[code]` | Verify earnings badge |
 
 ### Affiliate Auth Required
+
 | Method | Endpoint | Purpose |
 |---|---|---|
-| GET | `/api/affiliate/dashboard` | Get full dashboard data (stats, referrals, commissions, payouts, tier) |
-| GET | `/api/affiliate/assets` | Get marketing assets library |
-| POST | `/api/affiliate/activate` | Activate affiliate status and lock in terms |
-| GET | `/api/affiliate/referrals` | Get referral history |
-| GET | `/api/affiliate/payouts` | Get payout history |
+| GET | `/api/affiliate/dashboard` | Full dashboard data |
+| POST | `/api/affiliate/activate` | Activate and lock in terms |
+| GET | `/api/affiliate/referrals` | Referral history |
+| GET | `/api/affiliate/commissions` | Commission history |
+| GET | `/api/affiliate/payouts` | Payout history |
+| GET | `/api/affiliate/assets` | Marketing assets |
+| GET | `/api/affiliate/leaderboard` | Leaderboard rankings |
+| GET | `/api/affiliate/contests` | Active contests |
+| GET | `/api/affiliate/challenges` | Weekly challenges |
+| GET | `/api/affiliate/milestones` | Milestone progress |
+| GET | `/api/affiliate/badges` | Earned badges |
+| GET | `/api/affiliate/goals` | Earnings goals |
+| GET | `/api/affiliate/messages` | Message thread |
+| POST | `/api/affiliate/messages` | Send message |
+| GET | `/api/affiliate/analytics/*` | All analytics endpoints |
+| POST | `/api/affiliate/ai-*` | All AI tool endpoints |
+| GET | `/api/affiliate/discount-codes` | Affiliate's discount codes |
+| GET | `/api/affiliate/knowledge-base` | Knowledge base articles |
+| GET | `/api/affiliate/promotional-calendar` | Upcoming campaigns |
+| GET | `/api/affiliate/swipe-files` | Swipe file content |
+| GET | `/api/affiliate/tax-info` | Tax information |
+| GET | `/api/affiliate/tax-summary` | Annual tax summary |
+| GET | `/api/affiliate/earnings-statement` | Downloadable statement |
+| GET | `/api/affiliate/forecast` | Earnings forecast |
+| GET | `/api/affiliate/renewals` | Commission renewals |
+| GET/POST | `/api/affiliate/webhooks` | Affiliate webhook management |
+| GET | `/api/affiliate/api-keys` | API key management |
+| GET | `/api/affiliate/export-csv` | Data export |
 
 ### Admin Only
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/api/affiliate/applications` | List all applications (with status filter) |
-| POST | `/api/affiliate/applications/review` | Approve or reject an application |
-| GET | `/api/affiliate/networks` | Get network integration settings |
-| PUT | `/api/affiliate/networks` | Update a network's config |
-| PUT | `/api/affiliate/settings` | Update program settings |
-| GET/POST/PUT/DELETE | `/api/affiliate/tiers` | CRUD for performance tiers |
-| GET/POST/DELETE | `/api/affiliate/assets` | CRUD for marketing assets |
 
-### Internal (called by other system components)
 | Method | Endpoint | Purpose |
 |---|---|---|
-| POST | `/api/affiliate/track-signup` | Record a referred signup (called from signup page) |
+| GET/POST | `/api/affiliate/applications` | List/review applications |
+| POST | `/api/affiliate/applications/review` | Approve or reject |
+| GET/PUT | `/api/affiliate/settings` | Program settings |
+| GET/POST/PUT/DELETE | `/api/affiliate/tiers` | Tier CRUD |
+| GET/POST/DELETE | `/api/affiliate/assets` | Asset CRUD |
+| GET/POST | `/api/admin/affiliate/broadcasts` | Broadcast management |
+| GET | `/api/admin/affiliate/health` | Program health metrics |
+| GET | `/api/admin/affiliate/program-intelligence` | Program intelligence |
+| GET | `/api/admin/affiliate/messages/[id]` | View affiliate messages |
+| GET/POST | `/api/admin/affiliate/tax-info` | Tax info management |
+| GET | `/api/admin/affiliate/tax-export` | 1099 tax export |
+| GET | `/api/admin/affiliates` | List all affiliates |
+| GET | `/api/admin/affiliates/[userId]` | Affiliate detail |
+| GET/POST | `/api/admin/discount-codes` | Discount code CRUD |
+| GET/POST | `/api/admin/case-studies` | Case study management |
+| GET/POST | `/api/admin/knowledge-base` | Knowledge base CRUD |
+| GET | `/api/admin/revenue-attribution` | Revenue attribution report |
+| GET | `/api/admin/revenue-waterfall` | Revenue waterfall chart |
+
+### Internal (called by system components)
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/api/affiliate/track-signup` | Record a referred signup |
 | POST | `/api/affiliate/drip` | Trigger drip email sequence |
 | POST | `/api/referral` | Track a referral link click |
 
-### Stripe Webhook
-| Event | Handler |
+### Cron Jobs
+
+| Endpoint | Purpose |
 |---|---|
-| `invoice.paid` | Looks up referral, calculates commission, creates commission record |
-
----
-
-## Key Files
-
-| File | Purpose |
-|---|---|
-| `src/lib/affiliate/index.ts` | Core library — settings fetcher, tier logic, rate calculator, fraud detection, notifications |
-| `src/components/referral-tracker.tsx` | Client component — reads `?ref=` param, sets cookie, tracks click |
-| `src/app/affiliate/page.tsx` | Public landing page |
-| `src/app/affiliate/join/page.tsx` | Application form |
-| `src/app/affiliate/login/page.tsx` | Affiliate login (magic link + password) |
-| `src/app/affiliate/dashboard/page.tsx` | Standalone affiliate dashboard |
-| `src/app/admin/setup/affiliate/page.tsx` | Admin management (settings, tiers, assets, applications, networks) |
-| `src/app/api/affiliate/` | All affiliate API routes |
-| `src/app/api/stripe/webhook/route.ts` | Stripe webhook with commission handler |
-| `migrations/core/005_affiliate_system.sql` | Core tables migration |
-| `migrations/core/006_affiliate_applications.sql` | Open program tables migration |
+| `/api/cron/weekly-affiliate-digest` | Weekly summary email |
+| `/api/cron/weekly-performance` | Weekly performance stats |
+| `/api/cron/monthly-earnings` | Monthly earnings statement |
+| `/api/cron/weekly-coach` | Weekly AI coaching email |
+| `/api/cron/whats-new` | Feature update digest |
 
 ---
 
 ## Admin Management
 
-The admin affiliate page (`/admin/setup/affiliate`) has 6 tabs:
+The admin affiliate management page at `/admin/setup/affiliate` contains 15+ tabs:
 
-### Settings Tab
-- Commission rate (percentage)
-- Commission duration (months)
-- Minimum payout threshold (dollars)
-- Cookie duration (days)
-- Program active toggle
-
-### Tiers Tab
-- Create, edit, delete performance tiers
-- Each tier: name, minimum referrals, commission rate
-
-### Assets Tab
-- Create and manage marketing materials
-- Each asset: title, description, type, content or file URL
-
-### Management Tab
-- Affiliate rankings (top performers)
-- Fraud alerts (referrals with fraud flags)
-- Payout management (approve/reject/mark paid)
-
-### Applications Tab
-- Table of all applications with status filter
-- Approve or reject pending applications
-- Approval auto-provisions the affiliate account
-
-### Networks Tab
-- Toggle external networks on/off
-- Configure tracking IDs and postback URLs for ShareASale, Impact, PartnerStack
-
----
-
-## Glossary
-
-| Term | Definition |
-|---|---|
-| **Affiliate** | A person who promotes your product in exchange for commissions on referred sales |
-| **Referral Code** | A unique string (e.g., `a1b2c3d4e5f6`) assigned to each affiliate, appended to URLs as `?ref=CODE` |
-| **Referral Link** | The full URL an affiliate shares: `https://yourapp.com/?ref=CODE` |
-| **Cookie Window** | How long the referral tracking cookie lasts (default: 30 days). If a visitor clicks an affiliate's link and signs up within this window, the affiliate gets credit. |
-| **Commission** | The percentage of a payment that goes to the affiliate. Calculated as `invoice_amount × rate / 100`. |
-| **Commission Window** | How long an affiliate earns commissions on a referred customer's payments (default: 12 months from the affiliate's activation date) |
-| **Grandfathering / Rate Lock-In** | When an affiliate activates, the current program terms are saved on their account. Even if rates change later, they keep their original deal (or better, if tiers push them higher). |
-| **Performance Tier** | A level in the tier system (Bronze, Silver, Gold) that unlocks higher commission rates as affiliates refer more customers |
-| **Payout** | A payment made to an affiliate for their accumulated approved commissions |
-| **Minimum Payout** | The minimum balance an affiliate must accumulate before a payout is processed (default: $50) |
-| **Fraud Flag** | An automated warning on a referral indicating possible gaming (same domain, IP flooding, self-referral) |
-| **Magic Link** | A one-time login link sent via email — no password needed |
-| **Postback URL** | A server-to-server URL called when a conversion happens, used for external affiliate network tracking |
-| **Attribution** | The process of connecting a signup/payment to the affiliate who referred that person |
-| **Last-Touch Attribution** | The most recent affiliate link clicked gets credit. If a visitor clicks affiliate A's link and then affiliate B's link, affiliate B gets the referral. |
+- **Settings** — Commission rate, cookie window, min payout, attribution conflict policy, dormancy threshold
+- **Tiers** — CRUD for performance tiers with names, thresholds, rates, perks
+- **Milestones** — CRUD for milestone bonuses
+- **Assets** — Marketing material management
+- **Management** — Affiliate list with health scores, fraud flags, CRM cards
+- **Applications** — Pending/approved/rejected application review
+- **Networks** — External network configurations
+- **Broadcasts** — Compose, send, and track email campaigns
+- **Contests** — Create and manage time-bound competitions
+- **Leaderboard Config** — Privacy and display settings
+- **Badges** — Configure earning badge tiers
+- **Testimonials** — Manage affiliate success stories
+- **Payout Batches** — Scheduled batch management
+- **Tax Info** — Review submitted tax forms, 1099 export
+- **Messages** — View and respond to affiliate conversations
+- **Program Health** — Dashboard-style overview of program metrics and ROI
 
 ---
 
 ## Testing Checklist
 
-Use this step-by-step walkthrough to verify the entire affiliate system works correctly.
-
-### 1. Landing Page
-- [ ] Visit `/affiliate` — page loads with commission rate, benefits, "How It Works"
-- [ ] Commission rate displayed matches the value in admin settings
-- [ ] "Apply Now" button links to `/affiliate/join`
-- [ ] "Affiliate Login" button links to `/affiliate/login`
-- [ ] Page is responsive on mobile
-
-### 2. Application Flow
-- [ ] Visit `/affiliate/join` — form loads with all fields
-- [ ] Submit with valid data → see success confirmation
-- [ ] Submit same email again → see "application already exists" error
-- [ ] Submit with missing required fields → form validation prevents submission
-
-### 3. Admin Review
-- [ ] Log in as admin, go to `/admin/setup/affiliate` → "Applications" tab
-- [ ] Pending application appears in the list
-- [ ] Click "Approve" → application status changes to "approved"
-- [ ] Verify a new user was created in Supabase Auth with the applicant's email
-- [ ] Verify a referral link was created for that user
-- [ ] Verify the `user_roles` table has an "affiliate" role entry
-- [ ] Submit another application, click "Reject" → status changes to "rejected"
-
-### 4. Affiliate Login
-- [ ] Visit `/affiliate/login` → login page loads (NOT the product login)
-- [ ] Enter the approved affiliate's email, click "Send Login Link" → "Check Your Email" screen
-- [ ] Click the magic link from email → redirected to `/affiliate/dashboard`
-- [ ] Log out, switch to password mode, enter credentials → redirected to dashboard
-- [ ] Try logging in with a non-affiliate email → dashboard shows "Not an Affiliate Yet"
-
-### 5. Affiliate Dashboard
-- [ ] Dashboard loads with own header (no product sidebar)
-- [ ] Referral link is displayed and copyable
-- [ ] Stats show 0 clicks, 0 signups, $0 earnings (for new affiliates)
-- [ ] Tier progress card shows current tier (Bronze)
-- [ ] Referrals tab shows empty state
-- [ ] Earnings tab shows empty state with payout threshold
-- [ ] Payouts tab shows empty state
-- [ ] Marketing tab shows available assets (or empty state if none created)
-
-### 6. Referral Tracking
-- [ ] Copy the affiliate's referral link from the dashboard
-- [ ] Visit the link (e.g., `https://yourapp.com/?ref=abc123`) in an incognito window
-- [ ] Check browser cookies for `pp_ref=abc123`
-- [ ] Check `localStorage` for `ref_code=abc123`
-- [ ] Refresh the affiliate dashboard → click count should increment
-
-### 7. Signup Attribution
-- [ ] In the incognito window (with the cookie set), sign up as a new product user
-- [ ] Refresh the affiliate dashboard → signup count should increment
-- [ ] Check the Referrals tab → a new entry with status "signed_up"
-
-### 8. Commission (requires Stripe test mode)
-- [ ] As the referred user, subscribe to a paid plan using a Stripe test card
-- [ ] Verify the Stripe webhook fires and processes the `invoice.paid` event
-- [ ] Refresh the affiliate dashboard → pending earnings should show the commission
-- [ ] Check the Earnings tab → a new commission entry
-
-### 9. Admin Settings
-- [ ] Go to admin → Settings tab → change commission rate → save → verify landing page updates
-- [ ] Go to Tiers tab → create a new tier → verify it appears in dashboard tier progress
-- [ ] Go to Assets tab → create a marketing asset → verify it appears in affiliate dashboard
-- [ ] Go to Networks tab → toggle ShareASale on, add a tracking ID → save
-
-### 10. Navigation & Layout
-- [ ] Product sidebar → "Earn > Affiliate" links to `/affiliate` (not the old in-app dashboard)
-- [ ] Footer → "Affiliate Program" link points to `/affiliate`
-- [ ] On affiliate dashboard pages, the product header and footer are hidden
-- [ ] Affiliate dashboard has its own minimal header with app name and logout
-
----
-
-## FAQ
-
-**Q: Can someone be both a product user and an affiliate?**
-Yes. If an existing product user applies through `/affiliate/join`, the approval process will find their existing Supabase account (instead of creating a new one) and add the affiliate role. They'll use the product login as usual AND can access `/affiliate/dashboard` with that same account.
-
-**Q: What happens if I change the commission rate after affiliates have joined?**
-Affiliates who have activated keep their locked-in rate. New affiliates (or those who haven't activated yet) get the new rate. The system always uses the best rate for the affiliate — whichever is higher between their locked rate and their current tier rate. If an affiliate has neither, a hardcoded default of 20% applies.
-
-**Q: What happens if a referred customer cancels their subscription?**
-Commissions are only generated on `invoice.paid` events. If the customer cancels, no more invoices are generated, so no more commissions. Already-earned commissions are not clawed back by default.
-
-**Q: How long do commissions last?**
-By default, 12 months from when the affiliate activated. This means if an affiliate refers someone in January 2026, they earn commissions on that customer's payments through January 2027. After that, payments from that customer no longer generate commissions. This is configurable in admin settings.
-
-**Q: Can affiliates see who they referred?**
-They can see referral counts, statuses (signed up, converted, churned), and dates — but not the referred user's name or email. This protects customer privacy.
-
-**Q: How do payouts work?**
-Payouts are currently manual. When an affiliate's balance exceeds the minimum threshold ($50 default), the admin creates a payout, processes the payment externally (PayPal, bank transfer, etc.), and marks it as paid. Automated payout integration (e.g., PayPal Mass Pay, Stripe Connect) can be added later.
-
-**Q: What are the external networks (ShareASale, Impact, PartnerStack) for?**
-These are established affiliate marketplaces where thousands of affiliates look for products to promote. By integrating with these networks, you can recruit affiliates from their existing pools. The integration uses server-side postback URLs — when a Stripe conversion happens, the system pings the network's postback URL so the sale is tracked on their platform too.
-
-**Q: What if an affiliate tries to game the system?**
-The fraud detection system automatically flags suspicious referrals (same email domain, high IP volume, self-referral). Flags are visible to admins in the Management tab. Flagged referrals still generate commissions by default — it's up to the admin to review and take action (reject the commission, disable the affiliate, etc.).
-
-**Q: Is the affiliate system part of MuseKit or specific to one product?**
-It's part of MuseKit core. Every product built on MuseKit gets the full affiliate system. The migrations live in `migrations/core/`, the library in `src/lib/affiliate/`, and the pages in `src/app/affiliate/`. Each product deployment has its own independent affiliate program with its own settings, tiers, and affiliates.
-
----
-
-## External Networks Playbook
-
-This section covers how to integrate with third-party affiliate networks so you can recruit affiliates from established marketplaces alongside your own direct program.
-
-### Supported Networks
-
-| Network | Type | Best For |
-|---|---|---|
-| **ShareASale** | Large affiliate marketplace | Volume — thousands of bloggers, coupon sites, deal hunters |
-| **Impact** | Enterprise partnership platform | High-value partnerships, brand-to-brand deals, influencer programs |
-| **PartnerStack** | B2B SaaS-focused network | SaaS companies recruiting technology partners, consultants, resellers |
-
-### How Network Integration Works
-
-1. **You sign up as a merchant/advertiser** on the network's platform
-2. **You configure tracking** in the MuseKit admin at `/admin/setup/affiliate` under the "Networks" tab
-3. **Network affiliates find your program** through the network's marketplace
-4. **When a conversion happens** (Stripe `invoice.paid`), MuseKit fires a server-side postback to the network so they can attribute the sale
-
-### Configuration Fields
-
-For each network, you configure three fields in the admin dashboard:
-
-| Field | Purpose | Example |
-|---|---|---|
-| **Tracking ID** | Your merchant/advertiser ID on the platform | `MID-12345` |
-| **Postback URL** | The server-to-server URL the network provides for conversion tracking | `https://shareasale.com/sale.cfm?transtype=sale&amount={amount}&tracking={ref}` |
-| **API Key** | For advanced programmatic integration (optional) | `sk_live_abc123...` |
-
-### Postback URL Configuration
-
-Each network provides a specific postback URL format. When a Stripe conversion fires, MuseKit replaces placeholders in the URL with actual values:
-
-| Placeholder | Replaced With |
-|---|---|
-| `{amount}` | Invoice amount in dollars (e.g. `49.99`) |
-| `{ref}` | The affiliate's referral code |
-| `{order_id}` | The Stripe invoice ID |
-| `{commission}` | Commission amount in dollars |
-
-**ShareASale example:**
-```
-https://shareasale.com/sale.cfm?merchantID={tracking_id}&transtype=sale&amount={amount}&tracking={ref}&orderNumber={order_id}
-```
-
-**Impact example:**
-```
-https://api.impact.com/Advertisers/{tracking_id}/Conversions?CampaignId=12345&ActionTrackerId=1&OrderId={order_id}&Amount={amount}
-```
-
-**PartnerStack example:**
-```
-https://api.partnerstack.com/v1/transactions?key={api_key}&amount={amount}&external_key={ref}&transaction_key={order_id}
-```
-
-### Affiliate Onboarding Flow from Networks
-
-When affiliates join through an external network rather than your direct program:
-
-1. **Network routes traffic** — the affiliate promotes your product using the network's tracking link
-2. **Click lands on your site** — the network's click-tracking pixel or redirect handles attribution on their end
-3. **Customer signs up and pays** — Stripe processes the payment as normal
-4. **MuseKit fires postback** — on `invoice.paid`, the webhook handler checks if any network integrations are active and fires postback requests
-5. **Network credits the affiliate** — the network handles payout to their affiliate according to their own terms
-
-### Direct vs. Network Affiliates
-
-| Aspect | Direct (Your Program) | Network Affiliates |
-|---|---|---|
-| **Application** | Via `/affiliate/join` | Via the network's marketplace |
-| **Dashboard** | Full `/affiliate/dashboard` access | Network's own dashboard |
-| **Commission Rate** | Your configured rate + tiers | Negotiated via the network |
-| **Payouts** | You handle directly | Network handles payouts |
-| **Fraud Detection** | MuseKit fraud scoring | Network's fraud tools |
-| **Tracking** | Cookie-based (`pp_ref`) | Network's tracking pixel/redirect |
-
-### Best Practices
-
-1. **Start with your direct program first** — get the basics working before adding network complexity
-2. **Set competitive rates** — network affiliates compare programs; make sure your commission rate is attractive
-3. **Monitor postback delivery** — check your server logs for failed postback requests; networks may blacklist merchants with unreliable tracking
-4. **Avoid double-counting** — if an affiliate is in both your direct program AND a network, the cookie-based direct tracking takes priority; the postback only fires if no direct affiliate referral is found
-5. **Test with small amounts** — use the network's test/sandbox environment to verify postback URLs work before going live
-6. **Keep API keys secure** — network API keys are stored in your Supabase database; ensure your RLS policies and service role key access are properly configured
-
-### PartnerStack-Specific Notes
-
-PartnerStack is purpose-built for B2B SaaS and offers features beyond basic postback tracking:
-
-- **Partner types**: Technology partners, referral partners, reseller partners, affiliate partners
-- **Deal registration**: Partners can register deals before they close (relevant for enterprise sales)
-- **Co-selling**: PartnerStack supports shared pipeline visibility
-- **Marketplace listing**: Your product appears in the PartnerStack marketplace for partner discovery
-- **Automated payouts**: PartnerStack can handle partner payouts directly, reducing your operational overhead
-- **Onboarding automation**: Built-in partner onboarding flows with education content and certification
-
-To integrate with PartnerStack:
-1. Sign up at [partnerstack.com](https://partnerstack.com) and create a program
-2. Copy your Merchant ID and API key from the PartnerStack dashboard
-3. Enter them in MuseKit admin under Networks > PartnerStack
-4. Set the postback URL provided by PartnerStack in their integration docs
-5. Test with a sandbox transaction to verify tracking works end-to-end
+- [ ] Visitor can view the `/affiliate` landing page with live commission rates
+- [ ] Visitor can submit an application at `/affiliate/join`
+- [ ] Duplicate email applications are rejected
+- [ ] Admin can approve/reject applications in the admin panel
+- [ ] Approved affiliate can log in at `/affiliate/login`
+- [ ] Dashboard shows referral link, stats, tier progress
+- [ ] Referral link click sets `pp_ref` cookie and increments click count
+- [ ] New signup with referral cookie creates `affiliate_referrals` record
+- [ ] Fraud flags are set when appropriate (same domain, IP volume, self-referral)
+- [ ] Stripe payment creates commission with correct rate
+- [ ] Commission rate uses higher of locked rate vs tier rate
+- [ ] Milestone bonuses auto-award at thresholds
+- [ ] Leaderboard shows rankings with correct privacy mode
+- [ ] Contests display with countdown timers and standings
+- [ ] Deep links generate correctly with UTM parameters
+- [ ] Discount codes sync with Stripe and apply at checkout
+- [ ] Dual-attribution works (cookie vs code)
+- [ ] AI tools generate personalized content using real affiliate data
+- [ ] In-app messaging works between admin and affiliate
+- [ ] Broadcasts send to correct audience segments
+- [ ] Payout batch processing works with receipt emails
+- [ ] Tax forms can be submitted and verified
+- [ ] Partner directory shows opt-in affiliates
+- [ ] Co-branded landing pages render correctly
+- [ ] Badges verify at `/partner/verify/[code]`
+- [ ] Webhook notifications deliver with HMAC signatures

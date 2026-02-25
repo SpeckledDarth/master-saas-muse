@@ -1,12 +1,8 @@
 # New Muse Quick-Start Checklist
 
-> **Revision:** 5.0 | **Last Updated:** February 20, 2026 | **Created:** February 2026
-
-This checklist guides you through setting up a new project from the Master SaaS Muse Template.
+This checklist guides you through setting up a new project from the MuseKit SaaS template.
 
 **Estimated time: 15-30 minutes**
-
-**Template Status: MVP COMPLETE + Full Feature Set + PassivePost Extension + Marketing Components + UI Polish (February 2026)**
 
 ---
 
@@ -29,7 +25,7 @@ This checklist guides you through setting up a new project from the Master SaaS 
 
 - [ ] Fork/clone the GitHub repository
 - [ ] Import to Vercel OR clone to Replit
-- [ ] Rename the project to your new muse name
+- [ ] Rename the project to your new product name
 - [ ] Update `config/muse.config.json` with your project details:
   - `project.name`
   - `project.tagline`
@@ -76,7 +72,7 @@ Run the SQL from `docs/musekit/SETUP_GUIDE.md` in Supabase SQL Editor:
 - [ ] Enable Row Level Security on all tables
 - [ ] Create RLS policies
 
-> **New Table:** The `admin_notes` table is used by the Customer Service Tools in the admin Users page. See `docs/musekit/SETUP_GUIDE.md` for the SQL.
+> The `admin_notes` table is used by the Customer Service Tools in the admin Users page. See `docs/musekit/SETUP_GUIDE.md` for the SQL.
 
 ---
 
@@ -90,7 +86,7 @@ If using the PassivePost extension for AI social media scheduling:
 - [ ] Verify `alert_logs` table was created
 - [ ] Verify `social_posts` has `trend_source` and `niche_triggered` columns
 
-> **Note:** These tables are specific to PassivePost and should NOT be included in other Muse clones unless they also use social scheduling features.
+> These tables are specific to PassivePost and should NOT be included in other products unless they also use social scheduling features.
 
 ---
 
@@ -120,7 +116,7 @@ If using the PassivePost extension for AI social media scheduling:
 - Target roles: anon
 - USING: `bucket_id = 'avatars' OR bucket_id = 'branding'`
 
-> Note: The `branding` bucket stores logos and hero images uploaded via Setup Dashboard
+> The `branding` bucket stores logos and hero images uploaded via Setup Dashboard.
 
 ---
 
@@ -136,11 +132,11 @@ If using the PassivePost extension for AI social media scheduling:
   - Events: `checkout.session.completed`, `customer.subscription.*`, `invoice.*`
 - [ ] Copy webhook signing secret to `STRIPE_WEBHOOK_SECRET`
 
-### Configure Product Metadata (Important!)
+### Configure Product Metadata
 
-Stripe is the **single source of truth** for pricing. Your website automatically displays whatever you configure in Stripe - no code changes needed!
+Stripe is the **single source of truth** for pricing. Your website automatically displays whatever you configure in Stripe.
 
-**For each product (Pro, Team), add metadata:**
+For each product (Pro, Team), add metadata:
 
 1. Click on a product in Stripe Dashboard
 2. Scroll to the **Metadata** section
@@ -152,20 +148,7 @@ Stripe is the **single source of truth** for pricing. Your website automatically
 | `features` | `["Feature 1", "Feature 2", "Feature 3"]` | Shows as bullet points on pricing page |
 | `tier` | `pro` | Adds "Popular" badge (use on one plan only) |
 
-**Example for Pro plan:**
-- Key: `features`
-- Value: `["All Free features", "Priority support", "Advanced analytics", "Unlimited projects"]`
-- Key: `tier`
-- Value: `pro`
-
-**Example for Team plan:**
-- Key: `features`
-- Value: `["All Pro features", "Team collaboration", "Admin dashboard", "API access", "Custom integrations"]`
-
-5. Click **Save**
-6. Refresh your pricing page - changes appear instantly!
-
-> **Note:** The Free tier is hardcoded (no Stripe product needed) since free users don't go through checkout.
+> The Free tier is hardcoded (no Stripe product needed) since free users don't go through checkout.
 
 ### Configure PassivePost Tiers (Optional)
 
@@ -175,9 +158,10 @@ If using PassivePost, create additional Stripe products with tier metadata:
 - [ ] Create **Passive Basic** product with metadata: `muse_tier` = `tier_2`
 - [ ] Create **Passive Premium** product with metadata: `muse_tier` = `tier_3`
 
-> **Note:** Tier definitions are admin-configurable from the PassivePost setup page. The default 3 tiers (tier_1/Starter, tier_2/Basic, tier_3/Premium) ship out of the box. Admins can add, remove, or edit tiers and their limits from the dashboard.
+> Tier definitions are admin-configurable from the PassivePost setup page. The default 3 tiers ship out of the box. Admins can add, remove, or edit tiers and their limits from the dashboard.
 
 These tiers map to post/AI generation limits:
+
 | Tier | Daily AI Generations | Daily Posts | Monthly Posts | Max Platforms |
 |------|---------------------|-------------|---------------|---------------|
 | Starter (tier_1) | 5 | 1 | 15 | 2 |
@@ -245,12 +229,11 @@ Skip this if you only need email/password authentication. Configure only the pro
 
 ### Sentry Error Tracking
 - [ ] Create a Sentry project at [sentry.io](https://sentry.io)
-- [ ] Add environment variables in Vercel:
+- [ ] Add environment variables:
   - `NEXT_PUBLIC_SENTRY_DSN` = Your Sentry DSN
   - `SENTRY_ORG` = Your organization slug
   - `SENTRY_PROJECT` = Your project slug
   - `SENTRY_AUTH_TOKEN` = Auth token for source maps (optional)
-- [ ] Deploy and verify errors appear in Sentry dashboard
 
 ---
 
@@ -265,7 +248,7 @@ Required for background job processing (email sending, webhook retries, schedule
   - `UPSTASH_REDIS_REST_URL` = your Redis REST URL
   - `UPSTASH_REDIS_REST_TOKEN` = your Redis REST token
 
-> **Note:** If Upstash is not configured, the app still works — emails send directly (not queued), and rate limiting falls back to in-memory. Upstash is recommended for production.
+> If Upstash is not configured, the app still works — emails send directly (not queued), and rate limiting falls back to in-memory. Upstash is recommended for production.
 
 ---
 
@@ -288,21 +271,21 @@ Required for background job processing (email sending, webhook retries, schedule
 
 ---
 
-## Step 12: Configure Your SaaS (Setup Dashboard)
+## Step 12: Configure Your Product (Setup Dashboard)
 
-This is the key step that makes each clone unique! Go to `/admin/setup` and configure. The setup is organized into 11 focused sub-pages with a sidebar navigation:
+Go to `/admin/setup` and configure. The setup is organized into 11 focused sub-pages with sidebar navigation:
 
 ### Branding Sub-Page
-- [ ] **App Name** - Your SaaS product name (e.g., "ExtrusionCalc Pro")
-- [ ] **Tagline** - Short description (e.g., "Professional extrusion calculations")
-- [ ] **Company Name** - Your business name
-- [ ] **Support Email** - Where users contact you
-- [ ] **Logo** - Upload or paste URL for your logo (square recommended)
-- [ ] **Hero Image** - Upload or paste URL for landing page hero
-- [ ] **Primary Color** - Main brand color (use color picker)
-- [ ] **Accent Color** - Secondary brand color
-- [ ] **Header Style** - Configure header background color, text color, opacity, sticky positioning, and border
-- [ ] **Footer Style** - Configure footer background color, text color, background image, and layout mode
+- [ ] **App Name** — Your SaaS product name
+- [ ] **Tagline** — Short description
+- [ ] **Company Name** — Your business name
+- [ ] **Support Email** — Where users contact you
+- [ ] **Logo** — Upload or paste URL (square recommended)
+- [ ] **Hero Image** — Upload or paste URL for landing page hero
+- [ ] **Primary Color** — Main brand color (use color picker)
+- [ ] **Accent Color** — Secondary brand color
+- [ ] **Header Style** — Background color, text color, opacity, sticky positioning, border
+- [ ] **Footer Style** — Background color, text color, background image, layout mode
 
 ### Pricing Sub-Page
 - [ ] Click "Manage Products in Stripe" button to open Stripe Dashboard
@@ -319,13 +302,13 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 
 **Authentication Controls:**
 - [ ] Toggle Email Authentication (on/off)
-- [ ] Toggle Google OAuth (on/off) - enabled by default
-- [ ] Toggle GitHub OAuth (on/off) - disabled by default
-- [ ] Toggle Apple OAuth (on/off) - disabled by default
-- [ ] Toggle X (Twitter) OAuth (on/off) - disabled by default
-- [ ] Toggle Magic Link (on/off) - enabled by default
+- [ ] Toggle Google OAuth (on/off) — enabled by default
+- [ ] Toggle GitHub OAuth (on/off) — disabled by default
+- [ ] Toggle Apple OAuth (on/off) — disabled by default
+- [ ] Toggle X (Twitter) OAuth (on/off) — disabled by default
+- [ ] Toggle Magic Link (on/off) — enabled by default
 
-> **Note:** These toggles control which OAuth buttons appear on the login/signup pages. You must also configure the actual OAuth providers in Supabase Dashboard for them to work.
+> These toggles control which OAuth buttons appear on the login/signup pages. You must also configure the actual OAuth providers in Supabase Dashboard for them to work.
 
 **Other Features:**
 - [ ] Toggle Avatar Upload (on/off)
@@ -342,7 +325,7 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 - [ ] Configure Temperature (0-1)
 - [ ] Set Max Tokens
 - [ ] Write System Prompt (instructions for the AI)
-- [ ] Add the corresponding API key to Vercel environment variables:
+- [ ] Add the corresponding API key to environment variables:
   - xAI: `XAI_API_KEY`
   - OpenAI: `OPENAI_API_KEY`
   - Anthropic: `ANTHROPIC_API_KEY`
@@ -406,7 +389,7 @@ This is the key step that makes each clone unique! Go to `/admin/setup` and conf
 
 ## Step 13: Set Up Your Team (Optional)
 
-If you want to invite team members to help manage the SaaS:
+If you want to invite team members to help manage the product:
 
 - [ ] Go to `/admin/team` in your Admin Dashboard
 - [ ] Click **"Invite Team Member"**
@@ -425,19 +408,17 @@ If you want to invite team members to help manage the SaaS:
 3. Click "Accept Invitation" on the invite page
 4. Access Admin Dashboard via avatar dropdown menu
 
-> **Note**: The app admin who bootstrapped the system is automatically added as the organization Owner.
+> The app admin who bootstrapped the system is automatically added as the organization Owner.
 
-> **Email Confirmation**: If Supabase email confirmation is enabled, new users must verify their email before they can accept invitations. If disabled, users can accept immediately after signup.
+> If Supabase email confirmation is enabled, new users must verify their email before they can accept invitations.
 
 ---
 
 ## Step 14: Run E2E Tests (Optional, 5 min)
 
 ```bash
-# Install Playwright browsers (first time only)
 npx playwright install chromium
 
-# Run all tests against your Vercel deployment
 TEST_USER_EMAIL=your-admin@email.com \
 TEST_USER_PASSWORD='your-password' \
 TEST_BASE_URL=https://your-app.vercel.app \
@@ -446,7 +427,7 @@ npx playwright test
 
 Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with NPS), email templates, help widget, admin metrics, responsive design, and API endpoints.
 
-**Test suite: 92 tests across 7 test files (e2e-full: 46, blog: 9, feedback: 9, waitlist: 10, email-templates: 10, passivepost: 8)**
+**Test suite: 92 tests across 7 test files**
 
 ---
 
@@ -457,7 +438,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - [ ] Sign up works (email confirmation sent)
 - [ ] Login works
 - [ ] Google OAuth works (if configured and enabled in Features)
-- [ ] Other OAuth providers work (GitHub, Apple, X - if configured)
+- [ ] Other OAuth providers work (GitHub, Apple, X — if configured)
 - [ ] Magic Link passwordless login works
 - [ ] OAuth toggles in Setup Dashboard control which buttons appear
 - [ ] Profile page loads with avatar upload
@@ -574,7 +555,7 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - **Waitlist** management with CSV export
 - **Feedback** management with status filters and NPS badges
 - **Customer Service Tools** (subscription status, user detail, invoices, admin notes)
-- **Queue Dashboard** (monitor background jobs, 10 job types: email, webhook-retry, report, metrics-report, metrics-alert, token-rotation, social-post, social-health-check, social-trend-monitor, social-engagement-pull)
+- **Queue Dashboard** (monitor background jobs, 10 job types)
 - **SSO/SAML Management** (enterprise single sign-on)
 - **Scheduled Metrics Reports** (weekly/monthly KPI email summaries)
 - **Database Backup Configuration** (notification preferences, frequency, retention)
@@ -632,13 +613,25 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - Configurable header and footer styling
 - Section ordering and per-section background colors
 
+### Affiliate System
+- 32 enhancement features across 4 sprints (all complete)
+- Application, tracking, commissions, payouts
+- Gamification (tiers, milestones, contests, leaderboards, badges)
+- Marketing toolkit (deep links, QR codes, discount codes, swipe files)
+- 14 AI-powered tools for affiliates
+- Tax compliance (W-9/W-8BEN, 1099 export)
+- In-app messaging, broadcasts, drip sequences
+- Public partner directory and co-branded landing pages
+- Fraud detection and webhook notifications
+- See `docs/musekit/AFFILIATE.md` for full details
+
 ### PassivePost Module
 - Toggleable social media management extension
 - 2 tiers: Universal (basic) and Power (advanced)
 - 10 platform support (Twitter/X, LinkedIn, Instagram, YouTube, Facebook, TikTok, Reddit, Pinterest, Snapchat, Discord)
 - AI-powered post generation with multimodal image support
 - Post scheduling and management
-- Tier-based rate limiting (Universal: 10 AI gen/day, 20 posts/day; Power: 100 AI gen/day, 10k posts/day)
+- Tier-based rate limiting
 - Platform API health checker
 - Social KPI cards on admin metrics dashboard
 - BullMQ retry logic for post delivery failures
@@ -650,19 +643,21 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - Database extension pattern (tables in `migrations/extensions/`, core schema untouched)
 - OAuth flows for Facebook, LinkedIn, Twitter/X with PKCE
 - Per-user Stripe tier resolution (Starter/Basic/Premium)
-- 7-page social dashboard (overview, calendar, engagement, queue, posts, brand, onboarding)
+- 17+ page social dashboard
 - Brand preference system (tone, niche, location, audience, goals, frequency)
-- 15 admin-editable niche-specific AI prompts with default fallback
+- 15 admin-editable niche-specific AI prompts
 - Quick Generate dialog for on-demand AI content
 - Engagement analytics with Recharts charts
 - Calendar view with month-grid and per-platform tooltips
-- Reusable upgrade banner at 80%+ usage
-- Beta debug mode via `MUSE_DEBUG_MODE=true`
+- Blog publishing to 5 platforms
+- Content flywheel system (38 features across 7 phases + 4 bonus features)
+- 60+ API routes
+- Client approval portal
 
 ### Centralized API Keys & Integrations
 - Admin setup page at `/admin/setup/integrations` for Tech Stack keys
 - Social platform keys managed on PassivePost page
-- Collapsible groups (collapsed by default) with status indicators
+- Collapsible groups with status indicators
 - Required/Optional labels and format validation on save
 - Inline edit/reveal/delete with source badges (Dashboard vs Env Var)
 - Keys stored in `config_secrets` database table
@@ -680,27 +675,6 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - Structured logging utility
 - 92 Playwright E2E tests across 7 test files
 
-### Feature Completion Status
-
-| Feature | Status |
-|---------|--------|
-| SSO/SAML Enterprise Auth | Complete |
-| Queue Infrastructure (BullMQ + Upstash, 10 Job Types) | Complete |
-| Rate Limiting (Upstash Redis) | Complete |
-| Customer Service Tools | Complete |
-| Admin Setup UX (11 Sub-Pages) | Complete |
-| Metrics Dashboard (10 KPIs + NPS) | Complete |
-| Help Widget (Support Chatbot) | Complete |
-| NPS Score Tracking | Complete |
-| In-App Notifications | Complete |
-| User Impersonation | Complete |
-| Audit Log Viewer | Complete |
-| Legal & Compliance Pages | Complete |
-| Metrics Alerts & Reports | Complete |
-| PassivePost Module (10 platforms, 2 tiers) | Complete |
-| Centralized API Keys & Integrations | Complete |
-| PassivePost Extension (OAuth, Tiers, Analytics, Calendar, Brand Prefs, Quick Generate) | Complete |
-
 ---
 
 ## Documentation
@@ -710,8 +684,10 @@ Tests cover: Public pages, authentication, blog CRUD, waitlist, feedback (with N
 - `docs/musekit/ARCHITECTURE.md` — System architecture overview
 - `docs/musekit/ADDING_A_PRODUCT.md` — How to add new products/extensions
 - `docs/musekit/PROJECT_OVERVIEW.md` — Project overview and goals
-- `docs/musekit/MASTER_PLAN.md` — Roadmap and planning
-- `docs/passivepost/PRODUCT_GUIDE.md` — Dedicated PassivePost product guide
+- `docs/musekit/MASTER_PLAN.md` — Strategic plan and vision
+- `docs/musekit/AFFILIATE.md` — Complete affiliate system guide
+- `docs/musekit/AFFILIATE_ENHANCEMENTS.md` — Detailed affiliate feature specifications
+- `docs/passivepost/PRODUCT_GUIDE.md` — PassivePost product guide
 - `docs/musekit/MUSE_CHECKLIST.md` — This checklist
 
 ---
@@ -735,6 +711,3 @@ Before launching with live customer data:
 - [ ] If using PassivePost: verify Stripe tier products have correct metadata
 - [ ] If using PassivePost: verify extension tables exist in database
 - [ ] If using PassivePost: configure niche guidance entries in admin setup
-
----
-

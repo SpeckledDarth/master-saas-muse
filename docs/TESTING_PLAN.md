@@ -1,663 +1,557 @@
-# PassivePost — Deep Testing Plan
+# PassivePost — QA Testing Plan
 
-> **Created:** February 23, 2026
-> **Scope:** Phase 3 (Affiliate Core), Phase 3.5 (Open Affiliate Program), Phase 3.6 Sprint 1 (Revenue & Motivation), Phase 3.6 Sprint 2 (Tools & Analytics), Phase 3.6 Sprint 3 (Consolidation), Round 4 (Regression Fixes), Round 5 (11 Persistent Bug Fixes)
-> **Test on:** Live Vercel deployment (passivepost.io)
-
----
-
-## How to Use This Document
-
-Work through each section in order. For each test:
-- **PASS** = works as expected
-- **FAIL** = broken or unexpected behavior (note what happened)
-- **PARTIAL** = mostly works but has an issue
-
-After testing, we'll fix all FAILs before moving to Sprint 4.
+> **Purpose:** This document is the testing reference for anyone doing QA on the PassivePost platform. It covers all built features organized by dashboard area.
+>
+> **How to use this document:**
+> - Work through each section relevant to the area you're testing
+> - For each test, mark: **PASS**, **FAIL** (note what happened), or **PARTIAL** (mostly works but has an issue)
+> - Open browser console (F12) to check for JavaScript errors during testing
+> - Test on both desktop and mobile viewports where noted
 
 ---
 
-## Round 1 Results (Completed)
+## Table of Contents
 
-> These tests were confirmed working during Round 1 testing. No need to retest unless something changes.
-
-**Issues Found & Fixed in Round 1:**
-1. Broadcast edit/send UI buttons missing -> Fixed (added edit, send, delete buttons for drafts)
-2. Top Performers card hidden when no data -> Fixed (always visible with empty state message)
-3. Tier display not sorted by threshold -> Fixed (sorted by min_referrals)
-4. Tab state lost on navigation -> Fixed (tab persistence via URL params)
-5. "Affiliates" tab confusing name -> Fixed (renamed to "Members")
-6. Drip email welcome not triggering on activation -> Fixed (fires on affiliate activate)
-7. Build error: `.catch` on PromiseLike in activate route -> Fixed (replaced with try/catch)
-8. Runtime crash: `useSearchParams` without Suspense -> Fixed (replaced with useState + useEffect)
-9. Runtime crash: `e.perks.map is not a function` -> Fixed (perks data parsed as array on load)
-
-**Round 1 Confirmed Working:**
-- Admin dashboard loads (all sections except affiliate page had no issues)
-- Test data seeded across all 11 affiliate tabs
-- Affiliate page loads after bug fixes
+1. [Admin Dashboard](#1-admin-dashboard)
+2. [Affiliate Dashboard](#2-affiliate-dashboard)
+3. [User Dashboard](#3-user-dashboard)
+4. [Public Pages](#4-public-pages)
+5. [Cross-Cutting Features](#5-cross-cutting-features)
 
 ---
 
-## ROUND 2: Testing with Seeded Data
+## 1. Admin Dashboard
 
-> **Goal:** Verify all affiliate admin tabs display seeded data correctly, and all CRUD operations work.
-> **Pre-requisite:** Test data has been seeded. Admin is logged in on Vercel.
+### 1.1 Admin Login & Navigation
 
----
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Admin can access dashboard | Log in as admin, navigate to `/admin` | Admin dashboard loads with sidebar navigation | |
+| Setup wizard visible | Check for setup wizard or onboarding tasks | Setup tasks are listed with completion status | |
+| All admin sections accessible | Click through each sidebar link | Every admin page loads without errors | |
 
-### SECTION R2-1: Health Tab (Default View)
+### 1.2 User Management
 
-> **Where:** Admin > Setup > Affiliate (Health tab loads by default)
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| User list loads | Go to Admin > Users | Table of all users displays with name, email, role, and status | |
+| Search users | Type a name or email in search box | Table filters to matching results | |
+| Assign user role | Change a user's role (user, affiliate, admin) | Role updates and persists on reload | |
+| Impersonate user | Click impersonate on any user | Platform switches to that user's view. Impersonation indicator visible. | |
+| Exit impersonation | Click the exit/stop impersonation button | Returns to admin view | |
 
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-1.1 | Page loads without error | Go to `/admin/setup/affiliate` | Page loads, Health tab shown by default | |
-| R2-1.2 | Overview KPI cards | Check the 4 KPI cards at top | Shows: Active affiliates (7), Dormant (1), Net ROI (dollar amount), Conversion Rate (percentage) | |
-| R2-1.3 | Revenue Impact section | Check revenue breakdown | Shows: Total Revenue, Commissions Paid, Commissions Pending, Net ROI - all with dollar amounts | |
-| R2-1.4 | Growth metrics | Check growth section | Shows: New Affiliates This Month, Referrals This Month, Conversions This Month - non-zero values | |
-| R2-1.5 | Engagement metrics | Check engagement section | Shows: Avg Referrals per Affiliate, Avg Earnings per Affiliate | |
-| R2-1.6 | Top Performers | Check top performers card | Lists up to 5 top affiliates by earnings with referral counts. If no data, shows "No performer data yet" | |
-| R2-1.7 | Alerts section | Check alerts | Shows flagged referral count and pending payout amount | |
+### 1.3 Affiliate Program — Health Tab
 
----
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Health tab loads by default | Go to `/admin/setup/affiliate` | Health tab shows as the default view | |
+| KPI cards display | Check the overview cards at top | Shows: Active affiliates, Dormant, Net ROI, Conversion Rate | |
+| Revenue impact section | Check revenue breakdown area | Shows: Total Revenue, Commissions Paid, Commissions Pending, Net ROI | |
+| Growth metrics | Check growth section | Shows: New Affiliates This Month, Referrals This Month, Conversions This Month | |
+| Top performers | Check top performers card | Lists top affiliates by earnings. Shows "No performer data yet" if empty | |
+| Alerts section | Check alerts area | Shows flagged referral count and pending payout amount | |
 
-### SECTION R2-2: Summary Stats Cards (Above Tabs)
+### 1.4 Affiliate Program — Applications Tab
 
-> **Where:** The 4 stat cards shown above all tabs
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Applications list loads | Click "Applications" tab | Shows list of applications with pending count badge | |
+| Filter by status | Try each filter (All, Pending, Approved, Rejected) | List filters correctly for each status | |
+| Approve an application | Click approve on a pending application | Status changes to "approved", affiliate account created | |
+| Reject an application | Click reject, add reviewer notes | Status changes to "rejected", notes saved | |
+| Delete an application | Delete a rejected application | Application removed from list | |
 
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-2.1 | Affiliates count | Check first card | Shows total affiliate count (8) | |
-| R2-2.2 | Referrals count | Check second card | Shows total referral count (34+) | |
-| R2-2.3 | Revenue display | Check third card | Shows referred revenue as dollar amount | |
-| R2-2.4 | Commissions display | Check fourth card | Shows commissions owed as dollar amount | |
-| R2-2.5 | Fraud alerts banner | If flagged referrals exist | Yellow alert card appears below stats with flagged referral details | |
+### 1.5 Affiliate Program — Settings Tab
 
----
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Settings load | Click "Settings" tab | Current settings displayed (commission rate, cookie days, etc.) | |
+| Edit and save | Change commission rate, save | Saves successfully, value persists on reload | |
+| Re-engagement settings | Check re-engagement section | Shows dormancy threshold, max emails, enable toggle | |
+| Auto-batch settings | Check auto-batch section | Shows payout schedule day and auto-approve threshold | |
 
-### SECTION R2-3: Applications Tab
+### 1.6 Affiliate Program — Tiers Tab
 
-> **Where:** Admin > Setup > Affiliate > Applications tab
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Tiers load sorted | Click "Tiers" tab | Tiers shown sorted by referral threshold (lowest first) | |
+| Tier details visible | Check each tier card | Shows name, referral threshold, commission rate, and perks | |
+| Perks display as badges | Check tiers with perks | Perks shown as badges, not raw text | |
+| Edit a tier | Click edit, change a value, save | Updated value appears immediately | |
+| Create new tier | Add a new tier with name, threshold, rate | New tier appears in sorted position | |
+| Delete a tier | Delete a tier | Tier removed from list | |
 
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-3.1 | Tab loads | Click "Applications" tab | Shows applications list with pending count badge on tab | |
-| R2-3.2 | Pending applications | Check for pending apps | 3 pending applications visible (Sarah Palmer, Mike Torres, Nina Patel) | |
-| R2-3.3 | Approved/Rejected visible | Set filter to "All" | Shows all 5 applications: 3 pending, 1 approved (Lisa Wang), 1 rejected (Tom Baker) | |
-| R2-3.4 | Filter by status | Try each filter option (All, Pending, Approved, Rejected) | List filters correctly for each status | |
-| R2-3.5 | Approve an application | Approve Sarah Palmer's application | Status changes to "approved", account created | |
-| R2-3.6 | Reject an application | Reject Mike Torres with reviewer notes | Status changes to "rejected", notes saved | |
-| R2-3.7 | Delete an application | Delete Tom Baker's rejected application | Application removed from list | |
+### 1.7 Affiliate Program — Milestones Tab
 
----
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Milestones load | Click "Milestones" tab | All milestones display with details | |
+| Milestone details | Check each milestone | Shows name, referral threshold, bonus amount, description | |
+| Earned count shown | Check below each milestone | Shows "X affiliates earned" (including "0 affiliates earned") | |
+| CRUD operations | Create, edit, and delete milestones | All operations succeed without errors | |
 
-### SECTION R2-4: Settings Tab
+### 1.8 Affiliate Program — Marketing Assets Tab
 
-> **Where:** Admin > Setup > Affiliate > Settings tab
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Assets load | Click "Assets" tab | All assets display with type labels | |
+| Asset types visible | Check type labels | Each asset shows its type (Banner, Email Template, Social Post, etc.) | |
+| View content | Click to expand an asset | Content displays without broken formatting | |
+| CRUD operations | Create, edit, and delete assets | All operations succeed without errors | |
 
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-4.1 | Settings load | Click "Settings" tab | Current settings displayed (commission rate, duration, cookie days, etc.) | |
-| R2-4.2 | Edit and save | Change commission rate to a new value, save | Saves successfully, value persists on page reload | |
-| R2-4.3 | Re-engagement settings | Check re-engagement section | Shows dormancy threshold (30 days), max emails (3), toggle for enabled | |
-| R2-4.4 | Auto-batch settings | Check auto-batch section | Shows payout schedule day, auto-approve threshold | |
+### 1.9 Affiliate Program — Broadcasts Tab
 
----
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Broadcasts load | Click "Broadcasts" tab | Shows broadcasts with sent/draft status | |
+| Sent broadcast stats | Check a sent broadcast | Shows sent count, opened count, clicked count, date | |
+| Draft shows action buttons | Check a draft broadcast | Edit, Send, and Delete buttons visible | |
+| Create new broadcast | Click "New Broadcast", fill in name and body | Draft created and appears in list | |
+| Load from email template | In create dialog, use "Load from Template" dropdown | Subject and body auto-fill from selected template | |
+| Edit draft | Click edit on a draft, change body, save | Changes saved successfully | |
+| Send broadcast | Click send on a draft, confirm | Status changes to "sent" | |
+| Delete broadcast | Delete a broadcast | Removed from list | |
 
-### SECTION R2-5: Tiers Tab
+### 1.10 Affiliate Program — Members Tab
 
-> **Where:** Admin > Setup > Affiliate > Tiers tab
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Members table loads | Click "Members" tab | Table shows affiliates with: Name/Email, Status, Tier, Referrals, Earnings, Joined | |
+| Status badges correct | Check status column | Active affiliates show "Active", dormant show different status. No active affiliate shows "Pending Setup" | |
+| Earnings display | Check earnings column | Real dollar amounts shown. Zero earnings show em-dash, not "$0.00" | |
+| Search by name | Type part of a name in search | Matching members appear | |
+| Search by email | Type part of an email in search | Matching members appear | |
+| Search does not match IDs | Paste a user ID into search | No results (search only matches name and email) | |
+| Sort columns | Click column headers | Table sorts correctly | |
 
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-5.1 | Tiers load sorted | Click "Tiers" tab | 5 tiers shown sorted by threshold: Starter (0), Bronze (10), Silver (25), Gold (50), Platinum (75) | |
-| R2-5.2 | Tier details | Check each tier card | Shows name, referral threshold, commission rate, and perks (if any) | |
-| R2-5.3 | Perks display correctly | Check tiers with perks | Perks shown as badges (not raw text/comma-separated string) | |
-| R2-5.4 | Edit a tier | Click edit on any tier | Form pre-fills with current values, including perks as comma-separated text | |
-| R2-5.5 | Save tier edit | Change a value and save | Tier updated, change visible immediately | |
-| R2-5.6 | Create new tier | Click add, create "Diamond" with 100 referrals, 40% rate | New tier appears in sorted position | |
-| R2-5.7 | Delete tier | Delete the "Diamond" tier | Tier removed from list | |
+### 1.11 Affiliate Program — Networks Tab
 
----
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Networks load | Click "Networks" tab | Shows network cards (ShareASale, Impact, PartnerStack) | |
+| Fields are read-only in table | Check network row | Tracking ID and postback URL shown as plain text, not editable inputs | |
+| Edit via detail dialog | Click on a network row | Dialog opens with editable fields for tracking ID and postback URL | |
+| Toggle network | Toggle a network on/off | State changes and persists | |
 
-### SECTION R2-6: Milestones Tab
+### 1.12 Affiliate Program — Contests Tab
 
-> **Where:** Admin > Setup > Affiliate > Milestones tab
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Contests load | Click "Contests" tab | Shows contests with status badges (active, upcoming, completed) | |
+| Contest details | Check each contest | Shows name, status, metric, prize amount, date range | |
+| Completed contest shows winner | Check a completed contest | Shows trophy icon with winner info | |
+| Auto status from dates | Create contest with future start date | Status automatically set to "upcoming" | |
+| CRUD operations | Create, edit, and delete contests | All operations succeed without errors | |
 
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-6.1 | Milestones load | Click "Milestones" tab | 5 milestones shown (First Referral through Legend) | |
-| R2-6.2 | Milestone details | Check each milestone | Shows name, referral threshold, bonus amount, description | |
-| R2-6.3 | Awards granted | Check milestone awards | Some milestones show number of affiliates who earned them | |
-| R2-6.4 | Edit milestone | Edit any milestone | Form pre-fills, saves correctly | |
-| R2-6.5 | Create milestone | Add a new milestone | Appears in list | |
-| R2-6.6 | Delete milestone | Delete the new milestone | Removed from list | |
+### 1.13 Affiliate Program — Payout Runs Tab
 
----
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Batches display | Click "Payout Runs" tab | Shows batches with status, amount, count, and date | |
+| Pending batch has actions | Check a pending batch | "Approve" and "Reject" buttons visible | |
+| Approve batch | Click Approve on pending batch | Status changes to "approved" | |
+| Generate new batch | Click "Generate Payout Batch" | New batch created (or message saying no pending commissions) | |
 
-### SECTION R2-7: Marketing Assets Tab
+### 1.14 Affiliate Program — Audit Tab
 
-> **Where:** Admin > Setup > Affiliate > Assets tab
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Audit tab loads | Click "Audit" tab | Shows info card linking to centralized audit logs | |
+| Link navigates correctly | Click "View Affiliate Audit Logs" | Opens `/admin/audit-logs?category=affiliate` | |
 
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-7.1 | Assets load | Click "Assets" tab | 6 assets shown (banners, email templates, social posts, comparison doc) | |
-| R2-7.2 | Asset types | Check asset type labels | Each asset shows its type (Banner, Email Template, Social Post, etc.) | |
-| R2-7.3 | View content | Click to expand/view an asset | Content displays correctly (no broken formatting) | |
-| R2-7.4 | No emoji in templates | Check email templates and social posts | Templates contain no emoji characters | |
-| R2-7.5 | Edit asset | Edit any asset | Saves correctly | |
-| R2-7.6 | Create new asset | Add a new banner asset | Appears in list | |
-| R2-7.7 | Delete asset | Delete the new asset | Removed from list | |
+### 1.15 Affiliate Program — Tab Navigation
 
----
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| All tabs load | Click through every tab | Each tab loads without errors | |
+| Tab persistence | Click a tab, refresh the page | Same tab remains selected after reload | |
+| Direct URL access | Visit `/admin/setup/affiliate?tab=broadcasts` | Opens directly on Broadcasts tab | |
+| Applications badge | Check Applications tab | Shows pending count badge when pending apps exist | |
 
-### SECTION R2-8: Broadcasts Tab
+### 1.16 Centralized Audit Logs
 
-> **Where:** Admin > Setup > Affiliate > Broadcasts tab
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Page loads | Go to `/admin/audit-logs` | Shows all audit log entries | |
+| Category filter | Select "affiliate" from Category dropdown | Shows only affiliate-related entries. Action dropdown disappears. | |
+| Return to all categories | Change Category to "All Categories" | Action dropdown reappears, all entries shown | |
+| Click to expand entry | Click on any audit log entry | Detail dialog opens with action, entity, admin, timestamp, metadata | |
+| Events record after actions | Perform an action (edit a tier), then check audit logs | The action appears as a new entry | |
 
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-8.1 | Broadcasts load | Click "Broadcasts" tab | 3 broadcasts shown (2 sent, 1 draft) | |
-| R2-8.2 | Sent broadcast stats | Check sent broadcasts | Shows sent count, opened count, clicked count, date | |
-| R2-8.3 | Draft shows actions | Check the draft broadcast | Edit (pencil), Send (arrow), and Delete (trash) buttons visible | |
-| R2-8.4 | Edit draft | Click edit on draft, change subject | Dialog opens with pre-filled values, saves changes | |
-| R2-8.5 | Send draft | Click send on draft | Confirmation dialog appears. On confirm, status changes to "sent" | |
-| R2-8.6 | Create new broadcast | Click "New Broadcast", fill in subject/body | Draft created, appears in list | |
-| R2-8.7 | Delete broadcast | Delete a broadcast | Removed from list | |
+### 1.17 Email Templates
 
----
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Templates page loads | Go to `/admin/email-templates` | All templates display | |
+| Category badges visible | Check template cards | Templates with non-general category show a category badge | |
+| Create template | Create a template with name, subject, body, and category | Template saves and appears in list with category badge | |
+| Edit template | Edit a template's subject and category | Changes save and display correctly | |
+| Template appears in broadcasts | Create an "affiliate" category template, then create a new broadcast | Template appears in the "Load from Template" dropdown | |
 
-### SECTION R2-9: Members Tab
+### 1.18 Admin Reporting
 
-> **Where:** Admin > Setup > Affiliate > Members tab
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Revenue attribution loads | Go to Admin > Analytics (revenue attribution) | Shows affiliate vs direct revenue breakdown with charts | |
+| Revenue waterfall loads | Check revenue waterfall section | Visual waterfall from gross revenue to net after commissions | |
+| Metrics dashboard | Go to Admin > Metrics | KPI dashboard with configurable alert thresholds | |
+| Admin stats | Check admin stats area | Overview statistics for platform health | |
 
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-9.1 | Members load | Click "Members" tab | Table shows 8 affiliates with columns: Name/Email, Status, Tier, Referrals, Earnings, Joined, Actions | |
-| R2-9.2 | Status badges | Check status column | Active affiliates show "Active" badge, dormant show different status | |
-| R2-9.3 | Tier display | Check tier column | Each affiliate shows their assigned tier name | |
-| R2-9.4 | Earnings display | Check earnings column | Dollar amounts shown, pending earnings shown if > $0 | |
-| R2-9.5 | Search | Type a name or email in search | Table filters to matching results | |
-| R2-9.6 | Sort by earnings | Click earnings column header | Table sorts by earnings (ascending/descending) | |
-| R2-9.7 | Sort by referrals | Click referrals column header | Table sorts by referral count | |
-| R2-9.8 | Delete member | Delete a test affiliate | Confirmation dialog, then member removed | |
+### 1.19 Admin CRM Features
 
----
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Affiliate CRM card | Click an affiliate name in Members tab | Full profile drawer opens with earnings, payouts, tickets, activities, notes | |
+| Add admin note | Add an internal note to an affiliate record | Note saves and is visible only to admins | |
+| Health scores visible | Check affiliate health indicators | Green/yellow/red indicators based on activity and conversion rate | |
+| Ticket management | Go to Admin > Tickets (if separate page exists) | Can view and manage support tickets across all users | |
 
-### SECTION R2-10: Networks Tab
+### 1.20 Other Admin Pages
 
-> **Where:** Admin > Setup > Affiliate > Networks tab
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-10.1 | Networks load | Click "Networks" tab | Shows network cards (ShareASale, Impact, PartnerStack) | |
-| R2-10.2 | Active networks | Check ShareASale and Impact | Both show as active with tracking IDs configured (SAS-12345, IMP-67890) | |
-| R2-10.3 | Toggle network | Toggle one network off, then back on | State changes and persists | |
-| R2-10.4 | Edit tracking ID | Change a tracking ID and save | New value persists on reload | |
-
----
-
-### SECTION R2-11: Contests Tab
-
-> **Where:** Admin > Setup > Affiliate > Contests tab
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-11.1 | Contests load | Click "Contests" tab | 3 contests shown: 1 active, 1 upcoming, 1 completed | |
-| R2-11.2 | Contest details | Check each contest | Shows name, status badge, metric, prize amount, date range | |
-| R2-11.3 | Completed contest | Check the completed contest | Shows winner info if available | |
-| R2-11.4 | Edit contest | Edit any contest | Form pre-fills, saves correctly | |
-| R2-11.5 | Create contest | Add a new contest | Appears in list | |
-| R2-11.6 | Delete contest | Delete the new contest | Removed from list | |
-
----
-
-### SECTION R2-12: Payout Runs Tab
-
-> **Where:** Admin > Setup > Affiliate > Payout Runs tab
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-12.1 | Batches load | Click "Payout Runs" tab | 3 payout batches shown: 2 completed, 1 pending | |
-| R2-12.2 | Batch details | Check each batch | Shows status badge, total amount, payout count, batch date | |
-| R2-12.3 | Pending batch actions | Check the pending batch | Approve and Reject buttons visible | |
-| R2-12.4 | Approve batch | Click Approve on pending batch | Status changes to "approved" | |
-| R2-12.5 | Generate new batch | Click "Generate Payout Batch" | New batch created with pending commissions | |
-
----
-
-### SECTION R2-13: Tab Navigation
-
-> **Where:** Admin > Setup > Affiliate
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R2-13.1 | Tab switching | Click through all 11 tabs | Each tab loads its content without errors | |
-| R2-13.2 | Tab persistence | Click "Tiers" tab, then refresh the page | Page reloads on the Tiers tab (not reset to Health) | |
-| R2-13.3 | Direct URL access | Visit `/admin/setup/affiliate?tab=broadcasts` directly | Opens on Broadcasts tab | |
-| R2-13.4 | Applications badge | Check Applications tab trigger | Shows pending count badge (red) when pending apps exist | |
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Blog management | Go to Admin > Blog | Blog post management interface loads | |
+| Feedback page | Go to Admin > Feedback | User feedback submissions visible | |
+| Queue management | Go to Admin > Queue | Background job queues display with status | |
+| Waitlist | Go to Admin > Waitlist | Waitlist entries visible | |
+| Team management | Go to Admin > Team | Team member management interface loads | |
+| Onboarding funnel | Go to Admin > Onboarding | Onboarding step completion tracking visible | |
 
 ---
 
-## Testing Notes (Round 2)
+## 2. Affiliate Dashboard
 
-**Round 2 Focus:**
-- Verify seeded test data displays correctly across all 11 tabs
-- Test CRUD operations (create, edit, delete) on each tab
-- Confirm no runtime crashes on any tab
+### 2.1 Affiliate Signup & Login
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Application form accessible | Go to `/affiliate/join` | Public application form loads | |
+| Submit application | Fill in email and details, submit | Success message appears | |
+| Duplicate blocked | Submit a second application with the same email | "Pending application" message, not a crash | |
+| Affiliate login | Go to `/affiliate/login` with approved credentials | Logs in and redirects to affiliate dashboard | |
+| Forgot password | Go to `/affiliate/forgot-password` | Password reset flow works | |
+
+### 2.2 Affiliate Dashboard — Overview
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Dashboard loads | Go to `/affiliate/dashboard` | Dashboard loads with navigation tabs | |
+| Earnings summary | Check overview cards | Shows total earnings, pending, and paid amounts | |
+| Current tier displayed | Check tier section | Shows current tier with progress toward next tier | |
+| Active contests | Check contests section | Shows active/upcoming contests with countdown timers | |
+| Recent activity | Check activity feed | Shows recent commissions, referrals, and other events | |
+
+### 2.3 Affiliate Dashboard — Links & Tracking
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Referral link visible | Check referral link section | Unique referral link displayed with copy button | |
+| Deep link generator | Create a link to a specific page with UTM parameters | Link generated with proper tracking parameters | |
+| Link shortener | Shorten a referral link | Clean short link generated | |
+| QR code generation | Generate a QR code for a referral link | Branded QR code created and downloadable | |
+| Link performance | Check link performance data | Click counts and conversion data per link | |
+
+### 2.4 Affiliate Dashboard — Commissions & Earnings
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Commissions list | Check commissions section | Shows all commissions with status (pending, approved, paid) | |
+| Commission lifecycle | Click on a commission | Shows 7-step journey from click to paid out | |
+| Earnings projections | Check earnings projections | Shows 3, 6, 12 month projections with annual forecast | |
+| Earnings forecast | Check forecast section | Shows projected monthly earnings with optimistic/pessimistic range | |
+| Commission split estimator | Use the commission calculator | Shows how earnings split across tiers and products | |
+
+### 2.5 Affiliate Dashboard — Payouts & Financial Tools
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Payout history | Check payout history | Filterable, paginated list with CSV export | |
+| Payout schedule | Check payout schedule widget | Shows next payout date, minimum threshold progress, pending balance | |
+| Earnings statement | Download an earnings statement | PDF-style document with period selection | |
+| Tax center | Check tax center panel | Year selector, estimated withholding, monthly breakdown, downloadable report | |
+| Tax info submission | Submit W-9 or W-8BEN info | Form saves successfully | |
+| Commission renewals | Check renewal interface | Shows eligible referrals with bulk renewal option | |
+
+### 2.6 Affiliate Dashboard — Marketing Toolkit
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Marketing assets load | Check marketing toolkit tab | All available assets display with types | |
+| Copy-paste captions | Copy a social media caption | Referral link auto-inserted in copied text | |
+| Email templates with merge tags | View an email template | Merge tags ({affiliate_name}, {referral_link}, {discount_code}) auto-filled | |
+| Swipe files | View swipe file library | Pre-written emails with auto-filled affiliate info | |
+| Media kit page | View or generate media kit | Professional partner page with brand, stats, and materials | |
+| Sharing cards | View sharing cards | Social media images with referral code embedded | |
+| Discount codes | Check discount code section | Shows assigned branded codes with usage stats | |
+
+### 2.7 Affiliate Dashboard — Knowledge Base & Resources
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Knowledge base loads | Check knowledge base section | Searchable help articles organized by category | |
+| Search works | Search for a keyword | Relevant articles appear | |
+| Promotional calendar | Check promotional calendar | Upcoming campaigns with countdown timers and content suggestions | |
+| Starter kit | Check starter kit section (for new affiliates) | Curated bundle of essential materials | |
+
+### 2.8 Affiliate Dashboard — Gamification
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Tier progress | Check tier progress section | Current tier with visual progress toward next tier | |
+| Milestones | Check milestones | Shows earned and upcoming milestones with progress bars | |
+| Badges | Check badges section | Earned badges displayed on profile | |
+| Leaderboard | Check leaderboard | Ranked list by referrals, earnings, or conversion rate | |
+| Goals | Set an earnings goal | Progress bar shows progress toward personal target | |
+| Challenges | Check weekly challenges | Active challenges with progress bars and countdown timers | |
+| Contests | Check contests section | Active/upcoming contests with leaderboard and prizes | |
+
+### 2.9 Affiliate Dashboard — AI Tools
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| AI Post Writer | Generate a social post | Platform-specific content generated with referral link embedded | |
+| AI Email Drafter | Generate a promotional email | Professional email with affiliate's discount code and link | |
+| AI Blog Outline | Generate a blog outline | Structured outline with headings and CTA | |
+| AI Video Script | Generate a video script | Platform-appropriate script with hook, features, CTA | |
+| AI Coach | Check weekly coaching | Personalized tips based on actual performance data | |
+| AI Objection Handler | Enter a common objection | 3 response variations generated using product pricing and features | |
+| Promotion Strategy Quiz | Take the 6-question quiz | Personalized 30-day promotional playbook generated | |
+| Audience Analyzer | Run audience analysis | AI-powered audience persona generated from traffic data | |
+| AI Ad Copy | Generate ad copy | Short-form ad text with headline, body, CTA variations | |
+
+### 2.10 Affiliate Dashboard — Analytics
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Churn intelligence | Check churn analytics | Churn rate, reasons, timing patterns, at-risk referrals | |
+| Cohort analysis | Check cohort analytics | Referrals grouped by signup month with retention tracking | |
+| Revenue analytics | Check revenue section | Revenue breakdown with conversion funnel | |
+| Traffic insights | Check traffic analytics | Geographic, device, and repeat visitor data | |
+| Connected analytics | Check connected analytics (if platforms connected) | External platform data merged with affiliate metrics | |
+| Content intelligence | Check content analytics | Promotion frequency and content type performance correlation | |
+| Earnings heatmap | Check heatmap view | GitHub-style 52-week activity heatmap | |
+| Percentile benchmarks | Check benchmark data | Ranking compared to other affiliates | |
+| Custom date range | Select a custom date range | Analytics filter to the selected period | |
+| CSV export | Click export on any data table | CSV file downloads with correct data | |
+
+### 2.11 Affiliate Dashboard — Communication
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| In-app messaging | Open messaging section | Message thread with admin visible. Can send new messages. | |
+| Unread indicator | Check for unread messages | Unread count badge visible when messages exist | |
+| Announcements | Check announcements section | Admin announcements visible | |
+| What's new digest | Check what's new section | Recent platform updates and feature releases shown | |
+| Surveys | Check for active surveys | Survey form accessible with star rating and feedback fields | |
+
+### 2.12 Affiliate Dashboard — Profile & Social Proof
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Profile settings | Update affiliate profile | Changes save successfully | |
+| Co-branded landing page | Visit partner page at `/partner/[slug]` | Personalized landing page with affiliate branding | |
+| Case study submission | Submit a success story | Story submitted for admin review | |
+| Testimonial submission | Submit a testimonial | Testimonial saved and pending approval | |
+| Directory opt-in | Toggle public directory visibility | Affiliate appears/disappears from `/partners` page | |
+
+### 2.13 Affiliate Dashboard — Mobile Responsiveness
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Dashboard on mobile viewport | Resize browser to phone width | All panels stack vertically without horizontal scrolling | |
+| Navigation on mobile | Check tab navigation on small screen | Tabs are accessible (scrollable or collapsible) | |
+| Charts on mobile | Check analytics charts on small screen | Charts resize and remain readable | |
+
+---
+
+## 3. User Dashboard
+
+### 3.1 User Authentication
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Email/password login | Log in with email and password | Dashboard loads successfully | |
+| OAuth login | Log in with a social provider (Twitter, LinkedIn, Facebook, Instagram) | Dashboard loads successfully | |
+| Password reset | Go through forgot password flow | Reset email sent, new password works | |
+| Signup | Create a new account | Account created, redirected to onboarding or dashboard | |
+
+### 3.2 Billing & Subscription
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Billing page loads | Go to `/billing` or billing section | Current plan, billing cycle, and payment status shown | |
+| Invoice history | Check invoice list | All invoices displayed with status, date, and amount | |
+| Invoice detail | Click on an invoice | Full invoice detail with line items | |
+| Invoice PDF download | Click download on an invoice | PDF file downloads | |
+| Stripe customer portal | Click "Manage Subscription" link | Opens Stripe portal for payment method and plan changes | |
+| Feature gating | Try accessing a premium feature on a free plan | Upgrade prompt shown instead of feature | |
+| Affiliate invitation visible | Check billing page for affiliate card | "Earn 30% commission" card with link to affiliate application | |
+
+### 3.3 Support
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Submit ticket | Go to support section, create a new ticket | Ticket created with subject, description, and priority | |
+| View ticket history | Check existing tickets | List of tickets with status (Open, In Progress, Resolved, Closed) | |
+| Add comment to ticket | Open a ticket and add a comment | Comment appears in the thread | |
+| Ticket status updates | Check a ticket that admin has responded to | Updated status and admin comments visible | |
+
+### 3.4 Profile & Security
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Profile page loads | Go to `/profile` | Profile information displayed with edit capability | |
+| Update profile | Change profile fields, save | Changes persist on reload | |
+| Security page | Go to `/security` | Password change and session management options shown | |
+| Change password | Change password using current password | Password updated successfully | |
+| Email preferences | Go to email preferences | Category-based email preference toggles shown | |
+| Toggle email preferences | Turn off a notification category | Change saves and persists | |
+
+### 3.5 Usage & Insights
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Usage insights | Check usage section | Activity metrics shown (e.g., "You published 12 posts this month") | |
+| Membership info | Check membership section | Current plan and feature access displayed | |
+
+---
+
+## 4. Public Pages
+
+### 4.1 Marketing Pages
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Homepage loads | Visit root URL | Landing page loads with hero, features, and CTA | |
+| Features page | Go to `/features` | Feature descriptions and comparisons displayed | |
+| Pricing page | Go to `/pricing` | Plans with prices, features, and signup buttons | |
+| About page | Go to `/about` | Company information displayed | |
+| Contact page | Go to `/contact` | Contact form or information displayed | |
+| FAQ page | Go to `/faq` | Frequently asked questions with answers | |
+| Docs page | Go to `/docs` | Documentation or help content | |
+
+### 4.2 Legal & Policy Pages
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Terms of Service | Go to `/terms` | Terms displayed | |
+| Privacy Policy | Go to `/privacy` | Privacy policy displayed | |
+| Cookie Policy | Go to `/cookie-policy` | Cookie policy displayed | |
+| Acceptable Use | Go to `/acceptable-use` | Acceptable use policy displayed | |
+| Accessibility | Go to `/accessibility` | Accessibility statement displayed | |
+| DMCA | Go to `/dmca` | DMCA policy displayed | |
+| Security Policy | Go to `/security-policy` | Security policy displayed | |
+| AI Data Usage | Go to `/ai-data-usage` | AI data usage policy displayed | |
+| Data Handling | Go to `/data-handling` | Data handling policy displayed | |
+
+### 4.3 Social Proof Pages
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Partners directory | Go to `/partners` | Public list of opt-in affiliates with tier badges, bios, and social links | |
+| Search partners | Use search or filter on partners page | Results filter correctly by name or tier | |
+| Partner landing page | Visit `/partner/[slug]` for a known affiliate | Co-branded page with affiliate info and discount | |
+| Testimonials | Go to `/testimonials` | Approved testimonials displayed | |
+| Blog | Go to `/blog` | Blog posts listed | |
+| Blog post | Click a blog post | Full blog post content loads | |
+| Changelog | Go to `/changelog` | Platform changelog/updates displayed | |
+
+### 4.4 SEO & Meta Tags
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Open Graph tags | View page source on any public page | og:title, og:description, og:type, og:url tags present | |
+| Page titles | Check browser tab title on public pages | Each page has a unique, descriptive title | |
+| Canonical URLs | View page source | Canonical URL tags present | |
+| Mobile viewport | Check viewport meta tag | Proper viewport configuration for mobile rendering | |
+
+---
+
+## 5. Cross-Cutting Features
+
+### 5.1 Authentication & Security
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Protected routes | Try accessing `/admin` while logged out | Redirected to login page | |
+| Role enforcement | Try accessing admin page as regular user | Access denied or redirect | |
+| SSO/SAML login | Log in via SSO (if configured) | Successfully authenticates and reaches dashboard | |
+
+### 5.2 Content Scheduling (Product Features)
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Social dashboard loads | Go to `/dashboard/social/overview` | Content scheduling dashboard loads | |
+| Connect social account | Go to social settings, connect a platform | OAuth flow completes, account connected | |
+| Create post | Create a new social post | Post saved as draft or scheduled | |
+| Schedule post | Schedule a post for future date/time | Post appears in calendar at scheduled time | |
+| Calendar view | Go to calendar page | Visual calendar with scheduled posts | |
+| Blog management | Go to blog section | Blog post creation and management interface | |
+| Content intelligence | Check intelligence section | Content analysis and optimization suggestions | |
+| Engagement metrics | Check engagement section | Engagement data from connected platforms | |
+
+### 5.3 Notifications
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Notification bell visible | Check header on any authenticated page | Notification bell icon present | |
+| Bell click opens panel | Click the notification bell | Notification panel opens without crashing (may show empty list) | |
+| No console 500 errors | Check browser console while navigating | No red 500 errors from `/api/notifications` | |
+
+### 5.4 Dark Mode
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Theme toggle | Click theme toggle button | Page switches between light and dark mode | |
+| Theme persists | Toggle theme, refresh page | Theme remains as set after reload | |
+| All dashboards work | Navigate through admin, affiliate, and user dashboards in dark mode | All elements readable with proper contrast | |
+
+### 5.5 Email System
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Transactional emails send | Trigger an action that sends email (signup, password reset) | Email received | |
+| Branded receipts | Complete a payment | Branded receipt email received (not just Stripe default) | |
+| Drip sequences | Activate a new affiliate | Welcome email received, follow-up emails sent on schedule | |
+
+### 5.6 Mobile Responsiveness (General)
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| Public pages on mobile | View marketing pages on phone viewport | Content stacks properly, no horizontal scroll | |
+| Admin pages on mobile | View admin pages on phone viewport | Sidebar collapses, content remains usable | |
+| Forms on mobile | Fill out forms (signup, ticket, etc.) on phone viewport | All form fields accessible and functional | |
+
+### 5.7 Accessibility
+
+| Test | Steps | Expected Result | Status |
+|------|-------|-----------------|--------|
+| ARIA labels | Inspect interactive elements | ARIA labels present on buttons, inputs, and toggles | |
+| Keyboard navigation | Tab through form elements | Focus moves logically through the page | |
+| Screen reader labels | Check for sr-only labels | Screen-reader-only labels present on key elements | |
+
+---
+
+## Testing Tips
 
 **When something fails:**
-1. Note the section number and what happened
-2. Take a screenshot if possible
-3. Check browser console for errors (F12 > Console)
-4. We'll batch all fixes together
+1. Note the section and test name
+2. Describe what actually happened vs what was expected
+3. Take a screenshot if possible
+4. Check browser console (F12 > Console) for red error messages
+5. Note the URL where the failure occurred
 
-**Test data reference:**
-- 8 affiliates (7 active, 1 dormant) across 5 tiers
-- 34+ referrals, 52+ commissions
-- 5 applications (3 pending, 1 approved, 1 rejected)
-- 6 marketing assets
-- 3 broadcasts (2 sent, 1 draft)
-- 3 contests (1 active, 1 upcoming, 1 completed)
-- 3 payout batches (2 completed, 1 pending)
-- ShareASale and Impact networks activated
+**Environment notes:**
+- Test on the live deployment (passivepost.io)
+- Admin account required for admin dashboard tests
+- Affiliate account required for affiliate dashboard tests
+- Regular user account required for user dashboard tests
+- Browser: Test in Chrome primarily, spot-check in Firefox and Safari
 
-**Database check shortcut:** Check Supabase dashboard > Table Editor for affiliate_applications, referral_links, user_roles, affiliate_commissions, etc.
-
----
-
-## ROUND 3: Consolidation & Centralized Systems
-
-> **Created:** February 23, 2026
-> **Goal:** Verify the architecture consolidation changes — affiliate audit tab now links to centralized audit logs, broadcasts can load from centralized email templates, and email templates support category tagging.
-> **Pre-requisite:** Round 3 code pushed to GitHub and deployed on Vercel. Admin logged in. Migration `006_email_template_category.sql` run in Supabase (adds `category` column to `email_templates` table).
+**Test data:**
+- Seeded test data should be present (affiliates, referrals, commissions, applications, contests, etc.)
+- If data appears missing, check with the development team before reporting as a bug
 
 ---
 
-### SECTION R3-1: Audit Tab Consolidation
-
-> **Where:** Admin > Setup > Affiliate > Audit tab
-> **What changed:** The old audit tab (with inline timeline, filters, and detail modals) has been replaced with a simple info card that links to the centralized audit logs page.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R3-1.1 | Audit tab still exists | Click the "Audit" tab on the affiliate page | Tab loads without error | |
-| R3-1.2 | Simple card displays | Check tab content | Shows a card with title "Audit Log", description text explaining all actions are tracked centrally, and a button | |
-| R3-1.3 | No inline audit timeline | Look at the tab content | There is NO timeline of audit entries, NO entity type dropdown, NO action dropdown, NO refresh button — just the info card | |
-| R3-1.4 | Link button works | Click "View Affiliate Audit Logs" button | Navigates to `/admin/audit-logs?category=affiliate` | |
-| R3-1.5 | Centralized page loads | After clicking the link | Audit Logs page opens and shows affiliate-related events (if any exist) | |
-| R3-1.6 | Category filter applied | Check the audit logs page after arriving via the link | The page should show only audit entries with affiliate-related actions (entries with `affiliate_` prefix in action names) | |
-
----
-
-### SECTION R3-2: Centralized Audit Logs Page
-
-> **Where:** Admin > Audit Logs (`/admin/audit-logs`)
-> **What changed:** This page already existed. We're verifying it works correctly when accessed with the `?category=affiliate` filter.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R3-2.1 | Direct URL access | Go to `/admin/audit-logs` (no filter) | Page loads showing all audit log entries across all categories | |
-| R3-2.2 | Filtered URL access | Go to `/admin/audit-logs?category=affiliate` | Page loads showing only affiliate-category audit entries | |
-| R3-2.3 | Entries appear after actions | Go back to affiliate admin, make a change (e.g., edit a tier), then return to `/admin/audit-logs?category=affiliate` | The action you just performed appears in the log | |
-| R3-2.4 | Entry details | Click on any audit entry | Shows detail information (action, entity, admin, timestamp) | |
-| R3-2.5 | No filter shows everything | Visit `/admin/audit-logs` (no category param) | Shows entries from all sources, not just affiliate | |
-
----
-
-### SECTION R3-3: Broadcast "Load from Template"
-
-> **Where:** Admin > Setup > Affiliate > Broadcasts tab > "New Broadcast" button
-> **What changed:** The create broadcast dialog now includes a "Load from Email Template" dropdown at the top. This pulls templates from the centralized email templates system.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R3-3.1 | Template dropdown visible | Click "New Broadcast" button | Dialog opens with a "Load from Email Template" dropdown above the Subject field | |
-| R3-3.2 | Templates listed | Click the template dropdown | Shows all email templates from the centralized system. Templates with a category (other than "general") show the category in parentheses | |
-| R3-3.3 | Loading a template | Select any template from the dropdown | The Subject and Body fields auto-fill with the selected template's content | |
-| R3-3.4 | Can still edit after loading | Load a template, then change the subject or body text | Changes are allowed — the template just pre-fills, it doesn't lock | |
-| R3-3.5 | Manage templates link | Look below the dropdown | Small text link says "Manage templates in Email Templates" — clicking it navigates to `/admin/email-templates` | |
-| R3-3.6 | Not shown when editing | Click edit (pencil icon) on an existing draft broadcast | Dialog opens WITHOUT the template dropdown (only shows when creating new) | |
-| R3-3.7 | Works without templates | If no email templates exist in the system | The dropdown section is hidden entirely — broadcast form works normally | |
-
----
-
-### SECTION R3-4: Email Templates — Category Tagging
-
-> **Where:** Admin > Email Templates (`/admin/email-templates`)
-> **What changed:** Email templates now have a "Category" field. Available categories: General, Onboarding, Billing, Affiliate, Team, Notification. Categories appear as badges on template cards.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R3-4.1 | Page loads | Go to `/admin/email-templates` | Page loads with all existing templates | |
-| R3-4.2 | Category badges | Check existing template cards | Templates with a category other than "general" show a small category badge next to their name | |
-| R3-4.3 | Create with category | Click "Create Template", fill in name, description | A "Category" dropdown appears with options: General, Onboarding, Billing, Affiliate, Team, Notification | |
-| R3-4.4 | Category saves on create | Create a template with category set to "affiliate", save | Template appears in list with "affiliate" badge | |
-| R3-4.5 | Category in edit mode | Click edit on any existing template | A "Category" dropdown appears next to the Subject Line field | |
-| R3-4.6 | Category saves on edit | Change an existing template's category to "billing", save | Category badge updates on the card | |
-| R3-4.7 | Default category | Create a template without changing the category dropdown | Category defaults to "general" (no badge shown since general is the default) | |
-| R3-4.8 | Templates show in broadcast | Create a template with category "affiliate", then go to affiliate broadcasts and click "New Broadcast" | The newly created template appears in the "Load from Template" dropdown with "(affiliate)" label | |
-
----
-
-### SECTION R3-5: General Regression
-
-> **Where:** Admin > Setup > Affiliate (all tabs)
-> **Goal:** Make sure the consolidation changes didn't break anything from Round 2.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R3-5.1 | All tabs load | Click through every tab on the affiliate admin page | All tabs load without errors (Health, Applications, Settings, Tiers, Milestones, Assets, Broadcasts, Members, Networks, Contests, Payout Runs, Audit) | |
-| R3-5.2 | Tab count | Count the tabs | 12 tabs total | |
-| R3-5.3 | Health tab still default | Navigate to `/admin/setup/affiliate` (no tab param) | Health tab loads as default | |
-| R3-5.4 | Tab persistence | Click "Tiers" tab, refresh page | Still on Tiers tab after reload | |
-| R3-5.5 | Broadcasts still work | Go to Broadcasts tab | Existing broadcasts display, New Broadcast button works | |
-| R3-5.6 | Detail modals still work | Click on any tier, milestone, contest, or broadcast entry | Detail modal opens with correct information | |
-| R3-5.7 | No console errors | Open browser console (F12), navigate through tabs | No red error messages in console | |
-
----
-
-### SECTION R3-6: Database Migration Check
-
-> **Where:** Supabase dashboard
-> **Goal:** Verify the category column was added to email_templates.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R3-6.1 | Migration applied | Check `email_templates` table in Supabase Table Editor | A `category` column exists with type `text` | |
-| R3-6.2 | Default value | Check existing rows in email_templates | All pre-existing templates have `category = 'general'` | |
-| R3-6.3 | No data loss | Count rows in email_templates | Same number of templates as before the migration | |
-
----
-
-## Testing Notes (Round 3)
-
-**Round 3 Focus:**
-- Architecture consolidation — systems are connected, not duplicated
-- Centralized audit logs work with affiliate category filter
-- Broadcast dialog integrates with email templates
-- Email templates support category tagging
-- No regressions from Round 2
-
-**Migration required before testing:**
-Run this SQL in Supabase SQL Editor:
-```sql
-ALTER TABLE email_templates ADD COLUMN IF NOT EXISTS category text DEFAULT 'general';
-CREATE INDEX IF NOT EXISTS idx_email_templates_category ON email_templates(category);
-```
-(File: `migrations/extensions/006_email_template_category.sql`)
-
-**When something fails:**
-1. Note the section number (R3-X.X) and what happened
-2. Take a screenshot if possible
-3. Check browser console for errors (F12 > Console)
-4. We'll batch all fixes together
-
----
-
-## ROUND 4: Regression Tests for Round 3 Fixes
-
-> **Created:** February 23, 2026
-> **Goal:** Verify the 6 fixes deployed after Round 3 testing. Only tests prone to breakage from these specific changes are included.
-> **Pre-requisite:** Round 4 code pushed to GitHub and deployed on Vercel. Admin logged in.
-
----
-
-### SECTION R4-1: Email Template Save/Edit
-
-> **Where:** Admin > Email Templates (`/admin/email-templates`)
-> **What was fixed:** Templates were failing to save silently. API now handles missing `category` column gracefully, and error messages now display properly.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R4-1.1 | Create new template | Click "Create Template", fill in name, subject, body. Save. | Template saves successfully and appears in the list | |
-| R4-1.2 | Edit existing template | Click edit on any template, change the subject or body. Save. | Saves without error, updated content shows on reload | |
-| R4-1.3 | Error message displays | (If possible) try saving a template with an empty required field | A meaningful error message appears in the toast — not blank or generic | |
-
----
-
-### SECTION R4-2: Audit Log Filtering
-
-> **Where:** Admin > Audit Logs (`/admin/audit-logs`)
-> **What was fixed:** Category and action filters were conflicting, causing empty results. Action filter now hides when a category is selected.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R4-2.1 | Category filter hides action | Select "affiliate" from the Category dropdown | The Action dropdown disappears. Results show only affiliate-related entries | |
-| R4-2.2 | Return to all categories | Change Category back to "All Categories" | The Action dropdown reappears. Results are unfiltered | |
-| R4-2.3 | Action filter works alone | With Category set to "All Categories", select an action (e.g., "approve") | Results filter correctly by that action | |
-| R4-2.4 | No empty results from conflict | Select category "affiliate", then switch back to "All Categories" and pick an action | Results appear correctly — no blank screen from stale filters | |
-
----
-
-### SECTION R4-3: Broadcast Edit Dialog
-
-> **Where:** Admin > Setup > Affiliate > Broadcasts tab
-> **What was fixed:** Field was confusingly labeled "Subject" in both create and edit. Renamed to "Broadcast Name" to distinguish from email subject line.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R4-3.1 | Create label correct | Click "New Broadcast" | First text input is labeled "Broadcast Name" (not "Subject") | |
-| R4-3.2 | Edit shows field | Click edit (pencil icon) on an existing broadcast | Dialog opens with "Broadcast Name" field visible and pre-filled | |
-| R4-3.3 | Edit saves changes | Change the broadcast name in edit mode, save | Updated name appears in the broadcast list | |
-
----
-
-### SECTION R4-4: Affiliate Applications
-
-> **Where:** Public form at `/affiliate/join` and Admin > Setup > Affiliate > Applications tab
-> **What was fixed:** Applications weren't loading or saving due to missing `deleted_at` column. API now retries without that filter.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R4-4.1 | Submit new application | Go to `/affiliate/join`, fill in a fresh email and details, submit | Success message appears | |
-| R4-4.2 | Application appears in admin | Go to Admin > Affiliate > Applications tab | The application you just submitted appears in the list | |
-| R4-4.3 | Duplicate blocked | Submit a second application with the same email | You get a "pending application" message, not a crash or silent failure | |
-
----
-
-### SECTION R4-5: Notifications
-
-> **Where:** Any page (notification bell icon) + browser console
-> **What was fixed:** `/api/notifications` was returning 500 errors because the notifications table may not exist. Now returns empty data gracefully.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R4-5.1 | No console 500 errors | Open browser console (F12 > Console), navigate through admin pages | No red 500 errors from `/api/notifications` | |
-| R4-5.2 | Bell icon works | If a notification bell is visible, click it | Opens without crashing (may show empty list) | |
-
----
-
-### SECTION R4-6: Members Search Scope
-
-> **Where:** Admin > Setup > Affiliate > Members tab
-> **What was fixed:** Search was matching user IDs and referral codes (hidden fields). Now only matches name and email.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R4-6.1 | Search by name | Type part of a known member's name in the search box | Member appears in results | |
-| R4-6.2 | Search by email | Type part of a known member's email | Member appears in results | |
-| R4-6.3 | ID does not match | Copy a user ID or referral code and paste it into search | No results found (search should NOT match hidden fields) | |
-
----
-
-## Testing Notes (Round 4)
-
-**Round 4 Focus:**
-- These 15 tests cover ONLY the 6 areas changed after Round 3
-- If all pass, we can move forward to Sprint 4 features
-- If any fail, note the test number and what happened
-
-**When something fails:**
-1. Note the section number (R4-X.X) and what happened
-2. Take a screenshot if possible
-3. Check browser console for errors (F12 > Console)
-4. We'll batch all fixes together
-
----
-
-## ROUND 5: Regression Tests for 11 Persistent Bug Fixes
-
-> **Created:** February 23, 2026
-> **Goal:** Verify the 11 fixes deployed after Rounds 2-4 testing. These bugs had persisted across multiple rounds (some reported 4+ times). This round confirms they are finally resolved.
-> **Pre-requisite:** Round 5 code pushed to GitHub and deployed on Vercel. Admin logged in. Seeded test data still present.
-
----
-
-### SECTION R5-1: Networks — Read-Only Fields
-
-> **Where:** Admin > Setup > Affiliate > Networks tab
-> **What was fixed:** Tracking ID and postback URL were editable inline in the table, but changes weren't saving reliably. Now they display as read-only text in the table row and can only be edited via the detail dialog.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R5-1.1 | Fields are read-only in table | Go to Networks tab, look at ShareASale row | Tracking ID ("SAS-12345") and postback URL shown as plain text, NOT editable input fields | |
-| R5-1.2 | Edit via detail dialog | Click on the ShareASale row to open detail dialog | Dialog opens with editable fields for tracking ID and postback URL | |
-| R5-1.3 | Save from dialog | Change the tracking ID in the dialog, save | Value updates and persists on page reload | |
-
----
-
-### SECTION R5-2: Members — Status Badges
-
-> **Where:** Admin > Setup > Affiliate > Members tab
-> **What was fixed:** All members were showing "Pending Setup" regardless of activity. Status now considers signups > 0 or approved application as "Active".
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R5-2.1 | Active affiliates show Active | Check status column for affiliates with referrals | Affiliates with signups/referrals show "Active" badge (green) | |
-| R5-2.2 | Dormant shows differently | Check status for dormant affiliate | Shows "Dormant" or different badge, not "Active" | |
-| R5-2.3 | No "Pending Setup" for active | Scan all member rows | No active affiliate with referrals shows "Pending Setup" | |
-
----
-
-### SECTION R5-3: Members — Earnings Display
-
-> **Where:** Admin > Setup > Affiliate > Members tab
-> **What was fixed:** $0.00 was displaying for affiliates with no earnings. Now shows an em-dash (—) instead. Pending earnings still display when > $0 even if total is $0.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R5-3.1 | No $0.00 shown | Check earnings column for affiliates with no earnings | Shows "—" instead of "$0.00" | |
-| R5-3.2 | Real earnings display | Check earnings for affiliates with earnings | Dollar amounts shown correctly (e.g., "$125.00") | |
-| R5-3.3 | Pending earnings visible | Check for affiliates with pending commissions | "pending" line appears below the total (or below the em-dash if total is $0 but pending > $0) | |
-
----
-
-### SECTION R5-4: Broadcasts — CRUD Operations
-
-> **Where:** Admin > Setup > Affiliate > Broadcasts tab
-> **What was fixed:** Create, send, and delete were all failing due to missing database columns. API now retries with minimal fields on column errors.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R5-4.1 | Create draft | Click "New Broadcast", fill in name and body, save | Draft created and appears in list | |
-| R5-4.2 | Edit draft | Click edit (pencil) on the draft, change the body, save | Changes saved successfully | |
-| R5-4.3 | Send broadcast | Click send (arrow) on a draft | Confirmation dialog appears. On confirm, status changes to "sent" | |
-| R5-4.4 | Delete broadcast | Delete any broadcast | Removed from list without error | |
-
----
-
-### SECTION R5-5: Applications — Delete
-
-> **Where:** Admin > Setup > Affiliate > Applications tab
-> **What was fixed:** Delete was failing because it tried to soft-delete (set deleted_at column) which may not exist. Now falls back to hard delete.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R5-5.1 | Delete rejected application | Set filter to show rejected apps. Click delete on one. | Application removed from list without error | |
-| R5-5.2 | Delete pending application | Click delete on a pending application | Confirmation dialog, then application removed | |
-
----
-
-### SECTION R5-6: Payout Runs — Full Functionality
-
-> **Where:** Admin > Setup > Affiliate > Payout Runs tab
-> **What was fixed:** Generate batch was crashing, approve/reject buttons were missing. Completely rewritten with column-resilient inserts and proper button rendering.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R5-6.1 | Batches display | Go to Payout Runs tab | Existing batches shown with status, amount, count, and date | |
-| R5-6.2 | Pending batch actions | Check a pending batch | "Approve" and "Reject" buttons visible | |
-| R5-6.3 | Approve batch | Click Approve on a pending batch | Status changes to "approved" | |
-| R5-6.4 | Generate new batch | Click "Generate Payout Batch" | New batch created (or message saying no pending commissions) | |
-
----
-
-### SECTION R5-7: Contests — Create and Winner Display
-
-> **Where:** Admin > Setup > Affiliate > Contests tab
-> **What was fixed:** Contest create was failing due to missing status column. Now auto-determines status from dates. Completed contests now show winner info.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R5-7.1 | Create contest | Click "New Contest", fill in name, metric, prize, start/end dates. Save. | Contest created and appears in list | |
-| R5-7.2 | Auto status | Create a contest with start date in the future | Status automatically set to "upcoming" | |
-| R5-7.3 | Winner display | Check the completed contest | Shows a trophy icon with winner email/name | |
-| R5-7.4 | Edit contest | Edit any contest, change the prize amount, save | Updated value persists | |
-| R5-7.5 | Delete contest | Delete the contest you just created | Removed from list | |
-
----
-
-### SECTION R5-8: Milestones — Earned Count
-
-> **Where:** Admin > Setup > Affiliate > Milestones tab
-> **What was fixed:** No count was shown for how many affiliates earned each milestone. Now displays "X affiliates earned" below each milestone.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R5-8.1 | Count always shown | Check each milestone | Every milestone shows "X affiliates earned" text (including "0 affiliates earned" for unearned ones) | |
-| R5-8.2 | Count styling | Compare earned vs unearned | Milestones with earners show green text; milestones with 0 show muted/gray text | |
-| R5-8.3 | Count accuracy | Cross-check with Members tab | The count matches the number of members whose referrals meet or exceed the milestone threshold | |
-
----
-
-### SECTION R5-9: Audit Logs — Click-to-Expand and URL Filter
-
-> **Where:** Admin > Audit Logs (`/admin/audit-logs`)
-> **What was fixed:** Clicking an entry did nothing. URL category filter wasn't triggering. Audit events weren't recording because insert failed on missing columns.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R5-9.1 | Click to expand | Click on any audit log entry | A detail dialog opens showing action, entity, admin, timestamp, and any metadata | |
-| R5-9.2 | URL filter works | Navigate to `/admin/audit-logs?category=affiliate` | Page loads with only affiliate-category entries shown | |
-| R5-9.3 | Events record after actions | Perform an action (e.g., edit a tier on the affiliate page), then check audit logs | The action appears as a new entry | |
-| R5-9.4 | Close dialog | Click outside or press X on the detail dialog | Dialog closes cleanly | |
-
----
-
-### SECTION R5-10: General Regression
-
-> **Where:** Admin > Setup > Affiliate (all tabs)
-> **Goal:** Confirm the 11 fixes didn't break anything else.
-
-| # | Test | Steps | Expected Result | Status |
-|---|------|-------|-----------------|--------|
-| R5-10.1 | All 12 tabs load | Click through every tab | All tabs load without errors or crashes | |
-| R5-10.2 | Tab persistence | Click "Contests" tab, refresh page | Still on Contests tab after reload | |
-| R5-10.3 | No console errors | Open browser console (F12), navigate through all tabs | No red error messages | |
-| R5-10.4 | Health tab KPIs | Check Health tab | KPI cards still display data correctly | |
-| R5-10.5 | Settings save | Go to Settings tab, change a value, save | Saves successfully | |
-
----
-
-## Testing Notes (Round 5)
-
-**Round 5 Focus:**
-- These 35 tests cover the 11 bugs that persisted across Rounds 2-4
-- All fixes use column-resilient patterns (try full insert, retry with minimal fields on column errors)
-- If all pass, we move forward to the next development phase
-- If any fail, note the test number and what happened
-
-**Key architecture note:**
-The fixes use a "try → catch column error → retry with fewer fields" pattern. This means they work regardless of which optional columns exist in your Supabase database. You do NOT need to run any new migrations for these fixes.
-
-**When something fails:**
-1. Note the section number (R5-X.X) and what happened
-2. Take a screenshot if possible
-3. Check browser console for errors (F12 > Console)
-4. We'll batch all fixes together
-
----
-
-*Round 1 original test plan (Sections 1-27) retained for reference in git history.*
+*This document covers all built features of PassivePost as a QA reference. Update status columns as testing progresses.*
