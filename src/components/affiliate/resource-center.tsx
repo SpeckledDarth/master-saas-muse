@@ -124,14 +124,14 @@ export function KnowledgeBasePanel() {
                   data-testid={`button-toggle-kb-${article.slug}`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-sm font-medium truncate">{article.title}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-muted rounded text-muted-foreground shrink-0">{article.category}</span>
+                    <span className="text-sm font-medium truncate">{String(article.title ?? '')}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 bg-muted rounded text-muted-foreground shrink-0">{String(article.category ?? '')}</span>
                   </div>
                   <span className="text-xs text-muted-foreground shrink-0 ml-2">{expanded === article.slug ? '−' : '+'}</span>
                 </button>
                 {expanded === article.slug && (
                   <div className="p-4 border border-t-0 rounded-b-md bg-muted/10 text-sm leading-relaxed whitespace-pre-wrap" data-testid={`kb-content-${article.slug}`}>
-                    {article.body}
+                    {String(article.body ?? '')}
                   </div>
                 )}
               </div>

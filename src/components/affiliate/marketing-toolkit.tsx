@@ -87,7 +87,7 @@ export function LinkShortener() {
           {links.map(l => (
             <div key={l.id} data-testid={`short-link-${l.id}`} className="flex items-center justify-between p-2 bg-muted/30 rounded text-sm">
               <div className="truncate flex-1 mr-2">
-                <span className="font-medium">{l.label || l.slug}</span>
+                <span className="font-medium">{String(l.label || l.slug || '')}</span>
                 <span className="text-xs text-muted-foreground ml-1">({l.clicks} clicks)</span>
               </div>
               <button onClick={() => copyLink(l)} className="text-xs text-primary hover:underline shrink-0">
@@ -195,9 +195,9 @@ export function MediaKitPage() {
       <h3 className="font-semibold text-sm mb-3">📋 Your Media Kit</h3>
       <div className="space-y-3">
         <div className="p-3 bg-muted/30 rounded">
-          <p className="font-medium">{kit.name}</p>
-          {kit.badge && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{kit.badge}</span>}
-          <p className="text-sm text-muted-foreground mt-1">{kit.bio || 'Official PassivePost Partner'}</p>
+          <p className="font-medium">{String(kit.name ?? '')}</p>
+          {kit.badge && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{String(kit.badge)}</span>}
+          <p className="text-sm text-muted-foreground mt-1">{String(kit.bio || 'Official PassivePost Partner')}</p>
         </div>
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="p-2 bg-muted/20 rounded">

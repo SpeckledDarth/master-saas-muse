@@ -118,19 +118,19 @@ export function WeeklyChallengesPanel() {
           {challenges.map(ch => (
             <div key={ch.id} className="p-3 rounded-md border" data-testid={`challenge-${ch.id}`}>
               <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-sm">{ch.name}</span>
+                <span className="font-medium text-sm">{String(ch.name ?? '')}</span>
                 <div className="flex items-center gap-2">
                   {ch.badge_reward && (
                     <span className="text-[9px] px-1.5 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded" data-testid={`challenge-badge-${ch.id}`}>
-                      🏆 {ch.badge_reward}
+                      🏆 {String(ch.badge_reward ?? '')}
                     </span>
                   )}
                   {ch.days_remaining > 0 && (
-                    <span className="text-[10px] text-muted-foreground" data-testid={`challenge-time-${ch.id}`}>{ch.time_remaining}</span>
+                    <span className="text-[10px] text-muted-foreground" data-testid={`challenge-time-${ch.id}`}>{String(ch.time_remaining ?? '')}</span>
                   )}
                 </div>
               </div>
-              {ch.description && <p className="text-xs text-muted-foreground mb-2">{ch.description}</p>}
+              {ch.description && <p className="text-xs text-muted-foreground mb-2">{String(ch.description)}</p>}
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <div className="h-2 bg-muted rounded-full overflow-hidden" role="progressbar" aria-valuenow={Math.min(100, ch.progress_pct)} aria-valuemin={0} aria-valuemax={100} aria-label={`${ch.name} progress: ${ch.progress_count} of ${ch.target_count}`}>

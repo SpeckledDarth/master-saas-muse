@@ -1,5 +1,15 @@
 'use client'
 
+const S = (v: unknown): string => {
+  if (v === null || v === undefined) return ''
+  if (typeof v === 'string') return v
+  if (typeof v === 'number' || typeof v === 'boolean') return String(v)
+  if (typeof v === 'object') {
+    try { return JSON.stringify(v) } catch { return '[object]' }
+  }
+  return String(v)
+}
+
 import { useState, useEffect, useCallback, Suspense, useRef, useMemo, Component, type ErrorInfo, type ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -377,14 +387,19 @@ class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasErr
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Affiliate Dashboard Error:', error, errorInfo)
+    console.error('Affiliate Dashboard Error:', error.message)
     this.setState({ componentStack: errorInfo.componentStack || null })
+    try {
+      console.error('[COMPONENT_STACK]', errorInfo.componentStack || 'none')
+    } catch {}
     try {
       const diagnosticData = (typeof window !== 'undefined' && (window as any).__DASHBOARD_DIAGNOSTIC__) || null
       if (diagnosticData) {
-        console.error('[DIAGNOSTIC] Dashboard state at crash:', diagnosticData)
+        console.error('[DIAGNOSTIC_JSON]', JSON.stringify(diagnosticData, null, 2))
       }
-    } catch {}
+    } catch (e) {
+      console.error('[DIAGNOSTIC_SERIALIZE_FAILED]', String(e))
+    }
   }
 
   render() {
@@ -733,6 +748,24 @@ function StandaloneAffiliateDashboard() {
     }
     checkAuth()
   }, [router])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const handler = (event: ErrorEvent) => {
+      const msg = event.error?.message || event.message || ''
+      if (msg.includes('310') || msg.includes('Objects are not valid')) {
+        console.error('[GLOBAL_ERROR_INTERCEPT] React #310 caught!')
+        console.error('[GLOBAL_ERROR_INTERCEPT] Error:', msg)
+        console.error('[GLOBAL_ERROR_INTERCEPT] Stack:', event.error?.stack || 'no stack')
+        const urlMatch = msg.match(/https:\/\/react\.dev\/errors\/\d+\?args\[\]=(.+?)(?:&|\s|$)/)
+        if (urlMatch) {
+          try { console.error('[GLOBAL_ERROR_INTERCEPT] Decoded arg:', decodeURIComponent(urlMatch[1])) } catch {}
+        }
+      }
+    }
+    window.addEventListener('error', handler)
+    return () => window.removeEventListener('error', handler)
+  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -2079,7 +2112,7 @@ function StandaloneAffiliateDashboard() {
                   return (
                     <div key={ms.id} className={`p-3 rounded-md border ${achieved ? 'border-green-500/30 bg-green-50/30 dark:bg-green-950/20' : ''}`} data-testid={`milestone-progress-${ms.id}`}>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium">{ms.name}</span>
+                        <span className="text-sm font-medium">{S(ms.name)}</span>
                         <span className="text-sm font-medium text-green-600 dark:text-green-400">
                           ${(ms.bonus_amount_cents / 100).toFixed(2)}
                         </span>
@@ -2125,16 +2158,16 @@ function StandaloneAffiliateDashboard() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-sm">{contest.name}</span>
+                            <span className="font-medium text-sm">{S(contest.name)}</span>
                             <Badge variant={isActive ? 'default' : 'outline'} className="text-xs">
                               {isActive ? 'Active' : 'Upcoming'}
                             </Badge>
                           </div>
-                          {contest.description && <p className="text-xs text-muted-foreground">{contest.description}</p>}
+                          {contest.description && <p className="text-xs text-muted-foreground">{S(contest.description)}</p>}
                           <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                            <span>Metric: {contest.metric}</span>
+                            <span>Metric: {S(contest.metric)}</span>
                             <span>Prize: ${((contest.prize_amount_cents || 0) / 100).toFixed(2)}</span>
-                            {contest.prize_description && <span>{contest.prize_description}</span>}
+                            {contest.prize_description && <span>{S(contest.prize_description)}</span>}
                           </div>
                         </div>
                         {daysLeft !== null && (
@@ -2248,7 +2281,7 @@ function StandaloneAffiliateDashboard() {
                         <span className={`w-6 text-center text-xs font-bold ${entry.rank <= 3 ? 'text-yellow-600 dark:text-yellow-400' : 'text-muted-foreground'}`}>
                           #{entry.rank}
                         </span>
-                        <span>{entry.displayName} {entry.isYou && <Badge variant="outline" className="text-[10px] ml-1">You</Badge>}</span>
+                        <span>{S(entry.displayName)} {entry.isYou && <Badge variant="outline" className="text-[10px] ml-1">You</Badge>}</span>
                       </div>
                       <span className="font-medium">
                         {leaderboardMetric === 'earnings' ? `$${(entry.metricValue / 100).toFixed(2)}` : entry.metricValue}
@@ -2297,7 +2330,7 @@ function StandaloneAffiliateDashboard() {
                 return (
                   <div key={step.stage} data-testid={`funnel-stage-${step.stage.toLowerCase()}`}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium">{step.stage}</span>
+                      <span className="text-sm font-medium">{S(step.stage)}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold">{step.count}</span>
                         {i > 0 && (
@@ -2376,12 +2409,12 @@ function StandaloneAffiliateDashboard() {
                     data-testid={`coach-tip-${i}`}
                   >
                     <div className="flex items-start justify-between gap-2 mb-1">
-                      <span className="text-sm font-medium">{tip.title}</span>
+                      <span className="text-sm font-medium">{S(tip.title)}</span>
                       <Badge variant="outline" className="text-[10px] shrink-0">
-                        {priorityLabels[tip.priority]}
+                        {S(priorityLabels[tip.priority])}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground">{tip.description}</p>
+                    <p className="text-xs text-muted-foreground">{S(tip.description)}</p>
                   </div>
                 )
               })}
@@ -2492,7 +2525,7 @@ function StandaloneAffiliateDashboard() {
                     {youtubeAnalytics.videos.slice(0, 5).map((video: any) => (
                       <div key={video.id} className="flex items-center justify-between gap-3 p-2 rounded-md border" data-testid={`video-${video.id}`}>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{video.title}</p>
+                          <p className="text-sm font-medium truncate">{S(video.title)}</p>
                           <p className="text-[10px] text-muted-foreground">
                             {new Date(video.publishedAt).toLocaleDateString()}
                           </p>
@@ -3177,7 +3210,7 @@ function StandaloneAffiliateDashboard() {
                       <div>
                         <p className="text-sm">Referral #{r.referral_id?.slice(0, 8)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {r.check_in_type} · {new Date(r.created_at).toLocaleDateString()}
+                          {S(r.check_in_type)} · {new Date(r.created_at).toLocaleDateString()}
                         </p>
                       </div>
                       <Badge
@@ -3188,7 +3221,7 @@ function StandaloneAffiliateDashboard() {
                         {r.status === 'approved' && <CheckCircle className="h-3 w-3 mr-1" />}
                         {r.status === 'denied' && <AlertTriangle className="h-3 w-3 mr-1" />}
                         {r.status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
-                        {r.status}
+                        {S(r.status)}
                       </Badge>
                     </div>
                   ))}
@@ -3813,7 +3846,7 @@ function StandaloneAffiliateDashboard() {
                                 variant={ref.status === 'converted' ? 'default' : ref.status === 'churned' ? 'destructive' : 'outline'}
                                 className="text-[10px] capitalize"
                               >
-                                {ref.status}
+                                {S(ref.status)}
                               </Badge>
                               <span className="text-[10px] text-muted-foreground">{ref.commissionCount} commissions</span>
                             </div>
@@ -4190,9 +4223,9 @@ function StandaloneAffiliateDashboard() {
                       <div className="flex items-start gap-3">
                         <Icon className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
                         <div>
-                          <p className="font-medium text-sm">{asset.title}</p>
+                          <p className="font-medium text-sm">{S(asset.title)}</p>
                           {asset.description && (
-                            <p className="text-xs text-muted-foreground mt-0.5">{asset.description}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{S(asset.description)}</p>
                           )}
                           <div className="flex items-center gap-1 mt-1 flex-wrap">
                             <Badge variant="outline" className="text-[10px] capitalize">
@@ -4501,8 +4534,8 @@ function StandaloneAffiliateDashboard() {
               {linkPresets.map(p => (
                 <div key={p.id} className="flex items-center justify-between px-3 py-2 rounded-md bg-muted/40 text-sm" data-testid={`preset-${p.id}`}>
                   <div className="flex-1 min-w-0">
-                    <span className="font-medium">{p.name}</span>
-                    <span className="text-xs text-muted-foreground ml-2">{p.page_path}{p.source_tag ? ` (${p.source_tag})` : ''}</span>
+                    <span className="font-medium">{S(p.name)}</span>
+                    <span className="text-xs text-muted-foreground ml-2">{S(p.page_path)}{p.source_tag ? ` (${S(p.source_tag)})` : ''}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Button variant="ghost" size="sm" className="h-7 px-2" onClick={() => loadLinkPreset(p)} data-testid={`button-load-preset-${p.id}`}>
@@ -5896,8 +5929,8 @@ function StandaloneAffiliateDashboard() {
                 <div className="flex items-start gap-3">
                   <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.read ? 'bg-primary' : 'bg-muted'}`} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{n.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>
+                    <p className="text-sm font-medium">{S(n.title)}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{S(n.message)}</p>
                     <p className="text-[10px] text-muted-foreground mt-1">{new Date(n.created_at).toLocaleDateString()}</p>
                   </div>
                 </div>
@@ -6011,9 +6044,9 @@ function StandaloneAffiliateDashboard() {
                       <div className="flex items-start justify-between gap-3 flex-wrap">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-medium text-sm">{contract.title}</span>
+                            <span className="font-medium text-sm">{S(contract.title)}</span>
                             <Badge variant={isActive ? 'default' : isDraft ? 'secondary' : 'outline'} className="text-xs capitalize">
-                              {contract.status}
+                              {S(contract.status)}
                             </Badge>
                             {idx === 0 && contracts.length > 1 && (
                               <Badge variant="outline" className="text-xs">Latest</Badge>
