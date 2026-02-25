@@ -38,7 +38,7 @@ export default function PricingPage() {
 
           {(settings.pricing?.showFreePlan ?? true) && (
             <>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="freePlanName">Plan Name</Label>
                   <Input

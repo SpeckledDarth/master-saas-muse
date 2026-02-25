@@ -575,7 +575,7 @@ export default function UsersPage() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                   <div>
                     <Label className="text-muted-foreground">User ID</Label>
                     <p className="font-mono text-xs break-all" data-testid="text-user-id">{userDetail.user.id}</p>
@@ -611,7 +611,7 @@ export default function UsersPage() {
                     <CreditCard className="h-4 w-4" />
                     Subscription
                   </h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
                       <Label className="text-muted-foreground">Plan</Label>
                       <div className="mt-1">

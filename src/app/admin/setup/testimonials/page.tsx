@@ -185,7 +185,7 @@ export default function TestimonialsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-6 text-center">
             <div className="text-3xl font-bold" data-testid="text-total-count">{testimonials.length}</div>
@@ -213,7 +213,7 @@ export default function TestimonialsPage() {
             <CardDescription>Fill in the customer details and their testimonial</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Name *</Label>
                 <Input
@@ -233,7 +233,7 @@ export default function TestimonialsPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Role / Title</Label>
                 <Input
@@ -269,7 +269,7 @@ export default function TestimonialsPage() {
                 data-testid="input-testimonial-quote"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Avatar URL</Label>
                 <Input

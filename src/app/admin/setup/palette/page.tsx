@@ -251,7 +251,7 @@ function CategoriesPreview({ shades, isDark }: { shades: Record<string, string>;
         <CardTitle className="text-[30px] leading-tight">Categories</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {categories.map(c => (
             <div key={c.name} className="flex flex-col items-center gap-2 cursor-pointer hover-elevate active-elevate-2 rounded-lg p-1">
               <div
@@ -474,7 +474,7 @@ function PricingPreview() {
         <CardTitle className="text-[30px] leading-tight">Pricing plans</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {plans.map(plan => (
             <div key={plan.name} className={cn('rounded-xl border-2 p-5 space-y-4 cursor-pointer hover-elevate active-elevate-2', plan.featured ? 'border-primary-600 dark:border-primary-400' : 'border-border')}>
               <div>
@@ -556,7 +556,7 @@ function ContinueWatchingPreview() {
         <CardTitle className="text-[30px] leading-tight">Continue Watching</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {courses.map(c => (
             <div key={c.title} className="space-y-2 cursor-pointer hover-elevate active-elevate-2 rounded-xl p-1">
               <div className="group relative aspect-[16/10] rounded-xl overflow-hidden">
@@ -580,7 +580,7 @@ function EmailStatsPreview() {
   return (
     <Card>
       <CardContent className="pt-6">
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="space-y-1">
             <p className="text-[15px] text-muted-foreground">Total Subscribers</p>
             <div className="flex items-baseline gap-2">
@@ -619,7 +619,7 @@ function FeatureCardsPreview({ shades, isDark }: { shades: Record<string, string
   return (
     <Card>
       <CardContent className="pt-6">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map(f => (
             <div key={f.title} className="rounded-xl border p-5 space-y-3 cursor-pointer hover-elevate active-elevate-2">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: shades[bgShades[f.bgIdx]] }}>
@@ -706,7 +706,7 @@ function CalendarPreview() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-7 gap-1.5 text-center">
+        <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center">
           {days.map(d => (
             <span key={d} className="text-[15px] font-medium py-1.5 text-muted-foreground">{d}</span>
           ))}
@@ -1042,7 +1042,7 @@ export default function PalettePage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <ButtonShowcase />
             <CalendarPreview />
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <BookCardPreview shades={shades} />
               <StatsDonutPreview shades={shades} />
             </div>

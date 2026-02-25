@@ -751,7 +751,7 @@ function AffiliateCRMDrawer({
                   <CardTitle className="text-sm">Earnings Summary</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="text-center p-2 rounded bg-muted/50">
                       <p className="text-lg font-bold tabular-nums" data-testid="text-crm-total-earnings">${((member.totalEarnings || 0) / 100).toFixed(2)}</p>
                       <p className="text-xs text-muted-foreground">Total</p>
@@ -765,7 +765,7 @@ function AffiliateCRMDrawer({
                       <p className="text-xs text-muted-foreground">Paid</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3 mt-3 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 text-sm">
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-muted-foreground" />
                       <span data-testid="text-crm-referrals">{member.referrals} referrals</span>
@@ -3577,7 +3577,7 @@ export default function AffiliateSettingsPage() {
                   <Label>Description</Label>
                   <Input value={contestForm.description} onChange={e => setContestForm(f => ({ ...f, description: e.target.value }))} data-testid="input-contest-description" />
                 </div>
-                <div className="grid gap-3 grid-cols-2">
+                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
                   <div>
                     <Label>Metric</Label>
                     <Select value={contestForm.metric} onValueChange={v => setContestForm(f => ({ ...f, metric: v }))}>
@@ -3598,7 +3598,7 @@ export default function AffiliateSettingsPage() {
                   <Label>Prize Description</Label>
                   <Input value={contestForm.prize_description} onChange={e => setContestForm(f => ({ ...f, prize_description: e.target.value }))} placeholder="e.g. Cash bonus + featured spotlight" data-testid="input-contest-prize-desc" />
                 </div>
-                <div className="grid gap-3 grid-cols-2">
+                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
                   <div>
                     <Label>Start Date</Label>
                     <Input type="date" value={contestForm.start_date} onChange={e => setContestForm(f => ({ ...f, start_date: e.target.value }))} data-testid="input-contest-start" />
@@ -3704,7 +3704,7 @@ export default function AffiliateSettingsPage() {
               </DialogHeader>
               {processAllSummary ? (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Card>
                       <CardContent className="pt-4 pb-3">
                         <div className="flex items-center gap-2">

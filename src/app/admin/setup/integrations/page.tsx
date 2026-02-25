@@ -438,7 +438,7 @@ export default function IntegrationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card data-testid="card-total-summary">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between gap-2 flex-wrap">

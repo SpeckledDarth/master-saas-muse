@@ -399,7 +399,7 @@ export default function ProductsPage() {
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="product-slug">Slug</Label>
                 <Input
@@ -435,7 +435,7 @@ export default function ProductsPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="product-stripe-id">Stripe Product ID</Label>
                 <Input
@@ -505,7 +505,7 @@ export default function ProductsPage() {
                       </Button>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       <div className="space-y-1">
                         <Label className="text-xs">Tier ID</Label>
                         <Input

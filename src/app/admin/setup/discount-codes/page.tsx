@@ -332,7 +332,7 @@ export default function DiscountCodesPage() {
                     data-testid="input-code-description"
                   />
                 </div>
-                <div className="grid gap-4 grid-cols-2">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                   <div>
                     <Label>Discount Type</Label>
                     <Select value={form.discount_type} onValueChange={v => setForm(f => ({ ...f, discount_type: v }))}>
@@ -357,7 +357,7 @@ export default function DiscountCodesPage() {
                     />
                   </div>
                 </div>
-                <div className="grid gap-4 grid-cols-2">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                   <div>
                     <Label>Duration</Label>
                     <Select value={form.duration} onValueChange={v => setForm(f => ({ ...f, duration: v }))}>
@@ -385,7 +385,7 @@ export default function DiscountCodesPage() {
                     </div>
                   )}
                 </div>
-                <div className="grid gap-4 grid-cols-2">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                   <div>
                     <Label>Max Total Uses</Label>
                     <Input

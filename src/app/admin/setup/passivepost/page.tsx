@@ -535,7 +535,7 @@ export default function PassivePostPage() {
                         )}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label>Display Name</Label>
                           <Input
@@ -921,7 +921,7 @@ export default function PassivePostPage() {
                 {(socialModule.nicheGuidance || defaultSocialModuleSettings.nicheGuidance || []).map((entry: NicheGuidanceEntry, index: number) => (
                   <div key={entry.key + index} className="border rounded-md p-3 space-y-2" data-testid={`niche-entry-${entry.key}`}>
                     <div className="flex items-center justify-between gap-2">
-                      <div className="grid grid-cols-2 gap-2 flex-1">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1">
                         <Input
                           value={entry.label}
                           onChange={(e) => {
