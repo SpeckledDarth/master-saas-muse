@@ -754,7 +754,7 @@ export default function BillingPage() {
             </div>
           ) : selectedInvoice ? (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-muted-foreground">Date</p>
                   <p className="font-medium" data-testid="text-detail-date">{formatDate(selectedInvoice.created_at)}</p>

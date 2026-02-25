@@ -502,7 +502,7 @@ export default function EmailTemplatesPage() {
                   <CardTitle className="text-sm">All Variables</CardTitle>
                 </CardHeader>
                 <CardContent className="py-2">
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
                     {ALL_VARIABLES.map(v => (
                       <div 
                         key={v.name} 

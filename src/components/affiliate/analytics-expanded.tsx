@@ -116,7 +116,7 @@ export function MoMScorecard({ data }: { data: Record<string, { current: number;
   return (
     <div data-testid="mom-scorecard" className="rounded-lg border bg-card p-4">
       <h3 className="font-semibold text-sm mb-3">📈 Period Scorecard</h3>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {metrics.map(m => {
           const d = data[m.key];
           if (!d) return null;
