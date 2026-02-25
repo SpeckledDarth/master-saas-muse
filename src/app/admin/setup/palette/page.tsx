@@ -251,7 +251,7 @@ function CategoriesPreview({ shades, isDark }: { shades: Record<string, string>;
         <CardTitle className="text-[30px] leading-tight">Categories</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {categories.map(c => (
             <div key={c.name} className="flex flex-col items-center gap-2 cursor-pointer hover-elevate active-elevate-2 rounded-lg p-1">
               <div

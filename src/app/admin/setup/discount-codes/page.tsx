@@ -228,7 +228,7 @@ export default function DiscountCodesPage() {
         <p className="text-sm text-muted-foreground">Create and manage promotional discount codes for your checkout.</p>
       </div>
 
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card data-testid="stat-total-codes">
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2">

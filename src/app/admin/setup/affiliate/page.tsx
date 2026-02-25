@@ -1958,7 +1958,7 @@ export default function AffiliateSettingsPage() {
         <p className="text-sm text-muted-foreground">Manage your referral program, commission rates, tiers, and marketing assets.</p>
       </div>
 
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card data-testid="stat-total-affiliates">
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2">
@@ -2063,7 +2063,7 @@ export default function AffiliateSettingsPage() {
         <TabsContent value="health" className="space-y-4 mt-4">
           {healthData ? (
             <>
-              <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 <Card data-testid="health-active-affiliates">
                   <CardContent className="pt-4 pb-3">
                     <div className="flex items-center gap-2">
@@ -2196,7 +2196,7 @@ export default function AffiliateSettingsPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-4">
+                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4">
                       <div className="text-center p-3 rounded border" data-testid="attr-total-revenue">
                         <p className="text-xs text-muted-foreground mb-1">Total Revenue</p>
                         <p className="text-xl font-bold">${(revenueAttribution.totalRevenue / 100).toFixed(2)}</p>
