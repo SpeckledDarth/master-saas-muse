@@ -1838,7 +1838,8 @@ function StandaloneAffiliateDashboard() {
         })
         return `${label}={${entries.join(', ')}}`
       }
-      console.log('[RENDER_PHASE_DIAG]', snapKeys(data.stats, 'stats'), snapKeys(data.tier, 'tier'), snapKeys(data.tier?.current, 'tier.current'), snapKeys(data.tier?.next, 'tier.next'), snapKeys(data.terms, 'terms'), 'secondTierComms:', data.secondTierCommissions?.length ?? 'none', 'tierCelebration:', data.tierPromotionCelebration ? JSON.stringify(data.tierPromotionCelebration).slice(0,100) : 'null')
+      console.log('[RENDER_PHASE_DIAG] data:', snapKeys(data.stats, 'stats'), snapKeys(data.tier, 'tier'), snapKeys(data.tier?.current, 'tier.current'), snapKeys(data.tier?.next, 'tier.next'), snapKeys(data.terms, 'terms'), 'secondTierComms:', data.secondTierCommissions?.length ?? 'none', 'tierCelebration:', data.tierPromotionCelebration ? JSON.stringify(data.tierPromotionCelebration).slice(0,100) : 'null')
+      console.log('[RENDER_PHASE_DIAG] other state:', 'earnings:', earnings ? snapKeys(earnings, 'earnings') : 'null', 'milestoneData:', milestoneData ? `{milestones:array[${milestoneData.milestones?.length}],currentReferrals:${milestoneData.currentReferrals}}` : 'null', 'forecast:', forecast ? snapKeys(forecast, 'forecast') : 'null', 'contests:', `array[${contests.length}]`, 'leaderboard:', `array[${leaderboard.length}]`, 'funnel:', `array[${funnel.length}]`, 'coachTips:', `array[${coachTips.length}]`, 'notifications:', `array[${notifications.length}]`)
     } catch (diagErr) {
       console.error('[RENDER_PHASE_DIAG_ERROR]', String(diagErr))
     }
@@ -7219,23 +7220,42 @@ function StandaloneAffiliateDashboard() {
     )
   }
 
+  const LazySection = ({ renderFn }: { renderFn: () => React.ReactNode }) => {
+    try {
+      return <>{renderFn()}</>
+    } catch (e: any) {
+      console.error('[LAZY_SECTION_CRASH]', e?.message, e?.stack)
+      return (
+        <Card className="border-destructive/30">
+          <CardContent className="pt-4 pb-3 text-center">
+            <AlertTriangle className="h-6 w-6 mx-auto mb-2 text-destructive" />
+            <p className="text-sm font-medium text-destructive mb-1">Section render error</p>
+            <p className="text-xs text-muted-foreground">{String(e?.message || e)}</p>
+          </CardContent>
+        </Card>
+      )
+    }
+  }
+
   const renderSection = () => {
-    const wrap = (name: string, content: React.ReactNode) => (
-      <SectionErrorBoundary sectionName={name} key={name}>{content}</SectionErrorBoundary>
+    const wrap = (name: string, renderFn: () => React.ReactNode) => (
+      <SectionErrorBoundary sectionName={name} key={name}>
+        <LazySection renderFn={renderFn} />
+      </SectionErrorBoundary>
     )
     switch (section) {
-      case 'overview': return wrap('overview', renderOverview())
-      case 'analytics': return wrap('analytics', renderAnalytics())
-      case 'referrals': return wrap('referrals', renderReferrals())
-      case 'earnings': return wrap('earnings', renderEarnings())
-      case 'payouts': return wrap('payouts', renderPayouts())
-      case 'assets': return wrap('assets', renderAssets())
-      case 'tools': return wrap('tools', renderTools())
-      case 'announcements': return wrap('announcements', renderAnnouncements())
-      case 'messages': return wrap('messages', renderMessages())
-      case 'account': return wrap('account', renderAccount())
-      case 'support': return wrap('support', renderSupport())
-      default: return wrap('overview', renderOverview())
+      case 'overview': return wrap('overview', renderOverview)
+      case 'analytics': return wrap('analytics', renderAnalytics)
+      case 'referrals': return wrap('referrals', renderReferrals)
+      case 'earnings': return wrap('earnings', renderEarnings)
+      case 'payouts': return wrap('payouts', renderPayouts)
+      case 'assets': return wrap('assets', renderAssets)
+      case 'tools': return wrap('tools', renderTools)
+      case 'announcements': return wrap('announcements', renderAnnouncements)
+      case 'messages': return wrap('messages', renderMessages)
+      case 'account': return wrap('account', renderAccount)
+      case 'support': return wrap('support', renderSupport)
+      default: return wrap('overview', renderOverview)
     }
   }
 
