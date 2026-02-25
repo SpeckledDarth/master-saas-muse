@@ -130,6 +130,13 @@ export default function PricingPage() {
 
   return (
     <div className="flex flex-col">
+      <title>{pricingPage?.headline || 'Simple, Transparent Pricing'}</title>
+      <meta name="description" content={pricingPage?.subheadline || 'Choose the plan that works best for you. Simple, transparent pricing with no hidden fees.'} />
+      <meta property="og:title" content={pricingPage?.headline || 'Simple, Transparent Pricing'} />
+      <meta property="og:description" content={pricingPage?.subheadline || 'Choose the plan that works best for you. Simple, transparent pricing with no hidden fees.'} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/pricing" />
+      <link rel="canonical" href="/pricing" />
       <PageHero
         headline={pricingPage?.headline || 'Simple, Transparent Pricing'}
         subheadline={pricingPage?.subheadline || 'Choose the plan that works best for you'}

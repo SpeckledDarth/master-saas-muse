@@ -36,6 +36,13 @@ export default function SecurityPolicyPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <title>{`Security Policy | ${branding?.appName || 'Our Service'}`}</title>
+      <meta name="description" content={`Security Policy for ${branding?.appName || 'Our Service'}. Learn about our security measures and how we protect your data.`} />
+      <meta property="og:title" content={`Security Policy | ${branding?.appName || 'Our Service'}`} />
+      <meta property="og:description" content={`Security Policy for ${branding?.appName || 'Our Service'}. Learn about our security measures and how we protect your data.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/security-policy" />
+      <link rel="canonical" href="/security-policy" />
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2" data-testid="text-security-policy-title">

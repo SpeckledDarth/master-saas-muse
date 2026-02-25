@@ -24,6 +24,13 @@ export default function PrivacyPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <title>{`Privacy Policy | ${branding?.appName || 'Our Service'}`}</title>
+      <meta name="description" content={`Privacy Policy for ${branding?.appName || 'Our Service'}. Learn how we collect, use, and protect your personal data.`} />
+      <meta property="og:title" content={`Privacy Policy | ${branding?.appName || 'Our Service'}`} />
+      <meta property="og:description" content={`Privacy Policy for ${branding?.appName || 'Our Service'}. Learn how we collect, use, and protect your personal data.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/privacy" />
+      <link rel="canonical" href="/privacy" />
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2" data-testid="text-privacy-title">

@@ -45,19 +45,21 @@ export function KnowledgeBasePanel() {
   const [articles, setArticles] = useState<KBArticle[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const loadArticles = useCallback(() => {
     setLoading(true);
+    setError(null);
     let url = '/api/affiliate/knowledge-base?';
     if (category !== 'all') url += `category=${category}&`;
     if (search.trim()) url += `search=${encodeURIComponent(search)}&`;
     fetch(url)
       .then(r => { if (!r.ok) throw new Error('Failed'); return r.json(); })
       .then(d => { setArticles(d.articles || []); if (d.categories) setCategories(d.categories); })
-      .catch(() => setArticles([]))
+      .catch(() => setError('Failed to load help articles'))
       .finally(() => setLoading(false));
   }, [category, search]);
 
@@ -78,6 +80,7 @@ export function KnowledgeBasePanel() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search help articles..."
+            aria-label="Search help articles"
             className="flex-1 min-w-[180px] text-xs border rounded px-3 py-1.5 bg-background"
             data-testid="input-kb-search"
           />
@@ -85,6 +88,7 @@ export function KnowledgeBasePanel() {
             <select
               value={category}
               onChange={e => setCategory(e.target.value)}
+              aria-label="Filter by category"
               className="text-xs border rounded px-2 py-1.5 bg-background"
               data-testid="select-kb-category"
             >
@@ -99,16 +103,23 @@ export function KnowledgeBasePanel() {
             <div className="h-10 bg-muted rounded" />
             <div className="h-10 bg-muted rounded" />
           </div>
+        ) : error ? (
+          <div className="text-center py-6">
+            <p className="text-sm text-muted-foreground" data-testid="text-kb-error">{error}</p>
+            <button onClick={loadArticles} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-kb">Retry</button>
+          </div>
         ) : articles.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-kb-articles">
             {search || category !== 'all' ? 'No articles match your search.' : 'No help articles available yet.'}
           </p>
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-1" role="list" aria-label="Help articles">
             {articles.map(article => (
-              <div key={article.id} data-testid={`kb-article-${article.slug}`}>
+              <div key={article.id} role="listitem" data-testid={`kb-article-${article.slug}`}>
                 <button
                   onClick={() => toggleArticle(article.slug)}
+                  aria-expanded={expanded === article.slug}
+                  aria-label={`${expanded === article.slug ? 'Collapse' : 'Expand'} article: ${article.title}`}
                   className="w-full text-left p-3 rounded-md border hover:bg-muted/30 transition-colors flex items-center justify-between"
                   data-testid={`button-toggle-kb-${article.slug}`}
                 >
@@ -136,18 +147,20 @@ export function SwipeFileLibrary() {
   const [files, setFiles] = useState<SwipeFile[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const loadFiles = useCallback(() => {
     setLoading(true);
+    setError(null);
     let url = '/api/affiliate/swipe-files';
     if (selectedCategory !== 'all') url += `?category=${selectedCategory}`;
     fetch(url)
       .then(r => { if (!r.ok) throw new Error('Failed'); return r.json(); })
       .then(d => { setFiles(d.swipeFiles || []); if (d.categories) setCategories(d.categories); })
-      .catch(() => setFiles([]))
+      .catch(() => setError('Failed to load swipe files'))
       .finally(() => setLoading(false));
   }, [selectedCategory]);
 
@@ -187,6 +200,8 @@ export function SwipeFileLibrary() {
           <div className="flex gap-1 mb-3 flex-wrap">
             <button
               onClick={() => setSelectedCategory('all')}
+              aria-label="Show all swipe file categories"
+              aria-pressed={selectedCategory === 'all'}
               className={`text-[10px] px-2 py-1 rounded-full border transition-colors ${selectedCategory === 'all' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
               data-testid="button-swipe-category-all"
             >All</button>
@@ -194,6 +209,8 @@ export function SwipeFileLibrary() {
               <button
                 key={c}
                 onClick={() => setSelectedCategory(c)}
+                aria-label={`Filter swipe files by ${c.replace(/-/g, ' ')}`}
+                aria-pressed={selectedCategory === c}
                 className={`text-[10px] px-2 py-1 rounded-full border transition-colors capitalize ${selectedCategory === c ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
                 data-testid={`button-swipe-category-${c}`}
               >{c.replace(/-/g, ' ')}</button>
@@ -206,12 +223,17 @@ export function SwipeFileLibrary() {
             <div className="h-16 bg-muted rounded" />
             <div className="h-16 bg-muted rounded" />
           </div>
+        ) : error ? (
+          <div className="text-center py-6">
+            <p className="text-sm text-muted-foreground" data-testid="text-swipe-error">{error}</p>
+            <button onClick={loadFiles} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-swipe-files">Retry</button>
+          </div>
         ) : files.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-swipe-files">No swipe files available.</p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2" role="list" aria-label="Email swipe files">
             {files.map(file => (
-              <div key={file.id} className="rounded-md border overflow-hidden" data-testid={`swipe-file-${file.id}`}>
+              <div key={file.id} role="listitem" className="rounded-md border overflow-hidden" data-testid={`swipe-file-${file.id}`}>
                 <div className="flex items-center justify-between p-3">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className={`text-[10px] px-1.5 py-0.5 rounded capitalize shrink-0 ${CATEGORY_COLORS[file.category] || 'bg-muted text-muted-foreground'}`}>
@@ -225,11 +247,14 @@ export function SwipeFileLibrary() {
                   <div className="flex items-center gap-1 shrink-0 ml-2">
                     <button
                       onClick={() => setExpandedId(expandedId === file.id ? null : file.id)}
+                      aria-expanded={expandedId === file.id}
+                      aria-label={`${expandedId === file.id ? 'Hide' : 'Preview'} swipe file: ${file.title}`}
                       className="text-[10px] px-2 py-1 border rounded hover:bg-muted transition-colors"
                       data-testid={`button-preview-swipe-${file.id}`}
                     >{expandedId === file.id ? 'Hide' : 'Preview'}</button>
                     <button
                       onClick={() => handleCopy(file)}
+                      aria-label={`Copy swipe file "${file.title}" to clipboard`}
                       className="text-[10px] px-2 py-1 bg-primary text-primary-foreground rounded hover:opacity-90 transition-opacity"
                       data-testid={`button-copy-swipe-${file.id}`}
                     >{copiedId === file.id ? 'Copied!' : 'Copy'}</button>
@@ -259,15 +284,19 @@ export function SwipeFileLibrary() {
 export function PromotionalCalendarPanel() {
   const [events, setEvents] = useState<PromoEvent[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadEvents = () => {
     setLoading(true);
+    setError(null);
     fetch('/api/affiliate/promotional-calendar?include_contests=true')
       .then(r => { if (!r.ok) throw new Error('Failed'); return r.json(); })
       .then(d => setEvents(d.events || []))
-      .catch(() => setEvents([]))
+      .catch(() => setError('Failed to load promotional calendar'))
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { loadEvents(); }, []);
 
   const TYPE_COLORS: Record<string, string> = {
     seasonal: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
@@ -293,7 +322,18 @@ export function PromotionalCalendarPanel() {
     </div>
   );
 
-  if (events.length === 0) return null;
+  if (error) return (
+    <div data-testid="promo-calendar-error" className="rounded-lg border bg-card p-4 text-center">
+      <p className="text-sm text-muted-foreground">{error}</p>
+      <button onClick={loadEvents} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-promo-calendar">Retry</button>
+    </div>
+  );
+
+  if (events.length === 0) return (
+    <div data-testid="promo-calendar-empty" className="rounded-lg border bg-card p-4 text-center">
+      <p className="text-sm text-muted-foreground py-4">No upcoming promotions scheduled.</p>
+    </div>
+  );
 
   const activeEvents = events.filter(e => e.status === 'active');
   const upcomingEvents = events.filter(e => e.status === 'upcoming');

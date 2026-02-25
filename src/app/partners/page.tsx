@@ -61,6 +61,11 @@ export default function PartnersPage() {
     <div className="min-h-screen bg-background">
       <title>{`Our Partners | ${appName}`}</title>
       <meta name="description" content={`Meet the top affiliate partners of ${appName}. Join our partner program and start earning.`} />
+      <meta property="og:title" content={`Our Partners | ${appName}`} />
+      <meta property="og:description" content={`Meet the top affiliate partners of ${appName}. Join our partner program and start earning.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/partners" />
+      <link rel="canonical" href="/partners" />
 
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="text-center mb-8">
@@ -77,13 +82,15 @@ export default function PartnersPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search partners..."
-            className="min-w-[200px] text-sm border rounded-lg px-4 py-2 bg-background"
+            aria-label="Search partners"
+            className="min-w-0 w-full sm:min-w-[200px] text-sm border rounded-lg px-4 py-2 bg-background"
             data-testid="input-directory-search"
           />
           {tiers.length > 0 && (
             <select
               value={tierFilter}
               onChange={e => setTierFilter(e.target.value)}
+              aria-label="Filter by tier"
               className="text-sm border rounded-lg px-3 py-2 bg-background"
               data-testid="select-directory-tier"
             >
@@ -111,9 +118,9 @@ export default function PartnersPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label="Partner directory">
             {affiliates.map(aff => (
-              <div key={aff.id} className="rounded-lg border bg-card p-5 hover:shadow-md transition-shadow" data-testid={`partner-card-${aff.id}`}>
+              <div key={aff.id} role="listitem" className="rounded-lg border bg-card p-5 hover:shadow-md transition-shadow" data-testid={`partner-card-${aff.id}`}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
@@ -140,10 +147,10 @@ export default function PartnersPage() {
                   <span className="text-muted-foreground">{aff.referral_range} referrals</span>
                   <div className="flex items-center gap-2">
                     {aff.website && (
-                      <a href={aff.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" data-testid={`partner-website-${aff.id}`}>Website</a>
+                      <a href={aff.website} target="_blank" rel="noopener noreferrer" aria-label={`Visit ${aff.display_name}'s website`} className="text-primary hover:underline" data-testid={`partner-website-${aff.id}`}>Website</a>
                     )}
                     {aff.landing_page_slug && (
-                      <Link href={`/partner/${aff.landing_page_slug}`} className="text-primary hover:underline" data-testid={`partner-page-${aff.id}`}>Partner Page</Link>
+                      <Link href={`/partner/${aff.landing_page_slug}`} aria-label={`View ${aff.display_name}'s partner page`} className="text-primary hover:underline" data-testid={`partner-page-${aff.id}`}>Partner Page</Link>
                     )}
                   </div>
                 </div>

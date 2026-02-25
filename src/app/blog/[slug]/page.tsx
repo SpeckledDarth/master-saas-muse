@@ -42,6 +42,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.title,
     description: post.excerpt || `Read ${post.title} on ${appName}`,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt || `Read ${post.title} on ${appName}`,
+      type: 'article',
+      url: `/blog/${slug}`,
+    },
+    alternates: {
+      canonical: `/blog/${slug}`,
+    },
   }
 }
 

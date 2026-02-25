@@ -493,7 +493,7 @@
 
 ## Database Migration History
 
-All migrations 001-015 have been run on Replit Postgres. Migrations 015-016 need to be run on Supabase.
+All migrations 001-016 have been run on both Replit Postgres and Supabase.
 
 | # | File | Contents |
 |---|------|----------|
@@ -513,6 +513,25 @@ All migrations 001-015 have been run on Replit Postgres. Migrations 015-016 need
 | 014 | `migrations/core/014_analytics_columns.sql` | Analytics columns (geo/device on clicks, churn fields on referrals) |
 | 015 | `migrations/core/015_session_d_tables.sql` | Session D: affiliate_asset_usage, knowledge_base_articles, promotional_calendar |
 | 016 | `migrations/core/016_session_e_tables.sql` | Session E: challenge_progress, case_studies, affiliate_profiles columns |
+
+---
+
+## System 16: Polish & Responsiveness (Session F)
+
+### What's Built
+- **Dashboard Mobile Responsive:** 14 grid layouts fixed with proper mobile breakpoints, 5 fixed-width inputs/selects made fluid
+- **Public Pages Mobile:** Partners search and affiliate join form responsive on all screen sizes
+- **SEO Meta Tags:** Complete og:title, og:description, og:type, og:url, and canonical URLs on 21 public pages
+- **Loading/Error Consistency:** 9 panels now have consistent skeleton loaders, error states with retry, and descriptive empty states
+- **Accessibility:** aria-label on all buttons, role attributes (progressbar, list, radiogroup, switch), aria-expanded on toggles, sr-only labels
+
+### Key Files Modified
+- Dashboard: `src/app/affiliate/dashboard/page.tsx`
+- Components: `src/components/affiliate/delight-features.tsx`, `src/components/affiliate/resource-center.tsx`, `src/components/affiliate/retention-tools.tsx`
+- Public pages: `src/app/partners/page.tsx`, `src/app/affiliate/join/page.tsx`
+- Marketing pages: 21 pages under `src/app/(marketing)/` and root
+
+### No New Database Tables or Migrations
 
 ---
 

@@ -149,7 +149,7 @@ export default function AffiliateJoinPage() {
 
               <div className="space-y-3">
                 <Label>How will you promote? * <span className="text-muted-foreground font-normal">(select all that apply)</span></Label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {PROMOTION_METHODS.map((method) => (
                     <label
                       key={method.value}

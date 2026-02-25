@@ -76,6 +76,13 @@ export default function AffiliateLandingPage() {
 
   return (
     <div className="min-h-screen">
+      <title>{`Affiliate Program - Earn ${commissionRate}% Recurring Commissions | ${appName}`}</title>
+      <meta name="description" content={`Join the ${appName} affiliate program and earn ${commissionRate}% recurring commissions for ${commissionDuration} months on every referral. Apply today.`} />
+      <meta property="og:title" content={`Affiliate Program | ${appName}`} />
+      <meta property="og:description" content={`Earn ${commissionRate}% recurring commissions by promoting ${appName}. No product experience needed.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/affiliate" />
+      <link rel="canonical" href="/affiliate" />
       <section className="relative py-20 md:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-primary-600/10 dark:from-primary-900/30 dark:to-primary-800/20" />
         <div className="container mx-auto px-4 md:px-8 relative z-10">

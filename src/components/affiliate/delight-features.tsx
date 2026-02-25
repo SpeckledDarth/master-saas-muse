@@ -52,16 +52,20 @@ interface AudienceInsights {
 export function WeeklyChallengesPanel() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [progressing, setProgressing] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadChallenges = () => {
     setLoading(true);
+    setError(null);
     fetch('/api/affiliate/challenges?status=active')
-      .then(r => { if (!r.ok) throw new Error('Failed'); return r.json(); })
+      .then(r => { if (!r.ok) throw new Error('Failed to load challenges'); return r.json(); })
       .then(d => setChallenges(d.challenges || []))
-      .catch(() => setChallenges([]))
+      .catch(() => setError('Failed to load challenges'))
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { loadChallenges(); }, []);
 
   const recordProgress = async (challengeId: string) => {
     setProgressing(challengeId);
@@ -90,7 +94,18 @@ export function WeeklyChallengesPanel() {
     </div>
   );
 
-  if (challenges.length === 0) return null;
+  if (error) return (
+    <div data-testid="challenges-error" className="rounded-lg border bg-card p-4 text-center">
+      <p className="text-sm text-muted-foreground">{error}</p>
+      <button onClick={loadChallenges} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-challenges">Retry</button>
+    </div>
+  );
+
+  if (challenges.length === 0) return (
+    <div data-testid="challenges-empty" className="rounded-lg border bg-card p-4 text-center">
+      <p className="text-sm text-muted-foreground py-4">No active challenges right now. Check back soon!</p>
+    </div>
+  );
 
   return (
     <div data-testid="weekly-challenges-panel" className="space-y-3">
@@ -118,7 +133,7 @@ export function WeeklyChallengesPanel() {
               {ch.description && <p className="text-xs text-muted-foreground mb-2">{ch.description}</p>}
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-2 bg-muted rounded-full overflow-hidden" role="progressbar" aria-valuenow={Math.min(100, ch.progress_pct)} aria-valuemin={0} aria-valuemax={100} aria-label={`${ch.name} progress: ${ch.progress_count} of ${ch.target_count}`}>
                     <div
                       className="h-full bg-primary rounded-full transition-all duration-500"
                       style={{ width: `${Math.min(100, ch.progress_pct)}%` }}
@@ -134,6 +149,7 @@ export function WeeklyChallengesPanel() {
                   <button
                     onClick={() => recordProgress(ch.id)}
                     disabled={progressing === ch.id}
+                    aria-label={`Record progress for ${ch.name}`}
                     className="text-[10px] px-2.5 py-1 bg-primary text-primary-foreground rounded hover:opacity-90 transition-opacity disabled:opacity-50"
                     data-testid={`button-challenge-progress-${ch.id}`}
                   >{progressing === ch.id ? '...' : '+1'}</button>
@@ -150,17 +166,21 @@ export function WeeklyChallengesPanel() {
 export function CaseStudyLibrary() {
   const [studies, setStudies] = useState<CaseStudy[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadStudies = () => {
     setLoading(true);
+    setError(null);
     fetch('/api/affiliate/case-studies')
       .then(r => { if (!r.ok) throw new Error('Failed'); return r.json(); })
       .then(d => setStudies(d.caseStudies || d.case_studies || []))
-      .catch(() => setStudies([]))
+      .catch(() => setError('Failed to load case studies'))
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { loadStudies(); }, []);
 
   const shareStudy = async (study: CaseStudy) => {
     const text = `${study.headline}\n\n${study.summary}\n\n"${study.customer_quote}" — ${study.customer_name}`;
@@ -180,7 +200,18 @@ export function CaseStudyLibrary() {
     </div>
   );
 
-  if (studies.length === 0) return null;
+  if (error) return (
+    <div data-testid="case-studies-error" className="rounded-lg border bg-card p-4 text-center">
+      <p className="text-sm text-muted-foreground">{error}</p>
+      <button onClick={loadStudies} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-case-studies">Retry</button>
+    </div>
+  );
+
+  if (studies.length === 0) return (
+    <div data-testid="case-studies-empty" className="rounded-lg border bg-card p-4 text-center">
+      <p className="text-sm text-muted-foreground py-4">No success stories available yet.</p>
+    </div>
+  );
 
   return (
     <div data-testid="case-study-library" className="space-y-3">
@@ -203,11 +234,14 @@ export function CaseStudyLibrary() {
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => setExpandedId(expandedId === study.id ? null : study.id)}
+                      aria-expanded={expandedId === study.id}
+                      aria-label={`${expandedId === study.id ? 'Collapse' : 'Expand'} case study: ${study.headline}`}
                       className="text-[10px] px-2 py-1 border rounded hover:bg-muted transition-colors"
                       data-testid={`button-expand-study-${study.id}`}
                     >{expandedId === study.id ? 'Less' : 'More'}</button>
                     <button
                       onClick={() => shareStudy(study)}
+                      aria-label={`Copy case study "${study.headline}" to clipboard`}
                       className="text-[10px] px-2 py-1 bg-primary text-primary-foreground rounded hover:opacity-90 transition-opacity"
                       data-testid={`button-share-study-${study.id}`}
                     >{copiedId === study.id ? 'Copied!' : 'Share'}</button>
@@ -308,6 +342,7 @@ export function PromotionQuizPanel() {
       )}
       <button
         onClick={() => { setStep('quiz'); setCurrentQ(0); setAnswers({}); }}
+        aria-label={previousResult ? 'Retake promotion strategy quiz' : 'Start promotion strategy quiz'}
         className="text-xs px-3 py-1.5 bg-primary text-primary-foreground rounded hover:opacity-90 transition-opacity"
         data-testid="button-start-quiz"
       >{previousResult ? 'Retake Quiz' : 'Start Quiz'}</button>
@@ -316,7 +351,7 @@ export function PromotionQuizPanel() {
 
   if (step === 'loading') return (
     <div data-testid="quiz-loading" className="rounded-lg border bg-card p-4 text-center py-8">
-      <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-3" />
+      <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-3" role="status" aria-label="Generating playbook" />
       <p className="text-sm font-medium">Generating your playbook...</p>
       <p className="text-xs text-muted-foreground mt-1">Our AI is analyzing your profile and building a custom plan.</p>
     </div>
@@ -328,6 +363,7 @@ export function PromotionQuizPanel() {
         <h3 className="font-semibold text-sm">Your 30-Day Promotion Playbook</h3>
         <button
           onClick={() => { setStep('intro'); }}
+          aria-label="Retake promotion strategy quiz"
           className="text-[10px] px-2 py-1 border rounded hover:bg-muted transition-colors"
           data-testid="button-retake-quiz"
         >Retake</button>
@@ -372,6 +408,8 @@ export function PromotionQuizPanel() {
           <button
             key={opt}
             onClick={() => selectAnswer(q.id, opt)}
+            role="radio"
+            aria-checked={answers[q.id] === opt}
             className={`w-full text-left text-xs p-2.5 rounded border transition-colors ${answers[q.id] === opt ? 'bg-primary/10 border-primary' : 'hover:bg-muted/50'}`}
             data-testid={`quiz-option-${q.id}-${opt.replace(/\s+/g, '-').toLowerCase()}`}
           >{opt}</button>
@@ -381,6 +419,7 @@ export function PromotionQuizPanel() {
         <button
           onClick={() => setCurrentQ(Math.max(0, currentQ - 1))}
           disabled={currentQ === 0}
+          aria-label="Go to previous question"
           className="text-[10px] px-2 py-1 border rounded hover:bg-muted transition-colors disabled:opacity-30"
           data-testid="button-quiz-back"
         >Back</button>
@@ -388,6 +427,7 @@ export function PromotionQuizPanel() {
           <button
             onClick={() => setCurrentQ(currentQ + 1)}
             disabled={!answers[q.id]}
+            aria-label="Go to next question"
             className="text-[10px] px-3 py-1 bg-primary text-primary-foreground rounded hover:opacity-90 transition-opacity disabled:opacity-30"
             data-testid="button-quiz-next"
           >Next</button>
@@ -395,6 +435,7 @@ export function PromotionQuizPanel() {
           <button
             onClick={submitQuiz}
             disabled={!answers[q.id]}
+            aria-label="Submit quiz and generate playbook"
             className="text-[10px] px-3 py-1 bg-primary text-primary-foreground rounded hover:opacity-90 transition-opacity disabled:opacity-30"
             data-testid="button-quiz-submit"
           >Get My Playbook</button>
@@ -407,16 +448,25 @@ export function PromotionQuizPanel() {
 export function AudienceAnalyzerPanel() {
   const [insights, setInsights] = useState<AudienceInsights | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
 
   const analyze = () => {
     setLoading(true);
+    setError(null);
     fetch('/api/affiliate/analyze-audience?days=90')
       .then(r => { if (!r.ok) throw new Error('Failed'); return r.json(); })
       .then(d => setInsights(d))
-      .catch(() => setInsights(null))
+      .catch(() => setError('Failed to analyze audience data'))
       .finally(() => setLoading(false));
   };
+
+  if (error && !loading) return (
+    <div data-testid="audience-error" className="rounded-lg border bg-card p-4 text-center">
+      <p className="text-sm text-muted-foreground">{error}</p>
+      <button onClick={analyze} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-audience">Retry</button>
+    </div>
+  );
 
   if (!insights && !loading) return (
     <div data-testid="audience-analyzer-panel" className="rounded-lg border bg-card p-4">
@@ -426,6 +476,7 @@ export function AudienceAnalyzerPanel() {
       </p>
       <button
         onClick={analyze}
+        aria-label="Analyze my audience data"
         className="text-xs px-3 py-1.5 bg-primary text-primary-foreground rounded hover:opacity-90 transition-opacity"
         data-testid="button-analyze-audience"
       >Analyze My Audience</button>
@@ -434,7 +485,7 @@ export function AudienceAnalyzerPanel() {
 
   if (loading) return (
     <div data-testid="audience-loading" className="rounded-lg border bg-card p-4 text-center py-8">
-      <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-3" />
+      <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-3" role="status" aria-label="Analyzing audience" />
       <p className="text-sm font-medium">Analyzing your audience...</p>
       <p className="text-xs text-muted-foreground mt-1">Crunching click data, conversions, and platform metrics.</p>
     </div>
@@ -449,6 +500,7 @@ export function AudienceAnalyzerPanel() {
           <h3 className="font-semibold text-sm">Audience Insights</h3>
           <button
             onClick={analyze}
+            aria-label="Refresh audience insights"
             className="text-[10px] px-2 py-1 border rounded hover:bg-muted transition-colors"
             data-testid="button-refresh-audience"
           >Refresh</button>
@@ -461,12 +513,12 @@ export function AudienceAnalyzerPanel() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {insights.top_sources && insights.top_sources.length > 0 && (
-            <div data-testid="audience-top-sources">
+            <div data-testid="audience-top-sources" role="list" aria-label="Top traffic sources">
               <p className="text-[10px] font-medium text-muted-foreground mb-1.5">Top Traffic Sources</p>
               {insights.top_sources.slice(0, 5).map((s, i) => (
-                <div key={i} className="flex items-center justify-between py-1 border-b border-muted/30 last:border-0">
+                <div key={i} role="listitem" className="flex items-center justify-between py-1 border-b border-muted/30 last:border-0">
                   <span className="text-[11px]">{s.source || 'Direct'}</span>
                   <div className="text-right">
                     <span className="text-[10px] font-medium">{s.clicks} clicks</span>
@@ -478,15 +530,15 @@ export function AudienceAnalyzerPanel() {
           )}
 
           {insights.device_split && insights.device_split.length > 0 && (
-            <div data-testid="audience-device-split">
+            <div data-testid="audience-device-split" role="list" aria-label="Device breakdown">
               <p className="text-[10px] font-medium text-muted-foreground mb-1.5">Device Breakdown</p>
               {insights.device_split.map((d, i) => (
-                <div key={i} className="mb-1.5">
+                <div key={i} role="listitem" className="mb-1.5">
                   <div className="flex justify-between text-[11px] mb-0.5">
                     <span className="capitalize">{d.device || 'Unknown'}</span>
                     <span className="font-medium">{d.pct.toFixed(0)}%</span>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden" role="progressbar" aria-valuenow={Math.round(d.pct)} aria-valuemin={0} aria-valuemax={100} aria-label={`${d.device || 'Unknown'} usage: ${d.pct.toFixed(0)}%`}>
                     <div className="h-full bg-primary rounded-full" style={{ width: `${d.pct}%` }} />
                   </div>
                 </div>
@@ -499,13 +551,15 @@ export function AudienceAnalyzerPanel() {
           <div className="mt-3" data-testid="audience-top-geos">
             <button
               onClick={() => setExpanded(!expanded)}
+              aria-expanded={expanded}
+              aria-label={`${expanded ? 'Hide' : 'Show'} geographic data`}
               className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
               data-testid="button-toggle-geos"
             >{expanded ? '− Hide' : '+ Show'} Geographic Data</button>
             {expanded && (
-              <div className="mt-2 space-y-1">
+              <div className="mt-2 space-y-1" role="list" aria-label="Geographic data">
                 {insights.top_geos.slice(0, 10).map((g, i) => (
-                  <div key={i} className="flex items-center justify-between py-0.5">
+                  <div key={i} role="listitem" className="flex items-center justify-between py-0.5">
                     <span className="text-[11px]">{g.country || 'Unknown'}</span>
                     <div className="text-right">
                       <span className="text-[10px]">{g.clicks} clicks</span>
@@ -560,7 +614,14 @@ export function AffiliateDirectoryPreview() {
     setSaving(false);
   };
 
-  if (!loaded) return null;
+  if (!loaded) return (
+    <div data-testid="directory-loading" className="rounded-lg border bg-card p-4">
+      <div className="animate-pulse space-y-2">
+        <div className="h-4 bg-muted rounded w-1/3" />
+        <div className="h-10 bg-muted rounded" />
+      </div>
+    </div>
+  );
 
   return (
     <div data-testid="directory-preview" className="rounded-lg border bg-card p-4">
@@ -582,6 +643,7 @@ export function AffiliateDirectoryPreview() {
         </div>
         <a
           href="/partners"
+          aria-label="View partner directory"
           className="text-[10px] text-primary hover:underline"
           data-testid="link-view-directory"
         >View Directory →</a>

@@ -44,6 +44,13 @@ export default function FeatureSubPage() {
 
   return (
     <div className="flex flex-col" data-testid={`feature-page-${slug}`}>
+      <title>{`${(page as any).headline || page.title || slug} | Features`}</title>
+      <meta name="description" content={(page as any).subheadline || (page as any).description || `Learn more about this feature.`} />
+      <meta property="og:title" content={(page as any).headline || page.title || slug} />
+      <meta property="og:description" content={(page as any).subheadline || (page as any).description || `Learn more about this feature.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content={`/features/${slug}`} />
+      <link rel="canonical" href={`/features/${slug}`} />
       <section
         className="relative min-h-[400px] md:min-h-[500px] flex items-center justify-center overflow-hidden"
         data-testid="section-feature-hero"

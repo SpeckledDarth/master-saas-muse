@@ -419,6 +419,13 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
+      <title>{`${appName} - ${appTagline}`}</title>
+      <meta name="description" content={`${appName} - ${appTagline}. Get started free today.`} />
+      <meta property="og:title" content={`${appName} - ${appTagline}`} />
+      <meta property="og:description" content={`${appName} - ${appTagline}. Get started free today.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/" />
+      <link rel="canonical" href="/" />
       <AnnouncementBar />
       {renderHero()}
       <SocialProofPopup enabled={socialProofEnabled} />

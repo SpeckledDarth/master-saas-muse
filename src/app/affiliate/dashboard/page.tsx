@@ -1747,7 +1747,7 @@ function StandaloneAffiliateDashboard() {
 
       case 'quick_stats':
         return (
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <Card data-testid="stat-clicks">
               <CardContent className="pt-4 pb-3">
                 <div className="flex items-center gap-2">
@@ -2234,7 +2234,7 @@ function StandaloneAffiliateDashboard() {
                     <Activity className="h-3.5 w-3.5" />
                     Referral Attribution
                   </p>
-                  <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
                     <div>
                       <p className="text-lg font-bold">{youtubeAnalytics.attribution.youtubeClicks}</p>
                       <p className="text-[10px] text-muted-foreground">YouTube Clicks</p>
@@ -2373,7 +2373,7 @@ function StandaloneAffiliateDashboard() {
                   {new Date(data.payoutSchedule.nextPayoutDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-3">
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <p className="text-xs text-muted-foreground">Available Balance</p>
                   <p className="text-lg font-bold" data-testid="text-payout-balance">
@@ -2601,7 +2601,7 @@ function StandaloneAffiliateDashboard() {
           {referralView === 'list' && (
             <>
               <Select value={referralFilter} onValueChange={setReferralFilter}>
-                <SelectTrigger className="h-8 text-xs w-[120px]" data-testid="select-referral-filter">
+                <SelectTrigger className="h-8 text-xs w-full sm:w-[120px]" data-testid="select-referral-filter">
                   <SelectValue placeholder="All" />
                 </SelectTrigger>
                 <SelectContent>
@@ -2627,7 +2627,7 @@ function StandaloneAffiliateDashboard() {
 
       {referralView === 'portfolio' ? (
         <div className="space-y-4">
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <Card data-testid="stat-portfolio-value">
               <CardContent className="pt-4 pb-3">
                 <div className="flex items-center gap-2">
@@ -2987,7 +2987,7 @@ function StandaloneAffiliateDashboard() {
         <h2 className="text-lg font-semibold" data-testid="text-earnings-heading">Earnings ({data.commissions.length})</h2>
         <div className="flex gap-2">
           <Select value={earningsFilter} onValueChange={setEarningsFilter}>
-            <SelectTrigger className="h-8 text-xs w-[120px]" data-testid="select-earnings-filter">
+            <SelectTrigger className="h-8 text-xs w-full sm:w-[120px]" data-testid="select-earnings-filter">
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent>
@@ -3009,7 +3009,7 @@ function StandaloneAffiliateDashboard() {
         </div>
       </div>
 
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="pt-4 pb-3">
             <span className="text-xs text-muted-foreground">Pending</span>
@@ -3219,7 +3219,7 @@ function StandaloneAffiliateDashboard() {
             <div>
               <Label className="text-xs">Period</Label>
               <Select value={statementPeriod} onValueChange={(v: 'current_month' | 'last_month' | 'custom') => setStatementPeriod(v)}>
-                <SelectTrigger className="mt-1 w-[160px]" data-testid="select-statement-period">
+                <SelectTrigger className="mt-1 w-full sm:w-[160px]" data-testid="select-statement-period">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -3237,7 +3237,7 @@ function StandaloneAffiliateDashboard() {
                     type="date"
                     value={statementStartDate}
                     onChange={e => setStatementStartDate(e.target.value)}
-                    className="mt-1 w-[160px]"
+                    className="mt-1 w-full sm:w-[160px]"
                     data-testid="input-statement-start"
                   />
                 </div>
@@ -3247,7 +3247,7 @@ function StandaloneAffiliateDashboard() {
                     type="date"
                     value={statementEndDate}
                     onChange={e => setStatementEndDate(e.target.value)}
-                    className="mt-1 w-[160px]"
+                    className="mt-1 w-full sm:w-[160px]"
                     data-testid="input-statement-end"
                   />
                 </div>
@@ -3338,7 +3338,7 @@ function StandaloneAffiliateDashboard() {
                   <CardDescription>Based on your current month performance</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+                  <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                     <div className="p-3 rounded-md bg-muted/50 text-center">
                       <p className="text-xs text-muted-foreground">Daily Avg</p>
                       <p className="text-sm font-bold" data-testid="text-daily-avg">
@@ -3442,7 +3442,7 @@ function StandaloneAffiliateDashboard() {
                   <CardDescription>How your affiliate earnings compare to your subscription</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-3 grid-cols-3">
+                  <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
                     <div className="p-3 rounded-md bg-muted/50 text-center">
                       <p className="text-xs text-muted-foreground">Subscription</p>
                       <p className="text-sm font-bold">-${((financialTools.expenseOffset.subscriptionCostCents || 0) / 100).toFixed(2)}</p>
@@ -3631,7 +3631,7 @@ function StandaloneAffiliateDashboard() {
                           <span className="text-sm font-bold">{yr.year}</span>
                           <span className="text-sm font-bold text-primary">${(yr.earnings / 100).toFixed(2)}</span>
                         </div>
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div>
                             <p className="text-[10px] text-muted-foreground">Commissions</p>
                             <p className="text-xs font-medium">{yr.commissions}</p>
@@ -3672,7 +3672,7 @@ function StandaloneAffiliateDashboard() {
                 <CardDescription>Estimate your potential earnings</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="grid gap-3 grid-cols-3">
+                <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
                   <div>
                     <Label className="text-xs">Referrals</Label>
                     <Input
@@ -3715,7 +3715,7 @@ function StandaloneAffiliateDashboard() {
                   const monthlyEarning = refs * price * (rate / 100)
                   const annualEarning = monthlyEarning * 12
                   return (
-                    <div className="grid gap-3 grid-cols-2">
+                    <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
                       <div className="p-3 rounded-md bg-muted/50 text-center">
                         <p className="text-xs text-muted-foreground">Monthly Earnings</p>
                         <p className="text-lg font-bold" data-testid="text-calc-monthly">${monthlyEarning.toFixed(2)}</p>
@@ -3773,7 +3773,7 @@ function StandaloneAffiliateDashboard() {
                 <CardDescription>Download your financial data as CSV for records or taxes</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-2 grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                   <Button
                     variant="outline"
                     size="sm"
@@ -5700,7 +5700,7 @@ function StandaloneAffiliateDashboard() {
           <CardTitle className="text-base">Account Info</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <Label className="text-xs text-muted-foreground">Email</Label>
               <p className="text-sm font-medium">{userEmail}</p>
@@ -5749,7 +5749,7 @@ function StandaloneAffiliateDashboard() {
               {data.terms && (
                 <div className="mt-4 p-4 rounded-md bg-muted/40">
                   <p className="text-sm font-medium">Your Current Terms</p>
-                  <div className="grid grid-cols-2 gap-3 mt-3 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 text-sm">
                     <div>
                       <span className="text-xs text-muted-foreground">Commission Rate</span>
                       <p className="font-medium">{data.terms.rate}%</p>
@@ -6856,7 +6856,7 @@ function StandaloneAffiliateDashboard() {
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="p-3 rounded-md bg-muted/50 text-center">
                     <p className="text-xs text-muted-foreground">Your Earnings</p>
                     <p className="text-sm font-bold" data-testid="text-your-earnings">${(bm.yourEarnings / 100).toFixed(2)}</p>

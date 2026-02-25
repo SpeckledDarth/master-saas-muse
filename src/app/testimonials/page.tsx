@@ -54,6 +54,13 @@ export default function TestimonialsPage() {
 
   return (
     <div className="min-h-screen">
+      <title>Customer Testimonials - Wall of Love</title>
+      <meta name="description" content="See what our customers are saying about their experience. Read real testimonials and success stories." />
+      <meta property="og:title" content="Customer Testimonials - Wall of Love" />
+      <meta property="og:description" content="See what our customers are saying about their experience. Read real testimonials and success stories." />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/testimonials" />
+      <link rel="canonical" href="/testimonials" />
       <section className="py-16 md:py-24 bg-gradient-to-br from-primary/10 via-background to-accent/10">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4" data-testid="text-wall-title">

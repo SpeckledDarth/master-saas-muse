@@ -21,6 +21,13 @@ export default function AboutPage() {
 
   return (
     <div className="flex flex-col">
+      <title>{about?.headline || 'About Us'}</title>
+      <meta name="description" content={about?.subheadline || 'Learn more about our mission, story, and the team behind the product.'} />
+      <meta property="og:title" content={about?.headline || 'About Us'} />
+      <meta property="og:description" content={about?.subheadline || 'Learn more about our mission, story, and the team behind the product.'} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/about" />
+      <link rel="canonical" href="/about" />
       <PageHero
         headline={about?.headline || 'About Us'}
         subheadline={about?.subheadline || 'Learn more about our mission and team'}

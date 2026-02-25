@@ -36,6 +36,13 @@ export default function DmcaPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <title>{`DMCA Policy | ${branding?.appName || 'Our Service'}`}</title>
+      <meta name="description" content={`DMCA Policy for ${branding?.appName || 'Our Service'}. Learn about our procedures for copyright infringement claims.`} />
+      <meta property="og:title" content={`DMCA Policy | ${branding?.appName || 'Our Service'}`} />
+      <meta property="og:description" content={`DMCA Policy for ${branding?.appName || 'Our Service'}. Learn about our procedures for copyright infringement claims.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/dmca" />
+      <link rel="canonical" href="/dmca" />
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2" data-testid="text-dmca-title">

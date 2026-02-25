@@ -24,6 +24,13 @@ export default function TermsPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <title>{`Terms of Service | ${branding?.appName || 'Our Service'}`}</title>
+      <meta name="description" content={`Terms of Service for ${branding?.appName || 'Our Service'}. Read our terms and conditions for using the platform.`} />
+      <meta property="og:title" content={`Terms of Service | ${branding?.appName || 'Our Service'}`} />
+      <meta property="og:description" content={`Terms of Service for ${branding?.appName || 'Our Service'}. Read our terms and conditions for using the platform.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/terms" />
+      <link rel="canonical" href="/terms" />
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2" data-testid="text-terms-title">

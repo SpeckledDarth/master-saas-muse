@@ -36,6 +36,13 @@ export default function AiDataUsagePage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <title>{`AI Data Usage Policy | ${branding?.appName || 'Our Service'}`}</title>
+      <meta name="description" content={`AI Data Usage Policy for ${branding?.appName || 'Our Service'}. Understand how we use AI and handle your data.`} />
+      <meta property="og:title" content={`AI Data Usage Policy | ${branding?.appName || 'Our Service'}`} />
+      <meta property="og:description" content={`AI Data Usage Policy for ${branding?.appName || 'Our Service'}. Understand how we use AI and handle your data.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/ai-data-usage" />
+      <link rel="canonical" href="/ai-data-usage" />
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2" data-testid="text-ai-data-usage-title">

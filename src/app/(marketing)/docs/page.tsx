@@ -21,6 +21,13 @@ export default function DocsPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <title>{`Documentation | ${appName}`}</title>
+      <meta name="description" content={`Everything you need to get started with ${appName}. Guides, API reference, FAQ, and support resources.`} />
+      <meta property="og:title" content={`Documentation | ${appName}`} />
+      <meta property="og:description" content={`Everything you need to get started with ${appName}. Guides, API reference, FAQ, and support resources.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/docs" />
+      <link rel="canonical" href="/docs" />
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4" data-testid="text-docs-title">
           Documentation

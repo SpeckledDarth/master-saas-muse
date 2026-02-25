@@ -36,6 +36,13 @@ export default function DataHandlingPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <title>{`Data Handling Policy | ${branding?.appName || 'Our Service'}`}</title>
+      <meta name="description" content={`Data Handling Policy for ${branding?.appName || 'Our Service'}. Learn how we process, store, and protect your data.`} />
+      <meta property="og:title" content={`Data Handling Policy | ${branding?.appName || 'Our Service'}`} />
+      <meta property="og:description" content={`Data Handling Policy for ${branding?.appName || 'Our Service'}. Learn how we process, store, and protect your data.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/data-handling" />
+      <link rel="canonical" href="/data-handling" />
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2" data-testid="text-data-handling-title">

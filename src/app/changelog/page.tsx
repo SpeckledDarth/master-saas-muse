@@ -6,7 +6,16 @@ import ReactMarkdown from 'react-markdown'
 
 export const metadata: Metadata = {
   title: 'Changelog',
-  description: 'Product updates and new features',
+  description: 'Product updates and new features. Stay up to date with the latest improvements and releases.',
+  openGraph: {
+    title: 'Changelog',
+    description: 'Product updates and new features. Stay up to date with the latest improvements and releases.',
+    type: 'website',
+    url: '/changelog',
+  },
+  alternates: {
+    canonical: '/changelog',
+  },
 }
 
 export default async function ChangelogPage() {

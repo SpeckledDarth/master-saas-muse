@@ -21,6 +21,13 @@ export default function FeaturesPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <title>{`Features | ${appName}`}</title>
+      <meta name="description" content={`Discover what makes ${appName} the best choice. Explore our powerful features built for speed, security, and accessibility.`} />
+      <meta property="og:title" content={`Features | ${appName}`} />
+      <meta property="og:description" content={`Discover what makes ${appName} the best choice. Explore our powerful features built for speed, security, and accessibility.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/features" />
+      <link rel="canonical" href="/features" />
       <div className="text-center mb-8 md:mb-12">
         <h1 className="text-3xl md:text-4xl font-bold mb-4" data-testid="text-features-title">
           Features

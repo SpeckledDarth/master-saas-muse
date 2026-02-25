@@ -64,6 +64,13 @@ export default function ContactPage() {
 
   return (
     <div className="flex flex-col">
+      <title>{contact?.headline || 'Contact Us'}</title>
+      <meta name="description" content={contact?.subheadline || "Get in touch with our team. We'd love to hear from you."} />
+      <meta property="og:title" content={contact?.headline || 'Contact Us'} />
+      <meta property="og:description" content={contact?.subheadline || "Get in touch with our team. We'd love to hear from you."} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/contact" />
+      <link rel="canonical" href="/contact" />
       <PageHero
         headline={contact?.headline || 'Contact Us'}
         subheadline={contact?.subheadline || "We'd love to hear from you"}

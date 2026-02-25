@@ -36,6 +36,13 @@ export default function CookiePolicyPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <title>{`Cookie Policy | ${branding?.appName || 'Our Service'}`}</title>
+      <meta name="description" content={`Cookie Policy for ${branding?.appName || 'Our Service'}. Learn how we use cookies and similar technologies.`} />
+      <meta property="og:title" content={`Cookie Policy | ${branding?.appName || 'Our Service'}`} />
+      <meta property="og:description" content={`Cookie Policy for ${branding?.appName || 'Our Service'}. Learn how we use cookies and similar technologies.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/cookie-policy" />
+      <link rel="canonical" href="/cookie-policy" />
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2" data-testid="text-cookie-policy-title">

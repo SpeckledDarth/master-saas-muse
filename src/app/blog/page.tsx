@@ -18,7 +18,16 @@ async function getSettings() {
 
 export const metadata: Metadata = {
   title: 'Blog',
-  description: 'Latest news, updates, and insights',
+  description: 'Latest news, updates, and insights from our team. Stay up to date with what we are building and learning.',
+  openGraph: {
+    title: 'Blog',
+    description: 'Latest news, updates, and insights from our team. Stay up to date with what we are building and learning.',
+    type: 'website',
+    url: '/blog',
+  },
+  alternates: {
+    canonical: '/blog',
+  },
 }
 
 export default async function BlogPage() {

@@ -36,6 +36,13 @@ export default function AcceptableUsePage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <title>{`Acceptable Use Policy | ${branding?.appName || 'Our Service'}`}</title>
+      <meta name="description" content={`Acceptable Use Policy for ${branding?.appName || 'Our Service'}. Understand the rules and guidelines for using our platform.`} />
+      <meta property="og:title" content={`Acceptable Use Policy | ${branding?.appName || 'Our Service'}`} />
+      <meta property="og:description" content={`Acceptable Use Policy for ${branding?.appName || 'Our Service'}. Understand the rules and guidelines for using our platform.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/acceptable-use" />
+      <link rel="canonical" href="/acceptable-use" />
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2" data-testid="text-acceptable-use-title">

@@ -36,6 +36,13 @@ export default function AccessibilityPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
+      <title>{`Accessibility Statement | ${branding?.appName || 'Our Service'}`}</title>
+      <meta name="description" content={`Accessibility Statement for ${branding?.appName || 'Our Service'}. Learn about our commitment to digital accessibility.`} />
+      <meta property="og:title" content={`Accessibility Statement | ${branding?.appName || 'Our Service'}`} />
+      <meta property="og:description" content={`Accessibility Statement for ${branding?.appName || 'Our Service'}. Learn about our commitment to digital accessibility.`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/accessibility" />
+      <link rel="canonical" href="/accessibility" />
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2" data-testid="text-accessibility-title">

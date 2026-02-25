@@ -232,6 +232,7 @@ export function EarningsProjectionsPanel() {
 export function PayoutHistoryPanel() {
   const [data, setData] = useState<PayoutHistoryData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -239,6 +240,7 @@ export function PayoutHistoryPanel() {
 
   const loadPayouts = (p = 1) => {
     setLoading(true);
+    setError(null);
     let url = `/api/affiliate/payout-history?page=${p}&limit=20&format=csv`;
     if (statusFilter !== 'all') url += `&status=${statusFilter}`;
     if (startDate) url += `&startDate=${startDate}`;
@@ -246,11 +248,28 @@ export function PayoutHistoryPanel() {
     fetch(url)
       .then(r => { if (!r.ok) throw new Error('Request failed'); return r.json(); })
       .then(d => { setData(d); setPage(p); })
-      .catch(() => setData(null))
+      .catch(() => setError('Failed to load payout history'))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { loadPayouts(); }, []);
+
+  if (error && !data) return (
+    <div data-testid="payout-history-error" className="rounded-lg border bg-card p-4 text-center">
+      <p className="text-sm text-muted-foreground">{error}</p>
+      <button onClick={() => loadPayouts(1)} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-payouts">Retry</button>
+    </div>
+  );
+
+  if (loading && !data) return (
+    <div data-testid="payout-history-loading" className="rounded-lg border bg-card p-4">
+      <div className="animate-pulse space-y-3">
+        <div className="h-4 bg-muted rounded w-1/3" />
+        <div className="h-16 bg-muted rounded" />
+        <div className="h-10 bg-muted rounded" />
+      </div>
+    </div>
+  );
 
   return (
     <div data-testid="payout-history-panel" className="space-y-4">
@@ -338,6 +357,7 @@ export function PayoutHistoryPanel() {
 export function TaxCenterPanel() {
   const [taxSummary, setTaxSummary] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [downloading, setDownloading] = useState(false);
 
@@ -346,11 +366,12 @@ export function TaxCenterPanel() {
 
   const loadSummary = (year: number) => {
     setLoading(true);
+    setError(null);
     setSelectedYear(year);
     fetch(`/api/affiliate/tax-summary?year=${year}`)
       .then(r => { if (!r.ok) throw new Error('Request failed'); return r.json(); })
       .then(d => setTaxSummary(d))
-      .catch(() => setTaxSummary(null))
+      .catch(() => setError('Failed to load tax summary'))
       .finally(() => setLoading(false));
   };
 
@@ -406,6 +427,11 @@ export function TaxCenterPanel() {
         {loading ? (
           <div className="animate-pulse space-y-2">
             <div className="h-16 bg-muted rounded" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-4">
+            <p className="text-sm text-muted-foreground">{error}</p>
+            <button onClick={() => loadSummary(selectedYear)} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-tax">Retry</button>
           </div>
         ) : taxSummary ? (
           <>

@@ -38,6 +38,13 @@ export default function FAQPage() {
 
   return (
     <div className="flex flex-col">
+      <title>{faqPageSettings?.headline || content?.faqHeadline || 'Frequently Asked Questions'}</title>
+      <meta name="description" content={faqPageSettings?.subheadline || 'Find answers to common questions about our product, features, billing, and more.'} />
+      <meta property="og:title" content={faqPageSettings?.headline || content?.faqHeadline || 'Frequently Asked Questions'} />
+      <meta property="og:description" content={faqPageSettings?.subheadline || 'Find answers to common questions about our product, features, billing, and more.'} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="/faq" />
+      <link rel="canonical" href="/faq" />
       <PageHero
         headline={faqPageSettings?.headline || content?.faqHeadline || 'Frequently Asked Questions'}
         subheadline={faqPageSettings?.subheadline || 'Find answers to common questions about our product'}
