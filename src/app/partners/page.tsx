@@ -27,8 +27,8 @@ export default function PartnersPage() {
 
   useEffect(() => {
     fetch('/api/public/settings')
-      .then(r => r.ok ? r.json() : {})
-      .then(d => { if (d.appName) setAppName(d.appName); })
+      .then(r => r.ok ? r.json() : ({} as any))
+      .then((d: any) => { if (d.appName) setAppName(d.appName); })
       .catch(() => {});
   }, []);
 
