@@ -373,9 +373,9 @@ export function DropoffAnalysis({ data }: { data: SourcesData['dropoff'] }) {
       {latest.clicks > 0 && latest.conversions === 0 && (
         <p className="text-xs text-orange-600 mt-2">Tip: Focus on converting signups — you have clicks but no paid conversions this period.</p>
       )}
-      {latest.signups > 0 && latest.conversions > 0 && (
+      {latest.signups > 0 && latest.conversions > 0 && stages[0].value > 0 && stages[1].value > 0 && (
         <p className="text-xs text-muted-foreground mt-2">
-          Biggest drop: {stages[0].value > 0 && stages[1].value / stages[0].value < stages[1].value > 0 && stages[2].value / stages[1].value ? 'Click → Signup' : 'Signup → Conversion'}
+          Biggest drop: {(stages[1].value / stages[0].value) < (stages[2].value / stages[1].value) ? 'Click → Signup' : 'Signup → Conversion'}
         </p>
       )}
     </div>
