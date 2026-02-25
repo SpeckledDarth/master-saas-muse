@@ -19,7 +19,7 @@
 - **Phase 7:** AI & cross-dashboard features (6 features: AI post writer, AI coach, commission renewals, YouTube analytics, earnings charts/analytics suite, dashboard customization)
 
 **Migrations run on Supabase:** 001-014 (all complete)
-**Migrations needed on Supabase:** None — all caught up
+**Migrations needed on Supabase:** 015 — Session D tables (affiliate_asset_usage, knowledge_base_articles, promotional_calendar)
 
 **Launch target:** April 1, 2026
 
@@ -690,8 +690,8 @@ Key files for each phase, so agents can find relevant code quickly.
 
 | Session | Tier | Features | Focus |
 |---------|------|----------|-------|
-| C | Retention Deepeners | ~15 | Tax center, earnings projections, payout history export, commission renewal polish |
-| D | Retention Deepeners cont. | ~10 | Resource center, knowledge base, swipe files, content calendar |
+| C | Retention Deepeners | ~15 | Tax center, earnings projections, payout history export, commission renewal polish | **COMPLETE** |
+| D | Retention Deepeners cont. | ~10 | Resource center, knowledge base, swipe files, content calendar | **COMPLETE** |
 | E | Delight Multipliers | ~12 | Challenges, directory, case studies, quiz, analyze-audience |
 | F | Polish & External | ~8 | Mobile responsive, final polish (integration debt all fixed) |
 
@@ -774,6 +774,21 @@ Key files for each phase, so agents can find relevant code quickly.
 - `src/components/affiliate/retention-tools.tsx` — EarningsProjectionsPanel, PayoutHistoryPanel, TaxCenterPanel, CommissionRenewalStatsPanel, BulkRenewalButton, CommissionLifecycleTimeline
 **Dashboard wiring:** All panels integrated into affiliate dashboard — Projections in Analytics tab, Payout History in Payouts tab, Tax Center in Account tab, Renewal Stats + Bulk Renewal in Referrals tab
 **New tables/migrations:** 0 — all features use existing tables
+**Status:** All routes return 200/401 (no 500s), dev server compiles clean
+
+### Session D — February 25, 2026 (Retention Deepeners cont.)
+**Features built:** ~10 features across 4 focus areas (Resource Center, Knowledge Base, Swipe Files, Promotional Calendar)
+**New files:** 6 API routes + 1 component file
+- `src/app/api/affiliate/asset-analytics/route.ts` — Track asset downloads/copies/views, report top performers and conversion correlation (#65, #66, #79)
+- `src/app/api/affiliate/knowledge-base/route.ts` — Searchable help articles with categories, view tracking (#41)
+- `src/app/api/admin/knowledge-base/route.ts` — Admin CRUD for KB articles (create, update, delete, publish/unpublish)
+- `src/app/api/affiliate/swipe-files/route.ts` — Pre-written email templates with merge tags ({affiliate_name}, {referral_link}, {discount_code}), copy tracking (#73)
+- `src/app/api/affiliate/promotional-calendar/route.ts` — Upcoming campaigns with countdowns, content suggestions, linked assets/contests (#74, #78)
+- `src/app/api/affiliate/assets/route.ts` — EXTENDED with usage stats, top performer badges, category filters, enriched notifications (#67, #76)
+- `src/components/affiliate/resource-center.tsx` — KnowledgeBasePanel, SwipeFileLibrary, PromotionalCalendarPanel, TopPerformerBadge, AssetUsageBadge
+**Dashboard wiring:** KnowledgeBasePanel in Support tab, SwipeFileLibrary in Assets tab, PromotionalCalendarPanel in Announcements tab, TopPerformerBadge/AssetUsageBadge on asset cards
+**New tables/migrations:** 015_session_d_tables.sql — 3 new tables (affiliate_asset_usage, knowledge_base_articles, promotional_calendar)
+**Bug pattern discovered:** Supabase returns PGRST205 (schema cache miss) for brand-new tables — all routes handle both 42P01 and PGRST205
 **Status:** All routes return 200/401 (no 500s), dev server compiles clean
 
 ---

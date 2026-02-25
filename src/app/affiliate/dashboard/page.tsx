@@ -31,6 +31,7 @@ import { ExpandedAnalyticsSection } from '@/components/affiliate/analytics-expan
 import { FlywheelAnalyticsSection } from '@/components/affiliate/flywheel-analytics'
 import { FlywheelReportsSection } from '@/components/affiliate/flywheel-reports'
 import { EarningsProjectionsPanel, PayoutHistoryPanel, TaxCenterPanel, CommissionRenewalStatsPanel, BulkRenewalButton } from '@/components/affiliate/retention-tools'
+import { KnowledgeBasePanel, SwipeFileLibrary, PromotionalCalendarPanel, TopPerformerBadge, AssetUsageBadge } from '@/components/affiliate/resource-center'
 
 interface AffiliateDashboardData {
   link: {
@@ -3960,9 +3961,13 @@ function StandaloneAffiliateDashboard() {
                           {asset.description && (
                             <p className="text-xs text-muted-foreground mt-0.5">{asset.description}</p>
                           )}
-                          <Badge variant="outline" className="text-[10px] mt-1 capitalize">
-                            {ASSET_TYPE_LABELS[asset.asset_type] || asset.asset_type.replace('_', ' ')}
-                          </Badge>
+                          <div className="flex items-center gap-1 mt-1 flex-wrap">
+                            <Badge variant="outline" className="text-[10px] capitalize">
+                              {ASSET_TYPE_LABELS[asset.asset_type] || asset.asset_type.replace('_', ' ')}
+                            </Badge>
+                            {(asset as any).is_top_performer && <TopPerformerBadge />}
+                            {(asset as any).usage_stats?.total > 0 && <AssetUsageBadge count={(asset as any).usage_stats.total} />}
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
@@ -3991,6 +3996,7 @@ function StandaloneAffiliateDashboard() {
             })}
           </div>
         )}
+      <SwipeFileLibrary />
       </div>
     )
   }
@@ -5665,6 +5671,8 @@ function StandaloneAffiliateDashboard() {
           ))}
         </div>
       )}
+
+      <PromotionalCalendarPanel />
     </div>
   )
 
@@ -6472,6 +6480,8 @@ function StandaloneAffiliateDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      <KnowledgeBasePanel />
 
       <Card>
         <CardHeader>

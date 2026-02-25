@@ -153,6 +153,7 @@
 
 ### Key Files
 - Components: `src/components/affiliate/marketing-toolkit.tsx`
+- Resource Center: `src/components/affiliate/resource-center.tsx` (KnowledgeBasePanel, SwipeFileLibrary, PromotionalCalendarPanel, TopPerformerBadge, AssetUsageBadge)
 - Deep links: `src/app/api/affiliate/link-presets/`
 - Shortener: `src/app/api/affiliate/link-shortener/`
 - Media kit: `src/app/api/affiliate/media-kit/`
@@ -160,6 +161,10 @@
 - Landing pages: `src/app/api/affiliate/landing-page/`
 - Discount codes: `src/app/api/affiliate/discount-codes/`, `src/app/api/admin/discount-codes/`
 - Email templates: `src/app/api/affiliate/email-templates/`
+- Swipe files: `src/app/api/affiliate/swipe-files/` — pre-written emails with merge tags (#73)
+- Asset analytics: `src/app/api/affiliate/asset-analytics/` — track/report asset usage (#65, #66, #79)
+- Knowledge base: `src/app/api/affiliate/knowledge-base/`, `src/app/api/admin/knowledge-base/` — help articles with search (#41)
+- Promotional calendar: `src/app/api/affiliate/promotional-calendar/` — campaigns with countdowns (#74, #78)
 
 ### Database Tables
 - `affiliate_short_links` — shortened URLs
@@ -167,6 +172,9 @@
 - `discount_codes` — code definitions with Stripe coupon mapping
 - `discount_code_redemptions` — usage tracking
 - `affiliate_assets` — marketing materials library
+- `affiliate_asset_usage` — download/copy/view tracking per asset per affiliate (Session D)
+- `knowledge_base_articles` — help center articles with categories, search keywords, view counts (Session D)
+- `promotional_calendar` — admin-set campaigns with dates, content suggestions, linked assets/contests (Session D)
 
 ### RESOLVED INTEGRATION GAP (Fixed Feb 2026)
 - ~~Content intelligence disconnected from marketing toolkit~~ — FIXED: AI prompt now references available tools; response includes `suggestedTools` array with routes to Post Writer, Email Drafter, Deep Link Generator, QR Code Generator, and Content Calendar. ContentIntelligencePanel renders clickable tool links.
@@ -451,7 +459,7 @@
 
 ## Database Migration History
 
-All migrations 001-014 have been run on both Replit Postgres and Supabase.
+All migrations 001-014 have been run on both Replit Postgres and Supabase. Migration 015 has been run on Replit Postgres only — user must run on Supabase before testing Session D features.
 
 | # | File | Contents |
 |---|------|----------|
@@ -469,6 +477,7 @@ All migrations 001-014 have been run on both Replit Postgres and Supabase.
 | 012 | `migrations/core/012_commission_renewals.sql` | Commission renewal system |
 | 013 | `migrations/core/013_delight_features.sql` | Partner experience, toolkit, expanded analytics |
 | 014 | `migrations/core/014_analytics_columns.sql` | Analytics columns (geo/device on clicks, churn fields on referrals) |
+| 015 | `migrations/core/015_session_d_tables.sql` | Session D: affiliate_asset_usage, knowledge_base_articles, promotional_calendar |
 
 ---
 

@@ -214,4 +214,14 @@ The integration debt fix session was highly efficient (6 surgical changes, no ne
 
 ---
 
+## Session D Lessons (Feb 25, 2026)
+
+### Lesson: Handle BOTH Supabase error codes for new tables
+Supabase returns `42P01` (table not found) when a table doesn't exist, but returns `PGRST205` (schema cache miss) on the FIRST request after a table is created. Both must be handled gracefully. All Session D routes use a pattern that catches both codes and returns an empty result set instead of a 500.
+
+### Lesson: Self-contained UI components minimize dashboard risk
+The ~7000-line dashboard file is fragile. Session D components (KnowledgeBasePanel, SwipeFileLibrary, PromotionalCalendarPanel) are fully self-contained — they fetch their own data, handle their own loading/error states, and render independently. Dashboard wiring is just 3 import lines + 3 render calls. This pattern keeps the dashboard stable while adding new features.
+
+---
+
 *This document grows with every session. Add new lessons as they're discovered.*

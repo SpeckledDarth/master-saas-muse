@@ -109,14 +109,59 @@ export async function createTierPromotionNotification(
   }
 }
 
-export async function createAssetUploadNotification(assetTitle: string, assetType: string) {
+export async function createAssetUploadNotification(
+  assetTitle: string,
+  assetType: string,
+  options?: {
+    description?: string | null
+    category?: string | null
+    file_url?: string | null
+    file_name?: string | null
+  }
+) {
   try {
     const userIds = await getAllAffiliateUserIds()
     if (userIds.length === 0) return
+
+    const typeLabel = assetType.replace(/_/g, ' ')
+
+    const typeEmoji: Record<string, string> = {
+      banner: 'Banner',
+      email: 'Email Template',
+      social: 'Social Media Asset',
+      video: 'Video',
+      document: 'Document',
+      link: 'Link',
+      image: 'Image',
+      copy: 'Copy',
+      swipe_file: 'Swipe File',
+    }
+    const friendlyType = typeEmoji[assetType] || typeLabel
+
+    let title = `New ${friendlyType} Available`
+
+    let messageParts: string[] = [
+      `"${assetTitle}" has been added to your marketing toolkit.`
+    ]
+
+    if (options?.description) {
+      messageParts.push(options.description)
+    }
+
+    if (options?.category) {
+      messageParts.push(`Category: ${options.category}`)
+    }
+
+    if (options?.file_name) {
+      messageParts.push(`File: ${options.file_name}`)
+    }
+
+    const message = messageParts.join(' — ')
+
     await createBulkNotifications(
       userIds,
-      'New Resource Available',
-      `A new ${assetType.replace(/_/g, ' ')} "${assetTitle}" has been added to your marketing toolkit.`,
+      title,
+      message,
       'info',
       '/affiliate/dashboard?section=assets'
     )
