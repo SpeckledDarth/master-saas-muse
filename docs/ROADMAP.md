@@ -1,8 +1,29 @@
 # MuseKit + PassivePost — Development Roadmap
 
-> **Revision:** 1.4 | **Last Updated:** February 24, 2026 | **Created:** February 20, 2026
+> **Revision:** 1.5 | **Last Updated:** February 25, 2026 | **Created:** February 20, 2026
 
 > **IMPORTANT — READ THIS FILE AT THE START OF EVERY SESSION.** This is the single source of truth for the multi-week development plan. If agent memory resets, this file restores full context.
+
+---
+
+## NEXT SESSION: Phase 6 — Dashboard Enhancements (UI Layer)
+
+**Where we are:** Phases 1-3.6 and Phase 5 are COMPLETE. All database tables and API routes exist. No pending bugs.
+
+**What to build next:** Phase 6 wires the Phase 5 data layer into visible dashboard UI across all three user types:
+
+- **Admin Dashboard (6.1.1-6.1.5):** Affiliate CRM card, revenue attribution, bulk payouts, health scores, quick notes
+- **Affiliate Dashboard (6.2.1-6.2.6):** Earnings statements (PDF), portfolio view, commission lifecycle, contract view, tax summary, campaign creator
+- **User Dashboard (6.3.1-6.3.5):** Invoice history, subscription management, support tickets, account security, affiliate invitation
+
+**Key context:**
+- All Phase 5 tables exist in Supabase (migration 011 already run)
+- All Phase 5 APIs are live on Vercel (20+ routes)
+- Phase 6 is purely UI — no new tables or migrations expected
+- Read `docs/CRM_INVOICING_BRAINSTORM.md` for the full 217-feature vision that feeds these dashboards
+- See Phase 6 sprint tables below for the exact 16 features
+
+**Migrations run on Supabase (all current):** 001-011
 
 ---
 
@@ -285,7 +306,7 @@ A `/api/social/preflight` endpoint validates all prerequisites before attempting
 
 ---
 
-## Pending Bug Fixes (Must Complete Before Phase 3.6 is Fully Done)
+## Pending Bug Fixes
 
 All previously pending bugs have been resolved.
 
@@ -397,7 +418,7 @@ All previously pending bugs have been resolved.
 | 7.2 | AI Weekly Coach — personalized performance tips every Monday | Not Started | Brainstorm #89 |
 | 7.3 | Commission renewal system — extend commission window via customer check-ins | Not Started | Brainstorm #143-150 |
 | 7.4 | Connected analytics — YouTube/GA/podcast integration for full-funnel view | Not Started | Brainstorm #189-194 |
-| 7.5 | In-app messaging — simple admin ↔ affiliate message threads | Not Started | Brainstorm #39, Enhancement E28 |
+| 7.5 | ~~In-app messaging~~ — **Already built in Phase 3.6 Sprint 4 (E28)** | Complete | Admin ↔ affiliate messaging built as feature 3.6.26. No additional work needed. |
 | 7.6 | Earnings charts and analytics suite — line charts, heatmaps, funnels, benchmarks | Not Started | Brainstorm #151-210 |
 | 7.7 | Dashboard customization — drag/drop widgets | Not Started | Brainstorm #204 |
 
@@ -584,12 +605,6 @@ Key files for each phase, so agents can find relevant code quickly.
 ### Phase 4
 - PWA: `public/manifest.json`, service worker, `next.config.js` PWA config
 - Push notifications: Service worker registration, notification API
-
-### Phase 5 (CRM & Invoicing Foundation)
-- Vision document: `docs/CRM_INVOICING_BRAINSTORM.md` (217 features, dogfooding architecture, cross-Muse strategy)
-- Migrations: `migrations/core/009_crm_foundation.sql` (user_profiles, invoices, invoice_items, payments, affiliate_payout_items — to be created)
-- Migrations: `migrations/core/010_support_activities.sql` (tickets, ticket_comments, activities, campaigns, contracts — to be created)
-- Stripe webhook: `src/app/api/stripe/webhook/route.ts` (extend invoice.paid to create local records)
 
 ### Phase 5 (CRM & Invoicing Foundation)
 - Migration: `migrations/core/011_crm_foundation.sql` (10 tables: user_profiles, invoices, invoice_items, payments, affiliate_payout_items, tickets, ticket_comments, activities, campaigns, contracts)

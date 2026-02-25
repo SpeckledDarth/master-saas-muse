@@ -1,8 +1,8 @@
 # CRM & Invoicing Brainstorm — PassivePost
 
-> **Status:** BRAINSTORMING — Not approved for build yet. Do NOT start building until user approves a final plan.
+> **Status:** Phase 5 (Data Layer) COMPLETE. Phase 6 (Dashboard UI) is next. This doc remains the strategic vision — consult it when planning Phase 6-7 features.
 > **Created:** February 24, 2026
-> **Last Updated:** February 24, 2026
+> **Last Updated:** February 25, 2026
 
 ---
 
