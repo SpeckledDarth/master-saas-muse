@@ -57,24 +57,29 @@ export async function POST(request: NextRequest) {
       ? new Date(now.getFullYear(), now.getMonth(), 0)
       : now
 
-    const [usersRes, invoicesRes, commissionsRes, ticketsRes] = await Promise.all([
-      admin.auth.admin.listUsers({ perPage: 1000 }).catch(() => ({ data: { users: [] } })),
-      admin.from('invoices')
-        .select('amount_cents, status, created_at')
-        .gte('created_at', periodStart.toISOString())
-        .lte('created_at', periodEnd.toISOString())
-        .catch(() => ({ data: [] })),
-      admin.from('affiliate_commissions')
-        .select('commission_amount_cents, status, created_at')
-        .gte('created_at', periodStart.toISOString())
-        .lte('created_at', periodEnd.toISOString())
-        .catch(() => ({ data: [] })),
-      admin.from('support_tickets')
-        .select('id, status, created_at')
-        .gte('created_at', periodStart.toISOString())
-        .lte('created_at', periodEnd.toISOString())
-        .catch(() => ({ data: [] })),
-    ])
+    let usersRes: any = { data: { users: [] } }
+    let invoicesRes: any = { data: [] }
+    let commissionsRes: any = { data: [] }
+    let ticketsRes: any = { data: [] }
+    try {
+      [usersRes, invoicesRes, commissionsRes, ticketsRes] = await Promise.all([
+        admin.auth.admin.listUsers({ perPage: 1000 }),
+        admin.from('invoices')
+          .select('amount_cents, status, created_at')
+          .gte('created_at', periodStart.toISOString())
+          .lte('created_at', periodEnd.toISOString()),
+        admin.from('affiliate_commissions')
+          .select('commission_amount_cents, status, created_at')
+          .gte('created_at', periodStart.toISOString())
+          .lte('created_at', periodEnd.toISOString()),
+        admin.from('support_tickets')
+          .select('id, status, created_at')
+          .gte('created_at', periodStart.toISOString())
+          .lte('created_at', periodEnd.toISOString()),
+      ])
+    } catch {
+      // Tables may not exist yet — use empty defaults
+    }
 
     const totalUsers = (usersRes as any)?.data?.users?.length || 0
     const newUsersInPeriod = ((usersRes as any)?.data?.users || [])
