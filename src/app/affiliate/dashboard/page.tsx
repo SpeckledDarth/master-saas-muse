@@ -25,6 +25,9 @@ import {
   Youtube, Play, ThumbsUp, MessageCircle, ArrowRight, Activity,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { EarningsGoalSetter, CommissionDisputes, ReferralOfMonth, GracePeriodNotice, AffiliateManagerCard } from '@/components/affiliate/partner-experience'
+import { LinkShortener, QRCodeGenerator, MediaKitPage, CopyPasteCaptions, StarterKit } from '@/components/affiliate/marketing-toolkit'
+import { ExpandedAnalyticsSection } from '@/components/affiliate/analytics-expanded'
 
 interface AffiliateDashboardData {
   link: {
@@ -3858,6 +3861,16 @@ function StandaloneAffiliateDashboard() {
           )}
         </CardContent>
       </Card>
+
+      {/* Partner Experience Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <EarningsGoalSetter />
+        <ReferralOfMonth />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <AffiliateManagerCard />
+        <GracePeriodNotice />
+      </div>
     </div>
   )
 
@@ -5596,6 +5609,18 @@ function StandaloneAffiliateDashboard() {
           )}
         </CardContent>
       </Card>
+
+      {/* Marketing Toolkit */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <LinkShortener />
+        <QRCodeGenerator referralUrl={data?.link?.shareUrl || ''} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <MediaKitPage />
+        <CopyPasteCaptions referralCode={data?.link?.ref_code || ''} referralUrl={data?.link?.shareUrl || ''} />
+      </div>
+      <CommissionDisputes />
+      <StarterKit />
     </div>
   )
 
@@ -6866,6 +6891,9 @@ function StandaloneAffiliateDashboard() {
             <span className="text-sm text-muted-foreground">Updating charts...</span>
           </div>
         )}
+
+        {/* Expanded Analytics */}
+        <ExpandedAnalyticsSection />
       </div>
     )
   }

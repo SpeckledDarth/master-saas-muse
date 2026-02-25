@@ -109,3 +109,38 @@ CREATE POLICY "Service role full access announcements" ON announcements FOR ALL 
 CREATE POLICY "Service role full access spotlight" ON affiliate_spotlight FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Service role full access asset usage" ON affiliate_asset_usage FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Service role full access email prefs" ON email_preferences FOR ALL USING (auth.role() = 'service_role');
+
+-- Connected Analytics tables
+CREATE TABLE IF NOT EXISTS connected_platforms (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id),
+  platform TEXT NOT NULL,
+  account_name TEXT DEFAULT '',
+  access_token_encrypted TEXT,
+  refresh_token_encrypted TEXT,
+  token_expires_at TIMESTAMPTZ,
+  last_synced_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(user_id, platform)
+);
+
+CREATE TABLE IF NOT EXISTS connected_platform_metrics (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id),
+  platform TEXT NOT NULL,
+  metric_name TEXT NOT NULL,
+  metric_value NUMERIC NOT NULL DEFAULT 0,
+  date DATE NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_connected_platforms_user ON connected_platforms(user_id);
+CREATE INDEX IF NOT EXISTS idx_connected_platform_metrics_user ON connected_platform_metrics(user_id, platform, date);
+
+ALTER TABLE connected_platforms ENABLE ROW LEVEL SECURITY;
+ALTER TABLE connected_platform_metrics ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own connected platforms" ON connected_platforms FOR ALL USING (user_id = auth.uid());
+CREATE POLICY "Users manage own platform metrics" ON connected_platform_metrics FOR ALL USING (user_id = auth.uid());
+CREATE POLICY "Service role full access connected platforms" ON connected_platforms FOR ALL USING (auth.role() = 'service_role');
+CREATE POLICY "Service role full access platform metrics" ON connected_platform_metrics FOR ALL USING (auth.role() = 'service_role');
