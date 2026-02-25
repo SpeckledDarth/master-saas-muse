@@ -20,6 +20,7 @@ import {
   LayoutDashboard, Settings, Receipt, Megaphone, HelpCircle,
   Bell, Bookmark, Download, QrCode, Key, Trash2, Eye, EyeOff, Globe, Palette,
   Webhook, Send, AlertTriangle, RefreshCw, MessageSquare,
+  ChevronDown, ChevronRight, Briefcase, UserCheck, UserX, CircleDot,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -330,6 +331,24 @@ function StandaloneAffiliateDashboard() {
   const [surveySubmitting, setSurveySubmitting] = useState(false)
   const [surveyData, setSurveyData] = useState<{ surveys: any[]; canTakeSurvey: boolean; lastSurveyAt: string | null } | null>(null)
 
+  const [contracts, setContracts] = useState<any[]>([])
+  const [contractsLoading, setContractsLoading] = useState(false)
+  const [contractSigning, setContractSigning] = useState<string | null>(null)
+  const [expandedContract, setExpandedContract] = useState<string | null>(null)
+
+  const [campaigns, setCampaigns] = useState<any[]>([])
+  const [campaignsLoading, setCampaignsLoading] = useState(false)
+  const [campaignName, setCampaignName] = useState('')
+  const [campaignDescription, setCampaignDescription] = useState('')
+  const [campaignUtmSource, setCampaignUtmSource] = useState('')
+  const [campaignUtmMedium, setCampaignUtmMedium] = useState('')
+  const [campaignUtmCampaign, setCampaignUtmCampaign] = useState('')
+  const [campaignCreating, setCampaignCreating] = useState(false)
+  const [editingCampaign, setEditingCampaign] = useState<any | null>(null)
+  const [campaignEditName, setCampaignEditName] = useState('')
+  const [campaignEditDescription, setCampaignEditDescription] = useState('')
+  const [campaignSaving, setCampaignSaving] = useState(false)
+
   const [earnedBadges, setEarnedBadges] = useState<any[]>([])
   const [badgeTiers, setBadgeTiers] = useState<any[]>([])
   const [badgesLoading, setBadgesLoading] = useState(false)
@@ -340,6 +359,18 @@ function StandaloneAffiliateDashboard() {
   const [earningsFilter, setEarningsFilter] = useState('all')
   const [earningsSort, setEarningsSort] = useState<'newest' | 'oldest'>('newest')
   const [payoutSort, setPayoutSort] = useState<'newest' | 'oldest'>('newest')
+  const [referralView, setReferralView] = useState<'list' | 'portfolio'>('list')
+  const [expandedCommission, setExpandedCommission] = useState<string | null>(null)
+
+  const [statementPeriod, setStatementPeriod] = useState<'current_month' | 'last_month' | 'custom'>('current_month')
+  const [statementStartDate, setStatementStartDate] = useState('')
+  const [statementEndDate, setStatementEndDate] = useState('')
+  const [statementDownloading, setStatementDownloading] = useState(false)
+
+  const [taxSummaryYear, setTaxSummaryYear] = useState(new Date().getFullYear())
+  const [taxSummaryData, setTaxSummaryData] = useState<any>(null)
+  const [taxSummaryLoading, setTaxSummaryLoading] = useState(false)
+  const [taxSummaryDownloading, setTaxSummaryDownloading] = useState(false)
 
   const { toast } = useToast()
 
@@ -562,6 +593,95 @@ function StandaloneAffiliateDashboard() {
     setTaxInfoSaving(false)
   }
 
+  const getStatementDates = () => {
+    const now = new Date()
+    if (statementPeriod === 'current_month') {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1)
+      return {
+        start: start.toISOString().split('T')[0],
+        end: now.toISOString().split('T')[0],
+      }
+    } else if (statementPeriod === 'last_month') {
+      const start = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+      const end = new Date(now.getFullYear(), now.getMonth(), 0)
+      return {
+        start: start.toISOString().split('T')[0],
+        end: end.toISOString().split('T')[0],
+      }
+    }
+    return { start: statementStartDate, end: statementEndDate }
+  }
+
+  const downloadEarningsStatement = async () => {
+    const dates = getStatementDates()
+    if (!dates.start || !dates.end) {
+      toast({ title: 'Error', description: 'Please select a date range.', variant: 'destructive' })
+      return
+    }
+    setStatementDownloading(true)
+    try {
+      const res = await fetch(`/api/affiliate/earnings-statement?start=${dates.start}&end=${dates.end}&format=html`)
+      if (!res.ok) {
+        toast({ title: 'Error', description: 'Failed to generate statement.', variant: 'destructive' })
+        setStatementDownloading(false)
+        return
+      }
+      const html = await res.text()
+      const blob = new Blob([html], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `earnings-statement-${dates.start}-to-${dates.end}.html`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      toast({ title: 'Downloaded', description: 'Your earnings statement has been downloaded.' })
+    } catch {
+      toast({ title: 'Error', description: 'Failed to download statement.', variant: 'destructive' })
+    }
+    setStatementDownloading(false)
+  }
+
+  const fetchTaxSummary = useCallback(async (year?: number) => {
+    setTaxSummaryLoading(true)
+    try {
+      const y = year || taxSummaryYear
+      const res = await fetch(`/api/affiliate/tax-summary?year=${y}`)
+      if (res.ok) {
+        const d = await res.json()
+        setTaxSummaryData(d)
+      }
+    } catch {}
+    setTaxSummaryLoading(false)
+  }, [taxSummaryYear])
+
+  const downloadTaxSummary = async () => {
+    setTaxSummaryDownloading(true)
+    try {
+      const res = await fetch(`/api/affiliate/tax-summary?year=${taxSummaryYear}&format=html`)
+      if (!res.ok) {
+        toast({ title: 'Error', description: 'Failed to generate tax summary.', variant: 'destructive' })
+        setTaxSummaryDownloading(false)
+        return
+      }
+      const html = await res.text()
+      const blob = new Blob([html], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `tax-summary-${taxSummaryYear}.html`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      toast({ title: 'Downloaded', description: 'Your tax summary has been downloaded.' })
+    } catch {
+      toast({ title: 'Error', description: 'Failed to download tax summary.', variant: 'destructive' })
+    }
+    setTaxSummaryDownloading(false)
+  }
+
   const fetchDiscountCodes = useCallback(async () => {
     try {
       const res = await fetch('/api/affiliate/discount-codes')
@@ -747,6 +867,137 @@ function StandaloneAffiliateDashboard() {
     setBadgesLoading(false)
   }, [])
 
+  const fetchContracts = useCallback(async () => {
+    setContractsLoading(true)
+    try {
+      const res = await fetch('/api/contracts?contract_type=affiliate_terms')
+      if (res.ok) {
+        const d = await res.json()
+        setContracts(d.contracts || [])
+      }
+    } catch {}
+    setContractsLoading(false)
+  }, [])
+
+  const signContract = async (contractId: string) => {
+    setContractSigning(contractId)
+    try {
+      const res = await fetch(`/api/contracts/${contractId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sign: true }),
+      })
+      if (res.ok) {
+        toast({ title: 'Signed', description: 'Contract has been signed successfully.' })
+        fetchContracts()
+      } else {
+        const d = await res.json()
+        toast({ title: 'Error', description: d.error || 'Failed to sign contract.', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to sign contract.', variant: 'destructive' })
+    }
+    setContractSigning(null)
+  }
+
+  const fetchCampaigns = useCallback(async () => {
+    setCampaignsLoading(true)
+    try {
+      const res = await fetch('/api/campaigns')
+      if (res.ok) {
+        const d = await res.json()
+        setCampaigns(d.campaigns || [])
+      }
+    } catch {}
+    setCampaignsLoading(false)
+  }, [])
+
+  const createCampaign = async () => {
+    if (!campaignName.trim()) return
+    setCampaignCreating(true)
+    try {
+      const refCode = data?.link?.ref_code || ''
+      const res = await fetch('/api/campaigns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: campaignName,
+          description: campaignDescription || null,
+          utm_source: campaignUtmSource || refCode,
+          utm_medium: campaignUtmMedium || 'affiliate',
+          utm_campaign: campaignUtmCampaign || campaignName.toLowerCase().replace(/\s+/g, '-'),
+        }),
+      })
+      if (res.ok) {
+        toast({ title: 'Created', description: 'Campaign created successfully.' })
+        setCampaignName('')
+        setCampaignDescription('')
+        setCampaignUtmSource('')
+        setCampaignUtmMedium('')
+        setCampaignUtmCampaign('')
+        fetchCampaigns()
+      } else {
+        const d = await res.json()
+        toast({ title: 'Error', description: d.error || 'Failed to create campaign.', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to create campaign.', variant: 'destructive' })
+    }
+    setCampaignCreating(false)
+  }
+
+  const updateCampaign = async (campaignId: string) => {
+    setCampaignSaving(true)
+    try {
+      const res = await fetch(`/api/campaigns/${campaignId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: campaignEditName,
+          description: campaignEditDescription || null,
+        }),
+      })
+      if (res.ok) {
+        toast({ title: 'Updated', description: 'Campaign updated.' })
+        setEditingCampaign(null)
+        fetchCampaigns()
+      } else {
+        const d = await res.json()
+        toast({ title: 'Error', description: d.error || 'Failed to update campaign.', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to update campaign.', variant: 'destructive' })
+    }
+    setCampaignSaving(false)
+  }
+
+  const deleteCampaign = async (campaignId: string) => {
+    try {
+      const res = await fetch(`/api/campaigns/${campaignId}`, { method: 'DELETE' })
+      if (res.ok) {
+        toast({ title: 'Deleted', description: 'Campaign deleted.' })
+        fetchCampaigns()
+      } else {
+        toast({ title: 'Error', description: 'Failed to delete campaign.', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to delete campaign.', variant: 'destructive' })
+    }
+  }
+
+  const getCampaignLink = (campaign: any) => {
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+    const refCode = data?.link?.ref_code || ''
+    const params = new URLSearchParams()
+    params.set('ref', refCode)
+    if (campaign.utm_source) params.set('utm_source', campaign.utm_source)
+    if (campaign.utm_medium) params.set('utm_medium', campaign.utm_medium)
+    if (campaign.utm_campaign) params.set('utm_campaign', campaign.utm_campaign)
+    if (campaign.utm_term) params.set('utm_term', campaign.utm_term)
+    if (campaign.utm_content) params.set('utm_content', campaign.utm_content)
+    return `${baseUrl}/?${params.toString()}`
+  }
+
   const submitSurvey = async () => {
     if (surveyRating === 0) {
       toast({ title: 'Rating Required', description: 'Please select a star rating.', variant: 'destructive' })
@@ -791,6 +1042,9 @@ function StandaloneAffiliateDashboard() {
       fetchApiKeys()
       fetchSurveys()
       fetchBadges()
+      fetchContracts()
+      fetchCampaigns()
+      fetchTaxSummary()
       fetch('/api/affiliate/messages').then(r => r.ok ? r.json() : null).then(d => {
         if (d?.messages) {
           setMessages(d.messages)
@@ -798,7 +1052,7 @@ function StandaloneAffiliateDashboard() {
         }
       }).catch(() => {})
     }
-  }, [authChecking, fetchData, fetchNotifications, fetchProfile, fetchTaxInfo, fetchDiscountCodes, fetchLinkPresets, fetchLandingPage, fetchApiKeys, fetchSurveys, fetchBadges])
+  }, [authChecking, fetchData, fetchNotifications, fetchProfile, fetchTaxInfo, fetchDiscountCodes, fetchLinkPresets, fetchLandingPage, fetchApiKeys, fetchSurveys, fetchBadges, fetchContracts, fetchCampaigns, fetchTaxSummary])
 
   useEffect(() => {
     if (!authChecking && !loading) fetchLeaderboard()
@@ -1386,34 +1640,229 @@ function StandaloneAffiliateDashboard() {
     </div>
   )
 
-  const renderReferrals = () => (
+  const renderReferrals = () => {
+    const referralCommissions: Record<string, number> = {}
+    data.commissions.forEach(c => {
+      const refId = (c as any).referral_id
+      if (refId) {
+        referralCommissions[refId] = (referralCommissions[refId] || 0) + c.commission_amount_cents
+      }
+    })
+
+    const totalCommissionRevenue = data.commissions.reduce((sum, c) => sum + c.commission_amount_cents, 0)
+
+    const activeReferrals = data.referrals.filter(r => r.status === 'converted')
+    const churnedReferrals = data.referrals.filter(r => r.status === 'churned')
+    const trialReferrals = data.referrals.filter(r => r.status === 'signed_up')
+
+    const avgLTV = data.referrals.length > 0
+      ? totalCommissionRevenue / data.referrals.filter(r => r.status === 'converted' || r.status === 'churned').length || 0
+      : 0
+
+    const bestReferral = data.referrals.reduce<{ id: string; revenue: number } | null>((best, ref) => {
+      const rev = referralCommissions[ref.id] || 0
+      if (!best || rev > best.revenue) return { id: ref.id, revenue: rev }
+      return best
+    }, null)
+
+    return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-lg font-semibold" data-testid="text-referrals-heading">Referrals ({data.referrals.length})</h2>
-        <div className="flex gap-2">
-          <Select value={referralFilter} onValueChange={setReferralFilter}>
-            <SelectTrigger className="h-8 text-xs w-[120px]" data-testid="select-referral-filter">
-              <SelectValue placeholder="All" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="signed_up">Signed Up</SelectItem>
-              <SelectItem value="converted">Converted</SelectItem>
-              <SelectItem value="churned">Churned</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={referralSort} onValueChange={(v: 'newest' | 'oldest') => setReferralSort(v)}>
-            <SelectTrigger className="h-8 text-xs w-[100px]" data-testid="select-referral-sort">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="oldest">Oldest</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex gap-2 flex-wrap">
+          <div className="flex rounded-md border overflow-hidden">
+            <button
+              className={`px-3 py-1 text-xs font-medium transition-colors ${referralView === 'list' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}`}
+              onClick={() => setReferralView('list')}
+              data-testid="button-referral-view-list"
+            >
+              List
+            </button>
+            <button
+              className={`px-3 py-1 text-xs font-medium transition-colors ${referralView === 'portfolio' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}`}
+              onClick={() => setReferralView('portfolio')}
+              data-testid="button-referral-view-portfolio"
+            >
+              Portfolio
+            </button>
+          </div>
+          {referralView === 'list' && (
+            <>
+              <Select value={referralFilter} onValueChange={setReferralFilter}>
+                <SelectTrigger className="h-8 text-xs w-[120px]" data-testid="select-referral-filter">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="signed_up">Signed Up</SelectItem>
+                  <SelectItem value="converted">Converted</SelectItem>
+                  <SelectItem value="churned">Churned</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={referralSort} onValueChange={(v: 'newest' | 'oldest') => setReferralSort(v)}>
+                <SelectTrigger className="h-8 text-xs w-[100px]" data-testid="select-referral-sort">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Newest</SelectItem>
+                  <SelectItem value="oldest">Oldest</SelectItem>
+                </SelectContent>
+              </Select>
+            </>
+          )}
         </div>
       </div>
 
+      {referralView === 'portfolio' ? (
+        <div className="space-y-4">
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+            <Card data-testid="stat-portfolio-value">
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Portfolio Value</span>
+                </div>
+                <p className="text-xl font-bold mt-1">${(totalCommissionRevenue / 100).toFixed(2)}</p>
+              </CardContent>
+            </Card>
+            <Card data-testid="stat-avg-ltv">
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Avg LTV</span>
+                </div>
+                <p className="text-xl font-bold mt-1">${(avgLTV / 100).toFixed(2)}</p>
+              </CardContent>
+            </Card>
+            <Card data-testid="stat-active-subscribers">
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center gap-2">
+                  <UserCheck className="h-4 w-4 text-green-500" />
+                  <span className="text-xs text-muted-foreground">Active</span>
+                </div>
+                <p className="text-xl font-bold mt-1">{activeReferrals.length}</p>
+              </CardContent>
+            </Card>
+            <Card data-testid="stat-best-referral">
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center gap-2">
+                  <Award className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Best Referral</span>
+                </div>
+                <p className="text-xl font-bold mt-1">${bestReferral ? (bestReferral.revenue / 100).toFixed(2) : '0.00'}</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {activeReferrals.length > 0 && (
+            <Card data-testid="card-portfolio-active">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <UserCheck className="h-4 w-4 text-green-500" />
+                  Active Subscribers ({activeReferrals.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {activeReferrals.map(ref => {
+                    const revenue = referralCommissions[ref.id] || 0
+                    const daysSinceSignup = Math.floor((Date.now() - new Date(ref.created_at).getTime()) / (1000 * 60 * 60 * 24))
+                    const monthlyLTV = daysSinceSignup > 0 ? (revenue / daysSinceSignup) * 30 : 0
+                    return (
+                      <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`portfolio-referral-${ref.id}`}>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center">
+                            <UserCheck className="h-4 w-4 text-green-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Referral #{ref.id.slice(0, 8)}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Joined {new Date(ref.created_at).toLocaleDateString()} · {daysSinceSignup}d ago
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium">${(revenue / 100).toFixed(2)}</p>
+                          <p className="text-xs text-muted-foreground">${(monthlyLTV / 100).toFixed(2)}/mo est.</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {trialReferrals.length > 0 && (
+            <Card data-testid="card-portfolio-trial">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-yellow-500" />
+                  Free / Trial ({trialReferrals.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {trialReferrals.map(ref => (
+                    <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`portfolio-trial-${ref.id}`}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center">
+                          <Clock className="h-4 w-4 text-yellow-500" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">Referral #{ref.id.slice(0, 8)}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Signed up {new Date(ref.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-xs">Pending Conversion</Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {churnedReferrals.length > 0 && (
+            <Card data-testid="card-portfolio-churned">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <UserX className="h-4 w-4 text-red-500" />
+                  Churned ({churnedReferrals.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {churnedReferrals.map(ref => {
+                    const revenue = referralCommissions[ref.id] || 0
+                    return (
+                      <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border opacity-75" data-testid={`portfolio-churned-${ref.id}`}>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
+                            <UserX className="h-4 w-4 text-red-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Referral #{ref.id.slice(0, 8)}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Joined {new Date(ref.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-muted-foreground">${(revenue / 100).toFixed(2)}</p>
+                          <p className="text-xs text-red-500">Churned</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      ) : (
+        <>
       <Card>
         <CardContent className="pt-4">
           {filteredReferrals.length === 0 ? (
@@ -1476,8 +1925,11 @@ function StandaloneAffiliateDashboard() {
           )}
         </CardContent>
       </Card>
+        </>
+      )}
     </div>
-  )
+    )
+  }
 
   const renderEarnings = () => (
     <div className="space-y-4">
@@ -1545,24 +1997,109 @@ function StandaloneAffiliateDashboard() {
             </div>
           ) : (
             <div className="space-y-2">
-              {filteredCommissions.map(com => (
-                <div key={com.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`commission-${com.id}`}>
-                  <div className="flex items-center gap-3">
-                    <Badge variant={STATUS_COLORS[com.status] as any || 'outline'} className="text-xs capitalize">
-                      {com.status}
-                    </Badge>
-                    <div>
-                      <p className="text-sm font-medium">${(com.commission_amount_cents / 100).toFixed(2)}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {com.commission_rate}% of ${(com.invoice_amount_cents / 100).toFixed(2)}
-                      </p>
+              {filteredCommissions.map(com => {
+                const isExpanded = expandedCommission === com.id
+                const lifecycleSteps = (() => {
+                  const steps: { label: string; status: 'completed' | 'current' | 'pending' | 'skipped'; date?: string }[] = []
+                  steps.push({ label: 'Click', status: 'completed', date: undefined })
+                  steps.push({ label: 'Signup', status: 'completed', date: undefined })
+                  const hasTrial = com.invoice_amount_cents === 0
+                  if (hasTrial) {
+                    steps.push({ label: 'Trial', status: 'completed', date: undefined })
+                  } else {
+                    steps.push({ label: 'Trial', status: 'skipped' })
+                  }
+                  steps.push({ label: 'Paid', status: 'completed', date: undefined })
+                  steps.push({ label: 'Commission Created', status: 'completed', date: com.created_at })
+                  if (com.status === 'pending') {
+                    steps.push({ label: 'Approved', status: 'pending' })
+                    steps.push({ label: 'Paid Out', status: 'pending' })
+                  } else if (com.status === 'approved') {
+                    steps.push({ label: 'Approved', status: 'completed', date: undefined })
+                    steps.push({ label: 'Paid Out', status: 'current' })
+                  } else if (com.status === 'paid') {
+                    steps.push({ label: 'Approved', status: 'completed', date: undefined })
+                    steps.push({ label: 'Paid Out', status: 'completed', date: undefined })
+                  } else {
+                    steps.push({ label: 'Approved', status: 'pending' })
+                    steps.push({ label: 'Paid Out', status: 'pending' })
+                  }
+                  return steps
+                })()
+
+                return (
+                <div key={com.id} className="rounded-md border" data-testid={`commission-${com.id}`}>
+                  <button
+                    className="w-full flex items-center justify-between p-3 text-left"
+                    onClick={() => setExpandedCommission(isExpanded ? null : com.id)}
+                    data-testid={`button-expand-commission-${com.id}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" /> : <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />}
+                      <Badge variant={STATUS_COLORS[com.status] as any || 'outline'} className="text-xs capitalize">
+                        {com.status}
+                      </Badge>
+                      <div>
+                        <p className="text-sm font-medium">${(com.commission_amount_cents / 100).toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {com.commission_rate}% of ${(com.invoice_amount_cents / 100).toFixed(2)}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(com.created_at).toLocaleDateString()}
-                  </span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(com.created_at).toLocaleDateString()}
+                    </span>
+                  </button>
+                  {isExpanded && (
+                    <div className="px-3 pb-4 pt-1 border-t" data-testid={`lifecycle-${com.id}`}>
+                      <p className="text-xs font-medium text-muted-foreground mb-3 ml-7">Commission Lifecycle</p>
+                      <div className="flex items-start gap-0 overflow-x-auto pb-1 ml-7">
+                        {lifecycleSteps.map((step, i) => (
+                          <div key={i} className="flex items-start min-w-0">
+                            <div className="flex flex-col items-center">
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                                step.status === 'completed' ? 'bg-green-500/10 text-green-600 dark:text-green-400' :
+                                step.status === 'current' ? 'bg-primary/10 text-primary ring-2 ring-primary/30' :
+                                step.status === 'skipped' ? 'bg-muted text-muted-foreground line-through' :
+                                'bg-muted text-muted-foreground'
+                              }`}>
+                                {step.status === 'completed' ? (
+                                  <CheckCircle className="h-3.5 w-3.5" />
+                                ) : step.status === 'skipped' ? (
+                                  <span className="text-[9px]">-</span>
+                                ) : step.status === 'current' ? (
+                                  <CircleDot className="h-3.5 w-3.5" />
+                                ) : (
+                                  <Clock className="h-3 w-3" />
+                                )}
+                              </div>
+                              <span className={`text-[10px] mt-1 text-center leading-tight max-w-[60px] ${
+                                step.status === 'skipped' ? 'text-muted-foreground/50 line-through' :
+                                step.status === 'completed' || step.status === 'current' ? 'text-foreground' : 'text-muted-foreground'
+                              }`}>
+                                {step.label}
+                              </span>
+                              {step.date && (
+                                <span className="text-[9px] text-muted-foreground mt-0.5">
+                                  {new Date(step.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                </span>
+                              )}
+                            </div>
+                            {i < lifecycleSteps.length - 1 && (
+                              <div className={`h-[2px] w-6 mt-3 shrink-0 ${
+                                step.status === 'completed' && lifecycleSteps[i + 1].status !== 'pending'
+                                  ? 'bg-green-500/40'
+                                  : 'bg-muted'
+                              }`} />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </CardContent>
@@ -1618,6 +2155,69 @@ function StandaloneAffiliateDashboard() {
           </CardContent>
         </Card>
       )}
+
+      <Card data-testid="card-download-statement">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Download className="h-4 w-4" />
+            Download Statement
+          </CardTitle>
+          <CardDescription>Generate a printable earnings statement for your records</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-end gap-3 flex-wrap">
+            <div>
+              <Label className="text-xs">Period</Label>
+              <Select value={statementPeriod} onValueChange={(v: 'current_month' | 'last_month' | 'custom') => setStatementPeriod(v)}>
+                <SelectTrigger className="mt-1 w-[160px]" data-testid="select-statement-period">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="current_month">Current Month</SelectItem>
+                  <SelectItem value="last_month">Last Month</SelectItem>
+                  <SelectItem value="custom">Custom Range</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {statementPeriod === 'custom' && (
+              <>
+                <div>
+                  <Label className="text-xs">Start Date</Label>
+                  <Input
+                    type="date"
+                    value={statementStartDate}
+                    onChange={e => setStatementStartDate(e.target.value)}
+                    className="mt-1 w-[160px]"
+                    data-testid="input-statement-start"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">End Date</Label>
+                  <Input
+                    type="date"
+                    value={statementEndDate}
+                    onChange={e => setStatementEndDate(e.target.value)}
+                    className="mt-1 w-[160px]"
+                    data-testid="input-statement-end"
+                  />
+                </div>
+              </>
+            )}
+            <Button
+              onClick={downloadEarningsStatement}
+              disabled={statementDownloading}
+              size="sm"
+              data-testid="button-download-statement"
+            >
+              {statementDownloading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
+              Download
+            </Button>
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            Statement will be downloaded as an HTML file you can print or save as PDF from your browser.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   )
 
@@ -2621,6 +3221,148 @@ function StandaloneAffiliateDashboard() {
               </Button>
             </Link>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-my-terms">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            My Terms
+          </CardTitle>
+          <CardDescription>Your affiliate contract and commission rate details</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {contractsLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : contracts.length === 0 ? (
+            <div className="text-center py-6" data-testid="text-no-contracts">
+              <FileText className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">No contracts found.</p>
+              {data.terms && (
+                <div className="mt-4 p-4 rounded-md bg-muted/40">
+                  <p className="text-sm font-medium">Your Current Terms</p>
+                  <div className="grid grid-cols-2 gap-3 mt-3 text-sm">
+                    <div>
+                      <span className="text-xs text-muted-foreground">Commission Rate</span>
+                      <p className="font-medium">{data.terms.rate}%</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">Lock Duration</span>
+                      <p className="font-medium">{data.terms.durationMonths} months</p>
+                    </div>
+                    {data.terms.lockedAt && (
+                      <div>
+                        <span className="text-xs text-muted-foreground">Locked Since</span>
+                        <p className="font-medium">{new Date(data.terms.lockedAt).toLocaleDateString()}</p>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3">Your commission rate is locked and guaranteed for the duration shown above.</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {contracts.map((contract, idx) => {
+                const isActive = contract.status === 'active'
+                const isDraft = contract.status === 'draft'
+                const isExpanded = expandedContract === contract.id
+                return (
+                  <div key={contract.id} className={`rounded-md border ${isActive ? 'border-primary/30' : ''}`} data-testid={`contract-${contract.id}`}>
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-3 flex-wrap">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium text-sm">{contract.title}</span>
+                            <Badge variant={isActive ? 'default' : isDraft ? 'secondary' : 'outline'} className="text-xs capitalize">
+                              {contract.status}
+                            </Badge>
+                            {idx === 0 && contracts.length > 1 && (
+                              <Badge variant="outline" className="text-xs">Latest</Badge>
+                            )}
+                            {contract.version > 1 && (
+                              <Badge variant="outline" className="text-[10px]">v{contract.version}</Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground flex-wrap">
+                            {contract.effective_date && (
+                              <span>Effective: {new Date(contract.effective_date).toLocaleDateString()}</span>
+                            )}
+                            {contract.expiry_date && (
+                              <span>Expires: {new Date(contract.expiry_date).toLocaleDateString()}</span>
+                            )}
+                            <span>Created: {new Date(contract.created_at).toLocaleDateString()}</span>
+                          </div>
+                          {contract.signed_at && (
+                            <p className="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
+                              <CheckCircle className="h-3 w-3" />
+                              Signed on {new Date(contract.signed_at).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {isDraft && !contract.signed_at && (
+                            <Button
+                              size="sm"
+                              onClick={() => signContract(contract.id)}
+                              disabled={contractSigning === contract.id}
+                              data-testid={`button-sign-contract-${contract.id}`}
+                            >
+                              {contractSigning === contract.id ? (
+                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                              ) : (
+                                <CheckCircle className="h-4 w-4 mr-1" />
+                              )}
+                              Sign
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setExpandedContract(isExpanded ? null : contract.id)}
+                            data-testid={`button-toggle-contract-${contract.id}`}
+                          >
+                            {isExpanded ? 'Hide' : 'View'}
+                          </Button>
+                        </div>
+                      </div>
+                      {contract.metadata?.commission_rate && (
+                        <div className="mt-3 p-3 rounded-md bg-muted/40">
+                          <div className="flex items-center gap-4 text-sm">
+                            <div>
+                              <span className="text-xs text-muted-foreground">Commission Rate</span>
+                              <p className="font-medium">{contract.metadata.commission_rate}%</p>
+                            </div>
+                            {contract.metadata?.rate_lock_text && (
+                              <div className="flex-1">
+                                <span className="text-xs text-muted-foreground">Rate Lock Guarantee</span>
+                                <p className="text-xs">{contract.metadata.rate_lock_text}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {isExpanded && contract.body && (
+                      <div className="border-t px-4 py-3">
+                        <div className="prose prose-sm dark:prose-invert max-w-none text-sm whitespace-pre-wrap" data-testid={`text-contract-body-${contract.id}`}>
+                          {contract.body}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+              {contracts.length > 1 && (
+                <p className="text-xs text-muted-foreground text-center pt-2">
+                  Showing {contracts.length} contract version{contracts.length !== 1 ? 's' : ''}
+                </p>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 

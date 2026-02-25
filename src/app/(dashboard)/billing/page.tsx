@@ -1,11 +1,49 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import Link from 'next/link'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { CreditCard, ExternalLink, Loader2, Crown, Users, Sparkles } from 'lucide-react'
+import {
+  CreditCard,
+  ExternalLink,
+  Loader2,
+  Crown,
+  Users,
+  Sparkles,
+  FileText,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Receipt,
+  Calendar,
+  DollarSign,
+  ArrowRight,
+} from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface SubscriptionInfo {
   status: 'free' | 'active' | 'canceled' | 'past_due' | 'trialing'
@@ -14,6 +52,32 @@ interface SubscriptionInfo {
   cancelAtPeriodEnd: boolean
   subscriptionId: string | null
   priceId: string | null
+}
+
+interface Invoice {
+  id: string
+  invoice_number: string | null
+  amount: number | null
+  currency: string | null
+  status: string | null
+  description: string | null
+  stripe_invoice_id: string | null
+  hosted_invoice_url: string | null
+  invoice_pdf_url: string | null
+  created_at: string
+  paid_at: string | null
+  due_date: string | null
+  metadata: Record<string, unknown> | null
+}
+
+interface InvoiceItem {
+  id: string
+  invoice_id: string
+  description: string | null
+  amount: number | null
+  quantity: number | null
+  unit_price: number | null
+  created_at: string
 }
 
 const tierConfig = {
@@ -45,11 +109,55 @@ const statusLabels: Record<SubscriptionInfo['status'], { label: string; variant:
   trialing: { label: 'Trial', variant: 'outline' },
 }
 
+const invoiceStatusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+  paid: { label: 'Paid', variant: 'default' },
+  open: { label: 'Open', variant: 'outline' },
+  draft: { label: 'Draft', variant: 'secondary' },
+  void: { label: 'Void', variant: 'secondary' },
+  uncollectible: { label: 'Uncollectible', variant: 'destructive' },
+  overdue: { label: 'Overdue', variant: 'destructive' },
+  pending: { label: 'Pending', variant: 'outline' },
+}
+
+function formatCurrency(amount: number | null, currency?: string | null): string {
+  if (amount == null) return '$0.00'
+  const cents = amount < 100 && amount > 0 ? amount : amount / 100
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency || 'usd',
+  }).format(cents >= 1 ? amount / 100 : amount)
+}
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return '—'
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
+const PAGE_SIZE = 10
+
 export default function BillingPage() {
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isPortalLoading, setIsPortalLoading] = useState(false)
   const router = useRouter()
+
+  const [invoices, setInvoices] = useState<Invoice[]>([])
+  const [invoiceTotal, setInvoiceTotal] = useState(0)
+  const [invoicePage, setInvoicePage] = useState(0)
+  const [invoiceFilter, setInvoiceFilter] = useState<string>('all')
+  const [invoicesLoading, setInvoicesLoading] = useState(true)
+
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
+  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [subscriptionError, setSubscriptionError] = useState(false)
+  const [invoicesError, setInvoicesError] = useState(false)
+  const [detailError, setDetailError] = useState(false)
 
   useEffect(() => {
     async function fetchSubscription() {
@@ -59,16 +167,74 @@ export default function BillingPage() {
           router.push('/login?redirect=/billing')
           return
         }
+        if (!response.ok) {
+          setSubscriptionError(true)
+          return
+        }
         const data = await response.json()
         setSubscription(data)
+        setSubscriptionError(false)
       } catch (error) {
         console.error('Failed to fetch subscription:', error)
+        setSubscriptionError(true)
       } finally {
         setIsLoading(false)
       }
     }
     fetchSubscription()
   }, [router])
+
+  const fetchInvoices = useCallback(async () => {
+    setInvoicesLoading(true)
+    setInvoicesError(false)
+    try {
+      const params = new URLSearchParams({
+        limit: PAGE_SIZE.toString(),
+        offset: (invoicePage * PAGE_SIZE).toString(),
+      })
+      if (invoiceFilter !== 'all') {
+        params.set('status', invoiceFilter)
+      }
+      const response = await fetch(`/api/user/invoices?${params}`)
+      if (response.ok) {
+        const data = await response.json()
+        setInvoices(data.invoices || [])
+        setInvoiceTotal(data.total || 0)
+      } else {
+        setInvoicesError(true)
+      }
+    } catch (error) {
+      console.error('Failed to fetch invoices:', error)
+      setInvoicesError(true)
+    } finally {
+      setInvoicesLoading(false)
+    }
+  }, [invoicePage, invoiceFilter])
+
+  useEffect(() => {
+    fetchInvoices()
+  }, [fetchInvoices])
+
+  const openInvoiceDetail = async (invoice: Invoice) => {
+    setSelectedInvoice(invoice)
+    setDetailOpen(true)
+    setDetailLoading(true)
+    setDetailError(false)
+    try {
+      const response = await fetch(`/api/user/invoices/${invoice.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setInvoiceItems(data.items || [])
+      } else {
+        setDetailError(true)
+      }
+    } catch (error) {
+      console.error('Failed to fetch invoice detail:', error)
+      setDetailError(true)
+    } finally {
+      setDetailLoading(false)
+    }
+  }
 
   const handleManageBilling = async () => {
     setIsPortalLoading(true)
@@ -89,6 +255,8 @@ export default function BillingPage() {
     }
   }
 
+  const totalPages = Math.ceil(invoiceTotal / PAGE_SIZE)
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -99,24 +267,9 @@ export default function BillingPage() {
     )
   }
 
-  if (!subscription) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <Card>
-          <CardContent className="py-8 text-center">
-            <p className="text-muted-foreground">Unable to load subscription information.</p>
-            <Button onClick={() => window.location.reload()} className="mt-4" data-testid="button-retry">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  const tierInfo = tierConfig[subscription.tier]
+  const tierInfo = subscription ? tierConfig[subscription.tier] : tierConfig.free
   const TierIcon = tierInfo.icon
-  const statusInfo = statusLabels[subscription.status]
+  const statusInfo = subscription ? statusLabels[subscription.status] : statusLabels.free
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -126,11 +279,22 @@ export default function BillingPage() {
       </div>
 
       <div className="space-y-6">
+        {subscriptionError ? (
+          <Card data-testid="card-subscription-error">
+            <CardContent className="py-8 text-center">
+              <p className="text-destructive font-medium mb-2">Unable to load subscription information</p>
+              <p className="text-sm text-muted-foreground mb-4">Please try again or contact support if the issue persists.</p>
+              <Button variant="outline" onClick={() => window.location.reload()} data-testid="button-retry-subscription">
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
         <Card data-testid="card-subscription-status">
           <CardHeader>
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${tierInfo.color}`}>
+                <div className={`p-2 rounded-md ${tierInfo.color}`}>
                   <TierIcon className="h-5 w-5" />
                 </div>
                 <div>
@@ -144,19 +308,22 @@ export default function BillingPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {subscription.status !== 'free' && subscription.currentPeriodEnd && (
+            {subscription && subscription.status !== 'free' && subscription.currentPeriodEnd && (
               <div className="flex items-center justify-between gap-4 py-3 border-t flex-wrap">
-                <div>
-                  <p className="text-sm font-medium">
-                    {subscription.cancelAtPeriodEnd ? 'Access ends on' : 'Next billing date'}
-                  </p>
-                  <p className="text-sm text-muted-foreground" data-testid="text-billing-date">
-                    {new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">
+                      {subscription.cancelAtPeriodEnd ? 'Access ends on' : 'Next billing date'}
+                    </p>
+                    <p className="text-sm text-muted-foreground" data-testid="text-billing-date">
+                      {new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </p>
+                  </div>
                 </div>
                 {subscription.cancelAtPeriodEnd && (
                   <Badge variant="outline" className="text-amber-600 border-amber-600">
@@ -167,14 +334,14 @@ export default function BillingPage() {
             )}
 
             <div className="flex gap-3 pt-2 flex-wrap">
-              {subscription.status === 'free' ? (
+              {!subscription || subscription.status === 'free' ? (
                 <Button onClick={() => router.push('/pricing')} data-testid="button-upgrade">
                   <Sparkles className="h-4 w-4 mr-2" />
                   Upgrade to Pro
                 </Button>
               ) : (
-                <Button 
-                  onClick={handleManageBilling} 
+                <Button
+                  onClick={handleManageBilling}
                   disabled={isPortalLoading}
                   data-testid="button-manage-billing"
                 >
@@ -183,10 +350,10 @@ export default function BillingPage() {
                   ) : (
                     <CreditCard className="h-4 w-4 mr-2" />
                   )}
-                  Manage Billing
+                  Manage Subscription
                 </Button>
               )}
-              {subscription.status !== 'free' && (
+              {subscription && subscription.status !== 'free' && (
                 <Button variant="outline" onClick={() => router.push('/pricing')} data-testid="button-view-plans">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   View Plans
@@ -195,6 +362,184 @@ export default function BillingPage() {
             </div>
           </CardContent>
         </Card>
+        )}
+
+        <Card data-testid="card-payment-method">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-lg">Payment Method</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {subscription && subscription.status !== 'free' ? (
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <p className="text-sm text-muted-foreground">
+                  Your payment method is managed through Stripe. Click &quot;Manage Subscription&quot; above to update your card or payment details.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleManageBilling}
+                  disabled={isPortalLoading}
+                  data-testid="button-update-payment"
+                >
+                  {isPortalLoading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <CreditCard className="h-4 w-4 mr-2" />
+                  )}
+                  Update Payment
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No payment method on file. Upgrade your plan to add a payment method.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-invoice-history">
+          <CardHeader>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Receipt className="h-5 w-5 text-muted-foreground" />
+                <CardTitle className="text-lg">Invoice History</CardTitle>
+              </div>
+              <Select value={invoiceFilter} onValueChange={(val) => { setInvoiceFilter(val); setInvoicePage(0) }}>
+                <SelectTrigger className="w-[140px]" data-testid="select-invoice-filter">
+                  <SelectValue placeholder="Filter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="open">Open</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="void">Void</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <CardDescription>View and download your past invoices</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {invoicesLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" data-testid="loader-invoices" />
+              </div>
+            ) : invoicesError ? (
+              <div className="text-center py-12">
+                <p className="text-destructive font-medium mb-2">Failed to load invoices</p>
+                <p className="text-sm text-muted-foreground mb-4">Please try again.</p>
+                <Button variant="outline" size="sm" onClick={() => fetchInvoices()} data-testid="button-retry-invoices">
+                  Try Again
+                </Button>
+              </div>
+            ) : invoices.length === 0 ? (
+              <div className="text-center py-12">
+                <FileText className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+                <p className="text-sm text-muted-foreground" data-testid="text-no-invoices">No invoices found</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Invoice</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invoices.map((invoice) => {
+                    const invStatus = invoiceStatusConfig[invoice.status || 'draft'] || { label: invoice.status || 'Unknown', variant: 'secondary' as const }
+                    return (
+                      <TableRow key={invoice.id} data-testid={`row-invoice-${invoice.id}`}>
+                        <TableCell className="font-medium">
+                          <span data-testid={`text-invoice-number-${invoice.id}`}>
+                            {invoice.invoice_number || `INV-${invoice.id.slice(0, 8)}`}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {formatDate(invoice.created_at)}
+                        </TableCell>
+                        <TableCell>
+                          <span data-testid={`text-invoice-amount-${invoice.id}`}>
+                            {formatCurrency(invoice.amount, invoice.currency)}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={invStatus.variant} data-testid={`badge-invoice-status-${invoice.id}`}>
+                            {invStatus.label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => openInvoiceDetail(invoice)}
+                              data-testid={`button-view-invoice-${invoice.id}`}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            {(invoice.invoice_pdf_url || invoice.hosted_invoice_url) && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                data-testid={`button-download-invoice-${invoice.id}`}
+                              >
+                                <a
+                                  href={invoice.invoice_pdf_url || invoice.hosted_invoice_url || '#'}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <Download className="h-4 w-4" />
+                                </a>
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+          {totalPages > 1 && (
+            <CardFooter className="flex items-center justify-between gap-4 flex-wrap">
+              <p className="text-sm text-muted-foreground" data-testid="text-invoice-count">
+                Showing {invoicePage * PAGE_SIZE + 1}–{Math.min((invoicePage + 1) * PAGE_SIZE, invoiceTotal)} of {invoiceTotal}
+              </p>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={invoicePage === 0}
+                  onClick={() => setInvoicePage((p) => p - 1)}
+                  data-testid="button-invoice-prev"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-muted-foreground px-2">
+                  {invoicePage + 1} / {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={invoicePage >= totalPages - 1}
+                  onClick={() => setInvoicePage((p) => p + 1)}
+                  data-testid="button-invoice-next"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardFooter>
+          )}
+        </Card>
 
         <Card data-testid="card-billing-help">
           <CardHeader>
@@ -202,7 +547,7 @@ export default function BillingPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              If you have questions about your subscription or need assistance with billing, 
+              If you have questions about your subscription or need assistance with billing,
               please contact our support team.
             </p>
             <Button variant="outline" size="sm" data-testid="button-contact-support">
@@ -211,6 +556,109 @@ export default function BillingPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="max-w-lg" data-testid="dialog-invoice-detail">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Invoice {selectedInvoice?.invoice_number || `INV-${selectedInvoice?.id.slice(0, 8)}`}
+            </DialogTitle>
+          </DialogHeader>
+          {detailLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : detailError ? (
+            <div className="text-center py-8">
+              <p className="text-destructive font-medium mb-2">Failed to load invoice details</p>
+              <Button variant="outline" size="sm" onClick={() => selectedInvoice && openInvoiceDetail(selectedInvoice)} data-testid="button-retry-detail">
+                Try Again
+              </Button>
+            </div>
+          ) : selectedInvoice ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Date</p>
+                  <p className="font-medium" data-testid="text-detail-date">{formatDate(selectedInvoice.created_at)}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Status</p>
+                  <Badge
+                    variant={(invoiceStatusConfig[selectedInvoice.status || 'draft'] || { variant: 'secondary' }).variant as 'default' | 'secondary' | 'destructive' | 'outline'}
+                    data-testid="badge-detail-status"
+                  >
+                    {(invoiceStatusConfig[selectedInvoice.status || 'draft'] || { label: selectedInvoice.status }).label}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Amount</p>
+                  <p className="font-medium text-lg" data-testid="text-detail-amount">
+                    {formatCurrency(selectedInvoice.amount, selectedInvoice.currency)}
+                  </p>
+                </div>
+                {selectedInvoice.paid_at && (
+                  <div>
+                    <p className="text-muted-foreground">Paid On</p>
+                    <p className="font-medium" data-testid="text-detail-paid">{formatDate(selectedInvoice.paid_at)}</p>
+                  </div>
+                )}
+              </div>
+
+              {selectedInvoice.description && (
+                <div className="text-sm">
+                  <p className="text-muted-foreground">Description</p>
+                  <p data-testid="text-detail-description">{selectedInvoice.description}</p>
+                </div>
+              )}
+
+              {invoiceItems.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-2">Line Items</p>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="text-right">Qty</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {invoiceItems.map((item) => (
+                        <TableRow key={item.id} data-testid={`row-item-${item.id}`}>
+                          <TableCell className="text-sm">{item.description || 'Item'}</TableCell>
+                          <TableCell className="text-right text-sm">{item.quantity || 1}</TableCell>
+                          <TableCell className="text-right text-sm">{formatCurrency(item.amount)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+
+              <div className="flex gap-2 pt-2 flex-wrap">
+                {selectedInvoice.invoice_pdf_url && (
+                  <Button variant="outline" size="sm" asChild data-testid="button-detail-download-pdf">
+                    <a href={selectedInvoice.invoice_pdf_url} target="_blank" rel="noopener noreferrer">
+                      <Download className="h-4 w-4 mr-2" />
+                      Download PDF
+                    </a>
+                  </Button>
+                )}
+                {selectedInvoice.hosted_invoice_url && (
+                  <Button variant="outline" size="sm" asChild data-testid="button-detail-view-stripe">
+                    <a href={selectedInvoice.hosted_invoice_url} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View on Stripe
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

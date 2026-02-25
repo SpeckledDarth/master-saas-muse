@@ -27,6 +27,9 @@ import {
   DollarSign,
   Flame,
   Users,
+  CreditCard,
+  HelpCircle,
+  Shield,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -98,6 +101,14 @@ const NAV_ITEMS = [
     group: 'Earn',
     items: [
       { title: 'Affiliate Program', href: '/affiliate', icon: DollarSign },
+    ],
+  },
+  {
+    group: 'Account',
+    items: [
+      { title: 'Billing', href: '/billing', icon: CreditCard },
+      { title: 'Support', href: '/support', icon: HelpCircle },
+      { title: 'Security', href: '/security', icon: Shield },
     ],
   },
   {

@@ -1,27 +1,31 @@
 # MuseKit + PassivePost — Development Roadmap
 
-> **Revision:** 1.5 | **Last Updated:** February 25, 2026 | **Created:** February 20, 2026
+> **Revision:** 1.6 | **Last Updated:** February 25, 2026 | **Created:** February 20, 2026
 
 > **IMPORTANT — READ THIS FILE AT THE START OF EVERY SESSION.** This is the single source of truth for the multi-week development plan. If agent memory resets, this file restores full context.
 
 ---
 
-## NEXT SESSION: Phase 6 — Dashboard Enhancements (UI Layer)
+## NEXT SESSION: Phase 7 — AI & Cross-Dashboard Features
 
-**Where we are:** Phases 1-3.6 and Phase 5 are COMPLETE. All database tables and API routes exist. No pending bugs.
+**Where we are:** Phases 1-3.6, Phase 5, and Phase 6 are COMPLETE. All 16 Phase 6 dashboard UI features are built across Admin, Affiliate, and User dashboards. No pending bugs.
 
-**What to build next:** Phase 6 wires the Phase 5 data layer into visible dashboard UI across all three user types:
+**What to build next:** Phase 7 layers intelligence, automation, and advanced features on top of the foundation:
 
-- **Admin Dashboard (6.1.1-6.1.5):** Affiliate CRM card, revenue attribution, bulk payouts, health scores, quick notes
-- **Affiliate Dashboard (6.2.1-6.2.6):** Earnings statements (PDF), portfolio view, commission lifecycle, contract view, tax summary, campaign creator
-- **User Dashboard (6.3.1-6.3.5):** Invoice history, subscription management, support tickets, account security, affiliate invitation
+- **7.1:** AI Social Post Writer — generate promo content with affiliate code embedded
+- **7.2:** AI Weekly Coach — personalized performance tips every Monday
+- **7.3:** Commission renewal system — extend commission window via customer check-ins
+- **7.4:** Connected analytics — YouTube/GA/podcast integration for full-funnel view
+- **7.5:** ~~In-app messaging~~ — already built in Phase 3.6 Sprint 4 (E28)
+- **7.6:** Earnings charts and analytics suite — line charts, heatmaps, funnels, benchmarks
+- **7.7:** Dashboard customization — drag/drop widgets
 
 **Key context:**
 - All Phase 5 tables exist in Supabase (migration 011 already run)
-- All Phase 5 APIs are live on Vercel (20+ routes)
-- Phase 6 is purely UI — no new tables or migrations expected
-- Read `docs/CRM_INVOICING_BRAINSTORM.md` for the full 217-feature vision that feeds these dashboards
-- See Phase 6 sprint tables below for the exact 16 features
+- All Phase 5 + 6 APIs are live (20+ data APIs + 4 new UI APIs: revenue-attribution, earnings-statement, tax-summary, payout-receipt)
+- Phase 6 added: CRM card, health scores, bulk payouts, revenue attribution, earnings PDFs, portfolio view, commission lifecycle, contract view, tax summary, campaigns, billing page, support tickets, account security, affiliate invite
+- AI features require xAI/OpenAI API key (already configured in env)
+- Read `docs/CRM_INVOICING_BRAINSTORM.md` for the full 217-feature vision
 
 **Migrations run on Supabase (all current):** 001-011
 
@@ -45,7 +49,7 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 | 3.6 | Affiliate Enhancements & Discount Codes | **COMPLETE** — All 32/32 features across 4 sprints + Audit System + Bug Fixes | Week 4-6 |
 | 4 | Mobile App (PWA First) | Deprioritized | TBD |
 | **5** | **CRM & Invoicing Foundation (Data Layer)** | **COMPLETE** — All 9/9 features across 2 sprints | **Week 7-9** |
-| **6** | **Dashboard Enhancements (UI Layer)** | **Not Started** | **Week 9-11** |
+| **6** | **Dashboard Enhancements (UI Layer)** | **COMPLETE** — All 16/16 features across 3 dashboard types | **Week 9-11** |
 | **7** | **AI & Cross-Dashboard Features** | **Not Started** | **Week 11+** |
 
 ---
@@ -376,32 +380,32 @@ All previously pending bugs have been resolved.
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 6.1.1 | Affiliate "at a glance" CRM card — click name → full profile, earnings, payouts, tickets, activity log, notes | Not Started | Brainstorm #30 |
-| 6.1.2 | Revenue attribution report — affiliate vs. direct revenue split | Not Started | Brainstorm #32 |
-| 6.1.3 | Bulk payout processing with auto receipt emails | Not Started | Brainstorm #31 |
-| 6.1.4 | Affiliate health score — auto-calculated red/yellow/green indicator | Not Started | Brainstorm #35 |
-| 6.1.5 | Quick notes on any account — admin internal notes | Not Started | Brainstorm #34 |
+| 6.1.1 | Affiliate "at a glance" CRM card — click name → full profile, earnings, payouts, tickets, activity log, notes | Complete | CRM drawer on admin affiliate page. Click member name → full profile with earnings, payouts, tickets, activities, notes. |
+| 6.1.2 | Revenue attribution report — affiliate vs. direct revenue split | Complete | New API `/api/admin/revenue-attribution`. Revenue cards + visual bar chart in Health tab showing affiliate vs direct revenue split. |
+| 6.1.3 | Bulk payout processing with auto receipt emails | Complete | "Process All" button → summary dialog → approve + auto-send receipt emails via Resend. New API `/api/admin/affiliate/payout-receipt`. |
+| 6.1.4 | Affiliate health score — auto-calculated red/yellow/green indicator | Complete | Color-coded dot badges (green/yellow/red) on each member in Members tab. Calculated from activity recency, conversion rate, fraud score. |
+| 6.1.5 | Quick notes on any account — admin internal notes | Complete | Notes section in CRM card. Stored as activities with type 'note'. Add/view notes in reverse chronological order. |
 
 ### Affiliate Dashboard Enhancements
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 6.2.1 | Professional earnings statements — branded PDF with itemized commissions | Not Started | Brainstorm #109 |
-| 6.2.2 | "My Portfolio" view — referrals as investment portfolio with LTV | Not Started | Brainstorm #133 |
-| 6.2.3 | Commission lifecycle tracker — full journey from click to payout | Not Started | Brainstorm #117 |
-| 6.2.4 | "My Terms" contract view — locked-in terms, rate lock guarantee | Not Started | Brainstorm #104, #139 |
-| 6.2.5 | Tax summary and 1099-ready annual report | Not Started | Brainstorm #113 |
-| 6.2.6 | Campaign creator with per-campaign tracking | Not Started | Brainstorm #183-188 |
+| 6.2.1 | Professional earnings statements — branded PDF with itemized commissions | Complete | "Download Statement" button on Earnings tab. Period selector (current/last month/custom). New API `/api/affiliate/earnings-statement` generates HTML-to-PDF. |
+| 6.2.2 | "My Portfolio" view — referrals as investment portfolio with LTV | Complete | List/Portfolio toggle on Referrals tab. Shows referrals as investments with LTV, grouped by status (active/trial/churned). Summary cards for portfolio value. |
+| 6.2.3 | Commission lifecycle tracker — full journey from click to payout | Complete | Expandable commission rows in Earnings tab. Horizontal stepper showing: Click → Signup → Trial → Paid → Created → Approved → Paid Out with status icons. |
+| 6.2.4 | "My Terms" contract view — locked-in terms, rate lock guarantee | Complete | "My Terms" section in Account tab. Shows active contract, commission rate, effective date, sign button for drafts, version history. |
+| 6.2.5 | Tax summary and 1099-ready annual report | Complete | Tax Summary section in Account tab. Annual earnings by year, 1099-ready format. New API `/api/affiliate/tax-summary`. Download button for tax summary PDF. |
+| 6.2.6 | Campaign creator with per-campaign tracking | Complete | Campaigns section in Tools tab. Create/edit/delete campaigns with UTM fields. Per-campaign tracking stats (clicks, signups, conversions, revenue). Auto-generated trackable links. |
 
 ### User (Product) Dashboard Enhancements
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| 6.3.1 | Invoice history page — every payment, downloadable as PDF | Not Started | Brainstorm #21 |
-| 6.3.2 | Subscription management tab — plan, billing date, payment method, invoices | Not Started | Brainstorm #22 |
-| 6.3.3 | Support ticket submission and history | Not Started | Brainstorm #24 |
-| 6.3.4 | Account security page — password, sessions, 2FA future | Not Started | Brainstorm #25 |
-| 6.3.5 | Affiliate program invitation prompt — "Love it? Earn 30%" | Not Started | Brainstorm #26 |
+| 6.3.1 | Invoice history page — every payment, downloadable as PDF | Complete | Billing page at `/billing`. Invoice list with status filter, pagination. Click for detail dialog with line items. Download PDF via Stripe URL. Error states with retry. |
+| 6.3.2 | Subscription management tab — plan, billing date, payment method, invoices | Complete | Subscription card on billing page. Shows current plan, tier icon, status, billing cycle, next payment date. "Manage Subscription" → Stripe portal. Payment method card. |
+| 6.3.3 | Support ticket submission and history | Complete | Support page at `/support`. Ticket list with status badges, "New Ticket" form. Click ticket → detail view with comments thread. Add comment form. Status flow visible. |
+| 6.3.4 | Account security page — password, sessions, 2FA future | Complete | Security page at `/security`. Change password form with Supabase auth. Active sessions info. 2FA "Coming Soon" placeholder. Last login display. |
+| 6.3.5 | Affiliate program invitation prompt — "Love it? Earn 30%" | Complete | Invitation card on billing page. "Earn 30% commissions" CTA linking to `/affiliate/join`. Shown to non-affiliate users. |
 
 **Dependencies:**
 - Phase 5 data layer must be complete (tables must exist for UI to query)
@@ -470,6 +474,10 @@ Decisions made during planning, preserved for context.
 | Feb 25, 2026 | user_profiles coexists with affiliate_profiles | user_profiles is universal (all user types). affiliate_profiles remains for affiliate-specific data (payout method, bank details). No migration/merge needed — they serve different purposes. |
 | Feb 25, 2026 | Payout items inserted during batch generation, not retroactively | Only new batches will have payout_items. Existing batches won't have items. This is fine — the feature is forward-looking. |
 | Feb 25, 2026 | Stripe webhook sync is additive-only, wrapped in try/catch | syncInvoiceToLocal() runs AFTER existing commission logic and is wrapped in its own try/catch. If it fails, commissions still process normally. This ensures zero regression risk. |
+| Feb 25, 2026 | Phase 6 is purely UI — no new database migrations | All 16 features wire existing Phase 5 tables/APIs into visible dashboard UI. Only 4 new API routes needed (revenue-attribution, earnings-statement, tax-summary, payout-receipt). |
+| Feb 25, 2026 | Health scores calculated client-side from existing data | No new table/API needed. Score based on: days since last activity (30d green, 60d yellow, 60d+ red), conversion rate (>5% green, 1-5% yellow, <1% red), fraud score (>40 red). |
+| Feb 25, 2026 | Billing page uses explicit error states with retry buttons | Code review caught silent fallback to Free tier on subscription load failure. Fixed: subscription, invoice list, and invoice detail all show clear error messages with "Try Again" buttons. |
+| Feb 25, 2026 | User dashboard sidebar gets Account section (Billing, Support, Security) | Added "Account" nav group to social sidebar with links to /billing, /support, /security pages. |
 
 ---
 
@@ -516,6 +524,7 @@ Running log of what was accomplished each session. Update at the end of every se
 | Feb 24, 2026 | **CRM & Invoicing brainstorm session.** (1) Documented 217 features across all three dashboards in `docs/CRM_INVOICING_BRAINSTORM.md`. (2) Identified critical gap: no universal profiles, no local invoice/payment records, no support tickets, no contracts. (3) Designed three-layer dogfooding architecture (company uses product, affiliates use product to promote product, customers become affiliates). (4) Documented cross-Muse strategy (MuseKit built once, every Muse benefits). (5) Compared AFFILIATE_ENHANCEMENTS.md (32 features, implementation specs) with brainstorm doc (217 features, strategic vision) — kept both with cross-references. (6) Added Phases 5-7 to roadmap: data layer → dashboards → AI. (7) Deprioritized Phase 4 (Mobile PWA). (8) Recorded 3 pending affiliate onboarding bugs (BF1-BF3). (9) Updated replit.md with document map and session protocol. | Phases 5-7 Added, Documentation Overhaul |
 | Feb 24, 2026 | **Bug fixes (BF1-BF3) + Three-Environment Sync Protocol.** (1) Fixed BF1: Members API fetches `name` from `affiliate_applications` as fallback for existing users without `user_metadata` name. (2) Fixed BF2: Approval magic link now uses `token_hash` approach — auth callback (`/auth/callback`) handles both PKCE code exchange AND `token_hash`+`type` via `verifyOtp()`. No more PKCE code_verifier dependency for server-generated magic links. (3) Fixed BF3: Confirmed conditional email logic was already correct in code; BF2 fix makes it functional. (4) Codified Three-Environment Sync Protocol in `replit.md` — Replit (editor + local Postgres) vs GitHub (version control) vs Vercel+Supabase (production). Mandatory Pre-Push Sync Checklist: schema alignment, compile check, API smoke test, migration inventory, env var list, git status. This protocol addresses the root cause of most wasted debugging hours. | BF1-BF3 Fixed, Sync Protocol Added |
 | Feb 24, 2026 | **Phase 3.6 Sprint 3 — Complete (8/8 features).** Code audit revealed 7/8 features already built during Sprints 1-2. Only Resource Center (3.6.16) needed enhancement: (1) Added 4 new asset types to admin (faq, video_tutorial, best_practice, guide) — total now 13 types. (2) Added `ASSET_TYPE_LABELS` and `ASSET_TYPE_ICONS` mappings for all types. (3) Added category filter dropdown with per-type counts on affiliate dashboard. (4) Added text search filtering by title/description. (5) Renamed tab from "Marketing" to "Resources" with Bookmark icon. (6) Added "Clear Filters" button when no results match. (7) Updated video_tutorial label in admin file URL field. (8) Updated Sprint 2 ROADMAP entries from "Not Started" → "Complete" with detailed notes. (9) Updated Sprint 3 ROADMAP entries with comprehensive implementation notes. Dev server compiles clean, no errors. | Phase 3.6 Sprint 3 Complete |
+| Feb 25, 2026 | **Phase 6 — COMPLETE (16/16 features, 3 dashboard types).** Built all 16 dashboard UI features wiring Phase 5 data layer into visible UI. **Admin Dashboard (5 features):** (1) CRM card — click affiliate name → full profile drawer with earnings, payouts, tickets, activities, notes. (2) Revenue attribution — new `/api/admin/revenue-attribution` API, stats cards + bar chart in Health tab showing affiliate vs direct revenue split. (3) Bulk payouts — "Process All" → summary dialog → approve + auto-send receipt emails via Resend (`/api/admin/affiliate/payout-receipt`). (4) Health scores — green/yellow/red dot badges on each member calculated from activity recency, conversion rate, fraud score. (5) Quick notes — notes section in CRM card using activities API. **Affiliate Dashboard (6 features):** (6) Earnings statements — "Download Statement" with period selector, HTML-to-PDF via `/api/affiliate/earnings-statement`. (7) Portfolio view — list/portfolio toggle on Referrals tab showing referrals as investments with LTV. (8) Commission lifecycle — expandable rows with 7-step horizontal stepper (Click→Signup→Trial→Paid→Created→Approved→Paid Out). (9) Contract view — "My Terms" in Account tab with sign button, version history. (10) Tax summary — annual 1099-ready report via `/api/affiliate/tax-summary`. (11) Campaign creator — campaigns section in Tools tab with UTM auto-generation. **User Dashboard (5 features):** (12) Invoice history — `/billing` page with list, status filter, pagination, detail dialog, PDF download. (13) Subscription management — plan card with tier icon, status, billing cycle, Stripe portal link. (14) Support tickets — `/support` page with ticket list, new ticket form, comments thread. (15) Account security — `/security` page with password change, sessions, 2FA placeholder. (16) Affiliate invite — "Earn 30%" card on billing page linking to /affiliate/join. Code review: fixed billing page error handling (subscription/invoice/detail errors with retry buttons instead of silent fallback). Added "Account" nav group (Billing, Support, Security) to user sidebar. 4 new API routes total. No new migrations needed. | Phase 6 Complete |
 | Feb 25, 2026 | **Phase 5 — COMPLETE (9/9 features, 2 sprints).** Built entire CRM & Invoicing Foundation data layer in one session: (1) **Migration 011** — 10 new tables: user_profiles, invoices, invoice_items, payments, affiliate_payout_items, tickets, ticket_comments, activities, campaigns, contracts. (2) **User Profiles API (5.1.1)** — GET/POST `/api/user/profile` for users, admin GET/PATCH `/api/admin/users/[id]/profile`. (3) **Invoice Sync (5.1.2 + 5.1.5)** — `syncInvoiceToLocal()` added to Stripe webhook (additive-only, try/catch wrapped). Upserts invoices, inserts line items, creates payments. Also handles `invoice.payment_failed`. User GET `/api/user/invoices` + `[id]`, admin GET `/api/admin/invoices` + `[id]`. (4) **Payments API (5.1.3)** — User GET `/api/user/payments`. (5) **Payout Items (5.1.4)** — Junction table created, batch generation inserts items, GET `/api/affiliate/payouts/[id]/items` + admin version. (6) **Tickets (5.2.1)** — Full CRUD: user GET/POST, GET/PATCH `[id]`, comments GET/POST. Admin GET with filters. Status flow + internal comments. (7) **Activities (5.2.2)** — CRUD for 6 activity types, admin view across users. (8) **Campaigns (5.2.3)** — Full CRUD with UTM tracking + performance counters. (9) **Contracts (5.2.4)** — CRUD with signing flow (user sign → admin countersign) + version history via parent_contract_id. All 20+ API routes return 401/403 (not 500) without auth. Zero compile errors. | Phase 5 Complete |
 | Feb 24, 2026 | **Phase 3.6 Sprint 4 — Complete (13/13 features). PHASE 3.6 FULLY DONE (32/32).** Built all 13 Sprint 4 features in one session using parallel subagents: (1) **Anti-Spam/Compliance (3.6.20)** — `agreed_to_terms` checkbox on join form, admin suspend/unsuspend with reason. (2) **Fraud Scoring (3.6.21)** — `src/lib/affiliate/fraud.ts` with 6 scoring signals, auto-pause at configurable threshold, admin recalculate button. (3) **Tax Compliance (3.6.22)** — `affiliate_tax_info` table, W-9/W-8BEN forms in Account tab, admin Tax Info tab with verify, payouts blocked without tax info. (4) **Co-Branded Pages (3.6.23)** — `affiliate_landing_pages` table, editor in Tools tab, public `/partner/[slug]` route with ref code, view counter. (5) **Two-Tier Referrals (3.6.24)** — `recruited_by_affiliate_id` tracking, second-tier commissions in Stripe webhook, admin toggle + rate setting. (6) **API Access (3.6.25)** — `affiliate_api_keys` table, SHA-256 hashed keys, 100 req/hr rate limiting, 4 v1 endpoints (stats/referrals/commissions/earnings). (7) **Messaging (3.6.26)** — `affiliate_messages` table, chat UI on both dashboards, unread badges, mark-as-read. (8) **Surveys (3.6.27)** — `affiliate_surveys` table, 1-5 stars + feedback, configurable interval, auto-testimonial on opt-in. (9) **Testimonials (3.6.28)** — `affiliate_testimonials` table, admin CRUD tab, public display on `/affiliate` page. (10) **Badges (3.6.29)** — `affiliate_badges`/`affiliate_badge_tiers` tables, auto-award at $500/$2500/$10000, public `/partner/verify/[code]` page, embed code copy. (11) **Webhooks (3.6.30)** — `affiliate_webhooks`/`_deliveries` tables, HMAC-SHA256 signing, 3 retries, 6 event types, test button, delivery log. (12) **Auto-Promo (3.6.31)** — AI-powered promo post generator (7 platforms, 5 tones) with ref link embedding. (13) **PartnerStack Docs (3.6.32)** — External Networks Playbook added to AFFILIATE.md. Migration 010 created. Admin page gained Messages, Testimonials, Tax Info tabs + two-tier/fraud/survey settings. All 16+ new API endpoints tested with zero 500s. | Phase 3.6 Sprint 4 Complete — PHASE 3.6 DONE |
 
@@ -620,9 +629,16 @@ Key files for each phase, so agents can find relevant code quickly.
 - Contracts APIs: `src/app/api/contracts/route.ts`, `src/app/api/contracts/[id]/route.ts`, `src/app/api/admin/contracts/route.ts`
 
 ### Phase 6 (Dashboard Enhancements)
-- Admin CRM: Extend `src/app/admin/setup/affiliate/page.tsx` or new admin pages
-- Affiliate financial views: Extend `src/app/affiliate/dashboard/page.tsx`
-- User billing: New pages in `src/app/dashboard/` (invoices, support, security)
+- Admin CRM card + health scores + bulk payouts + revenue attribution + quick notes: Extended `src/app/admin/setup/affiliate/page.tsx`
+- Revenue attribution API: `src/app/api/admin/revenue-attribution/route.ts`
+- Payout receipt email API: `src/app/api/admin/affiliate/payout-receipt/route.ts`
+- Affiliate earnings statement API: `src/app/api/affiliate/earnings-statement/route.ts`
+- Affiliate tax summary API: `src/app/api/affiliate/tax-summary/route.ts`
+- Affiliate portfolio view + commission lifecycle + contract view + campaigns: Extended `src/app/affiliate/dashboard/page.tsx`
+- User billing page (invoices + subscription): `src/app/(dashboard)/billing/page.tsx`
+- User support tickets: `src/app/(dashboard)/support/page.tsx`
+- User account security: `src/app/(dashboard)/security/page.tsx`
+- User sidebar updated: `src/components/social/social-sidebar.tsx` (added Account group with Billing, Support, Security)
 
 ### Phase 7 (AI & Cross-Dashboard)
 - AI tools: `src/lib/ai/` (existing pluggable AI system)

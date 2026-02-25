@@ -23,6 +23,7 @@ import { useToast } from '@/hooks/use-toast'
 import DetailModal, { DetailField } from '@/components/admin/DetailModal'
 import HelpTooltip from '@/components/admin/HelpTooltip'
 import SortableHeader from '@/components/admin/SortableHeader'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 interface Settings {
   commission_rate: number
@@ -443,6 +444,316 @@ function AdminTestimonialsTab() {
   )
 }
 
+function AffiliateCRMDrawer({
+  member,
+  open,
+  onClose,
+  onSuspend,
+  onRecalcFraud,
+  suspendingMember,
+  recalcFraud: recalcFraudId,
+}: {
+  member: AffiliateMember | null
+  open: boolean
+  onClose: () => void
+  onSuspend: (userId: string, email: string, suspend: boolean) => void
+  onRecalcFraud: (userId: string, email: string) => void
+  suspendingMember: string | null
+  recalcFraud: string | null
+}) {
+  const [crmTab, setCrmTab] = useState('profile')
+  const [tickets, setTickets] = useState<any[]>([])
+  const [activities, setActivities] = useState<any[]>([])
+  const [notes, setNotes] = useState<any[]>([])
+  const [payouts, setPayouts] = useState<any[]>([])
+  const [loadingCrm, setLoadingCrm] = useState(false)
+  const [noteText, setNoteText] = useState('')
+  const [savingNote, setSavingNote] = useState(false)
+  const { toast } = useToast()
+
+  useEffect(() => {
+    if (!open || !member) return
+    setCrmTab('profile')
+    setLoadingCrm(true)
+    const userId = member.userId
+
+    Promise.all([
+      fetch(`/api/admin/tickets?user_id=${userId}&limit=10`).then(r => r.ok ? r.json() : { tickets: [] }).catch(() => ({ tickets: [] })),
+      fetch(`/api/activities?user_id=${userId}&limit=20`).then(r => r.ok ? r.json() : { activities: [] }).catch(() => ({ activities: [] })),
+      fetch(`/api/activities?user_id=${userId}&activity_type=note&limit=50`).then(r => r.ok ? r.json() : { activities: [] }).catch(() => ({ activities: [] })),
+      fetch(`/api/affiliate/payouts?affiliateId=${userId}`).then(r => r.ok ? r.json() : { payouts: [] }).catch(() => ({ payouts: [] })),
+    ]).then(([ticketData, activityData, noteData, payoutData]) => {
+      setTickets(ticketData.tickets || [])
+      setActivities((activityData.activities || []).filter((a: any) => a.activity_type !== 'note'))
+      setNotes(noteData.activities || [])
+      setPayouts(payoutData.payouts || [])
+    }).finally(() => setLoadingCrm(false))
+  }, [open, member])
+
+  const addNote = async () => {
+    if (!noteText.trim() || !member) return
+    setSavingNote(true)
+    try {
+      const res = await fetch('/api/activities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          activity_type: 'note',
+          subject: 'Admin Note',
+          body: noteText.trim(),
+          related_entity_type: 'affiliate',
+          related_entity_id: member.userId,
+          user_id: member.userId,
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setNotes(prev => [data.activity, ...prev])
+        setNoteText('')
+        toast({ title: 'Note added' })
+      } else {
+        toast({ title: 'Failed to add note', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Failed to add note', variant: 'destructive' })
+    } finally {
+      setSavingNote(false)
+    }
+  }
+
+  if (!member) return null
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col" data-testid="dialog-crm-drawer">
+        <DialogHeader>
+          <DialogTitle className="text-lg" data-testid="text-crm-title">{member.name || member.email}</DialogTitle>
+          <DialogDescription className="flex items-center gap-2 flex-wrap">
+            <span>{member.email}</span>
+            <Badge variant="outline" className="text-[10px]">{member.refCode}</Badge>
+            <Badge
+              variant={member.suspended ? 'destructive' : member.status === 'active' ? 'default' : 'secondary'}
+              className="text-[10px]"
+              data-testid="badge-crm-status"
+            >
+              {member.suspended ? 'Suspended' : member.status === 'active' ? 'Active' : member.status === 'pending_setup' ? 'Pending Setup' : 'Inactive'}
+            </Badge>
+          </DialogDescription>
+        </DialogHeader>
+
+        <Tabs value={crmTab} onValueChange={setCrmTab} className="flex-1 min-h-0">
+          <TabsList className="flex-wrap">
+            <TabsTrigger value="profile" data-testid="crm-tab-profile">Profile</TabsTrigger>
+            <TabsTrigger value="payouts" data-testid="crm-tab-payouts">Payouts</TabsTrigger>
+            <TabsTrigger value="tickets" data-testid="crm-tab-tickets">Tickets</TabsTrigger>
+            <TabsTrigger value="activity" data-testid="crm-tab-activity">Activity</TabsTrigger>
+            <TabsTrigger value="notes" data-testid="crm-tab-notes">Notes</TabsTrigger>
+          </TabsList>
+
+          <ScrollArea className="h-[55vh] mt-3">
+            <TabsContent value="profile" className="space-y-4 mt-0 pr-3">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Profile Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="grid grid-cols-[120px_1fr] gap-y-1.5">
+                    <span className="text-muted-foreground">Name</span>
+                    <span data-testid="text-crm-name">{member.name || '—'}</span>
+                    <span className="text-muted-foreground">Email</span>
+                    <span data-testid="text-crm-email">{member.email}</span>
+                    <span className="text-muted-foreground">Joined</span>
+                    <span data-testid="text-crm-joined">{new Date(member.joinedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                    <span className="text-muted-foreground">Last Sign In</span>
+                    <span>{member.lastSignIn ? new Date(member.lastSignIn).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}</span>
+                    <span className="text-muted-foreground">Tier</span>
+                    <span data-testid="text-crm-tier">{member.tier}</span>
+                    <span className="text-muted-foreground">Fraud Score</span>
+                    <span>
+                      <Badge variant={member.fraudScore >= 60 ? 'destructive' : member.fraudScore >= 30 ? 'secondary' : 'outline'} className="text-[10px]" data-testid="badge-crm-fraud">
+                        {member.fraudScore || 0}{member.fraudScore >= 60 ? ' (High)' : member.fraudScore >= 30 ? ' (Medium)' : ''}
+                      </Badge>
+                    </span>
+                    {member.lockedRate && (
+                      <>
+                        <span className="text-muted-foreground">Locked Rate</span>
+                        <span>{member.lockedRate}%{member.lockedDuration ? ` for ${member.lockedDuration} months` : ''}</span>
+                      </>
+                    )}
+                    {member.suspended && member.suspensionReason && (
+                      <>
+                        <span className="text-muted-foreground">Suspension</span>
+                        <span className="text-destructive">{member.suspensionReason}</span>
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Earnings Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="text-center p-2 rounded bg-muted/50">
+                      <p className="text-lg font-bold tabular-nums" data-testid="text-crm-total-earnings">${((member.totalEarnings || 0) / 100).toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground">Total</p>
+                    </div>
+                    <div className="text-center p-2 rounded bg-muted/50">
+                      <p className="text-lg font-bold tabular-nums" data-testid="text-crm-pending-earnings">${((member.pendingEarnings || 0) / 100).toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground">Pending</p>
+                    </div>
+                    <div className="text-center p-2 rounded bg-muted/50">
+                      <p className="text-lg font-bold tabular-nums" data-testid="text-crm-paid-earnings">${((member.paidEarnings || 0) / 100).toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground">Paid</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mt-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span data-testid="text-crm-referrals">{member.referrals} referrals</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                      <span data-testid="text-crm-clicks">{member.clicks} clicks</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="flex items-center flex-wrap gap-2 pt-1">
+                <Button
+                  variant={member.suspended ? 'default' : 'destructive'}
+                  size="sm"
+                  onClick={() => onSuspend(member.userId, member.email, !member.suspended)}
+                  disabled={suspendingMember === member.userId}
+                  data-testid="button-crm-suspend"
+                >
+                  {suspendingMember === member.userId ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : member.suspended ? <CheckCircle className="mr-1 h-3 w-3" /> : <AlertTriangle className="mr-1 h-3 w-3" />}
+                  {member.suspended ? 'Unsuspend' : 'Suspend'}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onRecalcFraud(member.userId, member.email)}
+                  disabled={recalcFraudId === member.userId}
+                  data-testid="button-crm-recalc-fraud"
+                >
+                  {recalcFraudId === member.userId ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <RefreshCw className="mr-1 h-3 w-3" />}
+                  Recalculate Fraud
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="payouts" className="mt-0 pr-3">
+              {loadingCrm ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>
+              ) : payouts.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-crm-no-payouts">No payouts yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {payouts.map((p: any) => (
+                    <div key={p.id} className="flex items-center justify-between p-3 border rounded text-sm" data-testid={`crm-payout-${p.id}`}>
+                      <div>
+                        <p className="font-medium tabular-nums">${((p.amount_cents || 0) / 100).toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <Badge variant={p.status === 'paid' || p.status === 'completed' ? 'default' : p.status === 'rejected' ? 'destructive' : 'secondary'} className="text-xs">
+                        {p.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="tickets" className="mt-0 pr-3">
+              {loadingCrm ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>
+              ) : tickets.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-crm-no-tickets">No tickets found.</p>
+              ) : (
+                <div className="space-y-2">
+                  {tickets.map((t: any) => (
+                    <div key={t.id} className="p-3 border rounded text-sm" data-testid={`crm-ticket-${t.id}`}>
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-medium truncate flex-1">{t.subject || `Ticket #${t.id?.slice(0, 8)}`}</p>
+                        <Badge variant={t.status === 'open' ? 'destructive' : t.status === 'in_progress' ? 'secondary' : 'outline'} className="text-[10px] shrink-0">
+                          {t.status}
+                        </Badge>
+                      </div>
+                      {t.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{t.description}</p>}
+                      <div className="flex items-center gap-2 mt-1">
+                        {t.priority && <Badge variant="outline" className="text-[10px]">{t.priority}</Badge>}
+                        <span className="text-[10px] text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="activity" className="mt-0 pr-3">
+              {loadingCrm ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>
+              ) : activities.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-crm-no-activity">No activity recorded.</p>
+              ) : (
+                <div className="space-y-2">
+                  {activities.map((a: any) => (
+                    <div key={a.id} className="flex items-start gap-3 p-3 border rounded text-sm" data-testid={`crm-activity-${a.id}`}>
+                      <Activity className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge variant="outline" className="text-[10px]">{a.activity_type}</Badge>
+                          {a.subject && <span className="font-medium truncate">{a.subject}</span>}
+                        </div>
+                        {a.body && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{a.body}</p>}
+                        <p className="text-[10px] text-muted-foreground mt-1">{new Date(a.created_at).toLocaleString()}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="notes" className="space-y-3 mt-0 pr-3">
+              <div className="flex gap-2">
+                <Input
+                  value={noteText}
+                  onChange={e => setNoteText(e.target.value)}
+                  placeholder="Add an internal note..."
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addNote() } }}
+                  data-testid="input-crm-note"
+                />
+                <Button onClick={addNote} disabled={savingNote || !noteText.trim()} data-testid="button-crm-add-note">
+                  {savingNote ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                </Button>
+              </div>
+
+              {loadingCrm ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>
+              ) : notes.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-crm-no-notes">No notes yet. Add the first note above.</p>
+              ) : (
+                <div className="space-y-2">
+                  {notes.map((n: any) => (
+                    <div key={n.id} className="p-3 border rounded text-sm" data-testid={`crm-note-${n.id}`}>
+                      <p className="whitespace-pre-wrap">{n.body || n.subject}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">{new Date(n.created_at).toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </ScrollArea>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 function AdminTaxInfoTab() {
   const [submissions, setSubmissions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -590,6 +901,11 @@ export default function AffiliateSettingsPage() {
   const [emailTemplates, setEmailTemplates] = useState<{ id: number; name: string; subject: string; body: string; category: string }[]>([])
 
   const [healthData, setHealthData] = useState<HealthData | null>(null)
+  const [revenueAttribution, setRevenueAttribution] = useState<{
+    totalRevenue: number; affiliateRevenue: number; directRevenue: number;
+    affiliatePercentage: number; totalCommissionsPaid: number; totalCommissionsPending: number;
+    invoiceCount: number; affiliateInvoiceCount: number;
+  } | null>(null)
 
   const [contests, setContests] = useState<any[]>([])
   const [contestDialog, setContestDialog] = useState(false)
@@ -600,6 +916,11 @@ export default function AffiliateSettingsPage() {
   })
   const [payoutBatches, setPayoutBatches] = useState<any[]>([])
   const [generatingBatch, setGeneratingBatch] = useState(false)
+  const [processAllDialog, setProcessAllDialog] = useState(false)
+  const [processAllSummary, setProcessAllSummary] = useState<{ batchId: string; affiliatesIncluded: number; totalAmountCents: number } | null>(null)
+  const [approvingAll, setApprovingAll] = useState(false)
+  const [sendingReceipts, setSendingReceipts] = useState(false)
+  const [receiptResult, setReceiptResult] = useState<{ sentCount: number; failedCount: number } | null>(null)
 
   const [members, setMembers] = useState<AffiliateMember[]>([])
   const [memberFilter, setMemberFilter] = useState('all')
@@ -612,6 +933,7 @@ export default function AffiliateSettingsPage() {
 
   const [detailItem, setDetailItem] = useState<any>(null)
   const [detailType, setDetailType] = useState<string>('')
+  const [crmMember, setCrmMember] = useState<AffiliateMember | null>(null)
 
   const [tierSort, setTierSort] = useState<{ key: string; dir: 'asc' | 'desc' }>({ key: 'min_referrals', dir: 'asc' })
   const [milestoneSort, setMilestoneSort] = useState<{ key: string; dir: 'asc' | 'desc' }>({ key: 'referral_threshold', dir: 'asc' })
@@ -680,6 +1002,7 @@ export default function AffiliateSettingsPage() {
       fetch('/api/affiliate/contests?admin=true').then(r => r.json()).then(d => setContests(d.contests || [])).catch(() => {})
       fetch('/api/affiliate/payout-batches').then(r => r.json()).then(d => setPayoutBatches(d.batches || [])).catch(() => {})
       fetch('/api/affiliate/members').then(r => r.json()).then(d => setMembers(d.members || [])).catch(() => {})
+      fetch('/api/admin/revenue-attribution').then(r => r.json()).then(d => setRevenueAttribution(d.attribution || null)).catch(() => {})
     } catch (err) {
       console.error('Failed to load affiliate data:', err)
     } finally {
@@ -729,6 +1052,9 @@ export default function AffiliateSettingsPage() {
         if (detailItem?.userId === userId) {
           setDetailItem((prev: any) => ({ ...prev, suspended: suspend, suspensionReason: suspend ? (reason || 'Suspended by admin') : null }))
         }
+        if (crmMember?.userId === userId) {
+          setCrmMember(prev => prev ? { ...prev, suspended: suspend, suspensionReason: suspend ? (reason || 'Suspended by admin') : null } : null)
+        }
       } else {
         toast({ title: 'Error', description: data.error || `Failed to ${actionLabel}`, variant: 'destructive' })
       }
@@ -753,6 +1079,9 @@ export default function AffiliateSettingsPage() {
         setMembers(prev => prev.map(m => m.userId === userId ? { ...m, fraudScore: data.fraudScore.score, fraudScoreUpdatedAt: new Date().toISOString(), suspended: data.fraudScore.autoPaused ? true : m.suspended } : m))
         if (detailItem?.userId === userId) {
           setDetailItem((prev: any) => ({ ...prev, fraudScore: data.fraudScore.score, fraudScoreUpdatedAt: new Date().toISOString(), suspended: data.fraudScore.autoPaused ? true : prev.suspended }))
+        }
+        if (crmMember?.userId === userId) {
+          setCrmMember(prev => prev ? { ...prev, fraudScore: data.fraudScore.score, fraudScoreUpdatedAt: new Date().toISOString(), suspended: data.fraudScore.autoPaused ? true : prev.suspended } : null)
         }
       } else {
         toast({ title: 'Error', description: data.error || 'Failed to recalculate fraud score', variant: 'destructive' })
@@ -1158,14 +1487,85 @@ export default function AffiliateSettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'generate' }),
       })
-      if (!res.ok) throw new Error('Failed')
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || 'Failed')
+      }
       const d = await res.json()
-      toast({ title: 'Payout batch generated', description: `${d.payoutCount || 0} payouts in batch` })
+      toast({ title: 'Payout batch generated', description: `${d.affiliates_included || 0} affiliates included` })
       fetchData()
-    } catch {
-      toast({ title: 'Error', description: 'Failed to generate payout batch', variant: 'destructive' })
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to generate payout batch', variant: 'destructive' })
     } finally {
       setGeneratingBatch(false)
+    }
+  }
+
+  const processAll = async () => {
+    setGeneratingBatch(true)
+    setProcessAllSummary(null)
+    setReceiptResult(null)
+    try {
+      const res = await fetch('/api/affiliate/payout-batches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'generate' }),
+      })
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || 'Failed to generate batch')
+      }
+      const d = await res.json()
+      setProcessAllSummary({
+        batchId: d.batch?.id,
+        affiliatesIncluded: d.affiliates_included || 0,
+        totalAmountCents: d.total_amount_cents || 0,
+      })
+      setProcessAllDialog(true)
+      fetchData()
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to generate payout batch', variant: 'destructive' })
+    } finally {
+      setGeneratingBatch(false)
+    }
+  }
+
+  const approveAndSendReceipts = async () => {
+    if (!processAllSummary?.batchId) return
+    setApprovingAll(true)
+    try {
+      const res = await fetch('/api/affiliate/payout-batches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'approve', batch_id: processAllSummary.batchId, status: 'approved' }),
+      })
+      if (!res.ok) throw new Error('Failed to approve batch')
+      toast({ title: 'Batch approved' })
+      fetchData()
+
+      setSendingReceipts(true)
+      try {
+        const receiptRes = await fetch('/api/admin/affiliate/payout-receipt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ batch_id: processAllSummary.batchId }),
+        })
+        if (receiptRes.ok) {
+          const receiptData = await receiptRes.json()
+          setReceiptResult({ sentCount: receiptData.sentCount || 0, failedCount: receiptData.failedCount || 0 })
+          toast({ title: 'Receipt emails sent', description: `${receiptData.sentCount} emails sent successfully` })
+        } else {
+          toast({ title: 'Warning', description: 'Batch approved but receipt emails failed to send', variant: 'destructive' })
+        }
+      } catch {
+        toast({ title: 'Warning', description: 'Batch approved but receipt emails failed to send', variant: 'destructive' })
+      } finally {
+        setSendingReceipts(false)
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to approve batch', variant: 'destructive' })
+    } finally {
+      setApprovingAll(false)
     }
   }
 
@@ -1178,10 +1578,66 @@ export default function AffiliateSettingsPage() {
       })
       if (!res.ok) throw new Error('Failed')
       toast({ title: `Batch ${action}` })
+
+      if (action === 'approved') {
+        try {
+          const receiptRes = await fetch('/api/admin/affiliate/payout-receipt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ batch_id: batchId }),
+          })
+          if (receiptRes.ok) {
+            const receiptData = await receiptRes.json()
+            toast({ title: 'Receipt emails sent', description: `${receiptData.sentCount} emails sent` })
+          }
+        } catch {
+          toast({ title: 'Note', description: 'Batch approved but receipt emails could not be sent' })
+        }
+      }
+
       fetchData()
     } catch {
       toast({ title: 'Error', description: `Failed to ${action} batch`, variant: 'destructive' })
     }
+  }
+
+  const sendReceiptsForBatch = async (batchId: string) => {
+    setSendingReceipts(true)
+    try {
+      const res = await fetch('/api/admin/affiliate/payout-receipt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ batch_id: batchId }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        toast({ title: 'Receipt emails sent', description: `${data.sentCount} sent, ${data.failedCount} failed` })
+      } else {
+        toast({ title: 'Error', description: 'Failed to send receipt emails', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to send receipt emails', variant: 'destructive' })
+    } finally {
+      setSendingReceipts(false)
+    }
+  }
+
+  const getHealthScore = (member: AffiliateMember): { color: 'green' | 'yellow' | 'red'; label: string } => {
+    const now = new Date()
+    const lastSignIn = member.lastSignIn ? new Date(member.lastSignIn) : null
+    const joinedAt = new Date(member.joinedAt)
+    const lastActivity = lastSignIn || joinedAt
+    const daysSinceActivity = Math.floor((now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24))
+    const conversionRate = member.clicks > 0 ? (member.referrals / member.clicks) * 100 : 0
+    const fraudScore = member.fraudScore || 0
+
+    if (daysSinceActivity > 60 || conversionRate < 1 || fraudScore > 40) {
+      return { color: 'red', label: 'At Risk' }
+    }
+    if (daysSinceActivity > 30 || (conversionRate >= 1 && conversionRate <= 5)) {
+      return { color: 'yellow', label: 'Needs Attention' }
+    }
+    return { color: 'green', label: 'Healthy' }
   }
 
   const filteredApplications = applications.filter(a => appFilter === 'all' || a.status === appFilter)
@@ -1570,6 +2026,75 @@ export default function AffiliateSettingsPage() {
                   </CardContent>
                 </Card>
               </div>
+
+              {revenueAttribution && (
+                <Card data-testid="health-revenue-attribution">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      Revenue Attribution
+                      <HelpTooltip text="Breakdown of total revenue by source. Affiliate revenue comes from customers referred by affiliates. Direct revenue is everything else." />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-4">
+                      <div className="text-center p-3 rounded border" data-testid="attr-total-revenue">
+                        <p className="text-xs text-muted-foreground mb-1">Total Revenue</p>
+                        <p className="text-xl font-bold">${(revenueAttribution.totalRevenue / 100).toFixed(2)}</p>
+                        <p className="text-[10px] text-muted-foreground">{revenueAttribution.invoiceCount} invoices</p>
+                      </div>
+                      <div className="text-center p-3 rounded border" data-testid="attr-affiliate-revenue">
+                        <p className="text-xs text-muted-foreground mb-1">Affiliate Revenue</p>
+                        <p className="text-xl font-bold text-green-600 dark:text-green-400">${(revenueAttribution.affiliateRevenue / 100).toFixed(2)}</p>
+                        <p className="text-[10px] text-muted-foreground">{revenueAttribution.affiliatePercentage}% of total</p>
+                      </div>
+                      <div className="text-center p-3 rounded border" data-testid="attr-direct-revenue">
+                        <p className="text-xs text-muted-foreground mb-1">Direct Revenue</p>
+                        <p className="text-xl font-bold">${(revenueAttribution.directRevenue / 100).toFixed(2)}</p>
+                        <p className="text-[10px] text-muted-foreground">{100 - revenueAttribution.affiliatePercentage}% of total</p>
+                      </div>
+                      <div className="text-center p-3 rounded border" data-testid="attr-commissions">
+                        <p className="text-xs text-muted-foreground mb-1">Commissions</p>
+                        <p className="text-xl font-bold">${(revenueAttribution.totalCommissionsPaid / 100).toFixed(2)}</p>
+                        <p className="text-[10px] text-muted-foreground">${(revenueAttribution.totalCommissionsPending / 100).toFixed(2)} pending</p>
+                      </div>
+                    </div>
+                    {revenueAttribution.totalRevenue > 0 && (
+                      <div className="space-y-2" data-testid="attr-bar-chart">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+                          <span>Revenue Split</span>
+                        </div>
+                        <div className="w-full h-6 rounded-md overflow-hidden flex bg-muted">
+                          <div
+                            className="bg-green-500 dark:bg-green-600 h-full flex items-center justify-center text-[10px] font-medium text-white transition-all"
+                            style={{ width: `${Math.max(revenueAttribution.affiliatePercentage, 2)}%` }}
+                            data-testid="attr-bar-affiliate"
+                          >
+                            {revenueAttribution.affiliatePercentage > 8 ? `${revenueAttribution.affiliatePercentage}%` : ''}
+                          </div>
+                          <div
+                            className="bg-blue-500 dark:bg-blue-600 h-full flex items-center justify-center text-[10px] font-medium text-white transition-all"
+                            style={{ width: `${Math.max(100 - revenueAttribution.affiliatePercentage, 2)}%` }}
+                            data-testid="attr-bar-direct"
+                          >
+                            {(100 - revenueAttribution.affiliatePercentage) > 8 ? `${100 - revenueAttribution.affiliatePercentage}%` : ''}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs">
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-sm bg-green-500 dark:bg-green-600" />
+                            <span className="text-muted-foreground">Affiliate</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-sm bg-blue-500 dark:bg-blue-600" />
+                            <span className="text-muted-foreground">Direct</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
               <Card data-testid="health-top-performers">
                 <CardHeader className="pb-3">
@@ -2278,11 +2803,20 @@ export default function AffiliateSettingsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {sortedFilteredMembers.map(m => (
-                        <tr key={m.userId} className="border-b last:border-0 hover:bg-muted/30 cursor-pointer" data-testid={`member-row-${m.userId}`} onClick={() => { setDetailItem(m); setDetailType('member') }}>
+                      {sortedFilteredMembers.map(m => {
+                        const health = getHealthScore(m)
+                        return (
+                        <tr key={m.userId} className="border-b last:border-0 hover:bg-muted/30 cursor-pointer" data-testid={`member-row-${m.userId}`} onClick={() => setCrmMember(m)}>
                           <td className="py-3 pr-3">
                             <div className="min-w-0">
-                              <p className="font-medium truncate">{m.name || m.email}</p>
+                              <div className="flex items-center gap-1.5">
+                                <p className="font-medium truncate">{m.name || m.email}</p>
+                                <span
+                                  className={`inline-block w-2 h-2 rounded-full shrink-0 ${health.color === 'green' ? 'bg-green-500' : health.color === 'yellow' ? 'bg-amber-500' : 'bg-red-500'}`}
+                                  title={health.label}
+                                  data-testid={`health-indicator-${m.userId}`}
+                                />
+                              </div>
                               {m.name && <p className="text-xs text-muted-foreground truncate">{m.email}</p>}
                               <div className="flex items-center gap-1.5 mt-0.5">
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0">{m.refCode}</Badge>
@@ -2366,7 +2900,8 @@ export default function AffiliateSettingsPage() {
                             </div>
                           </td>
                         </tr>
-                      ))}
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -2925,12 +3460,12 @@ export default function AffiliateSettingsPage() {
 
         <TabsContent value="payout-batches" className="space-y-4 mt-4">
           <Card data-testid="card-payout-batches">
-            <CardHeader className="flex-row items-center justify-between">
+            <CardHeader className="flex-row items-center justify-between gap-2">
               <div>
                 <CardTitle className="text-base">Scheduled Payout Runs</CardTitle>
                 <CardDescription>Generate and approve batched payout runs</CardDescription>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Select value={batchFilter} onValueChange={setBatchFilter}>
                   <SelectTrigger className="w-[130px]" data-testid="select-batch-filter">
                     <SelectValue placeholder="All" />
@@ -2943,15 +3478,19 @@ export default function AffiliateSettingsPage() {
                     <SelectItem value="rejected">Rejected</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button size="sm" onClick={generatePayoutBatch} disabled={generatingBatch} data-testid="button-generate-batch">
+                <Button size="sm" variant="outline" onClick={generatePayoutBatch} disabled={generatingBatch} data-testid="button-generate-batch">
                   {generatingBatch ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <RefreshCw className="h-3.5 w-3.5 mr-1" />}
                   Generate Batch
+                </Button>
+                <Button size="sm" onClick={processAll} disabled={generatingBatch} data-testid="button-process-all">
+                  {generatingBatch ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <DollarSign className="h-3.5 w-3.5 mr-1" />}
+                  Process All
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
               {payoutBatches.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-batches">No payout batches yet. Generate one to get started.</p>
+                <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-batches">No payout batches yet. Generate one or use Process All to get started.</p>
               ) : filteredBatches.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-6">No batches match the selected filter.</p>
               ) : (
@@ -2960,28 +3499,36 @@ export default function AffiliateSettingsPage() {
                     <div key={b.id} className="p-4 rounded-md border cursor-pointer" data-testid={`batch-${b.id}`} onClick={() => { setDetailItem(b); setDetailType('payout_batch') }}>
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge variant={b.status === 'pending' ? 'outline' : b.status === 'rejected' ? 'destructive' : 'default'} className={`text-xs capitalize ${b.status === 'approved' || b.status === 'completed' ? 'bg-green-600 hover:bg-green-700' : ''}`}>
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <Badge variant={b.status === 'pending' ? 'outline' : b.status === 'rejected' ? 'destructive' : 'default'} className={`text-xs capitalize ${b.status === 'approved' || b.status === 'completed' ? 'bg-green-600' : ''}`}>
                               {b.status}
                             </Badge>
                             <span className="text-sm font-medium">${((b.total_amount_cents || 0) / 100).toFixed(2)}</span>
-                            <span className="text-xs text-muted-foreground">{b.payout_count || 0} payouts</span>
+                            <span className="text-xs text-muted-foreground">{b.total_affiliates || b.payout_count || 0} affiliates</span>
                           </div>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
                             <span>Batch: {new Date(b.batch_date || b.created_at).toLocaleDateString()}</span>
                             {b.notes && <span>{b.notes}</span>}
                           </div>
                         </div>
-                        {b.status === 'pending' && (
-                          <div className="flex gap-1 shrink-0">
-                            <Button size="sm" onClick={(e) => { e.stopPropagation(); approveBatch(b.id, 'approved') }} data-testid={`button-approve-batch-${b.id}`}>
-                              <CheckCircle className="h-3.5 w-3.5 mr-1" /> Approve
+                        <div className="flex gap-1 shrink-0 flex-wrap">
+                          {b.status === 'pending' && (
+                            <>
+                              <Button size="sm" onClick={(e) => { e.stopPropagation(); approveBatch(b.id, 'approved') }} data-testid={`button-approve-batch-${b.id}`}>
+                                <CheckCircle className="h-3.5 w-3.5 mr-1" /> Approve
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); approveBatch(b.id, 'rejected') }} data-testid={`button-reject-batch-${b.id}`}>
+                                <XCircle className="h-3.5 w-3.5 mr-1" /> Reject
+                              </Button>
+                            </>
+                          )}
+                          {(b.status === 'approved' || b.status === 'completed') && (
+                            <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); sendReceiptsForBatch(b.id) }} disabled={sendingReceipts} data-testid={`button-send-receipts-${b.id}`}>
+                              {sendingReceipts ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Mail className="h-3.5 w-3.5 mr-1" />}
+                              Send Receipts
                             </Button>
-                            <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); approveBatch(b.id, 'rejected') }} data-testid={`button-reject-batch-${b.id}`}>
-                              <XCircle className="h-3.5 w-3.5 mr-1" /> Reject
-                            </Button>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -2989,6 +3536,70 @@ export default function AffiliateSettingsPage() {
               )}
             </CardContent>
           </Card>
+
+          <Dialog open={processAllDialog} onOpenChange={(open) => { if (!open) { setProcessAllDialog(false); setProcessAllSummary(null); setReceiptResult(null) } }}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Process All Payouts</DialogTitle>
+                <DialogDescription>Review the batch summary and approve to process all payouts at once.</DialogDescription>
+              </DialogHeader>
+              {processAllSummary ? (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <Card>
+                      <CardContent className="pt-4 pb-3">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">Affiliates</span>
+                        </div>
+                        <p className="text-2xl font-bold mt-1" data-testid="text-process-all-affiliates">{processAllSummary.affiliatesIncluded}</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="pt-4 pb-3">
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">Total Amount</span>
+                        </div>
+                        <p className="text-2xl font-bold mt-1" data-testid="text-process-all-amount">${(processAllSummary.totalAmountCents / 100).toFixed(2)}</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  {receiptResult && (
+                    <Card>
+                      <CardContent className="pt-4 pb-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Mail className="h-4 w-4 text-green-500" />
+                          <span className="text-sm font-medium">Receipt Emails Sent</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground" data-testid="text-receipt-result">
+                          {receiptResult.sentCount} sent successfully{receiptResult.failedCount > 0 ? `, ${receiptResult.failedCount} failed` : ''}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                  <div className="flex gap-2 justify-end">
+                    {!receiptResult && (
+                      <Button onClick={approveAndSendReceipts} disabled={approvingAll || sendingReceipts} data-testid="button-approve-and-send">
+                        {approvingAll ? (
+                          <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Approving...</>
+                        ) : sendingReceipts ? (
+                          <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Sending Receipts...</>
+                        ) : (
+                          <><CheckCircle className="h-4 w-4 mr-1" /> Approve &amp; Send Receipts</>
+                        )}
+                      </Button>
+                    )}
+                    <Button variant="outline" onClick={() => { setProcessAllDialog(false); setProcessAllSummary(null); setReceiptResult(null) }} data-testid="button-close-process-all">
+                      {receiptResult ? 'Done' : 'Cancel'}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+              )}
+            </DialogContent>
+          </Dialog>
         </TabsContent>
         <TabsContent value="audit" className="space-y-4 mt-4">
           <Card data-testid="card-audit-log">
@@ -3029,36 +3640,21 @@ export default function AffiliateSettingsPage() {
       </Tabs>
 
       <DetailModal
-        open={!!detailItem}
+        open={!!detailItem && detailType !== 'member'}
         onOpenChange={(open) => { if (!open) { setDetailItem(null); setDetailType('') } }}
         title={getDetailTitle()}
         fields={getDetailFields()}
-      >
-        {detailType === 'member' && detailItem && (
-          <div className="flex items-center flex-wrap gap-2 pt-3 border-t mt-2">
-            <Button
-              variant={detailItem.suspended ? 'default' : 'destructive'}
-              size="sm"
-              onClick={() => handleSuspendMember(detailItem.userId, detailItem.email, !detailItem.suspended)}
-              disabled={suspendingMember === detailItem.userId}
-              data-testid="button-detail-suspend"
-            >
-              {suspendingMember === detailItem.userId ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : detailItem.suspended ? <CheckCircle className="mr-1 h-3 w-3" /> : <AlertTriangle className="mr-1 h-3 w-3" />}
-              {detailItem.suspended ? 'Unsuspend' : 'Suspend'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleRecalcFraud(detailItem.userId, detailItem.email)}
-              disabled={recalcFraud === detailItem.userId}
-              data-testid="button-detail-recalc-fraud"
-            >
-              {recalcFraud === detailItem.userId ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <RefreshCw className="mr-1 h-3 w-3" />}
-              Recalculate Fraud
-            </Button>
-          </div>
-        )}
-      </DetailModal>
+      />
+
+      <AffiliateCRMDrawer
+        member={crmMember}
+        open={!!crmMember}
+        onClose={() => setCrmMember(null)}
+        onSuspend={handleSuspendMember}
+        onRecalcFraud={handleRecalcFraud}
+        suspendingMember={suspendingMember}
+        recalcFraud={recalcFraud}
+      />
     </div>
   )
 }
