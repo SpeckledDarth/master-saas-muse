@@ -309,9 +309,9 @@ export default function EmailTemplatesPage() {
         <div className="grid gap-4">
           {templates.map((template) => (
             <Card key={template.id} data-testid={`template-${template.name}`}>
-              <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 space-y-0">
                 <div className="min-w-0 flex-1">
-                  <CardTitle className="text-lg capitalize flex items-center gap-2">
+                  <CardTitle className="text-lg capitalize flex items-center gap-2 flex-wrap">
                     {template.name.replace(/_/g, ' ')}
                     {template.category && template.category !== 'general' && (
                       <Badge variant="outline" className="text-[10px] capitalize font-normal">{template.category}</Badge>
@@ -319,7 +319,7 @@ export default function EmailTemplatesPage() {
                   </CardTitle>
                   <CardDescription className="truncate">{template.description}</CardDescription>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 flex-wrap">
                   <Button
                     variant="outline"
                     size="sm"
@@ -437,7 +437,7 @@ export default function EmailTemplatesPage() {
                 </>
               )}
               
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <div className="space-y-2 flex-1">
                   <Label htmlFor="subject">Subject Line</Label>
                   <Input
@@ -469,7 +469,7 @@ export default function EmailTemplatesPage() {
               </div>
               
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <Label htmlFor="body">Email Body</Label>
                   <div className="flex flex-wrap gap-1">
                     {ALL_VARIABLES.slice(0, 5).map(v => (

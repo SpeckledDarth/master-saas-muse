@@ -89,7 +89,7 @@ export default function PagesSetupPage() {
               data-testid="input-about-values"
             />
           </div>
-          <div className="flex items-center justify-between py-3 border-t">
+          <div className="flex items-center justify-between gap-4 py-3 border-t">
             <div>
               <p className="font-medium">Show Team Section</p>
               <p className="text-sm text-muted-foreground">Display team members on the About page</p>
@@ -102,7 +102,7 @@ export default function PagesSetupPage() {
           </div>
           {settings.pages?.about?.showTeam && (
             <div className="space-y-4 pt-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <Label>Team Members</Label>
                 <Button size="sm" variant="outline" onClick={addTeamMember} data-testid="button-add-team-member">
                   <Plus className="h-4 w-4 mr-1" />
@@ -111,7 +111,7 @@ export default function PagesSetupPage() {
               </div>
               {(settings.pages?.about?.team ?? []).map(member => (
                 <div key={member.id} className="p-4 border rounded-lg space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <span className="font-medium">{member.name || 'New Member'}</span>
                     <Button size="icon" variant="ghost" onClick={() => removeTeamMember(member.id)} data-testid={`button-remove-member-${member.id}`}>
                       <Trash2 className="h-4 w-4 text-destructive" />
@@ -237,7 +237,7 @@ export default function PagesSetupPage() {
               data-testid="input-contact-address"
             />
           </div>
-          <div className="flex items-center justify-between py-3 border-t">
+          <div className="flex items-center justify-between gap-4 py-3 border-t">
             <div>
               <p className="font-medium">Show Contact Form</p>
               <p className="text-sm text-muted-foreground">Display a contact form for visitors</p>
@@ -420,7 +420,7 @@ export default function PagesSetupPage() {
         <CardContent className="space-y-4">
           {(settings.pages?.customPages ?? defaultSettings.pages.customPages).map((page, index) => (
             <div key={page.id} className="p-4 border rounded-lg space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <span className="font-medium">Page {index + 1}: {page.name || 'Untitled'}</span>
                 <Switch
                   checked={page.enabled}

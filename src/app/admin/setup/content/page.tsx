@@ -48,7 +48,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Features Section <InfoTooltip text="Highlight your product's key selling points on the homepage. Each card shows an icon, title, and description." /></CardTitle>
               <CardDescription>Highlight what makes your product special</CardDescription>
@@ -86,7 +86,7 @@ export default function ContentPage() {
           </div>
           
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <Label>Feature Cards</Label>
               <Button size="sm" variant="outline" onClick={addFeatureCard} data-testid="button-add-feature">
                 <Plus className="h-4 w-4 mr-1" /> Add Feature
@@ -95,7 +95,7 @@ export default function ContentPage() {
             
             {(settings.content?.featureCards ?? []).map((card, index) => (
               <div key={card.id} className="p-4 border rounded-lg space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium">Feature {index + 1}</span>
                   <Button 
                     size="icon" 
@@ -159,7 +159,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Testimonials <InfoTooltip text="Social proof from real customers builds trust and improves conversion rates." /></CardTitle>
               <CardDescription>Show what customers say about your product</CardDescription>
@@ -203,7 +203,7 @@ export default function ContentPage() {
           </div>
           
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <Label>Customer Testimonials</Label>
               <Button size="sm" variant="outline" onClick={addTestimonial} data-testid="button-add-testimonial">
                 <Plus className="h-4 w-4 mr-1" /> Add Testimonial
@@ -212,7 +212,7 @@ export default function ContentPage() {
             
             {(settings.content?.testimonials ?? []).map((t, index) => (
               <div key={t.id} className="p-4 border rounded-lg space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium">Testimonial {index + 1}</span>
                   <Button 
                     size="icon" 
@@ -271,7 +271,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">FAQ Section <InfoTooltip text="Answers common questions to reduce support tickets and help visitors make purchase decisions." /></CardTitle>
               <CardDescription>Answer common questions</CardDescription>
@@ -298,7 +298,7 @@ export default function ContentPage() {
           </div>
           
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <Label>FAQ Items</Label>
               <Button size="sm" variant="outline" onClick={addFAQItem} data-testid="button-add-faq">
                 <Plus className="h-4 w-4 mr-1" /> Add FAQ
@@ -307,7 +307,7 @@ export default function ContentPage() {
             
             {(settings.content?.faqItems ?? []).map((faq, index) => (
               <div key={faq.id} className="p-4 border rounded-lg space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium">FAQ {index + 1}</span>
                   <Button 
                     size="icon" 
@@ -348,7 +348,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Call to Action <InfoTooltip text="The final prompt encouraging visitors to sign up. A strong CTA can significantly boost conversions." /></CardTitle>
               <CardDescription>Final prompt to get users to sign up</CardDescription>
@@ -406,7 +406,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Trusted By / Logo Marquee <InfoTooltip text="Scrolling logos of trusted companies add credibility and social proof to your landing page." /></CardTitle>
               <CardDescription>Show scrolling logos of companies that trust you</CardDescription>
@@ -432,7 +432,7 @@ export default function ContentPage() {
             />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <Label>Grayscale Logos</Label>
               <p className="text-sm text-muted-foreground">Show logos in grayscale (color on hover). Turn off to always show full color.</p>
@@ -460,7 +460,7 @@ export default function ContentPage() {
           </div>
           
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <Label>Trusted Logos</Label>
               <Button
                 type="button"
@@ -482,7 +482,7 @@ export default function ContentPage() {
             <div className="space-y-3">
               {(settings.content?.trustedLogos || []).map((logo, index) => (
                 <div key={logo.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">Logo {index + 1}</span>
                     <Button
                       type="button"
@@ -546,7 +546,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Metrics / Counters <InfoTooltip text="Animated number counters that highlight key achievements like users, revenue, or uptime." /></CardTitle>
               <CardDescription>Show animated metric counters (e.g., "10,000+ Customers")</CardDescription>
@@ -573,7 +573,7 @@ export default function ContentPage() {
           </div>
           
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <Label>Metrics</Label>
               <Button
                 type="button"
@@ -595,7 +595,7 @@ export default function ContentPage() {
             <div className="space-y-4">
               {(settings.content?.metrics || []).map((metric, index) => (
                 <div key={metric.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">Metric {index + 1}</span>
                     <Button
                       type="button"
@@ -722,7 +722,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">How It Works / Process Steps <InfoTooltip text="A numbered step-by-step guide that shows visitors how to get started with your product." /></CardTitle>
               <CardDescription>Show step-by-step process visualization</CardDescription>
@@ -760,7 +760,7 @@ export default function ContentPage() {
           </div>
           
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <Label>Process Steps</Label>
               <Button
                 type="button"
@@ -807,7 +807,7 @@ export default function ContentPage() {
                           updateContent('processSteps', steps)
                         }}
                         placeholder="Step title"
-                        className="col-span-3"
+                        className="sm:col-span-1 lg:col-span-3"
                         data-testid={`input-step-title-${index}`}
                       />
                     </div>
@@ -848,7 +848,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Image + Text Blocks <InfoTooltip text="Alternating image and text sections for storytelling. Great for showcasing features in detail." /></CardTitle>
               <CardDescription>Alternating image and text sections (like GitBook/TheWone)</CardDescription>
@@ -865,7 +865,7 @@ export default function ContentPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <Label>Content Blocks</Label>
               <Button
                 type="button"
@@ -893,7 +893,7 @@ export default function ContentPage() {
             <div className="space-y-4">
               {(settings.content?.imageTextBlocks || []).map((block, index) => (
                 <div key={block.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">Block {index + 1}</span>
                     <Button
                       type="button"
@@ -1027,7 +1027,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Customer Stories <InfoTooltip text="In-depth success stories with photos, quotes, and company details. More detailed than testimonials." /></CardTitle>
               <CardDescription>Showcase customer success stories with photos and quotes</CardDescription>
@@ -1054,7 +1054,7 @@ export default function ContentPage() {
               />
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <Label>Stories</Label>
               <Button
                 type="button"
@@ -1083,7 +1083,7 @@ export default function ContentPage() {
             <div className="space-y-4">
               {(settings.content?.customerStories || []).map((story, index) => (
                 <div key={story.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">Story {index + 1}</span>
                     <Button
                       type="button"
@@ -1240,7 +1240,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Founder Letter <InfoTooltip text="A personal letter from the founder builds emotional connection and trust with visitors." /></CardTitle>
               <CardDescription>Personal narrative section with portrait and optional signature</CardDescription>
@@ -1329,7 +1329,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Comparison Bars <InfoTooltip text="Animated horizontal bars that visually compare your product against alternatives or benchmarks." /></CardTitle>
               <CardDescription>Animated comparison visualization with highlighted items</CardDescription>
@@ -1387,7 +1387,7 @@ export default function ContentPage() {
               </div>
             </div>
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <Label>Comparison Items</Label>
                 <Button
                   size="sm"
@@ -1406,7 +1406,7 @@ export default function ContentPage() {
               </div>
               {(settings.content?.comparisonBars?.items ?? []).map((item, index) => (
                 <div key={item.id} className="p-3 border rounded-lg bg-muted/30 space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">Item {index + 1}</span>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs">Highlighted</Label>
@@ -1483,7 +1483,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Product Screenshot Showcase <InfoTooltip text="Display a prominent screenshot of your product layered over a background image or gradient." /></CardTitle>
               <CardDescription>Showcase your app with a featured screenshot</CardDescription>
@@ -1560,7 +1560,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Bottom Hero CTA <InfoTooltip text="A closing call-to-action section at the bottom of the page with the same visual weight as the top hero." /></CardTitle>
               <CardDescription>Closing hero section to drive conversions</CardDescription>
@@ -1646,7 +1646,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Feature Sub-Pages <InfoTooltip text="Create dedicated pages for each major feature with their own URL, hero, and content blocks." /></CardTitle>
               <CardDescription>Dynamic feature detail pages at /features/[slug]</CardDescription>
@@ -1655,7 +1655,7 @@ export default function ContentPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <Label>Feature Pages</Label>
             <Button
               size="sm"
@@ -1680,7 +1680,7 @@ export default function ContentPage() {
           </div>
           {(settings.content?.featureSubPages || []).map((page, index) => (
             <div key={page.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-medium">{page.title || `Feature Page ${index + 1}`}</span>
                 <Button
                   size="icon"
@@ -1806,7 +1806,7 @@ export default function ContentPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Section Backgrounds <InfoTooltip text="Customize the visual style of each homepage section. Use contrast to draw attention to key areas." /></CardTitle>
               <CardDescription>Customize background styles for each section</CardDescription>

@@ -91,7 +91,7 @@ export default function AdminLayout({
     <div className="min-h-screen">
       <nav className="border-b bg-card">
         <div className="px-6 overflow-x-auto scrollbar-hide">
-          <div className="flex items-center gap-4 md:gap-6 h-14 w-max md:w-auto">
+          <div className="flex items-center gap-2 h-14 w-max">
             <Button 
               variant={pathname === '/admin' ? 'secondary' : 'ghost'} 
               size="sm" 
@@ -102,7 +102,6 @@ export default function AdminLayout({
                 Admin
               </Link>
             </Button>
-            <div className="flex items-center gap-2">
               {(isAppAdmin || permissions?.canViewAnalytics) && (
                 <Button 
                   variant={pathname === '/admin/metrics' ? 'secondary' : 'ghost'} 
@@ -248,7 +247,6 @@ export default function AdminLayout({
                   </Link>
                 </Button>
               )}
-            </div>
           </div>
         </div>
       </nav>

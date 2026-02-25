@@ -485,7 +485,7 @@ export default function BrandingPage() {
       </Card>
 
       <Card>
-        <CardContent className="flex items-center justify-between py-4">
+        <CardContent className="flex items-center justify-between gap-4 py-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-md" style={{ backgroundColor: settings.branding.primaryColor }}>
               <Paintbrush className="h-5 w-5 text-white" />
@@ -516,7 +516,7 @@ export default function BrandingPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Announcement Bar <InfoTooltip text="A top-of-page banner for promotions, product launches, or important updates. Visitors can dismiss it." /></CardTitle>
               <CardDescription>
@@ -615,7 +615,7 @@ export default function BrandingPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">Navigation Menu <InfoTooltip text="Controls which links appear in the top navigation bar. Add badges to highlight new or upcoming features." /></CardTitle>
               <CardDescription>
@@ -638,33 +638,42 @@ export default function BrandingPage() {
           </div>
           <div className="space-y-3">
             {(settings.navigation?.items ?? []).map((item, index) => (
-              <div key={item.id} className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">
-                <div className="flex items-center gap-2">
+              <div key={item.id} className="p-3 border rounded-lg bg-muted/30 space-y-3 sm:space-y-0 sm:flex sm:items-center sm:gap-3">
+                <div className="flex items-center justify-between sm:justify-start gap-2">
                   <Switch
                     checked={item.enabled}
                     onCheckedChange={checked => updateNavItem(item.id, 'enabled', checked)}
                     data-testid={`switch-nav-${index}`}
                   />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeNavItem(item.id)}
+                    className="sm:hidden"
+                    data-testid={`button-remove-nav-mobile-${index}`}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
                 </div>
-                <Input
-                  value={item.label}
-                  onChange={e => updateNavItem(item.id, 'label', e.target.value)}
-                  placeholder="Link Label"
-                  className="flex-1"
-                  data-testid={`input-nav-label-${index}`}
-                />
-                <Input
-                  value={item.href}
-                  onChange={e => updateNavItem(item.id, 'href', e.target.value)}
-                  placeholder="/path"
-                  className="flex-1"
-                  data-testid={`input-nav-href-${index}`}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1">
+                  <Input
+                    value={item.label}
+                    onChange={e => updateNavItem(item.id, 'label', e.target.value)}
+                    placeholder="Link Label"
+                    data-testid={`input-nav-label-${index}`}
+                  />
+                  <Input
+                    value={item.href}
+                    onChange={e => updateNavItem(item.id, 'href', e.target.value)}
+                    placeholder="/path"
+                    data-testid={`input-nav-href-${index}`}
+                  />
+                </div>
                 <Select
                   value={item.badge || 'none'}
                   onValueChange={value => updateNavItem(item.id, 'badge', value === 'none' ? null : value)}
                 >
-                  <SelectTrigger className="w-28" data-testid={`select-nav-badge-${index}`}>
+                  <SelectTrigger className="w-full sm:w-28" data-testid={`select-nav-badge-${index}`}>
                     <SelectValue placeholder="Badge" />
                   </SelectTrigger>
                   <SelectContent>
@@ -678,6 +687,7 @@ export default function BrandingPage() {
                   variant="ghost"
                   size="icon"
                   onClick={() => removeNavItem(item.id)}
+                  className="hidden sm:inline-flex"
                   data-testid={`button-remove-nav-${index}`}
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
@@ -734,7 +744,7 @@ export default function BrandingPage() {
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between gap-2 p-3 border rounded-lg">
               <Label>Sticky Header</Label>
               <Switch
                 checked={settings.navigation?.headerStyle?.sticky !== false}
@@ -742,7 +752,7 @@ export default function BrandingPage() {
                 data-testid="switch-header-sticky"
               />
             </div>
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between gap-2 p-3 border rounded-lg">
               <Label>Transparent</Label>
               <Switch
                 checked={settings.navigation?.headerStyle?.transparent ?? false}
@@ -750,7 +760,7 @@ export default function BrandingPage() {
                 data-testid="switch-header-transparent"
               />
             </div>
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between gap-2 p-3 border rounded-lg">
               <Label>Bottom Border</Label>
               <Switch
                 checked={settings.navigation?.headerStyle?.borderBottom !== false}
