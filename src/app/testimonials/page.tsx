@@ -75,7 +75,7 @@ export default function TestimonialsPage() {
       {stats && (stats.totalUsers > 0 || stats.totalPosts > 0) && (
         <section className="py-12 border-b">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               {stats.totalUsers > 0 && (
                 <div className="text-center" data-testid="stat-users">
                   <Users className="h-6 w-6 mx-auto mb-2 text-primary" />

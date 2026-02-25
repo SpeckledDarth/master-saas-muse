@@ -229,7 +229,7 @@ export function LeadCrm() {
           />
         </div>
         <Select value={tagFilter} onValueChange={setTagFilter}>
-          <SelectTrigger className="w-[150px]" data-testid="select-tag-filter">
+          <SelectTrigger className="w-full sm:w-[150px]" data-testid="select-tag-filter">
             <Tag className="h-4 w-4 mr-1" />
             <SelectValue placeholder="Filter by tag" />
           </SelectTrigger>
@@ -276,7 +276,7 @@ export function LeadCrm() {
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Select value={lead.status} onValueChange={v => handleStatusChange(lead.id, v)}>
-                        <SelectTrigger className="w-[130px]" data-testid={`select-status-${lead.id}`}>
+                        <SelectTrigger className="w-full sm:w-[130px]" data-testid={`select-status-${lead.id}`}>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -321,7 +321,7 @@ export function LeadCrm() {
                     <div className="flex items-center gap-1">
                       <Input
                         placeholder="Custom tag"
-                        className="w-[100px] text-xs"
+                        className="w-full sm:w-[100px] text-xs"
                         value={customTag[lead.id] || ''}
                         onChange={e => setCustomTag(prev => ({ ...prev, [lead.id]: e.target.value }))}
                         onKeyDown={e => {

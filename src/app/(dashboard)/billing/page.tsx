@@ -573,7 +573,7 @@ export default function BillingPage() {
                 <CardTitle className="text-lg">Invoice History</CardTitle>
               </div>
               <Select value={invoiceFilter} onValueChange={(val) => { setInvoiceFilter(val); setInvoicePage(0) }}>
-                <SelectTrigger className="w-[140px]" data-testid="select-invoice-filter">
+                <SelectTrigger className="w-full sm:w-[140px]" data-testid="select-invoice-filter">
                   <SelectValue placeholder="Filter" />
                 </SelectTrigger>
                 <SelectContent>
@@ -606,6 +606,7 @@ export default function BillingPage() {
                 <p className="text-sm text-muted-foreground" data-testid="text-no-invoices">No invoices found</p>
               </div>
             ) : (
+              <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -681,6 +682,7 @@ export default function BillingPage() {
                   })}
                 </TableBody>
               </Table>
+              </div>
             )}
           </CardContent>
           {totalPages > 1 && (

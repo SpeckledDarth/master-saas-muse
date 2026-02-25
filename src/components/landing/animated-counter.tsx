@@ -118,7 +118,7 @@ export function AnimatedCounterSection({ metrics, headline }: AnimatedCounterPro
         )}
         <div className={`grid gap-8 sm:gap-10 ${
           metrics.length === 1 ? 'grid-cols-1 max-w-xs' :
-          metrics.length === 2 ? 'grid-cols-2 max-w-2xl' :
+          metrics.length === 2 ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl' :
           metrics.length === 3 ? 'grid-cols-1 sm:grid-cols-3 max-w-4xl' :
           metrics.length === 4 ? 'grid-cols-2 md:grid-cols-4 max-w-5xl' :
           metrics.length <= 6 ? 'grid-cols-2 md:grid-cols-3 max-w-5xl' :

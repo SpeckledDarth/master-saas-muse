@@ -64,7 +64,7 @@ export default function ContentPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Section Headline</Label>
               <Input
@@ -107,7 +107,7 @@ export default function ContentPage() {
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   <div className="space-y-1">
                     <Label className="text-xs">Icon</Label>
                     <Select
@@ -175,7 +175,7 @@ export default function ContentPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Section Headline</Label>
               <Input
@@ -224,7 +224,7 @@ export default function ContentPage() {
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   <div className="space-y-1">
                     <Label className="text-xs">Name</Label>
                     <Input
@@ -361,7 +361,7 @@ export default function ContentPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -381,7 +381,7 @@ export default function ContentPage() {
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Button Text</Label>
               <Input
@@ -633,7 +633,7 @@ export default function ContentPage() {
                         data-testid={`input-metric-label-${index}`}
                       />
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                       <div>
                         <Label className="text-xs text-muted-foreground mb-1 block">Number (the big value)</Label>
                         <Input
@@ -738,7 +738,7 @@ export default function ContentPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Section Headline</Label>
               <Input
@@ -786,7 +786,7 @@ export default function ContentPage() {
                     {step.number}
                   </div>
                   <div className="flex-1 space-y-2">
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                       <Input
                         type="number"
                         value={step.number}
@@ -909,7 +909,7 @@ export default function ContentPage() {
                     </Button>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label className="text-xs">Headline</Label>
                       <Input
@@ -985,7 +985,7 @@ export default function ContentPage() {
                     testId={`block-image-${index}`}
                   />
                   
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label className="text-xs">Button Text (optional)</Label>
                       <Input
@@ -1098,7 +1098,7 @@ export default function ContentPage() {
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label className="text-xs">Company Name</Label>
                       <Input
@@ -1166,7 +1166,7 @@ export default function ContentPage() {
                       data-testid={`input-story-quote-${index}`}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <ImageUpload
                       label="Person Photo"
                       variant="avatar"
@@ -1276,7 +1276,7 @@ export default function ContentPage() {
                 data-testid="input-founder-body"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Founder Name</Label>
                 <Input
@@ -1346,7 +1346,7 @@ export default function ContentPage() {
         </CardHeader>
         {(settings.content?.comparisonBarsEnabled ?? false) && (
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Headline</Label>
                 <Input
@@ -1366,7 +1366,7 @@ export default function ContentPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>CTA Button Text (optional)</Label>
                 <Input
@@ -1433,7 +1433,7 @@ export default function ContentPage() {
                       </Button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                     <Input
                       value={item.label}
                       onChange={e => {
@@ -1500,7 +1500,7 @@ export default function ContentPage() {
         </CardHeader>
         {(settings.content?.productShowcaseEnabled ?? false) && (
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Headline</Label>
                 <Input
@@ -1577,7 +1577,7 @@ export default function ContentPage() {
         </CardHeader>
         {(settings.content?.bottomHeroCtaEnabled ?? false) && (
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Headline</Label>
                 <Input
@@ -1606,7 +1606,7 @@ export default function ContentPage() {
                 data-testid="input-bottom-hero-tagline"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Button Text</Label>
                 <Input
@@ -1694,7 +1694,7 @@ export default function ContentPage() {
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 <div className="space-y-1">
                   <Label className="text-xs">URL Slug</Label>
                   <Input
@@ -1735,7 +1735,7 @@ export default function ContentPage() {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="space-y-1">
                   <Label className="text-xs">Hero Headline</Label>
                   <Input
@@ -1763,7 +1763,7 @@ export default function ContentPage() {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="space-y-1">
                   <Label className="text-xs">Hero Image URL (optional)</Label>
                   <Input
@@ -1815,7 +1815,7 @@ export default function ContentPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Features Section</Label>
               <Select
@@ -1960,7 +1960,7 @@ export default function ContentPage() {
             <div className="space-y-2">
               <Label>Images (up to 5)</Label>
               <p className="text-xs text-muted-foreground">Upload portrait-oriented images for the best effect. They will fan out with alternating rotations.</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {(settings.content?.imageCollageImages || []).map((url, i) => (
                   <div key={i} className="relative">
                     <ImageUpload

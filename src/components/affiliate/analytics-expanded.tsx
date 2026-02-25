@@ -153,7 +153,7 @@ export function EfficiencyMetrics({ data }: { data: { earningsPerClick: number; 
   return (
     <div data-testid="efficiency-metrics" className="rounded-lg border bg-card p-4">
       <h3 className="font-semibold text-sm mb-3">⚡ Efficiency Metrics</h3>
-      <div className="grid grid-cols-3 gap-2 text-center">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
         <div className="p-2 bg-muted/30 rounded">
           <p className="font-bold">${(data.earningsPerClick / 100).toFixed(2)}</p>
           <p className="text-[10px] text-muted-foreground">Per Click</p>

@@ -40,7 +40,7 @@ export default function BrandingPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="appName">App Name</Label>
               <Input
@@ -86,7 +86,7 @@ export default function BrandingPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <ImageUpload
               label="Logo (Light Mode)"
               value={settings.branding.logoUrl}
@@ -550,7 +550,7 @@ export default function BrandingPage() {
                 data-testid="input-announcement-text"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Link Text (optional)</Label>
                 <Input
@@ -576,7 +576,7 @@ export default function BrandingPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <ColorInput
                 label="Background Color"
                 value={settings.announcement?.backgroundColor ?? '#7c3aed'}

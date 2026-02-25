@@ -83,7 +83,7 @@ export function EarningsProjectionsPanel() {
     <div data-testid="earnings-projections" className="space-y-4">
       <div className="rounded-lg border bg-card p-4">
         <h3 className="font-semibold text-sm mb-3">This Month's Pace</h3>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div className="text-center p-2 bg-muted/30 rounded">
             <p className="text-lg font-bold" data-testid="text-month-so-far">{fmt(data.currentMonth.monthSoFar)}</p>
             <p className="text-[10px] text-muted-foreground">Earned So Far</p>
@@ -127,7 +127,7 @@ export function EarningsProjectionsPanel() {
 
       <div className="rounded-lg border bg-card p-4">
         <h3 className="font-semibold text-sm mb-2">Annual Projection</h3>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div className="text-center p-2 bg-muted/30 rounded">
             <p className="text-sm font-bold" data-testid="text-ytd">{fmt(data.annualProjection.yearToDate)}</p>
             <p className="text-[10px] text-muted-foreground">Year to Date</p>
@@ -304,7 +304,7 @@ export function PayoutHistoryPanel() {
         </div>
 
         {data?.summary && (
-          <div className="grid grid-cols-3 gap-2 mb-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
             <div className="text-center p-2 bg-muted/30 rounded">
               <p className="text-sm font-bold text-green-600" data-testid="text-total-paid">{fmt(data.summary.totalPaid)}</p>
               <p className="text-[10px] text-muted-foreground">Total Paid</p>
@@ -435,7 +435,7 @@ export function TaxCenterPanel() {
           </div>
         ) : taxSummary ? (
           <>
-            <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
               <div className="text-center p-3 bg-muted/30 rounded">
                 <p className="text-lg font-bold" data-testid="text-gross-earnings">{fmt(grossCents)}</p>
                 <p className="text-[10px] text-muted-foreground">Gross Earnings</p>
@@ -456,7 +456,7 @@ export function TaxCenterPanel() {
             {taxSummary.monthlyBreakdown && taxSummary.monthlyBreakdown.length > 0 && (
               <div>
                 <h4 className="text-xs font-medium mb-2">Monthly Breakdown</h4>
-                <div className="grid grid-cols-4 gap-1 text-[10px]">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[10px]">
                   {taxSummary.monthlyBreakdown.map((m: any) => (
                     <div key={m.month} className="text-center p-1.5 bg-muted/20 rounded">
                       <p className="font-medium">{fmt(m.earnings || m.amount || 0)}</p>
@@ -469,7 +469,7 @@ export function TaxCenterPanel() {
 
             <div className="mt-3 p-3 bg-muted/20 rounded">
               <h4 className="text-xs font-medium mb-1">Estimated Tax Withholding</h4>
-              <div className="grid grid-cols-3 gap-2 text-[10px]">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px]">
                 <div>
                   <p className="text-muted-foreground">Self-Employment (15.3%)</p>
                   <p className="font-medium">{fmt(Math.round(grossCents * 0.153))}</p>
@@ -500,7 +500,7 @@ export function CommissionRenewalStatsPanel({ stats }: { stats: RenewalStats | n
   return (
     <div data-testid="renewal-stats-panel" className="rounded-lg border bg-card p-4">
       <h3 className="font-semibold text-sm mb-3">Renewal Performance</h3>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <div className="text-center p-2 bg-muted/30 rounded">
           <p className="text-sm font-bold" data-testid="text-renewal-total">{stats.totalRequests}</p>
           <p className="text-[10px] text-muted-foreground">Total Requests</p>

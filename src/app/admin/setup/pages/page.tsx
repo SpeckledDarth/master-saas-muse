@@ -38,7 +38,7 @@ export default function PagesSetupPage() {
             onPositionYChange={y => updateAbout('heroImagePositionY', y)}
             testId="about-hero-image"
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -117,7 +117,7 @@ export default function PagesSetupPage() {
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <Label className="text-xs">Name</Label>
                       <Input
@@ -186,7 +186,7 @@ export default function PagesSetupPage() {
             onPositionYChange={y => updateContact('heroImagePositionY', y)}
             testId="contact-hero-image"
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -206,7 +206,7 @@ export default function PagesSetupPage() {
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Contact Email</Label>
               <Input
@@ -343,7 +343,7 @@ export default function PagesSetupPage() {
             onPositionYChange={y => updatePricingPage('heroImagePositionY', y)}
             testId="pricing-hero-image"
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -387,7 +387,7 @@ export default function PagesSetupPage() {
             onPositionYChange={y => updateFAQPage('heroImagePositionY', y)}
             testId="faq-hero-image"
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -430,7 +430,7 @@ export default function PagesSetupPage() {
               </div>
               {page.enabled && (
                 <>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="text-xs">Page Name (appears in menu)</Label>
                       <Input
@@ -463,7 +463,7 @@ export default function PagesSetupPage() {
                     onPositionYChange={y => updateCustomPage(page.id, 'heroImagePositionY', y)}
                     testId={`custom-page-hero-${page.id}`}
                   />
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="text-xs">Headline</Label>
                       <Input

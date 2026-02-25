@@ -169,9 +169,9 @@ function AuditLogsContent() {
           <CardHeader>
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <CardTitle>Activity Log</CardTitle>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Select value={categoryFilter} onValueChange={handleCategoryChange}>
-                  <SelectTrigger className="w-[160px]" data-testid="select-category-filter">
+                  <SelectTrigger className="w-full sm:w-[160px]" data-testid="select-category-filter">
                     <SelectValue placeholder="All categories" />
                   </SelectTrigger>
                   <SelectContent>
@@ -183,7 +183,7 @@ function AuditLogsContent() {
                 </Select>
                 {categoryFilter === 'all' && (
                   <Select value={actionFilter} onValueChange={setActionFilter}>
-                    <SelectTrigger className="w-[200px]" data-testid="select-action-filter">
+                    <SelectTrigger className="w-full sm:w-[200px]" data-testid="select-action-filter">
                       <SelectValue placeholder="All actions" />
                     </SelectTrigger>
                     <SelectContent>
@@ -214,6 +214,7 @@ function AuditLogsContent() {
               </div>
             ) : (
               <>
+                <div className="overflow-x-auto">
                 <Table data-testid="table-audit-logs">
                   <TableHeader>
                     <TableRow>
@@ -255,6 +256,7 @@ function AuditLogsContent() {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
 
                 <div className="flex items-center justify-between gap-2 mt-4">
                   <p className="text-sm text-muted-foreground" data-testid="text-pagination-info">

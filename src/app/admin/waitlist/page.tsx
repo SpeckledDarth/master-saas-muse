@@ -130,7 +130,7 @@ export default function WaitlistPage() {
               </CardDescription>
             </div>
             {entries.length > 0 && (
-              <div className="relative w-64">
+              <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by email or name..."
@@ -151,13 +151,13 @@ export default function WaitlistPage() {
               <p className="text-muted-foreground">Enable waitlist mode in settings to start collecting emails.</p>
             </div>
           ) : (
-            <div className="space-y-2">
-              <div className="grid grid-cols-5 gap-4 py-2 px-4 bg-muted rounded-t-lg font-medium text-sm">
+            <div className="space-y-2 overflow-x-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 py-2 px-4 bg-muted rounded-t-lg font-medium text-sm min-w-0">
                 <span>Email</span>
-                <span>Name</span>
-                <span>Source</span>
-                <span>Date</span>
-                <span className="text-right">Actions</span>
+                <span className="hidden sm:block">Name</span>
+                <span className="hidden lg:block">Source</span>
+                <span className="hidden lg:block">Date</span>
+                <span className="hidden sm:block text-right">Actions</span>
               </div>
               {filteredEntries.length === 0 ? (
                 <div className="py-8 text-center text-muted-foreground">
@@ -167,7 +167,7 @@ export default function WaitlistPage() {
                 filteredEntries.map((entry) => (
                   <div 
                     key={entry.id} 
-                    className="grid grid-cols-5 gap-4 py-3 px-4 border-b last:border-0 items-center"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-4 py-3 px-4 border-b last:border-0 items-center"
                     data-testid={`waitlist-entry-${entry.id}`}
                   >
                     <span className="truncate font-medium">{entry.email}</span>
@@ -176,7 +176,7 @@ export default function WaitlistPage() {
                     <span className="text-muted-foreground">
                       {new Date(entry.created_at).toLocaleDateString()}
                     </span>
-                    <div className="flex justify-end">
+                    <div className="flex sm:justify-end">
                       <Button
                         size="icon"
                         variant="ghost"

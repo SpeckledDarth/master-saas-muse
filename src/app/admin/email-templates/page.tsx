@@ -260,7 +260,7 @@ export default function EmailTemplatesPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between gap-4" data-testid="email-templates-header">
+      <div className="flex items-center justify-between gap-4 flex-wrap" data-testid="email-templates-header">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Mail className="h-6 w-6" />
@@ -396,7 +396,7 @@ export default function EmailTemplatesPage() {
             <TabsContent value="edit" className="flex-1 overflow-auto space-y-4 mt-4">
               {isCreateMode && (
                 <>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Template Name</Label>
                       <Input
@@ -449,7 +449,7 @@ export default function EmailTemplatesPage() {
                   />
                 </div>
                 {!isCreateMode && (
-                  <div className="space-y-2 w-[160px]">
+                  <div className="space-y-2 w-full sm:w-[160px]">
                     <Label>Category</Label>
                     <Select value={form.category} onValueChange={v => setForm({ ...form, category: v })}>
                       <SelectTrigger data-testid="select-template-category-edit">
