@@ -32,6 +32,7 @@ import { FlywheelAnalyticsSection } from '@/components/affiliate/flywheel-analyt
 import { FlywheelReportsSection } from '@/components/affiliate/flywheel-reports'
 import { EarningsProjectionsPanel, PayoutHistoryPanel, TaxCenterPanel, CommissionRenewalStatsPanel, BulkRenewalButton } from '@/components/affiliate/retention-tools'
 import { KnowledgeBasePanel, SwipeFileLibrary, PromotionalCalendarPanel, TopPerformerBadge, AssetUsageBadge } from '@/components/affiliate/resource-center'
+import { WeeklyChallengesPanel, CaseStudyLibrary, PromotionQuizPanel, AudienceAnalyzerPanel, AffiliateDirectoryPreview } from '@/components/affiliate/delight-features'
 
 interface AffiliateDashboardData {
   link: {
@@ -3882,6 +3883,8 @@ function StandaloneAffiliateDashboard() {
         <AffiliateManagerCard />
         <GracePeriodNotice />
       </div>
+
+      <WeeklyChallengesPanel />
     </div>
   )
 
@@ -3997,6 +4000,7 @@ function StandaloneAffiliateDashboard() {
           </div>
         )}
       <SwipeFileLibrary />
+      <CaseStudyLibrary />
       </div>
     )
   }
@@ -5637,6 +5641,7 @@ function StandaloneAffiliateDashboard() {
       </div>
       <CommissionDisputes />
       <StarterKit />
+      <PromotionQuizPanel />
     </div>
   )
 
@@ -6374,6 +6379,8 @@ function StandaloneAffiliateDashboard() {
           </Button>
         </CardContent>
       </Card>
+
+      <AffiliateDirectoryPreview />
     </div>
   )
 
@@ -6925,6 +6932,8 @@ function StandaloneAffiliateDashboard() {
 
         {/* Reports & Intelligence — Connected, Financial, Predictions */}
         <FlywheelReportsSection />
+
+        <AudienceAnalyzerPanel />
       </div>
     )
   }

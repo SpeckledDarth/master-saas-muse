@@ -110,17 +110,19 @@
 - **"Fastest to $X" Recognition:** Speed-based recognition moments
 
 ### Key Files
-- Tier display: affiliate dashboard Overview tab (line ~1786)
-- Milestones: affiliate dashboard Overview tab (line ~1826)
-- Contests: affiliate dashboard Overview tab (line ~1871)
-- Leaderboards: affiliate dashboard Overview tab (line ~1969)
-- Badges: affiliate dashboard Overview tab (line ~2295)
+- Tier display: affiliate dashboard Overview tab
+- Milestones: affiliate dashboard Overview tab
+- Contests: affiliate dashboard Overview tab
+- Leaderboards: affiliate dashboard Overview tab
+- Badges: affiliate dashboard Overview tab
 - Goals API: `src/app/api/affiliate/goals/`
 - Contest API: `src/app/api/affiliate/contests/`, `contest-leaderboard/`
+- Challenges API: `src/app/api/affiliate/challenges/` — weekly micro-challenges with progress tracking, badge rewards (#75) (Session E)
 - Milestone API: `src/app/api/affiliate/milestones/`
 - Leaderboard API: `src/app/api/affiliate/leaderboard/`
 - Tiers API: `src/app/api/affiliate/tiers/`
 - Badges API: `src/app/api/affiliate/badges/`
+- Delight Components: `src/components/affiliate/delight-features.tsx` (WeeklyChallengesPanel, CaseStudyLibrary, PromotionQuizPanel, AudienceAnalyzerPanel, AffiliateDirectoryPreview) (Session E)
 
 ### Database Tables
 - `affiliate_tiers` — tier definitions (thresholds, rates, perks)
@@ -128,6 +130,7 @@
 - `affiliate_milestone_awards` — awarded milestones per affiliate
 - `affiliate_contests` — contest definitions (metric, dates, prizes)
 - `affiliate_contest_entries` — contest participation tracking
+- `challenge_progress` — per-affiliate challenge progress with completion tracking (Session E)
 
 ### RESOLVED INTEGRATION GAPS (Fixed Feb 2026)
 - ~~Contests data NOT flowing into AI analytics coaching~~ — FIXED: AI coach now queries `affiliate_contests` and includes active contest data in prompts
@@ -316,10 +319,15 @@
 - **AI Onboarding Advisor:** Getting-started guidance for new affiliates
 - **AI Conversion Optimizer:** Suggestions to improve conversion rates
 
+- **Promotion Strategy Quiz:** Interactive quiz generating AI-powered 30-day playbook (#98) (Session E)
+- **Audience Analyzer:** Demographic/device/geo analysis with AI persona generation (Session E)
+
 ### Key Files
 - All under `src/app/api/affiliate/ai-*/`
 - AI provider: `src/lib/ai/provider.ts` (chatCompletion function)
 - Model: `grok-3-mini-fast` via XAI_API_KEY
+- Promotion Quiz: `src/app/api/affiliate/promotion-quiz/` — quiz + AI playbook, saves to affiliate_profiles.quiz_results (Session E)
+- Audience Analyzer: `src/app/api/affiliate/analyze-audience/` — referral_clicks + connected_platform_metrics + AI persona (Session E)
 
 ### CRITICAL PATTERN
 - `AISettings` type REQUIRES `systemPrompt: string` field — never omit it
@@ -457,9 +465,35 @@
 
 ---
 
+## System 15: Social Proof & Directory (Session E)
+
+### What's Built
+- **Case Study Library:** Rich cards with headline, key metric, customer quote, share button. Admin creates; affiliates submit success stories (#70, #136)
+- **Public Affiliate Directory:** Opt-in partner page at `/partners` with tier badges, bio, social links, search/filter (#58)
+- **AI Case Study Drafting:** Admin can AI-generate case studies from real affiliate performance data
+
+### Key Files
+- Case studies (affiliate): `src/app/api/affiliate/case-studies/`
+- Case studies (admin): `src/app/api/admin/case-studies/`
+- Directory: `src/app/api/public/affiliate-directory/`
+- Partners page: `src/app/partners/page.tsx`
+
+### Database Tables
+- `case_studies` — headline, summary, key_metric, customer_quote, affiliate attribution, testimonial link, tags, status
+- `affiliate_profiles.show_in_directory` — opt-in column for directory visibility
+- `affiliate_profiles.quiz_results` — saved promotion quiz answers for AI coach context
+
+### Integration Points
+- Case studies reference `testimonials` table for quotes
+- Case studies pull real metrics from `affiliate_commissions` and `affiliate_referrals`
+- Directory pulls from `affiliate_profiles`, `affiliate_tiers`, `affiliate_landing_pages`
+- Directory uses leaderboard ranking for "Top Performer" designation
+
+---
+
 ## Database Migration History
 
-All migrations 001-014 have been run on both Replit Postgres and Supabase. Migration 015 has been run on Replit Postgres only — user must run on Supabase before testing Session D features.
+All migrations 001-015 have been run on Replit Postgres. Migrations 015-016 need to be run on Supabase.
 
 | # | File | Contents |
 |---|------|----------|
@@ -478,6 +512,7 @@ All migrations 001-014 have been run on both Replit Postgres and Supabase. Migra
 | 013 | `migrations/core/013_delight_features.sql` | Partner experience, toolkit, expanded analytics |
 | 014 | `migrations/core/014_analytics_columns.sql` | Analytics columns (geo/device on clicks, churn fields on referrals) |
 | 015 | `migrations/core/015_session_d_tables.sql` | Session D: affiliate_asset_usage, knowledge_base_articles, promotional_calendar |
+| 016 | `migrations/core/016_session_e_tables.sql` | Session E: challenge_progress, case_studies, affiliate_profiles columns |
 
 ---
 
