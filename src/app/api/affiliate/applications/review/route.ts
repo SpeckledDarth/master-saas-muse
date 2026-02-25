@@ -216,69 +216,50 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://master-saas-muse-u7ga.vercel.app'
 
     let emailActionUrl = `${baseUrl}/affiliate/login`
-    let emailSubject = ''
-    let emailButtonText = ''
-    let emailBodyText = ''
 
-    if (isNewUser) {
-      try {
-        const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
-          type: 'magiclink',
-          email: application.email,
-          options: {
-            redirectTo: `${baseUrl}/affiliate/set-password`,
-          },
-        })
+    try {
+      const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+        type: 'magiclink',
+        email: application.email,
+        options: {
+          redirectTo: `${baseUrl}/affiliate/set-password`,
+        },
+      })
 
-        if (linkError) {
-          console.error('generateLink error:', linkError)
-        }
-
-        if (linkData?.properties?.hashed_token) {
-          const token = linkData.properties.hashed_token
-          emailActionUrl = `${baseUrl}/auth/callback?token_hash=${token}&type=magiclink&next=/affiliate/set-password`
-        } else if (linkData?.properties?.action_link) {
-          emailActionUrl = linkData.properties.action_link
-        }
-      } catch (linkErr) {
-        console.error('Failed to generate password setup link:', linkErr)
+      if (linkError) {
+        console.error('generateLink error:', linkError)
       }
 
-      emailSubject = "You're In! Set Your Password to Get Started"
-      emailButtonText = 'Set Your Password &amp; Get Started'
-      emailBodyText = '<p><strong>Click below to set your password and access your dashboard:</strong></p>'
-    } else {
-      emailActionUrl = `${baseUrl}/affiliate/login`
-      emailSubject = "You're In! Log In to Your Affiliate Dashboard"
-      emailButtonText = 'Log In to Your Dashboard'
-      emailBodyText = '<p><strong>You already have an account. Click below to log in and access your affiliate dashboard:</strong></p>'
+      if (linkData?.properties?.hashed_token) {
+        const token = linkData.properties.hashed_token
+        emailActionUrl = `${baseUrl}/auth/callback?token_hash=${token}&type=magiclink&next=/affiliate/set-password`
+      } else if (linkData?.properties?.action_link) {
+        emailActionUrl = linkData.properties.action_link
+      }
+    } catch (linkErr) {
+      console.error('Failed to generate password setup link:', linkErr)
     }
 
     try {
       const { client: emailClient, fromEmail } = await getEmailClient()
 
-      const footerText = isNewUser
-        ? `<p style="color: #666; font-size: 14px;">After setting your password, you can always log in at: <a href="${baseUrl}/affiliate/login" style="color: #2563eb;">${baseUrl}/affiliate/login</a></p>
-           <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
-           <p style="color: #999; font-size: 12px;">This link expires in 24 hours. If it has expired, visit <a href="${baseUrl}/affiliate/forgot-password" style="color: #2563eb;">the password reset page</a> to get a new one.</p>`
-        : `<hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
-           <p style="color: #999; font-size: 12px;">If you've forgotten your password, you can <a href="${baseUrl}/affiliate/forgot-password" style="color: #2563eb;">reset it here</a>.</p>`
-
       await emailClient.emails.send({
         from: fromEmail,
         to: application.email,
-        subject: emailSubject,
+        subject: "You're In! Set Your Password to Get Started",
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #333;">Welcome to the Affiliate Program!</h2>
             <p>Hi ${application.name},</p>
             <p>Great news — your affiliate application has been approved! You now have access to your personal affiliate dashboard where you can track your referrals, earnings, and access marketing materials.</p>
-            ${emailBodyText}
+            <p><strong>Click below to set your password and access your dashboard:</strong></p>
             <p style="margin: 24px 0;">
-              <a href="${emailActionUrl}" style="background-color: #2563eb; color: #fff; padding: 14px 28px; border-radius: 6px; text-decoration: none; display: inline-block; font-weight: 600;">${emailButtonText}</a>
+              <a href="${emailActionUrl}" style="background-color: #2563eb; color: #fff; padding: 14px 28px; border-radius: 6px; text-decoration: none; display: inline-block; font-weight: 600;">Set Your Password &amp; Get Started</a>
             </p>
             <p style="color: #666; font-size: 14px;">Your login email: <strong>${application.email}</strong></p>
-            ${footerText}
+            <p style="color: #666; font-size: 14px;">After setting your password, you can always log in at: <a href="${baseUrl}/affiliate/login" style="color: #2563eb;">${baseUrl}/affiliate/login</a></p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
+            <p style="color: #999; font-size: 12px;">This link expires in 24 hours. If it has expired, visit <a href="${baseUrl}/affiliate/forgot-password" style="color: #2563eb;">the password reset page</a> to get a new one.</p>
           </div>
         `,
       })
