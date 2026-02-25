@@ -35,20 +35,16 @@ This project runs across THREE environments that MUST stay aligned. Most testing
 5. **Environment variables** — If any new env vars are needed, list them for both Vercel AND Supabase dashboards.
 6. **Git status check** — Remind user to push to GitHub. Vercel auto- deploys from the GitHub repo.
 
-**Why This Matters:**
-- Agent sees Replit Postgres. User's app reads Supabase.
-- Agent tests on localhost:5500. User tests on Vercel deployment.
-- Code changes only reach Vercel after git push → GitHub → Vercel auto-deploy.
-- Missing a Supabase migration = user sees 500 errors that agent cannot reproduce locally.
-
 ### Pre-Delivery Testing Checklist (MANDATORY before handing work to user)
-Every time code changes are made, the agent MUST complete these steps before telling the user the work is ready:
+Every time code changes are made, the agent MUST complete ALL of these steps before telling the user the work is ready. The user tests on Vercel, not Replit. If the agent skips these steps, the user will see errors the agent cannot reproduce, and days will be wasted.
+
 1. **Check the Replit database schema** — Query the Replit Postgres to confirm all tables and columns the code expects actually exist. The Replit DB should mirror what Supabase has. If a column is missing here, it's missing on Supabase too.
 2. **Start the dev server** — Run `npm run dev` and confirm no build/compile errors in the logs.
-3. **Test API endpoints** — Use curl or fetch against the local dev server to hit every API route that was changed. Confirm they return 200 (not 500). Check the response body makes sense.
+3. **Test API endpoints** — Use curl or fetch against the local dev server to hit every API route that was changed. Confirm they return 200 (not 500). Check the response body makes sense (not just the status code).
 4. **Check server logs** — Review the dev server console output for any errors, warnings, or stack traces while testing.
 5. **Trace the full path** — For each fix, mentally trace: frontend fetch call -> API route -> database query -> response handling. Confirm every step works, not just the spot that looked broken.
 6. **List required Supabase migrations** — If any fix depends on a table or column that might not exist in the user's Supabase instance, explicitly list the migration SQL the user needs to run BEFORE testing.
+7. **Fix all errors before handoff** — Do NOT hand partially-working code to the user. If an API returns a 500, debug and fix it. The user should never be the first person to discover a bug.
 
 ### Session Start Protocol (MANDATORY — DO NOT SKIP)
 

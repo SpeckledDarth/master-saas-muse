@@ -113,21 +113,39 @@ interface RangeData {
 
 ## Deployment Anti-Patterns
 
+### THE #1 PROBLEM: Replit Is Not the Production Environment
+
+**What happened (repeatedly):** Agent tested only within Replit (local dev server + Replit Postgres) and declared work "done." User then tested on the actual production environment (Vercel + Supabase) and hit errors that were invisible to the agent. Days were wasted debugging errors the user could see but the agent could not reproduce — because the agent was only looking at its own tools, not the real deployment.
+
+**The fundamental truth:**
+- This is a **Next.js + Vercel + Supabase** stack
+- The user NEVER tests in Replit. The user tests on Vercel.
+- Replit is a **code editor only**. The Replit preview/webview is never used.
+- If something works in Replit but breaks in Vercel, the user sees the breakage and the agent doesn't
+- **The agent must test as if it were deploying to Vercel**, not as if Replit is the target
+
+**Rules:**
+1. **Replit Postgres and Supabase Postgres must be synced at all times.** Every table, every column, every migration. If a migration runs on Replit, list the exact SQL the user needs to run on Supabase BEFORE testing.
+2. **Replit code and GitHub must be synced at all times.** The user pushes to GitHub (which triggers Vercel deploy). The agent must remind the user to push and must not declare work done until the code is committed.
+3. **Before handoff, the agent must do a full E2E test locally** — compile the code, hit every changed API route, check for errors in the response bodies, verify database schema matches. Fix all errors BEFORE giving work to the user.
+4. **Never suggest using the Replit preview panel.** It does not represent the production experience.
+5. **If the user reports a Vercel error**, do NOT dismiss it because "it works in Replit." The Vercel environment is the source of truth. Investigate the difference (TypeScript strictness, missing env vars, schema drift, etc.).
+
 ### Anti-Pattern: Three-Environment Desync
 **What happened:** Agent tests against Replit Postgres + local dev server. User tests against Supabase + Vercel. Schemas drifted, causing 500 errors that one side couldn't reproduce.
 
 **Rule:** Follow the Pre-Push Sync Checklist in `replit.md`:
-1. Schema alignment — confirm tables/columns exist
+1. Schema alignment — confirm tables/columns exist in Replit Postgres AND list migrations for Supabase
 2. Code compiles clean — `npm run dev` with zero errors
-3. API smoke test — curl every changed route
-4. Migration inventory — list ALL migrations needed on Supabase
-5. Environment variables — list any new ones needed
-6. Git push reminder
+3. API smoke test — curl every changed route, check response bodies (not just status codes)
+4. Migration inventory — list ALL migrations needed on Supabase, in order, with exact SQL
+5. Environment variables — list any new ones needed for both Vercel AND Supabase
+6. Git push reminder — user pushes to GitHub, Vercel auto-deploys
 
 ### Anti-Pattern: Turbopack vs Production Build Differences
-**What happened:** Dev server (Turbopack) compiled without errors but `next build` (production TypeScript check) found type errors. Vercel runs the production build.
+**What happened:** Dev server (Turbopack) compiled without errors but `next build` (production TypeScript check) found type errors. Vercel runs the production build, which is stricter.
 
-**Rule:** If you're making type-level changes, be aware that Turbopack is more lenient than the production TypeScript compiler. When in doubt, run a stricter check.
+**Rule:** Turbopack (dev mode) is more lenient than `next build` (production). Vercel runs the production build. If you're making type-level changes or adding new interfaces, be aware that code that compiles in dev may fail in production. When in doubt, mentally verify TypeScript correctness — interfaces can't be used as values, all types must be properly imported, etc.
 
 ---
 
