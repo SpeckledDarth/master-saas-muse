@@ -246,7 +246,7 @@ export function StarterKit() {
       <div className="space-y-1">
         {assets.slice(0, 5).map((a: any) => (
           <div key={a.id} className="flex items-center justify-between p-1.5 bg-white/50 dark:bg-black/20 rounded text-sm">
-            <span className="truncate">{a.title || a.name}</span>
+            <span className="truncate">{String(a.title ?? a.name ?? '')}</span>
             <button onClick={() => navigator.clipboard.writeText(a.content || a.url || '')} className="text-xs text-primary hover:underline shrink-0 ml-2">
               Copy
             </button>

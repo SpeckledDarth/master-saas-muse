@@ -361,14 +361,14 @@ export function PromotionalCalendarPanel() {
                   <div className="mt-2 space-y-1">
                     <p className="text-[10px] font-medium text-muted-foreground">Content Ideas:</p>
                     {event.content_suggestions.slice(0, 3).map((s: any, i: number) => (
-                      <p key={i} className="text-xs pl-3 text-muted-foreground" data-testid={`promo-suggestion-${event.id}-${i}`}>• {typeof s === 'string' ? s : s.text || s.title || JSON.stringify(s)}</p>
+                      <p key={i} className="text-xs pl-3 text-muted-foreground" data-testid={`promo-suggestion-${event.id}-${i}`}>• {typeof s === 'string' ? s : String(s?.text ?? s?.title ?? JSON.stringify(s))}</p>
                     ))}
                   </div>
                 )}
                 {event.linked_assets && event.linked_assets.length > 0 && (
                   <div className="mt-2 flex gap-1 flex-wrap">
                     {event.linked_assets.map((a: any) => (
-                      <span key={a.id} className="text-[9px] px-1.5 py-0.5 bg-muted rounded" data-testid={`promo-asset-${event.id}-${a.id}`}>{a.title}</span>
+                      <span key={a.id} className="text-[9px] px-1.5 py-0.5 bg-muted rounded" data-testid={`promo-asset-${event.id}-${a.id}`}>{String(a.title ?? '')}</span>
                     ))}
                   </div>
                 )}

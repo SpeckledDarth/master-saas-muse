@@ -326,10 +326,50 @@ class WidgetErrorBoundary extends Component<{ widgetId: string; children: ReactN
   }
 }
 
-class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
+class SectionErrorBoundary extends Component<{ sectionName: string; children: ReactNode }, { hasError: boolean; error: Error | null; componentStack: string | null }> {
+  constructor(props: { sectionName: string; children: ReactNode }) {
+    super(props)
+    this.state = { hasError: false, error: null, componentStack: null }
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error(`[SECTION CRASH] "${this.props.sectionName}":`, error.message, '\nComponent Stack:', errorInfo.componentStack)
+    this.setState({ componentStack: errorInfo.componentStack || null })
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Card className="border-destructive/30">
+          <CardContent className="pt-4 pb-3 text-center">
+            <AlertTriangle className="h-6 w-6 mx-auto mb-2 text-destructive" />
+            <p className="text-sm font-medium text-destructive mb-1">Section &quot;{this.props.sectionName}&quot; crashed</p>
+            <p className="text-xs text-muted-foreground mb-2">{this.state.error?.message || 'Unknown error'}</p>
+            {this.state.componentStack && (
+              <details className="text-left mb-2">
+                <summary className="text-xs text-muted-foreground cursor-pointer">Component Stack</summary>
+                <pre className="text-[10px] font-mono text-muted-foreground mt-1 overflow-auto max-h-32 whitespace-pre-wrap">{this.state.componentStack}</pre>
+              </details>
+            )}
+            <Button variant="ghost" size="sm" className="text-xs" onClick={() => this.setState({ hasError: false, error: null, componentStack: null })}>
+              Retry Section
+            </Button>
+          </CardContent>
+        </Card>
+      )
+    }
+    return this.props.children
+  }
+}
+
+class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null; componentStack: string | null }> {
   constructor(props: { children: ReactNode }) {
     super(props)
-    this.state = { hasError: false, error: null }
+    this.state = { hasError: false, error: null, componentStack: null }
   }
 
   static getDerivedStateFromError(error: Error) {
@@ -338,28 +378,65 @@ class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasErr
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Affiliate Dashboard Error:', error, errorInfo)
+    this.setState({ componentStack: errorInfo.componentStack || null })
+    try {
+      const diagnosticData = (typeof window !== 'undefined' && (window as any).__DASHBOARD_DIAGNOSTIC__) || null
+      if (diagnosticData) {
+        console.error('[DIAGNOSTIC] Dashboard state at crash:', diagnosticData)
+      }
+    } catch {}
   }
 
   render() {
     if (this.state.hasError) {
+      let decodedError = this.state.error?.message || 'Unknown error'
+      const reactUrlMatch = decodedError.match(/https:\/\/react\.dev\/errors\/\d+\?args\[\]=(.+?)(?:\s|$)/)
+      if (reactUrlMatch) {
+        try { decodedError += '\nDecoded arg: ' + decodeURIComponent(reactUrlMatch[1]) } catch {}
+      }
+
+      let diagnosticInfo: string | null = null
+      try {
+        const diag = (typeof window !== 'undefined' && (window as any).__DASHBOARD_DIAGNOSTIC__) || null
+        if (diag) diagnosticInfo = JSON.stringify(diag, null, 2)
+      } catch {}
+
       return (
         <div className="min-h-screen flex items-center justify-center p-4">
-          <Card className="w-full max-w-lg">
+          <Card className="w-full max-w-2xl">
             <CardContent className="pt-8 pb-6">
               <div className="text-center mb-4">
                 <AlertTriangle className="h-12 w-12 mx-auto mb-3 text-destructive" />
                 <h2 className="text-xl font-bold mb-2" data-testid="text-dashboard-error">Dashboard Error</h2>
                 <p className="text-sm text-muted-foreground mb-4">Something went wrong loading the dashboard.</p>
               </div>
-              <div className="bg-muted/50 rounded-lg p-3 mb-4 overflow-auto max-h-40">
+              <div className="bg-muted/50 rounded-lg p-3 mb-4 overflow-auto max-h-60">
+                <p className="text-xs font-bold mb-1">Error Message:</p>
                 <p className="text-xs font-mono text-destructive break-all" data-testid="text-error-detail">
-                  {this.state.error?.message || 'Unknown error'}
+                  {decodedError}
                 </p>
-                <p className="text-xs font-mono text-muted-foreground mt-1 break-all">
-                  {this.state.error?.stack?.split('\n').slice(0, 3).join('\n')}
-                </p>
+                <p className="text-xs font-bold mt-3 mb-1">Stack Trace (full):</p>
+                <pre className="text-[10px] font-mono text-muted-foreground break-all whitespace-pre-wrap">
+                  {this.state.error?.stack || 'No stack available'}
+                </pre>
+                {this.state.componentStack && (
+                  <>
+                    <p className="text-xs font-bold mt-3 mb-1">React Component Stack:</p>
+                    <pre className="text-[10px] font-mono text-muted-foreground break-all whitespace-pre-wrap">
+                      {this.state.componentStack}
+                    </pre>
+                  </>
+                )}
+                {diagnosticInfo && (
+                  <>
+                    <p className="text-xs font-bold mt-3 mb-1">Dashboard State Diagnostic:</p>
+                    <pre className="text-[10px] font-mono text-muted-foreground break-all whitespace-pre-wrap max-h-40 overflow-auto">
+                      {diagnosticInfo}
+                    </pre>
+                  </>
+                )}
               </div>
-              <Button className="w-full" onClick={() => this.setState({ hasError: false, error: null })} data-testid="button-retry-dashboard">
+              <Button className="w-full" onClick={() => this.setState({ hasError: false, error: null, componentStack: null })} data-testid="button-retry-dashboard">
                 Try Again
               </Button>
             </CardContent>
@@ -656,6 +733,49 @@ function StandaloneAffiliateDashboard() {
     }
     checkAuth()
   }, [router])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const scanForObjects = (label: string, val: unknown): string[] => {
+      const issues: string[] = []
+      if (val !== null && val !== undefined && typeof val === 'object' && !Array.isArray(val) && !(val instanceof Date)) {
+        issues.push(`${label} is an object: ${JSON.stringify(val).slice(0, 200)}`)
+      }
+      if (Array.isArray(val)) {
+        val.forEach((item, i) => {
+          if (item !== null && item !== undefined && typeof item === 'object' && !Array.isArray(item)) {
+            const keys = Object.keys(item)
+            for (const k of keys) {
+              if (item[k] !== null && item[k] !== undefined && typeof item[k] === 'object') {
+                issues.push(`${label}[${i}].${k} is nested object: ${JSON.stringify(item[k]).slice(0, 150)}`)
+              }
+            }
+          }
+        })
+      }
+      return issues
+    }
+    const diag: Record<string, unknown> = {}
+    if (data) {
+      const issues: string[] = []
+      if (data.link) issues.push(...scanForObjects('link', data.link))
+      if (data.stats) issues.push(...scanForObjects('stats', data.stats))
+      if (data.tier) issues.push(...scanForObjects('tier', data.tier))
+      if (data.referrals) issues.push(...scanForObjects('referrals', data.referrals))
+      if (data.commissions) issues.push(...scanForObjects('commissions', data.commissions))
+      if (data.payouts) issues.push(...scanForObjects('payouts', data.payouts))
+      if (issues.length > 0) {
+        diag.dataIssues = issues
+        console.warn('[DIAGNOSTIC] Potential render issues in dashboard data:', issues)
+      }
+    }
+    if (earnings) diag.earningsKeys = Object.keys(earnings)
+    if (milestoneData) diag.milestoneDataType = typeof milestoneData
+    if (forecast) diag.forecastType = typeof forecast
+    diag.section = section
+    diag.timestamp = new Date().toISOString()
+    ;(window as any).__DASHBOARD_DIAGNOSTIC__ = diag
+  }, [data, earnings, milestoneData, forecast, section])
 
   const fetchData = useCallback(async () => {
     try {
@@ -7049,19 +7169,22 @@ function StandaloneAffiliateDashboard() {
   }
 
   const renderSection = () => {
+    const wrap = (name: string, content: React.ReactNode) => (
+      <SectionErrorBoundary sectionName={name} key={name}>{content}</SectionErrorBoundary>
+    )
     switch (section) {
-      case 'overview': return renderOverview()
-      case 'analytics': return renderAnalytics()
-      case 'referrals': return renderReferrals()
-      case 'earnings': return renderEarnings()
-      case 'payouts': return renderPayouts()
-      case 'assets': return renderAssets()
-      case 'tools': return renderTools()
-      case 'announcements': return renderAnnouncements()
-      case 'messages': return renderMessages()
-      case 'account': return renderAccount()
-      case 'support': return renderSupport()
-      default: return renderOverview()
+      case 'overview': return wrap('overview', renderOverview())
+      case 'analytics': return wrap('analytics', renderAnalytics())
+      case 'referrals': return wrap('referrals', renderReferrals())
+      case 'earnings': return wrap('earnings', renderEarnings())
+      case 'payouts': return wrap('payouts', renderPayouts())
+      case 'assets': return wrap('assets', renderAssets())
+      case 'tools': return wrap('tools', renderTools())
+      case 'announcements': return wrap('announcements', renderAnnouncements())
+      case 'messages': return wrap('messages', renderMessages())
+      case 'account': return wrap('account', renderAccount())
+      case 'support': return wrap('support', renderSupport())
+      default: return wrap('overview', renderOverview())
     }
   }
 

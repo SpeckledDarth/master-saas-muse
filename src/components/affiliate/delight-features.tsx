@@ -373,10 +373,10 @@ export function PromotionQuizPanel() {
       )}
       {playbook.weeks && playbook.weeks.map((week: any, i: number) => (
         <div key={i} className="mb-3" data-testid={`quiz-week-${i + 1}`}>
-          <h4 className="text-xs font-medium mb-1">Week {i + 1}: {week.theme || week.title}</h4>
+          <h4 className="text-xs font-medium mb-1">Week {i + 1}: {String(week.theme ?? week.title ?? '')}</h4>
           <div className="space-y-1 pl-3">
             {(week.tasks || week.actions || []).map((task: any, j: number) => (
-              <p key={j} className="text-[11px] text-muted-foreground">• {typeof task === 'string' ? task : task.description || task.text}</p>
+              <p key={j} className="text-[11px] text-muted-foreground">• {typeof task === 'string' ? task : String(task?.description ?? task?.text ?? '')}</p>
             ))}
           </div>
         </div>
@@ -385,7 +385,7 @@ export function PromotionQuizPanel() {
         <div className="mt-3 p-2 rounded bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800" data-testid="quiz-quick-wins">
           <h4 className="text-xs font-medium text-green-700 dark:text-green-400 mb-1">Quick Wins</h4>
           {playbook.quick_wins.map((win: any, i: number) => (
-            <p key={i} className="text-[11px] text-muted-foreground">• {typeof win === 'string' ? win : win.text || win.description}</p>
+            <p key={i} className="text-[11px] text-muted-foreground">• {typeof win === 'string' ? win : String(win?.text ?? win?.description ?? '')}</p>
           ))}
         </div>
       )}
