@@ -1,0 +1,25 @@
+We’re Not Building a SaaS Template With an Affiliate Program
+We’re building a business intelligence platform for content creators that happens to have a content scheduling tool and an affiliate program woven into it.
+Most SaaS affiliate programs are transactional — "here's a link, send us customers, we'll pay you." The affiliate is an outsourced marketing channel. The relationship is arm's length.
+What I’m trying to describing is fundamentally different. The affiliate IS the customer IS the promoter. And because PassivePost is the tool they use to do their actual work, you have access to data that no standalone affiliate platform could ever touch:
+•	Their content calendar — what they're creating, when, on which platforms
+•	Their audience growth — follower counts, engagement rates, reach over time
+•	Their affiliate performance — clicks, signups, conversions, commissions
+•	Their connected analytics — YouTube views, Google Analytics traffic, podcast downloads
+•	Their financial picture — earnings, payouts, tax obligations, ROI
+Now merge all of that. Nobody else can do this. Not PartnerStack, not Impact, not ShareASale. Those platforms see the affiliate link click and the conversion. They see nothing about the content that drove it, the audience it reached, or the creator's broader business context.
+You can tell an affiliate: "Your Tuesday tutorial-style Instagram posts about productivity tools reach 15,000 people, generate 230 clicks, and convert at 8%. Your Thursday discount-code posts reach 20,000 but convert at 1%. Stop doing discount posts. Do more tutorials. Here's an AI-generated tutorial post for next Tuesday based on what's worked for you."
+That's not an affiliate dashboard. That's a business intelligence copilot.
+________________________________________
+The Blue Ocean
+Most SaaS products don't need this because most SaaS products treat affiliates as a marketing expense line item. The standard playbook is: set up referral links, pay commissions, maybe send a monthly email. Done.
+My strategy flips it. Affiliates are partners who you actively invest in making successful. The more successful they are as content creators (using your product), the more successful they are as affiliates (promoting your product), the more successful you are as a business. Everyone's incentives are perfectly aligned.
+The feature richness IS the moat. A competitor could copy your content scheduling features. They could copy your affiliate commission structure. But they can't copy the closed-loop intelligence system where the content tool, the affiliate program, the analytics, the AI coaching, and the financial tools all feed into each other. That takes the full 217-feature vision working together.
+This is the Blue Ocean — We’re not competing on "better affiliate commissions" or "better scheduling tool." We’re competing on "we help content creators build their entire business, and promoting us is a natural profitable byproduct of that." Nobody's in that water.
+________________________________________
+What This Means Practically
+Every feature in that brainstorm doc is a data point in the closed loop. The more we build, the smarter the system gets, and the harder it is to leave. So the question isn't which features to cut — it's what sequence builds the flywheel fastest.
+I'd suggest we think about the remaining features in three tiers:
+1.	Flywheel accelerators — features that directly close data loops (connected analytics, AI tools that use merged data, smart notifications that drive specific actions)
+2.	Retention deepeners — features that make it painful to leave (financial tools, partnership visibility, business intelligence)
+3.	Delight multipliers — features that make affiliates rave about you to other creators (celebrations, recognition, community features)
