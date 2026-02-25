@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, Suspense, useRef, useMemo } from 'react'
+import { useState, useEffect, useCallback, Suspense, useRef, useMemo, Component, type ErrorInfo, type ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -295,11 +295,58 @@ const NAV_ITEMS: { key: DashboardSection; label: string; icon: any }[] = [
   { key: 'support', label: 'Support', icon: HelpCircle },
 ]
 
+class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
+  constructor(props: { children: ReactNode }) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Affiliate Dashboard Error:', error, errorInfo)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <Card className="w-full max-w-lg">
+            <CardContent className="pt-8 pb-6">
+              <div className="text-center mb-4">
+                <AlertTriangle className="h-12 w-12 mx-auto mb-3 text-destructive" />
+                <h2 className="text-xl font-bold mb-2" data-testid="text-dashboard-error">Dashboard Error</h2>
+                <p className="text-sm text-muted-foreground mb-4">Something went wrong loading the dashboard.</p>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-3 mb-4 overflow-auto max-h-40">
+                <p className="text-xs font-mono text-destructive break-all" data-testid="text-error-detail">
+                  {this.state.error?.message || 'Unknown error'}
+                </p>
+                <p className="text-xs font-mono text-muted-foreground mt-1 break-all">
+                  {this.state.error?.stack?.split('\n').slice(0, 3).join('\n')}
+                </p>
+              </div>
+              <Button className="w-full" onClick={() => this.setState({ hasError: false, error: null })} data-testid="button-retry-dashboard">
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
 export default function StandaloneAffiliateDashboardPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
-      <StandaloneAffiliateDashboard />
-    </Suspense>
+    <DashboardErrorBoundary>
+      <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+        <StandaloneAffiliateDashboard />
+      </Suspense>
+    </DashboardErrorBoundary>
   )
 }
 
@@ -1688,6 +1735,21 @@ function StandaloneAffiliateDashboard() {
   }, [dashboardLayout])
 
   const renderWidgetContent = (widgetId: WidgetId): React.ReactNode => {
+    try {
+    return renderWidgetInner(widgetId)
+    } catch (err) {
+      console.error(`Widget "${widgetId}" crashed:`, err)
+      return (
+        <Card className="border-destructive/30">
+          <CardContent className="pt-4 pb-3 text-center">
+            <p className="text-xs text-destructive">Widget "{widgetId}" failed to load</p>
+          </CardContent>
+        </Card>
+      )
+    }
+  }
+
+  const renderWidgetInner = (widgetId: WidgetId): React.ReactNode => {
     switch (widgetId) {
       case 'share_link':
         return (
@@ -1739,7 +1801,7 @@ function StandaloneAffiliateDashboard() {
                 </div>
               </div>
               <p className="text-3xl font-bold mt-2 text-green-600 dark:text-green-400" data-testid="text-live-earnings-value">
-                ${(earnings[earningsPeriod] / 100).toFixed(2)}
+                ${((earnings?.[earningsPeriod] ?? 0) / 100).toFixed(2)}
               </p>
             </CardContent>
           </Card>
