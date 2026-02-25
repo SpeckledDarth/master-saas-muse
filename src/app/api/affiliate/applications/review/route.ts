@@ -213,7 +213,7 @@ export async function POST(request: NextRequest) {
       })
     } catch {}
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io'
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://master-saas-muse-u7ga.vercel.app'
 
     let emailActionUrl = `${baseUrl}/affiliate/login`
     let emailSubject = ''

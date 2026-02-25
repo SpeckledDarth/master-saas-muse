@@ -47,7 +47,7 @@ export async function POST() {
       .eq('user_id', user.id)
       .maybeSingle()
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io'
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://master-saas-muse-u7ga.vercel.app'
 
     try {
       const { sendEmail } = await import('@/lib/email')

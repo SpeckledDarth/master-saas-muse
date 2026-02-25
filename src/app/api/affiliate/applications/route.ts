@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to submit application. Please try again.' }, { status: 500 })
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io'
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://master-saas-muse-u7ga.vercel.app'
 
     try {
       const { data: admins } = await admin

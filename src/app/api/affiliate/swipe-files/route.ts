@@ -149,7 +149,7 @@ export async function GET(req: NextRequest) {
     ]);
 
     const refCode = linkRes.data?.ref_code || linkRes.data?.code || 'PARTNER';
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://master-saas-muse-u7ga.vercel.app';
     const referralLink = linkRes.data?.referral_url || `${baseUrl}?ref=${refCode}`;
     const affiliateName = profileRes.data?.display_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Your Name';
     const discountCode = discountRes.data?.code || refCode;

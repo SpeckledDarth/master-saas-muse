@@ -73,7 +73,7 @@ export async function GET() {
     const approvedEarnings = commissions?.filter((c: any) => c.status === 'approved').reduce((sum: number, c: any) => sum + c.commission_amount_cents, 0) || 0
     const paidEarnings = commissions?.filter((c: any) => c.status === 'paid').reduce((sum: number, c: any) => sum + c.commission_amount_cents, 0) || 0
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io'
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://master-saas-muse-u7ga.vercel.app'
     const shareUrl = `${baseUrl}?ref=${link.ref_code}`
 
     let nextMilestone: any = null
