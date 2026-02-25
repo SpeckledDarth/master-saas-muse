@@ -8,27 +8,42 @@ import { NextRequest, NextResponse } from 'next/server'
 // created_at (timestamptz, default now())
 
 export async function GET() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const adminClient = createAdminClient()
-  const { data, error } = await adminClient
-    .from('notifications')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(50)
+    const adminClient = createAdminClient()
+    const { data, error } = await adminClient
+      .from('notifications')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(50)
 
-  if (error) {
-    if (error.code === '42P01') {
-      return NextResponse.json({ notifications: [], unreadCount: 0 })
+    if (error) {
+      if (error.code === '42P01' || error.code === 'PGRST205' || error.message?.includes('does not exist') || error.message?.includes('schema cache')) {
+        return NextResponse.json({ notifications: [], unreadCount: 0 })
+      }
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
 
-  const unreadCount = data?.filter((n: any) => !n.read).length || 0
-  return NextResponse.json({ notifications: data || [], unreadCount })
+    const safeNotifications = (data || []).map((n: any) => ({
+      id: String(n.id ?? ''),
+      title: String(n.title ?? ''),
+      message: String(n.message ?? ''),
+      type: String(n.type ?? 'info'),
+      read: Boolean(n.read),
+      link: n.link != null ? String(n.link) : undefined,
+      created_at: String(n.created_at ?? ''),
+    }))
+
+    const unreadCount = safeNotifications.filter((n: any) => !n.read).length
+    return NextResponse.json({ notifications: safeNotifications, unreadCount })
+  } catch (err: any) {
+    console.error('Notifications GET error:', err)
+    return NextResponse.json({ notifications: [], unreadCount: 0 })
+  }
 }
 
 export async function POST(request: NextRequest) {

@@ -129,9 +129,47 @@ export async function GET() {
       } catch {}
     }
 
+    const safeTier = (t: any) => t ? {
+      id: String(t.id ?? ''),
+      name: String(t.name ?? ''),
+      min_referrals: Number(t.min_referrals ?? 0),
+      commission_rate: Number(t.commission_rate ?? 0),
+      perks: Array.isArray(t.perks) ? t.perks.map((p: unknown) => typeof p === 'string' ? p : (typeof p === 'object' && p !== null && 'name' in p ? String((p as any).name) : String(p))) : [],
+    } : null
+
+    const safeReferrals = (referrals || []).map((r: any) => ({
+      id: String(r.id ?? ''),
+      status: String(r.status ?? ''),
+      created_at: String(r.created_at ?? ''),
+      fraud_flags: Array.isArray(r.fraud_flags) ? r.fraud_flags.map((f: unknown) => typeof f === 'string' ? f : String(f)) : [],
+      source_tag: r.source_tag != null ? String(r.source_tag) : null,
+    }))
+
+    const safeCommissions = (commissions || []).map((c: any) => ({
+      id: String(c.id ?? ''),
+      invoice_amount_cents: Number(c.invoice_amount_cents ?? 0),
+      commission_rate: Number(c.commission_rate ?? 0),
+      commission_amount_cents: Number(c.commission_amount_cents ?? 0),
+      status: String(c.status ?? ''),
+      created_at: String(c.created_at ?? ''),
+    }))
+
+    const safePayouts = (payouts || []).map((p: any) => ({
+      id: String(p.id ?? ''),
+      amount_cents: Number(p.amount_cents ?? 0),
+      method: String(p.method ?? ''),
+      status: String(p.status ?? ''),
+      processed_at: p.processed_at != null ? String(p.processed_at) : null,
+      created_at: String(p.created_at ?? ''),
+    }))
+
     return NextResponse.json({
       affiliate: {
-        link: { ...link, shareUrl },
+        link: {
+          ref_code: String(link.ref_code ?? ''),
+          shareUrl,
+          is_affiliate: Boolean(link.is_affiliate),
+        },
         stats: {
           totalReferrals,
           conversions,
@@ -144,18 +182,18 @@ export async function GET() {
           effectiveRate,
         },
         tier: {
-          current: currentTier,
-          next: nextTier,
+          current: safeTier(currentTier),
+          next: safeTier(nextTier),
           referralsToNext: nextTier ? nextTier.min_referrals - (link.signups || 0) : 0,
         },
         terms: link.locked_at ? {
-          rate: link.locked_commission_rate,
-          durationMonths: link.locked_duration_months,
-          lockedAt: link.locked_at,
+          rate: Number(link.locked_commission_rate ?? 0),
+          durationMonths: Number(link.locked_duration_months ?? 0),
+          lockedAt: String(link.locked_at),
         } : null,
-        referrals: referrals || [],
-        commissions: commissions || [],
-        payouts: payouts || [],
+        referrals: safeReferrals,
+        commissions: safeCommissions,
+        payouts: safePayouts,
         settings: {
           minPayoutCents: settings?.min_payout_cents || 5000,
           twoTierEnabled: settings?.two_tier_enabled || false,

@@ -52,7 +52,7 @@ export function EarningsProjectionsPanel() {
     setError('');
     fetch('/api/affiliate/analytics/earnings-projections')
       .then(r => { if (!r.ok) throw new Error('Request failed'); return r.json(); })
-      .then(d => { if (d.error) setError(d.error); else setData(d); })
+      .then(d => { if (d.error) setError(typeof d.error === 'string' ? d.error : 'An error occurred'); else setData(d); })
       .catch(() => setError('Failed to load projections'))
       .finally(() => setLoading(false));
   };

@@ -23,10 +23,20 @@ export async function GET() {
       return NextResponse.json({ notifications: [], unreadCount: 0 })
     }
 
-    const unreadCount = (notifications || []).filter(n => !n.read).length
+    const safeNotifications = (notifications || []).map((n: any) => ({
+      id: String(n.id ?? ''),
+      title: String(n.title ?? ''),
+      message: String(n.message ?? ''),
+      type: String(n.type ?? 'info'),
+      read: Boolean(n.read),
+      link: n.link != null ? String(n.link) : undefined,
+      created_at: String(n.created_at ?? ''),
+    }))
+
+    const unreadCount = safeNotifications.filter(n => !n.read).length
 
     return NextResponse.json({
-      notifications: notifications || [],
+      notifications: safeNotifications,
       unreadCount,
     })
   } catch {

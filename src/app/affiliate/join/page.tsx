@@ -59,7 +59,7 @@ export default function AffiliateJoinPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || 'Failed to submit application')
+        setError(typeof data.error === 'string' ? data.error : 'Failed to submit application')
         setLoading(false)
         return
       }
