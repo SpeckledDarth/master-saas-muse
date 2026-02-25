@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useState, useEffect, useCallback, Suspense, useRef, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -21,6 +21,8 @@ import {
   Bell, Bookmark, Download, QrCode, Key, Trash2, Eye, EyeOff, Globe, Palette,
   Webhook, Send, AlertTriangle, RefreshCw, MessageSquare,
   ChevronDown, ChevronRight, Briefcase, UserCheck, UserX, CircleDot,
+  GripVertical, Plus, RotateCcw, X,
+  Youtube, Play, ThumbsUp, MessageCircle, ArrowRight, Activity,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -186,10 +188,72 @@ const DEEP_LINK_PAGES = [
   { label: 'About', path: '/about' },
 ]
 
-type DashboardSection = 'overview' | 'referrals' | 'earnings' | 'payouts' | 'assets' | 'tools' | 'announcements' | 'messages' | 'account' | 'support'
+type DashboardSection = 'overview' | 'analytics' | 'referrals' | 'earnings' | 'payouts' | 'assets' | 'tools' | 'announcements' | 'messages' | 'account' | 'support'
+
+type WidgetId = 'share_link' | 'live_earnings' | 'quick_stats' | 'tier_progress' | 'milestone_progress' | 'active_contests' | 'earnings_forecast' | 'leaderboard' | 'conversion_funnel' | 'ai_coach' | 'content_analytics' | 'achievements'
+
+interface WidgetConfig {
+  id: WidgetId
+  label: string
+  icon: any
+}
+
+const AVAILABLE_WIDGETS: WidgetConfig[] = [
+  { id: 'share_link', label: 'Referral Link', icon: Link2 },
+  { id: 'live_earnings', label: 'Live Earnings', icon: Zap },
+  { id: 'quick_stats', label: 'Quick Stats', icon: BarChart3 },
+  { id: 'tier_progress', label: 'Tier Progress', icon: Award },
+  { id: 'milestone_progress', label: 'Milestone Bonuses', icon: Target },
+  { id: 'active_contests', label: 'Active Contests', icon: Calendar },
+  { id: 'earnings_forecast', label: 'Earnings Forecast', icon: TrendingUp },
+  { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
+  { id: 'conversion_funnel', label: 'Conversion Funnel', icon: BarChart3 },
+  { id: 'ai_coach', label: 'AI Coach', icon: Zap },
+  { id: 'content_analytics', label: 'Content Analytics', icon: BarChart3 },
+  { id: 'achievements', label: 'Achievements', icon: Award },
+]
+
+const DEFAULT_WIDGET_ORDER: WidgetId[] = [
+  'share_link', 'live_earnings', 'quick_stats', 'tier_progress',
+  'milestone_progress', 'active_contests', 'earnings_forecast',
+  'leaderboard', 'conversion_funnel', 'ai_coach', 'content_analytics', 'achievements',
+]
+
+const LAYOUT_STORAGE_KEY = 'affiliate_dashboard_layout'
+
+interface DashboardLayout {
+  order: WidgetId[]
+  hidden: WidgetId[]
+}
+
+function loadDashboardLayout(): DashboardLayout {
+  try {
+    const stored = localStorage.getItem(LAYOUT_STORAGE_KEY)
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      if (parsed.order && Array.isArray(parsed.order)) {
+        const allIds = new Set(DEFAULT_WIDGET_ORDER)
+        const validOrder = parsed.order.filter((id: string) => allIds.has(id as WidgetId))
+        const missing = DEFAULT_WIDGET_ORDER.filter(id => !validOrder.includes(id))
+        return {
+          order: [...validOrder, ...missing] as WidgetId[],
+          hidden: Array.isArray(parsed.hidden) ? parsed.hidden.filter((id: string) => allIds.has(id as WidgetId)) : [],
+        }
+      }
+    }
+  } catch {}
+  return { order: [...DEFAULT_WIDGET_ORDER], hidden: [] }
+}
+
+function saveDashboardLayout(layout: DashboardLayout) {
+  try {
+    localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(layout))
+  } catch {}
+}
 
 const NAV_ITEMS: { key: DashboardSection; label: string; icon: any }[] = [
   { key: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+  { key: 'analytics', label: 'Analytics', icon: BarChart3 },
   { key: 'referrals', label: 'Referrals', icon: Users },
   { key: 'earnings', label: 'Earnings', icon: DollarSign },
   { key: 'payouts', label: 'Payouts', icon: Receipt },
@@ -306,6 +370,15 @@ function StandaloneAffiliateDashboard() {
   const [promoTone, setPromoTone] = useState('professional')
   const [promoCopied, setPromoCopied] = useState(false)
 
+  const [aiWriterFocus, setAiWriterFocus] = useState('')
+  const [aiWriterPost, setAiWriterPost] = useState('')
+  const [aiWriterHashtags, setAiWriterHashtags] = useState<string[]>([])
+  const [aiWriterCharCount, setAiWriterCharCount] = useState(0)
+  const [aiWriterShareUrl, setAiWriterShareUrl] = useState('')
+  const [aiWriterRefCode, setAiWriterRefCode] = useState('')
+  const [aiWriterGenerating, setAiWriterGenerating] = useState(false)
+  const [aiWriterCopied, setAiWriterCopied] = useState(false)
+
   const [messages, setMessages] = useState<any[]>([])
   const [messagesLoading, setMessagesLoading] = useState(false)
   const [messageBody, setMessageBody] = useState('')
@@ -325,6 +398,23 @@ function StandaloneAffiliateDashboard() {
   const [webhookDeliveriesOpen, setWebhookDeliveriesOpen] = useState<string | null>(null)
   const [webhookTesting, setWebhookTesting] = useState<string | null>(null)
 
+  const [youtubeAnalytics, setYoutubeAnalytics] = useState<any>(null)
+  const [youtubeLoading, setYoutubeLoading] = useState(false)
+
+  const [chartData, setChartData] = useState<{
+    earningsTimeSeries: { date: string; amount: number }[]
+    heatmapData: { date: string; amount: number }[]
+    funnelData: { clicks: number; signups: number; conversions: number; paid: number }
+    topSources: { source: string; earnings: number; count: number }[]
+    benchmarks: { percentile: number; avgEarnings: number; avgReferrals: number; yourEarnings: number; yourReferrals: number }
+  } | null>(null)
+  const [chartPeriod, setChartPeriod] = useState<'7d' | '30d' | '90d' | '1y'>('30d')
+  const [chartLoading, setChartLoading] = useState(false)
+
+  const [coachTips, setCoachTips] = useState<{ title: string; description: string; priority: 'high' | 'medium' | 'low' }[]>([])
+  const [coachLoading, setCoachLoading] = useState(false)
+  const [coachLastUpdated, setCoachLastUpdated] = useState<string | null>(null)
+
   const [surveyRating, setSurveyRating] = useState(0)
   const [surveyFeedback, setSurveyFeedback] = useState('')
   const [surveyTestimonialOptIn, setSurveyTestimonialOptIn] = useState(false)
@@ -335,6 +425,12 @@ function StandaloneAffiliateDashboard() {
   const [contractsLoading, setContractsLoading] = useState(false)
   const [contractSigning, setContractSigning] = useState<string | null>(null)
   const [expandedContract, setExpandedContract] = useState<string | null>(null)
+
+  const [dashboardLayout, setDashboardLayout] = useState<DashboardLayout>(() => loadDashboardLayout())
+  const [customizeMode, setCustomizeMode] = useState(false)
+  const [draggedWidget, setDraggedWidget] = useState<WidgetId | null>(null)
+  const [dragOverWidget, setDragOverWidget] = useState<WidgetId | null>(null)
+  const [showAddWidgetPanel, setShowAddWidgetPanel] = useState(false)
 
   const [campaigns, setCampaigns] = useState<any[]>([])
   const [campaignsLoading, setCampaignsLoading] = useState(false)
@@ -353,6 +449,14 @@ function StandaloneAffiliateDashboard() {
   const [badgeTiers, setBadgeTiers] = useState<any[]>([])
   const [badgesLoading, setBadgesLoading] = useState(false)
   const [copiedEmbed, setCopiedEmbed] = useState<string | null>(null)
+
+  const [renewals, setRenewals] = useState<any[]>([])
+  const [expiringReferrals, setExpiringReferrals] = useState<any[]>([])
+  const [renewalsLoading, setRenewalsLoading] = useState(false)
+  const [renewalSubmitting, setRenewalSubmitting] = useState(false)
+  const [renewalCheckInType, setRenewalCheckInType] = useState<'email' | 'call' | 'note'>('email')
+  const [renewalNotes, setRenewalNotes] = useState('')
+  const [renewalTargetId, setRenewalTargetId] = useState<string | null>(null)
 
   const [referralFilter, setReferralFilter] = useState('all')
   const [referralSort, setReferralSort] = useState<'newest' | 'oldest'>('newest')
@@ -445,6 +549,48 @@ function StandaloneAffiliateDashboard() {
     } catch {}
   }, [leaderboardPeriod, leaderboardMetric])
 
+  const fetchRenewals = useCallback(async () => {
+    setRenewalsLoading(true)
+    try {
+      const res = await fetch('/api/affiliate/renewals')
+      if (res.ok) {
+        const data = await res.json()
+        setRenewals(data.renewals || [])
+        setExpiringReferrals(data.expiringReferrals || [])
+      }
+    } catch {}
+    setRenewalsLoading(false)
+  }, [])
+
+  const submitRenewal = async (referralId: string, originalEndDate: string) => {
+    setRenewalSubmitting(true)
+    try {
+      const res = await fetch('/api/affiliate/renewals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          referral_id: referralId,
+          check_in_type: renewalCheckInType,
+          check_in_notes: renewalNotes,
+          original_end_date: originalEndDate,
+        }),
+      })
+      if (res.ok) {
+        toast({ title: 'Renewal Requested', description: 'Your commission renewal request has been submitted for review.' })
+        setRenewalTargetId(null)
+        setRenewalNotes('')
+        setRenewalCheckInType('email')
+        fetchRenewals()
+      } else {
+        const err = await res.json()
+        toast({ title: 'Error', description: err.error || 'Failed to submit renewal request.', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to submit renewal request.', variant: 'destructive' })
+    }
+    setRenewalSubmitting(false)
+  }
+
   const fetchFunnel = useCallback(async () => {
     try {
       const res = await fetch(`/api/affiliate/funnel?period=${funnelPeriod}`)
@@ -453,6 +599,18 @@ function StandaloneAffiliateDashboard() {
       if (data.funnel) setFunnel(data.funnel)
     } catch {}
   }, [funnelPeriod])
+
+  const fetchChartData = useCallback(async () => {
+    setChartLoading(true)
+    try {
+      const res = await fetch(`/api/affiliate/analytics/charts?period=${chartPeriod}`)
+      if (res.ok) {
+        const d = await res.json()
+        setChartData(d)
+      }
+    } catch {}
+    setChartLoading(false)
+  }, [chartPeriod])
 
   const fetchProfile = useCallback(async () => {
     setProfileLoading(true)
@@ -592,6 +750,19 @@ function StandaloneAffiliateDashboard() {
     }
     setTaxInfoSaving(false)
   }
+
+  const fetchCoachTips = useCallback(async () => {
+    setCoachLoading(true)
+    try {
+      const res = await fetch('/api/affiliate/ai-coach')
+      if (res.ok) {
+        const d = await res.json()
+        setCoachTips(d.tips || [])
+        setCoachLastUpdated(d.generatedAt || new Date().toISOString())
+      }
+    } catch {}
+    setCoachLoading(false)
+  }, [])
 
   const getStatementDates = () => {
     const now = new Date()
@@ -912,6 +1083,18 @@ function StandaloneAffiliateDashboard() {
     setCampaignsLoading(false)
   }, [])
 
+  const fetchYoutubeAnalytics = useCallback(async () => {
+    setYoutubeLoading(true)
+    try {
+      const res = await fetch('/api/affiliate/analytics/youtube')
+      if (res.ok) {
+        const d = await res.json()
+        setYoutubeAnalytics(d)
+      }
+    } catch {}
+    setYoutubeLoading(false)
+  }, [])
+
   const createCampaign = async () => {
     if (!campaignName.trim()) return
     setCampaignCreating(true)
@@ -1045,6 +1228,8 @@ function StandaloneAffiliateDashboard() {
       fetchContracts()
       fetchCampaigns()
       fetchTaxSummary()
+      fetchYoutubeAnalytics()
+      fetchRenewals()
       fetch('/api/affiliate/messages').then(r => r.ok ? r.json() : null).then(d => {
         if (d?.messages) {
           setMessages(d.messages)
@@ -1061,6 +1246,10 @@ function StandaloneAffiliateDashboard() {
   useEffect(() => {
     if (!authChecking && !loading) fetchFunnel()
   }, [authChecking, loading, fetchFunnel])
+
+  useEffect(() => {
+    if (!authChecking && !loading && section === 'analytics') fetchChartData()
+  }, [authChecking, loading, section, fetchChartData])
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -1136,6 +1325,48 @@ function StandaloneAffiliateDashboard() {
       setPromoCopied(true)
       setTimeout(() => setPromoCopied(false), 2000)
       toast({ title: 'Copied!', description: 'Promo post copied to clipboard' })
+    } catch {
+      toast({ title: 'Error', description: 'Could not copy to clipboard', variant: 'destructive' })
+    }
+  }
+
+  const generateAiWriterPost = async () => {
+    setAiWriterGenerating(true)
+    setAiWriterPost('')
+    setAiWriterHashtags([])
+    setAiWriterCharCount(0)
+    setAiWriterCopied(false)
+    try {
+      const res = await fetch('/api/affiliate/ai-post-writer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          platform: promoPlatform,
+          tone: promoTone,
+          focusTopic: aiWriterFocus,
+          productName: appName,
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to generate')
+      setAiWriterPost(json.post)
+      setAiWriterHashtags(json.hashtags || [])
+      setAiWriterCharCount(json.characterCount || 0)
+      setAiWriterShareUrl(json.shareUrl || '')
+      setAiWriterRefCode(json.refCode || '')
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to generate post', variant: 'destructive' })
+    } finally {
+      setAiWriterGenerating(false)
+    }
+  }
+
+  const copyAiWriterPost = async () => {
+    try {
+      await navigator.clipboard.writeText(aiWriterPost)
+      setAiWriterCopied(true)
+      setTimeout(() => setAiWriterCopied(false), 2000)
+      toast({ title: 'Copied!', description: 'Post copied to clipboard' })
     } catch {
       toast({ title: 'Error', description: 'Could not copy to clipboard', variant: 'destructive' })
     }
@@ -1217,230 +1448,313 @@ function StandaloneAffiliateDashboard() {
     : new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
   )
 
-  const renderOverview = () => (
-    <div className="space-y-6">
-      <Card data-testid="card-share-link">
-        <CardContent className="pt-5 pb-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <div className="flex-1 min-w-0 w-full">
-              <p className="text-sm font-medium mb-1">Your Referral Link</p>
-              <div className="flex items-center gap-2">
-                <Input value={data.link.shareUrl} readOnly className="font-mono text-sm" data-testid="input-share-url" />
-                <Button variant="outline" size="sm" onClick={() => handleCopy(data.link.shareUrl)} data-testid="button-copy-link">
-                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-            {data.terms && (
-              <Badge variant="secondary" className="shrink-0" data-testid="badge-locked-terms">
-                {data.terms.rate}% for {data.terms.durationMonths} months
-              </Badge>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+  const updateLayout = useCallback((newLayout: DashboardLayout) => {
+    setDashboardLayout(newLayout)
+    saveDashboardLayout(newLayout)
+  }, [])
 
-      {earnings && (
-        <Card className="border-green-500/30 bg-green-50/30 dark:bg-green-950/20" data-testid="card-live-earnings">
-          <CardContent className="pt-4 pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-green-500" />
-                <span className="text-sm font-medium">Live Earnings</span>
-              </div>
-              <div className="flex gap-1">
-                {(['today', 'thisWeek', 'thisMonth'] as const).map(period => (
-                  <Button
-                    key={period}
-                    variant={earningsPeriod === period ? 'default' : 'ghost'}
-                    size="sm"
-                    className="h-6 text-xs px-2"
-                    onClick={() => setEarningsPeriod(period)}
-                    data-testid={`button-earnings-${period}`}
-                  >
-                    {period === 'today' ? 'Today' : period === 'thisWeek' ? 'Week' : 'Month'}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <p className="text-3xl font-bold mt-2 text-green-600 dark:text-green-400" data-testid="text-live-earnings-value">
-              ${(earnings[earningsPeriod] / 100).toFixed(2)}
-            </p>
-          </CardContent>
-        </Card>
-      )}
+  const handleWidgetDragStart = useCallback((widgetId: WidgetId) => {
+    setDraggedWidget(widgetId)
+  }, [])
 
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-        <Card data-testid="stat-clicks">
-          <CardContent className="pt-4 pb-3">
-            <div className="flex items-center gap-2">
-              <MousePointerClick className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Link Clicks</span>
-            </div>
-            <p className="text-2xl font-bold mt-1">{data.stats.clicks}</p>
-          </CardContent>
-        </Card>
-        <Card data-testid="stat-referrals">
-          <CardContent className="pt-4 pb-3">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Signups</span>
-            </div>
-            <p className="text-2xl font-bold mt-1">{data.stats.totalReferrals}</p>
-            <p className="text-xs text-muted-foreground">{data.stats.conversionRate}% convert to paid</p>
-          </CardContent>
-        </Card>
-        <Card data-testid="stat-pending-earnings">
-          <CardContent className="pt-4 pb-3">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Pending</span>
-            </div>
-            <p className="text-2xl font-bold mt-1">${(data.stats.pendingEarnings / 100).toFixed(2)}</p>
-          </CardContent>
-        </Card>
-        <Card data-testid="stat-total-earned">
-          <CardContent className="pt-4 pb-3">
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Total Earned</span>
-            </div>
-            <p className="text-2xl font-bold mt-1">${(data.stats.totalEarnings / 100).toFixed(2)}</p>
-          </CardContent>
-        </Card>
-      </div>
+  const handleWidgetDragOver = useCallback((e: React.DragEvent, widgetId: WidgetId) => {
+    e.preventDefault()
+    if (draggedWidget && draggedWidget !== widgetId) {
+      setDragOverWidget(widgetId)
+    }
+  }, [draggedWidget])
 
-      {data.tier.current && (
-        <Card data-testid="card-tier-progress">
-          <CardContent className="pt-5 pb-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Award className="h-4 w-4 text-primary" />
-                <span className="font-medium text-sm">{data.tier.current.name} Tier</span>
-                <Badge variant="outline" className="text-xs">{data.stats.effectiveRate}% commission</Badge>
-              </div>
-              {data.tier.next && (
-                <span className="text-xs text-muted-foreground">
-                  {data.tier.referralsToNext} more to {data.tier.next.name} ({data.tier.next.commission_rate}%)
-                </span>
-              )}
-            </div>
-            {data.tier.next && (
-              <Progress value={Math.min(tierProgress, 100)} className="h-2" data-testid="progress-tier" />
-            )}
-            {!data.tier.next && (
-              <p className="text-xs text-muted-foreground">You've reached the highest tier!</p>
-            )}
-            {tierPerks.length > 0 && (
-              <div className="mt-3 pt-3 border-t">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Gift className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-xs font-medium">Your Tier Perks</span>
+  const handleWidgetDrop = useCallback((targetId: WidgetId) => {
+    if (!draggedWidget || draggedWidget === targetId) {
+      setDraggedWidget(null)
+      setDragOverWidget(null)
+      return
+    }
+    const newOrder = [...dashboardLayout.order]
+    const dragIdx = newOrder.indexOf(draggedWidget)
+    const dropIdx = newOrder.indexOf(targetId)
+    if (dragIdx !== -1 && dropIdx !== -1) {
+      newOrder.splice(dragIdx, 1)
+      newOrder.splice(dropIdx, 0, draggedWidget)
+      updateLayout({ ...dashboardLayout, order: newOrder })
+    }
+    setDraggedWidget(null)
+    setDragOverWidget(null)
+  }, [draggedWidget, dashboardLayout, updateLayout])
+
+  const handleWidgetDragEnd = useCallback(() => {
+    setDraggedWidget(null)
+    setDragOverWidget(null)
+  }, [])
+
+  const hideWidget = useCallback((widgetId: WidgetId) => {
+    updateLayout({
+      ...dashboardLayout,
+      hidden: [...dashboardLayout.hidden, widgetId],
+    })
+  }, [dashboardLayout, updateLayout])
+
+  const showWidget = useCallback((widgetId: WidgetId) => {
+    updateLayout({
+      ...dashboardLayout,
+      hidden: dashboardLayout.hidden.filter(id => id !== widgetId),
+    })
+    setShowAddWidgetPanel(false)
+  }, [dashboardLayout, updateLayout])
+
+  const resetLayout = useCallback(() => {
+    const defaultLayout: DashboardLayout = { order: [...DEFAULT_WIDGET_ORDER], hidden: [] }
+    updateLayout(defaultLayout)
+    setShowAddWidgetPanel(false)
+  }, [updateLayout])
+
+  const visibleWidgets = useMemo(() => {
+    return dashboardLayout.order.filter(id => !dashboardLayout.hidden.includes(id))
+  }, [dashboardLayout])
+
+  const hiddenWidgetIds = useMemo(() => {
+    return dashboardLayout.order.filter(id => dashboardLayout.hidden.includes(id))
+  }, [dashboardLayout])
+
+  const renderWidgetContent = (widgetId: WidgetId): React.ReactNode => {
+    switch (widgetId) {
+      case 'share_link':
+        return (
+          <Card data-testid="card-share-link">
+            <CardContent className="pt-5 pb-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <div className="flex-1 min-w-0 w-full">
+                  <p className="text-sm font-medium mb-1">Your Referral Link</p>
+                  <div className="flex items-center gap-2">
+                    <Input value={data.link.shareUrl} readOnly className="font-mono text-sm" data-testid="input-share-url" />
+                    <Button variant="outline" size="sm" onClick={() => handleCopy(data.link.shareUrl)} data-testid="button-copy-link">
+                      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {tierPerks.map((perk, i) => (
-                    <Badge key={i} variant="outline" className="text-xs">{perk}</Badge>
+                {data.terms && (
+                  <Badge variant="secondary" className="shrink-0" data-testid="badge-locked-terms">
+                    {data.terms.rate}% for {data.terms.durationMonths} months
+                  </Badge>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )
+
+      case 'live_earnings':
+        if (!earnings) return null
+        return (
+          <Card className="border-green-500/30 bg-green-50/30 dark:bg-green-950/20" data-testid="card-live-earnings">
+            <CardContent className="pt-4 pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-green-500" />
+                  <span className="text-sm font-medium">Live Earnings</span>
+                </div>
+                <div className="flex gap-1">
+                  {(['today', 'thisWeek', 'thisMonth'] as const).map(period => (
+                    <Button
+                      key={period}
+                      variant={earningsPeriod === period ? 'default' : 'ghost'}
+                      size="sm"
+                      className="h-6 text-xs px-2"
+                      onClick={() => setEarningsPeriod(period)}
+                      data-testid={`button-earnings-${period}`}
+                    >
+                      {period === 'today' ? 'Today' : period === 'thisWeek' ? 'Week' : 'Month'}
+                    </Button>
                   ))}
                 </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+              <p className="text-3xl font-bold mt-2 text-green-600 dark:text-green-400" data-testid="text-live-earnings-value">
+                ${(earnings[earningsPeriod] / 100).toFixed(2)}
+              </p>
+            </CardContent>
+          </Card>
+        )
 
-      {milestoneData && milestoneData.milestones.length > 0 && (
-        <Card data-testid="card-milestone-progress">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              Milestone Bonuses
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground mb-3">
-              You have {milestoneData.currentReferrals} referral{milestoneData.currentReferrals !== 1 ? 's' : ''} total.
-              {milestoneData.totalBonusEarned > 0 && ` Earned $${(milestoneData.totalBonusEarned / 100).toFixed(2)} in milestone bonuses.`}
-            </p>
-            <div className="space-y-2">
-              {milestoneData.milestones.map(ms => {
-                const achieved = milestoneData.currentReferrals >= ms.referral_threshold
-                const progress = Math.min((milestoneData.currentReferrals / ms.referral_threshold) * 100, 100)
-                return (
-                  <div key={ms.id} className={`p-3 rounded-md border ${achieved ? 'border-green-500/30 bg-green-50/30 dark:bg-green-950/20' : ''}`} data-testid={`milestone-progress-${ms.id}`}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium">{ms.name}</span>
-                      <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                        ${(ms.bonus_amount_cents / 100).toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Progress value={progress} className="h-1.5 flex-1" />
-                      <span className="text-xs text-muted-foreground w-16 text-right">
-                        {achieved ? (
-                          <span className="text-green-600 dark:text-green-400 flex items-center gap-1 justify-end"><CheckCircle className="h-3 w-3" /> Done</span>
-                        ) : (
-                          `${milestoneData.currentReferrals}/${ms.referral_threshold}`
-                        )}
-                      </span>
-                    </div>
+      case 'quick_stats':
+        return (
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+            <Card data-testid="stat-clicks">
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center gap-2">
+                  <MousePointerClick className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Link Clicks</span>
+                </div>
+                <p className="text-2xl font-bold mt-1">{data.stats.clicks}</p>
+              </CardContent>
+            </Card>
+            <Card data-testid="stat-referrals">
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Signups</span>
+                </div>
+                <p className="text-2xl font-bold mt-1">{data.stats.totalReferrals}</p>
+                <p className="text-xs text-muted-foreground">{data.stats.conversionRate}% convert to paid</p>
+              </CardContent>
+            </Card>
+            <Card data-testid="stat-pending-earnings">
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Pending</span>
+                </div>
+                <p className="text-2xl font-bold mt-1">${(data.stats.pendingEarnings / 100).toFixed(2)}</p>
+              </CardContent>
+            </Card>
+            <Card data-testid="stat-total-earned">
+              <CardContent className="pt-4 pb-3">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Total Earned</span>
+                </div>
+                <p className="text-2xl font-bold mt-1">${(data.stats.totalEarnings / 100).toFixed(2)}</p>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case 'tier_progress':
+        if (!data.tier.current) return null
+        return (
+          <Card data-testid="card-tier-progress">
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Award className="h-4 w-4 text-primary" />
+                  <span className="font-medium text-sm">{data.tier.current.name} Tier</span>
+                  <Badge variant="outline" className="text-xs">{data.stats.effectiveRate}% commission</Badge>
+                </div>
+                {data.tier.next && (
+                  <span className="text-xs text-muted-foreground">
+                    {data.tier.referralsToNext} more to {data.tier.next.name} ({data.tier.next.commission_rate}%)
+                  </span>
+                )}
+              </div>
+              {data.tier.next && (
+                <Progress value={Math.min(tierProgress, 100)} className="h-2" data-testid="progress-tier" />
+              )}
+              {!data.tier.next && (
+                <p className="text-xs text-muted-foreground">You've reached the highest tier!</p>
+              )}
+              {tierPerks.length > 0 && (
+                <div className="mt-3 pt-3 border-t">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Gift className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-xs font-medium">Your Tier Perks</span>
                   </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                  <div className="flex flex-wrap gap-1.5">
+                    {tierPerks.map((perk, i) => (
+                      <Badge key={i} variant="outline" className="text-xs">{perk}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )
 
-      {contests.length > 0 && (
-        <Card className="border-yellow-500/30 bg-yellow-50/30 dark:bg-yellow-950/20" data-testid="card-active-contests">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-              Active Contests
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {contests.map(contest => {
-                const now = new Date()
-                const end = new Date(contest.end_date)
-                const start = new Date(contest.start_date)
-                const isActive = contest.status === 'active' && now >= start && now <= end
-                const daysLeft = isActive ? Math.max(0, Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))) : null
-                return (
-                  <div key={contest.id} className={`p-4 rounded-md border ${isActive ? 'border-yellow-500/50' : ''}`} data-testid={`contest-${contest.id}`}>
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-sm">{contest.name}</span>
-                          <Badge variant={isActive ? 'default' : 'outline'} className="text-xs">
-                            {isActive ? 'Active' : 'Upcoming'}
-                          </Badge>
-                        </div>
-                        {contest.description && <p className="text-xs text-muted-foreground">{contest.description}</p>}
-                        <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                          <span>Metric: {contest.metric}</span>
-                          <span>Prize: ${((contest.prize_amount_cents || 0) / 100).toFixed(2)}</span>
-                          {contest.prize_description && <span>{contest.prize_description}</span>}
-                        </div>
+      case 'milestone_progress':
+        if (!milestoneData || milestoneData.milestones.length === 0) return null
+        return (
+          <Card data-testid="card-milestone-progress">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Target className="h-4 w-4" />
+                Milestone Bonuses
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-muted-foreground mb-3">
+                You have {milestoneData.currentReferrals} referral{milestoneData.currentReferrals !== 1 ? 's' : ''} total.
+                {milestoneData.totalBonusEarned > 0 && ` Earned $${(milestoneData.totalBonusEarned / 100).toFixed(2)} in milestone bonuses.`}
+              </p>
+              <div className="space-y-2">
+                {milestoneData.milestones.map(ms => {
+                  const achieved = milestoneData.currentReferrals >= ms.referral_threshold
+                  const progress = Math.min((milestoneData.currentReferrals / ms.referral_threshold) * 100, 100)
+                  return (
+                    <div key={ms.id} className={`p-3 rounded-md border ${achieved ? 'border-green-500/30 bg-green-50/30 dark:bg-green-950/20' : ''}`} data-testid={`milestone-progress-${ms.id}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium">{ms.name}</span>
+                        <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                          ${(ms.bonus_amount_cents / 100).toFixed(2)}
+                        </span>
                       </div>
-                      {daysLeft !== null && (
-                        <div className="text-right shrink-0">
-                          <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{daysLeft}</p>
-                          <p className="text-[10px] text-muted-foreground">days left</p>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <Progress value={progress} className="h-1.5 flex-1" />
+                        <span className="text-xs text-muted-foreground w-16 text-right">
+                          {achieved ? (
+                            <span className="text-green-600 dark:text-green-400 flex items-center gap-1 justify-end"><CheckCircle className="h-3 w-3" /> Done</span>
+                          ) : (
+                            `${milestoneData.currentReferrals}/${ms.referral_threshold}`
+                          )}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        {forecast && (
+      case 'active_contests':
+        if (contests.length === 0) return null
+        return (
+          <Card className="border-yellow-500/30 bg-yellow-50/30 dark:bg-yellow-950/20" data-testid="card-active-contests">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                Active Contests
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {contests.map(contest => {
+                  const now = new Date()
+                  const end = new Date(contest.end_date)
+                  const start = new Date(contest.start_date)
+                  const isActive = contest.status === 'active' && now >= start && now <= end
+                  const daysLeft = isActive ? Math.max(0, Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))) : null
+                  return (
+                    <div key={contest.id} className={`p-4 rounded-md border ${isActive ? 'border-yellow-500/50' : ''}`} data-testid={`contest-${contest.id}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-sm">{contest.name}</span>
+                            <Badge variant={isActive ? 'default' : 'outline'} className="text-xs">
+                              {isActive ? 'Active' : 'Upcoming'}
+                            </Badge>
+                          </div>
+                          {contest.description && <p className="text-xs text-muted-foreground">{contest.description}</p>}
+                          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                            <span>Metric: {contest.metric}</span>
+                            <span>Prize: ${((contest.prize_amount_cents || 0) / 100).toFixed(2)}</span>
+                            {contest.prize_description && <span>{contest.prize_description}</span>}
+                          </div>
+                        </div>
+                        {daysLeft !== null && (
+                          <div className="text-right shrink-0">
+                            <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{daysLeft}</p>
+                            <p className="text-[10px] text-muted-foreground">days left</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )
+
+      case 'earnings_forecast':
+        if (!forecast) return null
+        return (
           <Card data-testid="card-earnings-forecast">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -1484,9 +1798,11 @@ function StandaloneAffiliateDashboard() {
               </div>
             </CardContent>
           </Card>
-        )}
+        )
 
-        {leaderboardEnabled && (
+      case 'leaderboard':
+        if (!leaderboardEnabled) return null
+        return (
           <Card data-testid="card-leaderboard">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
@@ -1548,11 +1864,12 @@ function StandaloneAffiliateDashboard() {
               )}
             </CardContent>
           </Card>
-        )}
-      </div>
+        )
 
-      {funnel.length > 0 && (
-        <Card data-testid="card-conversion-funnel">
+      case 'conversion_funnel':
+        if (funnel.length === 0) return null
+        return (
+          <Card data-testid="card-conversion-funnel">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
@@ -1602,41 +1919,375 @@ function StandaloneAffiliateDashboard() {
             </div>
           </CardContent>
         </Card>
-      )}
+        )
 
-      <Card data-testid="card-achievement-badges">
+      case 'ai_coach':
+        return (
+          <Card data-testid="card-ai-coach">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Award className="h-4 w-4" />
-            Achievements
-          </CardTitle>
-          <CardDescription>Unlock badges as you grow your affiliate business</CardDescription>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              AI Coach
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              {coachLastUpdated && (
+                <span className="text-[10px] text-muted-foreground">
+                  Updated {new Date(coachLastUpdated).toLocaleString()}
+                </span>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchCoachTips}
+                disabled={coachLoading}
+                data-testid="button-refresh-coach"
+              >
+                {coachLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+                <span className="ml-1.5">{coachTips.length > 0 ? 'Refresh' : 'Get Tips'}</span>
+              </Button>
+            </div>
+          </div>
+          <CardDescription>Personalized tips to boost your affiliate earnings</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {BADGES.map(badge => {
-              const earned = badge.check()
-              const BadgeIcon = badge.icon
-              return (
-                <div
-                  key={badge.id}
-                  className={`p-3 rounded-lg border text-center transition-all ${earned ? 'border-primary/40 bg-primary/5' : 'border-muted bg-muted/20 opacity-50'}`}
-                  data-testid={`badge-${badge.id}`}
-                >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 ${earned ? 'bg-primary/10' : 'bg-muted'}`}>
-                    <BadgeIcon className={`h-5 w-5 ${earned ? 'text-primary' : 'text-muted-foreground'}`} />
+          {coachLoading && coachTips.length === 0 ? (
+            <div className="flex items-center justify-center py-8" data-testid="loading-coach-tips">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              <span className="ml-2 text-sm text-muted-foreground">Analyzing your performance...</span>
+            </div>
+          ) : coachTips.length > 0 ? (
+            <div className="space-y-3">
+              {coachTips.map((tip, i) => {
+                const priorityColors = {
+                  high: 'border-red-500/30 bg-red-50/20 dark:bg-red-950/20',
+                  medium: 'border-yellow-500/30 bg-yellow-50/20 dark:bg-yellow-950/20',
+                  low: 'border-blue-500/30 bg-blue-50/20 dark:bg-blue-950/20',
+                }
+                const priorityLabels = {
+                  high: 'High Impact',
+                  medium: 'Medium Impact',
+                  low: 'Quick Win',
+                }
+                return (
+                  <div
+                    key={i}
+                    className={`p-3 rounded-md border ${priorityColors[tip.priority]}`}
+                    data-testid={`coach-tip-${i}`}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <span className="text-sm font-medium">{tip.title}</span>
+                      <Badge variant="outline" className="text-[10px] shrink-0">
+                        {priorityLabels[tip.priority]}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{tip.description}</p>
                   </div>
-                  <p className="text-xs font-medium">{badge.label}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{badge.description}</p>
-                  {earned && (
-                    <Badge variant="default" className="text-[10px] mt-1.5 px-1.5 py-0">Earned</Badge>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-6" data-testid="text-no-coach-tips">
+              <Target className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground mb-1">Get personalized coaching tips</p>
+              <p className="text-xs text-muted-foreground">Click "Get Tips" to analyze your performance and receive actionable advice.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
+        )
+
+      case 'content_analytics':
+        return (
+          <Card data-testid="card-content-analytics">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Youtube className="h-4 w-4" />
+              Content Analytics
+            </CardTitle>
+            {youtubeAnalytics?.connected && (
+              <Button variant="ghost" size="sm" onClick={fetchYoutubeAnalytics} disabled={youtubeLoading} data-testid="button-refresh-youtube">
+                <RefreshCw className={`h-3.5 w-3.5 ${youtubeLoading ? 'animate-spin' : ''}`} />
+              </Button>
+            )}
+          </div>
+          <CardDescription>Track your YouTube video performance and referral attribution</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {youtubeLoading && !youtubeAnalytics ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : youtubeAnalytics?.connected ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                <span>Connected as <span className="font-medium text-foreground">{youtubeAnalytics.account?.displayName || youtubeAnalytics.account?.username}</span></span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="p-3 rounded-md border" data-testid="stat-yt-videos">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Play className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Videos</span>
+                  </div>
+                  <p className="text-lg font-bold">{youtubeAnalytics.channelStats?.totalVideos || 0}</p>
+                </div>
+                <div className="p-3 rounded-md border" data-testid="stat-yt-views">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Total Views</span>
+                  </div>
+                  <p className="text-lg font-bold">{(youtubeAnalytics.channelStats?.totalViews || 0).toLocaleString()}</p>
+                </div>
+                <div className="p-3 rounded-md border" data-testid="stat-yt-likes">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <ThumbsUp className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Likes</span>
+                  </div>
+                  <p className="text-lg font-bold">{(youtubeAnalytics.channelStats?.totalLikes || 0).toLocaleString()}</p>
+                </div>
+                <div className="p-3 rounded-md border" data-testid="stat-yt-comments">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <MessageCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Comments</span>
+                  </div>
+                  <p className="text-lg font-bold">{(youtubeAnalytics.channelStats?.totalComments || 0).toLocaleString()}</p>
+                </div>
+              </div>
+
+              {youtubeAnalytics.attribution && (
+                <div className="p-3 rounded-md border bg-muted/30" data-testid="card-yt-attribution">
+                  <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                    <Activity className="h-3.5 w-3.5" />
+                    Referral Attribution
+                  </p>
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    <div>
+                      <p className="text-lg font-bold">{youtubeAnalytics.attribution.youtubeClicks}</p>
+                      <p className="text-[10px] text-muted-foreground">YouTube Clicks</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold">{youtubeAnalytics.attribution.youtubeReferrals}</p>
+                      <p className="text-[10px] text-muted-foreground">YouTube Signups</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold">{youtubeAnalytics.attribution.youtubeConverted}</p>
+                      <p className="text-[10px] text-muted-foreground">Converted</p>
+                    </div>
+                  </div>
+                  {youtubeAnalytics.attribution.viewsToClickRate && (
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                      Views-to-click rate: {youtubeAnalytics.attribution.viewsToClickRate}%
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {youtubeAnalytics.videos?.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-2">Recent Videos</p>
+                  <div className="space-y-2">
+                    {youtubeAnalytics.videos.slice(0, 5).map((video: any) => (
+                      <div key={video.id} className="flex items-center justify-between gap-3 p-2 rounded-md border" data-testid={`video-${video.id}`}>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{video.title}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {new Date(video.publishedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
+                          <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {video.views.toLocaleString()}</span>
+                          <span className="flex items-center gap-1"><ThumbsUp className="h-3 w-3" /> {video.likes}</span>
+                          <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" /> {video.comments}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+                <Youtube className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <p className="text-sm font-medium mb-1">YouTube Not Connected</p>
+              <p className="text-xs text-muted-foreground mb-4 max-w-xs mx-auto">
+                Connect your YouTube account to see video performance and track how your content drives referrals.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Use source tags like <Badge variant="outline" className="text-[10px] mx-0.5">youtube</Badge> or <Badge variant="outline" className="text-[10px] mx-0.5">yt</Badge> in your referral links to track YouTube-driven referrals even without connecting.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+        )
+
+      case 'achievements':
+        return (
+          <Card data-testid="card-achievement-badges">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Award className="h-4 w-4" />
+                Achievements
+              </CardTitle>
+              <CardDescription>Unlock badges as you grow your affiliate business</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {BADGES.map(badge => {
+                  const earned = badge.check()
+                  const BadgeIcon = badge.icon
+                  return (
+                    <div
+                      key={badge.id}
+                      className={`p-3 rounded-lg border text-center transition-all ${earned ? 'border-primary/40 bg-primary/5' : 'border-muted bg-muted/20 opacity-50'}`}
+                      data-testid={`badge-${badge.id}`}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 ${earned ? 'bg-primary/10' : 'bg-muted'}`}>
+                        <BadgeIcon className={`h-5 w-5 ${earned ? 'text-primary' : 'text-muted-foreground'}`} />
+                      </div>
+                      <p className="text-xs font-medium">{badge.label}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{badge.description}</p>
+                      {earned && (
+                        <Badge variant="default" className="text-[10px] mt-1.5 px-1.5 py-0">Earned</Badge>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )
+
+      default:
+        return null
+    }
+  }
+
+  const renderOverview = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <h2 className="text-lg font-semibold" data-testid="text-overview-heading">Dashboard</h2>
+        <div className="flex items-center gap-2">
+          {customizeMode && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAddWidgetPanel(!showAddWidgetPanel)}
+                data-testid="button-add-widget"
+                disabled={hiddenWidgetIds.length === 0}
+              >
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
+                Add Widget
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={resetLayout}
+                data-testid="button-reset-layout"
+              >
+                <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+                Reset
+              </Button>
+            </>
+          )}
+          <Button
+            variant={customizeMode ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => {
+              setCustomizeMode(!customizeMode)
+              setShowAddWidgetPanel(false)
+            }}
+            data-testid="button-customize-dashboard"
+          >
+            <Settings className="h-3.5 w-3.5 mr-1.5" />
+            {customizeMode ? 'Done' : 'Customize'}
+          </Button>
+        </div>
+      </div>
+
+      {showAddWidgetPanel && hiddenWidgetIds.length > 0 && (
+        <Card data-testid="panel-add-widget">
+          <CardContent className="pt-4 pb-3">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-medium">Hidden Widgets</p>
+              <Button variant="ghost" size="icon" onClick={() => setShowAddWidgetPanel(false)} data-testid="button-close-add-panel">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {hiddenWidgetIds.map(widgetId => {
+                const config = AVAILABLE_WIDGETS.find(w => w.id === widgetId)
+                if (!config) return null
+                const WidgetIcon = config.icon
+                return (
+                  <Button
+                    key={widgetId}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => showWidget(widgetId)}
+                    data-testid={`button-show-widget-${widgetId}`}
+                  >
+                    <WidgetIcon className="h-3.5 w-3.5 mr-1.5" />
+                    {config.label}
+                  </Button>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {visibleWidgets.map(widgetId => {
+        const content = renderWidgetContent(widgetId)
+        if (!content && !customizeMode) return null
+
+        const config = AVAILABLE_WIDGETS.find(w => w.id === widgetId)
+        const isDragging = draggedWidget === widgetId
+        const isDragOver = dragOverWidget === widgetId
+
+        if (customizeMode) {
+          return (
+            <div
+              key={widgetId}
+              draggable
+              onDragStart={() => handleWidgetDragStart(widgetId)}
+              onDragOver={(e) => handleWidgetDragOver(e, widgetId)}
+              onDrop={() => handleWidgetDrop(widgetId)}
+              onDragEnd={handleWidgetDragEnd}
+              className={`relative transition-all ${isDragging ? 'opacity-40' : ''} ${isDragOver ? 'ring-2 ring-primary ring-offset-2 rounded-md' : ''}`}
+              data-testid={`widget-wrapper-${widgetId}`}
+            >
+              <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+                <div className="cursor-grab active:cursor-grabbing p-1.5 rounded-md bg-background/80 border shadow-sm" data-testid={`drag-handle-${widgetId}`}>
+                  <GripVertical className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <button
+                  onClick={() => hideWidget(widgetId)}
+                  className="p-1.5 rounded-md bg-background/80 border shadow-sm"
+                  data-testid={`button-hide-widget-${widgetId}`}
+                >
+                  <EyeOff className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </div>
+              {content || (
+                <Card className="border-dashed opacity-50">
+                  <CardContent className="py-6 text-center">
+                    <p className="text-sm text-muted-foreground">{config?.label} (no data)</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )
+        }
+
+        return <div key={widgetId} data-testid={`widget-${widgetId}`}>{content}</div>
+      })}
     </div>
   )
 
@@ -1927,6 +2578,141 @@ function StandaloneAffiliateDashboard() {
       </Card>
         </>
       )}
+
+      <Card data-testid="card-commission-renewals">
+        <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+          <div>
+            <CardTitle className="text-base flex items-center gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Commission Renewals
+            </CardTitle>
+            <CardDescription>Extend your commission window by checking in with referrals</CardDescription>
+          </div>
+          <Button variant="ghost" size="icon" onClick={fetchRenewals} disabled={renewalsLoading} data-testid="button-refresh-renewals">
+            <RefreshCw className={`h-4 w-4 ${renewalsLoading ? 'animate-spin' : ''}`} />
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {renewalsLoading ? (
+            <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+          ) : (
+            <div className="space-y-4">
+              {expiringReferrals.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium flex items-center gap-1.5">
+                    <AlertTriangle className="h-3.5 w-3.5 text-yellow-500" />
+                    Expiring Soon ({expiringReferrals.length})
+                  </p>
+                  {expiringReferrals.map((ref: any) => {
+                    const hasPending = renewals.some(r => r.referral_id === ref.id && r.status === 'pending')
+                    return (
+                      <div key={ref.id} className="p-3 rounded-md border space-y-2" data-testid={`expiring-referral-${ref.id}`}>
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div>
+                            <p className="text-sm font-medium">Referral #{ref.id.slice(0, 8)}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Expires {ref.computed_end_date} ({ref.days_remaining} day{ref.days_remaining !== 1 ? 's' : ''} left)
+                            </p>
+                          </div>
+                          {hasPending ? (
+                            <Badge variant="outline" className="text-xs" data-testid={`badge-pending-renewal-${ref.id}`}>
+                              <Clock className="h-3 w-3 mr-1" /> Renewal Pending
+                            </Badge>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setRenewalTargetId(renewalTargetId === ref.id ? null : ref.id)}
+                              data-testid={`button-request-renewal-${ref.id}`}
+                            >
+                              <RefreshCw className="h-3.5 w-3.5 mr-1" />
+                              Request Renewal
+                            </Button>
+                          )}
+                        </div>
+                        {renewalTargetId === ref.id && (
+                          <div className="border-t pt-3 space-y-3">
+                            <div>
+                              <Label className="text-xs">Check-in Type</Label>
+                              <Select value={renewalCheckInType} onValueChange={(v: 'email' | 'call' | 'note') => setRenewalCheckInType(v)}>
+                                <SelectTrigger className="h-8 text-xs mt-1" data-testid="select-renewal-checkin-type">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="email">Email Check-in</SelectItem>
+                                  <SelectItem value="call">Phone/Video Call</SelectItem>
+                                  <SelectItem value="note">Written Note</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <Label className="text-xs">Notes (describe your check-in with the customer)</Label>
+                              <Input
+                                value={renewalNotes}
+                                onChange={e => setRenewalNotes(e.target.value)}
+                                placeholder="e.g., Spoke with customer about their experience, they are happy..."
+                                className="mt-1 text-xs"
+                                data-testid="input-renewal-notes"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => submitRenewal(ref.id, ref.computed_end_date)}
+                                disabled={renewalSubmitting || !renewalNotes.trim()}
+                                data-testid="button-submit-renewal"
+                              >
+                                {renewalSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Check className="h-3.5 w-3.5 mr-1" />}
+                                Submit Request
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => { setRenewalTargetId(null); setRenewalNotes('') }} data-testid="button-cancel-renewal">
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {renewals.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Renewal History</p>
+                  {renewals.map((r: any) => (
+                    <div key={r.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`renewal-${r.id}`}>
+                      <div>
+                        <p className="text-sm">Referral #{r.referral_id?.slice(0, 8)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {r.check_in_type} · {new Date(r.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Badge
+                        variant={r.status === 'approved' ? 'default' : r.status === 'denied' ? 'destructive' : 'outline'}
+                        className="text-xs capitalize"
+                        data-testid={`badge-renewal-status-${r.id}`}
+                      >
+                        {r.status === 'approved' && <CheckCircle className="h-3 w-3 mr-1" />}
+                        {r.status === 'denied' && <AlertTriangle className="h-3 w-3 mr-1" />}
+                        {r.status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
+                        {r.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {expiringReferrals.length === 0 && renewals.length === 0 && (
+                <div className="text-center py-6" data-testid="text-no-renewals">
+                  <RefreshCw className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">No expiring referrals or renewal requests at this time.</p>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
     )
   }
@@ -2900,20 +3686,20 @@ function StandaloneAffiliateDashboard() {
         </CardContent>
       </Card>
 
-      <Card data-testid="card-auto-promo">
+      <Card data-testid="card-ai-post-writer">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
             <Zap className="h-4 w-4" />
-            Generate Promo Post
+            AI Post Writer
           </CardTitle>
-          <CardDescription>Use AI to create a ready-to-share promotional post with your referral link embedded</CardDescription>
+          <CardDescription>Generate platform-specific promotional posts with your referral link automatically embedded</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <Label className="text-xs">Platform</Label>
               <Select value={promoPlatform} onValueChange={setPromoPlatform}>
-                <SelectTrigger className="mt-1" data-testid="select-promo-platform">
+                <SelectTrigger className="mt-1" data-testid="select-ai-writer-platform">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -2930,36 +3716,65 @@ function StandaloneAffiliateDashboard() {
             <div>
               <Label className="text-xs">Tone</Label>
               <Select value={promoTone} onValueChange={setPromoTone}>
-                <SelectTrigger className="mt-1" data-testid="select-promo-tone">
+                <SelectTrigger className="mt-1" data-testid="select-ai-writer-tone">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="professional">Professional</SelectItem>
                   <SelectItem value="casual">Casual</SelectItem>
                   <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
-                  <SelectItem value="educational">Educational</SelectItem>
                   <SelectItem value="storytelling">Storytelling</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <Button onClick={generatePromoPost} disabled={promoGenerating} data-testid="button-generate-promo">
-            {promoGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
-            {promoGenerating ? 'Generating...' : 'Generate Promo Post'}
+          <div>
+            <Label className="text-xs">Focus / Topic (optional)</Label>
+            <Input
+              value={aiWriterFocus}
+              onChange={(e) => setAiWriterFocus(e.target.value)}
+              placeholder="e.g. time-saving features, pricing, free trial..."
+              className="mt-1"
+              data-testid="input-ai-writer-focus"
+            />
+          </div>
+          {data?.link?.ref_code && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Link2 className="h-3 w-3" />
+              <span>Your ref link will be embedded: <span className="font-mono text-foreground" data-testid="text-ai-writer-ref-link">?ref={data.link.ref_code}</span></span>
+            </div>
+          )}
+          <Button onClick={generateAiWriterPost} disabled={aiWriterGenerating} data-testid="button-ai-writer-generate">
+            {aiWriterGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            {aiWriterGenerating ? 'Generating...' : 'Generate Post'}
           </Button>
-          {promoContent && (
-            <div className="space-y-2">
-              <div className="p-3 rounded-md bg-muted/40 text-sm whitespace-pre-wrap" data-testid="text-promo-content">
-                {promoContent}
+          {aiWriterPost && (
+            <div className="space-y-3">
+              <div className="p-3 rounded-md bg-muted/40 text-sm whitespace-pre-wrap" data-testid="text-ai-writer-post">
+                {aiWriterPost}
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <Button variant="outline" size="sm" onClick={copyPromoContent} data-testid="button-copy-promo">
-                  {promoCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
-                  {promoCopied ? 'Copied!' : 'Copy to Clipboard'}
-                </Button>
-                <Button variant="ghost" size="sm" onClick={generatePromoPost} disabled={promoGenerating} data-testid="button-regenerate-promo">
-                  <Zap className="h-4 w-4 mr-1" /> Regenerate
-                </Button>
+              {aiWriterHashtags.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs text-muted-foreground mr-1">Hashtags:</span>
+                  {aiWriterHashtags.map((tag, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs" data-testid={`badge-ai-writer-hashtag-${i}`}>{tag}</Badge>
+                  ))}
+                </div>
+              )}
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Button variant="outline" size="sm" onClick={copyAiWriterPost} data-testid="button-ai-writer-copy">
+                    {aiWriterCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                    {aiWriterCopied ? 'Copied!' : 'Copy Post'}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={generateAiWriterPost} disabled={aiWriterGenerating} data-testid="button-ai-writer-regenerate">
+                    <RefreshCw className="h-4 w-4 mr-1" /> Regenerate
+                  </Button>
+                </div>
+                <span className="text-xs text-muted-foreground" data-testid="text-ai-writer-char-count">
+                  {aiWriterCharCount} characters
+                </span>
               </div>
             </div>
           )}
@@ -4055,9 +4870,368 @@ function StandaloneAffiliateDashboard() {
     { id: 'profile_complete', label: 'Profile Pro', icon: Settings, description: 'Completed your profile', check: () => profile.display_name && profile.payout_method },
   ]
 
+  const renderAnalytics = () => {
+    if (chartLoading && !chartData) {
+      return (
+        <div className="flex items-center justify-center py-12" data-testid="loading-analytics">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      )
+    }
+
+    const ts = chartData?.earningsTimeSeries || []
+    const maxEarning = Math.max(...ts.map(d => d.amount), 1)
+    const totalPeriodEarnings = ts.reduce((sum, d) => sum + d.amount, 0)
+
+    const heatmap = chartData?.heatmapData || []
+    const maxHeatVal = Math.max(...heatmap.map(d => d.amount), 1)
+
+    const fd = chartData?.funnelData || { clicks: 0, signups: 0, conversions: 0, paid: 0 }
+    const funnelSteps = [
+      { label: 'Clicks', value: fd.clicks },
+      { label: 'Signups', value: fd.signups },
+      { label: 'Conversions', value: fd.conversions },
+      { label: 'Paid', value: fd.paid },
+    ]
+    const maxFunnel = Math.max(fd.clicks, 1)
+
+    const sources = chartData?.topSources || []
+    const maxSourceEarnings = Math.max(...sources.map(s => s.earnings), 1)
+
+    const bm = chartData?.benchmarks || { percentile: 50, avgEarnings: 0, avgReferrals: 0, yourEarnings: 0, yourReferrals: 0 }
+
+    const heatmapColor = (amount: number) => {
+      if (amount === 0) return 'bg-muted'
+      const intensity = amount / maxHeatVal
+      if (intensity > 0.75) return 'bg-green-600 dark:bg-green-500'
+      if (intensity > 0.5) return 'bg-green-500 dark:bg-green-400'
+      if (intensity > 0.25) return 'bg-green-400/70 dark:bg-green-500/50'
+      return 'bg-green-300/50 dark:bg-green-600/30'
+    }
+
+    const weeks: { date: string; amount: number }[][] = []
+    let currentWeek: { date: string; amount: number }[] = []
+    heatmap.forEach((d, i) => {
+      const dayOfWeek = new Date(d.date).getDay()
+      if (i > 0 && dayOfWeek === 0 && currentWeek.length > 0) {
+        weeks.push(currentWeek)
+        currentWeek = []
+      }
+      currentWeek.push(d)
+    })
+    if (currentWeek.length > 0) weeks.push(currentWeek)
+
+    const monthLabels: { label: string; weekIndex: number }[] = []
+    let lastMonth = -1
+    weeks.forEach((week, wi) => {
+      if (week.length > 0) {
+        const m = new Date(week[0].date).getMonth()
+        if (m !== lastMonth) {
+          monthLabels.push({ label: new Date(week[0].date).toLocaleString('default', { month: 'short' }), weekIndex: wi })
+          lastMonth = m
+        }
+      }
+    })
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h2 className="text-lg font-semibold flex items-center gap-2" data-testid="text-analytics-title">
+            <BarChart3 className="h-5 w-5" />
+            Analytics
+          </h2>
+          <div className="flex gap-1">
+            {(['7d', '30d', '90d', '1y'] as const).map(p => (
+              <Button
+                key={p}
+                variant={chartPeriod === p ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setChartPeriod(p)}
+                data-testid={`button-chart-period-${p}`}
+              >
+                {p === '7d' ? '7D' : p === '30d' ? '30D' : p === '90d' ? '90D' : '1Y'}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <Card data-testid="card-earnings-line-chart">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Earnings Over Time
+            </CardTitle>
+            <CardDescription>
+              Total: ${(totalPeriodEarnings / 100).toFixed(2)} in selected period
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {ts.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-no-earnings-data">No earnings data for this period.</p>
+            ) : (
+              <div className="relative" data-testid="chart-earnings-line">
+                <svg viewBox={`0 0 ${Math.max(ts.length * 12, 200)} 120`} className="w-full h-48" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="earningsGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" className="[stop-color:hsl(var(--primary))]" stopOpacity="0.3" />
+                      <stop offset="100%" className="[stop-color:hsl(var(--primary))]" stopOpacity="0.02" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d={`M 0 120 ${ts.map((d, i) => {
+                      const x = (i / Math.max(ts.length - 1, 1)) * Math.max(ts.length * 12 - 10, 190)
+                      const y = 115 - (d.amount / maxEarning) * 105
+                      return `L ${x} ${y}`
+                    }).join(' ')} L ${Math.max(ts.length * 12 - 10, 190)} 120 Z`}
+                    fill="url(#earningsGrad)"
+                  />
+                  <polyline
+                    points={ts.map((d, i) => {
+                      const x = (i / Math.max(ts.length - 1, 1)) * Math.max(ts.length * 12 - 10, 190)
+                      const y = 115 - (d.amount / maxEarning) * 105
+                      return `${x},${y}`
+                    }).join(' ')}
+                    fill="none"
+                    className="stroke-primary"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                  />
+                  {ts.map((d, i) => {
+                    if (d.amount === 0) return null
+                    const x = (i / Math.max(ts.length - 1, 1)) * Math.max(ts.length * 12 - 10, 190)
+                    const y = 115 - (d.amount / maxEarning) * 105
+                    return (
+                      <circle
+                        key={i}
+                        cx={x}
+                        cy={y}
+                        r="2.5"
+                        className="fill-primary"
+                      >
+                        <title>{`${d.date}: $${(d.amount / 100).toFixed(2)}`}</title>
+                      </circle>
+                    )
+                  })}
+                </svg>
+                <div className="flex justify-between text-[10px] text-muted-foreground mt-1 px-1">
+                  <span>{ts[0]?.date}</span>
+                  <span>{ts[ts.length - 1]?.date}</span>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-conversion-funnel-visual">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Conversion Funnel
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {funnelSteps.map((step, i) => {
+                const width = Math.max((step.value / maxFunnel) * 100, 4)
+                const rate = i > 0 && funnelSteps[i - 1].value > 0
+                  ? Math.round((step.value / funnelSteps[i - 1].value) * 100)
+                  : 100
+                const colors = [
+                  'bg-blue-500 dark:bg-blue-400',
+                  'bg-cyan-500 dark:bg-cyan-400',
+                  'bg-green-500 dark:bg-green-400',
+                  'bg-emerald-600 dark:bg-emerald-400',
+                ]
+                return (
+                  <div key={step.label} data-testid={`funnel-step-${step.label.toLowerCase()}`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium">{step.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold">{step.value}</span>
+                        {i > 0 && (
+                          <Badge variant="outline" className="text-[10px]">{rate}%</Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div className="h-6 bg-muted rounded-md overflow-hidden">
+                      <div
+                        className={`h-full rounded-md ${colors[i]} transition-all duration-500`}
+                        style={{ width: `${width}%` }}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-earnings-heatmap">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Earnings Heatmap
+            </CardTitle>
+            <CardDescription>Last 52 weeks of earnings activity</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <div className="min-w-[700px]">
+                <div className="flex gap-0.5 mb-1 ml-8">
+                  {monthLabels.map((ml, i) => (
+                    <span
+                      key={i}
+                      className="text-[9px] text-muted-foreground"
+                      style={{ position: 'relative', left: `${ml.weekIndex * 11}px` }}
+                    >
+                      {ml.label}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-1">
+                  <div className="flex flex-col gap-0.5 mr-1 shrink-0">
+                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+                      <div key={i} className="h-[10px] text-[8px] text-muted-foreground leading-[10px] w-5 text-right pr-1">
+                        {i % 2 === 1 ? day : ''}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-0.5">
+                    {weeks.map((week, wi) => (
+                      <div key={wi} className="flex flex-col gap-0.5">
+                        {Array.from({ length: 7 }).map((_, di) => {
+                          const cell = week.find(d => new Date(d.date).getDay() === di)
+                          if (!cell) return <div key={di} className="w-[10px] h-[10px]" />
+                          return (
+                            <div
+                              key={di}
+                              className={`w-[10px] h-[10px] rounded-sm ${heatmapColor(cell.amount)}`}
+                              title={`${cell.date}: $${(cell.amount / 100).toFixed(2)}`}
+                              data-testid={`heatmap-cell-${cell.date}`}
+                            />
+                          )
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 mt-2 ml-8">
+                  <span className="text-[9px] text-muted-foreground mr-1">Less</span>
+                  <div className="w-[10px] h-[10px] rounded-sm bg-muted" />
+                  <div className="w-[10px] h-[10px] rounded-sm bg-green-300/50 dark:bg-green-600/30" />
+                  <div className="w-[10px] h-[10px] rounded-sm bg-green-400/70 dark:bg-green-500/50" />
+                  <div className="w-[10px] h-[10px] rounded-sm bg-green-500 dark:bg-green-400" />
+                  <div className="w-[10px] h-[10px] rounded-sm bg-green-600 dark:bg-green-500" />
+                  <span className="text-[9px] text-muted-foreground ml-1">More</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Card data-testid="card-performance-benchmarks">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Award className="h-4 w-4" />
+                Performance Benchmarks
+              </CardTitle>
+              <CardDescription>How you compare to the program average</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="text-center py-3">
+                  <div className="relative inline-flex items-center justify-center">
+                    <svg viewBox="0 0 100 100" className="w-28 h-28">
+                      <circle cx="50" cy="50" r="42" fill="none" className="stroke-muted" strokeWidth="8" />
+                      <circle
+                        cx="50" cy="50" r="42"
+                        fill="none"
+                        className="stroke-primary"
+                        strokeWidth="8"
+                        strokeDasharray={`${(bm.percentile / 100) * 264} 264`}
+                        strokeLinecap="round"
+                        transform="rotate(-90 50 50)"
+                      />
+                    </svg>
+                    <div className="absolute text-center">
+                      <span className="text-2xl font-bold" data-testid="text-percentile">{bm.percentile}</span>
+                      <span className="text-xs text-muted-foreground block">percentile</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-md bg-muted/50 text-center">
+                    <p className="text-xs text-muted-foreground">Your Earnings</p>
+                    <p className="text-sm font-bold" data-testid="text-your-earnings">${(bm.yourEarnings / 100).toFixed(2)}</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-muted/50 text-center">
+                    <p className="text-xs text-muted-foreground">Avg. Earnings</p>
+                    <p className="text-sm font-bold" data-testid="text-avg-earnings">${(bm.avgEarnings / 100).toFixed(2)}</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-muted/50 text-center">
+                    <p className="text-xs text-muted-foreground">Your Referrals</p>
+                    <p className="text-sm font-bold" data-testid="text-your-referrals">{bm.yourReferrals}</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-muted/50 text-center">
+                    <p className="text-xs text-muted-foreground">Avg. Referrals</p>
+                    <p className="text-sm font-bold" data-testid="text-avg-referrals">{bm.avgReferrals}</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card data-testid="card-top-sources">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                Top Sources
+              </CardTitle>
+              <CardDescription>Revenue by referral source</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {sources.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-sources">No source data available yet. Use source tags on your links to track performance.</p>
+              ) : (
+                <div className="space-y-3">
+                  {sources.map((s, i) => (
+                    <div key={s.source} data-testid={`source-bar-${i}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium truncate max-w-[140px]">{s.source}</span>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-[10px]">{s.count} refs</Badge>
+                          <span className="text-sm font-bold">${(s.earnings / 100).toFixed(2)}</span>
+                        </div>
+                      </div>
+                      <div className="h-4 bg-muted rounded-md overflow-hidden">
+                        <div
+                          className="h-full rounded-md bg-primary/70 transition-all duration-500"
+                          style={{ width: `${Math.max((s.earnings / maxSourceEarnings) * 100, 4)}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {chartLoading && (
+          <div className="flex items-center justify-center py-4">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mr-2" />
+            <span className="text-sm text-muted-foreground">Updating charts...</span>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   const renderSection = () => {
     switch (section) {
       case 'overview': return renderOverview()
+      case 'analytics': return renderAnalytics()
       case 'referrals': return renderReferrals()
       case 'earnings': return renderEarnings()
       case 'payouts': return renderPayouts()

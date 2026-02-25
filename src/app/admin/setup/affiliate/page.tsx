@@ -444,6 +444,162 @@ function AdminTestimonialsTab() {
   )
 }
 
+function AdminRenewalsTab() {
+  const [renewals, setRenewals] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [processingId, setProcessingId] = useState<string | null>(null)
+  const [filterStatus, setFilterStatus] = useState('all')
+  const { toast } = useToast()
+
+  const loadRenewals = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/renewals')
+      if (res.ok) {
+        const data = await res.json()
+        setRenewals(data.renewals || [])
+      } else {
+        setRenewals([])
+      }
+    } catch { setRenewals([]) }
+    finally { setLoading(false) }
+  }, [])
+
+  useEffect(() => { loadRenewals() }, [loadRenewals])
+
+  const handleAction = async (id: string, status: 'approved' | 'denied') => {
+    setProcessingId(id)
+    try {
+      const res = await fetch('/api/admin/renewals', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status }),
+      })
+      if (res.ok) {
+        toast({ title: status === 'approved' ? 'Renewal Approved' : 'Renewal Denied' })
+        loadRenewals()
+      } else {
+        const err = await res.json()
+        toast({ title: 'Error', description: err.error || 'Failed to process renewal.', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to process renewal.', variant: 'destructive' })
+    }
+    setProcessingId(null)
+  }
+
+  if (loading) return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+
+  const filtered = filterStatus === 'all' ? renewals : renewals.filter(r => r.status === filterStatus)
+  const pendingCount = renewals.filter(r => r.status === 'pending').length
+
+  return (
+    <div className="space-y-4">
+      <Card data-testid="card-admin-renewals">
+        <CardHeader>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                <RefreshCw className="h-4 w-4" />
+                Commission Renewal Requests
+                {pendingCount > 0 && <Badge variant="destructive" className="text-[10px]">{pendingCount} pending</Badge>}
+              </CardTitle>
+              <CardDescription>Review and approve/deny affiliate commission renewal requests</CardDescription>
+            </div>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="h-8 text-xs w-[120px]" data-testid="select-renewal-filter">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="denied">Denied</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {filtered.length === 0 ? (
+            <div className="text-center py-8" data-testid="text-no-admin-renewals">
+              <RefreshCw className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
+                {filterStatus === 'all' ? 'No renewal requests yet.' : `No ${filterStatus} renewal requests.`}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filtered.map((r: any) => (
+                <div key={r.id} className="p-4 rounded-md border space-y-2" data-testid={`admin-renewal-${r.id}`}>
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                      <p className="text-sm font-medium">
+                        Affiliate: <span className="font-mono">{r.affiliate_ref_code}</span>
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Referral #{r.referral_id?.slice(0, 8)} · Submitted {new Date(r.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <Badge
+                      variant={r.status === 'approved' ? 'default' : r.status === 'denied' ? 'destructive' : 'outline'}
+                      className="text-xs capitalize"
+                      data-testid={`badge-admin-renewal-status-${r.id}`}
+                    >
+                      {r.status}
+                    </Badge>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-3 text-xs">
+                    <div>
+                      <span className="text-muted-foreground">Check-in Type: </span>
+                      <span className="capitalize">{r.check_in_type}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Original End: </span>
+                      <span>{r.original_end_date}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Renewed End: </span>
+                      <span>{r.renewed_end_date}</span>
+                    </div>
+                  </div>
+                  {r.check_in_notes && (
+                    <p className="text-xs text-muted-foreground border-l-2 border-muted pl-2 mt-1">{r.check_in_notes}</p>
+                  )}
+                  {r.status === 'pending' && (
+                    <div className="flex gap-2 pt-1">
+                      <Button
+                        size="sm"
+                        onClick={() => handleAction(r.id, 'approved')}
+                        disabled={processingId === r.id}
+                        data-testid={`button-approve-renewal-${r.id}`}
+                      >
+                        {processingId === r.id ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <CheckCircle className="h-3.5 w-3.5 mr-1" />}
+                        Approve
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleAction(r.id, 'denied')}
+                        disabled={processingId === r.id}
+                        data-testid={`button-deny-renewal-${r.id}`}
+                      >
+                        <XCircle className="h-3.5 w-3.5 mr-1" />
+                        Deny
+                      </Button>
+                    </div>
+                  )}
+                  {r.reviewed_at && (
+                    <p className="text-[10px] text-muted-foreground">Reviewed {new Date(r.reviewed_at).toLocaleDateString()}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
 function AffiliateCRMDrawer({
   member,
   open,
@@ -1898,6 +2054,9 @@ export default function AffiliateSettingsPage() {
           </TabsTrigger>
           <TabsTrigger value="tax-info" data-testid="tab-tax-info">
             <FileText className="h-3.5 w-3.5 mr-1" /> Tax Info
+          </TabsTrigger>
+          <TabsTrigger value="renewals" data-testid="tab-renewals">
+            <RefreshCw className="h-3.5 w-3.5 mr-1" /> Renewals
           </TabsTrigger>
         </TabsList>
 
@@ -3635,6 +3794,10 @@ export default function AffiliateSettingsPage() {
 
         <TabsContent value="tax-info" className="space-y-4 mt-4">
           <AdminTaxInfoTab />
+        </TabsContent>
+
+        <TabsContent value="renewals" className="space-y-4 mt-4">
+          <AdminRenewalsTab />
         </TabsContent>
 
       </Tabs>
