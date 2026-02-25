@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
 
     let aiInsights = '';
     try {
-      const settings: AISettings = { provider: 'xai', model: 'grok-3-mini-fast', maxTokens: 600, temperature: 0.7 };
+      const settings: AISettings = { provider: 'xai', model: 'grok-3-mini-fast', maxTokens: 600, temperature: 0.7, systemPrompt: 'You are an affiliate conversion optimization advisor. Analyze trial users who haven\'t converted and provide specific follow-up strategies. Be concise and actionable.' };
       const result = await chatCompletion(settings, [
         { role: 'system', content: 'You are an affiliate conversion optimization advisor. Analyze trial users who haven\'t converted and provide specific follow-up strategies. Be concise and actionable.' },
         { role: 'user', content: `Analyze these unconverted trial referrals and suggest follow-up strategies:

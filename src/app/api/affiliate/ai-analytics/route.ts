@@ -92,6 +92,7 @@ AFFILIATE PERFORMANCE DATA:
       model: 'grok-3-mini-fast',
       maxTokens: 500,
       temperature: 0.7,
+      systemPrompt: 'You are an affiliate marketing analytics advisor. Analyze data and provide specific, actionable insights. Use numbers from the data. Be concise — 3-5 bullet points max. No filler.',
     };
 
     for (const t of types) {

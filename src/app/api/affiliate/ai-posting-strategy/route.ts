@@ -51,6 +51,7 @@ export async function GET(req: NextRequest) {
       model: 'grok-3-mini-fast',
       maxTokens: 1000,
       temperature: 0.7,
+      systemPrompt: 'You are an affiliate marketing strategist. Create actionable promotional calendars. Output in a structured format with dates, platforms, content types, and talking points.',
     };
 
     let calendar = '';
