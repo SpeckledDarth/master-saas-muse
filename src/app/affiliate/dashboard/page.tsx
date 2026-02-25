@@ -28,6 +28,7 @@ import { useToast } from '@/hooks/use-toast'
 import { EarningsGoalSetter, CommissionDisputes, ReferralOfMonth, GracePeriodNotice, AffiliateManagerCard } from '@/components/affiliate/partner-experience'
 import { LinkShortener, QRCodeGenerator, MediaKitPage, CopyPasteCaptions, StarterKit } from '@/components/affiliate/marketing-toolkit'
 import { ExpandedAnalyticsSection } from '@/components/affiliate/analytics-expanded'
+import { FlywheelAnalyticsSection } from '@/components/affiliate/flywheel-analytics'
 
 interface AffiliateDashboardData {
   link: {
@@ -6894,6 +6895,9 @@ function StandaloneAffiliateDashboard() {
 
         {/* Expanded Analytics */}
         <ExpandedAnalyticsSection />
+
+        {/* Flywheel Intelligence — Churn, Cohort, Revenue, AI */}
+        <FlywheelAnalyticsSection />
       </div>
     )
   }

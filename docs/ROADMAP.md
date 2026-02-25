@@ -10,7 +10,7 @@
 
 **Where we are:** ALL build phases (1-3.6, 5, 6, 7) are COMPLETE. Phase 4 (Mobile PWA) was deprioritized.
 
-**What's next:** Deep testing sweep across all three dashboards, bug fixes, and launch preparation.
+**What's next:** Session A (Flywheel Accelerators) complete. Sessions B-F remain (~53 features). See Phase 8 below.
 
 **Summary of what's built:**
 - **Phases 1-3.6:** 42 PassivePost features + 32 affiliate enhancements + audit system
@@ -18,8 +18,8 @@
 - **Phase 6:** Dashboard UI layer (16 features across Admin/Affiliate/User dashboards)
 - **Phase 7:** AI & cross-dashboard features (6 features: AI post writer, AI coach, commission renewals, YouTube analytics, earnings charts/analytics suite, dashboard customization)
 
-**Migrations run on Supabase:** 001-011
-**Migration needed on Supabase:** 012 (commission_renewals table + affiliate_referrals columns)
+**Migrations run on Supabase:** 001-013
+**Migrations needed on Supabase:** 012 (commission_renewals), 014 (analytics columns: country/device_type on referral_clicks, churned_at/churn_reason/last_active_at on affiliate_referrals)
 
 **Launch target:** April 1, 2026
 
@@ -45,6 +45,7 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 | **5** | **CRM & Invoicing Foundation (Data Layer)** | **COMPLETE** — All 9/9 features across 2 sprints | **Week 7-9** |
 | **6** | **Dashboard Enhancements (UI Layer)** | **COMPLETE** — All 16/16 features across 3 dashboard types | **Week 9-11** |
 | **7** | **AI & Cross-Dashboard Features** | **COMPLETE** — All 7/7 features (1 pre-built, 6 new) | **Week 11** |
+| **8** | **Flywheel Accelerators (Session A)** | **COMPLETE** — 20 features: churn intelligence, cohort analysis, AI analytics, geo/device, revenue charts | **Week 12** |
 
 ---
 
@@ -662,6 +663,38 @@ Key files for each phase, so agents can find relevant code quickly.
 - Cron: `src/app/api/cron/weekly-performance/route.ts`
 - Components: `src/components/affiliate/partner-experience.tsx`, `marketing-toolkit.tsx`, `analytics-expanded.tsx`
 - Dashboard wiring: All components imported and rendered in `src/app/affiliate/dashboard/page.tsx` (Overview, Tools, Analytics sections)
+
+### Phase 8 (Flywheel Accelerators — Session A)
+- Migration: `migrations/core/014_analytics_columns.sql` (adds country, device_type, referral_link_user_id to referral_clicks; churned_at, churn_reason, last_active_at to affiliate_referrals)
+- Churn Intelligence API: `src/app/api/affiliate/analytics/churn/route.ts` — churn rate, reasons, timing, at-risk alerts, net growth (#168-172)
+- Cohort & Trends API: `src/app/api/affiliate/analytics/cohort/route.ts` — retention curve, conversion trends, trial benchmarks (#156, #160, #162)
+- Revenue & Traffic API: `src/app/api/affiliate/analytics/sources/route.ts` — revenue pie, cumulative earnings, dropoff funnel, geo, devices, repeat visitors (#154, #158, #161, #164-166)
+- AI Analytics Intelligence API: `src/app/api/affiliate/ai-analytics/route.ts` — 6 AI insight types: conversion drop, content recs, channel optimization, audience fit, seasonal trends, competitor tips (#177-182)
+- AI Posting Strategy API: `src/app/api/affiliate/ai-posting-strategy/route.ts` — best time to post, promotional calendar (#90, #93)
+- AI Conversion Insights API: `src/app/api/affiliate/ai-conversion-insights/route.ts` — unconverted trial analysis, revenue attribution, platform correlation (#92, #196-198)
+- Components: `src/components/affiliate/flywheel-analytics.tsx` — ChurnRateCard, ChurnReasonsChart, ChurnTimingChart, AtRiskAlerts, NetGrowthCard, RetentionCurve, ConversionTrendLine, TrialBenchmarks, RevenuePieChart, CumulativeEarningsChart, DropoffAnalysis, GeoBreakdown, DeviceBreakdown, RepeatVisitors, AIInsightsPanel, BestTimeToPost, FlywheelAnalyticsSection
+- Dashboard wiring: FlywheelAnalyticsSection imported and rendered in Analytics tab of `src/app/affiliate/dashboard/page.tsx`
+- Seed data: Expanded `scripts/seed-affiliate-data.ts` with 12-month historical clicks (geo/device), churned referrals, trial referrals, 12-month commission history, 90-day connected platform metrics, goals, disputes, announcements, spotlight, short links, email preferences, asset usage
+
+**Remaining Sessions (B-F):**
+| Session | Tier | Features | Focus |
+|---------|------|----------|-------|
+| B | Flywheel cont. | ~8 | Connected data insights, auto promo calendar, best-time-to-post polish |
+| C | Retention Deepeners | ~15 | Financial tools, tax center, reports, commission renewal polish |
+| D | Retention Deepeners cont. | ~10 | Resource center, knowledge base, swipe files, content calendar |
+| E | Delight Multipliers | ~12 | Challenges, directory, case studies, quiz, analyze-audience |
+| F | Polish & External | ~8 | Mobile responsive, sparklines, export charts, OAuth integrations |
+
+---
+
+## Session Log
+
+### Session 8 — February 25, 2026 (Flywheel Accelerators)
+**Features built:** 20 features (#90, #92, #93, #154, #156, #158, #160, #161, #162, #164, #165, #166, #168, #169, #170, #171, #172, #177-182, #196-198)
+**New files:** 7 (6 API routes + 1 component file)
+**New migration:** 014_analytics_columns.sql (NOT YET RUN on Supabase)
+**Seed data:** Massively expanded with historical time-series data across all feature areas
+**Status:** All routes return 200/401 (no 500s), dev server compiles clean
 
 ---
 

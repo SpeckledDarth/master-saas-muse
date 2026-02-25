@@ -565,6 +565,292 @@ async function seed() {
     console.log('  Awarded milestones to eligible affiliates')
   }
 
+  console.log('\n16. Creating 12-month historical click data with geo/device...')
+  const countries = ['US', 'US', 'US', 'US', 'UK', 'UK', 'CA', 'CA', 'AU', 'DE', 'FR', 'IN', 'BR', 'JP'];
+  const deviceTypes = ['mobile', 'mobile', 'mobile', 'desktop', 'desktop', 'tablet'];
+  const sources = ['twitter', 'youtube', 'blog', 'email', 'linkedin', 'instagram', 'direct'];
+
+  for (const aff of affiliateUserIds.slice(0, 5)) {
+    const { data: affLink } = await admin.from('referral_links').select('ref_code').eq('user_id', aff.userId).maybeSingle();
+    if (!affLink) continue;
+
+    for (let monthsAgo = 0; monthsAgo < 12; monthsAgo++) {
+      const clickCount = Math.max(2, Math.floor(aff.clicks / 12) + Math.floor(Math.random() * 10) - 5);
+      for (let c = 0; c < Math.min(clickCount, 8); c++) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - monthsAgo);
+        d.setDate(Math.floor(Math.random() * 28) + 1);
+        d.setHours(Math.floor(Math.random() * 24));
+        d.setMinutes(Math.floor(Math.random() * 60));
+
+        await admin.from('referral_clicks').insert({
+          ref_code: affLink.ref_code,
+          referral_link_user_id: aff.userId,
+          ip_hash: `hash_${Math.random().toString(36).slice(2, 10)}`,
+          user_agent: `Mozilla/5.0 (${deviceTypes[Math.floor(Math.random() * deviceTypes.length)] === 'mobile' ? 'iPhone; CPU iPhone OS 17_0' : 'Windows NT 10.0; Win64; x64'})`,
+          page_url: ['/', '/pricing', '/features', '/blog/getting-started', '/blog/tips'][Math.floor(Math.random() * 5)],
+          source_tag: sources[Math.floor(Math.random() * sources.length)],
+          landing_page: ['/', '/pricing', '/features'][Math.floor(Math.random() * 3)],
+          country: countries[Math.floor(Math.random() * countries.length)],
+          device_type: deviceTypes[Math.floor(Math.random() * deviceTypes.length)],
+          created_at: d.toISOString(),
+        });
+      }
+    }
+    console.log(`  Added 12-month click history for ${aff.name}`);
+  }
+
+  console.log('\n17. Creating churned referrals for churn intelligence...')
+  for (const aff of affiliateUserIds.slice(0, 4)) {
+    const churnCount = Math.floor(Math.random() * 3) + 1;
+    for (let i = 0; i < churnCount; i++) {
+      const churnEmail = `churned.${aff.userId.slice(0, 6)}.${i}@test.com`;
+      try {
+        const churnedUserId = await getOrCreateUser(churnEmail, `Churned User ${i + 1}`);
+        const { data: existRef } = await admin.from('affiliate_referrals').select('id').eq('affiliate_user_id', aff.userId).eq('referred_user_id', churnedUserId).maybeSingle();
+        if (!existRef) {
+          const joinedMonthsAgo = Math.floor(Math.random() * 8) + 2;
+          const churnedMonthsAgo = Math.floor(Math.random() * (joinedMonthsAgo - 1)) + 1;
+          const joinDate = new Date(); joinDate.setMonth(joinDate.getMonth() - joinedMonthsAgo);
+          const churnDate = new Date(); churnDate.setMonth(churnDate.getMonth() - churnedMonthsAgo);
+          const lastActive = new Date(churnDate); lastActive.setDate(lastActive.getDate() - Math.floor(Math.random() * 14));
+
+          await admin.from('affiliate_referrals').insert({
+            affiliate_user_id: aff.userId,
+            referred_user_id: churnedUserId,
+            ref_code: randomRefCode(),
+            status: 'churned',
+            fraud_flags: [],
+            converted_at: joinDate.toISOString(),
+            created_at: joinDate.toISOString(),
+            churned_at: churnDate.toISOString(),
+            churn_reason: ['too_expensive', 'not_using_enough', 'switched_competitor', 'no_longer_needed', 'missing_features'][Math.floor(Math.random() * 5)],
+            last_active_at: lastActive.toISOString(),
+            source_tag: sources[Math.floor(Math.random() * sources.length)],
+          });
+          console.log(`  Added churned referral for ${aff.name}`);
+        }
+      } catch (err) {
+        console.error(`  Skipping churned referral:`, (err as Error).message);
+      }
+    }
+  }
+
+  console.log('\n18. Creating trial referrals (not yet converted)...')
+  for (const aff of affiliateUserIds.slice(0, 3)) {
+    const trialCount = Math.floor(Math.random() * 3) + 1;
+    for (let i = 0; i < trialCount; i++) {
+      const trialEmail = `trial.${aff.userId.slice(0, 6)}.${i}@test.com`;
+      try {
+        const trialUserId = await getOrCreateUser(trialEmail, `Trial User ${i + 1}`);
+        const { data: existRef } = await admin.from('affiliate_referrals').select('id').eq('affiliate_user_id', aff.userId).eq('referred_user_id', trialUserId).maybeSingle();
+        if (!existRef) {
+          const daysInTrial = Math.floor(Math.random() * 12) + 2;
+          const trialStart = new Date(); trialStart.setDate(trialStart.getDate() - daysInTrial);
+          const lastActive = new Date(); lastActive.setDate(lastActive.getDate() - Math.floor(Math.random() * daysInTrial));
+
+          await admin.from('affiliate_referrals').insert({
+            affiliate_user_id: aff.userId,
+            referred_user_id: trialUserId,
+            ref_code: randomRefCode(),
+            status: 'signed_up',
+            fraud_flags: [],
+            created_at: trialStart.toISOString(),
+            last_active_at: lastActive.toISOString(),
+            source_tag: sources[Math.floor(Math.random() * sources.length)],
+          });
+          console.log(`  Added trial referral for ${aff.name}`);
+        }
+      } catch (err) {
+        console.error(`  Skipping trial referral:`, (err as Error).message);
+      }
+    }
+  }
+
+  console.log('\n19. Spreading commissions across 12 months...')
+  for (const aff of affiliateUserIds.slice(0, 5)) {
+    const { data: affRefs } = await admin.from('affiliate_referrals').select('id').eq('affiliate_user_id', aff.userId).eq('status', 'converted');
+    const refIds = (affRefs || []).map(r => r.id);
+    if (refIds.length === 0) continue;
+
+    for (let monthsAgo = 1; monthsAgo < 12; monthsAgo++) {
+      const numCommissions = Math.ceil(Math.random() * 3);
+      for (let c = 0; c < numCommissions; c++) {
+        const d = new Date(); d.setMonth(d.getMonth() - monthsAgo); d.setDate(Math.floor(Math.random() * 28) + 1);
+        const invoiceAmount = [2900, 4900, 9900][Math.floor(Math.random() * 3)];
+        const tierData = TIERS.find(t => t.name.toLowerCase() === aff.tier);
+        const rate = tierData?.commission_rate || 20;
+        const invoiceId = `inv_hist_${aff.userId.slice(0, 6)}_m${monthsAgo}_${c}`;
+
+        const { data: existing } = await admin.from('affiliate_commissions').select('id').eq('stripe_invoice_id', invoiceId).maybeSingle();
+        if (!existing) {
+          await admin.from('affiliate_commissions').insert({
+            affiliate_user_id: aff.userId,
+            referral_id: refIds[Math.floor(Math.random() * refIds.length)],
+            stripe_invoice_id: invoiceId,
+            invoice_amount_cents: invoiceAmount,
+            commission_rate: rate,
+            commission_amount_cents: Math.round(invoiceAmount * rate / 100),
+            status: monthsAgo > 1 ? 'paid' : (Math.random() > 0.5 ? 'approved' : 'pending'),
+            created_at: d.toISOString(),
+          });
+        }
+      }
+    }
+    console.log(`  Added 12-month commission history for ${aff.name}`);
+  }
+
+  console.log('\n20. Creating connected platform metrics...')
+  const platforms = ['youtube', 'instagram', 'linkedin', 'google_analytics'];
+  for (const aff of affiliateUserIds.slice(0, 3)) {
+    for (const platform of platforms) {
+      const { data: existConn } = await admin.from('connected_platforms').select('id').eq('user_id', aff.userId).eq('platform', platform).maybeSingle();
+      if (!existConn) {
+        await admin.from('connected_platforms').insert({
+          user_id: aff.userId,
+          platform,
+          account_name: `${aff.name.split(' ')[0]}_${platform}`,
+          last_synced_at: new Date().toISOString(),
+        });
+      }
+
+      for (let daysAgo = 0; daysAgo < 90; daysAgo++) {
+        const d = new Date(); d.setDate(d.getDate() - daysAgo);
+        const dateStr = d.toISOString().split('T')[0];
+
+        const metrics: Record<string, Record<string, number>> = {
+          youtube: { views: Math.floor(Math.random() * 5000) + 500, watch_time_minutes: Math.floor(Math.random() * 2000) + 200, subscribers_gained: Math.floor(Math.random() * 20) },
+          instagram: { impressions: Math.floor(Math.random() * 8000) + 1000, reach: Math.floor(Math.random() * 5000) + 800, engagement: Math.floor(Math.random() * 300) + 50 },
+          linkedin: { impressions: Math.floor(Math.random() * 3000) + 200, clicks: Math.floor(Math.random() * 100) + 10, engagement: Math.floor(Math.random() * 50) + 5 },
+          google_analytics: { pageviews: Math.floor(Math.random() * 10000) + 500, sessions: Math.floor(Math.random() * 3000) + 200, bounce_rate: Math.floor(Math.random() * 40) + 30 },
+        };
+
+        const platformMetrics = metrics[platform] || {};
+        for (const [metricName, metricValue] of Object.entries(platformMetrics)) {
+          await admin.from('connected_platform_metrics').insert({
+            user_id: aff.userId,
+            platform,
+            metric_name: metricName,
+            metric_value: metricValue,
+            date: dateStr,
+          });
+        }
+      }
+    }
+    console.log(`  Added 90 days of platform metrics for ${aff.name}`);
+  }
+
+  console.log('\n21. Creating goals, disputes, announcements, spotlight...')
+  for (const aff of affiliateUserIds.slice(0, 3)) {
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+    const { data: existGoal } = await admin.from('affiliate_goals').select('id').eq('user_id', aff.userId).eq('is_active', true).maybeSingle();
+    if (!existGoal) {
+      await admin.from('affiliate_goals').insert({
+        user_id: aff.userId,
+        target_cents: [50000, 100000, 200000][Math.floor(Math.random() * 3)],
+        period: 'monthly',
+        period_start: monthStart.toISOString(),
+        period_end: monthEnd.toISOString(),
+        is_active: true,
+      });
+    }
+  }
+
+  const disputes = [
+    { affiliate_user_id: affiliateUserIds[0]?.userId, reason: 'Missing commission', details: 'Customer John signed up through my link on Feb 10 but I never received the commission.', status: 'open' },
+    { affiliate_user_id: affiliateUserIds[1]?.userId, reason: 'Incorrect amount', details: 'Commission was calculated at 20% but my locked rate is 25%.', status: 'under_review' },
+    { affiliate_user_id: affiliateUserIds[0]?.userId, reason: 'Attribution error', details: 'Referral was attributed to another affiliate but the customer used my discount code.', status: 'approved', admin_response: 'Verified — commission adjusted. The cookie attribution was overridden by your discount code per policy.', resolved_at: daysAgoDate(5) },
+  ];
+  for (const dispute of disputes) {
+    if (!dispute.affiliate_user_id) continue;
+    const { data: existing } = await admin.from('commission_disputes').select('id').eq('affiliate_user_id', dispute.affiliate_user_id).eq('reason', dispute.reason).maybeSingle();
+    if (!existing) {
+      await admin.from('commission_disputes').insert(dispute);
+    }
+  }
+  console.log('  Created goals, disputes');
+
+  const announcements = [
+    { title: 'New Feature: AI Post Writer', message: 'Generate promotional content with AI — check your Tools tab!', type: 'info', target_dashboards: ['affiliate'] },
+    { title: 'Commission Rate Boost', message: 'All tiers get +5% commission through March 31!', type: 'promo', target_dashboards: ['affiliate'] },
+    { title: 'Scheduled Maintenance', message: 'Brief downtime March 5, 2am-4am EST for database upgrades.', type: 'warning', target_dashboards: ['all'] },
+    { title: 'New Reporting Features', message: 'Check out the new Analytics tab with churn intelligence and cohort analysis.', type: 'success', target_dashboards: ['affiliate'] },
+  ];
+  for (const ann of announcements) {
+    const { data: existing } = await admin.from('announcements').select('id').eq('title', ann.title).maybeSingle();
+    if (!existing) {
+      await admin.from('announcements').insert(ann);
+    }
+  }
+  console.log('  Created announcements');
+
+  if (affiliateUserIds[0]) {
+    const { data: existSpotlight } = await admin.from('affiliate_spotlight').select('id').limit(1).maybeSingle();
+    if (!existSpotlight) {
+      await admin.from('affiliate_spotlight').insert({
+        affiliate_user_id: affiliateUserIds[0].userId,
+        month: new Date().toISOString().substring(0, 7),
+        affiliate_name: affiliateUserIds[0].name,
+        story: 'Alice grew her affiliate earnings from $0 to $500/month in just 3 months by focusing on tutorial content on YouTube and LinkedIn.',
+        stats_summary: '45 referrals, $13,500 total earnings, 8.5% conversion rate',
+        is_active: true,
+      });
+      console.log('  Created affiliate spotlight');
+    }
+  }
+
+  console.log('\n22. Creating email preferences and short links...')
+  for (const aff of affiliateUserIds) {
+    const { data: existPref } = await admin.from('email_preferences').select('id').eq('user_id', aff.userId).maybeSingle();
+    if (!existPref) {
+      await admin.from('email_preferences').insert({
+        user_id: aff.userId,
+        weekly_digest: Math.random() > 0.3,
+        monthly_report: Math.random() > 0.2,
+        affiliate_updates: true,
+        marketing_emails: Math.random() > 0.5,
+      });
+    }
+  }
+
+  for (const aff of affiliateUserIds.slice(0, 4)) {
+    const { data: affLink } = await admin.from('referral_links').select('ref_code').eq('user_id', aff.userId).maybeSingle();
+    if (!affLink) continue;
+    const slugBase = aff.name.split(' ')[0].toLowerCase();
+    const shortLinks = [
+      { slug: slugBase, destination_url: '/', label: 'Homepage', clicks: Math.floor(Math.random() * 200) + 50 },
+      { slug: `${slugBase}-pricing`, destination_url: '/pricing', label: 'Pricing page', clicks: Math.floor(Math.random() * 100) + 20 },
+    ];
+    for (const sl of shortLinks) {
+      const { data: existing } = await admin.from('affiliate_short_links').select('id').eq('slug', sl.slug).maybeSingle();
+      if (!existing) {
+        await admin.from('affiliate_short_links').insert({ affiliate_user_id: aff.userId, ...sl });
+      }
+    }
+  }
+  console.log('  Created email preferences and short links');
+
+  console.log('\n23. Creating asset usage records...')
+  const { data: allAssets } = await admin.from('affiliate_assets').select('id').limit(10);
+  if (allAssets && allAssets.length > 0) {
+    for (const aff of affiliateUserIds.slice(0, 5)) {
+      for (const asset of allAssets.slice(0, 3)) {
+        const actions: Array<'copy' | 'download' | 'view'> = ['copy', 'download', 'view'];
+        const action = actions[Math.floor(Math.random() * actions.length)];
+        await admin.from('affiliate_asset_usage').insert({
+          asset_id: asset.id,
+          affiliate_user_id: aff.userId,
+          action,
+          created_at: daysAgoDate(Math.floor(Math.random() * 30)),
+        });
+      }
+    }
+    console.log('  Created asset usage records');
+  }
+
   console.log('\n✅ Seed complete! Summary:')
   console.log(`  - ${TEST_AFFILIATES.length} affiliate members (1 dormant)`)
   console.log(`  - ${TIERS.length} tiers (Starter → Platinum)`)
@@ -575,6 +861,11 @@ async function seed() {
   console.log(`  - ${broadcasts.length} broadcasts (2 sent, 1 draft)`)
   console.log(`  - ${contests.length} contests (1 active, 1 upcoming, 1 completed)`)
   console.log(`  - ${batches.length} payout batches`)
+  console.log(`  - 12 months of historical clicks with geo/device data`)
+  console.log(`  - Churned + trial referrals for churn intelligence`)
+  console.log(`  - 12 months of commission history per affiliate`)
+  console.log(`  - 90 days of connected platform metrics (YouTube, Instagram, LinkedIn, GA)`)
+  console.log(`  - Goals, disputes, announcements, spotlight, short links, email prefs, asset usage`)
   console.log('\nRefresh the admin affiliate dashboard to see all data!')
 }
 
