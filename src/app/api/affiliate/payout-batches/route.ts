@@ -3,6 +3,47 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logAuditEvent } from '@/lib/affiliate/audit'
 
+async function insertPayoutItems(adminClient: any, payouts: any[], pendingMap: Record<string, number>) {
+  try {
+    const affiliateIds = payouts.map((p: any) => p.affiliate_user_id).filter(Boolean)
+    if (affiliateIds.length === 0) return
+
+    const { data: commissions } = await adminClient
+      .from('affiliate_commissions')
+      .select('id, affiliate_user_id, commission_amount_cents')
+      .in('affiliate_user_id', affiliateIds)
+      .eq('status', 'approved')
+
+    if (!commissions || commissions.length === 0) return
+
+    const commissionsByAffiliate: Record<string, any[]> = {}
+    for (const c of commissions) {
+      if (!commissionsByAffiliate[c.affiliate_user_id]) commissionsByAffiliate[c.affiliate_user_id] = []
+      commissionsByAffiliate[c.affiliate_user_id].push(c)
+    }
+
+    const payoutItemRows: any[] = []
+    for (const payout of payouts) {
+      const affiliateCommissions = commissionsByAffiliate[payout.affiliate_user_id] || []
+      for (const commission of affiliateCommissions) {
+        payoutItemRows.push({
+          payout_id: payout.id,
+          commission_id: commission.id,
+          amount_cents: commission.commission_amount_cents,
+        })
+      }
+    }
+
+    if (payoutItemRows.length > 0) {
+      await adminClient
+        .from('affiliate_payout_items')
+        .insert(payoutItemRows)
+    }
+  } catch (err) {
+    console.warn('Failed to insert payout items (table may not exist yet):', err)
+  }
+}
+
 async function requireAdmin() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -171,9 +212,10 @@ export async function POST(request: NextRequest) {
         method: 'batch',
       }))
 
-      const { error: payoutsErr } = await auth.admin
+      const { data: insertedPayouts, error: payoutsErr } = await auth.admin
         .from('affiliate_payouts')
         .insert(payoutRows)
+        .select()
 
       if (payoutsErr) {
         if (payoutsErr.code === '42P01') {
@@ -187,16 +229,22 @@ export async function POST(request: NextRequest) {
             amount_cents: a.pending_earnings_cents,
             status: 'pending',
           }))
-          const { error: retryErr } = await auth.admin
+          const { data: retryPayouts, error: retryErr } = await auth.admin
             .from('affiliate_payouts')
             .insert(simpleRows)
+            .select()
           if (retryErr) {
             await auth.admin.from('affiliate_payout_batches').delete().eq('id', batch.id)
             return NextResponse.json({ error: retryErr.message }, { status: 500 })
           }
+          if (retryPayouts) {
+            await insertPayoutItems(auth.admin, retryPayouts, pendingMap)
+          }
         } else {
           return NextResponse.json({ error: payoutsErr.message }, { status: 500 })
         }
+      } else if (insertedPayouts) {
+        await insertPayoutItems(auth.admin, insertedPayouts, pendingMap)
       }
 
       logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'create', entity_type: 'payout_batch', entity_id: batch.id, entity_name: `Batch ${batch.id}`, details: { total_amount_cents: totalCents, affiliates_included: eligible.length, notes: body.notes } })

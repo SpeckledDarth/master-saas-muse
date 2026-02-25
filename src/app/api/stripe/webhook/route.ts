@@ -62,6 +62,138 @@ async function resolveProductFromSubscription(
   return { productSlug: museProduct.slug, tierId };
 }
 
+async function syncInvoiceToLocal(invoice: Stripe.Invoice & Record<string, any>, status: string) {
+  const { createAdminClient: createAdmin } = await import('@/lib/supabase/admin');
+  const adminDb = createAdmin();
+
+  const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
+  if (!customerId) return;
+
+  // Resolve user_id from subscriptions table
+  const { data: sub } = await adminDb
+    .from('subscriptions')
+    .select('user_id')
+    .eq('stripe_customer_id', customerId)
+    .maybeSingle();
+
+  const userId = sub?.user_id;
+  if (!userId) {
+    console.log('syncInvoiceToLocal: No user_id found for customer', customerId);
+    return;
+  }
+
+  // Upsert the invoice record
+  const invoiceRecord = {
+    user_id: userId,
+    stripe_invoice_id: invoice.id,
+    stripe_customer_id: customerId,
+    invoice_number: invoice.number || null,
+    status,
+    currency: invoice.currency || 'usd',
+    subtotal_cents: invoice.subtotal || 0,
+    tax_cents: invoice.tax || 0,
+    total_cents: invoice.total || 0,
+    amount_paid_cents: invoice.amount_paid || 0,
+    amount_due_cents: invoice.amount_due || 0,
+    description: invoice.description || null,
+    period_start: invoice.period_start ? new Date(invoice.period_start * 1000).toISOString() : null,
+    period_end: invoice.period_end ? new Date(invoice.period_end * 1000).toISOString() : null,
+    due_date: invoice.due_date ? new Date(invoice.due_date * 1000).toISOString() : null,
+    paid_at: status === 'paid' ? new Date().toISOString() : null,
+    hosted_invoice_url: invoice.hosted_invoice_url || null,
+    invoice_pdf_url: invoice.invoice_pdf || null,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data: upsertedInvoice, error: invError } = await adminDb
+    .from('invoices')
+    .upsert(invoiceRecord, { onConflict: 'stripe_invoice_id' })
+    .select('id')
+    .single();
+
+  if (invError) {
+    if (invError.message?.includes('Could not find') || invError.code === '42P01') {
+      console.log('syncInvoiceToLocal: invoices table not found, skipping');
+      return;
+    }
+    throw invError;
+  }
+
+  const localInvoiceId = upsertedInvoice.id;
+
+  // Insert invoice line items
+  if (invoice.lines?.data?.length) {
+    const lineItems = invoice.lines.data.map((line: any) => ({
+      invoice_id: localInvoiceId,
+      stripe_line_item_id: line.id || null,
+      description: line.description || 'Line item',
+      quantity: line.quantity || 1,
+      unit_amount_cents: line.price?.unit_amount || 0,
+      amount_cents: line.amount || 0,
+      currency: line.currency || 'usd',
+      price_id: typeof line.price === 'object' ? line.price?.id : line.price || null,
+      product_id: typeof line.price?.product === 'string' ? line.price.product : null,
+      period_start: line.period?.start ? new Date(line.period.start * 1000).toISOString() : null,
+      period_end: line.period?.end ? new Date(line.period.end * 1000).toISOString() : null,
+    }));
+
+    // Delete existing items for this invoice (idempotent re-sync)
+    await adminDb
+      .from('invoice_items')
+      .delete()
+      .eq('invoice_id', localInvoiceId);
+
+    const { error: itemsError } = await adminDb
+      .from('invoice_items')
+      .insert(lineItems);
+
+    if (itemsError && !itemsError.message?.includes('Could not find') && itemsError.code !== '42P01') {
+      console.error('syncInvoiceToLocal: Error inserting invoice items:', itemsError);
+    }
+  }
+
+  // Create payment record (only for paid invoices)
+  if (status === 'paid' && invoice.amount_paid > 0) {
+    const paymentIntentId = typeof invoice.payment_intent === 'string'
+      ? invoice.payment_intent
+      : (invoice.payment_intent as any)?.id || null;
+
+    const chargeId = typeof invoice.charge === 'string'
+      ? invoice.charge
+      : (invoice.charge as any)?.id || null;
+
+    const paymentRecord = {
+      user_id: userId,
+      invoice_id: localInvoiceId,
+      stripe_payment_intent_id: paymentIntentId,
+      stripe_charge_id: chargeId,
+      amount_cents: invoice.amount_paid || 0,
+      currency: invoice.currency || 'usd',
+      status: 'succeeded',
+    };
+
+    if (paymentIntentId) {
+      const { error: payError } = await adminDb
+        .from('payments')
+        .upsert(paymentRecord, { onConflict: 'stripe_payment_intent_id' });
+
+      if (payError && !payError.message?.includes('Could not find') && payError.code !== '42P01') {
+        console.error('syncInvoiceToLocal: Error upserting payment:', payError);
+      }
+    } else {
+      const { error: payError } = await adminDb
+        .from('payments')
+        .insert(paymentRecord);
+
+      if (payError && !payError.message?.includes('Could not find') && payError.code !== '42P01') {
+        console.error('syncInvoiceToLocal: Error inserting payment:', payError);
+      }
+    }
+  }
+
+  console.log(`syncInvoiceToLocal: Synced invoice ${invoice.id} as ${status} for user ${userId}`);
+}
+
 export async function POST(request: NextRequest) {
   const signature = request.headers.get('stripe-signature');
 
@@ -393,6 +525,24 @@ export async function POST(request: NextRequest) {
           }
         } catch (affErr) {
           console.error('Affiliate commission processing error:', affErr);
+        }
+
+        // Sync invoice/payment to local tables (Phase 5 CRM)
+        try {
+          await syncInvoiceToLocal(invoice, 'paid');
+        } catch (syncErr) {
+          console.error('Invoice sync error (non-critical):', syncErr);
+        }
+        break;
+      }
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        console.log('Invoice payment failed:', invoice.id);
+
+        try {
+          await syncInvoiceToLocal(invoice, 'failed');
+        } catch (syncErr) {
+          console.error('Invoice sync error (non-critical):', syncErr);
         }
         break;
       }

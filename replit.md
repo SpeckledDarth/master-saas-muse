@@ -1,7 +1,7 @@
 # MuseKit.io - Master SaaS Muse Template
 
 ## Overview
-MuseKit.io is a production-ready, full-stack SaaS starter template built to accelerate the launch of new SaaS products. It provides a comprehensive, high-quality starting point, significantly reducing development time. Each SaaS product deployed using MuseKit operates with its own independent deployment, repository, database, and Stripe account, ensuring clean P&L, independent scaling, and zero cross-pollination risk. The platform includes robust authentication, Stripe-powered billing with feature gating, team collaboration with role-based permissions, an administrative dashboard, pluggable AI integrations, webhook support, monitoring, analytics, E2E testing, and SEO optimization.
+MuseKit.io is a production-ready, full-stack SaaS starter template designed to accelerate the launch of new SaaS products. It provides a comprehensive, high-quality starting point, significantly reducing development time. Each SaaS product deployed using MuseKit operates with its own independent deployment, repository, database, and Stripe account, ensuring clean P&L, independent scaling, and zero cross-pollination risk. The platform includes robust authentication, Stripe-powered billing with feature gating, team collaboration with role-based permissions, an administrative dashboard, pluggable AI integrations, webhook support, monitoring, analytics, E2E testing, and SEO optimization.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -33,7 +33,7 @@ This project runs across THREE environments that MUST stay aligned. Most testing
 3. **API smoke test** — curl every changed API route against the local dev server. Confirm no 500s.
 4. **Migration inventory** — List ALL migration files that need to be run on Supabase, in order, with the exact file paths. Don't assume the user has run previous migrations.
 5. **Environment variables** — If any new env vars are needed, list them for both Vercel AND Supabase dashboards.
-6. **Git status check** — Remind user to push to GitHub. Vercel auto-deploys from the GitHub repo.
+6. **Git status check** — Remind user to push to GitHub. Vercel auto- deploys from the GitHub repo.
 
 **Why This Matters:**
 - Agent sees Replit Postgres. User's app reads Supabase.
@@ -66,14 +66,6 @@ Every time code changes are made, the agent MUST complete these steps before tel
 | **Development Roadmap** | `docs/ROADMAP.md` | Master execution tracker: phase status, sprint details, pending bugs, decision log, session history | **Every session** — read first, always |
 | **CRM & Invoicing Brainstorm** | `docs/CRM_INVOICING_BRAINSTORM.md` | Strategic vision: 217 features across all 3 dashboards, dogfooding architecture, cross-Muse strategy, gap analysis | When working on Phases 5-7 (CRM, dashboards, AI) |
 | **Affiliate Enhancements** | `docs/musekit/AFFILIATE_ENHANCEMENTS.md` | Implementation specs: SQL schemas, API endpoints, UI descriptions for 32 affiliate features | When working on Phase 3.6 (Sprints 1-4) |
-| **Affiliate System Guide** | `docs/musekit/AFFILIATE.md` | How the existing affiliate system works (Phases 3 + 3.5) | When debugging or extending core affiliate features |
-| **Architecture** | `docs/musekit/ARCHITECTURE.md` | System architecture, folder structure, tech stack reference | When making structural changes or onboarding |
-| **Master Plan** | `docs/musekit/MASTER_PLAN.md` | MuseKit overall strategy and product vision | For strategic context |
-| **Admin Guide** | `docs/musekit/ADMIN_GUIDE.md` | Admin dashboard features and configuration | When building admin UI features |
-| **Adding a Product** | `docs/musekit/ADDING_A_PRODUCT.md` | How to add a new Muse product to the template | When adding product-specific features |
-| **Muse Checklist** | `docs/musekit/MUSE_CHECKLIST.md` | Launch checklist for new Muse deployments | Before deploying a new product |
-| **Project Overview** | `docs/musekit/PROJECT_OVERVIEW.md` | High-level project summary | For quick context |
-| **Setup Guide** | `docs/musekit/SETUP_GUIDE.md` | Initial project setup and configuration | For environment setup |
 
 ### Two-Document System (CRITICAL)
 
@@ -116,6 +108,7 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **Bonus Features**: AI Hashtag Suggestions, Gig Lead Notifications (keyword scanner, reply templates), AI Voice Fine-Tuner, and a Lead CRM Mini.
 - **Testimonial Management**: Admin CRUD for testimonials with public display on a "Wall of Love" page and social proof popups on the landing page.
 - **Affiliate System**: Complete affiliate marketing infrastructure with tracked referral links, commission tracking on Stripe events, fraud detection, performance tiers, marketing assets, and payout management. Includes public signup, application, separate login, and standalone dashboard for affiliates. Admin manages applications, networks, and all affiliate settings.
+- **CRM & Invoicing Foundation**: Universal user profiles (all user types), local invoice/payment records synced from Stripe webhooks, affiliate payout item tracking, support ticket system (open → in_progress → resolved → closed), CRM activity log (calls, notes, tasks, meetings), marketing campaign tracking with UTM attribution, and contract/agreement management with signing flow and version history.
 - **Product Extension Design Rules**: Emphasizes adding new files and tables for product-specific features (`migrations/extensions/`, `/dashboard/social/`, `src/lib/<product>/`), using plugin patterns for queue jobs, and minimizing core file modifications.
 
 ## External Dependencies
