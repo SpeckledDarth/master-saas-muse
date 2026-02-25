@@ -216,15 +216,25 @@
 - **Earnings Forecast:** Predicted monthly earnings from recent trends
 - **Financial Tools:** Commission split estimator, ROI calculations
 
+- **Earnings Projections:** Multi-month forward projections (3/6/12 months), annual forecast, tier trajectory, milestone income projections, goal progress tracking with daily pace
+- **Enhanced Payout History:** Date range/status filtering, paginated results, CSV export, receipt data with items breakdown, summary stats (total paid/pending/count)
+- **Admin 1099 Tax Export:** Year-end CSV export of affiliates earning >$600, includes tax info status, legal name, address, gross earnings — for 1099-NEC filing
+- **Bulk Commission Renewals:** Renew multiple expiring referrals in one request (max 50), renewal performance stats (success rate, avg extension days, revenue saved)
+- **Tax Center Panel:** Year selector, estimated withholding calculator (SE/federal/total), monthly breakdown, 1099 threshold notice, downloadable tax report
+- **Commission Renewal Stats:** Visual approval rate breakdown, revenue saved metric, average extension tracking
+
 ### Key Files
 - Payouts: `src/app/api/affiliate/payouts/`, `payout-batches/`, `payout-schedule/`
+- Payout history: `src/app/api/affiliate/payout-history/`
 - Tax: `src/app/api/affiliate/tax-info/`, `tax-summary/`
-- Admin tax: `src/app/api/admin/affiliate/tax-info/`
+- Admin tax: `src/app/api/admin/affiliate/tax-info/`, `src/app/api/admin/affiliate/tax-export/`
 - Earnings: `src/app/api/affiliate/earnings/`, `earnings-statement/`
+- Earnings projections: `src/app/api/affiliate/analytics/earnings-projections/`
 - Financial tools: `src/app/api/affiliate/financial-tools/`
 - Forecast: `src/app/api/affiliate/forecast/`
 - Renewals: `src/app/api/affiliate/renewals/`, `src/app/api/admin/renewals/`
 - Payout receipt: `src/app/api/admin/affiliate/payout-receipt/`
+- Retention UI: `src/components/affiliate/retention-tools.tsx`
 
 ### Database Tables
 - `affiliate_payouts`, `affiliate_payout_items`

@@ -30,6 +30,7 @@ import { LinkShortener, QRCodeGenerator, MediaKitPage, CopyPasteCaptions, Starte
 import { ExpandedAnalyticsSection } from '@/components/affiliate/analytics-expanded'
 import { FlywheelAnalyticsSection } from '@/components/affiliate/flywheel-analytics'
 import { FlywheelReportsSection } from '@/components/affiliate/flywheel-reports'
+import { EarningsProjectionsPanel, PayoutHistoryPanel, TaxCenterPanel, CommissionRenewalStatsPanel, BulkRenewalButton } from '@/components/affiliate/retention-tools'
 
 interface AffiliateDashboardData {
   link: {
@@ -522,6 +523,7 @@ function StandaloneAffiliateDashboard() {
   const [expiringReferrals, setExpiringReferrals] = useState<any[]>([])
   const [renewalsLoading, setRenewalsLoading] = useState(false)
   const [renewalSubmitting, setRenewalSubmitting] = useState(false)
+  const [renewalStats, setRenewalStats] = useState<any>(null)
   const [renewalCheckInType, setRenewalCheckInType] = useState<'email' | 'call' | 'note'>('email')
   const [renewalNotes, setRenewalNotes] = useState('')
   const [renewalTargetId, setRenewalTargetId] = useState<string | null>(null)
@@ -689,6 +691,7 @@ function StandaloneAffiliateDashboard() {
         const data = await res.json()
         setRenewals(data.renewals || [])
         setExpiringReferrals(data.expiringReferrals || [])
+        if (data.stats) setRenewalStats(data.stats)
       }
     } catch {}
     setRenewalsLoading(false)
@@ -2859,6 +2862,7 @@ function StandaloneAffiliateDashboard() {
                     <AlertTriangle className="h-3.5 w-3.5 text-yellow-500" />
                     Expiring Soon ({expiringReferrals.length})
                   </p>
+                  <BulkRenewalButton expiringReferrals={expiringReferrals} onSuccess={fetchRenewals} />
                   {expiringReferrals.map((ref: any) => {
                     const hasPending = renewals.some(r => r.referral_id === ref.id && r.status === 'pending')
                     return (
@@ -2969,6 +2973,8 @@ function StandaloneAffiliateDashboard() {
           )}
         </CardContent>
       </Card>
+
+      <CommissionRenewalStatsPanel stats={renewalStats} />
     </div>
     )
   }
@@ -3863,6 +3869,8 @@ function StandaloneAffiliateDashboard() {
           )}
         </CardContent>
       </Card>
+
+      <PayoutHistoryPanel />
 
       {/* Partner Experience Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -6073,6 +6081,8 @@ function StandaloneAffiliateDashboard() {
         </CardContent>
       </Card>
 
+      <TaxCenterPanel />
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
@@ -6899,6 +6909,9 @@ function StandaloneAffiliateDashboard() {
 
         {/* Flywheel Intelligence — Churn, Cohort, Revenue, AI */}
         <FlywheelAnalyticsSection />
+
+        {/* Earnings Projections */}
+        <EarningsProjectionsPanel />
 
         {/* Reports & Intelligence — Connected, Financial, Predictions */}
         <FlywheelReportsSection />

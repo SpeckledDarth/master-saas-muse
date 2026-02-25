@@ -764,6 +764,18 @@ Key files for each phase, so agents can find relevant code quickly.
 7. `components/affiliate/flywheel-reports.tsx` — Updated types; added UI for milestone progress bar, active contests panel, and suggested tools links
 **Status:** Dev server compiles clean, no TypeScript errors
 
+### Session C — February 25, 2026 (Retention Deepeners)
+**Features built:** ~15 features across 4 focus areas
+**New files:** 4 API routes + 1 component file
+- `src/app/api/affiliate/analytics/earnings-projections/route.ts` — Multi-month projections (3/6/12), annual forecast, tier trajectory, milestone income, goal-based projections, historical trend
+- `src/app/api/admin/affiliate/tax-export/route.ts` — Admin 1099 CSV export, $600 threshold filter, tax info status tracking
+- `src/app/api/affiliate/payout-history/route.ts` — Date range/status filtering, pagination, items breakdown, ExportButton-compatible CSV format, summary stats
+- `src/app/api/affiliate/renewals/route.ts` — EXTENDED with renewal stats (success rate, avg extension, revenue saved) and bulk renewal POST (up to 50 referrals)
+- `src/components/affiliate/retention-tools.tsx` — EarningsProjectionsPanel, PayoutHistoryPanel, TaxCenterPanel, CommissionRenewalStatsPanel, BulkRenewalButton, CommissionLifecycleTimeline
+**Dashboard wiring:** All panels integrated into affiliate dashboard — Projections in Analytics tab, Payout History in Payouts tab, Tax Center in Account tab, Renewal Stats + Bulk Renewal in Referrals tab
+**New tables/migrations:** 0 — all features use existing tables
+**Status:** All routes return 200/401 (no 500s), dev server compiles clean
+
 ---
 
 *This document is the project's persistent memory. Update it every session.*
