@@ -20,13 +20,17 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.id)
       .maybeSingle()
 
-    const { data: taxInfo } = await admin
-      .from('affiliate_tax_info')
-      .select('legal_name, tax_id_type, tax_id_last4, address_line1, address_city, address_state, address_zip, address_country, form_type')
-      .eq('affiliate_user_id', user.id)
-      .maybeSingle()
-      .then(r => r)
-      .catch(() => ({ data: null }))
+    let taxInfo = null
+    try {
+      const taxResult = await admin
+        .from('affiliate_tax_info')
+        .select('legal_name, tax_id_type, tax_id_last4, address_line1, address_city, address_state, address_zip, address_country, form_type')
+        .eq('affiliate_user_id', user.id)
+        .maybeSingle()
+      taxInfo = taxResult.data
+    } catch {
+      taxInfo = null
+    }
 
     const startOfYear = `${year}-01-01`
     const endOfYear = `${year}-12-31T23:59:59.999Z`
