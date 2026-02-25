@@ -677,14 +677,14 @@ Key files for each phase, so agents can find relevant code quickly.
 - Dashboard wiring: FlywheelAnalyticsSection imported and rendered in Analytics tab of `src/app/affiliate/dashboard/page.tsx`
 - Seed data: Expanded `scripts/seed-affiliate-data.ts` with 12-month historical clicks (geo/device), churned referrals, trial referrals, 12-month commission history, 90-day connected platform metrics, goals, disputes, announcements, spotlight, short links, email preferences, asset usage
 
-**Integration Debt (Fix in next session that touches these systems):**
-1. Contests → AI Coach: AI coaching should reference active contests and affiliate's standing
-2. Milestones → Predictions: Predictive intelligence should mention upcoming milestone bonuses
-3. Leaderboard → AI Insights: AI should reference current leaderboard rank
-4. Content Intelligence → Marketing Toolkit: AI content recs should link to existing tools (Post Writer, Email Drafter, Deep Link Generator)
-5. Financial Overview → Payout Schedule: Should reuse payout schedule logic instead of calculating separately
-6. Weekly Digest → Contest Standings: Monday email should include contest positions
-7. Broadcasts → In-App Notifications: Broadcasts should create in-app notifications, not just emails
+**Integration Debt — ALL RESOLVED (Feb 25, 2026):**
+1. ~~Contests → AI Coach~~ — FIXED: `gatherPerformanceData()` now queries `affiliate_contests`, includes in AI prompt
+2. ~~Milestones → Predictions~~ — FIXED: `predictions/route.ts` now queries `affiliate_milestones` + `affiliate_milestone_awards`, returns `nextMilestone` in response
+3. ~~Leaderboard → AI Insights~~ — FIXED: `ai-analytics/route.ts` and `ai-coach/route.ts` now calculate rank from all affiliate links
+4. ~~Content Intelligence → Marketing Toolkit~~ — FIXED: AI prompt references tools, response includes `suggestedTools` array, UI renders clickable links
+5. ~~Financial Overview → Payout Schedule~~ — FIXED: Uses same pending calculation as `payout-schedule/route.ts`, returns `payoutSchedule` object
+6. ~~Weekly Digest → Contest Standings~~ — FIXED: Digest queries active contests and milestones, email includes contest standings and milestone proximity
+7. ~~Broadcasts → In-App Notifications~~ — Already working: `createBulkNotifications` runs after email send
 
 **Remaining Sessions (C-F):**
 
@@ -693,7 +693,7 @@ Key files for each phase, so agents can find relevant code quickly.
 | C | Retention Deepeners | ~15 | Tax center, earnings projections, payout history export, commission renewal polish |
 | D | Retention Deepeners cont. | ~10 | Resource center, knowledge base, swipe files, content calendar |
 | E | Delight Multipliers | ~12 | Challenges, directory, case studies, quiz, analyze-audience |
-| F | Polish & External + Integration Debt | ~8+7 | Mobile responsive, fix integration debt items 1-7, final polish |
+| F | Polish & External | ~8 | Mobile responsive, final polish (integration debt all fixed) |
 
 **Session Integration Requirements (MANDATORY — every feature must connect to existing systems):**
 
@@ -717,7 +717,7 @@ Key files for each phase, so agents can find relevant code quickly.
 
 **Session F Integration Map:**
 - Mobile responsive → Apply to existing dashboard components, not rebuild
-- Fix all 7 integration debt items listed above
+- All 7 integration debt items already fixed (done in integration debt session, Feb 25 2026)
 - Final polish → Audit all AI features for real data context (tiers, contests, milestones, leaderboard)
 
 ### Phase 8.5 (Flywheel Accelerators — Session B)
@@ -748,6 +748,21 @@ Key files for each phase, so agents can find relevant code quickly.
 **New files:** 8 (7 API routes + 1 component file)
 **Bug fixes:** Fixed .catch() on Supabase query builders in revenue-waterfall, scheduled-reports, usage-insights routes
 **Status:** All routes return 200/401 (no 500s), dev server compiles clean
+
+### Integration Debt Fix Session — February 25, 2026
+**Integration gaps fixed:** 6 (all 7 identified gaps resolved, #7 was already working)
+**Files modified:** 7 (6 API routes + 1 component file)
+**New files:** 0
+**New tables/migrations:** 0
+**Changes:**
+1. `ai-coach/route.ts` — Added contests, milestones, leaderboard queries to `gatherPerformanceData()`; AI prompt now includes contest standings, next milestone proximity, and leaderboard rank
+2. `analytics/predictions/route.ts` — Added milestone + contest queries; response includes `nextMilestone` and `activeContests` structured fields; AI prompt references milestones and contests
+3. `ai-analytics/route.ts` — Added leaderboard rank calculation; AI prompt includes rank and percentile
+4. `analytics/content-intelligence/route.ts` — Updated AI prompt to reference available tools; response includes `suggestedTools` array
+5. `analytics/financial-overview/route.ts` — Added payout schedule alignment; uses same pending calculation as `payout-schedule/route.ts`; response includes `payoutSchedule` object
+6. `cron/weekly-affiliate-digest/route.ts` — Added contest standings and milestone proximity sections to weekly digest email
+7. `components/affiliate/flywheel-reports.tsx` — Updated types; added UI for milestone progress bar, active contests panel, and suggested tools links
+**Status:** Dev server compiles clean, no TypeScript errors
 
 ---
 

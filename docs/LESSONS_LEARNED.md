@@ -197,17 +197,20 @@ if (!profile) return NextResponse.json({ error: 'Not an affiliate' }, { status: 
 
 ---
 
-## Known Integration Debt (To Fix in Future Sessions)
+## Integration Debt — ALL RESOLVED (Feb 25, 2026)
 
-These are connections that should exist but don't yet. Fix them when working on related features:
+All 7 integration gaps identified in the Session A/B audit have been fixed:
 
-1. **Contests → AI Coach:** AI coaching should reference active contests and the affiliate's standing
-2. **Milestones → Predictions:** Predictive intelligence should mention upcoming milestone bonuses
-3. **Leaderboard → AI Insights:** AI should reference current leaderboard rank
-4. **Content Intelligence → Marketing Toolkit:** AI content recommendations should link to existing tools (Post Writer, Email Drafter, Deep Link Generator)
-5. **Financial Overview → Payout Schedule:** Should reuse payout schedule logic instead of calculating separately
-6. **Weekly Digest → Contest Standings:** Monday email should include contest positions
-7. **Broadcasts → In-App Notifications:** Admin broadcasts should create in-app notifications, not just emails
+1. ~~Contests → AI Coach~~ — FIXED
+2. ~~Milestones → Predictions~~ — FIXED
+3. ~~Leaderboard → AI Insights~~ — FIXED
+4. ~~Content Intelligence → Marketing Toolkit~~ — FIXED
+5. ~~Financial Overview → Payout Schedule~~ — FIXED
+6. ~~Weekly Digest → Contest Standings~~ — FIXED
+7. ~~Broadcasts → In-App Notifications~~ — Already working
+
+### Lesson: Fix integration debt BEFORE building new features
+The integration debt fix session was highly efficient (6 surgical changes, no new tables, no new routes). Every new AI feature now references the full context — contests, milestones, leaderboard rank, existing tools, payout schedule. This is how closed-loop architecture works: fix connections first, add features second.
 
 ---
 

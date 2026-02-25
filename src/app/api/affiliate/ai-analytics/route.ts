@@ -13,17 +13,25 @@ export async function GET(req: NextRequest) {
     const type = req.nextUrl.searchParams.get('type') || 'all';
     const admin = createAdminClient();
 
-    const [clicksRes, referralsRes, commissionsRes, metricsRes] = await Promise.all([
+    const [clicksRes, referralsRes, commissionsRes, metricsRes, allLinksRes] = await Promise.all([
       admin.from('referral_clicks').select('source_tag, landing_page, created_at, country, device_type').eq('referral_link_user_id', user.id),
       admin.from('affiliate_referrals').select('status, source_tag, created_at, converted_at, churned_at, churn_reason').eq('affiliate_user_id', user.id),
       admin.from('affiliate_commissions').select('commission_amount_cents, created_at, status').eq('affiliate_user_id', user.id),
       admin.from('connected_platform_metrics').select('platform, metric_name, metric_value, date').eq('user_id', user.id).order('date', { ascending: false }).limit(500),
+      admin.from('referral_links').select('user_id, total_earnings_cents').eq('is_affiliate', true),
     ]);
 
     const clicks = clicksRes.data || [];
     const referrals = referralsRes.data || [];
     const commissions = commissionsRes.data || [];
     const platformMetrics = metricsRes.data || [];
+    const allLinks = allLinksRes.data || [];
+
+    const userTotalEarnings = commissions.reduce((s: number, c: any) => s + (c.commission_amount_cents || 0), 0);
+    const leaderboardTotal = allLinks.length;
+    const higherEarners = allLinks.filter((l: any) => (l.total_earnings_cents || 0) > userTotalEarnings).length;
+    const leaderboardRank = leaderboardTotal > 0 ? higherEarners + 1 : null;
+    const leaderboardPercentile = leaderboardTotal > 0 ? Math.round(((leaderboardTotal - higherEarners) / leaderboardTotal) * 100) : null;
 
     const clicksBySource: Record<string, number> = {};
     clicks.forEach(c => { const s = (c as any).source_tag || 'direct'; clicksBySource[s] = (clicksBySource[s] || 0) + 1; });
@@ -73,6 +81,7 @@ AFFILIATE PERFORMANCE DATA:
 - Churn reasons: ${JSON.stringify(churnReasons)}
 - Trials not yet converted: ${trialRefs.length}
 - Connected platform data: ${JSON.stringify(platformSummary)}
+- Leaderboard rank: ${leaderboardRank ? `#${leaderboardRank} out of ${leaderboardTotal} affiliates (top ${leaderboardPercentile}%)` : 'no ranking data'}
 `;
 
     const prompts: Record<string, string> = {

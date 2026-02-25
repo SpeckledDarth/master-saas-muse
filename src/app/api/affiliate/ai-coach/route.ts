@@ -70,6 +70,10 @@ interface PerformanceData {
   recentReferralStatuses: { status: string; count: number }[]
   earningsTrend: string
   daysActive: number
+  activeContests: { name: string; metric: string; daysLeft: number; userValue: number; leaderValue: number }[]
+  nextMilestone: { name: string; threshold: number; current: number; bonusCents: number } | null
+  leaderboardRank: number | null
+  leaderboardTotal: number
 }
 
 async function gatherPerformanceData(admin: any, userId: string, link: any): Promise<PerformanceData> {
@@ -77,7 +81,7 @@ async function gatherPerformanceData(admin: any, userId: string, link: any): Pro
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
 
-  const [referralsRes, commissionsRes, recentCommissionsRes] = await Promise.all([
+  const [referralsRes, commissionsRes, recentCommissionsRes, contestsRes, milestonesRes, awardsRes, allLinksRes] = await Promise.all([
     admin
       .from('affiliate_referrals')
       .select('status, source_tag, created_at')
@@ -91,6 +95,23 @@ async function gatherPerformanceData(admin: any, userId: string, link: any): Pro
       .select('commission_amount_cents, created_at')
       .eq('affiliate_user_id', userId)
       .gte('created_at', thirtyDaysAgo),
+    admin
+      .from('affiliate_contests')
+      .select('id, name, metric, start_date, end_date, prizes')
+      .lte('start_date', now.toISOString())
+      .gte('end_date', now.toISOString()),
+    admin
+      .from('affiliate_milestones')
+      .select('id, name, referral_threshold, bonus_cents')
+      .order('referral_threshold', { ascending: true }),
+    admin
+      .from('affiliate_milestone_awards')
+      .select('milestone_id')
+      .eq('affiliate_user_id', userId),
+    admin
+      .from('referral_links')
+      .select('user_id, total_earnings_cents')
+      .eq('is_affiliate', true),
   ])
 
   const referrals = referralsRes.data || []
@@ -157,6 +178,32 @@ async function gatherPerformanceData(admin: any, userId: string, link: any): Pro
   if (recentEarnings7d > prevWeekEarnings * 1.1) earningsTrend = 'growing'
   else if (recentEarnings7d < prevWeekEarnings * 0.9) earningsTrend = 'declining'
 
+  const contests = contestsRes.data || []
+  const activeContests = contests.map((c: any) => ({
+    name: c.name,
+    metric: c.metric || 'referrals',
+    daysLeft: Math.max(0, Math.ceil((new Date(c.end_date).getTime() - now.getTime()) / 86400000)),
+    userValue: c.metric === 'earnings' ? totalEarnings : totalSignups,
+    leaderValue: 0,
+  }))
+
+  const milestones = milestonesRes.data || []
+  const earnedIds = new Set((awardsRes.data || []).map((a: any) => a.milestone_id))
+  const unearnedMilestones = milestones.filter((m: any) => !earnedIds.has(m.id))
+  const nextMilestone = unearnedMilestones.length > 0
+    ? {
+        name: unearnedMilestones[0].name,
+        threshold: unearnedMilestones[0].referral_threshold,
+        current: totalSignups,
+        bonusCents: unearnedMilestones[0].bonus_cents || 0,
+      }
+    : null
+
+  const allLinks = allLinksRes.data || []
+  const leaderboardTotal = allLinks.length
+  const higherEarners = allLinks.filter((l: any) => (l.total_earnings_cents || 0) > totalEarnings).length
+  const leaderboardRank = leaderboardTotal > 0 ? higherEarners + 1 : null
+
   return {
     totalClicks,
     totalSignups,
@@ -173,6 +220,10 @@ async function gatherPerformanceData(admin: any, userId: string, link: any): Pro
     recentReferralStatuses,
     earningsTrend,
     daysActive,
+    activeContests,
+    nextMilestone,
+    leaderboardRank,
+    leaderboardTotal,
   }
 }
 
@@ -208,6 +259,9 @@ Affiliate Performance Summary:
 - Earnings trend (vs prior week): ${data.earningsTrend}
 - Top referral sources: ${data.topSources.map(s => `${s.source} (${s.count})`).join(', ') || 'none tracked'}
 - Referral status breakdown: ${data.recentReferralStatuses.map(s => `${s.status}: ${s.count}`).join(', ') || 'none'}
+- Leaderboard rank: ${data.leaderboardRank ? `#${data.leaderboardRank} out of ${data.leaderboardTotal} affiliates` : 'no ranking data'}
+${data.activeContests.length > 0 ? `- Active contests: ${data.activeContests.map(c => `"${c.name}" (metric: ${c.metric}, your ${c.metric}: ${c.metric === 'earnings' ? '$' + (c.userValue / 100).toFixed(2) : c.userValue}, ${c.daysLeft} days left)`).join('; ')}` : '- No active contests'}
+${data.nextMilestone ? `- Next milestone: "${data.nextMilestone.name}" — need ${data.nextMilestone.threshold - data.nextMilestone.current} more referrals (at ${data.nextMilestone.current}/${data.nextMilestone.threshold}) for $${(data.nextMilestone.bonusCents / 100).toFixed(2)} bonus` : '- All milestones achieved or none configured'}
 `.trim()
 
   const prompt = `You are an affiliate marketing coach. Analyze this affiliate's performance data and provide 3-5 specific, actionable tips for improving their earnings this week.
@@ -221,6 +275,9 @@ Rules:
 - If they have few clicks, suggest promotion strategies
 - If earnings are declining, suggest re-engagement tactics
 - If they're doing well, suggest scaling strategies
+- If there's an active contest, reference it and suggest tactics to win or improve position
+- If they're close to a milestone, highlight how many referrals they need and the bonus they'll earn
+- If leaderboard rank data is available, reference their position and suggest how to climb
 - Do NOT use any emoji
 - Prioritize tips as "high", "medium", or "low" based on potential impact
 

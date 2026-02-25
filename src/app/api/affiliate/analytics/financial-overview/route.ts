@@ -10,11 +10,13 @@ export async function GET(req: NextRequest) {
 
     const admin = createAdminClient();
 
-    const [commissionsRes, payoutsRes, invoicesRes, referralsRes] = await Promise.all([
+    const [commissionsRes, payoutsRes, invoicesRes, referralsRes, settingsRes, linkRes] = await Promise.all([
       admin.from('affiliate_commissions').select('commission_amount_cents, status, created_at').eq('affiliate_user_id', user.id),
       admin.from('affiliate_payouts').select('total_amount_cents, status, created_at').eq('affiliate_user_id', user.id),
       admin.from('invoices').select('amount_cents, status, created_at').eq('user_id', user.id),
       admin.from('affiliate_referrals').select('status, created_at').eq('affiliate_user_id', user.id),
+      admin.from('affiliate_program_settings').select('payout_schedule_day, min_payout_cents').maybeSingle(),
+      admin.from('referral_links').select('pending_earnings_cents').eq('user_id', user.id).eq('is_affiliate', true).maybeSingle(),
     ]);
 
     const commissions = commissionsRes.data || [];
@@ -22,9 +24,25 @@ export async function GET(req: NextRequest) {
     const invoices = invoicesRes.data || [];
     const referrals = referralsRes.data || [];
 
+    const scheduleDay = settingsRes.data?.payout_schedule_day || 15;
+    const minPayoutCents = settingsRes.data?.min_payout_cents || 5000;
+
     const totalEarned = commissions.reduce((s, c) => s + ((c as any).commission_amount_cents || 0), 0);
     const totalPaidOut = payouts.filter(p => (p as any).status === 'completed' || (p as any).status === 'paid').reduce((s, p) => s + ((p as any).total_amount_cents || 0), 0);
-    const pendingEarnings = commissions.filter(c => (c as any).status === 'pending' || (c as any).status === 'approved').reduce((s, c) => s + ((c as any).commission_amount_cents || 0), 0);
+
+    const pendingFromCommissions = commissions.filter(c => (c as any).status === 'approved').reduce((s: number, c: any) => s + (c.commission_amount_cents || 0), 0);
+    const pendingFromLink = linkRes.data?.pending_earnings_cents || 0;
+    const pendingEarnings = Math.max(pendingFromCommissions, pendingFromLink);
+
+    const now = new Date();
+    let nextPayoutDate: Date;
+    if (now.getDate() < scheduleDay) {
+      nextPayoutDate = new Date(now.getFullYear(), now.getMonth(), scheduleDay);
+    } else {
+      nextPayoutDate = new Date(now.getFullYear(), now.getMonth() + 1, scheduleDay);
+    }
+    const meetsMinimum = pendingEarnings >= minPayoutCents;
+    const thresholdProgress = minPayoutCents > 0 ? Math.min(100, Math.round((pendingEarnings / minPayoutCents) * 100)) : 100;
 
     const totalSubscriptionCost = invoices.filter(i => (i as any).status === 'paid').reduce((s, i) => s + ((i as any).amount_cents || 0), 0);
 
@@ -57,7 +75,6 @@ export async function GET(req: NextRequest) {
       if (!breakEvenMonth && cumulativeNet > 0) breakEvenMonth = m;
     });
 
-    const now = new Date();
     const lastThreeMonths = commissions.filter(c => {
       const d = new Date((c as any).created_at);
       return (now.getTime() - d.getTime()) < 90 * 86400000;
@@ -92,6 +109,14 @@ export async function GET(req: NextRequest) {
       monthlyBreakdown: monthlyBreakdown.slice(-12),
       activeReferrals: referrals.filter(r => r.status === 'converted' || r.status === 'paid').length,
       totalReferrals: referrals.length,
+      payoutSchedule: {
+        nextPayoutDate: nextPayoutDate.toISOString(),
+        minimumThresholdCents: minPayoutCents,
+        pendingAmountCents: pendingEarnings,
+        meetsMinimum,
+        thresholdProgress,
+        scheduleDay,
+      },
     });
   } catch (err: any) {
     console.error('Financial overview error:', err);

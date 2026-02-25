@@ -129,11 +129,11 @@
 - `affiliate_contests` — contest definitions (metric, dates, prizes)
 - `affiliate_contest_entries` — contest participation tracking
 
-### KNOWN INTEGRATION GAPS (Fix in future sessions)
-- **Contests data NOT flowing into AI analytics coaching** — AI coach should mention active contests
-- **Milestones NOT referenced in predictive intelligence** — Predictions should say "3 referrals from next $50 milestone"
-- **Leaderboard rank NOT used in AI insights** — AI should reference current rank and how to climb
-- **Contest results NOT in weekly digest email** — Digest should include contest standings
+### RESOLVED INTEGRATION GAPS (Fixed Feb 2026)
+- ~~Contests data NOT flowing into AI analytics coaching~~ — FIXED: AI coach now queries `affiliate_contests` and includes active contest data in prompts
+- ~~Milestones NOT referenced in predictive intelligence~~ — FIXED: Predictions now queries `affiliate_milestones` + `affiliate_milestone_awards`, includes next milestone in response
+- ~~Leaderboard rank NOT used in AI insights~~ — FIXED: AI coach and AI analytics now query all affiliate links and calculate rank/percentile
+- ~~Contest results NOT in weekly digest email~~ — FIXED: Weekly digest now queries active contests and includes standings + milestone proximity
 
 ---
 
@@ -168,8 +168,8 @@
 - `discount_code_redemptions` — usage tracking
 - `affiliate_assets` — marketing materials library
 
-### KNOWN INTEGRATION GAP
-- **Content intelligence disconnected from marketing toolkit** — AI content recommendations should link to existing AI Post Writer, Email Drafter, and Deep Link Generator
+### RESOLVED INTEGRATION GAP (Fixed Feb 2026)
+- ~~Content intelligence disconnected from marketing toolkit~~ — FIXED: AI prompt now references available tools; response includes `suggestedTools` array with routes to Post Writer, Email Drafter, Deep Link Generator, QR Code Generator, and Content Calendar. ContentIntelligencePanel renders clickable tool links.
 
 ---
 
@@ -231,8 +231,8 @@
 - `affiliate_tax_info` — W-9/W-8 data
 - `commission_renewals` — renewal requests and check-ins
 
-### KNOWN INTEGRATION GAP
-- **Financial overview panel doesn't pull from payout schedule widget data** — Should reuse existing payout schedule logic, not calculate separately
+### RESOLVED INTEGRATION GAP (Fixed Feb 2026)
+- ~~Financial overview panel doesn't pull from payout schedule widget data~~ — FIXED: Financial overview now queries `affiliate_program_settings` + `referral_links.pending_earnings_cents`, uses same pending calculation as payout-schedule route (max of approved commissions vs link pending), returns `payoutSchedule` object with `nextPayoutDate`, `minimumThresholdCents`, `thresholdProgress`
 
 ---
 

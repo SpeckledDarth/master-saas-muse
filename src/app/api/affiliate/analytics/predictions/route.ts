@@ -12,12 +12,15 @@ export async function GET(req: NextRequest) {
 
     const admin = createAdminClient();
 
-    const [commissionsRes, referralsRes, clicksRes, tierRes, linkRes] = await Promise.all([
+    const [commissionsRes, referralsRes, clicksRes, tierRes, linkRes, milestonesRes, awardsRes, contestsRes] = await Promise.all([
       admin.from('affiliate_commissions').select('commission_amount_cents, created_at').eq('affiliate_user_id', user.id),
       admin.from('affiliate_referrals').select('status, created_at, converted_at, churned_at').eq('affiliate_user_id', user.id),
       admin.from('referral_clicks').select('created_at').eq('referral_link_user_id', user.id),
       admin.from('affiliate_tiers').select('name, min_referrals, min_earnings_cents').order('min_referrals', { ascending: true }),
       admin.from('referral_links').select('clicks, signups, total_earnings_cents').eq('user_id', user.id).eq('is_affiliate', true).maybeSingle(),
+      admin.from('affiliate_milestones').select('id, name, referral_threshold, bonus_cents').order('referral_threshold', { ascending: true }),
+      admin.from('affiliate_milestone_awards').select('milestone_id').eq('affiliate_user_id', user.id),
+      admin.from('affiliate_contests').select('id, name, metric, start_date, end_date, prizes').lte('start_date', new Date().toISOString()).gte('end_date', new Date().toISOString()),
     ]);
 
     const commissions = commissionsRes.data || [];
@@ -74,6 +77,27 @@ export async function GET(req: NextRequest) {
     const avgChurnMonth = churnTimings.length > 0 ? Math.round(churnTimings.reduce((s, v) => s + v, 0) / churnTimings.length) : null;
     const churnPrediction = avgChurnMonth ? `Your referrals typically churn around month ${avgChurnMonth}. Check in at month ${Math.max(1, avgChurnMonth - 1)} to improve retention.` : null;
 
+    const milestones = milestonesRes.data || [];
+    const earnedMilestoneIds = new Set((awardsRes.data || []).map((a: any) => a.milestone_id));
+    const unearnedMilestones = milestones.filter((m: any) => !earnedMilestoneIds.has(m.id));
+    const nextMilestone = unearnedMilestones.length > 0
+      ? {
+          name: unearnedMilestones[0].name,
+          threshold: unearnedMilestones[0].referral_threshold,
+          current: activeReferrals,
+          bonusCents: unearnedMilestones[0].bonus_cents || 0,
+          referralsNeeded: Math.max(0, unearnedMilestones[0].referral_threshold - activeReferrals),
+        }
+      : null;
+
+    const contests = contestsRes.data || [];
+    const activeContests = contests.map((c: any) => ({
+      name: c.name,
+      metric: c.metric || 'referrals',
+      daysLeft: Math.max(0, Math.ceil((new Date(c.end_date).getTime() - Date.now()) / 86400000)),
+      prizes: c.prizes,
+    }));
+
     const monthlyClicks: Record<string, number> = {};
     clicks.forEach(c => {
       const m = (c as any).created_at?.substring(0, 7);
@@ -103,8 +127,10 @@ NEXT TIER: ${nextTier?.name || 'Max tier reached'}
 AVG CHURN MONTH: ${avgChurnMonth || 'Not enough data'}
 MONTHLY CLICK TREND: ${JSON.stringify(clickMonths.slice(-6))}
 SEASONAL PATTERN: ${JSON.stringify(seasonalPattern?.slice(-6))}
+${nextMilestone ? `NEXT MILESTONE: "${nextMilestone.name}" — ${nextMilestone.referralsNeeded} more referrals needed (at ${nextMilestone.current}/${nextMilestone.threshold}) for $${(nextMilestone.bonusCents / 100).toFixed(2)} bonus` : 'ALL MILESTONES ACHIEVED'}
+${activeContests.length > 0 ? `ACTIVE CONTESTS: ${activeContests.map(c => `"${c.name}" (${c.metric}, ${c.daysLeft} days left)`).join(', ')}` : 'NO ACTIVE CONTESTS'}
 
-Predict: tier trajectory, earnings forecast, churn risk windows, best months to push hard.` },
+Predict: tier trajectory, earnings forecast, churn risk windows, best months to push hard.${nextMilestone ? ` Also predict when they'll hit the next milestone.` : ''}${activeContests.length > 0 ? ` Factor in active contests and suggest strategies to maximize contest performance.` : ''}` },
       ]);
       aiPredictions = result.content;
     } catch {
@@ -116,6 +142,8 @@ Predict: tier trajectory, earnings forecast, churn risk windows, best months to 
       churnPrediction,
       seasonalPattern,
       aiPredictions,
+      nextMilestone,
+      activeContests,
       generatedAt: new Date().toISOString(),
     });
   } catch (err: any) {

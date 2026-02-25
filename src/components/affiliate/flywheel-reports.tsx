@@ -22,6 +22,8 @@ interface PredictionsData {
   churnPrediction: string | null;
   seasonalPattern: { month: string; clicks: number }[] | null;
   aiPredictions: string;
+  nextMilestone?: { name: string; threshold: number; current: number; bonusCents: number; referralsNeeded: number } | null;
+  activeContests?: { name: string; metric: string; daysLeft: number; prizes: string }[];
   generatedAt: string;
 }
 
@@ -30,6 +32,7 @@ interface ContentIntelligenceData {
   weeklyActivity: { week: string; clicks: number; conversions: number; rate: number }[];
   platformCorrelation: { platform: string; postsNearClicks: number; totalPosts: number; correlation: number }[];
   aiRecommendations: string;
+  suggestedTools?: { tool: string; route: string; reason: string }[];
 }
 
 interface CustomRangePeriodData {
@@ -238,6 +241,34 @@ export function PredictiveIntelligencePanel({ data }: { data: PredictionsData })
         </div>
       )}
 
+      {data.nextMilestone && (
+        <div className="rounded-lg border bg-card p-4">
+          <h3 className="font-semibold text-sm mb-2">🎯 Next Milestone</h3>
+          <p className="text-sm font-medium">{data.nextMilestone.name}</p>
+          <div className="flex items-center gap-2 mt-2">
+            <div className="flex-1 bg-muted rounded-full h-2.5 overflow-hidden">
+              <div className="h-full bg-green-500 dark:bg-green-400 rounded-full transition-all" style={{ width: `${Math.min(100, Math.round((data.nextMilestone.current / data.nextMilestone.threshold) * 100))}%` }} />
+            </div>
+            <span className="text-xs text-muted-foreground">{data.nextMilestone.current}/{data.nextMilestone.threshold}</span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">{data.nextMilestone.referralsNeeded} more referral{data.nextMilestone.referralsNeeded !== 1 ? 's' : ''} → {fmt(data.nextMilestone.bonusCents)} bonus</p>
+        </div>
+      )}
+
+      {data.activeContests && data.activeContests.length > 0 && (
+        <div className="rounded-lg border bg-card p-4">
+          <h3 className="font-semibold text-sm mb-2">🏆 Active Contests</h3>
+          <div className="space-y-2">
+            {data.activeContests.map(c => (
+              <div key={c.name} className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded text-xs">
+                <p className="font-medium">{c.name}</p>
+                <p className="text-muted-foreground">Metric: {c.metric} · {c.daysLeft} day{c.daysLeft !== 1 ? 's' : ''} left{c.prizes ? ` · Prize: ${c.prizes}` : ''}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {data.aiPredictions && (
         <div className="rounded-lg border bg-card p-4">
           <h3 className="font-semibold text-sm mb-2">🔮 AI Predictions</h3>
@@ -293,6 +324,23 @@ export function ContentIntelligencePanel({ data }: { data: ContentIntelligenceDa
         <div className="rounded-lg border bg-card p-4">
           <h3 className="font-semibold text-sm mb-2">🤖 AI Frequency Recommendations</h3>
           <p className="text-xs text-muted-foreground whitespace-pre-wrap leading-relaxed">{data.aiRecommendations}</p>
+        </div>
+      )}
+
+      {data.suggestedTools && data.suggestedTools.length > 0 && (
+        <div className="rounded-lg border bg-card p-4">
+          <h3 className="font-semibold text-sm mb-3">🛠️ Recommended Tools</h3>
+          <div className="space-y-2">
+            {data.suggestedTools.map(t => (
+              <a key={t.tool} href={t.route} data-testid={`tool-link-${t.tool.toLowerCase().replace(/\s+/g, '-')}`} className="flex items-center justify-between p-2 rounded bg-muted/30 hover:bg-muted/50 transition-colors text-xs group">
+                <div>
+                  <span className="font-medium text-foreground">{t.tool}</span>
+                  <span className="text-muted-foreground ml-2">{t.reason}</span>
+                </div>
+                <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+              </a>
+            ))}
+          </div>
         </div>
       )}
     </div>

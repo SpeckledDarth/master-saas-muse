@@ -93,11 +93,11 @@ export async function GET(req: NextRequest) {
     try {
       const settings: AISettings = {
         provider: 'xai', model: 'grok-3-mini-fast', maxTokens: 500, temperature: 0.7,
-        systemPrompt: 'You are a content strategy advisor for affiliate marketers. Analyze posting patterns and give specific, data-backed recommendations.',
+        systemPrompt: 'You are a content strategy advisor for affiliate marketers. Analyze posting patterns and give specific, data-backed recommendations. When recommending content actions, reference these available tools: AI Post Writer (for generating platform-specific posts), AI Email Drafter (for email campaigns), Deep Link Generator (for tracking links to specific pages), QR Code Generator (for offline-to-online conversion), and Content Calendar (for scheduling and planning).',
       };
       const result = await chatCompletion(settings, [
         { role: 'system', content: settings.systemPrompt },
-        { role: 'user', content: `Analyze this affiliate's content patterns and recommend optimal promotion frequency:
+        { role: 'user', content: `Analyze this affiliate's content patterns and recommend optimal promotion frequency. When giving recommendations, suggest which tools from the platform they should use (AI Post Writer, AI Email Drafter, Deep Link Generator, QR Code Generator, Content Calendar).
 
 WEEKLY ACTIVITY: ${JSON.stringify(weeklyActivity.slice(-12))}
 HIGH ACTIVITY WEEKS conversion rate: ${highActivityConvRate.toFixed(1)}%
@@ -116,6 +116,14 @@ Questions to answer:
       aiRecommendations = 'AI recommendations temporarily unavailable.';
     }
 
+    const suggestedTools = [
+      { tool: 'AI Post Writer', route: '/affiliate/dashboard?tab=tools&subtool=post-writer', reason: 'Generate platform-specific promotional posts optimized for your best-performing channels' },
+      { tool: 'AI Email Drafter', route: '/affiliate/dashboard?tab=tools&subtool=email-drafter', reason: 'Create email campaigns to re-engage your referral audience' },
+      { tool: 'Deep Link Generator', route: '/affiliate/dashboard?tab=tools&subtool=deep-links', reason: 'Create tracked links to specific pages for targeted promotions' },
+      { tool: 'QR Code Generator', route: '/affiliate/dashboard?tab=tools&subtool=qr-codes', reason: 'Generate QR codes for offline-to-online referral tracking' },
+      { tool: 'Content Calendar', route: '/affiliate/dashboard?tab=tools&subtool=content-calendar', reason: 'Plan and schedule your promotional content for consistent posting' },
+    ];
+
     return NextResponse.json({
       frequencyAnalysis: {
         avgGapDays: avgGap,
@@ -131,6 +139,7 @@ Questions to answer:
         .map(([platform, data]) => ({ platform, ...data }))
         .sort((a, b) => b.correlation - a.correlation),
       aiRecommendations,
+      suggestedTools,
       generatedAt: new Date().toISOString(),
     });
   } catch (err: any) {
