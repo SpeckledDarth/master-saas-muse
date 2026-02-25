@@ -295,6 +295,37 @@ const NAV_ITEMS: { key: DashboardSection; label: string; icon: any }[] = [
   { key: 'support', label: 'Support', icon: HelpCircle },
 ]
 
+class WidgetErrorBoundary extends Component<{ widgetId: string; children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { widgetId: string; children: ReactNode }) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error(`Widget "${this.props.widgetId}" render error:`, error, errorInfo)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Card className="border-destructive/30">
+          <CardContent className="pt-4 pb-3 text-center">
+            <p className="text-xs text-destructive">Widget &quot;{this.props.widgetId}&quot; failed to render</p>
+            <Button variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => this.setState({ hasError: false })}>
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      )
+    }
+    return this.props.children
+  }
+}
+
 class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
   constructor(props: { children: ReactNode }) {
     super(props)
@@ -636,24 +667,31 @@ function StandaloneAffiliateDashboard() {
         fetch('/api/affiliate/forecast'),
       ])
 
-      const [dashData, assetsData, earningsData, msData, forecastData] = await Promise.all([
-        dashRes.json(),
-        assetsRes.json(),
-        earningsRes.json(),
-        milestonesRes.json(),
-        forecastRes.ok ? forecastRes.json() : null,
-      ])
+      const dashData = dashRes.ok ? await dashRes.json() : null
+      const assetsData = assetsRes.ok ? await assetsRes.json() : null
+      const earningsData = earningsRes.ok ? await earningsRes.json() : null
+      const msData = milestonesRes.ok ? await milestonesRes.json() : null
+      const forecastData = forecastRes.ok ? await forecastRes.json() : null
 
-      setData(dashData.affiliate)
-      setAssets(assetsData.assets || [])
-      setEarnings(earningsData)
-      setMilestoneData(msData)
-      if (forecastData && !forecastData.error) setForecast(forecastData)
-      if (dashData.affiliate?.link?.is_affiliate) {
-        fetch('/api/affiliate/contests').then(r => r.json()).then(d => setContests(d.contests || [])).catch(() => {})
+      if (dashData?.affiliate) {
+        setData(dashData.affiliate)
       }
-      if (dashData.affiliate?.tier?.current?.perks && Array.isArray(dashData.affiliate.tier.current.perks)) {
-        setTierPerks(dashData.affiliate.tier.current.perks)
+      setAssets(assetsData?.assets || [])
+      if (earningsData && typeof earningsData.today === 'number') {
+        setEarnings(earningsData)
+      }
+      if (msData && Array.isArray(msData.milestones)) {
+        setMilestoneData(msData)
+      }
+      if (forecastData && !forecastData.error && typeof forecastData.projectedTotal === 'number') {
+        setForecast(forecastData)
+      }
+      if (dashData?.affiliate?.link?.is_affiliate) {
+        fetch('/api/affiliate/contests').then(r => r.ok ? r.json() : null).then(d => setContests(d?.contests || [])).catch(() => {})
+      }
+      if (dashData?.affiliate?.tier?.current?.perks && Array.isArray(dashData.affiliate.tier.current.perks)) {
+        const safePerks = dashData.affiliate.tier.current.perks.map((p: unknown) => typeof p === 'string' ? p : (typeof p === 'object' && p !== null && 'name' in p ? String((p as any).name) : String(p)))
+        setTierPerks(safePerks)
       }
     } catch (err) {
       console.error('Failed to load affiliate data:', err)
@@ -1736,13 +1774,19 @@ function StandaloneAffiliateDashboard() {
 
   const renderWidgetContent = (widgetId: WidgetId): React.ReactNode => {
     try {
-    return renderWidgetInner(widgetId)
+      const inner = renderWidgetInner(widgetId)
+      if (!inner) return null
+      return (
+        <WidgetErrorBoundary widgetId={widgetId} key={`eb-${widgetId}`}>
+          {inner}
+        </WidgetErrorBoundary>
+      )
     } catch (err) {
       console.error(`Widget "${widgetId}" crashed:`, err)
       return (
         <Card className="border-destructive/30">
           <CardContent className="pt-4 pb-3 text-center">
-            <p className="text-xs text-destructive">Widget "{widgetId}" failed to load</p>
+            <p className="text-xs text-destructive">Widget &quot;{widgetId}&quot; failed to load</p>
           </CardContent>
         </Card>
       )
@@ -1750,6 +1794,9 @@ function StandaloneAffiliateDashboard() {
   }
 
   const renderWidgetInner = (widgetId: WidgetId): React.ReactNode => {
+    const dataWidgets: WidgetId[] = ['share_link', 'quick_stats', 'tier_progress', 'achievements', 'milestone_countdown', 'payout_schedule', 'tier_celebration']
+    if (dataWidgets.includes(widgetId) && !data) return null
+
     switch (widgetId) {
       case 'share_link':
         return (
@@ -1851,7 +1898,7 @@ function StandaloneAffiliateDashboard() {
         )
 
       case 'tier_progress':
-        if (!data.tier.current) return null
+        if (!data?.tier?.current) return null
         return (
           <Card data-testid="card-tier-progress">
             <CardContent className="pt-5 pb-4">
@@ -1881,7 +1928,7 @@ function StandaloneAffiliateDashboard() {
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {tierPerks.map((perk, i) => (
-                      <Badge key={i} variant="outline" className="text-xs">{perk}</Badge>
+                      <Badge key={i} variant="outline" className="text-xs">{typeof perk === 'string' ? perk : String(perk)}</Badge>
                     ))}
                   </div>
                 </div>
@@ -1891,7 +1938,7 @@ function StandaloneAffiliateDashboard() {
         )
 
       case 'milestone_progress':
-        if (!milestoneData || milestoneData.milestones.length === 0) return null
+        if (!milestoneData || !Array.isArray(milestoneData.milestones) || milestoneData.milestones.length === 0) return null
         return (
           <Card data-testid="card-milestone-progress">
             <CardHeader className="pb-2">
@@ -2372,7 +2419,8 @@ function StandaloneAffiliateDashboard() {
             <CardContent>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {BADGES.map(badge => {
-                  const earned = badge.check()
+                  let earned = false
+                  try { earned = badge.check() } catch {}
                   const BadgeIcon = badge.icon
                   return (
                     <div
@@ -2397,7 +2445,7 @@ function StandaloneAffiliateDashboard() {
         )
 
       case 'milestone_countdown':
-        if (!data.nextMilestone) return null
+        if (!data?.nextMilestone) return null
         return (
           <Card className="border-primary/30 bg-primary/5" data-testid="card-milestone-countdown">
             <CardContent className="pt-4 pb-3">
@@ -2422,7 +2470,7 @@ function StandaloneAffiliateDashboard() {
         )
 
       case 'payout_schedule':
-        if (!data.payoutSchedule) return null
+        if (!data?.payoutSchedule) return null
         return (
           <Card data-testid="card-payout-schedule">
             <CardContent className="pt-4 pb-3">
@@ -2465,7 +2513,7 @@ function StandaloneAffiliateDashboard() {
         )
 
       case 'tier_celebration':
-        if (!data.tierPromotionCelebration) return null
+        if (!data?.tierPromotionCelebration) return null
         return (
           <Card className="border-yellow-500/30 bg-gradient-to-r from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20" data-testid="card-tier-celebration">
             <CardContent className="pt-5 pb-4">
@@ -6619,13 +6667,13 @@ function StandaloneAffiliateDashboard() {
   }
 
   const BADGES = [
-    { id: 'first_referral', label: 'First Referral', icon: Users, description: 'Got your first referral signup', check: () => data.stats.totalReferrals >= 1 },
-    { id: 'first_commission', label: 'First Dollar', icon: DollarSign, description: 'Earned your first commission', check: () => data.stats.totalEarnings > 0 },
-    { id: 'five_referrals', label: 'Growing Network', icon: TrendingUp, description: 'Reached 5 referrals', check: () => data.stats.totalReferrals >= 5 },
-    { id: 'ten_referrals', label: 'Super Referrer', icon: Award, description: 'Reached 10 referrals', check: () => data.stats.totalReferrals >= 10 },
-    { id: 'first_payout', label: 'Payday', icon: Receipt, description: 'Received your first payout', check: () => data.payouts.some((p: any) => p.status === 'completed') },
-    { id: 'hundred_clicks', label: 'Traffic Driver', icon: MousePointerClick, description: '100+ clicks on your link', check: () => data.stats.clicks >= 100 },
-    { id: 'profile_complete', label: 'Profile Pro', icon: Settings, description: 'Completed your profile', check: () => profile.display_name && profile.payout_method },
+    { id: 'first_referral', label: 'First Referral', icon: Users, description: 'Got your first referral signup', check: () => (data?.stats?.totalReferrals ?? 0) >= 1 },
+    { id: 'first_commission', label: 'First Dollar', icon: DollarSign, description: 'Earned your first commission', check: () => (data?.stats?.totalEarnings ?? 0) > 0 },
+    { id: 'five_referrals', label: 'Growing Network', icon: TrendingUp, description: 'Reached 5 referrals', check: () => (data?.stats?.totalReferrals ?? 0) >= 5 },
+    { id: 'ten_referrals', label: 'Super Referrer', icon: Award, description: 'Reached 10 referrals', check: () => (data?.stats?.totalReferrals ?? 0) >= 10 },
+    { id: 'first_payout', label: 'Payday', icon: Receipt, description: 'Received your first payout', check: () => Array.isArray(data?.payouts) && data.payouts.some((p: any) => p.status === 'completed') },
+    { id: 'hundred_clicks', label: 'Traffic Driver', icon: MousePointerClick, description: '100+ clicks on your link', check: () => (data?.stats?.clicks ?? 0) >= 100 },
+    { id: 'profile_complete', label: 'Profile Pro', icon: Settings, description: 'Completed your profile', check: () => !!(profile?.display_name && profile?.payout_method) },
   ]
 
   const renderAnalytics = () => {
