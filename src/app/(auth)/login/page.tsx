@@ -62,11 +62,33 @@ function LoginForm() {
       return
     }
 
-    // Redirect - if going to invite page, keep the token for auto-accept
     const pendingToken = localStorage.getItem('pendingInviteToken')
-    const finalRedirect = pendingToken ? `/invite/${pendingToken}` : redirectTo
-    
-    router.push(finalRedirect)
+    if (pendingToken) {
+      router.push(`/invite/${pendingToken}`)
+      return
+    }
+
+    if (redirectTo !== '/') {
+      router.push(redirectTo)
+      return
+    }
+
+    try {
+      const roleRes = await fetch('/api/user/role')
+      if (roleRes.ok) {
+        const roleData = await roleRes.json()
+        if (roleData.role === 'affiliate') {
+          router.push('/affiliate/dashboard')
+          return
+        }
+        if (roleData.role === 'admin') {
+          router.push('/admin')
+          return
+        }
+      }
+    } catch {}
+
+    router.push(redirectTo)
   }
 
   async function handleOAuthLogin(provider: 'google' | 'github' | 'apple' | 'twitter') {
