@@ -58,7 +58,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ contests: data || [] })
+    const safeContests = (data || []).map((c: any) => ({
+      id: String(c.id ?? ''),
+      name: String(c.name ?? ''),
+      description: String(c.description ?? ''),
+      metric: String(c.metric ?? ''),
+      status: String(c.status ?? ''),
+      start_date: String(c.start_date ?? ''),
+      end_date: String(c.end_date ?? ''),
+      prize_description: String(c.prize_description ?? ''),
+      prize_amount_cents: Number(c.prize_amount_cents ?? 0),
+      created_at: String(c.created_at ?? ''),
+    }))
+
+    return NextResponse.json({ contests: safeContests })
   } catch (err: any) {
     if (err?.code === '42P01' || err?.message?.includes('does not exist')) {
       return NextResponse.json({ contests: [], note: 'Table not created yet' })

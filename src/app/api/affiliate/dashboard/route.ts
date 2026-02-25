@@ -60,7 +60,15 @@ export async function GET() {
           .eq('tier1_affiliate_id', user.id)
           .order('created_at', { ascending: false })
 
-        secondTierCommissions = tier2 || []
+        secondTierCommissions = (tier2 || []).map((c: any) => ({
+          id: String(c.id ?? ''),
+          tier1_affiliate_id: String(c.tier1_affiliate_id ?? ''),
+          tier2_affiliate_id: String(c.tier2_affiliate_id ?? ''),
+          commission_amount_cents: Number(c.commission_amount_cents ?? 0),
+          commission_rate: Number(c.commission_rate ?? 0),
+          status: String(c.status ?? ''),
+          created_at: String(c.created_at ?? ''),
+        }))
         secondTierTotal = secondTierCommissions.reduce((sum: number, c: any) => sum + (c.commission_amount_cents || 0), 0)
       }
     } catch {}

@@ -1826,6 +1826,24 @@ function StandaloneAffiliateDashboard() {
     )
   }
 
+  if (typeof window !== 'undefined') {
+    try {
+      const snapKeys = (obj: any, label: string) => {
+        if (!obj) return `${label}=null`
+        if (typeof obj !== 'object') return `${label}=${typeof obj}:${String(obj).slice(0,50)}`
+        const entries = Object.entries(obj).map(([k,v]) => {
+          const t = v === null ? 'null' : v === undefined ? 'undef' : typeof v
+          const preview = t === 'object' ? (Array.isArray(v) ? `array[${v.length}]` : `{${Object.keys(v as any).join(',')}}`) : String(v).slice(0,30)
+          return `${k}:${t}=${preview}`
+        })
+        return `${label}={${entries.join(', ')}}`
+      }
+      console.log('[RENDER_PHASE_DIAG]', snapKeys(data.stats, 'stats'), snapKeys(data.tier, 'tier'), snapKeys(data.tier?.current, 'tier.current'), snapKeys(data.tier?.next, 'tier.next'), snapKeys(data.terms, 'terms'), 'secondTierComms:', data.secondTierCommissions?.length ?? 'none', 'tierCelebration:', data.tierPromotionCelebration ? JSON.stringify(data.tierPromotionCelebration).slice(0,100) : 'null')
+    } catch (diagErr) {
+      console.error('[RENDER_PHASE_DIAG_ERROR]', String(diagErr))
+    }
+  }
+
   const tierProgress = data.tier.next
     ? ((data.stats.totalReferrals / data.tier.next.min_referrals) * 100)
     : 100
@@ -1967,7 +1985,7 @@ function StandaloneAffiliateDashboard() {
                 </div>
                 {data.terms && (
                   <Badge variant="secondary" className="shrink-0" data-testid="badge-locked-terms">
-                    {data.terms.rate}% for {data.terms.durationMonths} months
+                    {S(data.terms.rate)}% for {S(data.terms.durationMonths)} months
                   </Badge>
                 )}
               </div>
@@ -2016,7 +2034,7 @@ function StandaloneAffiliateDashboard() {
                   <MousePointerClick className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Link Clicks</span>
                 </div>
-                <p className="text-2xl font-bold mt-1">{data.stats.clicks}</p>
+                <p className="text-2xl font-bold mt-1">{S(data.stats.clicks)}</p>
               </CardContent>
             </Card>
             <Card data-testid="stat-referrals">
@@ -2025,8 +2043,8 @@ function StandaloneAffiliateDashboard() {
                   <Users className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Signups</span>
                 </div>
-                <p className="text-2xl font-bold mt-1">{data.stats.totalReferrals}</p>
-                <p className="text-xs text-muted-foreground">{data.stats.conversionRate}% convert to paid</p>
+                <p className="text-2xl font-bold mt-1">{S(data.stats.totalReferrals)}</p>
+                <p className="text-xs text-muted-foreground">{S(data.stats.conversionRate)}% convert to paid</p>
               </CardContent>
             </Card>
             <Card data-testid="stat-pending-earnings">
@@ -2058,12 +2076,12 @@ function StandaloneAffiliateDashboard() {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Award className="h-4 w-4 text-primary" />
-                  <span className="font-medium text-sm">{data.tier.current.name} Tier</span>
-                  <Badge variant="outline" className="text-xs">{data.stats.effectiveRate}% commission</Badge>
+                  <span className="font-medium text-sm">{S(data.tier.current.name)} Tier</span>
+                  <Badge variant="outline" className="text-xs">{S(data.stats.effectiveRate)}% commission</Badge>
                 </div>
                 {data.tier.next && (
                   <span className="text-xs text-muted-foreground">
-                    {data.tier.referralsToNext} more to {data.tier.next.name} ({data.tier.next.commission_rate}%)
+                    {S(data.tier.referralsToNext)} more to {S(data.tier.next.name)} ({S(data.tier.next.commission_rate)}%)
                   </span>
                 )}
               </div>
@@ -2676,10 +2694,10 @@ function StandaloneAffiliateDashboard() {
                 </div>
                 <div>
                   <p className="text-sm font-bold" data-testid="text-tier-celebration-title">
-                    You reached {data.tierPromotionCelebration.tierName} Tier!
+                    You reached {S(data.tierPromotionCelebration.tierName)} Tier!
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Your commission rate is now {data.tierPromotionCelebration.commissionRate}%
+                    Your commission rate is now {S(data.tierPromotionCelebration.commissionRate)}%
                   </p>
                 </div>
               </div>
@@ -3454,7 +3472,7 @@ function StandaloneAffiliateDashboard() {
                       <div>
                         <p className="text-sm font-medium">${(stc.commission_amount_cents / 100).toFixed(2)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {stc.commission_rate}% second-tier rate
+                          {S(stc.commission_rate)}% second-tier rate
                         </p>
                       </div>
                     </div>
@@ -5970,15 +5988,15 @@ function StandaloneAffiliateDashboard() {
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Referral Code</Label>
-              <p className="text-sm font-mono">{data.link.ref_code}</p>
+              <p className="text-sm font-mono">{S(data.link.ref_code)}</p>
             </div>
           </div>
           {data.tier.current && (
             <div>
               <Label className="text-xs text-muted-foreground">Current Tier</Label>
               <div className="flex items-center gap-2 mt-0.5">
-                <Badge variant="secondary" className="text-xs">{data.tier.current.name}</Badge>
-                <Badge variant="outline" className="text-xs">{data.stats.effectiveRate}% commission</Badge>
+                <Badge variant="secondary" className="text-xs">{S(data.tier.current.name)}</Badge>
+                <Badge variant="outline" className="text-xs">{S(data.stats.effectiveRate)}% commission</Badge>
               </div>
             </div>
           )}
@@ -6015,11 +6033,11 @@ function StandaloneAffiliateDashboard() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 text-sm">
                     <div>
                       <span className="text-xs text-muted-foreground">Commission Rate</span>
-                      <p className="font-medium">{data.terms.rate}%</p>
+                      <p className="font-medium">{S(data.terms.rate)}%</p>
                     </div>
                     <div>
                       <span className="text-xs text-muted-foreground">Lock Duration</span>
-                      <p className="font-medium">{data.terms.durationMonths} months</p>
+                      <p className="font-medium">{S(data.terms.durationMonths)} months</p>
                     </div>
                     {data.terms.lockedAt && (
                       <div>

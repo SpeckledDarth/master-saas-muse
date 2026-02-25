@@ -64,10 +64,15 @@ export async function GET(request: NextRequest) {
     const awardedIds = new Set(awards.map((a: any) => a.milestone_id))
 
     const enriched = milestones.map((m: any) => ({
-      ...m,
+      id: String(m.id ?? ''),
+      name: String(m.name ?? ''),
+      description: String(m.description ?? ''),
+      referral_threshold: Number(m.referral_threshold ?? 0),
+      bonus_amount_cents: Number(m.bonus_amount_cents ?? 0),
+      is_active: Boolean(m.is_active),
       awarded: awardedIds.has(m.id),
-      progress: Math.min(currentReferrals / m.referral_threshold, 1),
-      referralsNeeded: Math.max(0, m.referral_threshold - currentReferrals),
+      progress: Math.min(currentReferrals / (m.referral_threshold || 1), 1),
+      referralsNeeded: Math.max(0, (m.referral_threshold || 0) - currentReferrals),
     }))
 
     return NextResponse.json({

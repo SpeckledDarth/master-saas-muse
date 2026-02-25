@@ -133,10 +133,10 @@ export async function GET() {
         if (nextTier) {
           const remaining = nextTier.min_referrals - refCount
           tierInfo = {
-            currentTierName: currentTier?.name || 'Starter',
-            nextTierName: nextTier.name,
-            nextTierRate: nextTier.commission_rate,
-            referralsNeeded: remaining,
+            currentTierName: String(currentTier?.name || 'Starter'),
+            nextTierName: String(nextTier.name ?? ''),
+            nextTierRate: Number(nextTier.commission_rate ?? 0),
+            referralsNeeded: Number(remaining),
           }
         }
       }
