@@ -29,6 +29,7 @@ import { EarningsGoalSetter, CommissionDisputes, ReferralOfMonth, GracePeriodNot
 import { LinkShortener, QRCodeGenerator, MediaKitPage, CopyPasteCaptions, StarterKit } from '@/components/affiliate/marketing-toolkit'
 import { ExpandedAnalyticsSection } from '@/components/affiliate/analytics-expanded'
 import { FlywheelAnalyticsSection } from '@/components/affiliate/flywheel-analytics'
+import { FlywheelReportsSection } from '@/components/affiliate/flywheel-reports'
 
 interface AffiliateDashboardData {
   link: {
@@ -6898,6 +6899,9 @@ function StandaloneAffiliateDashboard() {
 
         {/* Flywheel Intelligence — Churn, Cohort, Revenue, AI */}
         <FlywheelAnalyticsSection />
+
+        {/* Reports & Intelligence — Connected, Financial, Predictions */}
+        <FlywheelReportsSection />
       </div>
     )
   }

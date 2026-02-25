@@ -46,6 +46,7 @@ PassivePost is feature-complete with 42 features (38 flywheel + 4 bonus) across 
 | **6** | **Dashboard Enhancements (UI Layer)** | **COMPLETE** — All 16/16 features across 3 dashboard types | **Week 9-11** |
 | **7** | **AI & Cross-Dashboard Features** | **COMPLETE** — All 7/7 features (1 pre-built, 6 new) | **Week 11** |
 | **8** | **Flywheel Accelerators (Session A)** | **COMPLETE** — 20 features: churn intelligence, cohort analysis, AI analytics, geo/device, revenue charts | **Week 12** |
+| **8.5** | **Flywheel Accelerators (Session B)** | **COMPLETE** — 18 features: connected analytics, financial view, predictions, content intelligence, reports, program intelligence | **Week 12** |
 
 ---
 
@@ -676,24 +677,41 @@ Key files for each phase, so agents can find relevant code quickly.
 - Dashboard wiring: FlywheelAnalyticsSection imported and rendered in Analytics tab of `src/app/affiliate/dashboard/page.tsx`
 - Seed data: Expanded `scripts/seed-affiliate-data.ts` with 12-month historical clicks (geo/device), churned referrals, trial referrals, 12-month commission history, 90-day connected platform metrics, goals, disputes, announcements, spotlight, short links, email preferences, asset usage
 
-**Remaining Sessions (B-F):**
+**Remaining Sessions (C-F):**
 | Session | Tier | Features | Focus |
 |---------|------|----------|-------|
-| B | Flywheel cont. | ~8 | Connected data insights, auto promo calendar, best-time-to-post polish |
-| C | Retention Deepeners | ~15 | Financial tools, tax center, reports, commission renewal polish |
+| C | Retention Deepeners | ~15 | Tax center, earnings projections, payout history export, commission renewal polish |
 | D | Retention Deepeners cont. | ~10 | Resource center, knowledge base, swipe files, content calendar |
 | E | Delight Multipliers | ~12 | Challenges, directory, case studies, quiz, analyze-audience |
-| F | Polish & External | ~8 | Mobile responsive, sparklines, export charts, OAuth integrations |
+| F | Polish & External | ~8 | Mobile responsive, OAuth integrations, final polish |
+
+### Phase 8.5 (Flywheel Accelerators — Session B)
+- Connected Analytics API: `src/app/api/affiliate/analytics/connected-overview/route.ts` — merged platform metrics + affiliate data, cross-platform comparison (#193, #194)
+- Content Intelligence API: `src/app/api/affiliate/analytics/content-intelligence/route.ts` — promotion frequency analysis, platform correlation, AI recommendations (#197, #214)
+- Custom Range Reports API: `src/app/api/affiliate/reports/custom-range/route.ts` — any date range + period-over-period comparison (#201, #202)
+- Financial Overview API: `src/app/api/affiliate/analytics/financial-overview/route.ts` — unified financial view, ROI, break-even, projections (#215)
+- Predictive Intelligence API: `src/app/api/affiliate/analytics/predictions/route.ts` — tier trajectory, churn windows, seasonal patterns, AI predictions (#217)
+- Admin Program Intelligence API: `src/app/api/admin/affiliate/program-intelligence/route.ts` — program-wide stats, coaching insights (#212, #216)
+- Weekly Affiliate Digest: `src/app/api/cron/weekly-affiliate-digest/route.ts` — automated Monday digest emails (#199)
+- Components: `src/components/affiliate/flywheel-reports.tsx` — ConnectedAnalyticsDashboard, FinancialOverviewPanel, PredictiveIntelligencePanel, ContentIntelligencePanel, CustomRangeReportPanel, MetricTooltip, LastUpdated, Sparkline, ExportButton, FlywheelReportsSection
+- UX utilities: MetricTooltip (#209), LastUpdated (#206), Sparkline (#208), ExportButton CSV (#210)
+- Dashboard wiring: FlywheelReportsSection imported and rendered in Analytics tab
 
 ---
 
 ## Session Log
 
-### Session 8 — February 25, 2026 (Flywheel Accelerators)
+### Session 8 — February 25, 2026 (Flywheel Accelerators — Session A)
 **Features built:** 20 features (#90, #92, #93, #154, #156, #158, #160, #161, #162, #164, #165, #166, #168, #169, #170, #171, #172, #177-182, #196-198)
 **New files:** 7 (6 API routes + 1 component file)
-**New migration:** 014_analytics_columns.sql (NOT YET RUN on Supabase)
+**New migration:** 014_analytics_columns.sql (RUN on Supabase)
 **Seed data:** Massively expanded with historical time-series data across all feature areas
+**Status:** All routes return 200/401 (no 500s), dev server compiles clean
+
+### Session 8.5 — February 25, 2026 (Flywheel Accelerators — Session B)
+**Features built:** 18 features (#193, #194, #197, #199, #200, #201, #202, #205, #206, #208, #209, #210, #212, #214, #215, #216, #217 + weekly digest cron)
+**New files:** 8 (7 API routes + 1 component file)
+**Bug fixes:** Fixed .catch() on Supabase query builders in revenue-waterfall, scheduled-reports, usage-insights routes
 **Status:** All routes return 200/401 (no 500s), dev server compiles clean
 
 ---

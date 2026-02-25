@@ -1,7 +1,7 @@
 # MuseKit.io - Master SaaS Muse Template
 
 ## Overview
-MuseKit.io is a production-ready, full-stack SaaS starter template designed to accelerate the launch of new SaaS products. It offers a comprehensive, high-quality starting point, significantly reducing development time. Each SaaS product deployed using MuseKit operates with its own independent deployment, repository, database, and Stripe account, ensuring clean P&L, independent scaling, and zero cross-pollination risk. The platform includes robust authentication, Stripe-powered billing with feature gating, team collaboration with role-based permissions, an administrative dashboard, pluggable AI integrations, webhook support, monitoring, analytics, E2E testing, and SEO optimization.
+MuseKit.io is a production-ready, full-stack SaaS starter template designed to accelerate the launch of new SaaS products. It provides a comprehensive, high-quality starting point, significantly reducing development time. Each SaaS product deployed using MuseKit operates with its own independent deployment, repository, database, and Stripe account, ensuring clean P&L, independent scaling, and zero cross-pollination risk. The platform includes robust authentication, Stripe-powered billing with feature gating, team collaboration with role-based permissions, an administrative dashboard, pluggable AI integrations, webhook support, monitoring, analytics, E2E testing, and SEO optimization.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -103,14 +103,14 @@ The UI emphasizes dynamic branding, configurable navigation, customizable sectio
 - **Database Backup Configuration**: Admin UI for setting backup notification preferences.
 - **API Token Rotation**: Automated webhook secret rotation.
 - **Product Registry**: Supports multiple SaaS products via dedicated database tables for product-scoped features.
-- **Blog Publishing**: Cross-platform system with SEO preview, Markdown editor, AI repurpose engine, and calendar integration (Medium, WordPress, Ghost, LinkedIn, Substack).
-- **Flywheel System**: Comprehensive content flywheel across 7 phases, including content intelligence, advanced automation, distribution, revenue, engagement, and collaboration features.
-- **Bonus Features**: AI Hashtag Suggestions, Gig Lead Notifications (keyword scanner, reply templates), AI Voice Fine-Tuner, and a Lead CRM Mini.
+- **Blog Publishing**: Cross-platform system with SEO preview, Markdown editor, AI repurpose engine, and calendar integration.
+- **Flywheel System**: Comprehensive content flywheel across 7 phases.
+- **Bonus Features**: AI Hashtag Suggestions, Gig Lead Notifications, AI Voice Fine-Tuner, and a Lead CRM Mini.
 - **Testimonial Management**: Admin CRUD for testimonials with public display on a "Wall of Love" page and social proof popups on the landing page.
 - **Affiliate System**: Complete affiliate marketing infrastructure with tracked referral links, commission tracking on Stripe events, fraud detection, performance tiers, marketing assets, and payout management. Includes public signup, application, separate login, and standalone dashboard for affiliates. Admin manages applications, networks, and all affiliate settings.
-- **CRM & Invoicing Foundation**: Universal user profiles (all user types), local invoice/payment records synced from Stripe webhooks, affiliate payout item tracking, support ticket system (open → in_progress → resolved → closed), CRM activity log (calls, notes, tasks, meetings), marketing campaign tracking with UTM attribution, and contract/agreement management with signing flow and version history.
-- **Dashboard Enhancements**: Admin CRM card (affiliate profiles with earnings/payouts/tickets/activities/notes), revenue attribution report, bulk payout processing, affiliate health scores, quick notes. Affiliate earnings statements (PDF), portfolio view, commission lifecycle tracker, contract view with signing, tax summary, campaign creator with UTM. User billing page (invoice history + subscription management + Stripe portal), support ticket submission/history, account security (password change, 2FA placeholder), affiliate invitation prompt.
-- **Flywheel Accelerators**: Churn intelligence suite, cohort analysis, revenue analytics, traffic insights, AI analytics intelligence, AI posting strategy, AI conversion insights.
+- **CRM & Invoicing Foundation**: Universal user profiles, local invoice/payment records synced from Stripe webhooks, affiliate payout item tracking, support ticket system, CRM activity log, marketing campaign tracking with UTM attribution, and contract/agreement management with signing flow and version history.
+- **Dashboard Enhancements**: Admin CRM card, revenue attribution report, bulk payout processing, affiliate health scores, quick notes. Affiliate earnings statements, portfolio view, commission lifecycle tracker, contract view with signing, tax summary, campaign creator with UTM. User billing page, support ticket submission/history, account security, affiliate invitation prompt.
+- **Flywheel Accelerators**: Churn intelligence suite, cohort analysis, revenue analytics, traffic insights, AI analytics intelligence, AI posting strategy, AI conversion insights, connected analytics dashboard, cross-platform comparison, unified financial view, predictive intelligence, content intelligence, custom date range reports with period comparison, weekly affiliate digest emails, admin program intelligence, MetricTooltip, LastUpdated, Sparkline, CSV export utilities.
 - **Product Extension Design Rules**: Emphasizes adding new files and tables for product-specific features (`migrations/extensions/`, `/dashboard/social/`, `src/lib/<product>/`), using plugin patterns for queue jobs, and minimizing core file modifications.
 
 ## External Dependencies
