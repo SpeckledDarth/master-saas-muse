@@ -1,7 +1,14 @@
+import { AnnouncementBar } from '@/components/landing/announcement-bar'
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <AnnouncementBar />
+      {children}
+    </>
+  );
 }

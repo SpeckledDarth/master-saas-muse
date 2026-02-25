@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logAuditEvent } from '@/lib/affiliate/audit'
+import { createAssetUploadNotification } from '@/lib/affiliate/notifications'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const admin = createAdminClient()
     const { data, error } = await admin
@@ -17,7 +18,39 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ assets: data || [] })
+    let assets = data || []
+
+    try {
+      const supabase = await createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: link } = await admin
+          .from('referral_links')
+          .select('ref_code')
+          .eq('user_id', user.id)
+          .maybeSingle()
+
+        if (link?.ref_code) {
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io'
+          const shareUrl = `${baseUrl}?ref=${link.ref_code}`
+          assets = assets.map((asset: any) => {
+            if (asset.content && typeof asset.content === 'string') {
+              let content = asset.content
+              content = content.replace(/\{\{REF_CODE\}\}/gi, link.ref_code)
+              content = content.replace(/\{\{REF_LINK\}\}/gi, shareUrl)
+              content = content.replace(/\{\{REFERRAL_CODE\}\}/gi, link.ref_code)
+              content = content.replace(/\{\{REFERRAL_LINK\}\}/gi, shareUrl)
+              content = content.replace(/\{\{AFFILIATE_CODE\}\}/gi, link.ref_code)
+              content = content.replace(/\{\{AFFILIATE_LINK\}\}/gi, shareUrl)
+              return { ...asset, content }
+            }
+            return asset
+          })
+        }
+      }
+    } catch {}
+
+    return NextResponse.json({ assets })
   } catch (err) {
     console.error('Affiliate assets GET error:', err)
     return NextResponse.json({ error: 'Failed to load assets' }, { status: 500 })
@@ -50,6 +83,8 @@ export async function POST(request: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     logAuditEvent({ admin_user_id: user.id, admin_email: user.email!, action: 'create', entity_type: 'asset', entity_id: data.id, entity_name: title, details: { asset_type, description, file_url, file_name } })
+
+    createAssetUploadNotification(title, asset_type).catch(() => {})
 
     return NextResponse.json({ asset: data })
   } catch (err) {

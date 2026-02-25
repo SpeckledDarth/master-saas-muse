@@ -46,7 +46,7 @@ export async function GET() {
 
     const { data: settings } = await admin
       .from('affiliate_program_settings')
-      .select('cookie_duration_days, min_payout_cents, two_tier_enabled, second_tier_commission_rate')
+      .select('cookie_duration_days, min_payout_cents, two_tier_enabled, second_tier_commission_rate, payout_schedule_day, auto_batch_enabled')
       .limit(1)
       .maybeSingle()
 
@@ -75,6 +75,59 @@ export async function GET() {
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passivepost.io'
     const shareUrl = `${baseUrl}?ref=${link.ref_code}`
+
+    let nextMilestone: any = null
+    try {
+      const { data: milestones } = await admin
+        .from('affiliate_milestones')
+        .select('id, name, referral_threshold, bonus_amount_cents')
+        .eq('is_active', true)
+        .order('referral_threshold', { ascending: true })
+
+      if (milestones && milestones.length > 0) {
+        const currentRefs = link.signups || 0
+        const next = milestones.find((m: any) => currentRefs < m.referral_threshold)
+        if (next) {
+          nextMilestone = {
+            name: next.name,
+            referralThreshold: next.referral_threshold,
+            bonusAmountCents: next.bonus_amount_cents,
+            referralsAway: next.referral_threshold - currentRefs,
+            progress: Math.min((currentRefs / next.referral_threshold) * 100, 100),
+          }
+        }
+      }
+    } catch {}
+
+    const scheduleDay = settings?.payout_schedule_day || 15
+    const now = new Date()
+    let nextPayoutDate: string
+    if (now.getDate() < scheduleDay) {
+      nextPayoutDate = new Date(now.getFullYear(), now.getMonth(), scheduleDay).toISOString()
+    } else {
+      nextPayoutDate = new Date(now.getFullYear(), now.getMonth() + 1, scheduleDay).toISOString()
+    }
+
+    let tierPromotionCelebration: any = null
+    if (currentTier) {
+      try {
+        const { data: lastPromoNotif } = await admin
+          .from('notifications')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('type', 'celebration')
+          .ilike('title', `%${currentTier.name}%`)
+          .limit(1)
+          .maybeSingle()
+
+        if (!lastPromoNotif && (link.signups || 0) >= currentTier.min_referrals && currentTier.min_referrals > 0) {
+          tierPromotionCelebration = {
+            tierName: currentTier.name,
+            commissionRate: currentTier.commission_rate,
+          }
+        }
+      } catch {}
+    }
 
     return NextResponse.json({
       affiliate: {
@@ -110,6 +163,15 @@ export async function GET() {
         },
         secondTierCommissions,
         secondTierTotal,
+        nextMilestone,
+        payoutSchedule: {
+          scheduleDay,
+          nextPayoutDate,
+          pendingAmountCents: approvedEarnings,
+          minPayoutCents: settings?.min_payout_cents || 5000,
+          meetsMinimum: approvedEarnings >= (settings?.min_payout_cents || 5000),
+        },
+        tierPromotionCelebration,
       },
     })
   } catch (err: any) {

@@ -10,7 +10,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { User, Mail, Lock, CreditCard, Loader2, Crown, Users, Sparkles, LogOut, Camera, MapPin, Phone, Building, Link2, Unlink } from 'lucide-react'
+import { User, Mail, Lock, CreditCard, Loader2, Crown, Users, Sparkles, LogOut, Camera, MapPin, Phone, Building, Link2, Unlink, Bell, Save } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
 import { SiGoogle, SiGithub, SiApple, SiX } from 'react-icons/si'
 import { useToast } from '@/hooks/use-toast'
 
@@ -57,6 +58,18 @@ export default function ProfilePage() {
   const [isSigningOut, setIsSigningOut] = useState(false)
   const [linkingProvider, setLinkingProvider] = useState<string | null>(null)
   const [unlinkingProvider, setUnlinkingProvider] = useState<string | null>(null)
+  const [emailPrefs, setEmailPrefs] = useState({
+    marketing_emails: true,
+    product_updates: true,
+    billing_alerts: true,
+    security_alerts: true,
+    weekly_digest: false,
+    monthly_report: true,
+    affiliate_updates: true,
+    support_responses: true,
+  })
+  const [emailPrefsLoading, setEmailPrefsLoading] = useState(true)
+  const [savingEmailPrefs, setSavingEmailPrefs] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const { toast } = useToast()
@@ -103,6 +116,17 @@ export default function ProfilePage() {
         }
       } catch (error) {
         console.error('Failed to fetch subscription:', error)
+      }
+
+      try {
+        const prefsRes = await fetch('/api/user/email-preferences')
+        if (prefsRes.ok && mounted) {
+          const prefsData = await prefsRes.json()
+          if (prefsData.preferences) setEmailPrefs(prefsData.preferences)
+        }
+      } catch {
+      } finally {
+        if (mounted) setEmailPrefsLoading(false)
       }
 
       if (mounted) {
@@ -319,6 +343,26 @@ export default function ProfilePage() {
     setIsSigningOut(true)
     await supabase.auth.signOut()
     router.push('/')
+  }
+
+  const handleSaveEmailPrefs = async () => {
+    setSavingEmailPrefs(true)
+    try {
+      const res = await fetch('/api/user/email-preferences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailPrefs),
+      })
+      if (res.ok) {
+        toast({ title: 'Email preferences saved', description: 'Your notification settings have been updated.' })
+      } else {
+        toast({ title: 'Error', description: 'Failed to save preferences', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save preferences', variant: 'destructive' })
+    } finally {
+      setSavingEmailPrefs(false)
+    }
   }
 
   const getConnectedProviders = useCallback(() => {
@@ -777,6 +821,57 @@ export default function ProfilePage() {
                 Manage Subscription
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-email-preferences">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              <CardTitle>Email Preferences</CardTitle>
+            </div>
+            <CardDescription>Choose which emails you&apos;d like to receive</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {emailPrefsLoading ? (
+              <div className="flex justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <>
+                {[
+                  { key: 'billing_alerts', label: 'Billing Alerts', desc: 'Payment confirmations, upcoming charges, and billing issues' },
+                  { key: 'security_alerts', label: 'Security Alerts', desc: 'Login notifications, password changes, and security warnings' },
+                  { key: 'product_updates', label: 'Product Updates', desc: 'New features, improvements, and platform changes' },
+                  { key: 'marketing_emails', label: 'Marketing Emails', desc: 'Promotions, tips, and special offers' },
+                  { key: 'weekly_digest', label: 'Weekly Digest', desc: 'Weekly summary of your activity and stats' },
+                  { key: 'monthly_report', label: 'Monthly Report', desc: 'Monthly performance report and insights' },
+                  { key: 'affiliate_updates', label: 'Affiliate Updates', desc: 'Commission notifications, tier changes, and program news' },
+                  { key: 'support_responses', label: 'Support Responses', desc: 'Replies to your support tickets' },
+                ].map(({ key, label, desc }) => (
+                  <div key={key} className="flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">{label}</p>
+                      <p className="text-xs text-muted-foreground">{desc}</p>
+                    </div>
+                    <Switch
+                      checked={emailPrefs[key as keyof typeof emailPrefs]}
+                      onCheckedChange={(checked) => setEmailPrefs(prev => ({ ...prev, [key]: checked }))}
+                      data-testid={`switch-email-${key}`}
+                    />
+                  </div>
+                ))}
+                <Button
+                  onClick={handleSaveEmailPrefs}
+                  disabled={savingEmailPrefs}
+                  className="mt-2"
+                  data-testid="button-save-email-prefs"
+                >
+                  {savingEmailPrefs ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                  Save Preferences
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
 

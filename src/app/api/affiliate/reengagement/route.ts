@@ -18,7 +18,24 @@ const REENGAGEMENT_EMAILS = [
     </div>`
   },
   {
-    step: 2, key: 'quick_tips',
+    step: 2, key: 'incentive_boost',
+    subject: 'Special offer: 2x commission boost for 7 days!',
+    html: (name: string) => `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h2>${name}, we have a special offer for you!</h2>
+      <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;">
+        <p style="font-size: 24px; font-weight: bold; margin: 0;">2x Commission Boost</p>
+        <p style="font-size: 14px; margin: 8px 0 0;">For the next 7 days only</p>
+      </div>
+      <p>Start sharing your affiliate link now and earn double on every referral that converts this week.</p>
+      <ul><li>Share on social media for maximum reach</li><li>Send to your email list</li><li>Post a review or tutorial</li></ul>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/affiliate/dashboard" style="background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">Claim Your Boost</a>
+      </div>
+      <p style="color: #6b7280; font-size: 12px;">*Commission boost is subject to program terms. Contact us for details.</p>
+    </div>`
+  },
+  {
+    step: 3, key: 'quick_tips',
     subject: 'Quick tips to get your first referral',
     html: (name: string) => `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <h2>${name}, here are 3 easy ways to earn:</h2>
@@ -29,7 +46,7 @@ const REENGAGEMENT_EMAILS = [
     </div>`
   },
   {
-    step: 3, key: 'new_features',
+    step: 4, key: 'new_features',
     subject: 'New features you can promote',
     html: (name: string) => `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <h2>${name}, exciting updates to share!</h2>

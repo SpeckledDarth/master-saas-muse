@@ -89,6 +89,24 @@ interface AffiliateDashboardData {
     created_at: string
   }>
   secondTierTotal?: number
+  nextMilestone?: {
+    name: string
+    referralThreshold: number
+    bonusAmountCents: number
+    referralsAway: number
+    progress: number
+  } | null
+  payoutSchedule?: {
+    scheduleDay: number
+    nextPayoutDate: string
+    pendingAmountCents: number
+    minPayoutCents: number
+    meetsMinimum: boolean
+  } | null
+  tierPromotionCelebration?: {
+    tierName: string
+    commissionRate: number
+  } | null
 }
 
 interface MarketingAsset {
@@ -190,7 +208,7 @@ const DEEP_LINK_PAGES = [
 
 type DashboardSection = 'overview' | 'analytics' | 'referrals' | 'earnings' | 'payouts' | 'assets' | 'tools' | 'announcements' | 'messages' | 'account' | 'support'
 
-type WidgetId = 'share_link' | 'live_earnings' | 'quick_stats' | 'tier_progress' | 'milestone_progress' | 'active_contests' | 'earnings_forecast' | 'leaderboard' | 'conversion_funnel' | 'ai_coach' | 'content_analytics' | 'achievements'
+type WidgetId = 'share_link' | 'live_earnings' | 'quick_stats' | 'tier_progress' | 'milestone_progress' | 'active_contests' | 'earnings_forecast' | 'leaderboard' | 'conversion_funnel' | 'ai_coach' | 'content_analytics' | 'achievements' | 'milestone_countdown' | 'payout_schedule' | 'tier_celebration'
 
 interface WidgetConfig {
   id: WidgetId
@@ -211,10 +229,14 @@ const AVAILABLE_WIDGETS: WidgetConfig[] = [
   { id: 'ai_coach', label: 'AI Coach', icon: Zap },
   { id: 'content_analytics', label: 'Content Analytics', icon: BarChart3 },
   { id: 'achievements', label: 'Achievements', icon: Award },
+  { id: 'milestone_countdown', label: 'Milestone Countdown', icon: Target },
+  { id: 'payout_schedule', label: 'Payout Schedule', icon: Calendar },
+  { id: 'tier_celebration', label: 'Tier Celebration', icon: Award },
 ]
 
 const DEFAULT_WIDGET_ORDER: WidgetId[] = [
-  'share_link', 'live_earnings', 'quick_stats', 'tier_progress',
+  'share_link', 'tier_celebration', 'milestone_countdown', 'payout_schedule',
+  'live_earnings', 'quick_stats', 'tier_progress',
   'milestone_progress', 'active_contests', 'earnings_forecast',
   'leaderboard', 'conversion_funnel', 'ai_coach', 'content_analytics', 'achievements',
 ]
@@ -379,6 +401,47 @@ function StandaloneAffiliateDashboard() {
   const [aiWriterGenerating, setAiWriterGenerating] = useState(false)
   const [aiWriterCopied, setAiWriterCopied] = useState(false)
 
+  const [aiToolActive, setAiToolActive] = useState<string | null>(null)
+  const [aiToolGenerating, setAiToolGenerating] = useState(false)
+  const [aiToolResult, setAiToolResult] = useState<any>(null)
+  const [aiToolCopied, setAiToolCopied] = useState(false)
+
+  const [aiEmailPurpose, setAiEmailPurpose] = useState('cold outreach')
+  const [aiEmailAudience, setAiEmailAudience] = useState('')
+  const [aiEmailTone, setAiEmailTone] = useState('professional')
+
+  const [aiBlogTopic, setAiBlogTopic] = useState('')
+  const [aiBlogAudience, setAiBlogAudience] = useState('')
+  const [aiBlogStyle, setAiBlogStyle] = useState('how-to')
+
+  const [aiVideoType, setAiVideoType] = useState('review')
+  const [aiVideoDuration, setAiVideoDuration] = useState('5-7 minutes')
+  const [aiVideoPlatform, setAiVideoPlatform] = useState('youtube')
+
+  const [aiAdPlatform, setAiAdPlatform] = useState('facebook')
+  const [aiAdObjective, setAiAdObjective] = useState('conversions')
+  const [aiAdAudience, setAiAdAudience] = useState('')
+
+  const [aiAudienceNiche, setAiAudienceNiche] = useState('')
+  const [aiAudienceDesc, setAiAudienceDesc] = useState('')
+  const [aiAudienceType, setAiAudienceType] = useState('social_post')
+
+  const [aiPitchProspect, setAiPitchProspect] = useState('')
+  const [aiPitchUrl, setAiPitchUrl] = useState('')
+  const [aiPitchRelationship, setAiPitchRelationship] = useState('cold')
+
+  const [aiObjection, setAiObjection] = useState('')
+  const [aiObjectionContext, setAiObjectionContext] = useState('')
+
+  const [aiPromoNiche, setAiPromoNiche] = useState('')
+  const [aiPromoChannels, setAiPromoChannels] = useState('social media, blog, email')
+  const [aiPromoExperience, setAiPromoExperience] = useState('beginner')
+
+  const [aiConversionScenario, setAiConversionScenario] = useState('')
+
+  const [aiOnboardingData, setAiOnboardingData] = useState<any>(null)
+  const [aiOnboardingLoading, setAiOnboardingLoading] = useState(false)
+
   const [messages, setMessages] = useState<any[]>([])
   const [messagesLoading, setMessagesLoading] = useState(false)
   const [messageBody, setMessageBody] = useState('')
@@ -476,6 +539,15 @@ function StandaloneAffiliateDashboard() {
   const [taxSummaryLoading, setTaxSummaryLoading] = useState(false)
   const [taxSummaryDownloading, setTaxSummaryDownloading] = useState(false)
 
+  const [financialTools, setFinancialTools] = useState<any>(null)
+  const [financialToolsLoading, setFinancialToolsLoading] = useState(false)
+  const [businessMode, setBusinessMode] = useState(false)
+  const [calcReferrals, setCalcReferrals] = useState('10')
+  const [calcPrice, setCalcPrice] = useState('49')
+  const [calcRate, setCalcRate] = useState('')
+  const [csvExporting, setCsvExporting] = useState(false)
+  const [financialSubTab, setFinancialSubTab] = useState<'overview' | 'referrals' | 'history' | 'tools'>('overview')
+
   const { toast } = useToast()
 
   const navigate = (s: DashboardSection) => {
@@ -533,6 +605,61 @@ function StandaloneAffiliateDashboard() {
       setLoading(false)
     }
   }, [])
+
+  const fetchFinancialTools = useCallback(async () => {
+    setFinancialToolsLoading(true)
+    try {
+      const res = await fetch('/api/affiliate/financial-tools')
+      if (res.ok) {
+        const ft = await res.json()
+        setFinancialTools(ft)
+        if (ft.revenueShare?.avgCommissionRate && !calcRate) {
+          setCalcRate(String(ft.revenueShare.avgCommissionRate))
+        }
+      }
+    } catch {}
+    setFinancialToolsLoading(false)
+  }, [calcRate])
+
+  const handleCsvExport = async (type: string) => {
+    setCsvExporting(true)
+    try {
+      const res = await fetch(`/api/affiliate/export-csv?type=${type}`)
+      if (res.ok) {
+        const blob = await res.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${type}-export-${new Date().toISOString().split('T')[0]}.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+        toast({ title: 'Export Complete', description: `Your ${type} data has been downloaded.` })
+      } else {
+        toast({ title: 'Export Failed', description: 'Unable to generate the export.', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Export Failed', description: 'An error occurred during export.', variant: 'destructive' })
+    }
+    setCsvExporting(false)
+  }
+
+  const handleInvoiceDownload = async (payoutId: string) => {
+    try {
+      const res = await fetch(`/api/affiliate/invoice?payoutId=${payoutId}`)
+      if (res.ok) {
+        const blob = await res.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `invoice-${payoutId.slice(0, 8)}.html`
+        a.click()
+        URL.revokeObjectURL(url)
+        toast({ title: 'Invoice Downloaded', description: 'Your invoice has been generated and downloaded.' })
+      }
+    } catch {
+      toast({ title: 'Download Failed', description: 'Unable to generate invoice.', variant: 'destructive' })
+    }
+  }
 
   const fetchLeaderboard = useCallback(async () => {
     try {
@@ -1230,6 +1357,7 @@ function StandaloneAffiliateDashboard() {
       fetchTaxSummary()
       fetchYoutubeAnalytics()
       fetchRenewals()
+      fetchFinancialTools()
       fetch('/api/affiliate/messages').then(r => r.ok ? r.json() : null).then(d => {
         if (d?.messages) {
           setMessages(d.messages)
@@ -1367,6 +1495,39 @@ function StandaloneAffiliateDashboard() {
       setAiWriterCopied(true)
       setTimeout(() => setAiWriterCopied(false), 2000)
       toast({ title: 'Copied!', description: 'Post copied to clipboard' })
+    } catch {
+      toast({ title: 'Error', description: 'Could not copy to clipboard', variant: 'destructive' })
+    }
+  }
+
+  const generateAiTool = async (toolName: string, endpoint: string, bodyData: Record<string, any>) => {
+    setAiToolGenerating(true)
+    setAiToolResult(null)
+    setAiToolCopied(false)
+    setAiToolActive(toolName)
+    try {
+      const method = endpoint.includes('onboarding-advisor') ? 'GET' : 'POST'
+      const fetchOpts: RequestInit = { method, headers: { 'Content-Type': 'application/json' } }
+      if (method === 'POST') {
+        fetchOpts.body = JSON.stringify({ ...bodyData, productName: appName })
+      }
+      const res = await fetch(endpoint, fetchOpts)
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to generate')
+      setAiToolResult(json)
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to generate content', variant: 'destructive' })
+    } finally {
+      setAiToolGenerating(false)
+    }
+  }
+
+  const copyAiToolContent = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setAiToolCopied(true)
+      setTimeout(() => setAiToolCopied(false), 2000)
+      toast({ title: 'Copied!', description: 'Content copied to clipboard' })
     } catch {
       toast({ title: 'Error', description: 'Could not copy to clipboard', variant: 'destructive' })
     }
@@ -2158,6 +2319,96 @@ function StandaloneAffiliateDashboard() {
                     </div>
                   )
                 })}
+              </div>
+            </CardContent>
+          </Card>
+        )
+
+      case 'milestone_countdown':
+        if (!data.nextMilestone) return null
+        return (
+          <Card className="border-primary/30 bg-primary/5" data-testid="card-milestone-countdown">
+            <CardContent className="pt-4 pb-3">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">Next Milestone: {data.nextMilestone.name}</span>
+                </div>
+                <Badge variant="outline" className="text-xs" data-testid="badge-milestone-bonus">
+                  ${(data.nextMilestone.bonusAmountCents / 100).toFixed(2)} bonus
+                </Badge>
+              </div>
+              <div className="mt-3 space-y-2">
+                <Progress value={data.nextMilestone.progress} className="h-2" data-testid="progress-milestone-countdown" />
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span data-testid="text-milestone-remaining">{data.nextMilestone.referralsAway} referral{data.nextMilestone.referralsAway !== 1 ? 's' : ''} away</span>
+                  <span>{Math.round(data.nextMilestone.progress)}% complete</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )
+
+      case 'payout_schedule':
+        if (!data.payoutSchedule) return null
+        return (
+          <Card data-testid="card-payout-schedule">
+            <CardContent className="pt-4 pb-3">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Upcoming Payout</span>
+                </div>
+                <span className="text-xs text-muted-foreground" data-testid="text-next-payout-date">
+                  {new Date(data.payoutSchedule.nextPayoutDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                </span>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-xs text-muted-foreground">Available Balance</p>
+                  <p className="text-lg font-bold" data-testid="text-payout-balance">
+                    ${(data.payoutSchedule.pendingAmountCents / 100).toFixed(2)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Minimum Payout</p>
+                  <p className="text-lg font-bold" data-testid="text-payout-minimum">
+                    ${(data.payoutSchedule.minPayoutCents / 100).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+              {data.payoutSchedule.meetsMinimum ? (
+                <div className="mt-2 flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400" data-testid="text-payout-eligible">
+                  <CheckCircle className="h-3.5 w-3.5" />
+                  Eligible for next payout
+                </div>
+              ) : (
+                <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground" data-testid="text-payout-not-eligible">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  ${((data.payoutSchedule.minPayoutCents - data.payoutSchedule.pendingAmountCents) / 100).toFixed(2)} more needed
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )
+
+      case 'tier_celebration':
+        if (!data.tierPromotionCelebration) return null
+        return (
+          <Card className="border-yellow-500/30 bg-gradient-to-r from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20" data-testid="card-tier-celebration">
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
+                  <Award className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold" data-testid="text-tier-celebration-title">
+                    You reached {data.tierPromotionCelebration.tierName} Tier!
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Your commission rate is now {data.tierPromotionCelebration.commissionRate}%
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -3004,6 +3255,564 @@ function StandaloneAffiliateDashboard() {
           </p>
         </CardContent>
       </Card>
+
+      <div className="border-t pt-4 mt-4">
+        <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <h3 className="text-base font-semibold flex items-center gap-2" data-testid="text-financial-tools-heading">
+            <TrendingUp className="h-4 w-4" />
+            Financial Tools
+          </h3>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setBusinessMode(!businessMode)}
+              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${businessMode ? 'bg-primary' : 'bg-muted'}`}
+              data-testid="toggle-business-mode"
+            >
+              <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${businessMode ? 'translate-x-[18px]' : 'translate-x-[3px]'}`} />
+            </button>
+            <span className="text-xs text-muted-foreground">Business Mode</span>
+          </div>
+        </div>
+
+        <div className="flex rounded-md border overflow-hidden mb-4">
+          {(['overview', 'referrals', 'history', 'tools'] as const).map(tab => (
+            <button
+              key={tab}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors flex-1 capitalize ${financialSubTab === tab ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}`}
+              onClick={() => setFinancialSubTab(tab)}
+              data-testid={`tab-financial-${tab}`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {financialToolsLoading && !financialTools ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        ) : financialSubTab === 'overview' ? (
+          <div className="space-y-4">
+            {financialTools?.sleepEarnings > 0 && (
+              <Card data-testid="card-sleep-earnings">
+                <CardContent className="pt-4 pb-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Activity className="h-3 w-3" />
+                        Earnings While You Sleep
+                      </p>
+                      <p className="text-2xl font-bold mt-1" data-testid="text-sleep-earnings">
+                        ${((financialTools?.sleepEarnings || 0) / 100).toFixed(2)}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">Earned in the last 24 hours passively</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Zap className="h-5 w-5 text-primary" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {financialTools?.projection && (
+              <Card data-testid="card-annual-projection">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Target className="h-4 w-4" />
+                    Annual Projection
+                  </CardTitle>
+                  <CardDescription>Based on your current month performance</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+                    <div className="p-3 rounded-md bg-muted/50 text-center">
+                      <p className="text-xs text-muted-foreground">Daily Avg</p>
+                      <p className="text-sm font-bold" data-testid="text-daily-avg">
+                        ${((financialTools.projection.dailyAvg || 0) / 100).toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-md bg-muted/50 text-center">
+                      <p className="text-xs text-muted-foreground">This Month</p>
+                      <p className="text-sm font-bold" data-testid="text-month-earnings">
+                        ${((financialTools.projection.currentMonthEarnings || 0) / 100).toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-md bg-muted/50 text-center">
+                      <p className="text-xs text-muted-foreground">Month Projected</p>
+                      <p className="text-sm font-bold" data-testid="text-projected-monthly">
+                        ${((financialTools.projection.projectedMonthly || 0) / 100).toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-md bg-primary/10 text-center">
+                      <p className="text-xs text-muted-foreground">Annual Projected</p>
+                      <p className="text-lg font-bold text-primary" data-testid="text-projected-annual">
+                        ${((financialTools.projection.projectedAnnual || 0) / 100).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  {financialTools.projection.yoyGrowth !== null && (
+                    <div className="mt-3 flex items-center gap-2">
+                      <Badge variant={financialTools.projection.yoyGrowth >= 0 ? 'default' : 'destructive'} className="text-xs">
+                        {financialTools.projection.yoyGrowth >= 0 ? <ArrowUp className="h-3 w-3 mr-0.5" /> : <ArrowDown className="h-3 w-3 mr-0.5" />}
+                        {Math.abs(financialTools.projection.yoyGrowth)}% YoY
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">compared to last year</span>
+                    </div>
+                  )}
+                  <p className="text-[10px] text-muted-foreground mt-2">
+                    {financialTools.projection.daysRemaining} days remaining this month
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {financialTools?.revenueShare && (
+              <Card data-testid="card-revenue-share">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    Revenue Share Transparency
+                  </CardTitle>
+                  <CardDescription>See exactly how revenue is split</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium">Your Share</span>
+                          <span className="text-sm font-bold" data-testid="text-your-share">
+                            ${((financialTools.revenueShare.yourEarnings || 0) / 100).toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="h-3 bg-muted rounded-md overflow-hidden">
+                          <div
+                            className="h-full rounded-md bg-primary transition-all"
+                            style={{ width: `${financialTools.revenueShare.yourPercentage || 0}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium">Platform Share</span>
+                          <span className="text-sm font-bold" data-testid="text-platform-share">
+                            ${((financialTools.revenueShare.platformShare || 0) / 100).toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="h-3 bg-muted rounded-md overflow-hidden">
+                          <div
+                            className="h-full rounded-md bg-muted-foreground/30 transition-all"
+                            style={{ width: `${100 - (financialTools.revenueShare.yourPercentage || 0)}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
+                      <span>Total invoice revenue: ${((financialTools.revenueShare.totalInvoiceRevenue || 0) / 100).toFixed(2)}</span>
+                      <span>Avg rate: {financialTools.revenueShare.avgCommissionRate || 0}%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {financialTools?.expenseOffset && businessMode && (
+              <Card data-testid="card-expense-offset">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Receipt className="h-4 w-4" />
+                    Expense Offset
+                  </CardTitle>
+                  <CardDescription>How your affiliate earnings compare to your subscription</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-3 grid-cols-3">
+                    <div className="p-3 rounded-md bg-muted/50 text-center">
+                      <p className="text-xs text-muted-foreground">Subscription</p>
+                      <p className="text-sm font-bold">-${((financialTools.expenseOffset.subscriptionCostCents || 0) / 100).toFixed(2)}</p>
+                    </div>
+                    <div className="p-3 rounded-md bg-muted/50 text-center">
+                      <p className="text-xs text-muted-foreground">This Month</p>
+                      <p className="text-sm font-bold text-green-600 dark:text-green-400">
+                        +${((financialTools.expenseOffset.monthlyEarnings || 0) / 100).toFixed(2)}
+                      </p>
+                    </div>
+                    <div className={`p-3 rounded-md text-center ${financialTools.expenseOffset.monthlyNet >= 0 ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                      <p className="text-xs text-muted-foreground">Net</p>
+                      <p className={`text-sm font-bold ${financialTools.expenseOffset.monthlyNet >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`} data-testid="text-monthly-net">
+                        {financialTools.expenseOffset.monthlyNet >= 0 ? '+' : ''}${((financialTools.expenseOffset.monthlyNet || 0) / 100).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  {financialTools.expenseOffset.isProfitable && (
+                    <p className="text-xs text-green-600 dark:text-green-400 mt-3 flex items-center gap-1">
+                      <CheckCircle className="h-3 w-3" />
+                      Your subscription pays for itself through affiliate earnings
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {financialTools?.churnAlerts && financialTools.churnAlerts.length > 0 && (
+              <Card data-testid="card-churn-alerts">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                    Churn Impact Alerts
+                  </CardTitle>
+                  <CardDescription>Recent referral cancellations and their earnings impact</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {financialTools.churnAlerts.slice(0, 5).map((alert: any, i: number) => (
+                      <div key={i} className="flex items-center justify-between p-3 rounded-md border" data-testid={`churn-alert-${i}`}>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
+                            <UserX className="h-4 w-4 text-red-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Referral #{alert.referralId.slice(0, 8)} churned</p>
+                            <p className="text-xs text-muted-foreground">{new Date(alert.churnedAt).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-red-600 dark:text-red-400">-${((alert.lostEarnings || 0) / 100).toFixed(2)}</p>
+                          <p className="text-[10px] text-muted-foreground">{alert.activeRemaining} active remaining</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {financialTools?.monthlyGrowthData && financialTools.monthlyGrowthData.some((m: any) => m.earnings > 0) && (
+              <Card data-testid="card-compound-growth">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4" />
+                    Compound Growth
+                  </CardTitle>
+                  <CardDescription>Cumulative earnings growth this year</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[140px] relative">
+                    <svg viewBox={`0 0 ${Math.max(financialTools.monthlyGrowthData.length * 40, 200)} 130`} className="w-full h-full" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" className="[stop-color:hsl(var(--primary))]" stopOpacity="0.3" />
+                          <stop offset="100%" className="[stop-color:hsl(var(--primary))]" stopOpacity="0.05" />
+                        </linearGradient>
+                      </defs>
+                      {(() => {
+                        const maxCum = Math.max(...financialTools.monthlyGrowthData.map((m: any) => m.cumulative), 1)
+                        const pts = financialTools.monthlyGrowthData.map((m: any, i: number) => ({
+                          x: (i / Math.max(financialTools.monthlyGrowthData.length - 1, 1)) * (financialTools.monthlyGrowthData.length * 40 - 10),
+                          y: 120 - (m.cumulative / maxCum) * 110,
+                        }))
+                        return (
+                          <>
+                            <path
+                              d={`M 0 120 ${pts.map((p: any) => `L ${p.x} ${p.y}`).join(' ')} L ${pts[pts.length - 1]?.x || 0} 120 Z`}
+                              fill="url(#growthGrad)"
+                            />
+                            <polyline
+                              points={pts.map((p: any) => `${p.x},${p.y}`).join(' ')}
+                              fill="none"
+                              className="stroke-primary"
+                              strokeWidth="2"
+                              strokeLinejoin="round"
+                            />
+                            {pts.map((p: any, i: number) => (
+                              <circle key={i} cx={p.x} cy={p.y} r="3" className="fill-primary">
+                                <title>{`${financialTools.monthlyGrowthData[i].month}: $${(financialTools.monthlyGrowthData[i].cumulative / 100).toFixed(2)} cumulative`}</title>
+                              </circle>
+                            ))}
+                          </>
+                        )
+                      })()}
+                    </svg>
+                  </div>
+                  <div className="flex justify-between text-[10px] text-muted-foreground mt-1 px-1">
+                    {financialTools.monthlyGrowthData.map((m: any, i: number) => (
+                      <span key={i}>{m.month}</span>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        ) : financialSubTab === 'referrals' ? (
+          <div className="space-y-4">
+            {financialTools?.earningsByReferral && financialTools.earningsByReferral.length > 0 ? (
+              <Card data-testid="card-earnings-by-referral">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Earnings by Referral
+                  </CardTitle>
+                  <CardDescription>Revenue breakdown per referred customer</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {financialTools.earningsByReferral.map((ref: any, i: number) => {
+                      const maxEarn = financialTools.earningsByReferral[0]?.totalEarnings || 1
+                      return (
+                        <div key={ref.referralId} className="space-y-1" data-testid={`earnings-referral-${i}`}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium">#{ref.referralId.slice(0, 8)}</span>
+                              <Badge
+                                variant={ref.status === 'converted' ? 'default' : ref.status === 'churned' ? 'destructive' : 'outline'}
+                                className="text-[10px] capitalize"
+                              >
+                                {ref.status}
+                              </Badge>
+                              <span className="text-[10px] text-muted-foreground">{ref.commissionCount} commissions</span>
+                            </div>
+                            <span className="text-sm font-bold">${(ref.totalEarnings / 100).toFixed(2)}</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-md overflow-hidden">
+                            <div
+                              className={`h-full rounded-md transition-all ${ref.status === 'churned' ? 'bg-red-400 dark:bg-red-500' : 'bg-primary/70'}`}
+                              style={{ width: `${Math.max((ref.totalEarnings / maxEarn) * 100, 2)}%` }}
+                            />
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="pt-4">
+                  <div className="text-center py-8" data-testid="text-no-earnings-by-referral">
+                    <Users className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">No referral earnings data yet.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        ) : financialSubTab === 'history' ? (
+          <div className="space-y-4">
+            {financialTools?.multiYearHistory && financialTools.multiYearHistory.length > 0 ? (
+              <Card data-testid="card-multi-year-history">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Multi-Year Financial History
+                  </CardTitle>
+                  <CardDescription>Year-over-year comparison of your affiliate performance</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {financialTools.multiYearHistory.map((yr: any) => (
+                      <div key={yr.year} className="p-3 rounded-md border" data-testid={`year-history-${yr.year}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-bold">{yr.year}</span>
+                          <span className="text-sm font-bold text-primary">${(yr.earnings / 100).toFixed(2)}</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-3">
+                          <div>
+                            <p className="text-[10px] text-muted-foreground">Commissions</p>
+                            <p className="text-xs font-medium">{yr.commissions}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-muted-foreground">Referrals</p>
+                            <p className="text-xs font-medium">{yr.referrals}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-muted-foreground">Paid Out</p>
+                            <p className="text-xs font-medium">${(yr.payouts / 100).toFixed(2)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="pt-4">
+                  <div className="text-center py-8">
+                    <Calendar className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Financial history will appear once you start earning commissions.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <Card data-testid="card-commission-calculator">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Commission Calculator
+                </CardTitle>
+                <CardDescription>Estimate your potential earnings</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid gap-3 grid-cols-3">
+                  <div>
+                    <Label className="text-xs">Referrals</Label>
+                    <Input
+                      type="number"
+                      value={calcReferrals}
+                      onChange={e => setCalcReferrals(e.target.value)}
+                      min="1"
+                      className="mt-1"
+                      data-testid="input-calc-referrals"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Price ($)</Label>
+                    <Input
+                      type="number"
+                      value={calcPrice}
+                      onChange={e => setCalcPrice(e.target.value)}
+                      min="1"
+                      className="mt-1"
+                      data-testid="input-calc-price"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Rate (%)</Label>
+                    <Input
+                      type="number"
+                      value={calcRate || String(data.stats.effectiveRate || 30)}
+                      onChange={e => setCalcRate(e.target.value)}
+                      min="1"
+                      max="100"
+                      className="mt-1"
+                      data-testid="input-calc-rate"
+                    />
+                  </div>
+                </div>
+                {(() => {
+                  const refs = parseInt(calcReferrals) || 0
+                  const price = parseFloat(calcPrice) || 0
+                  const rate = parseFloat(calcRate || String(data.stats.effectiveRate || 30)) || 0
+                  const monthlyEarning = refs * price * (rate / 100)
+                  const annualEarning = monthlyEarning * 12
+                  return (
+                    <div className="grid gap-3 grid-cols-2">
+                      <div className="p-3 rounded-md bg-muted/50 text-center">
+                        <p className="text-xs text-muted-foreground">Monthly Earnings</p>
+                        <p className="text-lg font-bold" data-testid="text-calc-monthly">${monthlyEarning.toFixed(2)}</p>
+                      </div>
+                      <div className="p-3 rounded-md bg-primary/10 text-center">
+                        <p className="text-xs text-muted-foreground">Annual Earnings</p>
+                        <p className="text-lg font-bold text-primary" data-testid="text-calc-annual">${annualEarning.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  )
+                })()}
+              </CardContent>
+            </Card>
+
+            <Card data-testid="card-split-estimator">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Commission Split Estimator
+                </CardTitle>
+                <CardDescription>See the detailed breakdown over time</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {(() => {
+                  const price = parseFloat(calcPrice) || 49
+                  const rate = parseFloat(calcRate || String(data.stats.effectiveRate || 30)) || 30
+                  const commission = price * (rate / 100)
+                  const months = [1, 3, 6, 12]
+                  return (
+                    <div className="space-y-2">
+                      {months.map(m => (
+                        <div key={m} className="flex items-center justify-between p-3 rounded-md border" data-testid={`split-month-${m}`}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">{m} month{m !== 1 ? 's' : ''}</span>
+                            <span className="text-xs text-muted-foreground">at ${price}/mo</span>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold">${(commission * m).toFixed(2)}</p>
+                            <p className="text-[10px] text-muted-foreground">{rate}% of ${(price * m).toFixed(2)}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
+              </CardContent>
+            </Card>
+
+            <Card data-testid="card-csv-export">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Download className="h-4 w-4" />
+                  Export Data
+                </CardTitle>
+                <CardDescription>Download your financial data as CSV for records or taxes</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-2 grid-cols-2 lg:grid-cols-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCsvExport('commissions')}
+                    disabled={csvExporting}
+                    data-testid="button-export-commissions"
+                  >
+                    <Download className="h-3.5 w-3.5 mr-1.5" />
+                    Commissions
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCsvExport('referrals')}
+                    disabled={csvExporting}
+                    data-testid="button-export-referrals"
+                  >
+                    <Download className="h-3.5 w-3.5 mr-1.5" />
+                    Referrals
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCsvExport('payouts')}
+                    disabled={csvExporting}
+                    data-testid="button-export-payouts"
+                  >
+                    <Download className="h-3.5 w-3.5 mr-1.5" />
+                    Payouts
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCsvExport('bookkeeping')}
+                    disabled={csvExporting}
+                    data-testid="button-export-bookkeeping"
+                  >
+                    <Download className="h-3.5 w-3.5 mr-1.5" />
+                    Bookkeeping
+                  </Button>
+                </div>
+                {csvExporting && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Generating export...</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
     </div>
   )
 
@@ -3776,6 +4585,839 @@ function StandaloneAffiliateDashboard() {
                   {aiWriterCharCount} characters
                 </span>
               </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="border-t pt-4">
+        <h3 className="text-base font-semibold mb-4 flex items-center gap-2" data-testid="text-ai-content-suite-heading">
+          <Zap className="h-4 w-4" />
+          AI Content Suite
+        </h3>
+        <p className="text-sm text-muted-foreground mb-4">Advanced AI tools to create promotional content, optimize conversions, and grow your affiliate earnings.</p>
+      </div>
+
+      <Card data-testid="card-ai-email-draft">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            AI Email Draft Generator
+          </CardTitle>
+          <CardDescription>Generate complete promotional emails with your referral link</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <Label className="text-xs">Purpose</Label>
+              <Select value={aiEmailPurpose} onValueChange={setAiEmailPurpose}>
+                <SelectTrigger className="mt-1" data-testid="select-ai-email-purpose">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cold outreach">Cold Outreach</SelectItem>
+                  <SelectItem value="follow-up">Follow-up</SelectItem>
+                  <SelectItem value="newsletter mention">Newsletter Mention</SelectItem>
+                  <SelectItem value="personal recommendation">Personal Recommendation</SelectItem>
+                  <SelectItem value="re-engagement">Re-engagement</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Target Audience</Label>
+              <Input value={aiEmailAudience} onChange={e => setAiEmailAudience(e.target.value)} placeholder="e.g. freelancers, coaches..." className="mt-1" data-testid="input-ai-email-audience" />
+            </div>
+            <div>
+              <Label className="text-xs">Tone</Label>
+              <Select value={aiEmailTone} onValueChange={setAiEmailTone}>
+                <SelectTrigger className="mt-1" data-testid="select-ai-email-tone">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="casual">Casual</SelectItem>
+                  <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
+                  <SelectItem value="friendly">Friendly</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button onClick={() => generateAiTool('email', '/api/affiliate/ai-email-draft', { purpose: aiEmailPurpose, audience: aiEmailAudience, tone: aiEmailTone })} disabled={aiToolGenerating && aiToolActive === 'email'} data-testid="button-ai-email-generate">
+            {aiToolGenerating && aiToolActive === 'email' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            Generate Email
+          </Button>
+          {aiToolResult && aiToolActive === 'email' && (
+            <div className="space-y-3">
+              <div className="p-3 rounded-md bg-muted/40 space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">Subject Line:</p>
+                <p className="text-sm font-medium" data-testid="text-ai-email-subject">{aiToolResult.subject}</p>
+                <p className="text-xs font-medium text-muted-foreground mt-2">Email Body:</p>
+                <p className="text-sm whitespace-pre-wrap" data-testid="text-ai-email-body">{aiToolResult.body}</p>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button variant="outline" size="sm" onClick={() => copyAiToolContent(`Subject: ${aiToolResult.subject}\n\n${aiToolResult.body}`)} data-testid="button-ai-email-copy">
+                  {aiToolCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                  {aiToolCopied ? 'Copied!' : 'Copy Email'}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => generateAiTool('email', '/api/affiliate/ai-email-draft', { purpose: aiEmailPurpose, audience: aiEmailAudience, tone: aiEmailTone })} disabled={aiToolGenerating} data-testid="button-ai-email-regenerate">
+                  <RefreshCw className="h-4 w-4 mr-1" /> Regenerate
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-ai-blog-outline">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            AI Blog Post Outline
+          </CardTitle>
+          <CardDescription>Get a structured blog post outline with SEO keywords and your referral link</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <Label className="text-xs">Topic / Angle</Label>
+              <Input value={aiBlogTopic} onChange={e => setAiBlogTopic(e.target.value)} placeholder="e.g. productivity tips, tool review..." className="mt-1" data-testid="input-ai-blog-topic" />
+            </div>
+            <div>
+              <Label className="text-xs">Target Audience</Label>
+              <Input value={aiBlogAudience} onChange={e => setAiBlogAudience(e.target.value)} placeholder="e.g. small business owners" className="mt-1" data-testid="input-ai-blog-audience" />
+            </div>
+            <div>
+              <Label className="text-xs">Blog Style</Label>
+              <Select value={aiBlogStyle} onValueChange={setAiBlogStyle}>
+                <SelectTrigger className="mt-1" data-testid="select-ai-blog-style">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="how-to">How-To Guide</SelectItem>
+                  <SelectItem value="review">Product Review</SelectItem>
+                  <SelectItem value="listicle">Listicle</SelectItem>
+                  <SelectItem value="comparison">Comparison</SelectItem>
+                  <SelectItem value="case-study">Case Study</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button onClick={() => generateAiTool('blog', '/api/affiliate/ai-blog-outline', { topic: aiBlogTopic, audience: aiBlogAudience, style: aiBlogStyle })} disabled={aiToolGenerating && aiToolActive === 'blog'} data-testid="button-ai-blog-generate">
+            {aiToolGenerating && aiToolActive === 'blog' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            Generate Outline
+          </Button>
+          {aiToolResult && aiToolActive === 'blog' && (
+            <div className="space-y-3">
+              <div className="p-3 rounded-md bg-muted/40 space-y-3">
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">Title:</p>
+                  <p className="text-sm font-semibold" data-testid="text-ai-blog-title">{aiToolResult.title}</p>
+                </div>
+                {aiToolResult.metaDescription && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Meta Description:</p>
+                    <p className="text-xs" data-testid="text-ai-blog-meta">{aiToolResult.metaDescription}</p>
+                  </div>
+                )}
+                {aiToolResult.sections?.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">Sections:</p>
+                    {aiToolResult.sections.map((s: any, i: number) => (
+                      <div key={i} className="pl-3 border-l-2 border-muted" data-testid={`section-blog-${i}`}>
+                        <p className="text-sm font-medium">{s.heading}</p>
+                        {s.keyPoints?.map((kp: string, j: number) => (
+                          <p key={j} className="text-xs text-muted-foreground ml-2">- {kp}</p>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {aiToolResult.keywords?.length > 0 && (
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-xs text-muted-foreground">Keywords:</span>
+                    {aiToolResult.keywords.map((kw: string, i: number) => (
+                      <Badge key={i} variant="secondary" className="text-xs" data-testid={`badge-blog-keyword-${i}`}>{kw}</Badge>
+                    ))}
+                  </div>
+                )}
+                {aiToolResult.ctaText && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">CTA:</p>
+                    <p className="text-xs" data-testid="text-ai-blog-cta">{aiToolResult.ctaText}</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button variant="outline" size="sm" onClick={() => {
+                  const text = `# ${aiToolResult.title}\n\n${aiToolResult.metaDescription ? `Meta: ${aiToolResult.metaDescription}\n\n` : ''}${aiToolResult.sections?.map((s: any) => `## ${s.heading}\n${s.keyPoints?.map((kp: string) => `- ${kp}`).join('\n') || ''}`).join('\n\n') || ''}\n\n${aiToolResult.ctaText || ''}\n\nKeywords: ${aiToolResult.keywords?.join(', ') || ''}`
+                  copyAiToolContent(text)
+                }} data-testid="button-ai-blog-copy">
+                  {aiToolCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                  {aiToolCopied ? 'Copied!' : 'Copy Outline'}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => generateAiTool('blog', '/api/affiliate/ai-blog-outline', { topic: aiBlogTopic, audience: aiBlogAudience, style: aiBlogStyle })} disabled={aiToolGenerating} data-testid="button-ai-blog-regenerate">
+                  <RefreshCw className="h-4 w-4 mr-1" /> Regenerate
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-ai-video-script">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Play className="h-4 w-4" />
+            AI Video Script Generator
+          </CardTitle>
+          <CardDescription>Create video scripts with hooks, sections, and CTAs for YouTube and more</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <Label className="text-xs">Video Type</Label>
+              <Select value={aiVideoType} onValueChange={setAiVideoType}>
+                <SelectTrigger className="mt-1" data-testid="select-ai-video-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="review">Product Review</SelectItem>
+                  <SelectItem value="tutorial">Tutorial / How-To</SelectItem>
+                  <SelectItem value="comparison">Comparison</SelectItem>
+                  <SelectItem value="unboxing">Unboxing / First Look</SelectItem>
+                  <SelectItem value="tips">Tips & Tricks</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Target Duration</Label>
+              <Select value={aiVideoDuration} onValueChange={setAiVideoDuration}>
+                <SelectTrigger className="mt-1" data-testid="select-ai-video-duration">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1-2 minutes">Short (1-2 min)</SelectItem>
+                  <SelectItem value="5-7 minutes">Medium (5-7 min)</SelectItem>
+                  <SelectItem value="10-15 minutes">Long (10-15 min)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Platform</Label>
+              <Select value={aiVideoPlatform} onValueChange={setAiVideoPlatform}>
+                <SelectTrigger className="mt-1" data-testid="select-ai-video-platform">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="youtube">YouTube</SelectItem>
+                  <SelectItem value="tiktok">TikTok</SelectItem>
+                  <SelectItem value="instagram-reels">Instagram Reels</SelectItem>
+                  <SelectItem value="linkedin">LinkedIn Video</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button onClick={() => generateAiTool('video', '/api/affiliate/ai-video-script', { videoType: aiVideoType, duration: aiVideoDuration, platform: aiVideoPlatform })} disabled={aiToolGenerating && aiToolActive === 'video'} data-testid="button-ai-video-generate">
+            {aiToolGenerating && aiToolActive === 'video' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            Generate Script
+          </Button>
+          {aiToolResult && aiToolActive === 'video' && (
+            <div className="space-y-3">
+              <div className="p-3 rounded-md bg-muted/40 space-y-3">
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">Title:</p>
+                  <p className="text-sm font-semibold" data-testid="text-ai-video-title">{aiToolResult.title}</p>
+                </div>
+                {aiToolResult.thumbnailConcept && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Thumbnail Concept:</p>
+                    <p className="text-xs" data-testid="text-ai-video-thumbnail">{aiToolResult.thumbnailConcept}</p>
+                  </div>
+                )}
+                {aiToolResult.hook && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Hook (first 10 seconds):</p>
+                    <p className="text-sm italic" data-testid="text-ai-video-hook">{aiToolResult.hook}</p>
+                  </div>
+                )}
+                {aiToolResult.sections?.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">Script Sections:</p>
+                    {aiToolResult.sections.map((s: any, i: number) => (
+                      <div key={i} className="pl-3 border-l-2 border-muted space-y-1" data-testid={`section-video-${i}`}>
+                        <p className="text-sm font-medium">{s.name}</p>
+                        <p className="text-xs whitespace-pre-wrap">{s.script}</p>
+                        {s.visualNotes && <p className="text-[10px] text-muted-foreground">[Visual: {s.visualNotes}]</p>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {aiToolResult.cta && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">CTA:</p>
+                    <p className="text-sm" data-testid="text-ai-video-cta">{aiToolResult.cta}</p>
+                  </div>
+                )}
+                {aiToolResult.estimatedDuration && (
+                  <p className="text-xs text-muted-foreground">Est. duration: {aiToolResult.estimatedDuration}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button variant="outline" size="sm" onClick={() => {
+                  const text = `Title: ${aiToolResult.title}\n\nHook: ${aiToolResult.hook || ''}\n\n${aiToolResult.sections?.map((s: any) => `--- ${s.name} ---\n${s.script}${s.visualNotes ? `\n[Visual: ${s.visualNotes}]` : ''}`).join('\n\n') || ''}\n\nCTA: ${aiToolResult.cta || ''}`
+                  copyAiToolContent(text)
+                }} data-testid="button-ai-video-copy">
+                  {aiToolCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                  {aiToolCopied ? 'Copied!' : 'Copy Script'}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => generateAiTool('video', '/api/affiliate/ai-video-script', { videoType: aiVideoType, duration: aiVideoDuration, platform: aiVideoPlatform })} disabled={aiToolGenerating} data-testid="button-ai-video-regenerate">
+                  <RefreshCw className="h-4 w-4 mr-1" /> Regenerate
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-ai-ad-copy">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Megaphone className="h-4 w-4" />
+            AI Ad Copy Generator
+          </CardTitle>
+          <CardDescription>Generate ad variations for Facebook, Instagram, Google, and more</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <Label className="text-xs">Ad Platform</Label>
+              <Select value={aiAdPlatform} onValueChange={setAiAdPlatform}>
+                <SelectTrigger className="mt-1" data-testid="select-ai-ad-platform">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="facebook">Facebook / Instagram</SelectItem>
+                  <SelectItem value="google">Google Ads</SelectItem>
+                  <SelectItem value="twitter">Twitter / X</SelectItem>
+                  <SelectItem value="linkedin">LinkedIn Ads</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Campaign Objective</Label>
+              <Select value={aiAdObjective} onValueChange={setAiAdObjective}>
+                <SelectTrigger className="mt-1" data-testid="select-ai-ad-objective">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="conversions">Conversions</SelectItem>
+                  <SelectItem value="traffic">Traffic</SelectItem>
+                  <SelectItem value="awareness">Brand Awareness</SelectItem>
+                  <SelectItem value="engagement">Engagement</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Target Audience</Label>
+              <Input value={aiAdAudience} onChange={e => setAiAdAudience(e.target.value)} placeholder="e.g. solopreneurs, creators..." className="mt-1" data-testid="input-ai-ad-audience" />
+            </div>
+          </div>
+          <Button onClick={() => generateAiTool('adcopy', '/api/affiliate/ai-ad-copy', { platform: aiAdPlatform, objective: aiAdObjective, audience: aiAdAudience })} disabled={aiToolGenerating && aiToolActive === 'adcopy'} data-testid="button-ai-ad-generate">
+            {aiToolGenerating && aiToolActive === 'adcopy' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            Generate Ad Copy
+          </Button>
+          {aiToolResult && aiToolActive === 'adcopy' && (
+            <div className="space-y-3">
+              {aiToolResult.variations?.map((v: any, i: number) => (
+                <div key={i} className="p-3 rounded-md bg-muted/40 space-y-2" data-testid={`ad-variation-${i}`}>
+                  <Badge variant="secondary" className="text-xs">{v.angle || `Variation ${i + 1}`}</Badge>
+                  <p className="text-sm font-semibold">{v.headline}</p>
+                  <p className="text-xs">{v.primaryText}</p>
+                  {v.ctaText && <p className="text-xs text-muted-foreground">CTA: {v.ctaText}</p>}
+                  <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => copyAiToolContent(`${v.headline}\n\n${v.primaryText}\n\nCTA: ${v.ctaText || ''}\nURL: ${v.destinationUrl || aiToolResult.shareUrl}`)} data-testid={`button-copy-ad-${i}`}>
+                    <Copy className="h-3 w-3 mr-1" /> Copy
+                  </Button>
+                </div>
+              ))}
+              {aiToolResult.tips?.length > 0 && (
+                <div className="p-3 rounded-md bg-muted/20 space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">Tips:</p>
+                  {aiToolResult.tips.map((tip: string, i: number) => (
+                    <p key={i} className="text-xs text-muted-foreground">- {tip}</p>
+                  ))}
+                </div>
+              )}
+              <Button variant="ghost" size="sm" onClick={() => generateAiTool('adcopy', '/api/affiliate/ai-ad-copy', { platform: aiAdPlatform, objective: aiAdObjective, audience: aiAdAudience })} disabled={aiToolGenerating} data-testid="button-ai-ad-regenerate">
+                <RefreshCw className="h-4 w-4 mr-1" /> Regenerate
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-ai-audience-content">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Audience-Aware Content
+          </CardTitle>
+          <CardDescription>Generate niche-specific content tailored to your audience's pain points</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <Label className="text-xs">Your Niche</Label>
+              <Input value={aiAudienceNiche} onChange={e => setAiAudienceNiche(e.target.value)} placeholder="e.g. fitness coaches, SaaS founders..." className="mt-1" data-testid="input-ai-audience-niche" />
+            </div>
+            <div>
+              <Label className="text-xs">Audience Description</Label>
+              <Input value={aiAudienceDesc} onChange={e => setAiAudienceDesc(e.target.value)} placeholder="e.g. busy professionals who..." className="mt-1" data-testid="input-ai-audience-desc" />
+            </div>
+            <div>
+              <Label className="text-xs">Content Type</Label>
+              <Select value={aiAudienceType} onValueChange={setAiAudienceType}>
+                <SelectTrigger className="mt-1" data-testid="select-ai-audience-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="social_post">Social Post</SelectItem>
+                  <SelectItem value="email">Email</SelectItem>
+                  <SelectItem value="blog_snippet">Blog Snippet</SelectItem>
+                  <SelectItem value="talking_points">Talking Points</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button onClick={() => generateAiTool('audience', '/api/affiliate/ai-audience-content', { niche: aiAudienceNiche, audienceDescription: aiAudienceDesc, contentType: aiAudienceType })} disabled={aiToolGenerating && aiToolActive === 'audience'} data-testid="button-ai-audience-generate">
+            {aiToolGenerating && aiToolActive === 'audience' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            Generate Content
+          </Button>
+          {aiToolResult && aiToolActive === 'audience' && (
+            <div className="space-y-3">
+              <div className="p-3 rounded-md bg-muted/40 space-y-3">
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">Generated Content:</p>
+                  <p className="text-sm whitespace-pre-wrap" data-testid="text-ai-audience-content">{aiToolResult.content}</p>
+                </div>
+                {aiToolResult.painPoints?.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Pain Points Addressed:</p>
+                    {aiToolResult.painPoints.map((pp: string, i: number) => (
+                      <p key={i} className="text-xs ml-2">- {pp}</p>
+                    ))}
+                  </div>
+                )}
+                {aiToolResult.hooks?.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Alternative Hooks:</p>
+                    {aiToolResult.hooks.map((h: string, i: number) => (
+                      <p key={i} className="text-xs ml-2 italic">"{h}"</p>
+                    ))}
+                  </div>
+                )}
+                {aiToolResult.hashtags?.length > 0 && (
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-xs text-muted-foreground">Hashtags:</span>
+                    {aiToolResult.hashtags.map((tag: string, i: number) => (
+                      <Badge key={i} variant="secondary" className="text-xs">{tag}</Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button variant="outline" size="sm" onClick={() => copyAiToolContent(aiToolResult.content)} data-testid="button-ai-audience-copy">
+                  {aiToolCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                  {aiToolCopied ? 'Copied!' : 'Copy Content'}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => generateAiTool('audience', '/api/affiliate/ai-audience-content', { niche: aiAudienceNiche, audienceDescription: aiAudienceDesc, contentType: aiAudienceType })} disabled={aiToolGenerating} data-testid="button-ai-audience-regenerate">
+                  <RefreshCw className="h-4 w-4 mr-1" /> Regenerate
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-ai-pitch-customizer">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Target className="h-4 w-4" />
+            AI Pitch Customizer
+          </CardTitle>
+          <CardDescription>Create personalized pitches based on prospect information</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label className="text-xs">Prospect Info</Label>
+              <Input value={aiPitchProspect} onChange={e => setAiPitchProspect(e.target.value)} placeholder="e.g. Fitness coach with 10k followers..." className="mt-1" data-testid="input-ai-pitch-prospect" />
+            </div>
+            <div>
+              <Label className="text-xs">Prospect Website/URL (optional)</Label>
+              <Input value={aiPitchUrl} onChange={e => setAiPitchUrl(e.target.value)} placeholder="https://their-website.com" className="mt-1" data-testid="input-ai-pitch-url" />
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs">Relationship</Label>
+            <Select value={aiPitchRelationship} onValueChange={setAiPitchRelationship}>
+              <SelectTrigger className="mt-1 max-w-xs" data-testid="select-ai-pitch-relationship">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cold">Cold (never met)</SelectItem>
+                <SelectItem value="warm">Warm (mutual connection)</SelectItem>
+                <SelectItem value="existing">Existing Contact</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button onClick={() => generateAiTool('pitch', '/api/affiliate/ai-pitch-customizer', { prospectInfo: aiPitchProspect, prospectUrl: aiPitchUrl, relationship: aiPitchRelationship })} disabled={aiToolGenerating && aiToolActive === 'pitch'} data-testid="button-ai-pitch-generate">
+            {aiToolGenerating && aiToolActive === 'pitch' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            Generate Pitch
+          </Button>
+          {aiToolResult && aiToolActive === 'pitch' && (
+            <div className="space-y-3">
+              <div className="p-3 rounded-md bg-muted/40 space-y-3">
+                {aiToolResult.subjectLine && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Subject Line:</p>
+                    <p className="text-sm font-medium" data-testid="text-ai-pitch-subject">{aiToolResult.subjectLine}</p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">Pitch:</p>
+                  <p className="text-sm whitespace-pre-wrap" data-testid="text-ai-pitch-body">{aiToolResult.pitch}</p>
+                </div>
+                {aiToolResult.keyPersonalization?.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Personalization Points:</p>
+                    {aiToolResult.keyPersonalization.map((kp: string, i: number) => (
+                      <p key={i} className="text-xs ml-2">- {kp}</p>
+                    ))}
+                  </div>
+                )}
+                {aiToolResult.followUpSuggestion && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Follow-up if no response:</p>
+                    <p className="text-xs italic" data-testid="text-ai-pitch-followup">{aiToolResult.followUpSuggestion}</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button variant="outline" size="sm" onClick={() => copyAiToolContent(`${aiToolResult.subjectLine ? `Subject: ${aiToolResult.subjectLine}\n\n` : ''}${aiToolResult.pitch}`)} data-testid="button-ai-pitch-copy">
+                  {aiToolCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                  {aiToolCopied ? 'Copied!' : 'Copy Pitch'}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => generateAiTool('pitch', '/api/affiliate/ai-pitch-customizer', { prospectInfo: aiPitchProspect, prospectUrl: aiPitchUrl, relationship: aiPitchRelationship })} disabled={aiToolGenerating} data-testid="button-ai-pitch-regenerate">
+                  <RefreshCw className="h-4 w-4 mr-1" /> Regenerate
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-ai-objection-handler">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            AI Objection Handler
+          </CardTitle>
+          <CardDescription>Get smart responses to counter common objections from prospects</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label className="text-xs">The Objection</Label>
+              <Input value={aiObjection} onChange={e => setAiObjection(e.target.value)} placeholder='e.g. "It is too expensive", "I already use X"' className="mt-1" data-testid="input-ai-objection" />
+            </div>
+            <div>
+              <Label className="text-xs">Context (optional)</Label>
+              <Input value={aiObjectionContext} onChange={e => setAiObjectionContext(e.target.value)} placeholder="e.g. DM conversation, in-person meeting..." className="mt-1" data-testid="input-ai-objection-context" />
+            </div>
+          </div>
+          <Button onClick={() => generateAiTool('objection', '/api/affiliate/ai-objection-handler', { objection: aiObjection, context: aiObjectionContext })} disabled={aiToolGenerating && aiToolActive === 'objection'} data-testid="button-ai-objection-generate">
+            {aiToolGenerating && aiToolActive === 'objection' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            Get Responses
+          </Button>
+          {aiToolResult && aiToolActive === 'objection' && (
+            <div className="space-y-3">
+              {aiToolResult.responses?.map((r: any, i: number) => (
+                <div key={i} className="p-3 rounded-md bg-muted/40 space-y-2" data-testid={`objection-response-${i}`}>
+                  <Badge variant="secondary" className="text-xs">{r.approach}</Badge>
+                  <p className="text-sm">{r.response}</p>
+                  <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => copyAiToolContent(r.response)} data-testid={`button-copy-objection-${i}`}>
+                    <Copy className="h-3 w-3 mr-1" /> Copy
+                  </Button>
+                </div>
+              ))}
+              {aiToolResult.alternativeFraming && (
+                <div className="p-3 rounded-md bg-muted/20">
+                  <p className="text-xs font-medium text-muted-foreground">Alternative Value Framing:</p>
+                  <p className="text-sm" data-testid="text-ai-objection-framing">{aiToolResult.alternativeFraming}</p>
+                </div>
+              )}
+              {aiToolResult.tips?.length > 0 && (
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">Tips:</p>
+                  {aiToolResult.tips.map((tip: string, i: number) => (
+                    <p key={i} className="text-xs text-muted-foreground">- {tip}</p>
+                  ))}
+                </div>
+              )}
+              <Button variant="ghost" size="sm" onClick={() => generateAiTool('objection', '/api/affiliate/ai-objection-handler', { objection: aiObjection, context: aiObjectionContext })} disabled={aiToolGenerating} data-testid="button-ai-objection-regenerate">
+                <RefreshCw className="h-4 w-4 mr-1" /> Regenerate
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-ai-promo-ideas">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Promotion Idea Generator
+          </CardTitle>
+          <CardDescription>Get creative, actionable promotion strategies tailored to your niche</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <Label className="text-xs">Your Niche</Label>
+              <Input value={aiPromoNiche} onChange={e => setAiPromoNiche(e.target.value)} placeholder="e.g. personal finance, health & wellness..." className="mt-1" data-testid="input-ai-promo-niche" />
+            </div>
+            <div>
+              <Label className="text-xs">Available Channels</Label>
+              <Input value={aiPromoChannels} onChange={e => setAiPromoChannels(e.target.value)} placeholder="e.g. YouTube, email, blog..." className="mt-1" data-testid="input-ai-promo-channels" />
+            </div>
+            <div>
+              <Label className="text-xs">Experience Level</Label>
+              <Select value={aiPromoExperience} onValueChange={setAiPromoExperience}>
+                <SelectTrigger className="mt-1" data-testid="select-ai-promo-experience">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="beginner">Beginner</SelectItem>
+                  <SelectItem value="intermediate">Intermediate</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button onClick={() => generateAiTool('promo', '/api/affiliate/ai-promo-ideas', { niche: aiPromoNiche, channels: aiPromoChannels, experience: aiPromoExperience })} disabled={aiToolGenerating && aiToolActive === 'promo'} data-testid="button-ai-promo-generate">
+            {aiToolGenerating && aiToolActive === 'promo' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            Generate Ideas
+          </Button>
+          {aiToolResult && aiToolActive === 'promo' && (
+            <div className="space-y-3">
+              {aiToolResult.ideas?.map((idea: any, i: number) => (
+                <div key={i} className="p-3 rounded-md bg-muted/40 space-y-2" data-testid={`promo-idea-${i}`}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-medium">{idea.title}</p>
+                    <Badge variant={idea.effort === 'low' ? 'secondary' : idea.effort === 'high' ? 'destructive' : 'outline'} className="text-[10px]">
+                      Effort: {idea.effort}
+                    </Badge>
+                    <Badge variant={idea.impact === 'high' ? 'default' : idea.impact === 'low' ? 'outline' : 'secondary'} className="text-[10px]">
+                      Impact: {idea.impact}
+                    </Badge>
+                  </div>
+                  <p className="text-xs">{idea.description}</p>
+                  {idea.steps?.length > 0 && (
+                    <div className="pl-2 space-y-0.5">
+                      {idea.steps.map((step: string, j: number) => (
+                        <p key={j} className="text-xs text-muted-foreground">{j + 1}. {step}</p>
+                      ))}
+                    </div>
+                  )}
+                  {idea.channel && <p className="text-[10px] text-muted-foreground">Channel: {idea.channel} | Timeframe: {idea.timeframe || 'varies'}</p>}
+                </div>
+              ))}
+              {aiToolResult.weeklyPlan && (
+                <div className="p-3 rounded-md bg-muted/20">
+                  <p className="text-xs font-medium text-muted-foreground">Suggested Weekly Plan:</p>
+                  <p className="text-xs whitespace-pre-wrap" data-testid="text-ai-promo-plan">{aiToolResult.weeklyPlan}</p>
+                </div>
+              )}
+              <Button variant="ghost" size="sm" onClick={() => generateAiTool('promo', '/api/affiliate/ai-promo-ideas', { niche: aiPromoNiche, channels: aiPromoChannels, experience: aiPromoExperience })} disabled={aiToolGenerating} data-testid="button-ai-promo-regenerate">
+                <RefreshCw className="h-4 w-4 mr-1" /> Regenerate
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-ai-conversion-optimizer">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            AI Conversion Optimizer
+          </CardTitle>
+          <CardDescription>Get data-driven tips to improve your conversion rate and follow-up templates</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="text-xs">Scenario / Context (optional)</Label>
+            <Input value={aiConversionScenario} onChange={e => setAiConversionScenario(e.target.value)} placeholder="e.g. lots of clicks but few signups, trying email outreach..." className="mt-1" data-testid="input-ai-conversion-scenario" />
+          </div>
+          <Button onClick={() => generateAiTool('conversion', '/api/affiliate/ai-conversion-optimizer', { scenario: aiConversionScenario })} disabled={aiToolGenerating && aiToolActive === 'conversion'} data-testid="button-ai-conversion-generate">
+            {aiToolGenerating && aiToolActive === 'conversion' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            Analyze & Optimize
+          </Button>
+          {aiToolResult && aiToolActive === 'conversion' && (
+            <div className="space-y-3">
+              {aiToolResult.currentStats && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                    <p className="text-lg font-bold" data-testid="text-conv-clicks">{aiToolResult.currentStats.clicks}</p>
+                    <p className="text-[10px] text-muted-foreground">Clicks</p>
+                  </div>
+                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                    <p className="text-lg font-bold" data-testid="text-conv-signups">{aiToolResult.currentStats.signups}</p>
+                    <p className="text-[10px] text-muted-foreground">Signups</p>
+                  </div>
+                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                    <p className="text-lg font-bold" data-testid="text-conv-rate">{aiToolResult.currentStats.conversionRate}%</p>
+                    <p className="text-[10px] text-muted-foreground">Conv. Rate</p>
+                  </div>
+                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                    <p className="text-lg font-bold" data-testid="text-conv-earnings">${aiToolResult.currentStats.earnings}</p>
+                    <p className="text-[10px] text-muted-foreground">Earnings</p>
+                  </div>
+                </div>
+              )}
+              {aiToolResult.analysis && (
+                <div className="p-3 rounded-md bg-muted/40">
+                  <p className="text-xs font-medium text-muted-foreground">Analysis:</p>
+                  <p className="text-sm" data-testid="text-ai-conversion-analysis">{aiToolResult.analysis}</p>
+                </div>
+              )}
+              {aiToolResult.optimizationTips?.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">Optimization Tips:</p>
+                  {aiToolResult.optimizationTips.map((tip: any, i: number) => (
+                    <div key={i} className="p-2 rounded-md bg-muted/40" data-testid={`optimization-tip-${i}`}>
+                      <p className="text-sm font-medium">{tip.area}</p>
+                      <p className="text-xs">{tip.suggestion}</p>
+                      {tip.expectedImpact && <p className="text-[10px] text-muted-foreground">Expected: {tip.expectedImpact}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {aiToolResult.followUpTemplates?.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">Follow-up Templates:</p>
+                  {aiToolResult.followUpTemplates.map((t: any, i: number) => (
+                    <div key={i} className="p-2 rounded-md bg-muted/40 space-y-1" data-testid={`followup-template-${i}`}>
+                      <p className="text-xs font-medium">{t.scenario}</p>
+                      <p className="text-xs">{t.message}</p>
+                      <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => copyAiToolContent(t.message)} data-testid={`button-copy-followup-${i}`}>
+                        <Copy className="h-3 w-3 mr-1" /> Copy
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {aiToolResult.talkingPoints?.length > 0 && (
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">Talking Points:</p>
+                  {aiToolResult.talkingPoints.map((tp: string, i: number) => (
+                    <p key={i} className="text-xs ml-2">- {tp}</p>
+                  ))}
+                </div>
+              )}
+              <Button variant="ghost" size="sm" onClick={() => generateAiTool('conversion', '/api/affiliate/ai-conversion-optimizer', { scenario: aiConversionScenario })} disabled={aiToolGenerating} data-testid="button-ai-conversion-regenerate">
+                <RefreshCw className="h-4 w-4 mr-1" /> Regenerate
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-ai-onboarding-advisor">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <UserCheck className="h-4 w-4" />
+            AI Onboarding Advisor
+          </CardTitle>
+          <CardDescription>Get a personalized first-week action plan based on your current progress</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button onClick={() => generateAiTool('onboarding', '/api/affiliate/ai-onboarding-advisor', {})} disabled={aiToolGenerating && aiToolActive === 'onboarding'} data-testid="button-ai-onboarding-generate">
+            {aiToolGenerating && aiToolActive === 'onboarding' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+            Get My Action Plan
+          </Button>
+          {aiToolResult && aiToolActive === 'onboarding' && (
+            <div className="space-y-3">
+              {aiToolResult.greeting && (
+                <div className="p-3 rounded-md bg-muted/40">
+                  <p className="text-sm" data-testid="text-ai-onboarding-greeting">{aiToolResult.greeting}</p>
+                  {aiToolResult.currentPhase && (
+                    <Badge variant="secondary" className="text-xs mt-2 capitalize">{aiToolResult.currentPhase.replace(/_/g, ' ')}</Badge>
+                  )}
+                </div>
+              )}
+              {aiToolResult.stats && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                    <p className="text-lg font-bold">{aiToolResult.stats.daysActive}</p>
+                    <p className="text-[10px] text-muted-foreground">Days Active</p>
+                  </div>
+                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                    <p className="text-lg font-bold">{aiToolResult.stats.clicks}</p>
+                    <p className="text-[10px] text-muted-foreground">Clicks</p>
+                  </div>
+                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                    <p className="text-lg font-bold">{aiToolResult.stats.signups}</p>
+                    <p className="text-[10px] text-muted-foreground">Signups</p>
+                  </div>
+                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                    <p className="text-lg font-bold">${aiToolResult.stats.earnings}</p>
+                    <p className="text-[10px] text-muted-foreground">Earnings</p>
+                  </div>
+                </div>
+              )}
+              {aiToolResult.quickWins?.length > 0 && (
+                <div className="p-3 rounded-md bg-muted/20 space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground">Quick Wins (do these now!):</p>
+                  {aiToolResult.quickWins.map((qw: string, i: number) => (
+                    <p key={i} className="text-xs ml-2" data-testid={`quick-win-${i}`}>- {qw}</p>
+                  ))}
+                </div>
+              )}
+              {aiToolResult.weekPlan?.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">Your Week Plan:</p>
+                  {aiToolResult.weekPlan.map((day: any, i: number) => (
+                    <div key={i} className="p-2 rounded-md bg-muted/40 flex items-start gap-3" data-testid={`week-plan-day-${i}`}>
+                      <div className="shrink-0 w-12 text-center">
+                        <p className="text-xs font-bold">Day {day.day}</p>
+                        <Badge variant={day.priority === 'high' ? 'default' : day.priority === 'low' ? 'outline' : 'secondary'} className="text-[10px] mt-0.5">
+                          {day.priority}
+                        </Badge>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium">{day.task}</p>
+                        {day.tip && <p className="text-xs text-muted-foreground mt-0.5">{day.tip}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {aiToolResult.resources?.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">Helpful Resources:</p>
+                  {aiToolResult.resources.map((res: any, i: number) => (
+                    <div key={i} className="p-2 rounded-md bg-muted/40" data-testid={`onboarding-resource-${i}`}>
+                      <p className="text-sm font-medium">{res.title}</p>
+                      <p className="text-xs text-muted-foreground">{res.description}</p>
+                      {res.action && <p className="text-xs mt-1">{res.action}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+              <Button variant="ghost" size="sm" onClick={() => generateAiTool('onboarding', '/api/affiliate/ai-onboarding-advisor', {})} disabled={aiToolGenerating} data-testid="button-ai-onboarding-regenerate">
+                <RefreshCw className="h-4 w-4 mr-1" /> Refresh Plan
+              </Button>
             </div>
           )}
         </CardContent>

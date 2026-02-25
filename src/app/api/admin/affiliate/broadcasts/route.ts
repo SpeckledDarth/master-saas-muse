@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendEmail } from '@/lib/email'
 import { logAuditEvent } from '@/lib/affiliate/audit'
+import { createBulkNotifications } from '@/lib/affiliate/notifications'
 
 async function requireAdmin() {
   const supabase = await createClient()
@@ -182,6 +183,18 @@ export async function PATCH(request: NextRequest) {
         sent_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
+
+      try {
+        await createBulkNotifications(
+          affiliateIds,
+          existing.subject,
+          existing.body.replace(/<[^>]*>/g, '').substring(0, 300),
+          'broadcast',
+          '/affiliate/dashboard?section=announcements'
+        )
+      } catch (notifErr) {
+        console.error('Failed to create broadcast notifications:', notifErr)
+      }
 
       logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'send', entity_type: 'broadcast', entity_id: id, entity_name: existing.subject, details: { sent_count: sentCount } })
 

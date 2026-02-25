@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logAuditEvent } from '@/lib/affiliate/audit'
+import { createPayoutNotification } from '@/lib/affiliate/notifications'
 
 async function insertPayoutItems(adminClient: any, payouts: any[], pendingMap: Record<string, number>) {
   try {
@@ -304,6 +305,18 @@ export async function POST(request: NextRequest) {
         if (payoutUpdateErr && payoutUpdateErr.code !== '42P01') {
           console.error('Failed to update payout statuses:', payoutUpdateErr)
         }
+
+        try {
+          const { data: approvedPayouts } = await auth.admin
+            .from('affiliate_payouts')
+            .select('affiliate_user_id, amount_cents')
+            .eq('batch_id', batch_id)
+          if (approvedPayouts) {
+            for (const p of approvedPayouts) {
+              createPayoutNotification(p.affiliate_user_id, p.amount_cents, 'approved').catch(() => {})
+            }
+          }
+        } catch {}
       }
 
       if (newStatus === 'rejected') {

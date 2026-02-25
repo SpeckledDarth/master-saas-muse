@@ -22,6 +22,14 @@ import {
   Calendar,
   DollarSign,
   ArrowRight,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  BarChart3,
+  CheckCircle,
+  Mail,
+  Bell,
+  Package,
 } from 'lucide-react'
 import {
   Dialog,
@@ -158,6 +166,8 @@ export default function BillingPage() {
   const [subscriptionError, setSubscriptionError] = useState(false)
   const [invoicesError, setInvoicesError] = useState(false)
   const [detailError, setDetailError] = useState(false)
+  const [sendingReceipt, setSendingReceipt] = useState<string | null>(null)
+  const [usageInsights, setUsageInsights] = useState<any>(null)
 
   useEffect(() => {
     async function fetchSubscription() {
@@ -214,6 +224,34 @@ export default function BillingPage() {
   useEffect(() => {
     fetchInvoices()
   }, [fetchInvoices])
+
+  useEffect(() => {
+    fetch('/api/user/usage-insights')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.insights) setUsageInsights(data.insights) })
+      .catch(() => {})
+  }, [])
+
+  const sendBrandedReceipt = async (invoiceId: string) => {
+    setSendingReceipt(invoiceId)
+    try {
+      const res = await fetch('/api/email/branded-receipt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invoiceId }),
+      })
+      if (res.ok) {
+        alert('Receipt sent to your email')
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Failed to send receipt')
+      }
+    } catch {
+      alert('Failed to send receipt')
+    } finally {
+      setSendingReceipt(null)
+    }
+  }
 
   const openInvoiceDetail = async (invoice: Invoice) => {
     setSelectedInvoice(invoice)
@@ -364,6 +402,133 @@ export default function BillingPage() {
         </Card>
         )}
 
+        {subscription && subscription.status !== 'free' && subscription.currentPeriodEnd && (
+          <Card data-testid="card-billing-reminder">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Bell className="h-5 w-5 text-muted-foreground" />
+                <CardTitle className="text-lg">Upcoming Payment</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="text-sm text-muted-foreground" data-testid="text-next-payment-info">
+                    {subscription.cancelAtPeriodEnd
+                      ? 'Your subscription will end on the date below. No further payments will be charged.'
+                      : `Your next payment will be processed on ${new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}.`}
+                  </p>
+                  {!subscription.cancelAtPeriodEnd && (() => {
+                    const daysUntil = Math.ceil((new Date(subscription.currentPeriodEnd!).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+                    if (daysUntil <= 7 && daysUntil > 0) {
+                      return (
+                        <Badge variant="outline" className="mt-2 text-amber-600 border-amber-600" data-testid="badge-payment-soon">
+                          Payment in {daysUntil} day{daysUntil !== 1 ? 's' : ''}
+                        </Badge>
+                      )
+                    }
+                    return null
+                  })()}
+                </div>
+                <Button variant="outline" size="sm" onClick={handleManageBilling} disabled={isPortalLoading} data-testid="button-update-payment-method">
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Update Payment Method
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <Card data-testid="card-plan-features">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Package className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-lg">Plan Features</CardTitle>
+            </div>
+            <CardDescription>What&apos;s included in your {tierInfo.name} plan</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {(!subscription || subscription.tier === 'free') ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {['Social post scheduling', 'Basic analytics', '3 connected accounts', 'Community support'].map((feature, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                      <span data-testid={`text-free-feature-${i}`}>{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t pt-3 mt-3">
+                  <p className="text-sm text-muted-foreground mb-2">Upgrade to Pro for:</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {['Unlimited scheduling', 'Advanced analytics', 'AI content tools', 'Priority support', 'Blog integration', 'Revenue tracking'].map((feature, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Sparkles className="h-4 w-4 text-primary shrink-0" />
+                        <span data-testid={`text-upgrade-feature-${i}`}>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : subscription.tier === 'pro' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {['Unlimited scheduling', 'Advanced analytics', 'AI content tools', 'Priority support', 'Blog integration', 'Revenue tracking', '10 connected accounts', 'Brand voice AI', 'Engagement insights', 'Lead generation'].map((feature, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                    <span data-testid={`text-pro-feature-${i}`}>{feature}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {['Everything in Pro', 'Unlimited accounts', 'Team collaboration', 'Approval workflows', 'Custom branding', 'API access', 'Dedicated support', 'SSO integration'].map((feature, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                    <span data-testid={`text-team-feature-${i}`}>{feature}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {usageInsights && (
+          <Card data-testid="card-usage-insights">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-muted-foreground" />
+                <CardTitle className="text-lg">Usage Insights</CardTitle>
+              </div>
+              <CardDescription>Your activity this {usageInsights.monthName}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold" data-testid="text-posts-this-month">{usageInsights.postsThisMonth}</p>
+                  <p className="text-sm text-muted-foreground">Posts this month</p>
+                  <div className="flex items-center gap-1 text-xs">
+                    {usageInsights.postsDelta > 0 ? (
+                      <><TrendingUp className="h-3 w-3 text-green-500" /><span className="text-green-600" data-testid="text-posts-delta">+{usageInsights.postsDelta} from {usageInsights.lastMonthName}</span></>
+                    ) : usageInsights.postsDelta < 0 ? (
+                      <><TrendingDown className="h-3 w-3 text-red-500" /><span className="text-red-600" data-testid="text-posts-delta">{usageInsights.postsDelta} from {usageInsights.lastMonthName}</span></>
+                    ) : (
+                      <><Minus className="h-3 w-3 text-muted-foreground" /><span className="text-muted-foreground" data-testid="text-posts-delta">Same as {usageInsights.lastMonthName}</span></>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold" data-testid="text-activities-count">{usageInsights.activitiesThisMonth}</p>
+                  <p className="text-sm text-muted-foreground">Activities</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold" data-testid="text-tickets-count">{usageInsights.ticketsTotal}</p>
+                  <p className="text-sm text-muted-foreground">Support tickets</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Card data-testid="card-payment-method">
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -483,6 +648,15 @@ export default function BillingPage() {
                               data-testid={`button-view-invoice-${invoice.id}`}
                             >
                               <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => sendBrandedReceipt(invoice.id)}
+                              disabled={sendingReceipt === invoice.id}
+                              data-testid={`button-email-receipt-${invoice.id}`}
+                            >
+                              {sendingReceipt === invoice.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
                             </Button>
                             {(invoice.invoice_pdf_url || invoice.hosted_invoice_url) && (
                               <Button
@@ -638,6 +812,16 @@ export default function BillingPage() {
               )}
 
               <div className="flex gap-2 pt-2 flex-wrap">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => sendBrandedReceipt(selectedInvoice.id)}
+                  disabled={sendingReceipt === selectedInvoice.id}
+                  data-testid="button-detail-email-receipt"
+                >
+                  {sendingReceipt === selectedInvoice.id ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Mail className="h-4 w-4 mr-2" />}
+                  Email Receipt
+                </Button>
                 {selectedInvoice.invoice_pdf_url && (
                   <Button variant="outline" size="sm" asChild data-testid="button-detail-download-pdf">
                     <a href={selectedInvoice.invoice_pdf_url} target="_blank" rel="noopener noreferrer">
