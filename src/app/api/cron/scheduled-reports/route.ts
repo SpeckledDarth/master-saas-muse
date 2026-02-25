@@ -157,19 +157,23 @@ export async function POST(request: NextRequest) {
       console.error('Failed to send report emails:', emailErr)
     }
 
-    await admin.from('audit_logs').insert({
-      user_id: adminIds[0],
-      action: `scheduled_${reportType}_report_sent`,
-      resource: 'report',
-      details: {
-        reportType,
-        dateRange,
-        totalRevenue,
-        totalCommissions,
-        newUsers: newUsersInPeriod,
-        emailsSent,
-      },
-    }).catch(() => {})
+    try {
+      await admin.from('audit_logs').insert({
+        user_id: adminIds[0],
+        action: `scheduled_${reportType}_report_sent`,
+        resource: 'report',
+        details: {
+          reportType,
+          dateRange,
+          totalRevenue,
+          totalCommissions,
+          newUsers: newUsersInPeriod,
+          emailsSent,
+        },
+      })
+    } catch {
+      // audit log insert is non-critical
+    }
 
     return NextResponse.json({
       success: true,
