@@ -26,17 +26,30 @@ if (typeof window !== 'undefined' && !(window as any).__CONSOLE_PATCHED__) {
         if (a instanceof Error) return `Error: ${a.message}\n${a.stack || ''}`
         try { return JSON.stringify(a, null, 2) } catch { return String(a) }
       }).join(' | ')
-      if (full.includes('Objects are not valid') || full.includes('object with keys') || full.includes('#310')) {
+      if (full.includes('Objects are not valid') || full.includes('object with keys') || full.includes('#310') || full.includes('not valid as a React child')) {
         (window as any).__REACT_FULL_ERROR__ = full
       }
       const prev = (window as any).__REACT_ALL_ERRORS__ || []
-      if (prev.length < 10) {
-        prev.push({ ts: Date.now(), msg: full.substring(0, 2000) })
+      if (prev.length < 20) {
+        prev.push({ ts: Date.now(), msg: full.substring(0, 3000) })
         ;(window as any).__REACT_ALL_ERRORS__ = prev
       }
     } catch {}
     _origErr.apply(console, args)
   }
+  window.addEventListener('error', (event) => {
+    try {
+      const msg = event.error?.message || event.message || ''
+      const stack = event.error?.stack || ''
+      const detail = `[window.error] ${msg}\nFile: ${event.filename || 'unknown'}:${event.lineno}:${event.colno}\nStack: ${stack}`
+      ;(window as any).__REACT_FULL_ERROR__ = ((window as any).__REACT_FULL_ERROR__ || '') + '\n---\n' + detail
+      const prev = (window as any).__REACT_ALL_ERRORS__ || []
+      if (prev.length < 20) {
+        prev.push({ ts: Date.now(), msg: detail.substring(0, 3000) })
+        ;(window as any).__REACT_ALL_ERRORS__ = prev
+      }
+    } catch {}
+  })
 }
 
 import { useState, useEffect, useCallback, Suspense, useRef, useMemo, Component, type ErrorInfo, type ReactNode } from 'react'
@@ -2378,25 +2391,26 @@ function StandaloneAffiliateDashboard() {
                   Leaderboard
                 </CardTitle>
                 <div className="flex gap-1">
-                  <Select value={leaderboardPeriod} onValueChange={setLeaderboardPeriod}>
-                    <SelectTrigger className="h-7 text-xs w-24" data-testid="select-leaderboard-period">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="month">This Month</SelectItem>
-                      <SelectItem value="last_month">Last Month</SelectItem>
-                      <SelectItem value="all">All Time</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={leaderboardMetric} onValueChange={setLeaderboardMetric}>
-                    <SelectTrigger className="h-7 text-xs w-24" data-testid="select-leaderboard-metric">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="referrals">Referrals</SelectItem>
-                      <SelectItem value="earnings">Earnings</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex border rounded-md overflow-hidden">
+                    {([['month', 'Month'], ['last_month', 'Last'], ['all', 'All']] as const).map(([val, lbl]) => (
+                      <button
+                        key={val}
+                        onClick={() => setLeaderboardPeriod(val)}
+                        className={`px-2 py-1 text-[10px] transition-colors ${leaderboardPeriod === val ? 'bg-primary text-primary-foreground' : 'hover:bg-muted text-muted-foreground'}`}
+                        data-testid={`btn-lb-period-${val}`}
+                      >{lbl}</button>
+                    ))}
+                  </div>
+                  <div className="flex border rounded-md overflow-hidden">
+                    {([['referrals', 'Refs'], ['earnings', '$']] as const).map(([val, lbl]) => (
+                      <button
+                        key={val}
+                        onClick={() => setLeaderboardMetric(val)}
+                        className={`px-2 py-1 text-[10px] transition-colors ${leaderboardMetric === val ? 'bg-primary text-primary-foreground' : 'hover:bg-muted text-muted-foreground'}`}
+                        data-testid={`btn-lb-metric-${val}`}
+                      >{lbl}</button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -2443,17 +2457,16 @@ function StandaloneAffiliateDashboard() {
                 <BarChart3 className="h-4 w-4" />
                 Conversion Funnel
               </CardTitle>
-              <Select value={funnelPeriod} onValueChange={setFunnelPeriod}>
-                <SelectTrigger className="h-7 text-xs w-24" data-testid="select-funnel-period">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7d">7 Days</SelectItem>
-                  <SelectItem value="30d">30 Days</SelectItem>
-                  <SelectItem value="90d">90 Days</SelectItem>
-                  <SelectItem value="all">All Time</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex border rounded-md overflow-hidden">
+                {([['7d', '7d'], ['30d', '30d'], ['90d', '90d'], ['all', 'All']] as const).map(([val, lbl]) => (
+                  <button
+                    key={val}
+                    onClick={() => setFunnelPeriod(val)}
+                    className={`px-2 py-1 text-[10px] transition-colors ${funnelPeriod === val ? 'bg-primary text-primary-foreground' : 'hover:bg-muted text-muted-foreground'}`}
+                    data-testid={`btn-funnel-period-${val}`}
+                  >{lbl}</button>
+                ))}
+              </div>
             </div>
           </CardHeader>
           <CardContent>
