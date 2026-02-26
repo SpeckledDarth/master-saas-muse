@@ -21,15 +21,15 @@ import {
   Moon, BarChart3, Table2, Loader2, Bell, FormInput,
   Accessibility, Printer, Minus, Palette, Upload, Download, RotateCcw
 } from 'lucide-react'
-import { useState, useRef } from 'react'
+import { useState, useRef, type ElementType, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import type { BrandingSettings } from '@/types/settings'
 import { designPresets, exportDesignConfig, importDesignConfig, type DesignPresetName } from '@/lib/design-presets'
 
 function Section({ title, icon: Icon, children, defaultOpen = false }: {
   title: string
-  icon: React.ElementType
-  children: React.ReactNode
+  icon: ElementType
+  children: ReactNode
   defaultOpen?: boolean
 }) {
   const [open, setOpen] = useState(defaultOpen)

@@ -85,10 +85,10 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <AdminSidebar isAppAdmin={isAppAdmin} permissions={permissions} />
       <main className="flex-1 min-w-0">
-        <div className="px-6 pt-6 flex items-center justify-between">
+        <div className="px-6 pt-4 flex items-center justify-between">
           <AdminBreadcrumbs />
           <CommandPalette />
         </div>

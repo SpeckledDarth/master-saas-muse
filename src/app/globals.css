@@ -257,7 +257,9 @@
     font-size: 0.8em;
     color: #666;
   }
-  [data-testid="aside-admin-sidebar"],
+  [data-testid="admin-topnav-wrapper"],
+  [data-testid="nav-admin-topbar"],
+  [data-testid="button-mobile-menu"],
   [data-testid="button-open-search"],
   [data-testid="button-back-revenue"],
   [data-testid="button-back-subs"],

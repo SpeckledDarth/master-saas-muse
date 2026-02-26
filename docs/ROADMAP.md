@@ -536,6 +536,38 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 
 ---
 
+### Session — February 26, 2026 (Post-Blueprint Fixes)
+
+**What was accomplished:**
+
+1. **Fixed Metrics page crash on Vercel (T001)** — Root cause: the `/api/admin/revenue-waterfall` API returns `waterfall` as an object with a `months` array inside, but the metrics page treated `data.waterfall` as a flat array and called `.map()` on it. Since objects don't have `.map()`, this caused a `TypeError` and triggered Next.js error boundary ("Something went wrong"). Fixed by using `data.waterfall?.months || []`. Also aligned the `WaterfallData` interface and chart field names to match the actual API response (`label`, `revenue`, `commissions`, `net` instead of `month`, `beginning_mrr`, `new_revenue`, etc.).
+
+2. **Redesigned admin navigation from left sidebar to top horizontal nav (T002)** — Replaced the long collapsible left sidebar with a two-tier horizontal navigation bar:
+   - Top bar: 6 section tabs (Business, Support, Content, Growth, Settings, System) with dropdown menus
+   - Sub-nav bar: shows items for the currently active section
+   - Mobile: retains slide-out sidebar with grouped sections
+   - Badge counts preserved on relevant items
+   - Dropdown closes on outside click and route change
+   - Print CSS updated to hide top nav instead of old sidebar
+
+3. **Fixed React.ElementType imports** — Replaced `React.ElementType` with named `ElementType` import from React in `related-records.tsx`, `timeline.tsx`, and `sidebar.tsx` to avoid implicit React namespace usage.
+
+**Files modified:**
+- `src/app/admin/metrics/page.tsx` (waterfall data fix + chart field alignment)
+- `src/components/admin/sidebar.tsx` (full rewrite: left sidebar → top horizontal nav)
+- `src/app/admin/layout.tsx` (layout changed from horizontal flex to vertical stack)
+- `src/app/globals.css` (print CSS updated for new nav selectors)
+- `src/components/admin/timeline.tsx` (ElementType import fix)
+- `src/components/admin/related-records.tsx` (ElementType import fix)
+
+**No new DB tables or Supabase migrations needed.**
+
+**Pending items for next session:**
+- Seed data for dashboard tables (invoices, subscriptions, commissions, etc.)
+- Verify metrics page loads correctly on Vercel after push
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience

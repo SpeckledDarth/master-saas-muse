@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, type ElementType } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   CommandDialog,
@@ -20,7 +20,7 @@ interface SearchResult {
   href: string
 }
 
-const TYPE_ICONS: Record<string, React.ElementType> = {
+const TYPE_ICONS: Record<string, ElementType> = {
   user: Users,
   invoice: FileText,
   subscription: CreditCard,

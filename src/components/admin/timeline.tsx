@@ -1,5 +1,6 @@
 'use client'
 
+import { type ElementType } from 'react'
 import { cn } from '@/lib/utils'
 import {
   UserPlus,
@@ -27,7 +28,7 @@ export interface TimelineEvent {
   metadata?: Record<string, string | number | boolean>
 }
 
-const EVENT_ICONS: Record<TimelineEvent['type'], React.ElementType> = {
+const EVENT_ICONS: Record<TimelineEvent['type'], ElementType> = {
   signup: UserPlus,
   payment: DollarSign,
   login: LogIn,

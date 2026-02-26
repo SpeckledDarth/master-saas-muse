@@ -35,13 +35,10 @@ interface MetricsData {
 }
 
 interface WaterfallData {
-  month: string
-  beginning_mrr: number
-  new_revenue: number
-  expansion: number
-  contraction: number
-  churn: number
-  ending_mrr: number
+  label: string
+  revenue: number
+  commissions: number
+  net: number
 }
 
 interface ScheduledReportConfig {
@@ -96,7 +93,7 @@ export default function MetricsPage() {
         const res = await fetch('/api/admin/revenue-waterfall')
         if (res.ok) {
           const data = await res.json()
-          setWaterfall(data.waterfall || [])
+          setWaterfall(Array.isArray(data.waterfall?.months) ? data.waterfall.months : [])
         }
       } catch {
       } finally {
@@ -452,14 +449,13 @@ export default function MetricsPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={waterfall}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="month" className="text-xs" tick={{ fontSize: 12 }} />
+                    <XAxis dataKey="label" className="text-xs" tick={{ fontSize: 12 }} />
                     <YAxis className="text-xs" tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 100).toLocaleString()}`} />
                     <Tooltip content={<ThemedChartTooltip valueFormatter={(v) => formatWaterfallCurrency(v)} />} cursor={false} />
                     <Legend />
-                    <Bar dataKey="new_revenue" name="New Revenue" stackId="positive" fill="hsl(var(--primary))" />
-                    <Bar dataKey="expansion" name="Expansion" stackId="positive" fill="hsl(142 71% 45%)" />
-                    <Bar dataKey="contraction" name="Contraction" stackId="negative" fill="hsl(38 92% 50%)" />
-                    <Bar dataKey="churn" name="Churn" stackId="negative" fill="hsl(0 84% 60%)" />
+                    <Bar dataKey="revenue" name="Revenue" fill="hsl(var(--primary))" />
+                    <Bar dataKey="commissions" name="Commissions" fill="hsl(var(--warning, 38 92% 50%))" />
+                    <Bar dataKey="net" name="Net" fill="hsl(var(--success, 142 71% 45%))" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -468,24 +464,18 @@ export default function MetricsPage() {
                   <thead>
                     <tr className="border-b text-muted-foreground">
                       <th className="text-left py-2 font-medium">Month</th>
-                      <th className="text-right py-2 font-medium">Beginning MRR</th>
-                      <th className="text-right py-2 font-medium">New</th>
-                      <th className="text-right py-2 font-medium">Expansion</th>
-                      <th className="text-right py-2 font-medium">Contraction</th>
-                      <th className="text-right py-2 font-medium">Churn</th>
-                      <th className="text-right py-2 font-medium">Ending MRR</th>
+                      <th className="text-right py-2 font-medium">Revenue</th>
+                      <th className="text-right py-2 font-medium">Commissions</th>
+                      <th className="text-right py-2 font-medium">Net</th>
                     </tr>
                   </thead>
                   <tbody>
                     {waterfall.map((row) => (
-                      <tr key={row.month} className="border-b" data-testid={`row-waterfall-${row.month}`}>
-                        <td className="py-2">{row.month}</td>
-                        <td className="text-right py-2">{formatWaterfallCurrency(row.beginning_mrr)}</td>
-                        <td className="text-right py-2 text-green-600 dark:text-green-400">+{formatWaterfallCurrency(row.new_revenue)}</td>
-                        <td className="text-right py-2 text-green-600 dark:text-green-400">+{formatWaterfallCurrency(row.expansion)}</td>
-                        <td className="text-right py-2 text-yellow-600 dark:text-yellow-400">-{formatWaterfallCurrency(row.contraction)}</td>
-                        <td className="text-right py-2 text-red-600 dark:text-red-400">-{formatWaterfallCurrency(row.churn)}</td>
-                        <td className="text-right py-2 font-medium">{formatWaterfallCurrency(row.ending_mrr)}</td>
+                      <tr key={row.label} className="border-b" data-testid={`row-waterfall-${row.label}`}>
+                        <td className="py-2">{row.label}</td>
+                        <td className="text-right py-2">{formatWaterfallCurrency(row.revenue)}</td>
+                        <td className="text-right py-2 text-[hsl(var(--warning,38_92%_50%))]">-{formatWaterfallCurrency(row.commissions)}</td>
+                        <td className="text-right py-2 font-medium">{formatWaterfallCurrency(row.net)}</td>
                       </tr>
                     ))}
                   </tbody>

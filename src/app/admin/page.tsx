@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ElementType } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -16,7 +16,7 @@ function formatCurrency(cents: number) {
 interface KPI {
   label: string
   value: string | number
-  icon: React.ElementType
+  icon: ElementType
   href: string
   color: string
 }

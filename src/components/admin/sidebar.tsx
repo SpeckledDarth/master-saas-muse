@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, type ElementType } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -36,77 +36,57 @@ import {
   Layers,
   Key,
   Rocket,
-  ChevronDown,
-  ChevronRight,
-  PanelLeftClose,
-  PanelLeft,
   Menu,
   X,
   Share2,
+  ChevronDown,
+  Briefcase,
 } from 'lucide-react'
 import type { TeamPermissions } from '@/lib/team-permissions'
 
 interface NavItem {
   label: string
   href: string
-  icon: React.ElementType
+  icon: ElementType
   permission?: (p: TeamPermissions | null, isAdmin: boolean) => boolean
   badge?: number
 }
 
-interface NavGroup {
+interface NavSection {
   label: string
-  icon: React.ElementType
+  icon: ElementType
   permission?: (p: TeamPermissions | null, isAdmin: boolean) => boolean
   items: NavItem[]
 }
 
-type NavEntry = NavItem | NavGroup
-
-function isNavGroup(entry: NavEntry): entry is NavGroup {
-  return 'items' in entry
+interface BadgeCounts {
+  openTickets: number
+  newUsersToday: number
+  failedPayments: number
 }
 
-function buildNavEntries(badgeCounts: BadgeCounts): NavEntry[] {
+function buildSections(badgeCounts: BadgeCounts): NavSection[] {
   return [
     {
-      label: 'Dashboard',
-      href: '/admin',
-      icon: LayoutDashboard,
+      label: 'Business',
+      icon: Briefcase,
       permission: () => true,
-    },
-    {
-      label: 'CRM',
-      href: '/admin/crm',
-      icon: BookUser,
-      permission: (p, isAdmin) => isAdmin || !!p?.canManageUsers,
-      badge: badgeCounts.newUsersToday,
-    },
-    {
-      label: 'Revenue',
-      href: '/admin/revenue',
-      icon: DollarSign,
-      permission: (p, isAdmin) => isAdmin || !!p?.canViewAnalytics,
-      badge: badgeCounts.failedPayments,
-    },
-    {
-      label: 'Subscriptions',
-      href: '/admin/subscriptions',
-      icon: CreditCard,
-      permission: (p, isAdmin) => isAdmin || !!p?.canViewAnalytics,
-    },
-    {
-      label: 'Metrics',
-      href: '/admin/metrics',
-      icon: BarChart3,
-      permission: (p, isAdmin) => isAdmin || !!p?.canViewAnalytics,
+      items: [
+        { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, permission: () => true },
+        { label: 'CRM', href: '/admin/crm', icon: BookUser, permission: (p, isAdmin) => isAdmin || !!p?.canManageUsers, badge: badgeCounts.newUsersToday },
+        { label: 'Revenue', href: '/admin/revenue', icon: DollarSign, permission: (p, isAdmin) => isAdmin || !!p?.canViewAnalytics, badge: badgeCounts.failedPayments },
+        { label: 'Subscriptions', href: '/admin/subscriptions', icon: CreditCard, permission: (p, isAdmin) => isAdmin || !!p?.canViewAnalytics },
+        { label: 'Metrics', href: '/admin/metrics', icon: BarChart3, permission: (p, isAdmin) => isAdmin || !!p?.canViewAnalytics },
+      ],
     },
     {
       label: 'Support',
-      href: '/admin/feedback',
       icon: MessageSquare,
       permission: (p, isAdmin) => isAdmin || !!p?.canManageUsers,
-      badge: badgeCounts.openTickets,
+      items: [
+        { label: 'Tickets', href: '/admin/feedback', icon: MessageSquare, permission: (p, isAdmin) => isAdmin || !!p?.canManageUsers, badge: badgeCounts.openTickets },
+        { label: 'Waitlist', href: '/admin/waitlist', icon: ListChecks, permission: (p, isAdmin) => isAdmin || !!p?.canManageUsers },
+      ],
     },
     {
       label: 'Content',
@@ -115,7 +95,6 @@ function buildNavEntries(badgeCounts: BadgeCounts): NavEntry[] {
       items: [
         { label: 'Blog', href: '/admin/blog', icon: FileText, permission: (p, isAdmin) => isAdmin || !!p?.canEditContent },
         { label: 'Email Templates', href: '/admin/email-templates', icon: Mail, permission: (p, isAdmin) => isAdmin || !!p?.canEditContent },
-        { label: 'Waitlist', href: '/admin/waitlist', icon: ListChecks, permission: (p, isAdmin) => isAdmin || !!p?.canManageUsers },
       ],
     },
     {
@@ -167,10 +146,16 @@ function buildNavEntries(badgeCounts: BadgeCounts): NavEntry[] {
   ]
 }
 
-interface BadgeCounts {
-  openTickets: number
-  newUsersToday: number
-  failedPayments: number
+function findActiveSection(sections: NavSection[], pathname: string): string {
+  for (const section of sections) {
+    for (const item of section.items) {
+      if (item.href === '/admin' && pathname === '/admin') return section.label
+      if (item.href !== '/admin' && (pathname === item.href || pathname.startsWith(item.href + '/'))) {
+        return section.label
+      }
+    }
+  }
+  return sections[0]?.label || 'Business'
 }
 
 interface AdminSidebarProps {
@@ -180,10 +165,10 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const [badgeCounts, setBadgeCounts] = useState<BadgeCounts>({ openTickets: 0, newUsersToday: 0, failedPayments: 0 })
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     async function fetchCounts() {
@@ -199,30 +184,33 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
   }, [])
 
   useEffect(() => {
-    const entries = buildNavEntries(badgeCounts)
-    for (const entry of entries) {
-      if (isNavGroup(entry)) {
-        const hasActiveChild = entry.items.some(item =>
-          pathname === item.href || pathname.startsWith(item.href + '/')
-        )
-        if (hasActiveChild) {
-          setExpandedGroups(prev => new Set([...prev, entry.label]))
-        }
-      }
-    }
-  }, [pathname, badgeCounts])
-
-  useEffect(() => {
     setMobileOpen(false)
+    setOpenDropdown(null)
   }, [pathname])
 
-  function toggleGroup(label: string) {
-    setExpandedGroups(prev => {
-      const next = new Set(prev)
-      if (next.has(label)) next.delete(label)
-      else next.add(label)
-      return next
-    })
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null)
+      }
+    }
+    if (openDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [openDropdown])
+
+  const sections = buildSections(badgeCounts)
+  const activeSection = findActiveSection(sections, pathname)
+
+  function canSeeSection(section: NavSection) {
+    if (!section.permission) return true
+    return section.permission(permissions, isAppAdmin)
+  }
+
+  function canSeeItem(item: NavItem) {
+    if (!item.permission) return true
+    return item.permission(permissions, isAppAdmin)
   }
 
   function isActive(href: string) {
@@ -230,114 +218,151 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
     return pathname === href || pathname.startsWith(href + '/')
   }
 
-  function canSee(entry: NavEntry) {
-    if (!entry.permission) return true
-    return entry.permission(permissions, isAppAdmin)
+  const visibleSections = sections.filter(canSeeSection)
+  const currentSection = visibleSections.find(s => s.label === activeSection) || visibleSections[0]
+  const currentItems = currentSection?.items.filter(canSeeItem) || []
+
+  const totalBadge = (section: NavSection) => {
+    return section.items.reduce((sum, item) => sum + (canSeeItem(item) && item.badge ? item.badge : 0), 0)
   }
 
-  const navEntries = buildNavEntries(badgeCounts)
-
-  const sidebarContent = (
-    <div className="flex flex-col h-full">
-      <div className={cn(
-        'flex items-center border-b h-14 px-3',
-        collapsed ? 'justify-center' : 'justify-between'
-      )}>
-        {!collapsed && (
-          <span className="font-semibold text-sm text-foreground" data-testid="text-admin-sidebar-title">Admin</span>
-        )}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 shrink-0 hidden lg:flex"
-          onClick={() => setCollapsed(!collapsed)}
-          data-testid="button-toggle-sidebar"
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-        </Button>
-      </div>
-
-      <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5" data-testid="nav-admin-sidebar">
-        {navEntries.map(entry => {
-          if (!canSee(entry)) return null
-
-          if (!isNavGroup(entry)) {
-            return (
-              <Link key={entry.label} href={entry.href} data-testid={`link-sidebar-${entry.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                <div className={cn(
-                  'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  isActive(entry.href)
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                  collapsed && 'justify-center px-2'
-                )}>
-                  <entry.icon className="h-4 w-4 shrink-0" />
-                  {!collapsed && (
-                    <>
-                      <span className="flex-1 truncate">{entry.label}</span>
-                      {entry.badge && entry.badge > 0 ? (
-                        <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground" data-testid={`badge-sidebar-${entry.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                          {entry.badge}
-                        </span>
-                      ) : null}
-                    </>
-                  )}
-                  {collapsed && entry.badge && entry.badge > 0 ? (
-                    <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground">
-                      {entry.badge}
-                    </span>
-                  ) : null}
-                </div>
-              </Link>
-            )
-          }
-
-          const isExpanded = expandedGroups.has(entry.label)
-          const hasActiveChild = entry.items.some(item => isActive(item.href))
+  const topNav = (
+    <nav className="border-b bg-card" data-testid="nav-admin-topbar" ref={dropdownRef}>
+      <div className="flex items-center gap-1 px-4 h-11">
+        {visibleSections.map(section => {
+          const Icon = section.icon
+          const isCurrent = section.label === activeSection
+          const badge = totalBadge(section)
+          const isDropdownOpen = openDropdown === section.label
+          const visibleItems = section.items.filter(canSeeItem)
 
           return (
-            <div key={entry.label}>
+            <div key={section.label} className="relative">
               <button
-                onClick={() => toggleGroup(entry.label)}
+                onClick={() => {
+                  setOpenDropdown(isDropdownOpen ? null : section.label)
+                }}
                 className={cn(
-                  'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium w-full transition-colors',
-                  hasActiveChild
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                  collapsed && 'justify-center px-2'
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+                  isCurrent
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )}
-                data-testid={`button-sidebar-group-${entry.label.toLowerCase().replace(/\s+/g, '-')}`}
+                data-testid={`button-topnav-${section.label.toLowerCase()}`}
+                aria-label={section.label}
               >
-                <entry.icon className="h-4 w-4 shrink-0" />
-                {!collapsed && (
-                  <>
-                    <span className="flex-1 truncate text-left">{entry.label}</span>
-                    {isExpanded ? <ChevronDown className="h-3 w-3 shrink-0" /> : <ChevronRight className="h-3 w-3 shrink-0" />}
-                  </>
+                <Icon className="h-4 w-4 shrink-0" />
+                <span>{section.label}</span>
+                {badge > 0 && (
+                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground" data-testid={`badge-topnav-${section.label.toLowerCase()}`}>
+                    {badge}
+                  </span>
                 )}
+                <ChevronDown className={cn('h-3 w-3 shrink-0 transition-transform', isDropdownOpen && 'rotate-180')} />
               </button>
 
-              {!collapsed && isExpanded && (
-                <div className="ml-4 pl-3 border-l border-border space-y-0.5 mt-0.5">
-                  {entry.items.map(item => {
-                    if (!canSee(item)) return null
+              {isDropdownOpen && (
+                <div className="absolute top-full left-0 mt-1 z-50 min-w-[200px] rounded-md border bg-popover p-1 shadow-lg" data-testid={`dropdown-${section.label.toLowerCase()}`}>
+                  {visibleItems.map(item => {
+                    const ItemIcon = item.icon
                     return (
-                      <Link key={item.label} href={item.href} data-testid={`link-sidebar-${item.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                        <div className={cn(
-                          'flex items-center gap-3 rounded-md px-3 py-1.5 text-sm transition-colors',
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        className={cn(
+                          'flex items-center gap-2 rounded-sm px-3 py-2 text-sm transition-colors',
                           isActive(item.href)
                             ? 'bg-primary/10 text-primary font-medium'
-                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                        )}>
-                          <item.icon className="h-3.5 w-3.5 shrink-0" />
-                          <span className="truncate">{item.label}</span>
-                        </div>
+                            : 'text-popover-foreground hover:bg-muted'
+                        )}
+                        data-testid={`link-dropdown-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
+                        <ItemIcon className="h-3.5 w-3.5 shrink-0" />
+                        <span className="flex-1">{item.label}</span>
+                        {item.badge && item.badge > 0 ? (
+                          <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground">
+                            {item.badge}
+                          </span>
+                        ) : null}
                       </Link>
                     )
                   })}
                 </div>
               )}
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="flex items-center gap-0.5 px-4 h-9 border-t bg-muted/30 overflow-x-auto scrollbar-hide" data-testid="nav-admin-subnav">
+        {currentItems.map(item => {
+          const ItemIcon = item.icon
+          return (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={cn(
+                'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors whitespace-nowrap',
+                isActive(item.href)
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              )}
+              data-testid={`link-subnav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+            >
+              <ItemIcon className="h-3.5 w-3.5 shrink-0" />
+              <span>{item.label}</span>
+              {item.badge && item.badge > 0 ? (
+                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground" data-testid={`badge-subnav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                  {item.badge}
+                </span>
+              ) : null}
+            </Link>
+          )
+        })}
+      </div>
+    </nav>
+  )
+
+  const mobileSidebarContent = (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between border-b h-14 px-3">
+        <span className="font-semibold text-sm text-foreground" data-testid="text-admin-mobile-title">Admin</span>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setMobileOpen(false)} data-testid="button-close-mobile-menu" aria-label="Close navigation menu">
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+      <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-3" data-testid="nav-admin-mobile">
+        {visibleSections.map(section => {
+          const SectionIcon = section.icon
+          return (
+            <div key={section.label}>
+              <div className="flex items-center gap-2 px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <SectionIcon className="h-3.5 w-3.5" />
+                {section.label}
+              </div>
+              <div className="space-y-0.5 mt-1">
+                {section.items.filter(canSeeItem).map(item => {
+                  const ItemIcon = item.icon
+                  return (
+                    <Link key={item.label} href={item.href} data-testid={`link-mobile-${item.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                      <div className={cn(
+                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                        isActive(item.href)
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      )}>
+                        <ItemIcon className="h-4 w-4 shrink-0" />
+                        <span className="flex-1 truncate">{item.label}</span>
+                        {item.badge && item.badge > 0 ? (
+                          <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
+                            {item.badge}
+                          </span>
+                        ) : null}
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
             </div>
           )
         })}
@@ -361,26 +386,15 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden" data-testid="overlay-mobile-sidebar">
           <div className="fixed inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <div className="fixed inset-y-0 left-0 w-64 bg-card border-r shadow-xl z-50">
-            <div className="absolute top-3 right-3">
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setMobileOpen(false)} data-testid="button-close-mobile-menu" aria-label="Close navigation menu">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            {sidebarContent}
+          <div className="fixed inset-y-0 left-0 w-72 bg-card border-r shadow-xl z-50">
+            {mobileSidebarContent}
           </div>
         </div>
       )}
 
-      <aside
-        className={cn(
-          'hidden lg:flex flex-col border-r bg-card shrink-0 h-[calc(100vh-0px)] sticky top-0 transition-all duration-200',
-          collapsed ? 'w-14' : 'w-56'
-        )}
-        data-testid="aside-admin-sidebar"
-      >
-        {sidebarContent}
-      </aside>
+      <div className="hidden lg:block" data-testid="admin-topnav-wrapper">
+        {topNav}
+      </div>
     </>
   )
 }
