@@ -45,26 +45,12 @@ export default function RootLayout({
                     document.documentElement.classList.remove('dark');
                   }
                 } catch (e) {}
-                function markReady() {
-                  if (document.body) {
-                    document.body.classList.add('ready');
-                  } else {
-                    document.addEventListener('DOMContentLoaded', function() {
-                      document.body.classList.add('ready');
-                    });
-                  }
-                }
-                if (document.readyState !== 'loading') {
-                  markReady();
-                } else {
-                  requestAnimationFrame(markReady);
-                }
               })();
             `,
           }}
         />
       </head>
-      <body className={inter.variable}>
+      <body className={inter.variable} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
