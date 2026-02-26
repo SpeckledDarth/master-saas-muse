@@ -111,16 +111,16 @@ export function EarningsProjectionsPanel() {
               <div key={m.month} className="flex items-center gap-2 text-xs" data-testid={`projection-row-${m.month}`}>
                 <span className="w-14 text-muted-foreground">{new Date(m.month + '-01').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}</span>
                 <div className="flex-1 bg-muted rounded-full h-3 overflow-hidden relative">
-                  <div className="h-full bg-blue-200 dark:bg-blue-900 rounded-full absolute" style={{ width: `${(m.optimistic / maxProjected) * 100}%` }} />
-                  <div className="h-full bg-blue-500 dark:bg-blue-400 rounded-full absolute" style={{ width: `${(m.projected / maxProjected) * 100}%` }} />
+                  <div className="h-full bg-[hsl(var(--chart-1)/0.3)] dark:bg-[hsl(var(--chart-1)/0.2)] rounded-full absolute" style={{ width: `${(m.optimistic / maxProjected) * 100}%` }} />
+                  <div className="h-full bg-[hsl(var(--chart-1))] rounded-full absolute" style={{ width: `${(m.projected / maxProjected) * 100}%` }} />
                 </div>
                 <span className="w-16 text-right font-medium">{fmtShort(m.projected)}</span>
               </div>
             ))}
           </div>
           <div className="flex items-center gap-4 mt-3 text-[10px] text-muted-foreground">
-            <span className="flex items-center gap-1"><span className="w-3 h-2 bg-blue-500 rounded inline-block" /> Projected</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-2 bg-blue-200 dark:bg-blue-900 rounded inline-block" /> Optimistic</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-2 bg-[hsl(var(--chart-1))] rounded inline-block" /> Projected</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-2 bg-[hsl(var(--chart-1)/0.3)] dark:bg-[hsl(var(--chart-1)/0.2)] rounded inline-block" /> Optimistic</span>
           </div>
         </div>
       )}
@@ -137,7 +137,7 @@ export function EarningsProjectionsPanel() {
             <p className="text-[10px] text-muted-foreground">Projected Annual</p>
           </div>
           <div className="text-center p-2 bg-muted/30 rounded">
-            <p className="text-sm font-bold text-green-600" data-testid="text-annual-growth">{fmt(data.annualProjection.growthAdjusted)}</p>
+            <p className="text-sm font-bold text-[hsl(var(--success))]" data-testid="text-annual-growth">{fmt(data.annualProjection.growthAdjusted)}</p>
             <p className="text-[10px] text-muted-foreground">With Growth</p>
           </div>
         </div>
@@ -151,7 +151,7 @@ export function EarningsProjectionsPanel() {
             {data.tierProjection.estimatedDate && <> (estimated {new Date(data.tierProjection.estimatedDate).toLocaleDateString()})</>}
           </p>
           {data.tierProjection.additionalMonthlyEarnings > 0 && (
-            <p className="text-xs text-green-600 mt-1">Upgrading adds ~{fmt(data.tierProjection.additionalMonthlyEarnings)}/mo from higher commission rate</p>
+            <p className="text-xs text-[hsl(var(--success))] mt-1">Upgrading adds ~{fmt(data.tierProjection.additionalMonthlyEarnings)}/mo from higher commission rate</p>
           )}
         </div>
       )}
@@ -167,7 +167,7 @@ export function EarningsProjectionsPanel() {
                   <span className="text-muted-foreground ml-2">{m.current}/{m.threshold} referrals</span>
                 </div>
                 <div className="text-right">
-                  <span className="font-medium text-green-600">{fmt(m.bonusCents)}</span>
+                  <span className="font-medium text-[hsl(var(--success))]">{fmt(m.bonusCents)}</span>
                   {m.estimatedDate && <span className="text-muted-foreground ml-1">~{new Date(m.estimatedDate).toLocaleDateString('en-US', { month: 'short' })}</span>}
                 </div>
               </div>
@@ -186,11 +186,11 @@ export function EarningsProjectionsPanel() {
                 <div key={g.name}>
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="font-medium">{g.name}</span>
-                    <span className={g.onTrack ? 'text-green-600' : 'text-orange-500'}>{g.onTrack ? 'On track' : 'Behind pace'}</span>
+                    <span className={g.onTrack ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--warning))]'}>{g.onTrack ? 'On track' : 'Behind pace'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
-                      <div className={`h-full rounded-full ${g.onTrack ? 'bg-green-500' : 'bg-orange-400'}`} style={{ width: `${pct}%` }} />
+                      <div className={`h-full rounded-full ${g.onTrack ? 'bg-[hsl(var(--success))]' : 'bg-[hsl(var(--warning))]'}`} style={{ width: `${pct}%` }} />
                     </div>
                     <span className="text-[10px] text-muted-foreground w-20 text-right">{fmt(g.currentCents)} / {fmt(g.targetCents)}</span>
                   </div>
@@ -217,7 +217,7 @@ export function EarningsProjectionsPanel() {
               const max = Math.max(...data.historicalMonthly.map(x => x.earnings), 1);
               return (
                 <div key={h.month} className="flex-1 flex flex-col items-center">
-                  <div className="w-full bg-blue-400 dark:bg-blue-600 rounded-t transition-all" style={{ height: `${(h.earnings / max) * 60}px` }} title={fmt(h.earnings)} />
+                  <div className="w-full bg-[hsl(var(--chart-1))] rounded-t transition-all" style={{ height: `${(h.earnings / max) * 60}px` }} title={fmt(h.earnings)} />
                   <span className="text-[7px] text-muted-foreground mt-0.5">{new Date(h.month + '-01').toLocaleDateString('en-US', { month: 'short' })}</span>
                 </div>
               );
@@ -306,11 +306,11 @@ export function PayoutHistoryPanel() {
         {data?.summary && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
             <div className="text-center p-2 bg-muted/30 rounded">
-              <p className="text-sm font-bold text-green-600" data-testid="text-total-paid">{fmt(data.summary.totalPaid)}</p>
+              <p className="text-sm font-bold text-[hsl(var(--success))]" data-testid="text-total-paid">{fmt(data.summary.totalPaid)}</p>
               <p className="text-[10px] text-muted-foreground">Total Paid</p>
             </div>
             <div className="text-center p-2 bg-muted/30 rounded">
-              <p className="text-sm font-bold text-orange-500" data-testid="text-total-pending">{fmt(data.summary.totalPending)}</p>
+              <p className="text-sm font-bold text-[hsl(var(--warning))]" data-testid="text-total-pending">{fmt(data.summary.totalPending)}</p>
               <p className="text-[10px] text-muted-foreground">Pending</p>
             </div>
             <div className="text-center p-2 bg-muted/30 rounded">
@@ -326,10 +326,10 @@ export function PayoutHistoryPanel() {
               <div key={p.id} className="flex items-center justify-between p-2 rounded border text-xs" data-testid={`payout-history-${p.id}`}>
                 <div className="flex items-center gap-2">
                   <span data-testid={`badge-payout-status-${p.id}`} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                    p.status === 'paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                    p.status === 'approved' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                    p.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                    p.status === 'paid' ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))] dark:bg-[hsl(var(--success)/0.15)]' :
+                    p.status === 'approved' ? 'bg-primary/10 text-primary dark:bg-primary/15' :
+                    p.status === 'pending' ? 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))] dark:bg-[hsl(var(--warning)/0.15)]' :
+                    'bg-[hsl(var(--danger)/0.1)] text-[hsl(var(--danger))] dark:bg-[hsl(var(--danger)/0.15)]'
                   }`}>{p.status}</span>
                   <span className="font-medium">{fmt(p.total_amount_cents)}</span>
                   {p.method && <span className="text-muted-foreground">{p.method}</span>}
@@ -441,15 +441,15 @@ export function TaxCenterPanel() {
                 <p className="text-[10px] text-muted-foreground">Gross Earnings</p>
               </div>
               <div className="text-center p-3 bg-muted/30 rounded">
-                <p className="text-lg font-bold text-green-600" data-testid="text-total-paid-tax">{fmt(paidCents)}</p>
+                <p className="text-lg font-bold text-[hsl(var(--success))]" data-testid="text-total-paid-tax">{fmt(paidCents)}</p>
                 <p className="text-[10px] text-muted-foreground">Total Paid Out</p>
               </div>
             </div>
 
             {needs1099 && (
-              <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800 mb-3" data-testid="notice-1099">
-                <p className="text-xs font-medium text-amber-800 dark:text-amber-300">1099-NEC Likely Required</p>
-                <p className="text-[10px] text-amber-700 dark:text-amber-400 mt-0.5">Your {selectedYear} earnings exceed $600. You should receive a 1099-NEC form. Make sure your tax information is up to date.</p>
+              <div className="p-3 bg-[hsl(var(--warning)/0.05)] dark:bg-[hsl(var(--warning)/0.1)] rounded-lg border border-[hsl(var(--warning)/0.2)] dark:border-[hsl(var(--warning)/0.3)] mb-3" data-testid="notice-1099">
+                <p className="text-xs font-medium text-[hsl(var(--warning))]">1099-NEC Likely Required</p>
+                <p className="text-[10px] text-[hsl(var(--warning))] mt-0.5">Your {selectedYear} earnings exceed $600. You should receive a 1099-NEC form. Make sure your tax information is up to date.</p>
               </div>
             )}
 
@@ -480,7 +480,7 @@ export function TaxCenterPanel() {
                 </div>
                 <div>
                   <p className="text-muted-foreground">Total (~37%)</p>
-                  <p className="font-medium text-red-500">{fmt(Math.round(grossCents * 0.37))}</p>
+                  <p className="font-medium text-destructive">{fmt(Math.round(grossCents * 0.37))}</p>
                 </div>
               </div>
               <p className="text-[9px] text-muted-foreground mt-1">Estimates only. Consult a tax professional for accurate calculations.</p>
@@ -506,7 +506,7 @@ export function CommissionRenewalStatsPanel({ stats }: { stats: RenewalStats | n
           <p className="text-[10px] text-muted-foreground">Total Requests</p>
         </div>
         <div className="text-center p-2 bg-muted/30 rounded">
-          <p className="text-sm font-bold text-green-600" data-testid="text-renewal-success-rate">{stats.successRate}%</p>
+          <p className="text-sm font-bold text-[hsl(var(--success))]" data-testid="text-renewal-success-rate">{stats.successRate}%</p>
           <p className="text-[10px] text-muted-foreground">Approval Rate</p>
         </div>
         <div className="text-center p-2 bg-muted/30 rounded">
@@ -514,21 +514,21 @@ export function CommissionRenewalStatsPanel({ stats }: { stats: RenewalStats | n
           <p className="text-[10px] text-muted-foreground">Avg Extension</p>
         </div>
         <div className="text-center p-2 bg-muted/30 rounded">
-          <p className="text-sm font-bold text-green-600" data-testid="text-renewal-revenue-saved">{fmt(stats.revenueSavedCents)}</p>
+          <p className="text-sm font-bold text-[hsl(var(--success))]" data-testid="text-renewal-revenue-saved">{fmt(stats.revenueSavedCents)}</p>
           <p className="text-[10px] text-muted-foreground">Revenue Saved</p>
         </div>
       </div>
 
       <div className="flex items-center gap-1 mt-3">
         <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden flex">
-          {stats.approved > 0 && <div className="h-full bg-green-500" style={{ width: `${(stats.approved / stats.totalRequests) * 100}%` }} />}
-          {stats.denied > 0 && <div className="h-full bg-red-400" style={{ width: `${(stats.denied / stats.totalRequests) * 100}%` }} />}
-          {stats.pending > 0 && <div className="h-full bg-yellow-400" style={{ width: `${(stats.pending / stats.totalRequests) * 100}%` }} />}
+          {stats.approved > 0 && <div className="h-full bg-[hsl(var(--success))]" style={{ width: `${(stats.approved / stats.totalRequests) * 100}%` }} />}
+          {stats.denied > 0 && <div className="h-full bg-[hsl(var(--danger))]" style={{ width: `${(stats.denied / stats.totalRequests) * 100}%` }} />}
+          {stats.pending > 0 && <div className="h-full bg-[hsl(var(--warning))]" style={{ width: `${(stats.pending / stats.totalRequests) * 100}%` }} />}
         </div>
         <div className="flex gap-2 text-[9px] text-muted-foreground">
-          <span className="flex items-center gap-0.5"><span className="w-2 h-2 bg-green-500 rounded-full inline-block" /> {stats.approved}</span>
-          <span className="flex items-center gap-0.5"><span className="w-2 h-2 bg-red-400 rounded-full inline-block" /> {stats.denied}</span>
-          <span className="flex items-center gap-0.5"><span className="w-2 h-2 bg-yellow-400 rounded-full inline-block" /> {stats.pending}</span>
+          <span className="flex items-center gap-0.5"><span className="w-2 h-2 bg-[hsl(var(--success))] rounded-full inline-block" /> {stats.approved}</span>
+          <span className="flex items-center gap-0.5"><span className="w-2 h-2 bg-[hsl(var(--danger))] rounded-full inline-block" /> {stats.denied}</span>
+          <span className="flex items-center gap-0.5"><span className="w-2 h-2 bg-[hsl(var(--warning))] rounded-full inline-block" /> {stats.pending}</span>
         </div>
       </div>
     </div>
@@ -554,14 +554,14 @@ export function CommissionLifecycleTimeline({ referral }: { referral: any }) {
       {stages.map((s, i) => (
         <div key={s.key} className="flex items-center">
           <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold ${
-            s.key === 'churned' || s.key === 'lost' ? 'bg-red-100 text-red-600 dark:bg-red-900/30' :
-            s.done ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' :
+            s.key === 'churned' || s.key === 'lost' ? 'bg-[hsl(var(--danger)/0.1)] text-[hsl(var(--danger))] dark:bg-[hsl(var(--danger)/0.15)]' :
+            s.done ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))] dark:bg-[hsl(var(--success)/0.15)]' :
             'bg-muted text-muted-foreground'
           }`}>
             {i + 1}
           </div>
           {i < stages.length - 1 && (
-            <div className={`w-4 h-0.5 ${s.done ? 'bg-green-400' : 'bg-muted'}`} />
+            <div className={`w-4 h-0.5 ${s.done ? 'bg-[hsl(var(--success))]' : 'bg-muted'}`} />
           )}
         </div>
       ))}

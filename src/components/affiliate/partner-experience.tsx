@@ -136,10 +136,10 @@ export function CommissionDisputes() {
   };
 
   const statusColor: Record<string, string> = {
-    open: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-    under_review: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    approved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    denied: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+    open: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))] dark:bg-[hsl(var(--warning)/0.15)]',
+    under_review: 'bg-primary/10 text-primary dark:bg-primary/15',
+    approved: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))] dark:bg-[hsl(var(--success)/0.15)]',
+    denied: 'bg-[hsl(var(--danger)/0.1)] text-[hsl(var(--danger))] dark:bg-[hsl(var(--danger)/0.15)]'
   };
 
   return (

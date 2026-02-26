@@ -531,14 +531,14 @@ class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasErr
                 </p>
                 {fullReactError && (
                   <>
-                    <p className="text-xs font-bold mt-3 mb-1 text-red-600">FULL React Error (captured from console):</p>
-                    <pre className="text-xs font-mono text-red-500 break-all whitespace-pre-wrap border border-red-300 rounded p-2 bg-red-50 dark:bg-red-950">{fullReactError}</pre>
+                    <p className="text-xs font-bold mt-3 mb-1 text-destructive">FULL React Error (captured from console):</p>
+                    <pre className="text-xs font-mono text-destructive break-all whitespace-pre-wrap border border-destructive/30 rounded p-2 bg-destructive/5 dark:bg-destructive/10">{fullReactError}</pre>
                   </>
                 )}
                 {objectScanResults && (
                   <>
-                    <p className="text-xs font-bold mt-3 mb-1 text-orange-600">Objects Found in State:</p>
-                    <pre className="text-xs font-mono text-orange-500 break-all whitespace-pre-wrap">{objectScanResults}</pre>
+                    <p className="text-xs font-bold mt-3 mb-1 text-[hsl(var(--warning))]">Objects Found in State:</p>
+                    <pre className="text-xs font-mono text-[hsl(var(--warning))] break-all whitespace-pre-wrap">{objectScanResults}</pre>
                   </>
                 )}
                 {this.state.componentStack && (
@@ -2025,11 +2025,11 @@ function StandaloneAffiliateDashboard() {
       case 'live_earnings':
         if (!earnings) return null
         return (
-          <Card className="border-green-500/30 bg-green-50/30 dark:bg-green-950/20" data-testid="card-live-earnings">
+          <Card className="border-[hsl(var(--success)/0.3)] bg-[hsl(var(--success)/0.05)] dark:bg-[hsl(var(--success)/0.1)]" data-testid="card-live-earnings">
             <CardContent className="pt-4 pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-green-500" />
+                  <Zap className="h-4 w-4 text-[hsl(var(--success))]" />
                   <span className="text-sm font-medium">Live Earnings</span>
                 </div>
                 <div className="flex gap-1">
@@ -2047,7 +2047,7 @@ function StandaloneAffiliateDashboard() {
                   ))}
                 </div>
               </div>
-              <p className="text-3xl font-bold mt-2 text-green-600 dark:text-green-400" data-testid="text-live-earnings-value">
+              <p className="text-3xl font-bold mt-2 text-[hsl(var(--success))]" data-testid="text-live-earnings-value">
                 ${((earnings?.[earningsPeriod] ?? 0) / 100).toFixed(2)}
               </p>
             </CardContent>
@@ -2157,10 +2157,10 @@ function StandaloneAffiliateDashboard() {
                   const achieved = milestoneData.currentReferrals >= ms.referral_threshold
                   const progress = Math.min((milestoneData.currentReferrals / ms.referral_threshold) * 100, 100)
                   return (
-                    <div key={ms.id} className={`p-3 rounded-md border ${achieved ? 'border-green-500/30 bg-green-50/30 dark:bg-green-950/20' : ''}`} data-testid={`milestone-progress-${ms.id}`}>
+                    <div key={ms.id} className={`p-3 rounded-md border ${achieved ? 'border-[hsl(var(--success)/0.3)] bg-[hsl(var(--success)/0.05)] dark:bg-[hsl(var(--success)/0.1)]' : ''}`} data-testid={`milestone-progress-${ms.id}`}>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium">{S(ms.name)}</span>
-                        <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                        <span className="text-sm font-medium text-[hsl(var(--success))]">
                           ${(ms.bonus_amount_cents / 100).toFixed(2)}
                         </span>
                       </div>
@@ -2168,7 +2168,7 @@ function StandaloneAffiliateDashboard() {
                         <Progress value={progress} className="h-1.5 flex-1" />
                         <span className="text-xs text-muted-foreground w-16 text-right">
                           {achieved ? (
-                            <span className="text-green-600 dark:text-green-400 flex items-center gap-1 justify-end"><CheckCircle className="h-3 w-3" /> Done</span>
+                            <span className="text-[hsl(var(--success))] flex items-center gap-1 justify-end"><CheckCircle className="h-3 w-3" /> Done</span>
                           ) : (
                             `${milestoneData.currentReferrals}/${ms.referral_threshold}`
                           )}
@@ -2185,10 +2185,10 @@ function StandaloneAffiliateDashboard() {
       case 'active_contests':
         if (contests.length === 0) return null
         return (
-          <Card className="border-yellow-500/30 bg-yellow-50/30 dark:bg-yellow-950/20" data-testid="card-active-contests">
+          <Card className="border-[hsl(var(--warning)/0.3)] bg-[hsl(var(--warning)/0.05)] dark:bg-[hsl(var(--warning)/0.1)]" data-testid="card-active-contests">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                <Calendar className="h-4 w-4 text-[hsl(var(--warning))]" />
                 Active Contests
               </CardTitle>
             </CardHeader>
@@ -2201,7 +2201,7 @@ function StandaloneAffiliateDashboard() {
                   const isActive = contest.status === 'active' && now >= start && now <= end
                   const daysLeft = isActive ? Math.max(0, Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))) : null
                   return (
-                    <div key={contest.id} className={`p-4 rounded-md border ${isActive ? 'border-yellow-500/50' : ''}`} data-testid={`contest-${contest.id}`}>
+                    <div key={contest.id} className={`p-4 rounded-md border ${isActive ? 'border-[hsl(var(--warning)/0.5)]' : ''}`} data-testid={`contest-${contest.id}`}>
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -2219,7 +2219,7 @@ function StandaloneAffiliateDashboard() {
                         </div>
                         {daysLeft !== null && (
                           <div className="text-right shrink-0">
-                            <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{daysLeft}</p>
+                            <p className="text-2xl font-bold text-[hsl(var(--warning))]">{daysLeft}</p>
                             <p className="text-[10px] text-muted-foreground">days left</p>
                           </div>
                         )}
@@ -2260,11 +2260,11 @@ function StandaloneAffiliateDashboard() {
                 {forecast.paceVsLastMonth !== null && (
                   <div className="flex items-center gap-1 text-xs">
                     {forecast.paceVsLastMonth >= 0 ? (
-                      <ArrowUp className="h-3 w-3 text-green-500" />
+                      <ArrowUp className="h-3 w-3 text-[hsl(var(--success))]" />
                     ) : (
-                      <ArrowDown className="h-3 w-3 text-red-500" />
+                      <ArrowDown className="h-3 w-3 text-destructive" />
                     )}
-                    <span className={forecast.paceVsLastMonth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+                    <span className={forecast.paceVsLastMonth >= 0 ? 'text-[hsl(var(--success))]' : 'text-destructive'}>
                       {Math.abs(forecast.paceVsLastMonth)}% vs last month
                     </span>
                   </div>
@@ -2326,7 +2326,7 @@ function StandaloneAffiliateDashboard() {
                       data-testid={`leaderboard-rank-${entry.rank}`}
                     >
                       <div className="flex items-center gap-2">
-                        <span className={`w-6 text-center text-xs font-bold ${entry.rank <= 3 ? 'text-yellow-600 dark:text-yellow-400' : 'text-muted-foreground'}`}>
+                        <span className={`w-6 text-center text-xs font-bold ${entry.rank <= 3 ? 'text-[hsl(var(--warning))]' : 'text-muted-foreground'}`}>
                           #{entry.rank}
                         </span>
                         <span>{S(entry.displayName)} {entry.isYou && <Badge variant="outline" className="text-[10px] ml-1">You</Badge>}</span>
@@ -2381,7 +2381,7 @@ function StandaloneAffiliateDashboard() {
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold">{N(step.count)}</span>
                         {i > 0 && (
-                          <span className={`text-xs ${N(step.rate) >= 50 ? 'text-green-600 dark:text-green-400' : N(step.rate) >= 20 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
+                          <span className={`text-xs ${N(step.rate) >= 50 ? 'text-[hsl(var(--success))]' : N(step.rate) >= 20 ? 'text-[hsl(var(--warning))]' : 'text-destructive'}`}>
                             {N(step.rate)}%
                           </span>
                         )}
@@ -2440,9 +2440,9 @@ function StandaloneAffiliateDashboard() {
             <div className="space-y-3">
               {coachTips.map((tip, i) => {
                 const priorityColors = {
-                  high: 'border-red-500/30 bg-red-50/20 dark:bg-red-950/20',
-                  medium: 'border-yellow-500/30 bg-yellow-50/20 dark:bg-yellow-950/20',
-                  low: 'border-blue-500/30 bg-blue-50/20 dark:bg-blue-950/20',
+                  high: 'border-[hsl(var(--danger)/0.3)] bg-[hsl(var(--danger)/0.05)] dark:bg-[hsl(var(--danger)/0.1)]',
+                  medium: 'border-[hsl(var(--warning)/0.3)] bg-[hsl(var(--warning)/0.05)] dark:bg-[hsl(var(--warning)/0.1)]',
+                  low: 'border-primary/30 bg-primary/5 dark:bg-primary/10',
                 }
                 const priorityLabels = {
                   high: 'High Impact',
@@ -2502,7 +2502,7 @@ function StandaloneAffiliateDashboard() {
           ) : youtubeAnalytics?.connected ? (
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                <CheckCircle className="h-3.5 w-3.5 text-[hsl(var(--success))]" />
                 <span>Connected as <span className="font-medium text-foreground">{S(youtubeAnalytics.account?.displayName || youtubeAnalytics.account?.username)}</span></span>
               </div>
 
@@ -2698,7 +2698,7 @@ function StandaloneAffiliateDashboard() {
                 </div>
               </div>
               {data.payoutSchedule.meetsMinimum ? (
-                <div className="mt-2 flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400" data-testid="text-payout-eligible">
+                <div className="mt-2 flex items-center gap-1.5 text-xs text-[hsl(var(--success))]" data-testid="text-payout-eligible">
                   <CheckCircle className="h-3.5 w-3.5" />
                   Eligible for next payout
                 </div>
@@ -2715,11 +2715,11 @@ function StandaloneAffiliateDashboard() {
       case 'tier_celebration':
         if (!data?.tierPromotionCelebration) return null
         return (
-          <Card className="border-yellow-500/30 bg-gradient-to-r from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20" data-testid="card-tier-celebration">
+          <Card className="border-[hsl(var(--warning)/0.3)] bg-gradient-to-r from-[hsl(var(--warning)/0.05)] to-[hsl(var(--warning)/0.08)] dark:from-[hsl(var(--warning)/0.1)] dark:to-[hsl(var(--warning)/0.12)]" data-testid="card-tier-celebration">
             <CardContent className="pt-5 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                  <Award className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+                <div className="w-12 h-12 rounded-full bg-[hsl(var(--warning)/0.1)] flex items-center justify-center">
+                  <Award className="h-6 w-6 text-[hsl(var(--warning))]" />
                 </div>
                 <div>
                   <p className="text-sm font-bold" data-testid="text-tier-celebration-title">
@@ -2960,7 +2960,7 @@ function StandaloneAffiliateDashboard() {
             <Card data-testid="stat-active-subscribers">
               <CardContent className="pt-4 pb-3">
                 <div className="flex items-center gap-2">
-                  <UserCheck className="h-4 w-4 text-green-500" />
+                  <UserCheck className="h-4 w-4 text-[hsl(var(--success))]" />
                   <span className="text-xs text-muted-foreground">Active</span>
                 </div>
                 <p className="text-xl font-bold mt-1">{activeReferrals.length}</p>
@@ -2981,7 +2981,7 @@ function StandaloneAffiliateDashboard() {
             <Card data-testid="card-portfolio-active">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <UserCheck className="h-4 w-4 text-green-500" />
+                  <UserCheck className="h-4 w-4 text-[hsl(var(--success))]" />
                   Active Subscribers ({activeReferrals.length})
                 </CardTitle>
               </CardHeader>
@@ -2994,8 +2994,8 @@ function StandaloneAffiliateDashboard() {
                     return (
                       <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`portfolio-referral-${ref.id}`}>
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center">
-                            <UserCheck className="h-4 w-4 text-green-500" />
+                          <div className="w-8 h-8 rounded-full bg-[hsl(var(--success)/0.1)] flex items-center justify-center">
+                            <UserCheck className="h-4 w-4 text-[hsl(var(--success))]" />
                           </div>
                           <div>
                             <p className="text-sm font-medium">Referral #{ref.id.slice(0, 8)}</p>
@@ -3020,7 +3020,7 @@ function StandaloneAffiliateDashboard() {
             <Card data-testid="card-portfolio-trial">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-yellow-500" />
+                  <Clock className="h-4 w-4 text-[hsl(var(--warning))]" />
                   Free / Trial ({trialReferrals.length})
                 </CardTitle>
               </CardHeader>
@@ -3029,8 +3029,8 @@ function StandaloneAffiliateDashboard() {
                   {trialReferrals.map(ref => (
                     <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`portfolio-trial-${ref.id}`}>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                          <Clock className="h-4 w-4 text-yellow-500" />
+                        <div className="w-8 h-8 rounded-full bg-[hsl(var(--warning)/0.1)] flex items-center justify-center">
+                          <Clock className="h-4 w-4 text-[hsl(var(--warning))]" />
                         </div>
                         <div>
                           <p className="text-sm font-medium">Referral #{ref.id.slice(0, 8)}</p>
@@ -3051,7 +3051,7 @@ function StandaloneAffiliateDashboard() {
             <Card data-testid="card-portfolio-churned">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <UserX className="h-4 w-4 text-red-500" />
+                  <UserX className="h-4 w-4 text-[hsl(var(--danger))]" />
                   Churned ({churnedReferrals.length})
                 </CardTitle>
               </CardHeader>
@@ -3062,8 +3062,8 @@ function StandaloneAffiliateDashboard() {
                     return (
                       <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border opacity-75" data-testid={`portfolio-churned-${ref.id}`}>
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
-                            <UserX className="h-4 w-4 text-red-500" />
+                          <div className="w-8 h-8 rounded-full bg-[hsl(var(--danger)/0.1)] flex items-center justify-center">
+                            <UserX className="h-4 w-4 text-[hsl(var(--danger))]" />
                           </div>
                           <div>
                             <p className="text-sm font-medium">Referral #{ref.id.slice(0, 8)}</p>
@@ -3074,7 +3074,7 @@ function StandaloneAffiliateDashboard() {
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-medium text-muted-foreground">${(revenue / 100).toFixed(2)}</p>
-                          <p className="text-xs text-red-500">Churned</p>
+                          <p className="text-xs text-[hsl(var(--danger))]">Churned</p>
                         </div>
                       </div>
                     )
@@ -3172,7 +3172,7 @@ function StandaloneAffiliateDashboard() {
               {expiringReferrals.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-sm font-medium flex items-center gap-1.5">
-                    <AlertTriangle className="h-3.5 w-3.5 text-yellow-500" />
+                    <AlertTriangle className="h-3.5 w-3.5 text-[hsl(var(--warning))]" />
                     Expiring Soon ({expiringReferrals.length})
                   </p>
                   <BulkRenewalButton expiringReferrals={expiringReferrals} onSuccess={fetchRenewals} />
@@ -3421,7 +3421,7 @@ function StandaloneAffiliateDashboard() {
                           <div key={i} className="flex items-start min-w-0">
                             <div className="flex flex-col items-center">
                               <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
-                                step.status === 'completed' ? 'bg-green-500/10 text-green-600 dark:text-green-400' :
+                                step.status === 'completed' ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]' :
                                 step.status === 'current' ? 'bg-primary/10 text-primary ring-2 ring-primary/30' :
                                 step.status === 'skipped' ? 'bg-muted text-muted-foreground line-through' :
                                 'bg-muted text-muted-foreground'
@@ -3451,7 +3451,7 @@ function StandaloneAffiliateDashboard() {
                             {i < lifecycleSteps.length - 1 && (
                               <div className={`h-[2px] w-6 mt-3 shrink-0 ${
                                 step.status === 'completed' && lifecycleSteps[i + 1].status !== 'pending'
-                                  ? 'bg-green-500/40'
+                                  ? 'bg-[hsl(var(--success)/0.4)]'
                                   : 'bg-muted'
                               }`} />
                             )}
@@ -3762,19 +3762,19 @@ function StandaloneAffiliateDashboard() {
                     </div>
                     <div className="p-3 rounded-md bg-muted/50 text-center">
                       <p className="text-xs text-muted-foreground">This Month</p>
-                      <p className="text-sm font-bold text-green-600 dark:text-green-400">
+                      <p className="text-sm font-bold text-[hsl(var(--success))]">
                         +${((financialTools.expenseOffset.monthlyEarnings || 0) / 100).toFixed(2)}
                       </p>
                     </div>
-                    <div className={`p-3 rounded-md text-center ${financialTools.expenseOffset.monthlyNet >= 0 ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                    <div className={`p-3 rounded-md text-center ${financialTools.expenseOffset.monthlyNet >= 0 ? 'bg-[hsl(var(--success)/0.1)]' : 'bg-[hsl(var(--danger)/0.1)]'}`}>
                       <p className="text-xs text-muted-foreground">Net</p>
-                      <p className={`text-sm font-bold ${financialTools.expenseOffset.monthlyNet >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`} data-testid="text-monthly-net">
+                      <p className={`text-sm font-bold ${financialTools.expenseOffset.monthlyNet >= 0 ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--danger))]'}`} data-testid="text-monthly-net">
                         {financialTools.expenseOffset.monthlyNet >= 0 ? '+' : ''}${((financialTools.expenseOffset.monthlyNet || 0) / 100).toFixed(2)}
                       </p>
                     </div>
                   </div>
                   {financialTools.expenseOffset.isProfitable && (
-                    <p className="text-xs text-green-600 dark:text-green-400 mt-3 flex items-center gap-1">
+                    <p className="text-xs text-[hsl(var(--success))] mt-3 flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />
                       Your subscription pays for itself through affiliate earnings
                     </p>
@@ -3787,7 +3787,7 @@ function StandaloneAffiliateDashboard() {
               <Card data-testid="card-churn-alerts">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                    <AlertTriangle className="h-4 w-4 text-[hsl(var(--warning))]" />
                     Churn Impact Alerts
                   </CardTitle>
                   <CardDescription>Recent referral cancellations and their earnings impact</CardDescription>
@@ -3797,8 +3797,8 @@ function StandaloneAffiliateDashboard() {
                     {financialTools.churnAlerts.slice(0, 5).map((alert: any, i: number) => (
                       <div key={i} className="flex items-center justify-between p-3 rounded-md border" data-testid={`churn-alert-${i}`}>
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
-                            <UserX className="h-4 w-4 text-red-500" />
+                          <div className="w-8 h-8 rounded-full bg-[hsl(var(--danger)/0.1)] flex items-center justify-center">
+                            <UserX className="h-4 w-4 text-[hsl(var(--danger))]" />
                           </div>
                           <div>
                             <p className="text-sm font-medium">Referral #{alert.referralId.slice(0, 8)} churned</p>
@@ -3806,7 +3806,7 @@ function StandaloneAffiliateDashboard() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-red-600 dark:text-red-400">-${((alert.lostEarnings || 0) / 100).toFixed(2)}</p>
+                          <p className="text-sm text-[hsl(var(--danger))]">-${((alert.lostEarnings || 0) / 100).toFixed(2)}</p>
                           <p className="text-[10px] text-muted-foreground">{alert.activeRemaining} active remaining</p>
                         </div>
                       </div>
@@ -3904,7 +3904,7 @@ function StandaloneAffiliateDashboard() {
                           </div>
                           <div className="h-2 bg-muted rounded-md overflow-hidden">
                             <div
-                              className={`h-full rounded-md transition-all ${ref.status === 'churned' ? 'bg-red-400 dark:bg-red-500' : 'bg-primary/70'}`}
+                              className={`h-full rounded-md transition-all ${ref.status === 'churned' ? 'bg-[hsl(var(--danger))]' : 'bg-primary/70'}`}
                               style={{ width: `${Math.max((ref.totalEarnings / maxEarn) * 100, 2)}%` }}
                             />
                           </div>
@@ -4626,7 +4626,7 @@ function StandaloneAffiliateDashboard() {
                     <div className="flex items-center gap-2 mt-0.5">
                       <Badge variant="secondary" className="text-xs">{code.discount_percent}% off</Badge>
                       {code.is_active ? (
-                        <Badge variant="outline" className="text-xs text-green-600">Active</Badge>
+                        <Badge variant="outline" className="text-xs text-[hsl(var(--success))]">Active</Badge>
                       ) : (
                         <Badge variant="outline" className="text-xs text-muted-foreground">Inactive</Badge>
                       )}
@@ -5783,10 +5783,10 @@ function StandaloneAffiliateDashboard() {
         </CardHeader>
         <CardContent className="space-y-4">
           {webhookSecret && (
-            <div className="p-3 rounded-md bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800 space-y-2">
+            <div className="p-3 rounded-md bg-[hsl(var(--warning)/0.05)] dark:bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.2)] dark:border-[hsl(var(--warning)/0.3)] space-y-2">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">Signing Secret (copy now — shown only once)</span>
+                <AlertTriangle className="h-4 w-4 text-[hsl(var(--warning))]" />
+                <span className="text-sm font-medium text-[hsl(var(--warning))]">Signing Secret (copy now — shown only once)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Input value={webhookSecret} readOnly className="font-mono text-xs" data-testid="input-webhook-secret" />
@@ -5916,7 +5916,7 @@ function StandaloneAffiliateDashboard() {
                           {(webhookDeliveries[wh.id] || []).map((del: any) => (
                             <div key={del.id} className="flex items-center justify-between text-xs px-2 py-1 rounded bg-background" data-testid={`delivery-${del.id}`}>
                               <div className="flex items-center gap-2 min-w-0">
-                                <span className={`w-2 h-2 rounded-full shrink-0 ${del.delivered_at ? 'bg-green-500' : 'bg-red-500'}`} />
+                                <span className={`w-2 h-2 rounded-full shrink-0 ${del.delivered_at ? 'bg-[hsl(var(--success))]' : 'bg-[hsl(var(--danger))]'}`} />
                                 <span className="font-medium truncate">{del.event_type}</span>
                                 <span className="text-muted-foreground">#{del.attempt}</span>
                               </div>
@@ -6119,7 +6119,7 @@ function StandaloneAffiliateDashboard() {
                             <span>Created: {new Date(contract.created_at).toLocaleDateString()}</span>
                           </div>
                           {contract.signed_at && (
-                            <p className="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
+                            <p className="text-xs text-[hsl(var(--success))] mt-1 flex items-center gap-1">
                               <CheckCircle className="h-3 w-3" />
                               Signed on {new Date(contract.signed_at).toLocaleDateString()}
                             </p>
@@ -6601,7 +6601,7 @@ function StandaloneAffiliateDashboard() {
                   <button
                     key={star}
                     onClick={() => setSurveyRating(star)}
-                    className={`text-2xl transition-colors ${star <= surveyRating ? 'text-yellow-500' : 'text-muted-foreground/30'}`}
+                    className={`text-2xl transition-colors ${star <= surveyRating ? 'text-[hsl(var(--warning))]' : 'text-muted-foreground/30'}`}
                     data-testid={`button-star-${star}`}
                   >
                     &#9733;
@@ -6979,10 +6979,10 @@ function StandaloneAffiliateDashboard() {
     const heatmapColor = (amount: number) => {
       if (amount === 0) return 'bg-muted'
       const intensity = amount / maxHeatVal
-      if (intensity > 0.75) return 'bg-green-600 dark:bg-green-500'
-      if (intensity > 0.5) return 'bg-green-500 dark:bg-green-400'
-      if (intensity > 0.25) return 'bg-green-400/70 dark:bg-green-500/50'
-      return 'bg-green-300/50 dark:bg-green-600/30'
+      if (intensity > 0.75) return 'bg-primary/70 dark:bg-primary/60'
+      if (intensity > 0.5) return 'bg-primary/50 dark:bg-primary/45'
+      if (intensity > 0.25) return 'bg-primary/30 dark:bg-primary/25'
+      return 'bg-primary/15 dark:bg-primary/10'
     }
 
     const weeks: { date: string; amount: number }[][] = []
@@ -7113,10 +7113,10 @@ function StandaloneAffiliateDashboard() {
                   ? Math.round((step.value / funnelSteps[i - 1].value) * 100)
                   : 100
                 const colors = [
-                  'bg-blue-500 dark:bg-blue-400',
-                  'bg-cyan-500 dark:bg-cyan-400',
-                  'bg-green-500 dark:bg-green-400',
-                  'bg-emerald-600 dark:bg-emerald-400',
+                  'bg-[hsl(var(--chart-1))]',
+                  'bg-[hsl(var(--chart-2))]',
+                  'bg-[hsl(var(--chart-3))]',
+                  'bg-[hsl(var(--chart-4))]',
                 ]
                 return (
                   <div key={step.label} data-testid={`funnel-step-${step.label.toLowerCase()}`}>
@@ -7194,10 +7194,10 @@ function StandaloneAffiliateDashboard() {
                 <div className="flex items-center gap-1 mt-2 ml-8">
                   <span className="text-[9px] text-muted-foreground mr-1">Less</span>
                   <div className="w-[10px] h-[10px] rounded-sm bg-muted" />
-                  <div className="w-[10px] h-[10px] rounded-sm bg-green-300/50 dark:bg-green-600/30" />
-                  <div className="w-[10px] h-[10px] rounded-sm bg-green-400/70 dark:bg-green-500/50" />
-                  <div className="w-[10px] h-[10px] rounded-sm bg-green-500 dark:bg-green-400" />
-                  <div className="w-[10px] h-[10px] rounded-sm bg-green-600 dark:bg-green-500" />
+                  <div className="w-[10px] h-[10px] rounded-sm bg-primary/15 dark:bg-primary/10" />
+                  <div className="w-[10px] h-[10px] rounded-sm bg-primary/30 dark:bg-primary/25" />
+                  <div className="w-[10px] h-[10px] rounded-sm bg-primary/50 dark:bg-primary/45" />
+                  <div className="w-[10px] h-[10px] rounded-sm bg-primary/70 dark:bg-primary/60" />
                   <span className="text-[9px] text-muted-foreground ml-1">More</span>
                 </div>
               </div>
@@ -7367,7 +7367,7 @@ function StandaloneAffiliateDashboard() {
               >
                 <Bell className="h-4 w-4" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-[hsl(var(--danger))] rounded-full" />
                 )}
               </button>
               <span className="text-sm text-muted-foreground hidden sm:inline">{userEmail}</span>

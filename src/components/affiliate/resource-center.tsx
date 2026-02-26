@@ -181,11 +181,11 @@ export function SwipeFileLibrary() {
   };
 
   const CATEGORY_COLORS: Record<string, string> = {
-    introduction: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    'follow-up': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    'limited-time': 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    seasonal: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-    're-engagement': 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+    introduction: 'bg-primary/10 text-primary dark:bg-primary/15',
+    'follow-up': 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))] dark:bg-[hsl(var(--success)/0.15)]',
+    'limited-time': 'bg-[hsl(var(--danger)/0.1)] text-[hsl(var(--danger))] dark:bg-[hsl(var(--danger)/0.15)]',
+    seasonal: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))] dark:bg-[hsl(var(--warning)/0.15)]',
+    're-engagement': 'bg-[hsl(var(--chart-5)/0.1)] text-[hsl(var(--chart-5))] dark:bg-[hsl(var(--chart-5)/0.15)]',
   };
 
   return (
@@ -299,11 +299,11 @@ export function PromotionalCalendarPanel() {
   useEffect(() => { loadEvents(); }, []);
 
   const TYPE_COLORS: Record<string, string> = {
-    seasonal: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-    feature_launch: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    flash_sale: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    holiday: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    contest: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+    seasonal: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))] dark:bg-[hsl(var(--warning)/0.15)]',
+    feature_launch: 'bg-primary/10 text-primary dark:bg-primary/15',
+    flash_sale: 'bg-[hsl(var(--danger)/0.1)] text-[hsl(var(--danger))] dark:bg-[hsl(var(--danger)/0.15)]',
+    holiday: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))] dark:bg-[hsl(var(--success)/0.15)]',
+    contest: 'bg-[hsl(var(--chart-5)/0.1)] text-[hsl(var(--chart-5))] dark:bg-[hsl(var(--chart-5)/0.15)]',
     general: 'bg-muted text-muted-foreground',
   };
 
@@ -345,7 +345,7 @@ export function PromotionalCalendarPanel() {
           <h3 className="font-semibold text-sm mb-3">Active Promotions</h3>
           <div className="space-y-3">
             {activeEvents.map(event => (
-              <div key={event.id} className="p-3 rounded-md border border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10" data-testid={`promo-active-${event.id}`}>
+              <div key={event.id} className="p-3 rounded-md border border-[hsl(var(--success)/0.2)] dark:border-[hsl(var(--success)/0.3)] bg-[hsl(var(--success)/0.05)] dark:bg-[hsl(var(--success)/0.1)]" data-testid={`promo-active-${event.id}`}>
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm" data-testid={`promo-status-${event.id}`}>{STATUS_ICONS[event.status]}</span>
@@ -353,7 +353,7 @@ export function PromotionalCalendarPanel() {
                     <span className={`text-[10px] px-1.5 py-0.5 rounded capitalize ${TYPE_COLORS[event.campaign_type] || TYPE_COLORS.general}`}>{event.campaign_type.replace('_', ' ')}</span>
                   </div>
                   {event.days_remaining > 0 && (
-                    <span className="text-xs text-green-600 font-medium" data-testid={`promo-countdown-${event.id}`}>{event.days_remaining}d left</span>
+                    <span className="text-xs text-[hsl(var(--success))] font-medium" data-testid={`promo-countdown-${event.id}`}>{event.days_remaining}d left</span>
                   )}
                 </div>
                 {event.description && <p className="text-xs text-muted-foreground mt-1">{event.description}</p>}
@@ -390,7 +390,7 @@ export function PromotionalCalendarPanel() {
                     <span className={`text-[10px] px-1.5 py-0.5 rounded capitalize ${TYPE_COLORS[event.campaign_type] || TYPE_COLORS.general}`}>{event.campaign_type.replace('_', ' ')}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-medium text-blue-600" data-testid={`promo-starts-in-${event.id}`}>Starts in {event.days_until_start}d</span>
+                    <span className="text-xs font-medium text-primary" data-testid={`promo-starts-in-${event.id}`}>Starts in {event.days_until_start}d</span>
                     <p className="text-[10px] text-muted-foreground">{new Date(event.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                   </div>
                 </div>
@@ -419,7 +419,7 @@ export function AssetUsageTracker({ assetId, onTrack }: { assetId: string; onTra
 
 export function TopPerformerBadge() {
   return (
-    <span className="text-[9px] px-1.5 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded font-medium" data-testid="badge-top-performer">
+    <span className="text-[9px] px-1.5 py-0.5 bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))] dark:bg-[hsl(var(--warning)/0.15)] rounded font-medium" data-testid="badge-top-performer">
       Top Performer
     </span>
   );

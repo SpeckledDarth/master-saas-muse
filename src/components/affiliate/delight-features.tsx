@@ -121,7 +121,7 @@ export function WeeklyChallengesPanel() {
                 <span className="font-medium text-sm">{String(ch.name ?? '')}</span>
                 <div className="flex items-center gap-2">
                   {ch.badge_reward && (
-                    <span className="text-[9px] px-1.5 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded" data-testid={`challenge-badge-${ch.id}`}>
+                    <span className="text-[9px] px-1.5 py-0.5 bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))] dark:bg-[hsl(var(--warning)/0.15)] rounded" data-testid={`challenge-badge-${ch.id}`}>
                       🏆 {String(ch.badge_reward ?? '')}
                     </span>
                   )}
@@ -251,7 +251,7 @@ export function CaseStudyLibrary() {
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <span className="text-[10px] text-muted-foreground">by {study.affiliate_name}</span>
                     {study.tier_name && (
-                      <span className="text-[9px] px-1.5 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded">{study.tier_name}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 bg-primary/10 text-primary dark:bg-primary/15 rounded">{study.tier_name}</span>
                     )}
                   </div>
                 )}
@@ -382,8 +382,8 @@ export function PromotionQuizPanel() {
         </div>
       ))}
       {playbook.quick_wins && (
-        <div className="mt-3 p-2 rounded bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800" data-testid="quiz-quick-wins">
-          <h4 className="text-xs font-medium text-green-700 dark:text-green-400 mb-1">Quick Wins</h4>
+        <div className="mt-3 p-2 rounded bg-[hsl(var(--success)/0.05)] dark:bg-[hsl(var(--success)/0.1)] border border-[hsl(var(--success)/0.2)] dark:border-[hsl(var(--success)/0.3)]" data-testid="quiz-quick-wins">
+          <h4 className="text-xs font-medium text-[hsl(var(--success))] mb-1">Quick Wins</h4>
           {playbook.quick_wins.map((win: any, i: number) => (
             <p key={i} className="text-[11px] text-muted-foreground">• {typeof win === 'string' ? win : String(win?.text ?? win?.description ?? '')}</p>
           ))}
@@ -401,7 +401,7 @@ export function PromotionQuizPanel() {
         <h3 className="font-semibold text-sm">Promotion Strategy Quiz</h3>
         <span className="text-[10px] text-muted-foreground">{currentQ + 1}/{questions.length}</span>
       </div>
-      {error && <p className="text-xs text-red-500 mb-2" data-testid="text-quiz-error">{error}</p>}
+      {error && <p className="text-xs text-destructive mb-2" data-testid="text-quiz-error">{error}</p>}
       <p className="text-sm mb-3" data-testid="text-quiz-question">{q.question}</p>
       <div className="space-y-1.5 mb-3">
         {q.options.map(opt => (
@@ -522,7 +522,7 @@ export function AudienceAnalyzerPanel() {
                   <span className="text-[11px]">{s.source || 'Direct'}</span>
                   <div className="text-right">
                     <span className="text-[10px] font-medium">{s.clicks} clicks</span>
-                    {s.rate > 0 && <span className="text-[9px] text-green-600 ml-1">{s.rate.toFixed(1)}%</span>}
+                    {s.rate > 0 && <span className="text-[9px] text-[hsl(var(--success))] ml-1">{s.rate.toFixed(1)}%</span>}
                   </div>
                 </div>
               ))}
@@ -563,7 +563,7 @@ export function AudienceAnalyzerPanel() {
                     <span className="text-[11px]">{g.country || 'Unknown'}</span>
                     <div className="text-right">
                       <span className="text-[10px]">{g.clicks} clicks</span>
-                      {g.conversions > 0 && <span className="text-[9px] text-green-600 ml-1">({g.conversions} conv)</span>}
+                      {g.conversions > 0 && <span className="text-[9px] text-[hsl(var(--success))] ml-1">({g.conversions} conv)</span>}
                     </div>
                   </div>
                 ))}
