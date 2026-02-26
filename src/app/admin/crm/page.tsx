@@ -140,7 +140,7 @@ export default function CRMPage() {
         new Date(c.member_since).toISOString().split('T')[0],
       ])
 
-      const csv = [headers.join(','), ...csvRows.map(r => r.join(','))].join('\n')
+      const csv = [headers.join(','), ...csvRows.map((r: string[]) => r.join(','))].join('\n')
       const blob = new Blob([csv], { type: 'text/csv' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
