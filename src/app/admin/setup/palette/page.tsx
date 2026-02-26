@@ -1022,33 +1022,11 @@ export default function PalettePage() {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Design System</h3>
-        <p className="text-sm text-muted-foreground">Configure typography, components, layout, interactions, and more. These settings apply site-wide.</p>
-      </div>
-
-      <PresetsSection />
-      <SemanticColorsSection />
-      <TypographySection />
-      <ComponentStyleSection />
-      <LayoutSection />
-      <InteractiveSection />
-      <DarkModeSection />
-      <DataVizSection />
-      <TablesSection />
-      <LoadingStatesSection />
-      <NotificationsSection />
-      <FormsSection />
-      <ScrollPageSection />
-      <AccessibilitySection />
-      <DividerSection />
-      <PrintSection />
-
       <div
         className="rounded-xl p-8 transition-colors duration-300 bg-background text-foreground"
         style={cssOverrides as React.CSSProperties}
       >
-        <p className="text-[15px] font-medium text-muted-foreground mb-6 uppercase tracking-wider">Examples</p>
+        <p className="text-[15px] font-medium text-muted-foreground mb-6 uppercase tracking-wider">Live Preview</p>
         <div className="space-y-6">
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1090,6 +1068,28 @@ export default function PalettePage() {
 
         </div>
       </div>
+
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold">Design System</h3>
+        <p className="text-sm text-muted-foreground">Configure typography, components, layout, interactions, and more. These settings apply site-wide.</p>
+      </div>
+
+      <PresetsSection />
+      <SemanticColorsSection />
+      <TypographySection />
+      <ComponentStyleSection />
+      <LayoutSection />
+      <InteractiveSection />
+      <DarkModeSection />
+      <DataVizSection />
+      <TablesSection />
+      <LoadingStatesSection />
+      <NotificationsSection />
+      <FormsSection />
+      <ScrollPageSection />
+      <AccessibilitySection />
+      <DividerSection />
+      <PrintSection />
     </div>
   )
 }

@@ -351,6 +351,20 @@ Changes:
 
 **No database changes.** No new environment variables. No Supabase migrations needed.
 
+### Session: Dark Mode 950-Scale Fix + Palette UX (February 26, 2026)
+
+**Feature:** Fix dark/light mode component color switching and improve admin palette UX.
+
+Changes:
+1. **950-scale component variables** — `useThemeFromSettings` now derives all component-level CSS variables from the primary color's shade scale:
+   - Dark: card=900, foreground=50, muted=800, muted-fg=300, border=700
+   - Light: card=50, foreground=950, muted=100, muted-fg=600, border=200
+   - Respects admin `darkTheme`/`lightTheme` overrides (shade scale only fills in what admin didn't explicitly set)
+2. **Card component fixed** — Replaced hardcoded `bg-white/[0.09]` with `bg-card` so cards use the `--card` CSS variable and respond to theme switching
+3. **Palette page UX** — Moved "Live Preview" (example cards) from bottom to right after the color picker/shade scale/background overrides, before Design System sections. Admins see real-time color changes while picking colors.
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
 ---
 
 ## Related Documentation

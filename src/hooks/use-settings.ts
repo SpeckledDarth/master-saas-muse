@@ -573,6 +573,33 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
       }
     }
 
+    if (settings.branding.primaryColor) {
+      const scale = generateShadeScaleHsl(settings.branding.primaryColor)
+      if (!theme?.card) {
+        const cardShade = isDark ? scale['900'] : scale['50']
+        if (cardShade) root.style.setProperty('--card', cardShade)
+      }
+      if (!theme?.foreground) {
+        const fgShade = isDark ? scale['50'] : scale['950']
+        if (fgShade) {
+          root.style.setProperty('--foreground', fgShade)
+          root.style.setProperty('--popover-foreground', fgShade)
+          root.style.setProperty('--card-foreground', fgShade)
+        }
+      }
+      if (!theme?.border) {
+        const borderShade = isDark ? scale['700'] : scale['200']
+        if (borderShade) {
+          root.style.setProperty('--border', borderShade)
+          root.style.setProperty('--input', borderShade)
+        }
+      }
+      const mutedShade = isDark ? scale['800'] : scale['100']
+      const mutedFgShade = isDark ? scale['300'] : scale['600']
+      if (mutedShade) root.style.setProperty('--muted', mutedShade)
+      if (mutedFgShade) root.style.setProperty('--muted-foreground', mutedFgShade)
+    }
+
     applyDesignSystemVars(root, settings.branding)
   }, [settings?.branding, resolvedTheme])
   
