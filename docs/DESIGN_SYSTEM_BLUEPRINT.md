@@ -350,8 +350,8 @@ All 4 tasks completed. UI components consume CSS variables, FOUC prevention acti
 | `src/components/ui/badge.tsx` | Badge component — consumes badge-radius | ✅ Done |
 | `src/components/ui/input.tsx` | Input component — consumes input-radius | ✅ Done |
 | `src/app/layout.tsx` | Root layout — FOUC prevention inline script + body ready class | ✅ Done |
-| `src/app/affiliate/dashboard/page.tsx` | Affiliate dashboard — color audit target | ❌ Pending (T009) |
-| `src/components/affiliate/*.tsx` | 8 affiliate component files — color audit targets | ❌ Pending (T010) |
+| `src/app/affiliate/dashboard/page.tsx` | Affiliate dashboard — all colors palette-aware | ✅ Done |
+| `src/components/affiliate/*.tsx` | 8 affiliate component files — all colors palette-aware | ✅ Done |
 
 ---
 
@@ -381,4 +381,4 @@ To prevent partial completion surprises:
 3. **At the end of every session**, the agent updates ROADMAP.md with: which sprint completed, which tasks within it completed, and what the next session should start with.
 4. **If a sprint cannot be completed in the current session**, the agent must tell the user before the session ends: "Sprint X is partially done. Tasks T00Y and T00Z are complete. Task T00W is not started. The next session should resume with T00W."
 5. **The user should never discover partial completion after the fact.** Transparency is mandatory.
-6. **The next session to run is: Session A (Sprint 3 Resume).**
+6. **All sprints are COMPLETE. The Design System Configuration blueprint is finished.**

@@ -36,6 +36,7 @@ const cleanAirySettings: Partial<BrandingSettings> = {
   buttonFontWeight: 'semibold',
   buttonTextTransform: 'none',
   badgeShape: 'pill',
+  buttonRadius: 'pill',
 
   contentDensity: 'spacious',
   sectionSpacing: 'spacious',

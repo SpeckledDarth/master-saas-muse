@@ -266,6 +266,8 @@ function resolveComponentVars(b: SiteSettings['branding']): Record<string, strin
   if (b.cardShadow) vars['--card-shadow'] = shadowMap[b.cardShadow] || shadowMap.sm
   if (b.cardBorderWidth !== undefined) vars['--card-border-width'] = `${b.cardBorderWidth}px`
   if (b.cardBorderStyle) vars['--card-border-style'] = b.cardBorderStyle === 'none' ? 'none' : b.cardBorderStyle
+  const btnRadiusMap = { pill: '9999px', rounded: '0.375rem' }
+  if (b.buttonRadius) vars['--btn-radius'] = btnRadiusMap[b.buttonRadius] || btnRadiusMap.pill
   if (b.buttonSize) vars['--btn-padding'] = btnPadMap[b.buttonSize] || btnPadMap.default
   if (b.buttonFontWeight) vars['--btn-font-weight'] = fontWeightMap[b.buttonFontWeight] || fontWeightMap.semibold
   if (b.buttonTextTransform) vars['--btn-text-transform'] = b.buttonTextTransform
@@ -412,6 +414,9 @@ function applyDesignSystemVars(root: HTMLElement, b: SiteSettings['branding']) {
   } else {
     root.removeAttribute('data-reduce-motion')
   }
+
+  root.setAttribute('data-contrast', b.contrastEnforcement !== false ? 'true' : 'false')
+  root.setAttribute('data-print-styles', b.printStyles !== false ? 'true' : 'false')
 
   if (b.darkCardDepth) {
     const depthMap = { subtle: '2%', default: '4%', deep: '8%' }
