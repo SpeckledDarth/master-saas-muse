@@ -244,6 +244,8 @@ Common issues that pass in dev but fail in production:
 | Handling only one Supabase error code for missing tables | Intermittent 500 errors after table creation | Handle both `42P01` and `PGRST205` error codes |
 | Computing derived data that another component already computes | Inconsistent numbers across the UI | Search existing endpoints before creating new calculations |
 | Ignoring Vercel-reported errors because "it works in Replit" | Production stays broken | Vercel is the source of truth; investigate environment differences |
+| Placing early returns (loading/auth guards) BEFORE all hooks in a component | React Error #310 "Rendered more hooks than during the previous render" — hooks count changes between renders | ALL hooks (useState, useEffect, useCallback, useMemo, useRef) MUST be called before ANY conditional return. Move loading/auth guards to AFTER all hooks. This is a fundamental React rule. |
+| Having 200+ hooks in a single component | Hard to audit hook ordering, easy to accidentally place early returns before hooks | Refactor large components into smaller sub-components that handle their own state |
 
 ---
 

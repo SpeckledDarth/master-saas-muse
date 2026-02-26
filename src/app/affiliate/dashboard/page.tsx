@@ -738,7 +738,6 @@ function StandaloneAffiliateDashboard() {
   const [unreadMessages, setUnreadMessages] = useState(0)
 
   const [showTour, setShowTour] = useState(false)
-  const [widgetDebugMax, setWidgetDebugMax] = useState(0)
   const [tourStep, setTourStep] = useState(0)
 
   const [webhooks, setWebhooks] = useState<any[]>([])
@@ -1763,13 +1762,13 @@ function StandaloneAffiliateDashboard() {
 
   const generateDeepLink = () => {
     if (!data?.link?.ref_code) return ''
-    const baseUrl = data.link.shareUrl.split('?')[0].replace(/\/$/, '')
+    const baseUrl = data?.link?.shareUrl || "".split('?')[0].replace(/\/$/, '')
     const baseDomain = baseUrl.replace(/\/+$/, '')
     const path = deepLinkPage === 'custom' ? customPath : deepLinkPage
     const cleanPath = path.startsWith('/') ? path : `/${path}`
 
     const params = new URLSearchParams()
-    params.set('ref', data.link.ref_code)
+    params.set('ref', data?.link?.ref_code)
 
     if (sourceTag.trim()) {
       params.set('src', sourceTag.trim())
@@ -1778,7 +1777,7 @@ function StandaloneAffiliateDashboard() {
     if (includeUtm) {
       params.set('utm_source', appName.toLowerCase().replace(/\s+/g, '-'))
       params.set('utm_medium', 'affiliate')
-      params.set('utm_campaign', data.link.ref_code)
+      params.set('utm_campaign', data?.link?.ref_code)
       if (sourceTag.trim()) {
         params.set('utm_content', sourceTag.trim())
       }
@@ -1906,105 +1905,6 @@ function StandaloneAffiliateDashboard() {
     }
   }
 
-  if (authChecking || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen" data-testid="loading-affiliate-dashboard">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    )
-  }
-
-  if (!data || !data.link?.is_affiliate) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 border-gray-500/50">
-          <CardContent className="pt-8 pb-6 text-center">
-            <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-bold text-black dark:text-white mb-2" data-testid="text-no-affiliate">Not an Affiliate Yet</h2>
-            <p className="text-muted-foreground mb-6">
-              Your account doesn't have affiliate access. If you recently applied, your application may still be under review.
-            </p>
-            <div className="flex flex-col gap-3">
-              <Link href="/affiliate/join">
-                <Button className="w-full" data-testid="button-apply">Apply to Program</Button>
-              </Link>
-              <Button variant="outline" onClick={handleLogout} data-testid="button-logout">
-                <LogOut className="h-4 w-4 mr-2" /> Log Out
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  if (typeof window !== 'undefined') {
-    try {
-      const deepSnap = (obj: any, depth = 0): any => {
-        if (depth > 3) return '[deep]'
-        if (obj === null) return 'null'
-        if (obj === undefined) return 'undefined'
-        if (typeof obj !== 'object') return `${typeof obj}:${String(obj).slice(0, 50)}`
-        if (Array.isArray(obj)) return `array[${obj.length}]${obj.length > 0 ? ':' + JSON.stringify(obj.slice(0, 2)).slice(0, 100) : ''}`
-        const result: Record<string, any> = {}
-        for (const [k, v] of Object.entries(obj)) {
-          result[k] = deepSnap(v, depth + 1)
-        }
-        return result
-      }
-      const diagState = {
-        section,
-        timestamp: new Date().toISOString(),
-        stats: deepSnap(data.stats),
-        tier: deepSnap(data.tier),
-        terms: deepSnap(data.terms),
-        earnings: deepSnap(earnings),
-        milestoneData: milestoneData ? { count: milestoneData.milestones?.length, currentReferrals: milestoneData.currentReferrals, sample: milestoneData.milestones?.[0] ? deepSnap(milestoneData.milestones[0]) : null } : null,
-        forecast: deepSnap(forecast),
-        contests: `array[${contests.length}]`,
-        leaderboard: `array[${leaderboard.length}]`,
-        funnel: `array[${funnel.length}]`,
-        coachTips: `array[${coachTips.length}]`,
-        notifications: `array[${notifications.length}]`,
-      };
-      (window as any).__DASHBOARD_DIAGNOSTIC__ = diagState
-      console.log('[RENDER_PHASE_DIAG]', JSON.stringify(diagState, null, 2))
-    } catch (diagErr) {
-      console.error('[RENDER_PHASE_DIAG_ERROR]', String(diagErr))
-    }
-  }
-
-  const tierProgress = data.tier.next
-    ? ((data.stats.totalReferrals / data.tier.next.min_referrals) * 100)
-    : 100
-
-  const sourceBreakdown: Record<string, { referrals: number; converted: number }> = {}
-  data.referrals.forEach(ref => {
-    const tag = ref.source_tag || '(no tag)'
-    if (!sourceBreakdown[tag]) sourceBreakdown[tag] = { referrals: 0, converted: 0 }
-    sourceBreakdown[tag].referrals++
-    if (ref.status === 'converted') sourceBreakdown[tag].converted++
-  })
-
-  const filteredReferrals = data.referrals
-    .filter(r => referralFilter === 'all' || r.status === referralFilter)
-    .sort((a, b) => referralSort === 'newest'
-      ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      : new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    )
-
-  const filteredCommissions = data.commissions
-    .filter(c => earningsFilter === 'all' || c.status === earningsFilter)
-    .sort((a, b) => earningsSort === 'newest'
-      ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      : new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    )
-
-  const sortedPayouts = [...data.payouts].sort((a, b) => payoutSort === 'newest'
-    ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    : new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-  )
-
   const updateLayout = useCallback((newLayout: DashboardLayout) => {
     setDashboardLayout(newLayout)
     saveDashboardLayout(newLayout)
@@ -2095,8 +1995,7 @@ function StandaloneAffiliateDashboard() {
   }
 
   const renderWidgetInner = (widgetId: WidgetId): React.ReactNode => {
-    const dataWidgets: WidgetId[] = ['share_link', 'quick_stats', 'tier_progress', 'achievements', 'milestone_countdown', 'payout_schedule', 'tier_celebration']
-    if (dataWidgets.includes(widgetId) && !data) return null
+    if (!data) return null
 
     switch (widgetId) {
       case 'share_link':
@@ -2107,15 +2006,15 @@ function StandaloneAffiliateDashboard() {
                 <div className="flex-1 min-w-0 w-full">
                   <p className="text-sm font-medium mb-1">Your Referral Link</p>
                   <div className="flex items-center gap-2">
-                    <Input value={data.link.shareUrl} readOnly className="font-mono text-sm" data-testid="input-share-url" />
-                    <Button variant="outline" size="sm" onClick={() => handleCopy(data.link.shareUrl)} data-testid="button-copy-link">
+                    <Input value={data?.link?.shareUrl || ""} readOnly className="font-mono text-sm" data-testid="input-share-url" />
+                    <Button variant="outline" size="sm" onClick={() => handleCopy(data?.link?.shareUrl || "")} data-testid="button-copy-link">
                       {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
                 </div>
-                {data.terms && (
+                {data?.terms && (
                   <Badge variant="secondary" className="shrink-0" data-testid="badge-locked-terms">
-                    {S(data.terms.rate)}% for {S(data.terms.durationMonths)} months
+                    {S(data?.terms.rate)}% for {S(data?.terms.durationMonths)} months
                   </Badge>
                 )}
               </div>
@@ -2183,7 +2082,7 @@ function StandaloneAffiliateDashboard() {
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Pending</span>
                 </div>
-                <p className="text-2xl font-bold mt-1">${(data.stats.pendingEarnings / 100).toFixed(2)}</p>
+                <p className="text-2xl font-bold mt-1">${(data?.stats?.pendingEarnings / 100).toFixed(2)}</p>
               </CardContent>
             </Card>
             <Card data-testid="stat-total-earned">
@@ -2192,7 +2091,7 @@ function StandaloneAffiliateDashboard() {
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Total Earned</span>
                 </div>
-                <p className="text-2xl font-bold mt-1">${(data.stats.totalEarnings / 100).toFixed(2)}</p>
+                <p className="text-2xl font-bold mt-1">${(data?.stats?.totalEarnings / 100).toFixed(2)}</p>
               </CardContent>
             </Card>
           </div>
@@ -2206,19 +2105,19 @@ function StandaloneAffiliateDashboard() {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Award className="h-4 w-4 text-primary" />
-                  <span className="font-medium text-sm">{S(data.tier.current.name)} Tier</span>
-                  <Badge variant="outline" className="text-xs">{S(data.stats.effectiveRate)}% commission</Badge>
+                  <span className="font-medium text-sm">{S(data?.tier?.current.name)} Tier</span>
+                  <Badge variant="outline" className="text-xs">{S(data?.stats?.effectiveRate)}% commission</Badge>
                 </div>
-                {data.tier.next && (
+                {data?.tier?.next && (
                   <span className="text-xs text-muted-foreground">
-                    {S(data.tier.referralsToNext)} more to {S(data.tier.next.name)} ({S(data.tier.next.commission_rate)}%)
+                    {S(data.tier.referralsToNext)} more to {S(data?.tier?.next.name)} ({S(data?.tier?.next.commission_rate)}%)
                   </span>
                 )}
               </div>
-              {data.tier.next && (
+              {data?.tier?.next && (
                 <Progress value={Math.min(tierProgress, 100)} className="h-2" data-testid="progress-tier" />
               )}
-              {!data.tier.next && (
+              {!data?.tier?.next && (
                 <p className="text-xs text-muted-foreground">You've reached the highest tier!</p>
               )}
               {tierPerks.length > 0 && (
@@ -2915,22 +2814,7 @@ function StandaloneAffiliateDashboard() {
         </Card>
       )}
 
-      <div className="p-3 mb-4 border rounded-md bg-yellow-50 dark:bg-yellow-950/30">
-        <p className="text-xs font-medium mb-2">Debug Mode: Showing {widgetDebugMax} of {visibleWidgets.length} widgets</p>
-        <div className="flex gap-2 flex-wrap">
-          <Button size="sm" variant="outline" onClick={() => setWidgetDebugMax(m => m + 1)} disabled={widgetDebugMax >= visibleWidgets.length} data-testid="button-add-widget-debug">
-            Show Next Widget ({widgetDebugMax < visibleWidgets.length ? visibleWidgets[widgetDebugMax] : 'all shown'})
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => setWidgetDebugMax(visibleWidgets.length)} data-testid="button-show-all-widgets">
-            Show All
-          </Button>
-          <Button size="sm" variant="ghost" onClick={() => setWidgetDebugMax(0)} data-testid="button-hide-all-widgets">
-            Reset to 0
-          </Button>
-        </div>
-      </div>
-
-      {visibleWidgets.slice(0, widgetDebugMax).map(widgetId => {
+      {visibleWidgets.map(widgetId => {
         const content = renderWidgetContent(widgetId)
         if (!content && !customizeMode) return null
 
@@ -2979,8 +2863,9 @@ function StandaloneAffiliateDashboard() {
   )
 
   const renderReferrals = () => {
+    if (!data) return null
     const referralCommissions: Record<string, number> = {}
-    data.commissions.forEach(c => {
+    data?.commissions?.forEach(c => {
       const refId = (c as any).referral_id
       if (refId) {
         referralCommissions[refId] = (referralCommissions[refId] || 0) + c.commission_amount_cents
@@ -3407,7 +3292,9 @@ function StandaloneAffiliateDashboard() {
     )
   }
 
-  const renderEarnings = () => (
+  const renderEarnings = () => {
+    if (!data) return null
+    return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold" data-testid="text-earnings-heading">Earnings ({data.commissions.length})</h2>
@@ -3439,25 +3326,25 @@ function StandaloneAffiliateDashboard() {
         <Card>
           <CardContent className="pt-4 pb-3">
             <span className="text-xs text-muted-foreground">Pending</span>
-            <p className="text-xl font-bold mt-1">${(data.stats.pendingEarnings / 100).toFixed(2)}</p>
+            <p className="text-xl font-bold mt-1">${(data?.stats?.pendingEarnings / 100).toFixed(2)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-3">
             <span className="text-xs text-muted-foreground">Approved</span>
-            <p className="text-xl font-bold mt-1">${(data.stats.approvedEarnings / 100).toFixed(2)}</p>
+            <p className="text-xl font-bold mt-1">${(data?.stats?.approvedEarnings / 100).toFixed(2)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-3">
             <span className="text-xs text-muted-foreground">Paid Out</span>
-            <p className="text-xl font-bold mt-1">${(data.stats.paidEarnings / 100).toFixed(2)}</p>
+            <p className="text-xl font-bold mt-1">${(data?.stats?.paidEarnings / 100).toFixed(2)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-3">
             <span className="text-xs text-muted-foreground">Min Payout</span>
-            <p className="text-xl font-bold mt-1">${(data.settings.minPayoutCents / 100).toFixed(2)}</p>
+            <p className="text-xl font-bold mt-1">${(data?.settings?.minPayoutCents / 100).toFixed(2)}</p>
           </CardContent>
         </Card>
       </div>
@@ -4125,7 +4012,7 @@ function StandaloneAffiliateDashboard() {
                     <Label className="text-xs">Rate (%)</Label>
                     <Input
                       type="number"
-                      value={calcRate || String(data.stats.effectiveRate || 30)}
+                      value={calcRate || String(data?.stats?.effectiveRate || 30)}
                       onChange={e => setCalcRate(e.target.value)}
                       min="1"
                       max="100"
@@ -4137,7 +4024,7 @@ function StandaloneAffiliateDashboard() {
                 {(() => {
                   const refs = parseInt(calcReferrals) || 0
                   const price = parseFloat(calcPrice) || 0
-                  const rate = parseFloat(calcRate || String(data.stats.effectiveRate || 30)) || 0
+                  const rate = parseFloat(calcRate || String(data?.stats?.effectiveRate || 30)) || 0
                   const monthlyEarning = refs * price * (rate / 100)
                   const annualEarning = monthlyEarning * 12
                   return (
@@ -4167,7 +4054,7 @@ function StandaloneAffiliateDashboard() {
               <CardContent>
                 {(() => {
                   const price = parseFloat(calcPrice) || 49
-                  const rate = parseFloat(calcRate || String(data.stats.effectiveRate || 30)) || 30
+                  const rate = parseFloat(calcRate || String(data?.stats?.effectiveRate || 30)) || 30
                   const commission = price * (rate / 100)
                   const months = [1, 3, 6, 12]
                   return (
@@ -4254,8 +4141,11 @@ function StandaloneAffiliateDashboard() {
       </div>
     </div>
   )
+  }
 
-  const renderPayouts = () => (
+  const renderPayouts = () => {
+    if (!data) return null
+    return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold" data-testid="text-payouts-heading">Payouts ({data.payouts.length})</h2>
@@ -4313,6 +4203,7 @@ function StandaloneAffiliateDashboard() {
       <WeeklyChallengesPanel />
     </div>
   )
+  }
 
   const renderAssets = () => {
     const availableTypes = [...new Set(assets.map(a => a.asset_type))]
@@ -4657,7 +4548,7 @@ function StandaloneAffiliateDashboard() {
           <div className="flex flex-col items-center gap-4">
             <div className="bg-white p-4 rounded-lg" data-testid="qr-code-container">
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.link.shareUrl)}`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data?.link?.shareUrl || "")}`}
                 alt="Referral QR Code"
                 className="w-48 h-48"
                 data-testid="img-qr-code"
@@ -4665,7 +4556,7 @@ function StandaloneAffiliateDashboard() {
             </div>
             <Button variant="outline" size="sm" asChild data-testid="button-download-qr">
               <a
-                href={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=${encodeURIComponent(data.link.shareUrl)}`}
+                href={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=${encodeURIComponent(data?.link?.shareUrl || "")}`}
                 download="referral-qr-code.png"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -4792,30 +4683,30 @@ function StandaloneAffiliateDashboard() {
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <Button variant="outline" size="sm" className="justify-start" asChild data-testid="button-share-twitter">
-              <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${appName}! ${data.link.shareUrl}`)}`} target="_blank" rel="noopener noreferrer">
+              <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${appName}! ${data?.link?.shareUrl || ""}`)}`} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> Twitter / X
               </a>
             </Button>
             <Button variant="outline" size="sm" className="justify-start" asChild data-testid="button-share-facebook">
-              <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(data.link.shareUrl)}`} target="_blank" rel="noopener noreferrer">
+              <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(data?.link?.shareUrl || "")}`} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> Facebook
               </a>
             </Button>
             <Button variant="outline" size="sm" className="justify-start" asChild data-testid="button-share-linkedin">
-              <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(data.link.shareUrl)}`} target="_blank" rel="noopener noreferrer">
+              <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(data?.link?.shareUrl || "")}`} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> LinkedIn
               </a>
             </Button>
             <Button variant="outline" size="sm" className="justify-start" asChild data-testid="button-share-email">
-              <a href={`mailto:?subject=${encodeURIComponent(`Check out ${appName}`)}&body=${encodeURIComponent(`I've been using ${appName} and thought you'd love it too!\n\n${data.link.shareUrl}`)}`}>
+              <a href={`mailto:?subject=${encodeURIComponent(`Check out ${appName}`)}&body=${encodeURIComponent(`I've been using ${appName} and thought you'd love it too!\n\n${data?.link?.shareUrl || ""}`)}`}>
                 <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> Email
               </a>
             </Button>
           </div>
           <div className="mt-3 p-3 rounded-md bg-muted/40">
             <Label className="text-xs text-muted-foreground mb-1 block">Quick Copy Text</Label>
-            <p className="text-xs mb-2">Check out {appName}! Sign up with my link for a special offer: {data.link.shareUrl}</p>
-            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { navigator.clipboard.writeText(`Check out ${appName}! Sign up with my link for a special offer: ${data.link.shareUrl}`); toast({ title: 'Copied!', description: 'Sharing text copied to clipboard.' }) }} data-testid="button-copy-share-text">
+            <p className="text-xs mb-2">Check out {appName}! Sign up with my link for a special offer: {data?.link?.shareUrl || ""}</p>
+            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { navigator.clipboard.writeText(`Check out ${appName}! Sign up with my link for a special offer: ${data?.link?.shareUrl || ""}`); toast({ title: 'Copied!', description: 'Sharing text copied to clipboard.' }) }} data-testid="button-copy-share-text">
               <Copy className="h-3 w-3 mr-1" /> Copy Text
             </Button>
           </div>
@@ -5010,7 +4901,7 @@ function StandaloneAffiliateDashboard() {
           {data?.link?.ref_code && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Link2 className="h-3 w-3" />
-              <span>Your ref link will be embedded: <span className="font-mono text-foreground" data-testid="text-ai-writer-ref-link">?ref={data.link.ref_code}</span></span>
+              <span>Your ref link will be embedded: <span className="font-mono text-foreground" data-testid="text-ai-writer-ref-link">?ref={data?.link?.ref_code}</span></span>
             </div>
           )}
           <Button onClick={generateAiWriterPost} disabled={aiWriterGenerating} data-testid="button-ai-writer-generate">
@@ -6133,15 +6024,15 @@ function StandaloneAffiliateDashboard() {
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Referral Code</Label>
-              <p className="text-sm font-mono">{S(data.link.ref_code)}</p>
+              <p className="text-sm font-mono">{S(data?.link?.ref_code)}</p>
             </div>
           </div>
-          {data.tier.current && (
+          {data?.tier?.current && (
             <div>
               <Label className="text-xs text-muted-foreground">Current Tier</Label>
               <div className="flex items-center gap-2 mt-0.5">
-                <Badge variant="secondary" className="text-xs">{S(data.tier.current.name)}</Badge>
-                <Badge variant="outline" className="text-xs">{S(data.stats.effectiveRate)}% commission</Badge>
+                <Badge variant="secondary" className="text-xs">{S(data?.tier?.current.name)}</Badge>
+                <Badge variant="outline" className="text-xs">{S(data?.stats?.effectiveRate)}% commission</Badge>
               </div>
             </div>
           )}
@@ -6172,22 +6063,22 @@ function StandaloneAffiliateDashboard() {
             <div className="text-center py-6" data-testid="text-no-contracts">
               <FileText className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">No contracts found.</p>
-              {data.terms && (
+              {data?.terms && (
                 <div className="mt-4 p-4 rounded-md bg-muted/40">
                   <p className="text-sm font-medium">Your Current Terms</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 text-sm">
                     <div>
                       <span className="text-xs text-muted-foreground">Commission Rate</span>
-                      <p className="font-medium">{S(data.terms.rate)}%</p>
+                      <p className="font-medium">{S(data?.terms.rate)}%</p>
                     </div>
                     <div>
                       <span className="text-xs text-muted-foreground">Lock Duration</span>
-                      <p className="font-medium">{S(data.terms.durationMonths)} months</p>
+                      <p className="font-medium">{S(data?.terms.durationMonths)} months</p>
                     </div>
-                    {data.terms.lockedAt && (
+                    {data?.terms.lockedAt && (
                       <div>
                         <span className="text-xs text-muted-foreground">Locked Since</span>
-                        <p className="font-medium">{new Date(data.terms.lockedAt).toLocaleDateString()}</p>
+                        <p className="font-medium">{new Date(data?.terms.lockedAt).toLocaleDateString()}</p>
                       </div>
                     )}
                   </div>
@@ -6758,10 +6649,10 @@ function StandaloneAffiliateDashboard() {
           <Button variant="outline" size="sm" className="w-full justify-start" data-testid="button-download-performance-report"
             onClick={() => {
               const csv = ['Date,Type,Amount,Status']
-              data.commissions.forEach(c => {
+              data?.commissions?.forEach(c => {
                 csv.push(`${new Date(c.created_at).toLocaleDateString()},commission,$${(c.commission_amount_cents / 100).toFixed(2)},${c.status}`)
               })
-              data.payouts.forEach(p => {
+              data?.payouts?.forEach(p => {
                 csv.push(`${new Date(p.created_at).toLocaleDateString()},payout,$${(p.amount_cents / 100).toFixed(2)},${p.status}`)
               })
               const blob = new Blob([csv.join('\n')], { type: 'text/csv' })
@@ -6786,10 +6677,10 @@ function StandaloneAffiliateDashboard() {
                 `Address: ${[profile.address_line1, profile.address_line2, profile.city, profile.state, profile.postal_code, profile.country].filter(Boolean).join(', ') || 'Not provided'}`,
                 `Tax ID: ${profile.tax_id ? '****' + profile.tax_id.slice(-4) : 'Not provided'}`,
                 '',
-                `Total Paid: $${(data.stats.paidEarnings / 100).toFixed(2)}`,
-                `Total Pending: $${(data.stats.pendingEarnings / 100).toFixed(2)}`,
-                `Total Approved: $${(data.stats.approvedEarnings / 100).toFixed(2)}`,
-                `Total Earnings: $${(data.stats.totalEarnings / 100).toFixed(2)}`,
+                `Total Paid: $${((data?.stats?.paidEarnings || 0) / 100).toFixed(2)}`,
+                `Total Pending: $${((data?.stats?.pendingEarnings || 0) / 100).toFixed(2)}`,
+                `Total Approved: $${((data?.stats?.approvedEarnings || 0) / 100).toFixed(2)}`,
+                `Total Earnings: $${((data?.stats?.totalEarnings || 0) / 100).toFixed(2)}`,
               ]
               const blob = new Blob([lines.join('\n')], { type: 'text/plain' })
               const url = URL.createObjectURL(blob)
@@ -6900,7 +6791,7 @@ function StandaloneAffiliateDashboard() {
             </div>
             <div className="p-3 rounded-md bg-muted/50">
               <p className="font-medium text-foreground text-xs mb-1">Payouts</p>
-              <p className="text-xs">Payouts are processed once your approved balance reaches the minimum threshold (${(data.settings.minPayoutCents / 100).toFixed(2)}). Payouts are reviewed and processed by our team.</p>
+              <p className="text-xs">Payouts are processed once your approved balance reaches the minimum threshold (${((data?.settings?.minPayoutCents || 0) / 100).toFixed(2)}). Payouts are reviewed and processed by our team.</p>
             </div>
             <div className="p-3 rounded-md bg-muted/50">
               <p className="font-medium text-foreground text-xs mb-1">Prohibited Activities</p>
@@ -6970,6 +6861,69 @@ function StandaloneAffiliateDashboard() {
       }
     }
   }, [loading, profileLoading, profile, data])
+
+  if (authChecking || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen" data-testid="loading-affiliate-dashboard">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    )
+  }
+
+  if (!data || !data.link?.is_affiliate) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white/10 border-gray-500/50">
+          <CardContent className="pt-8 pb-6 text-center">
+            <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <h2 className="text-xl font-bold text-black dark:text-white mb-2" data-testid="text-no-affiliate">Not an Affiliate Yet</h2>
+            <p className="text-muted-foreground mb-6">
+              Your account doesn't have affiliate access. If you recently applied, your application may still be under review.
+            </p>
+            <div className="flex flex-col gap-3">
+              <Link href="/affiliate/join">
+                <Button className="w-full" data-testid="button-apply">Apply to Program</Button>
+              </Link>
+              <Button variant="outline" onClick={handleLogout} data-testid="button-logout">
+                <LogOut className="h-4 w-4 mr-2" /> Log Out
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  const tierProgress = data?.tier?.next
+    ? ((data.stats.totalReferrals / data?.tier?.next.min_referrals) * 100)
+    : 100
+
+  const sourceBreakdown: Record<string, { referrals: number; converted: number }> = {}
+  data.referrals.forEach(ref => {
+    const tag = ref.source_tag || '(no tag)'
+    if (!sourceBreakdown[tag]) sourceBreakdown[tag] = { referrals: 0, converted: 0 }
+    sourceBreakdown[tag].referrals++
+    if (ref.status === 'converted') sourceBreakdown[tag].converted++
+  })
+
+  const filteredReferrals = data.referrals
+    .filter(r => referralFilter === 'all' || r.status === referralFilter)
+    .sort((a, b) => referralSort === 'newest'
+      ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      : new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    )
+
+  const filteredCommissions = data.commissions
+    .filter(c => earningsFilter === 'all' || c.status === earningsFilter)
+    .sort((a, b) => earningsSort === 'newest'
+      ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      : new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    )
+
+  const sortedPayouts = [...data.payouts].sort((a, b) => payoutSort === 'newest'
+    ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    : new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  )
 
   const completeTour = () => {
     setShowTour(false)
