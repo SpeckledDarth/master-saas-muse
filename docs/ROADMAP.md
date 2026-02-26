@@ -507,6 +507,35 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 
 ---
 
+### Session: Sprint 5 — Polish & Cross-Linking (Feb 26, 2026)
+
+**Sprint 5 completed (T016–T018) — BLUEPRINT COMPLETE (18/18 tasks):**
+
+- Related Records API (`/api/admin/related?entityType=&entityId=&userId=`) — returns grouped lists of related records for any entity type (invoices, subscriptions, tickets, commissions, referrals)
+- `<RelatedRecords />` component — lazy-loads related data, compact card style, hidden in print view, empty sections auto-hidden
+- Integrated RelatedRecords sidebar into Revenue detail page (all 4 transaction types) and Subscription detail page
+- Print CSS added to `globals.css` — hides sidebar, nav, action buttons, related records, search. Clean typography, no shadows, no border-radius
+- CSV export verified on all 3 list pages (CRM, Revenue, Subscriptions)
+- Updated FEATURE_INVENTORY.md with 8 new features from the relational dashboard
+- All APIs compile clean, return 401 for unauthenticated requests
+
+**Files created:**
+- `src/app/api/admin/related/route.ts` (Related Records API)
+- `src/components/admin/related-records.tsx` (Related Records component)
+
+**Files modified:**
+- `src/app/admin/revenue/[id]/page.tsx` (added RelatedRecords sidebar)
+- `src/app/admin/subscriptions/[id]/page.tsx` (added RelatedRecords sidebar)
+- `src/app/globals.css` (extended print CSS for admin pages)
+- `docs/ADMIN_DASHBOARD_BLUEPRINT.md` (marked 18/18 complete)
+- `docs/FEATURE_INVENTORY.md` (added 8 new dashboard features)
+
+**No new DB tables needed for Sprint 5. No new Supabase migrations.**
+
+**Admin Relational Dashboard Blueprint is COMPLETE.** All 18 tasks across 5 sprints are done.
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience

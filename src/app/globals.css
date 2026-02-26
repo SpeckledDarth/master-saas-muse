@@ -257,6 +257,32 @@
     font-size: 0.8em;
     color: #666;
   }
+  [data-testid="aside-admin-sidebar"],
+  [data-testid="button-open-search"],
+  [data-testid="button-back-revenue"],
+  [data-testid="button-back-subs"],
+  [data-testid="button-view-stripe"],
+  [data-testid="button-view-customer-stripe"],
+  [data-testid="button-export-csv"] {
+    display: none !important;
+  }
+  [data-testid="related-records"] {
+    display: none !important;
+  }
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  .rounded-lg {
+    border-radius: 0 !important;
+  }
+  table {
+    font-size: 10pt !important;
+  }
+  * {
+    box-shadow: none !important;
+  }
 }
 
 @keyframes marquee {

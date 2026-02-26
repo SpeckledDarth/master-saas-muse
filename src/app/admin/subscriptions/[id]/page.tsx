@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Loader2, ArrowLeft, ExternalLink, AlertTriangle, CreditCard } from 'lucide-react'
 import { EntityNotes } from '@/components/admin/entity-notes'
+import { RelatedRecords } from '@/components/admin/related-records'
 
 const STATUS_COLORS: Record<string, string> = {
   active: 'bg-green-500/10 text-green-600 dark:text-green-400',
@@ -202,9 +203,14 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
         )}
       </div>
 
-      <div>
-        <h3 className="text-sm font-medium mb-3">Notes</h3>
-        <EntityNotes entityType="subscription" entityId={id} />
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+        <div>
+          <h3 className="text-sm font-medium mb-3">Notes</h3>
+          <EntityNotes entityType="subscription" entityId={id} />
+        </div>
+        <div className="print:hidden">
+          <RelatedRecords entityType="subscription" entityId={id} userId={user.id} />
+        </div>
       </div>
     </div>
   )

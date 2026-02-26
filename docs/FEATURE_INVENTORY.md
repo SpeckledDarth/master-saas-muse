@@ -340,7 +340,16 @@ The admin dashboard provides platform owners with the tools to manage the busine
 | **Queue Management UI** | View and manage background job queues (email sending, metric pulling, etc.). | Operational visibility — ensure automated processes are running smoothly. |
 | **Product Registry** | Multi-product support — manage multiple SaaS products from a single admin interface. | Scalability — one deployment can serve multiple product lines (the MuseKit vision). |
 
-**Key Files:** `src/app/admin/` (admin pages), `src/app/api/admin/stats/`, `src/app/api/admin/revenue-attribution/`, `src/app/api/admin/revenue-waterfall/`, `src/app/api/admin/metrics/`, `src/app/api/admin/audit-logs/`
+| **Admin Relational Dashboard** | Four-layer drill-down dashboard: Dashboard Home → List → Detail → Cross-linked Detail. Includes CRM, Revenue, Subscriptions sections with full cross-linking between all entities. | CEO-grade visibility — every record is a doorway to every related record. No more isolated data. |
+| **Dashboard Command Center** | Admin home page with 6 clickable KPI cards (MRR, Active Subscribers, New Users, Open Tickets, Churn Rate, Failed Payments), actionable alerts, recent activity timeline, and 7-day revenue sparkline. | At-a-glance health — one screen to know if anything needs attention. |
+| **CRM (People)** | Admin CRM list + detail with search, filters, health scores, tags, 6 tabs (Profile, Transactions, Activity, Support, Notes, Contracts), EntityNotes. | Unified customer view — every person's full history in one place. |
+| **Revenue Management** | Revenue list (invoices, payments, commissions, payouts) with filters, summary stats. Detail pages for all 4 types with affiliate attribution, line items, subscription links. | Complete financial visibility across all transaction types. |
+| **Subscription Management** | Subscriptions list with churn risk indicators/filters, MRR by tier. Detail with churn risk section, invoice history, Stripe links. | Churn prevention — identify at-risk subscribers before they cancel. |
+| **Command Palette (Cmd+K)** | Global search across users, invoices, subscriptions, and tickets. Recent searches in localStorage. Accessible from any admin page. | Power-user navigation — find any entity in seconds without clicking through menus. |
+| **Related Records Sidebar** | Auto-populated sidebar on detail pages showing related entities from other types (other invoices, subscriptions, tickets by same customer). | Context without navigation — see the full picture without leaving the page. |
+| **Admin Print Styles** | Print-friendly CSS that hides sidebar, navigation, action buttons. Clean typography for detail page printing. | Printable invoices and records for offline use or client communication. |
+
+**Key Files:** `src/app/admin/` (admin pages), `src/app/api/admin/stats/`, `src/app/api/admin/revenue-attribution/`, `src/app/api/admin/revenue-waterfall/`, `src/app/api/admin/metrics/`, `src/app/api/admin/audit-logs/`, `src/app/api/admin/dashboard/`, `src/app/api/admin/crm/`, `src/app/api/admin/revenue/`, `src/app/api/admin/subscriptions/`, `src/app/api/admin/search/`, `src/app/api/admin/related/`, `src/components/admin/sidebar.tsx`, `src/components/admin/breadcrumbs.tsx`, `src/components/admin/timeline.tsx`, `src/components/admin/entity-notes.tsx`, `src/components/admin/related-records.tsx`, `src/components/admin/command-palette.tsx`, `src/lib/admin-auth.ts`
 
 ---
 
