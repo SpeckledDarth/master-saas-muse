@@ -219,6 +219,32 @@ All migrations have been run on Supabase (001-016):
 
 ---
 
+## Session Log
+
+### Session — February 26, 2026 (Schema Sync & Data Seeding)
+**Objective:** Fix Replit/Supabase database sync gap, seed all admin content, verify dashboard rendering.
+
+**Completed:**
+1. **Schema gap analysis** — Identified that migrations 013-016 were never applied to Supabase. Also found `notifications` and `affiliate_link_presets` tables missing from Supabase entirely.
+2. **Created Supabase sync script** — `migrations/supabase/sync_013_016_plus_missing.sql` combines all missing migrations (15 tables, RLS policies, indexes) into one idempotent script for the user to run in Supabase SQL Editor.
+3. **Rewrote comprehensive seed data** — `migrations/seed/comprehensive-seed-data.sql` covers 21 table systems: contests, challenges, knowledge base (10 articles), announcements (5), promotional calendar (3), case studies (3), marketing assets (8), spotlight, discount codes (5), badge tiers (4), badges, milestones (3), link presets (3), short links (3), notifications (5), messages (3), landing page, testimonials (3), broadcasts (2), affiliate profile, milestone awards.
+4. **Verified on Replit** — Seed SQL ran with zero errors on Replit Postgres. All 21 tables confirmed populated.
+5. **Verified API routes** — 101 affiliate API routes exist, all query correct columns matching seed data. Zero TypeScript compilation errors.
+6. **Updated documentation** — Feature Discovery Guide, Roadmap session log.
+
+**User action required before testing on Vercel:**
+1. Run `migrations/supabase/sync_013_016_plus_missing.sql` in Supabase SQL Editor
+2. Run `migrations/seed/comprehensive-seed-data.sql` in Supabase SQL Editor
+3. Push to GitHub (Vercel auto-deploys)
+
+**Honest feature status:**
+- ~113 features genuinely visible/working
+- ~46 need admin-seeded content (addressed by this session's seed data)
+- ~42 need user interaction to trigger (by design — AI tools, quizzes, goals, etc.)
+- ~32 are duplicate counts of the same underlying system
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience
