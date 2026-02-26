@@ -44,8 +44,19 @@ const COUNTRY_FLAGS: Record<string, string> = {
   US: '🇺🇸', UK: '🇬🇧', CA: '🇨🇦', AU: '🇦🇺', DE: '🇩🇪', FR: '🇫🇷', IN: '🇮🇳', BR: '🇧🇷', JP: '🇯🇵',
 };
 
+const CHART_COLORS = [
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
+  'hsl(var(--primary-400))',
+  'hsl(var(--primary-600))',
+  'hsl(var(--primary-300))',
+];
+
 export function ChurnRateCard({ data }: { data: ChurnData['churnRate'] }) {
-  const color = data.rate < 5 ? 'text-green-600' : data.rate < 10 ? 'text-yellow-600' : 'text-red-600';
+  const color = data.rate < 5 ? 'text-[hsl(var(--success))]' : data.rate < 10 ? 'text-[hsl(var(--warning))]' : 'text-[hsl(var(--danger))]';
   return (
     <div data-testid="churn-rate-card" className="rounded-lg border bg-card p-4">
       <h3 className="font-semibold text-sm mb-2">📉 Churn Rate</h3>
@@ -59,7 +70,7 @@ export function ChurnRateCard({ data }: { data: ChurnData['churnRate'] }) {
 
 export function ChurnReasonsChart({ reasons }: { reasons: ChurnData['churnReasons'] }) {
   if (reasons.length === 0) return null;
-  const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-blue-500', 'bg-purple-500', 'bg-gray-400'];
+  const colors = ['bg-[hsl(var(--chart-4))]', 'bg-[hsl(var(--chart-3))]', 'bg-[hsl(var(--warning))]', 'bg-[hsl(var(--chart-1))]', 'bg-[hsl(var(--chart-5))]', 'bg-muted-foreground/60'];
 
   return (
     <div data-testid="churn-reasons" className="rounded-lg border bg-card p-4">
@@ -91,7 +102,7 @@ export function ChurnTimingChart({ timing }: { timing: ChurnData['churnTiming'] 
       <div className="flex items-end gap-1 h-24">
         {timing.map(t => (
           <div key={t.month} className="flex-1 flex flex-col items-center">
-            <div className="w-full bg-red-400 dark:bg-red-600 rounded-t" style={{ height: `${(t.count / maxCount) * 80}px` }} title={`Month ${t.month}: ${t.count} churned`} />
+            <div className="w-full bg-[hsl(var(--danger)/0.6)] dark:bg-[hsl(var(--danger)/0.7)] rounded-t" style={{ height: `${(t.count / maxCount) * 80}px` }} title={`Month ${t.month}: ${t.count} churned`} />
             <span className="text-[9px] text-muted-foreground mt-1">M{t.month}</span>
           </div>
         ))}
@@ -116,9 +127,9 @@ export function AtRiskAlerts({ alerts }: { alerts: ChurnData['atRisk'] }) {
       <h3 className="font-semibold text-sm mb-3">⚠️ At-Risk Referrals</h3>
       <div className="space-y-2">
         {alerts.slice(0, 5).map(a => (
-          <div key={a.referral_id} className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/20 rounded text-xs">
+          <div key={a.referral_id} className="flex items-center justify-between p-2 bg-[hsl(var(--danger)/0.08)] dark:bg-[hsl(var(--danger)/0.12)] rounded text-xs">
             <span>Referral {a.referral_id.slice(0, 8)}...</span>
-            <span className="text-red-600 font-medium">{a.days_inactive} days inactive</span>
+            <span className="text-[hsl(var(--danger))] font-medium">{a.days_inactive} days inactive</span>
           </div>
         ))}
       </div>
@@ -129,7 +140,7 @@ export function AtRiskAlerts({ alerts }: { alerts: ChurnData['atRisk'] }) {
 
 export function NetGrowthCard({ data }: { data: ChurnData['netGrowth'] }) {
   const isPositive = data.net > 0;
-  const color = isPositive ? 'text-green-600' : data.net < 0 ? 'text-red-600' : 'text-muted-foreground';
+  const color = isPositive ? 'text-[hsl(var(--success))]' : data.net < 0 ? 'text-[hsl(var(--danger))]' : 'text-muted-foreground';
   const trendIcon = data.trend === 'up' ? '↑' : data.trend === 'down' ? '↓' : '→';
 
   return (
@@ -137,8 +148,8 @@ export function NetGrowthCard({ data }: { data: ChurnData['netGrowth'] }) {
       <h3 className="font-semibold text-sm mb-2">📊 Net Referral Growth</h3>
       <p className={`text-3xl font-bold ${color}`}>{isPositive ? '+' : ''}{data.net}</p>
       <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-        <span className="text-green-600">+{data.new} new</span>
-        <span className="text-red-600">-{data.churned} churned</span>
+        <span className="text-[hsl(var(--success))]">+{data.new} new</span>
+        <span className="text-[hsl(var(--danger))]">-{data.churned} churned</span>
         <span>{trendIcon} vs prev period ({data.previousNet >= 0 ? '+' : ''}{data.previousNet})</span>
       </div>
     </div>
@@ -166,15 +177,15 @@ export function RetentionCurve({ data }: { data: CohortData['retentionCurve'] })
         <polygon points={areaPoints} fill="url(#retentionGrad)" />
         <defs>
           <linearGradient id="retentionGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.05" />
+            <stop offset="0%" stopColor="hsl(var(--chart-1))" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="hsl(var(--chart-1))" stopOpacity="0.05" />
           </linearGradient>
         </defs>
-        <polyline points={points} fill="none" stroke="#3b82f6" strokeWidth="2.5" />
+        <polyline points={points} fill="none" stroke="hsl(var(--chart-1))" strokeWidth="2.5" />
         {data.map((d, i) => {
           const x = padding + (i / (data.length - 1 || 1)) * (width - 2 * padding);
           const y = height - padding - (d.percentage / 100) * (height - 2 * padding);
-          return <circle key={i} cx={x} cy={y} r="3" fill="#3b82f6" />;
+          return <circle key={i} cx={x} cy={y} r="3" fill="hsl(var(--chart-1))" />;
         })}
         {[0, 25, 50, 75, 100].map(v => {
           const y = height - padding - (v / 100) * (height - 2 * padding);
@@ -209,13 +220,13 @@ export function ConversionTrendLine({ data }: { data: CohortData['conversionTren
     <div data-testid="conversion-trend" className="rounded-lg border bg-card p-4">
       <h3 className="font-semibold text-sm mb-3">📉 Conversion Rate Over Time</h3>
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
-        <polyline points={points} fill="none" stroke="#10b981" strokeWidth="2" />
+        <polyline points={points} fill="none" stroke="hsl(var(--chart-2))" strokeWidth="2" />
         {data.map((d, i) => {
           const x = padding + (i / (data.length - 1 || 1)) * (width - 2 * padding);
           const y = height - padding - (d.rate / maxRate) * (height - 2 * padding);
-          return <circle key={i} cx={x} cy={y} r="2.5" fill="#10b981" />;
+          return <circle key={i} cx={x} cy={y} r="2.5" fill="hsl(var(--chart-2))" />;
         })}
-        {data.filter((_, i) => i % Math.max(1, Math.floor(data.length / 6)) === 0 || i === data.length - 1).map((d, _, arr) => {
+        {data.filter((_, i) => i % Math.max(1, Math.floor(data.length / 6)) === 0 || i === data.length - 1).map((d) => {
           const idx = data.indexOf(d);
           const x = padding + (idx / (data.length - 1 || 1)) * (width - 2 * padding);
           return <text key={d.month} x={x} y={height - padding + 12} textAnchor="middle" fontSize="7" fill="currentColor" opacity="0.5">{d.month.slice(5)}</text>;
@@ -239,7 +250,7 @@ export function TrialBenchmarks({ data }: { data: CohortData['benchmark'] }) {
       <div className="grid grid-cols-2 gap-3">
         <div className="text-center p-3 bg-muted/30 rounded">
           <p className="text-xs text-muted-foreground">Your Rate</p>
-          <p className={`text-2xl font-bold ${isAbove ? 'text-green-600' : 'text-orange-500'}`}>{data.yourRate}%</p>
+          <p className={`text-2xl font-bold ${isAbove ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--warning))]'}`}>{data.yourRate}%</p>
         </div>
         <div className="text-center p-3 bg-muted/30 rounded">
           <p className="text-xs text-muted-foreground">Average</p>
@@ -256,20 +267,18 @@ export function TrialBenchmarks({ data }: { data: CohortData['benchmark'] }) {
 export function RevenuePieChart({ data }: { data: SourcesData['revenueBySource'] }) {
   if (data.length === 0) return null;
   const total = data.reduce((s, d) => s + d.revenue_cents, 0) || 1;
-  const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6'];
 
   let cumAngle = 0;
   const slices = data.slice(0, 8).map((d, i) => {
     const angle = (d.revenue_cents / total) * 360;
     const startAngle = cumAngle;
     cumAngle += angle;
-    const midAngle = (startAngle + angle / 2) * (Math.PI / 180);
     const x1 = 100 + 80 * Math.cos(startAngle * Math.PI / 180);
     const y1 = 100 + 80 * Math.sin(startAngle * Math.PI / 180);
     const x2 = 100 + 80 * Math.cos((startAngle + angle) * Math.PI / 180);
     const y2 = 100 + 80 * Math.sin((startAngle + angle) * Math.PI / 180);
     const large = angle > 180 ? 1 : 0;
-    return { ...d, color: colors[i], path: `M100,100 L${x1},${y1} A80,80 0 ${large},1 ${x2},${y2} Z`, percentage: Math.round((d.revenue_cents / total) * 100) };
+    return { ...d, color: CHART_COLORS[i], path: `M100,100 L${x1},${y1} A80,80 0 ${large},1 ${x2},${y2} Z`, percentage: Math.round((d.revenue_cents / total) * 100) };
   });
 
   return (
@@ -315,11 +324,11 @@ export function CumulativeEarningsChart({ data }: { data: SourcesData['cumulativ
         <polygon points={areaPoints} fill="url(#earningsGrad)" />
         <defs>
           <linearGradient id="earningsGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#10b981" stopOpacity="0.05" />
+            <stop offset="0%" stopColor="hsl(var(--chart-2))" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="hsl(var(--chart-2))" stopOpacity="0.05" />
           </linearGradient>
         </defs>
-        <polyline points={points} fill="none" stroke="#10b981" strokeWidth="2.5" />
+        <polyline points={points} fill="none" stroke="hsl(var(--chart-2))" strokeWidth="2.5" />
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
         {data.filter((_, i) => i % Math.max(1, Math.floor(data.length / 6)) === 0 || i === data.length - 1).map((d) => {
           const idx = data.indexOf(d);
@@ -340,9 +349,9 @@ export function DropoffAnalysis({ data }: { data: SourcesData['dropoff'] }) {
   if (!latest) return null;
 
   const stages = [
-    { label: 'Clicks', value: latest.clicks, color: 'bg-blue-500' },
-    { label: 'Signups', value: latest.signups, color: 'bg-green-500' },
-    { label: 'Conversions', value: latest.conversions, color: 'bg-purple-500' },
+    { label: 'Clicks', value: latest.clicks, color: 'bg-[hsl(var(--chart-1))]' },
+    { label: 'Signups', value: latest.signups, color: 'bg-[hsl(var(--chart-2))]' },
+    { label: 'Conversions', value: latest.conversions, color: 'bg-[hsl(var(--chart-5))]' },
   ];
   const maxVal = Math.max(...stages.map(s => s.value), 1);
 
@@ -360,7 +369,7 @@ export function DropoffAnalysis({ data }: { data: SourcesData['dropoff'] }) {
                 <span>{stage.label}</span>
                 <span className="text-muted-foreground">
                   {stage.value}
-                  {i > 0 && <span className="text-red-500 ml-1">(-{dropPct}%)</span>}
+                  {i > 0 && <span className="text-[hsl(var(--danger))] ml-1">(-{dropPct}%)</span>}
                 </span>
               </div>
               <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
@@ -371,7 +380,7 @@ export function DropoffAnalysis({ data }: { data: SourcesData['dropoff'] }) {
         })}
       </div>
       {latest.clicks > 0 && latest.conversions === 0 && (
-        <p className="text-xs text-orange-600 mt-2">Tip: Focus on converting signups — you have clicks but no paid conversions this period.</p>
+        <p className="text-xs text-[hsl(var(--warning))] mt-2">Tip: Focus on converting signups — you have clicks but no paid conversions this period.</p>
       )}
       {latest.signups > 0 && latest.conversions > 0 && stages[0].value > 0 && stages[1].value > 0 && (
         <p className="text-xs text-muted-foreground mt-2">
@@ -394,7 +403,7 @@ export function GeoBreakdown({ data }: { data: SourcesData['geo'] }) {
             <span className="text-base">{COUNTRY_FLAGS[g.country] || '🏳️'}</span>
             <span className="w-8">{g.country}</span>
             <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
-              <div className="h-full bg-blue-500 dark:bg-blue-400 rounded-full" style={{ width: `${g.percentage}%` }} />
+              <div className="h-full bg-primary-500 dark:bg-primary-400 rounded-full" style={{ width: `${g.percentage}%` }} />
             </div>
             <span className="text-muted-foreground w-10 text-right">{g.percentage}%</span>
           </div>
@@ -407,7 +416,7 @@ export function GeoBreakdown({ data }: { data: SourcesData['geo'] }) {
 export function DeviceBreakdown({ data }: { data: SourcesData['devices'] }) {
   if (data.length === 0) return null;
   const icons: Record<string, string> = { mobile: '📱', desktop: '💻', tablet: '📟', unknown: '❓' };
-  const colors: Record<string, string> = { mobile: 'bg-blue-500', desktop: 'bg-green-500', tablet: 'bg-purple-500', unknown: 'bg-gray-400' };
+  const colors: Record<string, string> = { mobile: 'bg-[hsl(var(--chart-1))]', desktop: 'bg-[hsl(var(--chart-2))]', tablet: 'bg-[hsl(var(--chart-5))]', unknown: 'bg-muted-foreground/60' };
 
   return (
     <div data-testid="device-breakdown" className="rounded-lg border bg-card p-4">
@@ -423,7 +432,7 @@ export function DeviceBreakdown({ data }: { data: SourcesData['devices'] }) {
       </div>
       <div className="w-full h-3 rounded-full flex overflow-hidden">
         {data.map(d => (
-          <div key={d.device} className={`h-full ${colors[d.device] || 'bg-gray-400'}`} style={{ width: `${d.percentage}%` }} />
+          <div key={d.device} className={`h-full ${colors[d.device] || 'bg-muted-foreground/60'}`} style={{ width: `${d.percentage}%` }} />
         ))}
       </div>
     </div>
@@ -489,7 +498,7 @@ export function BestTimeToPost({ data }: { data: AIAnalyticsData['bestTimeToPost
   const maxDayClicks = Math.max(...dayData.map(d => d.count), 1);
 
   return (
-    <div data-testid="best-time-to-post" className="rounded-lg border bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 p-4">
+    <div data-testid="best-time-to-post" className="rounded-lg border bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950/20 dark:to-primary-900/20 p-4">
       <h3 className="font-semibold text-sm mb-2">⏰ Best Time to Post</h3>
       {data.bestDay && data.bestHour !== null ? (
         <p className="text-lg font-bold">{data.bestDay}s at {data.bestHour}:00</p>
@@ -502,7 +511,7 @@ export function BestTimeToPost({ data }: { data: AIAnalyticsData['bestTimeToPost
             const count = (data.clicksByDay as Record<string, number>)?.[day] || 0;
             return (
               <div key={day} className="flex-1 flex flex-col items-center">
-                <div className="w-full bg-blue-400 dark:bg-blue-600 rounded-t transition-all" style={{ height: `${(count / maxDayClicks) * 40}px`, minHeight: count > 0 ? '2px' : '0' }} />
+                <div className="w-full bg-primary-400 dark:bg-primary-600 rounded-t transition-all" style={{ height: `${(count / maxDayClicks) * 40}px`, minHeight: count > 0 ? '2px' : '0' }} />
                 <span className="text-[8px] text-muted-foreground mt-0.5">{day.slice(0, 2)}</span>
               </div>
             );

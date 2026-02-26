@@ -49,10 +49,10 @@ export function ClickHeatmap({ data }: { data: Record<string, number> }) {
                   const bg = val === 0
                     ? 'bg-muted/30'
                     : intensity < 0.33
-                      ? 'bg-green-200 dark:bg-green-900/40'
+                      ? 'bg-primary-200 dark:bg-primary-900/40'
                       : intensity < 0.66
-                        ? 'bg-green-400 dark:bg-green-700/60'
-                        : 'bg-green-600 dark:bg-green-500/80';
+                        ? 'bg-primary-400 dark:bg-primary-700/60'
+                        : 'bg-primary-600 dark:bg-primary-500/80';
                   return (
                     <div key={h} className={`w-full aspect-square rounded-sm ${bg}`} title={`${day} ${h}:00 — ${val} clicks`} />
                   );
@@ -65,9 +65,9 @@ export function ClickHeatmap({ data }: { data: Record<string, number> }) {
       <div className="flex items-center gap-2 mt-2 text-[10px] text-muted-foreground">
         <span>Less</span>
         <div className="w-3 h-3 rounded-sm bg-muted/30" />
-        <div className="w-3 h-3 rounded-sm bg-green-200 dark:bg-green-900/40" />
-        <div className="w-3 h-3 rounded-sm bg-green-400 dark:bg-green-700/60" />
-        <div className="w-3 h-3 rounded-sm bg-green-600 dark:bg-green-500/80" />
+        <div className="w-3 h-3 rounded-sm bg-primary-200 dark:bg-primary-900/40" />
+        <div className="w-3 h-3 rounded-sm bg-primary-400 dark:bg-primary-700/60" />
+        <div className="w-3 h-3 rounded-sm bg-primary-600 dark:bg-primary-500/80" />
         <span>More</span>
       </div>
     </div>
@@ -93,7 +93,7 @@ export function ConversionByChannel({ data }: { data: Record<string, { clicks: n
                 <span className="text-muted-foreground">{stats.clicks} clicks → {stats.conversions} conv ({rate}%)</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                <div className="h-full bg-blue-500 dark:bg-blue-400 rounded-full" style={{ width: `${(stats.clicks / maxClicks) * 100}%` }} />
+                <div className="h-full bg-primary-500 dark:bg-primary-400 rounded-full" style={{ width: `${(stats.clicks / maxClicks) * 100}%` }} />
               </div>
             </div>
           );
@@ -126,7 +126,7 @@ export function MoMScorecard({ data }: { data: Record<string, { current: number;
             <div key={m.key} data-testid={`scorecard-${m.key}`} className="p-2 bg-muted/30 rounded text-center">
               <p className="text-xs text-muted-foreground">{m.label}</p>
               <p className="text-lg font-bold">{m.format(d.current)}</p>
-              <p className={`text-xs ${isUp ? 'text-green-600' : isDown ? 'text-red-600' : 'text-muted-foreground'}`}>
+              <p className={`text-xs ${isUp ? 'text-[hsl(var(--success))]' : isDown ? 'text-[hsl(var(--danger))]' : 'text-muted-foreground'}`}>
                 {isUp ? '↑' : isDown ? '↓' : '→'} {Math.abs(d.change)}%
               </p>
             </div>
@@ -141,7 +141,7 @@ export function PersonalBestCard({ data }: { data: { month: string; amount_cents
   if (!data) return null;
 
   return (
-    <div data-testid="personal-best" className="rounded-lg border bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20 p-4">
+    <div data-testid="personal-best" className="rounded-lg border bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950/20 dark:to-primary-900/20 p-4">
       <h3 className="font-semibold text-sm">🏆 Personal Best</h3>
       <p className="text-2xl font-bold mt-1">${(data.amount_cents / 100).toFixed(2)}</p>
       <p className="text-xs text-muted-foreground">{data.month} — Can you beat it?</p>
@@ -197,13 +197,13 @@ export function DualAxisChart({ data }: { data: { dailyClicks: Record<string, nu
     <div data-testid="dual-axis-chart" className="rounded-lg border bg-card p-4">
       <h3 className="font-semibold text-sm mb-3">📉 Clicks vs Conversions</h3>
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
-        <polyline points={clickPoints} fill="none" stroke="#3b82f6" strokeWidth="2" />
-        <polyline points={convPoints} fill="none" stroke="#10b981" strokeWidth="2" />
+        <polyline points={clickPoints} fill="none" stroke="hsl(var(--chart-1))" strokeWidth="2" />
+        <polyline points={convPoints} fill="none" stroke="hsl(var(--chart-2))" strokeWidth="2" />
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
       </svg>
       <div className="flex items-center gap-4 justify-center text-xs text-muted-foreground mt-1">
-        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-blue-500 inline-block" /> Clicks</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-green-500 inline-block" /> Conversions</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-[hsl(var(--chart-1))] inline-block" /> Clicks</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-[hsl(var(--chart-2))] inline-block" /> Conversions</span>
       </div>
     </div>
   );

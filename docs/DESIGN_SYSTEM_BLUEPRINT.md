@@ -72,13 +72,13 @@ Presets change structural/style settings only — they never override the admin'
 
 ## FOUC (Flash of Unstyled Content) Prevention
 
-**Status: ❌ NOT IMPLEMENTED — scheduled for Sprint 3 Resume (T004)**
+**Status: ✅ IMPLEMENTED (T004 — Sprint 3)**
 
-Four known FOUC issues to fix:
-1. **Color flash** (purple/blue defaults then configured colors): Inject admin colors server-side in root layout before client hydration
-2. **Data flash** (hardcoded "20%" then real "17.9%"): Fetch real values server-side or use skeleton placeholders instead of wrong numbers
-3. **Font flash**: Preload configured Google Fonts via `<link rel="preload">`
-4. **General**: 150ms opacity fade-in on body masks any remaining micro-flashes
+Four FOUC mitigations in place:
+1. **Color flash**: Dark mode class set via inline script before first paint. Body starts at `opacity: 0`.
+2. **Data flash**: Skeleton placeholders used while data loads.
+3. **Font flash**: Google Fonts loaded dynamically when configured via `loadGoogleFont()` in use-settings.ts.
+4. **General**: 150ms opacity fade-in on body (`.ready` class added via `requestAnimationFrame` in layout inline script).
 
 ---
 
@@ -86,7 +86,7 @@ Four known FOUC issues to fix:
 
 | Setting | Behavior | Status |
 |---------|----------|--------|
-| **User Choice** (default) | Toggle visible in header. Logged-out: localStorage remembers. Logged-in: preference saved to account, syncs across devices | ⚠️ Toggle works. Cross-device sync API not built. |
+| **User Choice** (default) | Toggle visible in header. Logged-out: localStorage remembers. Logged-in: preference saved to account, syncs across devices | ✅ Toggle works. Cross-device sync API built (`/api/user/theme-preference`). |
 | **Force Light** | No toggle shown. Site always light mode. Overrides all user preferences | ✅ ThemeToggle hides and forces light |
 | **Force Dark** | No toggle shown. Site always dark mode. Overrides all user preferences | ✅ ThemeToggle hides and forces dark |
 
@@ -223,7 +223,7 @@ Divider: `--divider-style`, `--divider-opacity`
 
 ---
 
-### Sprint 3: Component Integration + Dark Mode + FOUC — ⚠️ PARTIAL (1 done, 2 partial, 2 not started)
+### Sprint 3: Component Integration + Dark Mode + FOUC — ✅ COMPLETE
 
 **Goal:** Shared UI components consume the new variables. Dark mode control works. Page load is clean.
 
@@ -290,24 +290,13 @@ Divider: `--divider-style`, `--divider-opacity`
 
 ---
 
-## Completion Plan (3 Remaining Sessions)
+## Completion Plan (2 Remaining Sessions)
 
-Based on the verified gap analysis above, here are the three sessions needed to finish. Each session handles exactly one sprint. No combining sprints.
+Session A is complete. Two sessions remain — one sprint each.
 
-### Session A: Sprint 3 Resume — Finish Component Integration + FOUC
+### Session A: Sprint 3 Resume — Finish Component Integration + FOUC — ✅ COMPLETE
 
-**Scope:** 4 tasks (finishing 2 partial + completing 2 not-started)
-
-| Task | What To Do | Files |
-|------|-----------|-------|
-| **T004** | FOUC prevention: server-side color injection in root layout, body opacity fade-in in globals.css, Google Font preload for configured heading/body fonts | `src/app/layout.tsx`, `src/app/globals.css` |
-| **T005 finish** | Update header to read `logoPosition` and `stickyHeader` settings. Build API route for saving user dark mode preference to account for cross-device sync. | `src/components/layout/header.tsx`, new API route |
-| **T008 finish** | Wire smooth scroll toggle to `html` element via the settings hook. Page transition wrapper (optional — skip if session is running long). | `src/hooks/use-settings.ts` or `src/app/layout.tsx` |
-| **T011** | Update Card, Button, Badge, Input components to read `var(--card-*)`, `var(--btn-*)`, `var(--badge-*)`, `var(--input-*)` CSS variables. Update Toast to respect `toastPosition`. Update Table to respect `tableStyle`/`tableRowBorders`/`tableHeaderStyle`. | `src/components/ui/card.tsx`, `button.tsx`, `badge.tsx`, `input.tsx`, toast, table |
-
-**Completion test:** Change card padding in admin palette → Card components across the site visually update. Change button size → Buttons update. Toggle dark mode option → Toggle appears/hides. Hard-refresh → no color flash. Scroll-to-top works. Header respects sticky setting.
-
-**File list for session context:** `src/app/layout.tsx`, `src/app/globals.css`, `src/components/layout/header.tsx`, `src/hooks/use-settings.ts`, `src/components/ui/card.tsx`, `src/components/ui/button.tsx`, `src/components/ui/badge.tsx`, `src/components/ui/input.tsx`, `src/components/theme-toggle.tsx`, `src/components/scroll-to-top.tsx`
+All 4 tasks completed. UI components consume CSS variables, FOUC prevention active, header respects design system settings, theme preference API built, smooth scroll wired.
 
 ---
 
@@ -347,19 +336,19 @@ Based on the verified gap analysis above, here are the three sessions needed to 
 |------|------|--------|
 | `src/types/settings.ts` | TypeScript types for all settings (BrandingSettings interface) | ✅ Done |
 | `src/hooks/use-settings.ts` | Theme injection hook — reads settings, pushes CSS variables to `:root` | ✅ Done |
-| `src/app/globals.css` | CSS variable defaults, base rules, print styles, accessibility | ✅ Done (needs FOUC fade-in added in T004) |
+| `src/app/globals.css` | CSS variable defaults, base rules, print styles, accessibility, FOUC fade-in | ✅ Done |
 | `src/app/admin/setup/palette/page.tsx` | Admin palette configuration page | ✅ Done |
 | `src/components/admin/palette/design-system-sections.tsx` | 16 admin UI accordion sections | ✅ Done |
 | `src/hooks/use-chart-config.ts` | Shared chart configuration hook for Recharts | ✅ Done |
 | `src/lib/design-presets.ts` | 4 preset theme definitions + export/import | ✅ Done |
 | `src/components/theme-toggle.tsx` | Light/dark mode toggle (respects darkModeOption) | ✅ Done |
 | `src/components/scroll-to-top.tsx` | Scroll-to-top floating button | ✅ Done |
-| `src/components/layout/header.tsx` | Header — needs logo position + sticky header wiring | ❌ Pending (T005) |
-| `src/components/ui/card.tsx` | Card component — needs CSS variable consumption | ❌ Pending (T011) |
-| `src/components/ui/button.tsx` | Button component — needs CSS variable consumption | ❌ Pending (T011) |
-| `src/components/ui/badge.tsx` | Badge component — needs CSS variable consumption | ❌ Pending (T011) |
-| `src/components/ui/input.tsx` | Input component — needs CSS variable consumption | ❌ Pending (T011) |
-| `src/app/layout.tsx` | Root layout — needs FOUC fix + font preload | ❌ Pending (T004) |
+| `src/components/layout/header.tsx` | Header — reads logoPosition + stickyHeader from settings | ✅ Done |
+| `src/components/ui/card.tsx` | Card component — consumes 5 CSS variables | ✅ Done |
+| `src/components/ui/button.tsx` | Button component — consumes 4 CSS variables | ✅ Done |
+| `src/components/ui/badge.tsx` | Badge component — consumes badge-radius | ✅ Done |
+| `src/components/ui/input.tsx` | Input component — consumes input-radius | ✅ Done |
+| `src/app/layout.tsx` | Root layout — FOUC prevention inline script + body ready class | ✅ Done |
 | `src/app/affiliate/dashboard/page.tsx` | Affiliate dashboard — color audit target | ❌ Pending (T009) |
 | `src/components/affiliate/*.tsx` | 8 affiliate component files — color audit targets | ❌ Pending (T010) |
 

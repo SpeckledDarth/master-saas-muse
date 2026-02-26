@@ -126,26 +126,26 @@ export function FinancialOverviewPanel({ data }: { data: FinancialData }) {
       <div className="rounded-lg border bg-card p-4">
         <h3 className="font-semibold text-sm mb-3">💰 Unified Financial View</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-          <div className="text-center p-2 bg-green-50 dark:bg-green-950/20 rounded">
+          <div className="text-center p-2 bg-[hsl(var(--success)/0.08)] dark:bg-[hsl(var(--success)/0.12)] rounded">
             <p className="text-[10px] text-muted-foreground">Total Earned</p>
-            <p className="text-lg font-bold text-green-600">{fmt(data.overview.totalEarned)}</p>
+            <p className="text-lg font-bold text-[hsl(var(--success))]">{fmt(data.overview.totalEarned)}</p>
           </div>
-          <div className="text-center p-2 bg-red-50 dark:bg-red-950/20 rounded">
+          <div className="text-center p-2 bg-[hsl(var(--danger)/0.08)] dark:bg-[hsl(var(--danger)/0.12)] rounded">
             <p className="text-[10px] text-muted-foreground">Subscription Cost</p>
-            <p className="text-lg font-bold text-red-600">{fmt(data.overview.totalSubscriptionCost)}</p>
+            <p className="text-lg font-bold text-[hsl(var(--danger))]">{fmt(data.overview.totalSubscriptionCost)}</p>
           </div>
           <div className="text-center p-2 bg-muted/30 rounded">
             <p className="text-[10px] text-muted-foreground">Net Income</p>
-            <p className={`text-lg font-bold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>{isPositive ? '+' : ''}{fmt(data.overview.netIncome)}</p>
+            <p className={`text-lg font-bold ${isPositive ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--danger))]'}`}>{isPositive ? '+' : ''}{fmt(data.overview.netIncome)}</p>
           </div>
           <div className="text-center p-2 bg-muted/30 rounded">
             <p className="text-[10px] text-muted-foreground">ROI</p>
-            <p className={`text-lg font-bold ${data.overview.roi >= 100 ? 'text-green-600' : 'text-orange-500'}`}>{data.overview.roi}%</p>
+            <p className={`text-lg font-bold ${data.overview.roi >= 100 ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--warning))]'}`}>{data.overview.roi}%</p>
           </div>
         </div>
 
         {data.overview.breakEvenMonth && (
-          <p className="text-xs text-green-600 mb-3">Subscription paid for itself since {data.overview.breakEvenMonth}</p>
+          <p className="text-xs text-[hsl(var(--success))] mb-3">Subscription paid for itself since {data.overview.breakEvenMonth}</p>
         )}
 
         {breakdown.length > 0 && (
@@ -155,16 +155,16 @@ export function FinancialOverviewPanel({ data }: { data: FinancialData }) {
               {breakdown.map(m => (
                 <div key={m.month} className="flex-1 flex flex-col items-center gap-0.5">
                   <div className="w-full flex flex-col gap-px">
-                    <div className="bg-green-400 dark:bg-green-600 rounded-t" style={{ height: `${(m.earned / maxVal) * 60}px` }} title={`Earned: ${fmt(m.earned)}`} />
-                    <div className="bg-red-300 dark:bg-red-700 rounded-b" style={{ height: `${(m.spent / maxVal) * 60}px` }} title={`Spent: ${fmt(m.spent)}`} />
+                    <div className="bg-[hsl(var(--success)/0.7)] dark:bg-[hsl(var(--success)/0.6)] rounded-t" style={{ height: `${(m.earned / maxVal) * 60}px` }} title={`Earned: ${fmt(m.earned)}`} />
+                    <div className="bg-[hsl(var(--danger)/0.5)] dark:bg-[hsl(var(--danger)/0.6)] rounded-b" style={{ height: `${(m.spent / maxVal) * 60}px` }} title={`Spent: ${fmt(m.spent)}`} />
                   </div>
                   <span className="text-[7px] text-muted-foreground">{m.month.slice(5)}</span>
                 </div>
               ))}
             </div>
             <div className="flex items-center gap-4 mt-2 text-[10px] text-muted-foreground">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-green-400 rounded-sm" /> Earned</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-red-300 rounded-sm" /> Spent</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-[hsl(var(--success)/0.7)] rounded-sm" /> Earned</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-[hsl(var(--danger)/0.5)] rounded-sm" /> Spent</span>
             </div>
           </div>
         )}
@@ -183,15 +183,15 @@ export function FinancialOverviewPanel({ data }: { data: FinancialData }) {
           </div>
           <div className="p-2 bg-muted/30 rounded">
             <p className="text-[10px] text-muted-foreground">Monthly Net</p>
-            <p className={`text-sm font-bold ${data.projections.monthlyNet >= 0 ? 'text-green-600' : 'text-red-600'}`}>{data.projections.monthlyNet >= 0 ? '+' : ''}{fmt(data.projections.monthlyNet)}</p>
+            <p className={`text-sm font-bold ${data.projections.monthlyNet >= 0 ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--danger))]'}`}>{data.projections.monthlyNet >= 0 ? '+' : ''}{fmt(data.projections.monthlyNet)}</p>
           </div>
           <div className="p-2 bg-muted/30 rounded">
             <p className="text-[10px] text-muted-foreground">Projected Annual Net</p>
-            <p className={`text-sm font-bold ${data.projections.projectedAnnualNet >= 0 ? 'text-green-600' : 'text-red-600'}`}>{data.projections.projectedAnnualNet >= 0 ? '+' : ''}{fmt(data.projections.projectedAnnualNet)}</p>
+            <p className={`text-sm font-bold ${data.projections.projectedAnnualNet >= 0 ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--danger))]'}`}>{data.projections.projectedAnnualNet >= 0 ? '+' : ''}{fmt(data.projections.projectedAnnualNet)}</p>
           </div>
         </div>
         {data.projections.subscriptionPaysForItself && (
-          <p className="text-xs text-green-600 mt-2">Your subscription pays for itself through affiliate earnings.</p>
+          <p className="text-xs text-[hsl(var(--success))] mt-2">Your subscription pays for itself through affiliate earnings.</p>
         )}
       </div>
     </div>
@@ -202,7 +202,7 @@ export function PredictiveIntelligencePanel({ data }: { data: PredictionsData })
   return (
     <div data-testid="predictions" className="space-y-4">
       {data.tierProjection && (
-        <div className="rounded-lg border bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 p-4">
+        <div className="rounded-lg border bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950/20 dark:to-primary-900/20 p-4">
           <h3 className="font-semibold text-sm mb-2">🎯 Tier Trajectory</h3>
           <p className="text-xs">Current: <strong>{data.tierProjection.currentTier}</strong> → Next: <strong>{data.tierProjection.nextTier}</strong></p>
           <div className="mt-2 space-y-1 text-xs text-muted-foreground">
@@ -232,7 +232,7 @@ export function PredictiveIntelligencePanel({ data }: { data: PredictionsData })
               const max = Math.max(...data.seasonalPattern!.map(x => x.clicks), 1);
               return (
                 <div key={s.month} className="flex-1 flex flex-col items-center">
-                  <div className="w-full bg-indigo-400 dark:bg-indigo-600 rounded-t" style={{ height: `${(s.clicks / max) * 50}px` }} />
+                  <div className="w-full bg-primary-400 dark:bg-primary-600 rounded-t" style={{ height: `${(s.clicks / max) * 50}px` }} />
                   <span className="text-[7px] text-muted-foreground mt-0.5">{s.month}</span>
                 </div>
               );
@@ -247,7 +247,7 @@ export function PredictiveIntelligencePanel({ data }: { data: PredictionsData })
           <p className="text-sm font-medium">{data.nextMilestone.name}</p>
           <div className="flex items-center gap-2 mt-2">
             <div className="flex-1 bg-muted rounded-full h-2.5 overflow-hidden">
-              <div className="h-full bg-green-500 dark:bg-green-400 rounded-full transition-all" style={{ width: `${Math.min(100, Math.round((data.nextMilestone.current / data.nextMilestone.threshold) * 100))}%` }} />
+              <div className="h-full bg-[hsl(var(--success))] rounded-full transition-all" style={{ width: `${Math.min(100, Math.round((data.nextMilestone.current / data.nextMilestone.threshold) * 100))}%` }} />
             </div>
             <span className="text-xs text-muted-foreground">{data.nextMilestone.current}/{data.nextMilestone.threshold}</span>
           </div>
@@ -260,7 +260,7 @@ export function PredictiveIntelligencePanel({ data }: { data: PredictionsData })
           <h3 className="font-semibold text-sm mb-2">🏆 Active Contests</h3>
           <div className="space-y-2">
             {data.activeContests.map(c => (
-              <div key={c.name} className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded text-xs">
+              <div key={c.name} className="p-2 bg-[hsl(var(--warning)/0.1)] dark:bg-[hsl(var(--warning)/0.12)] rounded text-xs">
                 <p className="font-medium">{c.name}</p>
                 <p className="text-muted-foreground">Metric: {c.metric} · {c.daysLeft} day{c.daysLeft !== 1 ? 's' : ''} left{c.prizes ? ` · Prize: ${c.prizes}` : ''}</p>
               </div>
@@ -291,11 +291,11 @@ export function ContentIntelligencePanel({ data }: { data: ContentIntelligenceDa
             <p className="text-[10px] text-muted-foreground">Avg Gap</p>
           </div>
           <div className="text-center p-2 bg-muted/30 rounded">
-            <p className="text-sm font-bold text-green-600">{data.frequencyAnalysis.highActivityConvRate}%</p>
+            <p className="text-sm font-bold text-[hsl(var(--success))]">{data.frequencyAnalysis.highActivityConvRate}%</p>
             <p className="text-[10px] text-muted-foreground">High Activity Rate</p>
           </div>
           <div className="text-center p-2 bg-muted/30 rounded">
-            <p className="text-sm font-bold text-orange-500">{data.frequencyAnalysis.lowActivityConvRate}%</p>
+            <p className="text-sm font-bold text-[hsl(var(--warning))]">{data.frequencyAnalysis.lowActivityConvRate}%</p>
             <p className="text-[10px] text-muted-foreground">Low Activity Rate</p>
           </div>
         </div>
@@ -310,7 +310,7 @@ export function ContentIntelligencePanel({ data }: { data: ContentIntelligenceDa
               <div key={p.platform} className="flex items-center gap-2 text-xs">
                 <span className="w-20">{PLATFORM_ICONS[p.platform] || '📌'} {p.platform}</span>
                 <div className="flex-1 bg-muted rounded-full h-2.5 overflow-hidden">
-                  <div className="h-full bg-blue-500 dark:bg-blue-400 rounded-full" style={{ width: `${p.correlation}%` }} />
+                  <div className="h-full bg-primary-500 dark:bg-primary-400 rounded-full" style={{ width: `${p.correlation}%` }} />
                 </div>
                 <span className="text-muted-foreground w-10 text-right">{p.correlation}%</span>
               </div>
@@ -409,7 +409,7 @@ export function CustomRangeReportPanel() {
                 <p className="text-[10px] text-muted-foreground">{m.label}</p>
                 <p className="text-sm font-bold">{m.value}</p>
                 {m.delta !== undefined && m.delta !== null && (
-                  <p className={`text-[10px] ${m.delta > 0 ? 'text-green-600' : m.delta < 0 ? 'text-red-600' : 'text-muted-foreground'}`}>
+                  <p className={`text-[10px] ${m.delta > 0 ? 'text-[hsl(var(--success))]' : m.delta < 0 ? 'text-[hsl(var(--danger))]' : 'text-muted-foreground'}`}>
                     {m.delta > 0 ? '↑' : m.delta < 0 ? '↓' : '→'} {Math.abs(m.delta)}%
                   </p>
                 )}
@@ -434,9 +434,9 @@ export function CustomRangeReportPanel() {
           <div>
             <p className="text-xs font-medium mb-1">Commission Status</p>
             <div className="flex gap-2 text-xs">
-              <span className="text-green-600">Paid: {fmt(data.primary.commissionBreakdown.paid)}</span>
-              <span className="text-blue-600">Approved: {fmt(data.primary.commissionBreakdown.approved)}</span>
-              <span className="text-orange-500">Pending: {fmt(data.primary.commissionBreakdown.pending)}</span>
+              <span className="text-[hsl(var(--success))]">Paid: {fmt(data.primary.commissionBreakdown.paid)}</span>
+              <span className="text-[hsl(var(--chart-1))]">Approved: {fmt(data.primary.commissionBreakdown.approved)}</span>
+              <span className="text-[hsl(var(--warning))]">Pending: {fmt(data.primary.commissionBreakdown.pending)}</span>
             </div>
           </div>
         </div>
@@ -479,7 +479,7 @@ export function LastUpdated({ timestamp }: { timestamp?: string }) {
   return <span data-testid="last-updated" className="text-[10px] text-muted-foreground">Updated {relative}</span>;
 }
 
-export function Sparkline({ data, width = 60, height = 16, color = '#3b82f6' }: { data: number[]; width?: number; height?: number; color?: string }) {
+export function Sparkline({ data, width = 60, height = 16, color = 'hsl(var(--chart-1))' }: { data: number[]; width?: number; height?: number; color?: string }) {
   if (!data || data.length < 2) return null;
   const max = Math.max(...data, 1);
   const min = Math.min(...data, 0);
