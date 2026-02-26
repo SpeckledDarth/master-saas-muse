@@ -1,8 +1,26 @@
 # MuseKit Design System Configuration — Complete Blueprint
 
 > **Created:** February 26, 2026
-> **Status:** In Progress — Sprint 1 complete, Sprint 2 complete, Sprint 3 partial (3 of 5 tasks done)
+> **Last Verified:** February 26, 2026
+> **Status:** 6 of 14 tasks complete, 2 partial, 6 not started. Next up: Sprint 3 Resume.
 > **Goal:** Transform the Color Palette into a comprehensive, configurable Design System that serves as the single source of truth for ALL visual styling across every MuseKit-cloned SaaS app.
+
+---
+
+## Current Status (Verified Gap Analysis)
+
+| Sprint | Tasks | ✅ Done | ⚠️ Partial | ❌ Not Started | Sprint Status |
+|--------|-------|--------|-----------|---------------|---------------|
+| Sprint 1: Foundation | T001, T002, T003, T012 | 4 | 0 | 0 | **COMPLETE** |
+| Sprint 2: Admin UI | T006 | 1 | 0 | 0 | **COMPLETE** |
+| Sprint 3: Integration | T004, T005, T007, T008, T011 | 1 | 2 | 2 | **PARTIAL** |
+| Sprint 4: Color Audit | T009, T010 | 0 | 0 | 2 | **NOT STARTED** |
+| Sprint 5: Testing + Docs | T013, T014 | 0 | 0 | 2 | **NOT STARTED** |
+| **Totals** | **14 tasks** | **6** | **2** | **6** | |
+
+**What works today:** The infrastructure is solid — all ~60 settings exist as TypeScript types, all CSS variables are injected by the hook, globals.css has defaults, 4 presets exist with export/import, and the admin palette page has 16 collapsible sections for configuring everything. The ThemeToggle respects darkModeOption, useChartConfig hook is ready, and scroll-to-top component is in the layout.
+
+**What doesn't work yet:** Changing settings in the admin palette does NOT visually change Card, Button, Badge, or Input components on the actual site — those components haven't been wired to read the CSS variables yet (T011). There's no FOUC prevention (T004). The header doesn't respond to logo position or sticky header settings (T005). Hardcoded hex colors remain in affiliate dashboard charts (T009/T010).
 
 ---
 
@@ -54,7 +72,9 @@ Presets change structural/style settings only — they never override the admin'
 
 ## FOUC (Flash of Unstyled Content) Prevention
 
-Two known FOUC issues will be fixed:
+**Status: ❌ NOT IMPLEMENTED — scheduled for Sprint 3 Resume (T004)**
+
+Four known FOUC issues to fix:
 1. **Color flash** (purple/blue defaults then configured colors): Inject admin colors server-side in root layout before client hydration
 2. **Data flash** (hardcoded "20%" then real "17.9%"): Fetch real values server-side or use skeleton placeholders instead of wrong numbers
 3. **Font flash**: Preload configured Google Fonts via `<link rel="preload">`
@@ -64,30 +84,30 @@ Two known FOUC issues will be fixed:
 
 ## Dark Mode Control
 
-| Setting | Behavior |
-|---------|----------|
-| **User Choice** (default) | Toggle visible in header. Logged-out: localStorage remembers. Logged-in: preference saved to account, syncs across devices |
-| **Force Light** | No toggle shown. Site always light mode. Overrides all user preferences |
-| **Force Dark** | No toggle shown. Site always dark mode. Overrides all user preferences |
+| Setting | Behavior | Status |
+|---------|----------|--------|
+| **User Choice** (default) | Toggle visible in header. Logged-out: localStorage remembers. Logged-in: preference saved to account, syncs across devices | ⚠️ Toggle works. Cross-device sync API not built. |
+| **Force Light** | No toggle shown. Site always light mode. Overrides all user preferences | ✅ ThemeToggle hides and forces light |
+| **Force Dark** | No toggle shown. Site always dark mode. Overrides all user preferences | ✅ ThemeToggle hides and forces dark |
 
 ---
 
 ## Sprint Breakdown
 
-This blueprint is organized into 5 sprints. Each sprint is designed to be completable in a single session and produces a working, testable result. If a session runs long, the sprint boundary tells you exactly where to stop and resume.
+This blueprint is organized into 5 sprints. **ONE SPRINT PER SESSION — NO EXCEPTIONS.** Each sprint is designed to be completable in a single session and produces a working, testable result.
 
 ---
 
-### Sprint 1: Foundation (Types + CSS Variables + Theme Injection)
+### Sprint 1: Foundation (Types + CSS Variables + Theme Injection) — ✅ COMPLETE
 
 **Goal:** All new CSS variables exist and are injectable. No visual changes yet — just the infrastructure.
 
-| Task | Description | Files | Depends On |
-|------|-------------|-------|------------|
-| **T001** | Extend `BrandingSettings` in settings types with ALL new properties (typography, components, layout, interactive, dark mode, charts, tables, forms, accessibility, etc.) | `src/types/settings.ts` | — |
-| **T002** | Extend `useThemeFromSettings` hook to inject all new CSS variables + dark mode control logic + user preference persistence | `src/hooks/use-settings.ts` | T001 |
-| **T003** | Update `globals.css` with default values for all new variables, base CSS rules (typography, hover, transitions, skeletons, print, reduced-motion, form styles, badge shapes, dividers) | `src/app/globals.css` | T002 |
-| **T012** | Create `design-presets.ts` with 4 preset configurations + export/import utilities | `src/lib/design-presets.ts` | T001 |
+| Task | Status | Description | Files |
+|------|--------|-------------|-------|
+| **T001** | ✅ Done | Extend `BrandingSettings` with ~60 new properties | `src/types/settings.ts` |
+| **T002** | ✅ Done | Extend `useThemeFromSettings` hook to inject all CSS variables + dark mode control | `src/hooks/use-settings.ts` |
+| **T003** | ✅ Done | Update `globals.css` with defaults, typography rules, skeletons, print, reduced-motion, dividers | `src/app/globals.css` |
+| **T012** | ✅ Done | Create 4 preset configurations + export/import utilities | `src/lib/design-presets.ts` |
 
 **T001 Full Property List:**
 
@@ -173,94 +193,83 @@ Tables: `--table-stripe-opacity`, `--table-border-opacity`
 
 Divider: `--divider-style`, `--divider-opacity`
 
-**Completion test:** Dev server starts with zero errors. No visual regression. New CSS variables visible in browser inspector on `:root`. Preset JSON objects export/import correctly.
-
-**Sprint 1 handoff note:** At the end of Sprint 1, the session must document in ROADMAP.md: "Sprint 1 complete. Sprint 2 ready to begin."
-
 ---
 
-### Sprint 2: Admin UI (Palette Page Expansion)
+### Sprint 2: Admin UI (Palette Page Expansion) — ✅ COMPLETE
 
 **Goal:** Admin can see and change every setting through the palette page.
 
-| Task | Description | Files | Depends On |
-|------|-------------|-------|------------|
-| **T006** | Build the expanded admin palette page with all configuration sections (Colors, Typography, Component Style, Layout, Interactive States, Dark Mode, Data Viz, Tables, Loading, Notifications, Forms, Scroll, Accessibility, Dividers, Presets & Reset). Split into sub-components. | `src/app/admin/setup/palette/page.tsx`, `src/components/admin/palette/*.tsx` | T001, T002, T003 |
+| Task | Status | Description | Files |
+|------|--------|-------------|-------|
+| **T006** | ✅ Done | Built 16 collapsible accordion sections covering all configuration areas | `src/app/admin/setup/palette/page.tsx`, `src/components/admin/palette/design-system-sections.tsx` |
 
 **Palette Page Sections (collapsible accordions):**
-1. **Colors** (existing, at top — primary, accent, theme overrides, semantic colors)
-2. **Typography** — H1/H2/H3 size sliders, weight dropdowns, letter spacing, text transform, heading color mode, body size/line-height. Live heading preview.
-3. **Component Style** — Card: padding/radius/shadow/border width/border style. Button: radius/size/weight/text-transform/click feedback. Input: match card toggle. Badge: shape. Live card + button preview.
-4. **Layout** — Content density toggle, section spacing, sidebar width, container max width, page header style, logo position, sticky header. Visual spacing preview.
-5. **Interactive States** — Hover effect picker (with live demo), animation speed slider, focus ring width, page transition fade toggle.
-6. **Dark Mode** — Mode control (user-choice/force-light/force-dark radio), card depth slider, accent brightness slider. Dark mode preview panel.
-7. **Data Visualization** — Bar: thickness/radius. Line: width/curve/dots. Grid: visible/style. Trend lines toggle. Area fill toggle/opacity. Color strategy picker. Live mini chart preview.
-8. **Tables** — Striped/clean toggle, row borders, header style. Live mini table preview.
-9. **Loading & States** — Skeleton style picker, empty state style. Live skeleton preview.
-10. **Notifications** — Toast position picker with visual position diagram.
-11. **Forms** — Label position, required indicator, error style. Live form preview.
-12. **Scroll & Page** — Smooth scroll, scroll-to-top button.
-13. **Accessibility** — Contrast enforcement toggle, reduced motion respect toggle.
-14. **Dividers** — Style picker with live preview.
-15. **Presets & Reset** — 4 preset buttons, reset to defaults, export/import JSON.
-
-**Completion test:** Admin can open the palette page, expand each accordion section, change settings, and save. Live previews work within each section. Presets apply. Reset works. Export/import works.
-
-**Sprint 2 handoff note:** "Sprint 2 complete. Admin palette page fully functional. Sprint 3 ready."
+1. **Presets & Reset** — 4 preset buttons, Export/Import JSON, Reset to Defaults
+2. **Semantic Colors** — success/warning/danger color pickers
+3. **Typography** — H1/H2/H3 size/weight/spacing/transform, heading color mode, body size/line-height. Live preview.
+4. **Component Style** — Card padding/radius/shadow/border. Button size/weight/transform. Badge shape. Live preview.
+5. **Layout** — Content density, section spacing, sidebar width, container max width, page header style, logo position, sticky header.
+6. **Interactive States** — Hover effect picker, animation speed, focus ring width, click feedback, page transition fade.
+7. **Dark Mode** — Mode control radio (user-choice/force-light/force-dark), card depth, accent brightness.
+8. **Data Visualization** — Bar thickness/radius, line width/curve/dots, grid, trend lines, area fill, color strategy.
+9. **Tables** — Striped/clean, row borders, header style.
+10. **Loading & States** — Skeleton style picker with live preview, empty state style.
+11. **Notifications** — Toast position picker with visual grid.
+12. **Forms** — Label position, required indicator, error style.
+13. **Scroll & Page** — Smooth scroll toggle, scroll-to-top toggle.
+14. **Accessibility** — Contrast enforcement, reduced motion respect.
+15. **Dividers** — Style picker with live preview.
+16. **Print** — Print stylesheet toggle.
 
 ---
 
-### Sprint 3: Component Integration + Dark Mode + FOUC
+### Sprint 3: Component Integration + Dark Mode + FOUC — ⚠️ PARTIAL (1 done, 2 partial, 2 not started)
 
 **Goal:** Shared UI components consume the new variables. Dark mode control works. Page load is clean.
 
-| Task | Description | Files | Depends On |
-|------|-------------|-------|------------|
-| **T004** | Eliminate FOUC — server-side color injection, replace hardcoded fallback values, body fade-in, font preload | `src/app/layout.tsx`, `src/app/affiliate/page.tsx`, `src/app/globals.css` | T002 |
-| **T005** | Update ThemeToggle + header for dark mode control, user preference persistence API, logo position, sticky header | `src/components/theme-toggle.tsx`, `src/components/layout/header.tsx`, `src/app/dashboard/social/layout.tsx`, new API route | T002 |
-| **T007** | Create shared chart configuration hook (`useChartConfig`) with color strategies, trend lines, Recharts-compatible props | `src/hooks/use-chart-config.ts` | T002 |
-| **T008** | Create scroll-to-top component, smooth scroll, page transition wrapper | `src/components/scroll-to-top.tsx`, `src/app/layout.tsx` | T003 |
-| **T011** | Update shared UI components (Card, Button, Badge, Input, Toast, Table) to consume new CSS variables | `src/components/ui/card.tsx`, `button.tsx`, `badge.tsx`, `input.tsx`, toast, table | T003 |
+| Task | Status | Description | Files | What's Done | What's Missing |
+|------|--------|-------------|-------|-------------|----------------|
+| **T007** | ✅ Done | Chart configuration hook | `src/hooks/use-chart-config.ts` | Full hook with barSize, barRadius, lineWidth, lineCurve, showDots, showGrid, colors array, etc. | — |
+| **T005** | ⚠️ Partial | Dark mode control + header updates | `src/components/theme-toggle.tsx`, `src/components/layout/header.tsx` | ThemeToggle hides on force-light/force-dark, forces correct theme | Header not updated for `logoPosition` or `stickyHeader`. No API route for saving user dark mode preference to account (cross-device sync). |
+| **T008** | ⚠️ Partial | Scroll-to-top + smooth scroll + page transitions | `src/components/scroll-to-top.tsx`, `src/app/layout.tsx` | Scroll-to-top component created and added to root layout | Smooth scroll toggle not wired to `html` element. Page transition wrapper not built. |
+| **T004** | ❌ Not Started | FOUC prevention | `src/app/layout.tsx`, `src/app/globals.css` | — | No server-side color injection. No body fade-in. No font preload. Colors flash on page load. |
+| **T011** | ❌ Not Started | Wire UI components to CSS variables | `src/components/ui/card.tsx`, `button.tsx`, `badge.tsx`, `input.tsx`, toast, table | — | Card has 0 references to `var(--card-*)`. Button has 0 references to `var(--btn-*)`. Badge and Input same. Changing admin settings has zero visual effect on actual site components. |
 
 **Completion test:** Changing settings in admin palette page updates Card, Button, Badge, Input globally. Dark mode toggle appears/hides based on setting. No FOUC on page load. Scroll-to-top button works. Charts have a config hook ready.
 
-**Sprint 3 handoff note:** "Sprint 3 complete. UI components wired. Sprint 4 ready."
-
 ---
 
-### Sprint 4: Color Audit (Affiliate Dashboard + Components)
+### Sprint 4: Color Audit (Affiliate Dashboard + Components) — ❌ NOT STARTED
 
 **Goal:** Every hardcoded color in the affiliate dashboard is replaced with palette-aware equivalents.
 
-| Task | Description | Files | Depends On |
-|------|-------------|-------|------------|
-| **T009** | Audit and fix hardcoded colors in affiliate dashboard `page.tsx` (~50 instances). Replace with semantic tokens and palette classes. Wire charts to `useChartConfig`. | `src/app/affiliate/dashboard/page.tsx` | T003, T007 |
-| **T010** | Audit and fix hardcoded colors in all 8 affiliate component files. Wire charts to `useChartConfig`. Replace status colors with semantic tokens. | `src/components/affiliate/*.tsx` (8 files) | T003, T007 |
+| Task | Status | Description | Files |
+|------|--------|-------------|-------|
+| **T009** | ❌ Not Started | Replace hardcoded colors in affiliate dashboard page. Wire charts to `useChartConfig`. | `src/app/affiliate/dashboard/page.tsx` |
+| **T010** | ❌ Not Started | Replace hardcoded colors in 8 affiliate component files. Wire charts to `useChartConfig`. | `src/components/affiliate/*.tsx` |
 
-**Files to audit:**
-- `analytics-expanded.tsx` (285 lines) — chart hex colors, Tailwind colors
-- `flywheel-analytics.tsx` (635 lines) — heavy hex usage for charts, multiple color arrays
-- `flywheel-reports.tsx` (614 lines) — financial status colors
-- `delight-features.tsx` (653 lines) — badge and challenge colors
-- `resource-center.tsx` (435 lines) — category label colors
-- `retention-tools.tsx` (645 lines) — status indicators
-- `partner-experience.tsx` (244 lines) — dispute status colors
-- `marketing-toolkit.tsx` (311 lines) — asset type colors
+**Files to audit (with known hardcoded hex counts from gap analysis):**
+- `flywheel-analytics.tsx` (635 lines) — **10 hardcoded hex values** — heavy chart color arrays
+- `analytics-expanded.tsx` (285 lines) — **2 hardcoded hex values** — chart colors
+- `flywheel-reports.tsx` (614 lines) — **1 hardcoded hex value** — financial status
+- `delight-features.tsx` (653 lines) — 0 hex but needs Tailwind color audit
+- `resource-center.tsx` (435 lines) — 0 hex but needs Tailwind color audit
+- `retention-tools.tsx` (645 lines) — 0 hex but needs Tailwind color audit
+- `partner-experience.tsx` (244 lines) — 0 hex, clean
+- `marketing-toolkit.tsx` (311 lines) — 0 hex, clean
 
-**Completion test:** Change primary color in admin palette and every element in affiliate dashboard updates (including charts). Zero hardcoded Tailwind color classes remain. Zero hardcoded hex values remain.
-
-**Sprint 4 handoff note:** "Sprint 4 complete. Color audit done. Sprint 5 ready."
+**Completion test:** Change primary color in admin palette and every element in affiliate dashboard updates (including charts). Zero hardcoded hex values remain. Hardcoded Tailwind color classes replaced with palette-aware equivalents.
 
 ---
 
-### Sprint 5: Integration Testing + Documentation
+### Sprint 5: Integration Testing + Documentation — ❌ NOT STARTED
 
 **Goal:** End-to-end verification of the complete design system. Documentation updated.
 
-| Task | Description | Files | Depends On |
-|------|-------------|-------|------------|
-| **T013** | Full integration testing: FOUC, presets, reset, export/import, dark mode, colors, typography, components, charts, interactive states, scroll, toast, accessibility, print, light+dark modes | Various | T004-T012 |
-| **T014** | Update all documentation: FEATURE_INVENTORY, LESSONS_LEARNED, ROADMAP, replit.md | `docs/*.md`, `replit.md` | T013 |
+| Task | Status | Description | Files |
+|------|--------|-------------|-------|
+| **T013** | ❌ Not Started | Full integration testing across all settings, both modes | Various |
+| **T014** | ❌ Not Started | Update FEATURE_INVENTORY, LESSONS_LEARNED, ROADMAP, replit.md | `docs/*.md`, `replit.md` |
 
 **Test matrix:**
 - FOUC test: Hard-refresh pages — no color flash, no wrong data flash, no font flash
@@ -279,33 +288,80 @@ Divider: `--divider-style`, `--divider-opacity`
 - Print test: Print preview a report/invoice — clean output
 - Light AND dark mode: Every test above in both modes
 
-**Completion test:** Every configurable setting works end-to-end. Site is visually consistent across all dashboards and marketing pages. Documentation is complete.
+---
 
-**Sprint 5 handoff note:** "Sprint 5 complete. Design System Configuration fully operational."
+## Completion Plan (3 Remaining Sessions)
+
+Based on the verified gap analysis above, here are the three sessions needed to finish. Each session handles exactly one sprint. No combining sprints.
+
+### Session A: Sprint 3 Resume — Finish Component Integration + FOUC
+
+**Scope:** 4 tasks (finishing 2 partial + completing 2 not-started)
+
+| Task | What To Do | Files |
+|------|-----------|-------|
+| **T004** | FOUC prevention: server-side color injection in root layout, body opacity fade-in in globals.css, Google Font preload for configured heading/body fonts | `src/app/layout.tsx`, `src/app/globals.css` |
+| **T005 finish** | Update header to read `logoPosition` and `stickyHeader` settings. Build API route for saving user dark mode preference to account for cross-device sync. | `src/components/layout/header.tsx`, new API route |
+| **T008 finish** | Wire smooth scroll toggle to `html` element via the settings hook. Page transition wrapper (optional — skip if session is running long). | `src/hooks/use-settings.ts` or `src/app/layout.tsx` |
+| **T011** | Update Card, Button, Badge, Input components to read `var(--card-*)`, `var(--btn-*)`, `var(--badge-*)`, `var(--input-*)` CSS variables. Update Toast to respect `toastPosition`. Update Table to respect `tableStyle`/`tableRowBorders`/`tableHeaderStyle`. | `src/components/ui/card.tsx`, `button.tsx`, `badge.tsx`, `input.tsx`, toast, table |
+
+**Completion test:** Change card padding in admin palette → Card components across the site visually update. Change button size → Buttons update. Toggle dark mode option → Toggle appears/hides. Hard-refresh → no color flash. Scroll-to-top works. Header respects sticky setting.
+
+**File list for session context:** `src/app/layout.tsx`, `src/app/globals.css`, `src/components/layout/header.tsx`, `src/hooks/use-settings.ts`, `src/components/ui/card.tsx`, `src/components/ui/button.tsx`, `src/components/ui/badge.tsx`, `src/components/ui/input.tsx`, `src/components/theme-toggle.tsx`, `src/components/scroll-to-top.tsx`
+
+---
+
+### Session B: Sprint 4 — Color Audit
+
+**Scope:** 2 tasks (affiliate dashboard + 8 component files)
+
+| Task | What To Do | Files |
+|------|-----------|-------|
+| **T009** | Audit affiliate dashboard page. Replace all hardcoded hex colors and Tailwind color classes with palette CSS variables and semantic tokens. Wire any Recharts instances to `useChartConfig()`. | `src/app/affiliate/dashboard/page.tsx` |
+| **T010** | Audit all 8 affiliate component files. Same treatment: replace hardcoded colors, wire charts, use semantic tokens for status indicators. | `src/components/affiliate/analytics-expanded.tsx`, `flywheel-analytics.tsx`, `flywheel-reports.tsx`, `delight-features.tsx`, `resource-center.tsx`, `retention-tools.tsx`, `partner-experience.tsx`, `marketing-toolkit.tsx` |
+
+**Completion test:** Change primary color in admin palette → every chart, badge, status indicator, and card in the affiliate dashboard updates. Run `grep -E '#[0-9a-fA-F]{6}'` across all affiliate files → zero matches.
+
+**File list for session context:** `src/app/affiliate/dashboard/page.tsx`, all 8 files in `src/components/affiliate/`, `src/hooks/use-chart-config.ts`
+
+---
+
+### Session C: Sprint 5 — Integration Testing + Documentation
+
+**Scope:** 2 tasks (full test matrix + documentation updates)
+
+| Task | What To Do | Files |
+|------|-----------|-------|
+| **T013** | Execute the full test matrix (listed above in Sprint 5). Fix any issues found. Verify in both light and dark modes. | Various |
+| **T014** | Update FEATURE_INVENTORY.md with design system feature entry. Update LESSONS_LEARNED.md with any new patterns discovered. Update ROADMAP.md with completion status. Update replit.md to reflect final state. | `docs/FEATURE_INVENTORY.md`, `docs/LESSONS_LEARNED.md`, `docs/ROADMAP.md`, `replit.md` |
+
+**Completion test:** Every configurable setting works end-to-end. Site is visually consistent. All documentation reflects the completed design system. Blueprint status updated to "COMPLETE."
+
+**File list for session context:** All design system files + all docs files
 
 ---
 
 ## Key Files Reference
 
-| File | Role |
-|------|------|
-| `src/types/settings.ts` | TypeScript types for all settings (BrandingSettings interface) |
-| `src/hooks/use-settings.ts` | Theme injection hook — reads settings, pushes CSS variables to `:root` |
-| `src/app/globals.css` | CSS variable defaults, base rules, print styles, accessibility |
-| `src/app/admin/setup/palette/page.tsx` | Admin palette configuration page |
-| `src/components/admin/palette/*.tsx` | Sub-components for palette page sections (NEW) |
-| `src/hooks/use-chart-config.ts` | Shared chart configuration hook for Recharts (NEW) |
-| `src/lib/design-presets.ts` | 4 preset theme definitions + export/import (NEW) |
-| `src/components/theme-toggle.tsx` | Light/dark mode toggle (modified for darkModeOption) |
-| `src/components/layout/header.tsx` | Header (modified for logo position, sticky, toggle visibility) |
-| `src/components/scroll-to-top.tsx` | Scroll-to-top floating button (NEW) |
-| `src/components/ui/card.tsx` | Card component (modified to consume CSS vars) |
-| `src/components/ui/button.tsx` | Button component (modified to consume CSS vars) |
-| `src/components/ui/badge.tsx` | Badge component (modified to consume CSS vars) |
-| `src/components/ui/input.tsx` | Input component (modified for inputStyleMatch) |
-| `src/app/layout.tsx` | Root layout (modified for FOUC fix, scroll-to-top, transitions) |
-| `src/app/affiliate/dashboard/page.tsx` | Affiliate dashboard (color audit target) |
-| `src/components/affiliate/*.tsx` | 8 affiliate component files (color audit targets) |
+| File | Role | Status |
+|------|------|--------|
+| `src/types/settings.ts` | TypeScript types for all settings (BrandingSettings interface) | ✅ Done |
+| `src/hooks/use-settings.ts` | Theme injection hook — reads settings, pushes CSS variables to `:root` | ✅ Done |
+| `src/app/globals.css` | CSS variable defaults, base rules, print styles, accessibility | ✅ Done (needs FOUC fade-in added in T004) |
+| `src/app/admin/setup/palette/page.tsx` | Admin palette configuration page | ✅ Done |
+| `src/components/admin/palette/design-system-sections.tsx` | 16 admin UI accordion sections | ✅ Done |
+| `src/hooks/use-chart-config.ts` | Shared chart configuration hook for Recharts | ✅ Done |
+| `src/lib/design-presets.ts` | 4 preset theme definitions + export/import | ✅ Done |
+| `src/components/theme-toggle.tsx` | Light/dark mode toggle (respects darkModeOption) | ✅ Done |
+| `src/components/scroll-to-top.tsx` | Scroll-to-top floating button | ✅ Done |
+| `src/components/layout/header.tsx` | Header — needs logo position + sticky header wiring | ❌ Pending (T005) |
+| `src/components/ui/card.tsx` | Card component — needs CSS variable consumption | ❌ Pending (T011) |
+| `src/components/ui/button.tsx` | Button component — needs CSS variable consumption | ❌ Pending (T011) |
+| `src/components/ui/badge.tsx` | Badge component — needs CSS variable consumption | ❌ Pending (T011) |
+| `src/components/ui/input.tsx` | Input component — needs CSS variable consumption | ❌ Pending (T011) |
+| `src/app/layout.tsx` | Root layout — needs FOUC fix + font preload | ❌ Pending (T004) |
+| `src/app/affiliate/dashboard/page.tsx` | Affiliate dashboard — color audit target | ❌ Pending (T009) |
+| `src/components/affiliate/*.tsx` | 8 affiliate component files — color audit targets | ❌ Pending (T010) |
 
 ---
 
@@ -318,16 +374,21 @@ After this blueprint is implemented, these rules are permanent:
 3. **Respect `darkModeOption`.** Never render a theme toggle without checking this setting.
 4. **Never use hardcoded fallback values.** Use skeleton/shimmer placeholders while data loads. Never show "20%" when the real value is "17.9%".
 5. **Test both light and dark modes.** Every visual change must look correct in both.
-6. **New settings go through the pipeline.** Type in settings.ts then hook injection then CSS default then admin UI then documentation. No shortcuts.
+6. **New settings go through the pipeline.** Type in settings.ts → hook injection → CSS default → admin UI → documentation. No shortcuts.
 
 ---
 
 ## Session Continuity Protocol
 
+**ONE SPRINT PER SESSION — NO EXCEPTIONS.**
+
+Sessions that try to combine multiple sprints will run out of context and leave work partially done. This has already happened and caused confusion. The rule is absolute.
+
 To prevent partial completion surprises:
 
 1. **Each session starts by reading this document** and checking ROADMAP.md for which sprint is current.
-2. **Each session works on exactly one sprint** (or finishes a partially-completed sprint from last session).
+2. **Each session works on exactly one sprint.** No combining. No "just one more task."
 3. **At the end of every session**, the agent updates ROADMAP.md with: which sprint completed, which tasks within it completed, and what the next session should start with.
 4. **If a sprint cannot be completed in the current session**, the agent must tell the user before the session ends: "Sprint X is partially done. Tasks T00Y and T00Z are complete. Task T00W is not started. The next session should resume with T00W."
 5. **The user should never discover partial completion after the fact.** Transparency is mandatory.
+6. **The next session to run is: Session A (Sprint 3 Resume).**
