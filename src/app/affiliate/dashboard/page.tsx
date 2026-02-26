@@ -9,6 +9,11 @@ const S = (v: unknown): string => {
   }
   return String(v)
 }
+const N = (v: unknown): number => {
+  if (typeof v === 'number' && !isNaN(v)) return v
+  if (typeof v === 'string') { const n = parseFloat(v); return isNaN(n) ? 0 : n }
+  return 0
+}
 
 import { useState, useEffect, useCallback, Suspense, useRef, useMemo, Component, type ErrorInfo, type ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -376,6 +381,47 @@ class SectionErrorBoundary extends Component<{ sectionName: string; children: Re
   }
 }
 
+function LazySectionComponent({ renderFn }: { renderFn: () => ReactNode }) {
+  try {
+    const result = renderFn()
+    return <>{result}</>
+  } catch (e: any) {
+    console.error('[LAZY_SECTION_CRASH]', e?.message, e?.stack)
+    return (
+      <Card className="border-destructive/30">
+        <CardContent className="pt-4 pb-3 text-center">
+          <AlertTriangle className="h-6 w-6 mx-auto mb-2 text-destructive" />
+          <p className="text-sm font-medium text-destructive mb-1">Section render error</p>
+          <p className="text-xs text-muted-foreground">{String(e?.message || e)}</p>
+        </CardContent>
+      </Card>
+    )
+  }
+}
+
+function deepScanForObjects(obj: any, path: string, results: string[]): void {
+  if (results.length > 20) return
+  if (obj === null || obj === undefined) return
+  if (typeof obj === 'object' && !Array.isArray(obj)) {
+    for (const [key, val] of Object.entries(obj)) {
+      const p = `${path}.${key}`
+      if (val !== null && val !== undefined && typeof val === 'object' && !Array.isArray(val)) {
+        const isDate = val instanceof Date
+        if (!isDate) {
+          results.push(`${p} = object{${Object.keys(val).join(',')}}`)
+        }
+      }
+      if (typeof val === 'object' && val !== null) {
+        deepScanForObjects(val, p, results)
+      }
+    }
+  } else if (Array.isArray(obj)) {
+    obj.slice(0, 3).forEach((item, i) => {
+      deepScanForObjects(item, `${path}[${i}]`, results)
+    })
+  }
+}
+
 class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null; componentStack: string | null }> {
   constructor(props: { children: ReactNode }) {
     super(props)
@@ -405,15 +451,29 @@ class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasErr
   render() {
     if (this.state.hasError) {
       let decodedError = this.state.error?.message || 'Unknown error'
-      const reactUrlMatch = decodedError.match(/https:\/\/react\.dev\/errors\/\d+\?args\[\]=(.+?)(?:\s|$)/)
+      const reactUrlMatch = decodedError.match(/https:\/\/react\.dev\/errors\/\d+/)
+      let errorCode = ''
       if (reactUrlMatch) {
-        try { decodedError += '\nDecoded arg: ' + decodeURIComponent(reactUrlMatch[1]) } catch {}
+        errorCode = reactUrlMatch[0]
+      }
+      const argsMatch = decodedError.match(/args\[\]=([^&\s]+)/g)
+      let decodedArgs = ''
+      if (argsMatch) {
+        decodedArgs = argsMatch.map(a => {
+          try { return decodeURIComponent(a.replace('args[]=', '')) } catch { return a }
+        }).join(', ')
       }
 
       let diagnosticInfo: string | null = null
+      let objectScanResults: string | null = null
       try {
         const diag = (typeof window !== 'undefined' && (window as any).__DASHBOARD_DIAGNOSTIC__) || null
-        if (diag) diagnosticInfo = JSON.stringify(diag, null, 2)
+        if (diag) {
+          diagnosticInfo = JSON.stringify(diag, null, 2)
+          const objFindings: string[] = []
+          deepScanForObjects(diag, 'state', objFindings)
+          if (objFindings.length > 0) objectScanResults = objFindings.join('\n')
+        }
       } catch {}
 
       return (
@@ -425,15 +485,23 @@ class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasErr
                 <h2 className="text-xl font-bold mb-2" data-testid="text-dashboard-error">Dashboard Error</h2>
                 <p className="text-sm text-muted-foreground mb-4">Something went wrong loading the dashboard.</p>
               </div>
-              <div className="bg-muted/50 rounded-lg p-3 mb-4 overflow-auto max-h-60">
+              <div className="bg-muted/50 rounded-lg p-3 mb-4 overflow-auto max-h-[70vh]">
                 <p className="text-xs font-bold mb-1">Error Message:</p>
                 <p className="text-xs font-mono text-destructive break-all" data-testid="text-error-detail">
                   {decodedError}
                 </p>
-                <p className="text-xs font-bold mt-3 mb-1">Stack Trace (full):</p>
-                <pre className="text-[10px] font-mono text-muted-foreground break-all whitespace-pre-wrap">
-                  {this.state.error?.stack || 'No stack available'}
-                </pre>
+                {decodedArgs && (
+                  <>
+                    <p className="text-xs font-bold mt-3 mb-1">Decoded Error Args:</p>
+                    <pre className="text-xs font-mono text-orange-600 dark:text-orange-400 break-all whitespace-pre-wrap">{decodedArgs}</pre>
+                  </>
+                )}
+                {objectScanResults && (
+                  <>
+                    <p className="text-xs font-bold mt-3 mb-1 text-red-600">Objects Found in State (potential #310 cause):</p>
+                    <pre className="text-xs font-mono text-red-500 break-all whitespace-pre-wrap">{objectScanResults}</pre>
+                  </>
+                )}
                 {this.state.componentStack && (
                   <>
                     <p className="text-xs font-bold mt-3 mb-1">React Component Stack:</p>
@@ -444,7 +512,7 @@ class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasErr
                 )}
                 {diagnosticInfo && (
                   <>
-                    <p className="text-xs font-bold mt-3 mb-1">Dashboard State Diagnostic:</p>
+                    <p className="text-xs font-bold mt-3 mb-1">Full State Dump:</p>
                     <pre className="text-[10px] font-mono text-muted-foreground break-all whitespace-pre-wrap max-h-40 overflow-auto">
                       {diagnosticInfo}
                     </pre>
@@ -477,7 +545,7 @@ function StandaloneAffiliateDashboard() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { settings: appSettings } = useSettings()
-  const appName = appSettings?.branding?.appName || 'Our Product'
+  const appName = S(appSettings?.branding?.appName) || 'Our Product'
 
   const initialSection = (searchParams.get('section') as DashboardSection) || 'overview'
   const [section, setSection] = useState<DashboardSection>(initialSection)
@@ -1828,18 +1896,35 @@ function StandaloneAffiliateDashboard() {
 
   if (typeof window !== 'undefined') {
     try {
-      const snapKeys = (obj: any, label: string) => {
-        if (!obj) return `${label}=null`
-        if (typeof obj !== 'object') return `${label}=${typeof obj}:${String(obj).slice(0,50)}`
-        const entries = Object.entries(obj).map(([k,v]) => {
-          const t = v === null ? 'null' : v === undefined ? 'undef' : typeof v
-          const preview = t === 'object' ? (Array.isArray(v) ? `array[${v.length}]` : `{${Object.keys(v as any).join(',')}}`) : String(v).slice(0,30)
-          return `${k}:${t}=${preview}`
-        })
-        return `${label}={${entries.join(', ')}}`
+      const deepSnap = (obj: any, depth = 0): any => {
+        if (depth > 3) return '[deep]'
+        if (obj === null) return 'null'
+        if (obj === undefined) return 'undefined'
+        if (typeof obj !== 'object') return `${typeof obj}:${String(obj).slice(0, 50)}`
+        if (Array.isArray(obj)) return `array[${obj.length}]${obj.length > 0 ? ':' + JSON.stringify(obj.slice(0, 2)).slice(0, 100) : ''}`
+        const result: Record<string, any> = {}
+        for (const [k, v] of Object.entries(obj)) {
+          result[k] = deepSnap(v, depth + 1)
+        }
+        return result
       }
-      console.log('[RENDER_PHASE_DIAG] data:', snapKeys(data.stats, 'stats'), snapKeys(data.tier, 'tier'), snapKeys(data.tier?.current, 'tier.current'), snapKeys(data.tier?.next, 'tier.next'), snapKeys(data.terms, 'terms'), 'secondTierComms:', data.secondTierCommissions?.length ?? 'none', 'tierCelebration:', data.tierPromotionCelebration ? JSON.stringify(data.tierPromotionCelebration).slice(0,100) : 'null')
-      console.log('[RENDER_PHASE_DIAG] other state:', 'earnings:', earnings ? snapKeys(earnings, 'earnings') : 'null', 'milestoneData:', milestoneData ? `{milestones:array[${milestoneData.milestones?.length}],currentReferrals:${milestoneData.currentReferrals}}` : 'null', 'forecast:', forecast ? snapKeys(forecast, 'forecast') : 'null', 'contests:', `array[${contests.length}]`, 'leaderboard:', `array[${leaderboard.length}]`, 'funnel:', `array[${funnel.length}]`, 'coachTips:', `array[${coachTips.length}]`, 'notifications:', `array[${notifications.length}]`)
+      const diagState = {
+        section,
+        timestamp: new Date().toISOString(),
+        stats: deepSnap(data.stats),
+        tier: deepSnap(data.tier),
+        terms: deepSnap(data.terms),
+        earnings: deepSnap(earnings),
+        milestoneData: milestoneData ? { count: milestoneData.milestones?.length, currentReferrals: milestoneData.currentReferrals, sample: milestoneData.milestones?.[0] ? deepSnap(milestoneData.milestones[0]) : null } : null,
+        forecast: deepSnap(forecast),
+        contests: `array[${contests.length}]`,
+        leaderboard: `array[${leaderboard.length}]`,
+        funnel: `array[${funnel.length}]`,
+        coachTips: `array[${coachTips.length}]`,
+        notifications: `array[${notifications.length}]`,
+      };
+      (window as any).__DASHBOARD_DIAGNOSTIC__ = diagState
+      console.log('[RENDER_PHASE_DIAG]', JSON.stringify(diagState, null, 2))
     } catch (diagErr) {
       console.error('[RENDER_PHASE_DIAG_ERROR]', String(diagErr))
     }
@@ -2243,8 +2328,8 @@ function StandaloneAffiliateDashboard() {
                 )}
                 {forecast.tierInfo && (
                   <div className="p-2 rounded bg-primary/10 text-xs">
-                    <span className="font-medium">{forecast.tierInfo.referralsNeeded} more referrals</span> to reach{' '}
-                    <span className="font-medium">{forecast.tierInfo.nextTierName}</span> tier ({forecast.tierInfo.nextTierRate}% commission)
+                    <span className="font-medium">{S(forecast.tierInfo.referralsNeeded)} more referrals</span> to reach{' '}
+                    <span className="font-medium">{S(forecast.tierInfo.nextTierName)}</span> tier ({S(forecast.tierInfo.nextTierRate)}% commission)
                   </div>
                 )}
               </div>
@@ -2303,7 +2388,7 @@ function StandaloneAffiliateDashboard() {
                         <span>{S(entry.displayName)} {entry.isYou && <Badge variant="outline" className="text-[10px] ml-1">You</Badge>}</span>
                       </div>
                       <span className="font-medium">
-                        {leaderboardMetric === 'earnings' ? `$${(entry.metricValue / 100).toFixed(2)}` : entry.metricValue}
+                        {leaderboardMetric === 'earnings' ? `$${(N(entry.metricValue) / 100).toFixed(2)}` : S(entry.metricValue)}
                       </span>
                     </div>
                   ))}
@@ -2351,10 +2436,10 @@ function StandaloneAffiliateDashboard() {
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-medium">{S(step.stage)}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold">{step.count}</span>
+                        <span className="text-sm font-bold">{N(step.count)}</span>
                         {i > 0 && (
-                          <span className={`text-xs ${step.rate >= 50 ? 'text-green-600 dark:text-green-400' : step.rate >= 20 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
-                            {step.rate}%
+                          <span className={`text-xs ${N(step.rate) >= 50 ? 'text-green-600 dark:text-green-400' : N(step.rate) >= 20 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
+                            {N(step.rate)}%
                           </span>
                         )}
                       </div>
@@ -2475,7 +2560,7 @@ function StandaloneAffiliateDashboard() {
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <CheckCircle className="h-3.5 w-3.5 text-green-500" />
-                <span>Connected as <span className="font-medium text-foreground">{youtubeAnalytics.account?.displayName || youtubeAnalytics.account?.username}</span></span>
+                <span>Connected as <span className="font-medium text-foreground">{S(youtubeAnalytics.account?.displayName || youtubeAnalytics.account?.username)}</span></span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -2484,28 +2569,28 @@ function StandaloneAffiliateDashboard() {
                     <Play className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Videos</span>
                   </div>
-                  <p className="text-lg font-bold">{youtubeAnalytics.channelStats?.totalVideos || 0}</p>
+                  <p className="text-lg font-bold">{N(youtubeAnalytics.channelStats?.totalVideos)}</p>
                 </div>
                 <div className="p-3 rounded-md border" data-testid="stat-yt-views">
                   <div className="flex items-center gap-1.5 mb-1">
                     <Eye className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Total Views</span>
                   </div>
-                  <p className="text-lg font-bold">{(youtubeAnalytics.channelStats?.totalViews || 0).toLocaleString()}</p>
+                  <p className="text-lg font-bold">{N(youtubeAnalytics.channelStats?.totalViews).toLocaleString()}</p>
                 </div>
                 <div className="p-3 rounded-md border" data-testid="stat-yt-likes">
                   <div className="flex items-center gap-1.5 mb-1">
                     <ThumbsUp className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Likes</span>
                   </div>
-                  <p className="text-lg font-bold">{(youtubeAnalytics.channelStats?.totalLikes || 0).toLocaleString()}</p>
+                  <p className="text-lg font-bold">{N(youtubeAnalytics.channelStats?.totalLikes).toLocaleString()}</p>
                 </div>
                 <div className="p-3 rounded-md border" data-testid="stat-yt-comments">
                   <div className="flex items-center gap-1.5 mb-1">
                     <MessageCircle className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Comments</span>
                   </div>
-                  <p className="text-lg font-bold">{(youtubeAnalytics.channelStats?.totalComments || 0).toLocaleString()}</p>
+                  <p className="text-lg font-bold">{N(youtubeAnalytics.channelStats?.totalComments).toLocaleString()}</p>
                 </div>
               </div>
 
@@ -2517,21 +2602,21 @@ function StandaloneAffiliateDashboard() {
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
                     <div>
-                      <p className="text-lg font-bold">{youtubeAnalytics.attribution.youtubeClicks}</p>
+                      <p className="text-lg font-bold">{N(youtubeAnalytics.attribution.youtubeClicks)}</p>
                       <p className="text-[10px] text-muted-foreground">YouTube Clicks</p>
                     </div>
                     <div>
-                      <p className="text-lg font-bold">{youtubeAnalytics.attribution.youtubeReferrals}</p>
+                      <p className="text-lg font-bold">{N(youtubeAnalytics.attribution.youtubeReferrals)}</p>
                       <p className="text-[10px] text-muted-foreground">YouTube Signups</p>
                     </div>
                     <div>
-                      <p className="text-lg font-bold">{youtubeAnalytics.attribution.youtubeConverted}</p>
+                      <p className="text-lg font-bold">{N(youtubeAnalytics.attribution.youtubeConverted)}</p>
                       <p className="text-[10px] text-muted-foreground">Converted</p>
                     </div>
                   </div>
                   {youtubeAnalytics.attribution.viewsToClickRate && (
                     <p className="text-xs text-muted-foreground mt-2 text-center">
-                      Views-to-click rate: {youtubeAnalytics.attribution.viewsToClickRate}%
+                      Views-to-click rate: {S(youtubeAnalytics.attribution.viewsToClickRate)}%
                     </p>
                   )}
                 </div>
@@ -2546,13 +2631,13 @@ function StandaloneAffiliateDashboard() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{S(video.title)}</p>
                           <p className="text-[10px] text-muted-foreground">
-                            {new Date(video.publishedAt).toLocaleDateString()}
+                            {new Date(String(video.publishedAt || '')).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
-                          <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {video.views.toLocaleString()}</span>
-                          <span className="flex items-center gap-1"><ThumbsUp className="h-3 w-3" /> {video.likes}</span>
-                          <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" /> {video.comments}</span>
+                          <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {N(video.views).toLocaleString()}</span>
+                          <span className="flex items-center gap-1"><ThumbsUp className="h-3 w-3" /> {N(video.likes)}</span>
+                          <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" /> {N(video.comments)}</span>
                         </div>
                       </div>
                     ))}
@@ -3072,10 +3157,10 @@ function StandaloneAffiliateDashboard() {
                 <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`referral-${ref.id}`}>
                   <div className="flex items-center gap-3">
                     <Badge variant={STATUS_COLORS[ref.status] as any || 'outline'} className="text-xs capitalize">
-                      {ref.status.replace('_', ' ')}
+                      {S(ref.status).replace('_', ' ')}
                     </Badge>
                     {ref.source_tag && (
-                      <Badge variant="outline" className="text-[10px]">{ref.source_tag}</Badge>
+                      <Badge variant="outline" className="text-[10px]">{S(ref.source_tag)}</Badge>
                     )}
                     <span className="text-xs text-muted-foreground">
                       {new Date(ref.created_at).toLocaleDateString()}
@@ -3369,12 +3454,12 @@ function StandaloneAffiliateDashboard() {
                     <div className="flex items-center gap-3">
                       {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" /> : <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />}
                       <Badge variant={STATUS_COLORS[com.status] as any || 'outline'} className="text-xs capitalize">
-                        {com.status}
+                        {S(com.status)}
                       </Badge>
                       <div>
-                        <p className="text-sm font-medium">${(com.commission_amount_cents / 100).toFixed(2)}</p>
+                        <p className="text-sm font-medium">${(N(com.commission_amount_cents) / 100).toFixed(2)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {com.commission_rate}% of ${(com.invoice_amount_cents / 100).toFixed(2)}
+                          {N(com.commission_rate)}% of ${(N(com.invoice_amount_cents) / 100).toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -3409,7 +3494,7 @@ function StandaloneAffiliateDashboard() {
                                 step.status === 'skipped' ? 'text-muted-foreground/50 line-through' :
                                 step.status === 'completed' || step.status === 'current' ? 'text-foreground' : 'text-muted-foreground'
                               }`}>
-                                {step.label}
+                                {S(step.label)}
                               </span>
                               {step.date && (
                                 <span className="text-[9px] text-muted-foreground mt-0.5">
@@ -3445,7 +3530,7 @@ function StandaloneAffiliateDashboard() {
               Second-Tier Earnings
             </CardTitle>
             <CardDescription>
-              Earn {data.settings.secondTierCommissionRate || 5}% from affiliates you recruited
+              Earn {N(data.settings.secondTierCommissionRate) || 5}% from affiliates you recruited
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -3910,21 +3995,21 @@ function StandaloneAffiliateDashboard() {
                     {financialTools.multiYearHistory.map((yr: any) => (
                       <div key={yr.year} className="p-3 rounded-md border" data-testid={`year-history-${yr.year}`}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-bold">{yr.year}</span>
-                          <span className="text-sm font-bold text-primary">${(yr.earnings / 100).toFixed(2)}</span>
+                          <span className="text-sm font-bold">{S(yr.year)}</span>
+                          <span className="text-sm font-bold text-primary">${(N(yr.earnings) / 100).toFixed(2)}</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div>
                             <p className="text-[10px] text-muted-foreground">Commissions</p>
-                            <p className="text-xs font-medium">{yr.commissions}</p>
+                            <p className="text-xs font-medium">{N(yr.commissions)}</p>
                           </div>
                           <div>
                             <p className="text-[10px] text-muted-foreground">Referrals</p>
-                            <p className="text-xs font-medium">{yr.referrals}</p>
+                            <p className="text-xs font-medium">{N(yr.referrals)}</p>
                           </div>
                           <div>
                             <p className="text-[10px] text-muted-foreground">Paid Out</p>
-                            <p className="text-xs font-medium">${(yr.payouts / 100).toFixed(2)}</p>
+                            <p className="text-xs font-medium">${(N(yr.payouts) / 100).toFixed(2)}</p>
                           </div>
                         </div>
                       </div>
@@ -4139,10 +4224,10 @@ function StandaloneAffiliateDashboard() {
                 <div key={payout.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`payout-${payout.id}`}>
                   <div className="flex items-center gap-3">
                     <Badge variant={STATUS_COLORS[payout.status] as any || 'outline'} className="text-xs capitalize">
-                      {payout.status}
+                      {S(payout.status)}
                     </Badge>
-                    <p className="text-sm font-medium">${(payout.amount_cents / 100).toFixed(2)}</p>
-                    <span className="text-xs text-muted-foreground">{payout.method}</span>
+                    <p className="text-sm font-medium">${(N(payout.amount_cents) / 100).toFixed(2)}</p>
+                    <span className="text-xs text-muted-foreground">{S(payout.method)}</span>
                   </div>
                   <span className="text-xs text-muted-foreground">
                     {new Date(payout.processed_at || payout.created_at).toLocaleDateString()}
@@ -4272,7 +4357,7 @@ function StandaloneAffiliateDashboard() {
                     </div>
                     {asset.content && (
                       <pre className="mt-3 p-3 rounded bg-muted text-xs overflow-auto max-h-32 whitespace-pre-wrap" data-testid={`content-asset-${asset.id}`}>
-                        {asset.content}
+                        {S(asset.content)}
                       </pre>
                     )}
                   </CardContent>
@@ -5707,12 +5792,12 @@ function StandaloneAffiliateDashboard() {
                       <div className="shrink-0 w-12 text-center">
                         <p className="text-xs font-bold">Day {day.day}</p>
                         <Badge variant={day.priority === 'high' ? 'default' : day.priority === 'low' ? 'outline' : 'secondary'} className="text-[10px] mt-0.5">
-                          {day.priority}
+                          {S(day.priority)}
                         </Badge>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium">{day.task}</p>
-                        {day.tip && <p className="text-xs text-muted-foreground mt-0.5">{day.tip}</p>}
+                        <p className="text-sm font-medium">{S(day.task)}</p>
+                        {day.tip && <p className="text-xs text-muted-foreground mt-0.5">{S(day.tip)}</p>}
                       </div>
                     </div>
                   ))}
@@ -5787,7 +5872,7 @@ function StandaloneAffiliateDashboard() {
                     onClick={() => toggleWebhookEvent(evt.value)}
                     data-testid={`badge-event-${evt.value}`}
                   >
-                    {evt.label}
+                    {S(evt.label)}
                   </Badge>
                 ))}
               </div>
@@ -5816,7 +5901,7 @@ function StandaloneAffiliateDashboard() {
                         </Badge>
                         {wh.failure_count > 0 && (
                           <Badge variant="destructive" className="text-[10px]">
-                            {wh.failure_count} failures
+                            {N(wh.failure_count)} failures
                           </Badge>
                         )}
                         {wh.events?.map((e: string) => (
@@ -5888,7 +5973,7 @@ function StandaloneAffiliateDashboard() {
                               <div className="flex items-center gap-2 shrink-0">
                                 {del.response_status ? (
                                   <Badge variant={del.delivered_at ? 'secondary' : 'destructive'} className="text-[10px]">
-                                    {del.response_status}
+                                    {S(del.response_status)}
                                   </Badge>
                                 ) : (
                                   <Badge variant="destructive" className="text-[10px]">Failed</Badge>
@@ -6136,7 +6221,7 @@ function StandaloneAffiliateDashboard() {
                     {isExpanded && contract.body && (
                       <div className="border-t px-4 py-3">
                         <div className="prose prose-sm dark:prose-invert max-w-none text-sm whitespace-pre-wrap" data-testid={`text-contract-body-${contract.id}`}>
-                          {contract.body}
+                          {S(contract.body)}
                         </div>
                       </div>
                     )}
@@ -6705,7 +6790,7 @@ function StandaloneAffiliateDashboard() {
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
                   }`}>
-                    <p className="whitespace-pre-wrap break-words">{msg.body}</p>
+                    <p className="whitespace-pre-wrap break-words">{S(msg.body)}</p>
                     <p className={`text-xs mt-1 ${
                       msg.sender_role === 'affiliate' ? 'text-primary-foreground/70' : 'text-muted-foreground'
                     }`}>
@@ -7062,7 +7147,7 @@ function StandaloneAffiliateDashboard() {
                       className="text-[9px] text-muted-foreground"
                       style={{ position: 'relative', left: `${ml.weekIndex * 11}px` }}
                     >
-                      {ml.label}
+                      {S(ml.label)}
                     </span>
                   ))}
                 </div>
@@ -7220,27 +7305,10 @@ function StandaloneAffiliateDashboard() {
     )
   }
 
-  const LazySection = ({ renderFn }: { renderFn: () => React.ReactNode }) => {
-    try {
-      return <>{renderFn()}</>
-    } catch (e: any) {
-      console.error('[LAZY_SECTION_CRASH]', e?.message, e?.stack)
-      return (
-        <Card className="border-destructive/30">
-          <CardContent className="pt-4 pb-3 text-center">
-            <AlertTriangle className="h-6 w-6 mx-auto mb-2 text-destructive" />
-            <p className="text-sm font-medium text-destructive mb-1">Section render error</p>
-            <p className="text-xs text-muted-foreground">{String(e?.message || e)}</p>
-          </CardContent>
-        </Card>
-      )
-    }
-  }
-
   const renderSection = () => {
     const wrap = (name: string, renderFn: () => React.ReactNode) => (
       <SectionErrorBoundary sectionName={name} key={name}>
-        <LazySection renderFn={renderFn} />
+        <LazySectionComponent renderFn={renderFn} />
       </SectionErrorBoundary>
     )
     switch (section) {
