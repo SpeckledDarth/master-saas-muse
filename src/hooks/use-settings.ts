@@ -227,17 +227,211 @@ function getFontFamily(value: string): string {
   return `"${value}"${fallback}`
 }
 
+function resolveTypographyVars(b: SiteSettings['branding']): Record<string, string> {
+  const vars: Record<string, string> = {}
+  if (b.h1FontSize) vars['--h1-size'] = b.h1FontSize
+  if (b.h1FontWeight) vars['--h1-weight'] = b.h1FontWeight
+  if (b.h1LetterSpacing) vars['--h1-spacing'] = b.h1LetterSpacing
+  if (b.h1TextTransform) vars['--h1-transform'] = b.h1TextTransform
+  if (b.h2FontSize) vars['--h2-size'] = b.h2FontSize
+  if (b.h2FontWeight) vars['--h2-weight'] = b.h2FontWeight
+  if (b.h2LetterSpacing) vars['--h2-spacing'] = b.h2LetterSpacing
+  if (b.h2TextTransform) vars['--h2-transform'] = b.h2TextTransform
+  if (b.h3FontSize) vars['--h3-size'] = b.h3FontSize
+  if (b.h3FontWeight) vars['--h3-weight'] = b.h3FontWeight
+  if (b.h3LetterSpacing) vars['--h3-spacing'] = b.h3LetterSpacing
+  if (b.h3TextTransform) vars['--h3-transform'] = b.h3TextTransform
+  if (b.bodyFontSize) vars['--body-size'] = b.bodyFontSize
+  if (b.bodyLineHeight) vars['--body-line-height'] = b.bodyLineHeight
+  return vars
+}
+
+function resolveComponentVars(b: SiteSettings['branding']): Record<string, string> {
+  const vars: Record<string, string> = {}
+
+  const paddingMap = { compact: '0.75rem', default: '1.25rem', spacious: '1.75rem' }
+  const radiusMap = { none: '0', sm: '0.25rem', md: '0.5rem', lg: '0.75rem', xl: '1rem' }
+  const shadowMap = {
+    none: 'none',
+    sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+    md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+  }
+  const btnPadMap = { compact: '0.375rem 0.75rem', default: '0.5rem 1rem', large: '0.625rem 1.5rem' }
+  const badgeRadiusMap = { pill: '9999px', rounded: '0.375rem', square: '0.125rem' }
+  const fontWeightMap = { medium: '500', semibold: '600', bold: '700' }
+
+  if (b.cardPadding) vars['--card-padding'] = paddingMap[b.cardPadding] || paddingMap.default
+  if (b.cardBorderRadius) vars['--card-radius'] = radiusMap[b.cardBorderRadius] || radiusMap.lg
+  if (b.cardShadow) vars['--card-shadow'] = shadowMap[b.cardShadow] || shadowMap.sm
+  if (b.cardBorderWidth !== undefined) vars['--card-border-width'] = `${b.cardBorderWidth}px`
+  if (b.cardBorderStyle) vars['--card-border-style'] = b.cardBorderStyle === 'none' ? 'none' : b.cardBorderStyle
+  if (b.buttonSize) vars['--btn-padding'] = btnPadMap[b.buttonSize] || btnPadMap.default
+  if (b.buttonFontWeight) vars['--btn-font-weight'] = fontWeightMap[b.buttonFontWeight] || fontWeightMap.semibold
+  if (b.buttonTextTransform) vars['--btn-text-transform'] = b.buttonTextTransform
+  if (b.badgeShape) vars['--badge-radius'] = badgeRadiusMap[b.badgeShape] || badgeRadiusMap.pill
+
+  if (b.inputStyleMatch) {
+    vars['--input-radius'] = vars['--card-radius'] || radiusMap.lg
+  }
+
+  return vars
+}
+
+function resolveLayoutVars(b: SiteSettings['branding']): Record<string, string> {
+  const vars: Record<string, string> = {}
+  const gapMap = { compact: '0.5rem', default: '1rem', spacious: '1.5rem' }
+  const sectionMap = { compact: '2rem', default: '3.5rem', spacious: '5rem' }
+  const sidebarMap = { narrow: '14rem', default: '16rem', wide: '18rem' }
+
+  if (b.contentDensity) vars['--content-density-gap'] = gapMap[b.contentDensity] || gapMap.default
+  if (b.sectionSpacing) vars['--section-spacing'] = sectionMap[b.sectionSpacing] || sectionMap.default
+  if (b.sidebarWidth) vars['--sidebar-width'] = sidebarMap[b.sidebarWidth] || sidebarMap.default
+  if (b.containerMaxWidth) vars['--container-max-width'] = b.containerMaxWidth
+  if (b.pageHeaderStyle) vars['--page-header-size'] = b.pageHeaderStyle === 'compact' ? '1.5rem' : '2.25rem'
+  return vars
+}
+
+function resolveInteractiveVars(b: SiteSettings['branding']): Record<string, string> {
+  const vars: Record<string, string> = {}
+
+  const hoverTransformMap = { lift: 'translateY(-2px)', glow: 'none', scale: 'scale(1.02)', none: 'none' }
+  const hoverShadowMap = {
+    lift: '0 4px 12px rgb(0 0 0 / 0.15)',
+    glow: '0 0 12px hsl(var(--primary) / 0.4)',
+    scale: 'none',
+    none: 'none',
+  }
+  const speedMap = { fast: '100ms', normal: '200ms', slow: '350ms', none: '0ms' }
+
+  if (b.hoverEffect) {
+    vars['--hover-transform'] = hoverTransformMap[b.hoverEffect] || 'none'
+    vars['--hover-shadow'] = hoverShadowMap[b.hoverEffect] || 'none'
+  }
+  if (b.animationSpeed) vars['--transition-speed'] = speedMap[b.animationSpeed] || speedMap.normal
+  if (b.focusRingWidth) vars['--focus-ring-width'] = `${b.focusRingWidth}px`
+  if (b.buttonClickFeedback) vars['--click-scale'] = '0.97'
+  if (b.buttonClickFeedback === false) vars['--click-scale'] = '1'
+  return vars
+}
+
+function resolveChartVars(b: SiteSettings['branding']): Record<string, string> {
+  const vars: Record<string, string> = {}
+  const barSizeMap = { thin: '12', default: '20', thick: '32' }
+  const barRadiusMap = { none: '0', sm: '2', md: '4' }
+
+  if (b.chartBarThickness) vars['--chart-bar-size'] = barSizeMap[b.chartBarThickness] || barSizeMap.default
+  if (b.chartBarRadius) vars['--chart-bar-radius'] = barRadiusMap[b.chartBarRadius] || barRadiusMap.sm
+  if (b.chartLineWidth) vars['--chart-line-width'] = `${b.chartLineWidth}`
+  if (b.chartAreaOpacity !== undefined) vars['--chart-area-opacity'] = `${b.chartAreaOpacity}`
+  return vars
+}
+
+function resolveSemanticVars(b: SiteSettings['branding']): Record<string, string> {
+  const vars: Record<string, string> = {}
+  if (b.successColor) {
+    const hsl = hexToHSL(b.successColor)
+    if (hsl) vars['--success'] = hsl
+  }
+  if (b.warningColor) {
+    const hsl = hexToHSL(b.warningColor)
+    if (hsl) vars['--warning'] = hsl
+  }
+  if (b.dangerColor) {
+    const hsl = hexToHSL(b.dangerColor)
+    if (hsl) vars['--danger'] = hsl
+  }
+  return vars
+}
+
+function resolveTableVars(b: SiteSettings['branding']): Record<string, string> {
+  const vars: Record<string, string> = {}
+  if (b.tableStyle === 'striped') vars['--table-stripe-opacity'] = '0.04'
+  if (b.tableStyle === 'clean') vars['--table-stripe-opacity'] = '0'
+  if (b.tableRowBorders === true) vars['--table-border-opacity'] = '1'
+  if (b.tableRowBorders === false) vars['--table-border-opacity'] = '0'
+  return vars
+}
+
+function resolveDividerVars(b: SiteSettings['branding']): Record<string, string> {
+  const vars: Record<string, string> = {}
+  if (b.dividerStyle === 'none') vars['--divider-opacity'] = '0'
+  else if (b.dividerStyle) vars['--divider-opacity'] = '1'
+  return vars
+}
+
+function applyDesignSystemVars(root: HTMLElement, b: SiteSettings['branding']) {
+  const allVars = {
+    ...resolveTypographyVars(b),
+    ...resolveComponentVars(b),
+    ...resolveLayoutVars(b),
+    ...resolveInteractiveVars(b),
+    ...resolveChartVars(b),
+    ...resolveSemanticVars(b),
+    ...resolveTableVars(b),
+    ...resolveDividerVars(b),
+  }
+
+  for (const [key, value] of Object.entries(allVars)) {
+    root.style.setProperty(key, value)
+  }
+
+  if (b.smoothScroll) {
+    root.style.setProperty('scroll-behavior', 'smooth')
+  } else if (b.smoothScroll === false) {
+    root.style.removeProperty('scroll-behavior')
+  }
+
+  root.setAttribute('data-heading-color', b.headingColorMode || 'foreground')
+  root.setAttribute('data-skeleton', b.skeletonStyle || 'pulse')
+  root.setAttribute('data-divider', b.dividerStyle || 'line')
+  root.setAttribute('data-dark-mode', b.darkModeOption || 'user-choice')
+  root.setAttribute('data-empty-state', b.emptyStateStyle || 'illustration')
+  root.setAttribute('data-toast-position', b.toastPosition || 'top-right')
+  root.setAttribute('data-label-position', b.labelPosition || 'above')
+  root.setAttribute('data-required-indicator', b.requiredFieldIndicator || 'asterisk')
+  root.setAttribute('data-error-style', b.errorMessageStyle || 'inline')
+  root.setAttribute('data-chart-curve', b.chartLineCurve || 'monotone')
+  root.setAttribute('data-chart-dots', b.chartDots !== false ? 'true' : 'false')
+  root.setAttribute('data-chart-grid', b.chartGridLines || 'visible')
+  root.setAttribute('data-chart-grid-style', b.chartGridStyle || 'dashed')
+  root.setAttribute('data-chart-trend', b.chartTrendLine ? 'true' : 'false')
+  root.setAttribute('data-chart-fill', b.chartAreaFill ? 'true' : 'false')
+  root.setAttribute('data-chart-color-strategy', b.chartColorStrategy || 'monochromatic')
+  root.setAttribute('data-chart-tooltip-card', b.chartTooltipMatchCard !== false ? 'true' : 'false')
+  root.setAttribute('data-table-header', b.tableHeaderStyle || 'bold')
+  root.setAttribute('data-page-transition', b.pageTransitionFade !== false ? 'true' : 'false')
+  root.setAttribute('data-card-click', b.cardClickFeedback ? 'true' : 'false')
+  root.setAttribute('data-scroll-top', b.scrollToTopButton !== false ? 'true' : 'false')
+  root.setAttribute('data-sticky-header', b.stickyHeader !== false ? 'true' : 'false')
+  root.setAttribute('data-logo-position', b.logoPosition || 'left')
+  root.setAttribute('data-page-header', b.pageHeaderStyle || 'large')
+
+  if (b.respectReducedMotion !== false) {
+    root.setAttribute('data-reduce-motion', 'true')
+  } else {
+    root.removeAttribute('data-reduce-motion')
+  }
+
+  if (b.darkCardDepth) {
+    const depthMap = { subtle: '2%', default: '4%', deep: '8%' }
+    root.style.setProperty('--dark-depth-offset', depthMap[b.darkCardDepth] || depthMap.default)
+  }
+  if (b.darkAccentBrightness) {
+    const satMap = { muted: '70%', default: '100%', vivid: '130%' }
+    root.style.setProperty('--dark-accent-saturation', satMap[b.darkAccentBrightness] || satMap.default)
+  }
+}
+
 export function useThemeFromSettings(settings: SiteSettings | null) {
   const { resolvedTheme } = useTheme()
   
-  // Apply all theme colors - both brand colors and theme-specific colors
   useEffect(() => {
     if (!settings) return
     
     const root = document.documentElement
     const isDark = resolvedTheme === 'dark'
     
-    // Apply brand colors (primary/accent) + full 950 shade scale
     if (settings.branding.primaryColor) {
       const hsl = hexToHSL(settings.branding.primaryColor)
       if (hsl) {
@@ -250,16 +444,12 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
     if (settings.branding.accentColor) {
       applyShadeScale(root, 'accent', settings.branding.accentColor)
     }
-    // --accent is used for hover/focus backgrounds (dropdown items, menus)
-    // Always use neutral gray so hovers are subtle regardless of brand colors
     root.style.setProperty('--accent', isDark ? '0 0% 15%' : '0 0% 95%')
     root.style.setProperty('--accent-foreground', isDark ? '0 0% 90%' : '0 0% 15%')
     
-    // Apply theme colors (background/foreground/card/border) based on current mode
     const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
     applyTheme(theme)
     
-    // Apply site background overrides (take precedence over theme backgrounds)
     const siteBgOverride = isDark ? settings.branding.siteBgDarkOverride : settings.branding.siteBgLightOverride
     if (siteBgOverride) {
       const hsl = hexToHSL(siteBgOverride)
@@ -268,7 +458,6 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
         root.style.setProperty('--popover', hsl)
       }
     } else if (settings.branding.primaryColor) {
-      // Auto-derive site background from 950-scale: shade 50 for light, shade 950 for dark
       const scale = generateShadeScaleHsl(settings.branding.primaryColor)
       const bgShade = isDark ? scale['950'] : scale['50']
       if (bgShade) {
@@ -276,9 +465,10 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
         root.style.setProperty('--popover', bgShade)
       }
     }
+
+    applyDesignSystemVars(root, settings.branding)
   }, [settings?.branding, resolvedTheme])
   
-  // Apply fonts from settings to the live site
   useEffect(() => {
     if (!settings) return
     const root = document.documentElement
@@ -302,7 +492,6 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
     }
   }, [settings?.branding.headingFont, settings?.branding.bodyFont])
   
-  // Watch for light/dark mode changes and re-apply the correct theme
   useEffect(() => {
     if (!settings) return
     
@@ -344,6 +533,8 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
           root.style.setProperty('--popover', bgShade)
         }
       }
+
+      applyDesignSystemVars(root, settings.branding)
     }
     
     const observer = new MutationObserver((mutations) => {

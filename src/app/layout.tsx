@@ -12,6 +12,7 @@ import { UnifiedSupportWidget } from "@/components/unified-support-widget"
 import { Toaster } from "@/components/ui/toaster"
 import { Suspense } from "react"
 import { ReferralTracker } from "@/components/referral-tracker"
+import { ScrollToTop } from "@/components/scroll-to-top"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -69,6 +70,7 @@ export default function RootLayout({
               </Suspense>
             </div>
             <Toaster />
+            <ScrollToTop />
           </ThemeSettingsProvider>
         </ThemeProvider>
       </body>

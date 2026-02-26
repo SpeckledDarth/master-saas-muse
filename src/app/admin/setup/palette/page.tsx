@@ -27,6 +27,24 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import {
+  TypographySection,
+  ComponentStyleSection,
+  LayoutSection,
+  InteractiveSection,
+  DarkModeSection,
+  DataVizSection,
+  TablesSection,
+  LoadingStatesSection,
+  NotificationsSection,
+  FormsSection,
+  ScrollPageSection,
+  AccessibilitySection,
+  SemanticColorsSection,
+  DividerSection,
+  PrintSection,
+  PresetsSection,
+} from '@/components/admin/palette/design-system-sections'
 
 function hexToHsl(hex: string): [number, number, number] {
   hex = hex.replace('#', '')
@@ -1003,6 +1021,28 @@ export default function PalettePage() {
           />
         </div>
       </div>
+
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold">Design System</h3>
+        <p className="text-sm text-muted-foreground">Configure typography, components, layout, interactions, and more. These settings apply site-wide.</p>
+      </div>
+
+      <PresetsSection />
+      <SemanticColorsSection />
+      <TypographySection />
+      <ComponentStyleSection />
+      <LayoutSection />
+      <InteractiveSection />
+      <DarkModeSection />
+      <DataVizSection />
+      <TablesSection />
+      <LoadingStatesSection />
+      <NotificationsSection />
+      <FormsSection />
+      <ScrollPageSection />
+      <AccessibilitySection />
+      <DividerSection />
+      <PrintSection />
 
       <div
         className="rounded-xl p-8 transition-colors duration-300 bg-background text-foreground"

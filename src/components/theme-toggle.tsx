@@ -2,10 +2,27 @@
 
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
+import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import { useSettings } from "@/hooks/use-settings"
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
+  const { settings } = useSettings()
+
+  const darkModeOption = settings?.branding?.darkModeOption || 'user-choice'
+
+  useEffect(() => {
+    if (darkModeOption === 'force-light') {
+      setTheme('light')
+    } else if (darkModeOption === 'force-dark') {
+      setTheme('dark')
+    }
+  }, [darkModeOption, setTheme])
+
+  if (darkModeOption === 'force-light' || darkModeOption === 'force-dark') {
+    return null
+  }
 
   return (
     <Button

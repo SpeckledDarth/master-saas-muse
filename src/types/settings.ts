@@ -38,6 +38,92 @@ export interface BrandingSettings {
   siteBgLightOverride?: string | null
   siteBgDarkOverride?: string | null
   buttonRadius?: 'pill' | 'rounded'
+
+  h1FontSize?: string
+  h1FontWeight?: string
+  h1LetterSpacing?: string
+  h1TextTransform?: 'none' | 'uppercase' | 'capitalize'
+  h2FontSize?: string
+  h2FontWeight?: string
+  h2LetterSpacing?: string
+  h2TextTransform?: 'none' | 'uppercase' | 'capitalize'
+  h3FontSize?: string
+  h3FontWeight?: string
+  h3LetterSpacing?: string
+  h3TextTransform?: 'none' | 'uppercase' | 'capitalize'
+  headingColorMode?: 'primary' | 'foreground' | 'gradient'
+  bodyFontSize?: string
+  bodyLineHeight?: string
+
+  cardPadding?: 'compact' | 'default' | 'spacious'
+  cardBorderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl'
+  cardShadow?: 'none' | 'sm' | 'md' | 'lg'
+  cardBorderWidth?: 0 | 1 | 2
+  cardBorderStyle?: 'solid' | 'dashed' | 'none'
+  inputStyleMatch?: boolean
+  buttonSize?: 'compact' | 'default' | 'large'
+  buttonFontWeight?: 'medium' | 'semibold' | 'bold'
+  buttonTextTransform?: 'none' | 'uppercase'
+  badgeShape?: 'pill' | 'rounded' | 'square'
+
+  contentDensity?: 'compact' | 'default' | 'spacious'
+  sectionSpacing?: 'compact' | 'default' | 'spacious'
+  sidebarWidth?: 'narrow' | 'default' | 'wide'
+  containerMaxWidth?: string
+  pageHeaderStyle?: 'large' | 'compact'
+  logoPosition?: 'left' | 'center' | 'left-nav-center'
+  stickyHeader?: boolean
+
+  hoverEffect?: 'lift' | 'glow' | 'scale' | 'none'
+  animationSpeed?: 'fast' | 'normal' | 'slow' | 'none'
+  focusRingWidth?: 1 | 2 | 3
+  buttonClickFeedback?: boolean
+  cardClickFeedback?: boolean
+  pageTransitionFade?: boolean
+
+  darkModeOption?: 'user-choice' | 'force-light' | 'force-dark'
+  darkCardDepth?: 'subtle' | 'default' | 'deep'
+  darkAccentBrightness?: 'muted' | 'default' | 'vivid'
+
+  chartBarThickness?: 'thin' | 'default' | 'thick'
+  chartBarRadius?: 'none' | 'sm' | 'md'
+  chartLineWidth?: 1 | 2 | 3
+  chartLineCurve?: 'monotone' | 'linear' | 'step'
+  chartDots?: boolean
+  chartGridLines?: 'visible' | 'hidden'
+  chartGridStyle?: 'solid' | 'dashed'
+  chartTrendLine?: boolean
+  chartAreaFill?: boolean
+  chartAreaOpacity?: number
+  chartColorStrategy?: 'monochromatic' | 'complementary' | 'multi'
+  chartTooltipMatchCard?: boolean
+
+  tableStyle?: 'striped' | 'clean'
+  tableRowBorders?: boolean
+  tableHeaderStyle?: 'bold' | 'subtle'
+
+  successColor?: string
+  warningColor?: string
+  dangerColor?: string
+
+  smoothScroll?: boolean
+  scrollToTopButton?: boolean
+
+  skeletonStyle?: 'pulse' | 'shimmer' | 'static'
+  emptyStateStyle?: 'illustration' | 'icon-only'
+
+  toastPosition?: 'top-right' | 'top-center' | 'bottom-right' | 'bottom-center'
+
+  labelPosition?: 'above' | 'floating'
+  requiredFieldIndicator?: 'asterisk' | 'text' | 'border'
+  errorMessageStyle?: 'inline' | 'tooltip'
+
+  contrastEnforcement?: boolean
+  respectReducedMotion?: boolean
+
+  printStyles?: boolean
+
+  dividerStyle?: 'line' | 'gradient' | 'none'
 }
 
 export interface PricingPlan {

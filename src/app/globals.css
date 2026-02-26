@@ -53,6 +53,59 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    --h1-size: 2.25rem;
+    --h1-weight: 700;
+    --h1-spacing: -0.025em;
+    --h1-transform: none;
+    --h2-size: 1.5rem;
+    --h2-weight: 600;
+    --h2-spacing: -0.015em;
+    --h2-transform: none;
+    --h3-size: 1.25rem;
+    --h3-weight: 600;
+    --h3-spacing: 0;
+    --h3-transform: none;
+    --body-size: 0.9375rem;
+    --body-line-height: 1.6;
+
+    --card-padding: 1.75rem;
+    --card-radius: 0.75rem;
+    --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --card-border-width: 1px;
+    --card-border-style: solid;
+    --btn-padding: 0.5rem 1rem;
+    --btn-font-weight: 600;
+    --btn-text-transform: none;
+    --badge-radius: 9999px;
+    --input-radius: 0.75rem;
+
+    --content-density-gap: 1.5rem;
+    --section-spacing: 5rem;
+    --sidebar-width: 16rem;
+    --container-max-width: 1280px;
+    --page-header-size: 2.25rem;
+
+    --hover-transform: translateY(-2px);
+    --hover-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+    --transition-speed: 200ms;
+    --focus-ring-width: 2px;
+    --click-scale: 0.97;
+
+    --chart-bar-size: 20;
+    --chart-bar-radius: 2;
+    --chart-line-width: 2;
+    --chart-area-opacity: 0.15;
+
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --danger: 0 84% 60%;
+
+    --table-stripe-opacity: 0;
+    --table-border-opacity: 1;
+
+    --divider-opacity: 1;
+
     --sidebar: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -108,17 +161,102 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body, var(--font-inter, ui-sans-serif, system-ui, sans-serif));
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: var(--body-size, 0.9375rem);
+    line-height: var(--body-line-height, 1.6);
   }
   h1, h2, h3, h4, h5, h6,
   [data-slot="card-title"] {
     font-family: var(--font-heading, inherit);
   }
-  h1 { font-size: 24px; }
-  h2 { font-size: 24px; }
-  h3 { font-size: 20px; }
-  h4 { font-size: 18px; }
+  h1 {
+    font-size: var(--h1-size, 2.25rem);
+    font-weight: var(--h1-weight, 700);
+    letter-spacing: var(--h1-spacing, -0.025em);
+    text-transform: var(--h1-transform, none);
+  }
+  h2 {
+    font-size: var(--h2-size, 1.5rem);
+    font-weight: var(--h2-weight, 600);
+    letter-spacing: var(--h2-spacing, -0.015em);
+    text-transform: var(--h2-transform, none);
+  }
+  h3 {
+    font-size: var(--h3-size, 1.25rem);
+    font-weight: var(--h3-weight, 600);
+    letter-spacing: var(--h3-spacing, 0);
+    text-transform: var(--h3-transform, none);
+  }
+  h4 { font-size: 1.125rem; }
+
+  [data-heading-color="primary"] :is(h1, h2, h3) {
+    color: hsl(var(--primary));
+  }
+  [data-heading-color="gradient"] :is(h1, h2, h3) {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent-500)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@layer base {
+  @keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  @keyframes skeleton-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  [data-skeleton="pulse"] .skeleton {
+    animation: skeleton-pulse 2s ease-in-out infinite;
+  }
+  [data-skeleton="shimmer"] .skeleton {
+    background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted) / 0.5) 50%, hsl(var(--muted)) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
+  [data-skeleton="static"] .skeleton {
+    animation: none;
+  }
+
+  [data-divider="gradient"] hr,
+  [data-divider="gradient"] .divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--border)), transparent);
+  }
+  [data-divider="none"] hr,
+  [data-divider="none"] .divider {
+    opacity: var(--divider-opacity, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-reduce-motion="true"] *,
+  html[data-reduce-motion="true"] *::before,
+  html[data-reduce-motion="true"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  .no-print, nav, footer, .scroll-to-top, .toast-container {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt !important;
+  }
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
 }
 
 @keyframes marquee {

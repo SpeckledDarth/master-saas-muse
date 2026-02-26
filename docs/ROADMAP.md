@@ -245,6 +245,46 @@ All migrations have been run on Supabase (001-016):
 
 ---
 
+### Session: Design System Configuration — Sprint 1 (February 26, 2026)
+
+**Sprint 1: Foundation (Types + CSS Variables + Theme Injection)** — COMPLETE
+
+Tasks completed:
+1. **T001** — Extended `BrandingSettings` in `src/types/settings.ts` with ~60 new design system properties covering typography, component styling, layout, interactive states, dark mode, data visualization, tables, forms, semantic colors, scroll, loading states, notifications, accessibility, print, and dividers
+2. **T002** — Extended `useThemeFromSettings` in `src/hooks/use-settings.ts` with full CSS variable injection and data attribute system. Every property type is now injected as either a CSS variable (for visual properties) or a data-* attribute (for component-level settings) with Clean & Airy defaults
+3. **T003** — Updated `src/app/globals.css` with CSS variable defaults matching Clean & Airy preset, typography rules consuming CSS variables, skeleton animation keyframes (pulse/shimmer/static), divider styles (line/gradient/none), heading color modes (foreground/primary/gradient), reduced-motion media query, and print stylesheet
+4. **T012** — Created `src/lib/design-presets.ts` with 4 preset configurations (Clean & Airy, Compact & Dense, Bold & Modern, Minimal) plus `exportDesignConfig()` and `importDesignConfig()` utilities for JSON export/import
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
+**Sprint 2: Admin UI (Palette Page Expansion)** — COMPLETE
+
+Tasks completed:
+1. **T006** — Built `src/components/admin/palette/design-system-sections.tsx` with 16 collapsible accordion sections: Presets & Reset, Semantic Colors, Typography, Component Style, Layout, Interactive States, Dark Mode, Data Visualization, Tables, Loading & States, Notifications, Forms, Scroll & Page, Accessibility, Dividers, Print. Each section has appropriate controls (toggle groups, select dropdowns, switches) and live previews where applicable. Integrated all sections into the existing palette page (`src/app/admin/setup/palette/page.tsx`).
+
+Key features:
+- All 16 sections are collapsible accordions to keep the page manageable
+- Presets section at the top with 4 preset buttons, Export/Import JSON, and Reset to Defaults
+- Live typography preview (H1/H2/H3/body text)
+- Live skeleton animation preview
+- Toast position picker with visual grid
+- Every setting uses `updateBranding()` from the existing settings context — changes auto-save
+
+**Sprint 3: Component Integration + Dark Mode + FOUC** — PARTIAL (3 of 5 tasks complete)
+
+Tasks completed:
+1. **T005** — Updated `src/components/theme-toggle.tsx` to respect `darkModeOption` setting. When set to `force-light` or `force-dark`, the toggle hides itself and forces the correct theme. When `user-choice`, behaves as before.
+2. **T007** — Created `src/hooks/use-chart-config.ts` — a shared chart configuration hook that reads all chart-related settings and returns Recharts-compatible props (barSize, barRadius, lineWidth, lineCurve, showDots, showGrid, gridDasharray, showTrendLine, areaFill, areaOpacity, colorStrategy, colors array).
+3. **T008** — Created `src/components/scroll-to-top.tsx` — floating scroll-to-top button that appears after 400px scroll, respects `data-scroll-top` attribute from design system settings. Added to root layout.
+
+Tasks remaining for next session:
+- **T004** — FOUC prevention (server-side color injection in root layout, replace hardcoded fallback values, body fade-in, font preload)
+- **T011** — Update shared UI components (Card, Button, Badge, Input) to consume new CSS variables
+
+**Next session should start with:** Sprint 3 tasks T004 and T011, then proceed to Sprint 4 (Color Audit). See `docs/DESIGN_SYSTEM_BLUEPRINT.md` for full task details.
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience
