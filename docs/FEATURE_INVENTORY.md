@@ -26,7 +26,8 @@ For context on the product vision, see [PRODUCT_IDENTITY.md](./PRODUCT_IDENTITY.
 14. [User Dashboard](#system-14-user-dashboard)
 15. [Social Proof & Directory](#system-15-social-proof--directory)
 16. [Polish & Responsiveness](#system-16-polish--responsiveness)
-17. [Database Migration History](#database-migration-history)
+17. [Design System Configuration](#system-17-design-system-configuration)
+18. [Database Migration History](#database-migration-history)
 
 ---
 
@@ -392,6 +393,42 @@ Cross-cutting quality improvements that ensure the platform works well on all de
 | **Accessibility** | ARIA labels on all interactive elements, role attributes (progressbar, list, radiogroup, switch), aria-expanded on toggles, and screen-reader-only labels. | Inclusive design — the platform is usable by people with disabilities and assistive technologies. |
 
 **Key Files Modified:** `src/app/affiliate/dashboard/page.tsx`, `src/components/affiliate/delight-features.tsx`, `src/components/affiliate/resource-center.tsx`, `src/components/affiliate/retention-tools.tsx`, `src/app/partners/page.tsx`, `src/app/affiliate/join/page.tsx`, 21 marketing pages
+
+---
+
+## System 17: Design System Configuration
+
+A comprehensive, admin-configurable design system that controls all visual styling across the entire application from a single palette page. No code changes needed — every visual property is a CSS variable or data attribute.
+
+| Feature | What It Does | Value |
+|---------|-------------|-------|
+| **76 Design Properties** | Typography (h1-h3 size/weight/spacing/transform, body size/line-height, heading color mode), component styling (card padding/radius/shadow/border, button radius/size/weight/transform, badge shape, input style match), layout (content density, section spacing, sidebar width, container max width, page header style), interactive states (hover effect, animation speed, focus ring, click feedback, page transition), dark mode (option, card depth, accent brightness), data visualization (bar thickness/radius, line width/curve, dots, grid, trend line, area fill/opacity, color strategy, tooltip match), tables (style, row borders, header style), semantic colors (success/warning/danger), scroll (smooth scroll, scroll-to-top), loading states (skeleton style, empty state style), notifications (toast position), forms (label position, required indicator, error style), accessibility (contrast enforcement, reduced motion), print styles, dividers. | Admins can fully customize the look and feel of any MuseKit-cloned SaaS app without touching code. Every clone can look completely different. |
+| **4 Built-in Presets** | Clean & Airy (spacious, rounded), Compact & Dense (tight, square), Bold & Modern (large headings, strong shadows), Minimal (thin borders, no shadows). One-click apply from the palette page. | Quick starting points — admins can apply a preset and then fine-tune individual settings. |
+| **JSON Export/Import** | Export current design config as JSON file, import a previously exported config to restore settings. | Backup/restore configurations, share design settings between MuseKit clones, or version-control design changes. |
+| **FOUC Prevention** | Body starts at opacity 0, dark mode class set before first paint via inline script, body fades in after 150ms once ready class is applied. | No flash of unstyled content or wrong theme — users see the correct design from the first frame. |
+| **CSS Variable Pipeline** | All 76 settings are injected as CSS variables or data attributes by `useThemeFromSettings`. Components read these variables and update in real-time when settings change. | Live preview — admins see changes instantly in the palette page without page refresh. |
+| **Component Integration** | Card (5 vars), Button (4 vars), Badge (1 var), Input (1 var), Table (2 vars), Toast (position + radius) all consume CSS variables. | Every shared UI component across all dashboards automatically updates when design settings change. |
+| **Chart Configuration Hook** | `useChartConfig()` returns Recharts-compatible props (barSize, barRadius, lineWidth, colors, etc.) derived from design settings. | All data visualizations stay consistent with the design system and update when settings change. |
+| **Semantic Color Tokens** | `--success`, `--warning`, `--danger` configurable from palette page. All status indicators, badges, and alerts use these tokens instead of hardcoded colors. | Changing one semantic color updates every status indicator across the entire affiliate dashboard (9 files audited). |
+| **Palette-Aware Color Audit** | Zero hardcoded Tailwind color classes (`text-red-600`, `bg-blue-500`, etc.) in the affiliate dashboard. All replaced with CSS variable equivalents. | Admin color changes propagate everywhere — no orphaned hardcoded colors that ignore the palette. |
+| **Dark Mode Control** | Three options: user-choice (shows toggle), force-light, force-dark. Theme toggle auto-hides when forced. Dark card depth and accent brightness configurable. | Admins decide whether users can toggle dark mode or if the brand enforces a specific mode. |
+| **Scroll-to-Top Button** | Floating button appears after 400px scroll, respects `scrollToTopButton` setting. Smooth scroll configurable. | Toggleable UX enhancement for long pages. |
+| **Reduced Motion Support** | Respects `prefers-reduced-motion` media query and admin toggle. Disables transitions and animations for users who need it. | Accessibility compliance — users with motion sensitivity get a comfortable experience. |
+| **Print Styles** | `@media print` rules in globals.css hide nav/sidebar/buttons, optimize layout for paper output. | Affiliates can print earnings reports, tax summaries, and other pages cleanly. |
+| **Admin Design System UI** | 16 collapsible accordion sections in the palette page covering every design property. Live previews for typography and skeleton animations. Visual toast position picker. | Admin-friendly interface — no technical knowledge needed to customize the design. |
+
+**Key Files:**
+- `src/types/settings.ts` — BrandingSettings type with 76 properties
+- `src/hooks/use-settings.ts` — CSS variable injection pipeline
+- `src/hooks/use-chart-config.ts` — Chart configuration hook
+- `src/lib/design-presets.ts` — 4 presets + export/import utilities
+- `src/app/globals.css` — CSS variable defaults, typography, print styles, animations
+- `src/components/admin/palette/design-system-sections.tsx` — Admin UI (16 sections)
+- `src/components/scroll-to-top.tsx` — Scroll-to-top component
+- `src/components/theme-toggle.tsx` — Dark mode toggle (respects darkModeOption)
+- `src/app/layout.tsx` — FOUC prevention inline script
+
+**No database changes.** All settings stored in the existing `site_settings.branding` JSON column.
 
 ---
 
