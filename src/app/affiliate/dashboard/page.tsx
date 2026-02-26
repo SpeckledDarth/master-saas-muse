@@ -7430,7 +7430,7 @@ function StandaloneAffiliateDashboard() {
       </div>
 
       {showTour && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" data-testid="tour-overlay">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" data-testid="tour-overlay">
           <Card className="w-full max-w-md mx-4 shadow-2xl">
             <CardContent className="pt-6 pb-4">
               <div className="text-center space-y-4">
