@@ -1,6 +1,7 @@
 'use client'
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
+import { generateHarmonizedSemantics } from '@/hooks/use-settings'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -932,36 +933,64 @@ export function AccessibilitySection() {
 export function SemanticColorsSection() {
   const { settings, updateBranding } = useSetupSettingsContext()
   const b = settings.branding
+  const harmonized = b.primaryColor ? generateHarmonizedSemantics(b.primaryColor) : null
+  const defaultSuccess = harmonized?.successHex || '#22c55e'
+  const defaultWarning = harmonized?.warningHex || '#f59e0b'
+  const defaultDanger = harmonized?.dangerHex || '#ef4444'
+  const hasAnyOverride = !!(b.successColor || b.warningColor || b.dangerColor)
 
   return (
     <Section title="Semantic Colors" icon={Palette}>
-      <p className="text-xs text-muted-foreground">Override the default success, warning, and danger colors used across the site. Leave blank to use defaults.</p>
+      <p className="text-xs text-muted-foreground">
+        {harmonized
+          ? 'These colors are auto-harmonized from your primary color. Override any color manually, or reset to harmonized defaults.'
+          : 'Set a primary color first to auto-generate harmonious defaults, or pick colors manually.'}
+      </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <ColorInput
-          label="Success"
-          value={b.successColor || '#22c55e'}
-          onChange={hex => updateBranding('successColor', hex)}
-          onClear={() => updateBranding('successColor', undefined)}
-          defaultValue="#22c55e"
-          testId="input-success-color"
-        />
-        <ColorInput
-          label="Warning"
-          value={b.warningColor || '#f59e0b'}
-          onChange={hex => updateBranding('warningColor', hex)}
-          onClear={() => updateBranding('warningColor', undefined)}
-          defaultValue="#f59e0b"
-          testId="input-warning-color"
-        />
-        <ColorInput
-          label="Danger"
-          value={b.dangerColor || '#ef4444'}
-          onChange={hex => updateBranding('dangerColor', hex)}
-          onClear={() => updateBranding('dangerColor', undefined)}
-          defaultValue="#ef4444"
-          testId="input-danger-color"
-        />
+        <div>
+          <ColorInput
+            label={b.successColor ? 'Success' : 'Success (auto-harmonized)'}
+            value={b.successColor || defaultSuccess}
+            onChange={hex => updateBranding('successColor', hex)}
+            onClear={() => updateBranding('successColor', undefined)}
+            defaultValue={defaultSuccess}
+            testId="input-success-color"
+          />
+        </div>
+        <div>
+          <ColorInput
+            label={b.warningColor ? 'Warning' : 'Warning (auto-harmonized)'}
+            value={b.warningColor || defaultWarning}
+            onChange={hex => updateBranding('warningColor', hex)}
+            onClear={() => updateBranding('warningColor', undefined)}
+            defaultValue={defaultWarning}
+            testId="input-warning-color"
+          />
+        </div>
+        <div>
+          <ColorInput
+            label={b.dangerColor ? 'Danger' : 'Danger (auto-harmonized)'}
+            value={b.dangerColor || defaultDanger}
+            onChange={hex => updateBranding('dangerColor', hex)}
+            onClear={() => updateBranding('dangerColor', undefined)}
+            defaultValue={defaultDanger}
+            testId="input-danger-color"
+          />
+        </div>
       </div>
+      {hasAnyOverride && (
+        <button
+          onClick={() => {
+            updateBranding('successColor', undefined)
+            updateBranding('warningColor', undefined)
+            updateBranding('dangerColor', undefined)
+          }}
+          className="mt-3 text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+          data-testid="button-reset-semantic-colors"
+        >
+          Reset all to harmonized defaults
+        </button>
+      )}
     </Section>
   )
 }

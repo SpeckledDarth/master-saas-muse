@@ -319,6 +319,18 @@ Tasks completed:
 
 **The Design System Configuration blueprint is now FULLY COMPLETE.** All 14 tasks across 5 sprints done. No remaining work.
 
+### Session: Harmonized Semantic Colors (February 26, 2026)
+
+**Feature:** Auto-generate harmonious success/warning/danger colors from the primary brand color.
+
+Changes:
+1. **`generateHarmonizedSemantics()` utility** — New exported function in `use-settings.ts`. Takes a primary hex color and produces harmonized semantic colors by nudging base hues (green=142°, amber=38°, red=0°) toward the primary hue using shortest-arc interpolation (15% for success, 10% for warning/danger), blending saturation (70/30 base/primary) and lightness (80/20 base/primary), with clamps to keep colors readable (sat 40-85%, lightness 35-55%).
+2. **Settings pipeline updated** — `resolveSemanticVars()` now falls back to harmonized colors when no explicit override is set: explicit override → auto-harmonized from primary → CSS default.
+3. **Admin palette UI updated** — SemanticColorsSection shows "(auto-harmonized)" labels when using generated defaults, dynamically computes harmonized hex values as placeholders, and includes a "Reset all to harmonized defaults" button.
+4. **Vercel build fix** — Fixed hydration error (body opacity FOUC prevention removed), added `suppressHydrationWarning` to body, fixed 4 TypeScript strict-mode errors in ToggleGroup/parseInt casts.
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
 ---
 
 ## Related Documentation

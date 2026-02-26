@@ -90,6 +90,97 @@ function hexToHSL(hex: string): string {
   return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`
 }
 
+function hexToHSLParts(hex: string): { h: number; s: number; l: number } | null {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  if (!result) return null
+
+  let r = parseInt(result[1], 16) / 255
+  let g = parseInt(result[2], 16) / 255
+  let b = parseInt(result[3], 16) / 255
+
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  let h = 0
+  let s = 0
+  const l = (max + min) / 2
+
+  if (max !== min) {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break
+      case g: h = ((b - r) / d + 2) / 6; break
+      case b: h = ((r - g) / d + 4) / 6; break
+    }
+  }
+
+  return { h: h * 360, s: s * 100, l: l * 100 }
+}
+
+function hslPartsToString(h: number, s: number, l: number): string {
+  return `${Math.round(h)} ${Math.round(s)}% ${Math.round(l)}%`
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  s /= 100
+  l /= 100
+  const a = s * Math.min(l, 1 - l)
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)
+    return Math.round(255 * color).toString(16).padStart(2, '0')
+  }
+  return `#${f(0)}${f(8)}${f(4)}`
+}
+
+export function generateHarmonizedSemantics(primaryHex: string): { success: string; warning: string; danger: string; successHex: string; warningHex: string; dangerHex: string } {
+  const primary = hexToHSLParts(primaryHex)
+  if (!primary) {
+    return {
+      success: '142 71% 45%', warning: '38 92% 50%', danger: '0 84% 60%',
+      successHex: '#22c55e', warningHex: '#f59e0b', dangerHex: '#ef4444'
+    }
+  }
+
+  const BASE_SUCCESS = { h: 142, s: 71, l: 45 }
+  const BASE_WARNING = { h: 38, s: 92, l: 50 }
+  const BASE_DANGER = { h: 0, s: 84, l: 60 }
+
+  function nudgeHue(baseHue: number, primaryHue: number, amount: number): number {
+    let diff = primaryHue - baseHue
+    if (diff > 180) diff -= 360
+    if (diff < -180) diff += 360
+    let result = baseHue + diff * amount
+    if (result < 0) result += 360
+    if (result >= 360) result -= 360
+    return result
+  }
+
+  function clamp(val: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, val))
+  }
+
+  function harmonize(base: { h: number; s: number; l: number }, hueNudge: number) {
+    const h = nudgeHue(base.h, primary!.h, hueNudge)
+    const s = clamp(base.s * 0.7 + primary!.s * 0.3, 40, 85)
+    const l = clamp(base.l * 0.8 + primary!.l * 0.2, 35, 55)
+    return { h, s, l }
+  }
+
+  const success = harmonize(BASE_SUCCESS, 0.15)
+  const warning = harmonize(BASE_WARNING, 0.10)
+  const danger = harmonize(BASE_DANGER, 0.10)
+
+  return {
+    success: hslPartsToString(success.h, success.s, success.l),
+    warning: hslPartsToString(warning.h, warning.s, warning.l),
+    danger: hslPartsToString(danger.h, danger.s, danger.l),
+    successHex: hslToHex(success.h, success.s, success.l),
+    warningHex: hslToHex(warning.h, warning.s, warning.l),
+    dangerHex: hslToHex(danger.h, danger.s, danger.l),
+  }
+}
+
 function getContrastForeground(hex: string): string {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
   if (!result) return '0 0% 100%'
@@ -331,18 +422,29 @@ function resolveChartVars(b: SiteSettings['branding']): Record<string, string> {
 
 function resolveSemanticVars(b: SiteSettings['branding']): Record<string, string> {
   const vars: Record<string, string> = {}
-  if (b.successColor) {
-    const hsl = hexToHSL(b.successColor)
-    if (hsl) vars['--success'] = hsl
+  const harmonized = b.primaryColor ? generateHarmonizedSemantics(b.primaryColor) : null
+
+  const successHsl = b.successColor ? hexToHSL(b.successColor) : ''
+  if (successHsl) {
+    vars['--success'] = successHsl
+  } else if (harmonized) {
+    vars['--success'] = harmonized.success
   }
-  if (b.warningColor) {
-    const hsl = hexToHSL(b.warningColor)
-    if (hsl) vars['--warning'] = hsl
+
+  const warningHsl = b.warningColor ? hexToHSL(b.warningColor) : ''
+  if (warningHsl) {
+    vars['--warning'] = warningHsl
+  } else if (harmonized) {
+    vars['--warning'] = harmonized.warning
   }
-  if (b.dangerColor) {
-    const hsl = hexToHSL(b.dangerColor)
-    if (hsl) vars['--danger'] = hsl
+
+  const dangerHsl = b.dangerColor ? hexToHSL(b.dangerColor) : ''
+  if (dangerHsl) {
+    vars['--danger'] = dangerHsl
+  } else if (harmonized) {
+    vars['--danger'] = harmonized.danger
   }
+
   return vars
 }
 
