@@ -1,6 +1,6 @@
 # PassivePost — Project History & Status
 
-> **Last Updated:** February 25, 2026
+> **Last Updated:** February 26, 2026
 
 ---
 
@@ -17,7 +17,7 @@ PassivePost is a social media content automation platform built on the MuseKit S
 - Admin dashboard with CRM, revenue analytics, program health monitoring, and user management
 - User dashboard with billing, invoicing, support tickets, and account security
 - Affiliate dashboard with earnings tracking, marketing tools, analytics, and self-service features
-- 14 database migrations deployed to Supabase
+- 16 database migrations deployed to Supabase (plus sync script for missing tables)
 - SEO meta tags on all public pages, mobile-responsive dashboards, accessibility improvements
 
 **What's live:** The application is deployed on Vercel with Supabase as the production database. All OAuth integrations are wired and functional. The product uses real platform APIs (demo data fallbacks have been removed).

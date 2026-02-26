@@ -1,6 +1,6 @@
 # PassivePost — Complete Feature Inventory
 
-> **Last Updated:** February 25, 2026
+> **Last Updated:** February 26, 2026
 
 PassivePost is a closed-loop business intelligence platform for content creators. This document is a complete inventory of every feature that has been built, organized by system. Each feature includes a plain-English description and the value it provides to users, administrators, or the business.
 
@@ -397,26 +397,29 @@ Cross-cutting quality improvements that ensure the platform works well on all de
 
 ## Database Migration History
 
-All migrations have been run on both the development database (Replit Postgres) and the production database (Supabase).
+All migrations have been run on both the development database (Replit Postgres) and the production database (Supabase). As of Feb 26, 2026, both databases are fully in sync.
 
-| # | File | What It Creates |
-|---|------|-----------------|
-| 001 | `migrations/core/001_social_tables.sql` | Social platform account connections |
-| 002 | `migrations/core/002_product_registry.sql` | Multi-product support tables |
-| 003 | `migrations/core/003_testimonials.sql` | Testimonial management system |
-| 004 | `migrations/core/004_launch_kit.sql` | Launch features (drip campaigns, referral tracking, onboarding funnel) |
-| 005 | `migrations/core/005_affiliate_system.sql` | Core affiliate program tables |
-| 006 | `migrations/core/006_affiliate_applications.sql` | Affiliate application workflow |
-| 007 | `migrations/core/007_affiliate_enhancements_p1.sql` | Milestones, discount codes, broadcasts |
-| 008 | `migrations/core/008_affiliate_enhancements_p2.sql` | Tiers, payouts, contests, source tags |
-| 009 | `migrations/core/009_affiliate_enhancements_p3.sql` | Co-branded pages, tax info, fraud scoring, API keys, webhooks, messaging |
-| 010 | `migrations/core/010_affiliate_sprint4.sql` | Sprint 4 features (badges, surveys, testimonials) |
-| 011 | `migrations/core/011_crm_foundation.sql` | CRM tables (profiles, invoices, tickets, activities, campaigns, contracts) |
-| 012 | `migrations/core/012_commission_renewals.sql` | Commission renewal system |
-| 013 | `migrations/core/013_delight_features.sql` | Partner experience, marketing toolkit expansion, analytics tables |
-| 014 | `migrations/core/014_analytics_columns.sql` | Analytics columns (geo/device on clicks, churn fields on referrals) |
-| 015 | `migrations/core/015_session_d_tables.sql` | Asset usage tracking, knowledge base, promotional calendar |
-| 016 | `migrations/core/016_session_e_tables.sql` | Challenge progress, case studies, directory and quiz columns |
+| # | File | What It Creates | Supabase Status |
+|---|------|-----------------|-----------------|
+| 001 | `migrations/core/001_social_tables.sql` | Social platform account connections | Applied |
+| 002 | `migrations/core/002_product_registry.sql` | Multi-product support tables | Applied |
+| 003 | `migrations/core/003_testimonials.sql` | Testimonial management system | Applied |
+| 004 | `migrations/core/004_launch_kit.sql` | Launch features (drip campaigns, referral tracking, onboarding funnel) | Applied |
+| 005 | `migrations/core/005_affiliate_system.sql` | Core affiliate program tables | Applied |
+| 006 | `migrations/core/006_affiliate_applications.sql` | Affiliate application workflow | Applied |
+| 007 | `migrations/core/007_affiliate_enhancements_p1.sql` | Milestones, discount codes, broadcasts | Applied |
+| 008 | `migrations/core/008_affiliate_enhancements_p2.sql` | Tiers, payouts, contests, source tags | Applied |
+| 009 | `migrations/core/009_affiliate_enhancements_p3.sql` | Co-branded pages, tax info, fraud scoring, API keys, webhooks, messaging | Applied |
+| 010 | `migrations/core/010_affiliate_sprint4.sql` | Sprint 4 features (badges, surveys, testimonials) | Applied |
+| 011 | `migrations/core/011_crm_foundation.sql` | CRM tables (profiles, invoices, tickets, activities, campaigns, contracts) | Applied |
+| 012 | `migrations/core/012_commission_renewals.sql` | Commission renewal system | Applied |
+| 013 | `migrations/core/013_delight_features.sql` | Partner experience, marketing toolkit expansion, analytics tables | Applied (via sync script) |
+| 014 | `migrations/core/014_analytics_columns.sql` | Analytics columns (geo/device on clicks, churn fields on referrals) | Applied (via sync script) |
+| 015 | `migrations/core/015_session_d_tables.sql` | Asset usage tracking, knowledge base, promotional calendar | Applied (via sync script) |
+| 016 | `migrations/core/016_session_e_tables.sql` | Challenge progress, case studies, directory and quiz columns | Applied (via sync script) |
+| — | `migrations/supabase/sync_013_016_plus_missing.sql` | Combined 013-016 + notifications + affiliate_link_presets columns | Applied |
+
+**Seed Data:** `migrations/seed/comprehensive-seed-data.sql` populates 21 tables with demo content (contests, KB articles, announcements, assets, discount codes, badges, milestones, testimonials, etc.). Applied to both databases on Feb 26, 2026.
 
 ---
 

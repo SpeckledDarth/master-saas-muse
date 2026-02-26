@@ -240,6 +240,8 @@ Common issues that pass in dev but fail in production:
 | Using `typeof Interface.prototype.x` | Build fails on Vercel (interfaces have no runtime representation) | Extract shared shapes into named type aliases |
 | Testing only in Replit | Bugs appear on Vercel that can't be reproduced locally | Follow the pre-deployment checklist; treat Vercel as source of truth |
 | Running migrations only on Replit Postgres | Schema drift causes 500 errors in production | Always provide exact SQL for Supabase migrations |
+| Using CREATE TABLE IF NOT EXISTS for tables that already exist with fewer columns | Missing columns cause INSERT failures but no table creation error | Always follow CREATE TABLE with ALTER TABLE ADD COLUMN IF NOT EXISTS for every column — covers cases where the table existed before with a different schema |
+| Assuming Supabase schema matches Replit | Seed data fails on Supabase even though it works on Replit | Before writing any seed SQL, query BOTH databases to confirm tables and columns exist. The sync script pattern (`migrations/supabase/sync_*.sql`) is the fix. |
 | Building features in isolation | Disconnected UX; AI coach doesn't know about new features | Evaluate every feature against admin, affiliate, AI, and prediction systems |
 | Handling only one Supabase error code for missing tables | Intermittent 500 errors after table creation | Handle both `42P01` and `PGRST205` error codes |
 | Computing derived data that another component already computes | Inconsistent numbers across the UI | Search existing endpoints before creating new calculations |
