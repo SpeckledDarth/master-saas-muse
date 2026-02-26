@@ -107,16 +107,7 @@ INSERT INTO case_studies (headline, summary, key_metric, key_metric_label, custo
 ('YouTube Channel Generated 200+ Referrals', 'Marcus created tutorial videos showing his PassivePost workflow. Videos continue generating referrals months later.', '200+', 'Total Referrals', 'One video from 6 months ago still brings 3-4 signups per week.', 'Marcus Johnson', 'YouTuber', ARRAY['youtube', 'video'], 'published', 'admin'),
 ('Agency Owner Saves 20 Hours/Week', 'Priya manages social media for 8 clients using PassivePost and earns commissions onboarding new clients.', '20 hrs/week', 'Time Saved', 'My clients love the content flywheel. I earn commissions on tools I recommend anyway.', 'Priya Patel', 'Agency Owner', ARRAY['agency', 'workflow'], 'published', 'admin');
 
--- 15. NOTIFICATIONS (8)
-INSERT INTO notifications (user_id, title, message, type, read, link) VALUES
-('85281033-9998-4d3c-bcbc-d2053ad39eae', 'Commission Earned!', 'You earned a $24.00 commission from a new referral.', 'success', false, '/affiliate/dashboard?section=earnings'),
-('85281033-9998-4d3c-bcbc-d2053ad39eae', 'New Contest Started', 'Summer Referral Sprint is live! Win $500.', 'info', false, '/affiliate/dashboard?section=overview'),
-('85281033-9998-4d3c-bcbc-d2053ad39eae', 'Badge Earned: Power Partner', 'You earned Power Partner for reaching $500 lifetime earnings.', 'success', true, '/affiliate/dashboard?section=overview'),
-('85281033-9998-4d3c-bcbc-d2053ad39eae', 'Payout Processed', 'Your $78.00 payout has been processed via PayPal.', 'success', true, '/affiliate/dashboard?section=payouts'),
-('85281033-9998-4d3c-bcbc-d2053ad39eae', 'New Marketing Assets', 'Holiday promo materials available in Resources tab.', 'info', false, '/affiliate/dashboard?section=assets'),
-('85281033-9998-4d3c-bcbc-d2053ad39eae', 'Milestone: First Five', 'You hit 5 referrals! $25 bonus added to next payout.', 'success', true, '/affiliate/dashboard?section=overview'),
-('85281033-9998-4d3c-bcbc-d2053ad39eae', 'Tier Upgrade: Silver', 'You have been promoted to Silver tier!', 'success', true, '/affiliate/dashboard?section=overview'),
-('85281033-9998-4d3c-bcbc-d2053ad39eae', 'Weekly Challenge', 'New challenge: Share 3 posts this week for a badge!', 'info', false, '/affiliate/dashboard?section=overview');
+-- 15. (SKIP notifications table — Replit-only, does not exist in Supabase)
 
 -- 16. TESTIMONIALS (3)
 INSERT INTO affiliate_testimonials (affiliate_user_id, name, quote, earnings_display, tier_name, is_featured, is_active, sort_order) VALUES
