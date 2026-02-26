@@ -251,4 +251,92 @@ Common issues that pass in dev but fail in production:
 
 ---
 
+## 8. Session Planning & Continuity
+
+### Sessions Have a Context Limit
+
+AI coding sessions have a finite context window. When it fills up (from reading files, making edits, running commands), the session ends — whether the plan is complete or not. This has caused partial completion surprises in the past where the user believed work was 100% done but discovered later that only a portion was implemented.
+
+**Rule:** All plans with more than 3-4 tasks MUST be broken into sprints (or phases) that are each designed to fit within a single session. Each sprint must produce a working, testable result — not a half-finished state.
+
+### Sprint Planning Requirements
+
+Every plan must include:
+
+1. **Sprint boundaries** — group tasks into sprints of 3-5 tasks each. Each sprint should be completable in one session.
+2. **Completion tests** — each sprint has a clear "done" test so the user knows exactly what to verify.
+3. **Handoff notes** — at the end of every session, the agent MUST update ROADMAP.md with: which sprint completed, which tasks completed, and what the next session should start with.
+4. **Early warning** — if a sprint is running long and may not complete, the agent must tell the user immediately. Do not wait until the session ends to reveal partial completion.
+5. **No surprises** — the user should never discover partial completion after the fact. Transparency is mandatory.
+
+### Session Start Protocol
+
+Every session must:
+1. Read `docs/PRODUCT_IDENTITY.md` (what we're building)
+2. Read `docs/FEATURE_INVENTORY.md` (what's already built)
+3. Read `docs/LESSONS_LEARNED.md` (this document — anti-patterns and rules)
+4. Read `docs/ROADMAP.md` (current progress and what's next)
+5. Check for any active blueprint documents (e.g., `docs/DESIGN_SYSTEM_BLUEPRINT.md`) and identify which sprint is current
+6. Resume from the documented stopping point — do not restart or re-plan work that was already planned
+
+### Reference Documents
+
+Plans that span multiple sessions should have a dedicated blueprint document saved in the `docs/` folder. This document serves as the source of truth for the plan and must include:
+- Full task list with dependencies
+- Sprint breakdown with completion tests
+- Key files reference
+- Rules for future development
+- Session continuity protocol
+
+Current active blueprints:
+- `docs/DESIGN_SYSTEM_BLUEPRINT.md` — Design System Configuration (5 sprints)
+
+---
+
+## 9. Design System & Styling Rules
+
+### Never Hardcode Colors
+
+All colors must come from the MuseKit palette system via CSS variables. The admin-configured Color Palette is the single source of truth for all visual styling across the entire site.
+
+```css
+/* CORRECT — uses palette CSS variables */
+className="bg-primary-600 text-primary-foreground"
+className="text-[hsl(var(--success))]"
+stroke={`hsl(var(--chart-1))`}
+
+/* WRONG — hardcoded colors that bypass the palette */
+className="text-red-600 bg-blue-500"
+stroke="#3b82f6"
+fill="#10b981"
+```
+
+**Why this matters:** MuseKit is designed to be cloned for multiple SaaS apps. Each clone has its own brand colors configured through the admin palette. Hardcoded colors break when the palette is changed and create visual inconsistency across the site.
+
+### Always Use `useChartConfig()` for Charts
+
+All Recharts components must use the shared chart configuration hook (`src/hooks/use-chart-config.ts`) for colors, bar size, line width, and other visual properties. Never pass raw hex colors or hardcoded props to chart components.
+
+### Never Use Hardcoded Fallback Values
+
+When data is loading, show a skeleton or shimmer placeholder — never a hardcoded fallback value. Showing "20%" when the real configured value is "17.9%" creates a visible flash (FOUC) that looks broken.
+
+### Test Both Light and Dark Modes
+
+Every visual change must be verified in both light and dark modes. The site supports admin-controlled dark mode (user-choice, force-light, force-dark) and all components must look correct in both modes.
+
+---
+
+## 10. Common Mistakes (continued)
+
+| Mistake | What Breaks | How to Avoid |
+|---------|-------------|--------------|
+| Hardcoding Tailwind colors (`text-red-600`, `bg-blue-500`) | Colors don't respond to palette changes; visual inconsistency across site | Use palette CSS variables (`bg-primary-*`, `text-primary-*`) or semantic tokens (`--success`, `--warning`, `--danger`) |
+| Using raw hex colors in charts (`#3b82f6`) | Charts don't respond to palette changes | Use `useChartConfig()` hook for all chart visual properties |
+| Showing hardcoded fallback values while data loads | FOUC — wrong numbers flash before correct data appears | Use skeleton/shimmer placeholders, or fetch data server-side |
+| Building a large plan without sprint breakdown | Session ends mid-plan; user discovers partial completion after the fact | Break plans into sprints of 3-5 tasks; each sprint fits in one session |
+| Not updating ROADMAP.md at end of session | Next session doesn't know where to resume; work gets repeated or skipped | Always update ROADMAP.md with sprint status and next steps before session ends |
+
+---
+
 *This document captures architectural patterns and anti-patterns for this codebase. Update it when new patterns are discovered or existing ones change.*
