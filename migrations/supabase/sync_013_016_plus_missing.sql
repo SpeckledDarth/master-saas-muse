@@ -298,6 +298,7 @@ DO $$ BEGIN CREATE POLICY "Service role full access notifications" ON notificati
 
 -- =============================================
 -- MISSING TABLE: affiliate_link_presets
+-- (Table may already exist with fewer columns — ALTER adds missing ones)
 -- =============================================
 
 CREATE TABLE IF NOT EXISTS affiliate_link_presets (
@@ -311,6 +312,12 @@ CREATE TABLE IF NOT EXISTS affiliate_link_presets (
   landing_page TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE affiliate_link_presets ADD COLUMN IF NOT EXISTS utm_source TEXT;
+ALTER TABLE affiliate_link_presets ADD COLUMN IF NOT EXISTS utm_medium TEXT;
+ALTER TABLE affiliate_link_presets ADD COLUMN IF NOT EXISTS utm_campaign TEXT;
+ALTER TABLE affiliate_link_presets ADD COLUMN IF NOT EXISTS utm_content TEXT;
+ALTER TABLE affiliate_link_presets ADD COLUMN IF NOT EXISTS landing_page TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_affiliate_link_presets_user ON affiliate_link_presets(affiliate_user_id);
 
