@@ -738,6 +738,7 @@ function StandaloneAffiliateDashboard() {
   const [unreadMessages, setUnreadMessages] = useState(0)
 
   const [showTour, setShowTour] = useState(false)
+  const [widgetDebugMax, setWidgetDebugMax] = useState(0)
   const [tourStep, setTourStep] = useState(0)
 
   const [webhooks, setWebhooks] = useState<any[]>([])
@@ -2914,7 +2915,22 @@ function StandaloneAffiliateDashboard() {
         </Card>
       )}
 
-      {visibleWidgets.map(widgetId => {
+      <div className="p-3 mb-4 border rounded-md bg-yellow-50 dark:bg-yellow-950/30">
+        <p className="text-xs font-medium mb-2">Debug Mode: Showing {widgetDebugMax} of {visibleWidgets.length} widgets</p>
+        <div className="flex gap-2 flex-wrap">
+          <Button size="sm" variant="outline" onClick={() => setWidgetDebugMax(m => m + 1)} disabled={widgetDebugMax >= visibleWidgets.length} data-testid="button-add-widget-debug">
+            Show Next Widget ({widgetDebugMax < visibleWidgets.length ? visibleWidgets[widgetDebugMax] : 'all shown'})
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setWidgetDebugMax(visibleWidgets.length)} data-testid="button-show-all-widgets">
+            Show All
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setWidgetDebugMax(0)} data-testid="button-hide-all-widgets">
+            Reset to 0
+          </Button>
+        </div>
+      </div>
+
+      {visibleWidgets.slice(0, widgetDebugMax).map(widgetId => {
         const content = renderWidgetContent(widgetId)
         if (!content && !customizeMode) return null
 
@@ -2949,7 +2965,7 @@ function StandaloneAffiliateDashboard() {
               {content || (
                 <Card className="border-dashed opacity-50">
                   <CardContent className="py-6 text-center">
-                    <p className="text-sm text-muted-foreground">{config?.label} (no data)</p>
+                    <p className="text-sm text-muted-foreground">{S(config?.label)} (no data)</p>
                   </CardContent>
                 </Card>
               )}
