@@ -331,6 +331,26 @@ Changes:
 
 **No database changes.** No new environment variables. No Supabase migrations needed.
 
+### Session: Role-Based Access Control (February 26, 2026)
+
+**Feature:** Enforce proper access control across all user types — Admin, Team Member, Affiliate, SaaS User.
+
+Changes:
+1. **Expanded `/api/user/membership`** — Now returns `isAffiliate` (checks both `user_roles` and `affiliate_profiles`) and `userRole` alongside existing fields. Uses `Promise.all` for 3 parallel DB queries.
+2. **Role-aware UserNav dropdown** — Avatar menu now shows only appropriate items per role:
+   - Affiliate-only: Affiliate Dashboard, Profile, Log out
+   - Admin: Admin Dashboard, PassivePost, Affiliate Dashboard (if also affiliate), Profile, Billing, Log out
+   - Team member: Admin Dashboard, PassivePost, Profile, Billing, Log out
+   - SaaS user: PassivePost, Profile, Billing, Log out
+3. **Middleware role enforcement** — Authenticated users are now blocked from unauthorized paths:
+   - Affiliates redirected from `/admin` and `/dashboard` to `/affiliate/dashboard`
+   - Non-affiliates redirected from `/affiliate/dashboard` to `/`
+   - Non-admin/non-team users redirected from `/admin` to `/`
+   - Uses parallel role + affiliate_profiles queries for efficiency
+4. **Edge case fixed** — Users with `affiliate_profiles` row but `userRole = 'user'` are correctly treated as affiliates throughout.
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
 ---
 
 ## Related Documentation

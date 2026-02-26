@@ -15,17 +15,31 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { User } from '@supabase/supabase-js'
-import { Shield, CalendarDays } from 'lucide-react'
+import { Shield, CalendarDays, Users, User as UserIcon } from 'lucide-react'
+
+interface MembershipData {
+  hasAdminAccess: boolean
+  isAppAdmin: boolean
+  isAffiliate: boolean
+  userRole: string
+  teamRole: string | null
+}
+
+const defaultMembership: MembershipData = {
+  hasAdminAccess: false,
+  isAppAdmin: false,
+  isAffiliate: false,
+  userRole: 'user',
+  teamRole: null,
+}
 
 export function UserNav() {
   const [user, setUser] = useState<User | null>(null)
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [hasAdminAccess, setHasAdminAccess] = useState(false)
+  const [membership, setMembership] = useState<MembershipData>(defaultMembership)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
   
-  // Create supabase client once
   if (typeof window !== 'undefined' && !supabaseRef.current) {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       supabaseRef.current = createClient()
@@ -34,14 +48,12 @@ export function UserNav() {
   
   const supabase = supabaseRef.current
 
-  // Effect 1: Get initial session and subscribe to auth changes
   useEffect(() => {
     if (!supabase) {
       setLoading(false)
       return
     }
     
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       setLoading(false)
@@ -49,12 +61,10 @@ export function UserNav() {
       setLoading(false)
     })
 
-    // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       if (!session) {
-        setIsAdmin(false)
-        setHasAdminAccess(false)
+        setMembership(defaultMembership)
       }
     })
 
@@ -63,11 +73,9 @@ export function UserNav() {
     }
   }, [supabase])
   
-  // Effect 2: Check role whenever user changes (via API to bypass RLS)
   useEffect(() => {
     if (!user) {
-      setIsAdmin(false)
-      setHasAdminAccess(false)
+      setMembership(defaultMembership)
       return
     }
     
@@ -76,15 +84,18 @@ export function UserNav() {
         const response = await fetch('/api/user/membership')
         if (response.ok) {
           const data = await response.json()
-          setIsAdmin(data.isAppAdmin)
-          setHasAdminAccess(data.hasAdminAccess)
+          setMembership({
+            hasAdminAccess: data.hasAdminAccess ?? false,
+            isAppAdmin: data.isAppAdmin ?? false,
+            isAffiliate: data.isAffiliate ?? false,
+            userRole: data.userRole ?? 'user',
+            teamRole: data.teamRole ?? null,
+          })
         } else {
-          setIsAdmin(false)
-          setHasAdminAccess(false)
+          setMembership(defaultMembership)
         }
       } catch {
-        setIsAdmin(false)
-        setHasAdminAccess(false)
+        setMembership(defaultMembership)
       }
     }
     
@@ -94,7 +105,7 @@ export function UserNav() {
   const handleSignOut = useCallback(async () => {
     if (!supabase) return
     await supabase.auth.signOut()
-    setIsAdmin(false)
+    setMembership(defaultMembership)
     router.push('/')
     router.refresh()
   }, [supabase, router])
@@ -117,6 +128,10 @@ export function UserNav() {
   }
 
   const initials = user.email?.slice(0, 2).toUpperCase() || 'U'
+  const isAffiliateOnly = membership.isAffiliate && !membership.hasAdminAccess
+  const showProductDashboard = !isAffiliateOnly
+  const showBilling = !isAffiliateOnly
+  const showAffiliateDashboard = membership.isAffiliate || membership.isAppAdmin
 
   return (
     <DropdownMenu>
@@ -136,7 +151,7 @@ export function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {hasAdminAccess && (
+        {membership.hasAdminAccess && (
           <DropdownMenuItem asChild>
             <Link href="/admin" data-testid="link-admin" className="flex items-center">
               <Shield className="mr-2 h-4 w-4" />
@@ -144,18 +159,33 @@ export function UserNav() {
             </Link>
           </DropdownMenuItem>
         )}
+        {showProductDashboard && (
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/social/overview" data-testid="link-passivepost" className="flex items-center">
+              <CalendarDays className="mr-2 h-4 w-4" />
+              PassivePost
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {showAffiliateDashboard && (
+          <DropdownMenuItem asChild>
+            <Link href="/affiliate/dashboard" data-testid="link-affiliate" className="flex items-center">
+              <Users className="mr-2 h-4 w-4" />
+              Affiliate Dashboard
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/social/overview" data-testid="link-passivepost" className="flex items-center">
-            <CalendarDays className="mr-2 h-4 w-4" />
-            PassivePost
+          <Link href="/profile" data-testid="link-profile" className="flex items-center">
+            <UserIcon className="mr-2 h-4 w-4" />
+            Profile
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/profile" data-testid="link-profile">Profile</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/billing" data-testid="link-billing">Billing</Link>
-        </DropdownMenuItem>
+        {showBilling && (
+          <DropdownMenuItem asChild>
+            <Link href="/billing" data-testid="link-billing">Billing</Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} data-testid="button-signout">
           Log out
