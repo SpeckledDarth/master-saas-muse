@@ -461,6 +461,52 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 
 ---
 
+### Session: Sprint 3 + Sprint 4 — Revenue, Subscriptions, Dashboard Home & Command Palette (Feb 26, 2026)
+
+**Sprint 3 completed (T009–T012):**
+- Revenue list API (`/api/admin/revenue`) with type/status/date/search filters, sort, pagination, CSV export, summary stats (total revenue, pending commissions, outstanding payouts)
+- Revenue detail API (`/api/admin/revenue/[id]`) auto-detects type (invoice/payment/commission/payout) with full cross-linking (customer, payment, subscription, affiliate attribution, line items, referral, included commissions)
+- Subscriptions list API (`/api/admin/subscriptions`) with status/tier/churnRisk/search filters, sort, pagination, CSV export, summary stats (active count, MRR, churn risk count, tier breakdown)
+- Subscription detail API (`/api/admin/subscriptions/[id]`) with customer card, product info, invoice history, churn risk indicators, Stripe links, EntityNotes
+- Revenue list page with type badges, person cross-links to CRM, skeleton loading, empty states
+- Revenue detail page with 4 type-specific views (InvoiceDetail, PaymentDetail, CommissionDetail, PayoutDetail), EntityNotes on invoices
+- Subscriptions list page with churn risk toggle/indicators, person cross-links to CRM
+- Subscription detail page with churn risk section, invoice history cross-linked to revenue, EntityNotes
+
+**Sprint 4 completed (T013–T015):**
+- Dashboard Home API (`/api/admin/dashboard`) returning KPIs (MRR, active subscribers, new users, open tickets, churn rate, failed payments), alerts (renewals 24h, failed payments, stale tickets, pending payouts, pending applications), recent activity feed (last 15 events), and 7-day revenue trend
+- Dashboard Home page replacing old bare admin page — 6 clickable KPI cards (each linking to filtered list view), alerts section (only shows when count > 0), recent activity timeline, revenue sparkline chart, full skeleton loading states
+- Command Palette (`Cmd+K` / `Ctrl+K`) searching across users, invoices, subscriptions, tickets — integrated into admin layout header, recent searches in localStorage
+- Search API (`/api/admin/search?q=`) with results across all entity types
+
+**Fixed Vercel deployment error:** Added `string[]` type annotation to CSV export callback in CRM page.
+
+**No new DB tables needed for Sprint 3 or Sprint 4.**
+
+**Files created:**
+- `src/app/api/admin/revenue/route.ts` (Revenue list API)
+- `src/app/api/admin/revenue/[id]/route.ts` (Revenue detail API)
+- `src/app/admin/revenue/page.tsx` (Revenue list page)
+- `src/app/admin/revenue/[id]/page.tsx` (Revenue detail page)
+- `src/app/api/admin/subscriptions/route.ts` (Subscriptions list API)
+- `src/app/api/admin/subscriptions/[id]/route.ts` (Subscription detail API)
+- `src/app/admin/subscriptions/page.tsx` (Subscriptions list page)
+- `src/app/admin/subscriptions/[id]/page.tsx` (Subscription detail page)
+- `src/app/api/admin/dashboard/route.ts` (Dashboard Home API)
+- `src/app/api/admin/search/route.ts` (Search API)
+- `src/components/admin/command-palette.tsx` (Command Palette component)
+
+**Files modified:**
+- `src/app/admin/page.tsx` (replaced with command center dashboard)
+- `src/app/admin/layout.tsx` (added CommandPalette to header)
+- `src/app/admin/crm/page.tsx` (fixed TypeScript type annotation for Vercel)
+
+**Blueprint status:** 15/18 tasks complete. Only Sprint 5 (Polish & Cross-Linking) remains.
+
+**Next session should start with:** Sprint 5 — Related Records sidebar, export/print, final QA. See `docs/ADMIN_DASHBOARD_BLUEPRINT.md` → Sprint 5.
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience

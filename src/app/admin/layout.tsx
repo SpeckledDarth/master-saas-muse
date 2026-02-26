@@ -7,6 +7,7 @@ import { Loader2 } from 'lucide-react'
 import { getTeamPermissions, type TeamRole, type TeamPermissions } from '@/lib/team-permissions'
 import { AdminSidebar } from '@/components/admin/sidebar'
 import { AdminBreadcrumbs } from '@/components/admin/breadcrumbs'
+import { CommandPalette } from '@/components/admin/command-palette'
 
 export default function AdminLayout({
   children,
@@ -87,8 +88,9 @@ export default function AdminLayout({
     <div className="flex min-h-screen">
       <AdminSidebar isAppAdmin={isAppAdmin} permissions={permissions} />
       <main className="flex-1 min-w-0">
-        <div className="px-6 pt-6">
+        <div className="px-6 pt-6 flex items-center justify-between">
           <AdminBreadcrumbs />
+          <CommandPalette />
         </div>
         {children}
       </main>
