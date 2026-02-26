@@ -91,29 +91,35 @@ export async function GET() {
 
     try {
       const { data: subs, error } = await adminClient
-        .from('subscriptions')
-        .select('id, status, price_amount, current_period_start, current_period_end')
+        .from('muse_product_subscriptions')
+        .select('id, status, stripe_price_id, tier_id')
         .in('status', ['active', 'trialing'])
 
       if (!error && subs) {
         activeSubscriptions = subs.length
-        mrr = subs.reduce((sum, s) => sum + (s.price_amount || 0), 0)
+      }
+      if (error && error.code !== '42P01' && error.code !== 'PGRST205') {
+        console.error('Error fetching subscriptions:', error)
       }
     } catch {
       activeSubscriptions = 0
-      mrr = 0
     }
 
     try {
-      const { data: profiles } = await adminClient
-        .from('profiles')
-        .select('id, stripe_subscription_id')
-        .not('stripe_subscription_id', 'is', null)
+      const { data: invoiceData, error: invError } = await adminClient
+        .from('invoices')
+        .select('amount_paid_cents')
+        .eq('status', 'paid')
 
-      if (profiles && activeSubscriptions === 0) {
-        activeSubscriptions = profiles.length
+      if (!invError && invoiceData) {
+        mrr = invoiceData.reduce((sum, inv) => sum + (inv.amount_paid_cents || 0), 0)
       }
-    } catch {}
+      if (invError && invError.code !== '42P01' && invError.code !== 'PGRST205') {
+        console.error('Error fetching invoices for MRR:', invError)
+      }
+    } catch {
+      mrr = 0
+    }
 
     for (let i = 29; i >= 0; i--) {
       const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
@@ -150,8 +156,8 @@ export async function GET() {
 
     try {
       const { data: cancelledSubs } = await adminClient
-        .from('subscriptions')
-        .select('id, status, current_period_end, canceled_at')
+        .from('muse_product_subscriptions')
+        .select('id, status, current_period_end')
         .eq('status', 'canceled')
         .gte('current_period_end', monthAgo)
 
@@ -165,7 +171,7 @@ export async function GET() {
           churnMap.set(key, 0)
         }
         for (const s of cancelledSubs) {
-          const dateKey = (s.canceled_at || s.current_period_end || '').split('T')[0]
+          const dateKey = (s.current_period_end || '').split('T')[0]
           if (churnMap.has(dateKey)) {
             churnMap.set(dateKey, (churnMap.get(dateKey) || 0) + 1)
           }

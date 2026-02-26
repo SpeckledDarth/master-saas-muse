@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Loader2, BarChart3, ScrollText } from 'lucide-react'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { Loader2 } from 'lucide-react'
 import { getTeamPermissions, type TeamRole, type TeamPermissions } from '@/lib/team-permissions'
+import { AdminSidebar } from '@/components/admin/sidebar'
+import { AdminBreadcrumbs } from '@/components/admin/breadcrumbs'
 
 export default function AdminLayout({
   children,
@@ -14,7 +14,6 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
-  const pathname = usePathname()
   const [loading, setLoading] = useState(true)
   const [hasAccess, setHasAccess] = useState(false)
   const [isAppAdmin, setIsAppAdmin] = useState(false)
@@ -30,7 +29,6 @@ export default function AdminLayout({
         return
       }
       
-      // Use API endpoint to check membership (bypasses RLS issues)
       try {
         const response = await fetch('/api/user/membership')
         if (!response.ok) {
@@ -52,7 +50,6 @@ export default function AdminLayout({
           const teamRole = data.teamRole as TeamRole
           const teamPermissions = getTeamPermissions(teamRole)
           
-          // Viewers cannot access admin dashboard at all
           if (teamRole === 'viewer') {
             router.push('/')
             return
@@ -64,7 +61,6 @@ export default function AdminLayout({
           return
         }
         
-        // No access
         router.push('/')
       } catch (error) {
         console.error('Error checking access:', error)
@@ -88,169 +84,14 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen">
-      <nav className="border-b bg-card">
-        <div className="px-6 overflow-x-auto scrollbar-hide">
-          <div className="flex items-center gap-2 h-14 w-max">
-            <Button 
-              variant={pathname === '/admin' ? 'secondary' : 'ghost'} 
-              size="sm" 
-              asChild
-              className="shrink-0"
-            >
-              <Link href="/admin" data-testid="link-admin-home">
-                Admin
-              </Link>
-            </Button>
-              {(isAppAdmin || permissions?.canViewAnalytics) && (
-                <Button 
-                  variant={pathname === '/admin/metrics' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/metrics" data-testid="link-admin-metrics">
-                    <BarChart3 className="h-4 w-4 mr-1" />
-                    Metrics
-                  </Link>
-                </Button>
-              )}
-              {(isAppAdmin || permissions?.canEditSettings) && (
-                <Button 
-                  variant={pathname === '/admin/onboarding' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/onboarding" data-testid="link-admin-onboarding">
-                    Onboarding
-                  </Link>
-                </Button>
-              )}
-              {(isAppAdmin || permissions?.canEditSettings) && (
-                <Button 
-                  variant={pathname.startsWith('/admin/setup') ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/setup" data-testid="link-admin-setup">
-                    Setup
-                  </Link>
-                </Button>
-              )}
-              {(isAppAdmin || permissions?.canManageUsers) && (
-                <Button 
-                  variant={pathname === '/admin/users' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/users" data-testid="link-admin-users">
-                    Users
-                  </Link>
-                </Button>
-              )}
-              {(isAppAdmin || permissions?.canManageTeam || permissions?.canViewTeamList) && (
-                <Button 
-                  variant={pathname === '/admin/team' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/team" data-testid="link-admin-team">
-                    Team
-                  </Link>
-                </Button>
-              )}
-              {(isAppAdmin || permissions?.canEditContent) && (
-                <Button 
-                  variant={pathname === '/admin/blog' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/blog" data-testid="link-admin-blog">
-                    Blog
-                  </Link>
-                </Button>
-              )}
-              {(isAppAdmin || permissions?.canViewAnalytics) && (
-                <Button 
-                  variant={pathname === '/admin/analytics' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/analytics" data-testid="link-admin-analytics">
-                    Analytics
-                  </Link>
-                </Button>
-              )}
-              {(isAppAdmin || permissions?.canManageUsers) && (
-                <Button 
-                  variant={pathname === '/admin/feedback' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/feedback" data-testid="link-admin-feedback">
-                    Feedback
-                  </Link>
-                </Button>
-              )}
-              {(isAppAdmin || permissions?.canManageUsers) && (
-                <Button 
-                  variant={pathname === '/admin/waitlist' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/waitlist" data-testid="link-admin-waitlist">
-                    Waitlist
-                  </Link>
-                </Button>
-              )}
-              {(isAppAdmin || permissions?.canEditContent) && (
-                <Button 
-                  variant={pathname === '/admin/email-templates' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/email-templates" data-testid="link-admin-emails">
-                    Emails
-                  </Link>
-                </Button>
-              )}
-              {(isAppAdmin || permissions?.canViewAnalytics) && (
-                <Button 
-                  variant={pathname === '/admin/audit-logs' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/audit-logs" data-testid="link-admin-audit-logs">
-                    <ScrollText className="h-4 w-4 mr-1" />
-                    Audit Logs
-                  </Link>
-                </Button>
-              )}
-              {isAppAdmin && (
-                <Button 
-                  variant={pathname === '/admin/queue' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/queue" data-testid="link-admin-queue">
-                    Queue
-                  </Link>
-                </Button>
-              )}
-              {isAppAdmin && (
-                <Button 
-                  variant={pathname === '/admin/sso' ? 'secondary' : 'ghost'} 
-                  size="sm" 
-                  asChild
-                >
-                  <Link href="/admin/sso" data-testid="link-admin-sso">
-                    SSO
-                  </Link>
-                </Button>
-              )}
-          </div>
+    <div className="flex min-h-screen">
+      <AdminSidebar isAppAdmin={isAppAdmin} permissions={permissions} />
+      <main className="flex-1 min-w-0">
+        <div className="px-6 pt-6">
+          <AdminBreadcrumbs />
         </div>
-      </nav>
-      {children}
+        {children}
+      </main>
     </div>
   )
 }

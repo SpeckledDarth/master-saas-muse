@@ -365,6 +365,31 @@ Changes:
 
 **No database changes.** No new environment variables. No Supabase migrations needed.
 
+### Session: Admin Relational Dashboard — Sprint 1 Foundation (February 26, 2026)
+
+**Sprint 1: Foundation (Sidebar, Breadcrumbs, Timeline, Metrics Fix)** — COMPLETE
+
+Tasks completed:
+1. **T000** — Saved full `docs/ADMIN_DASHBOARD_BLUEPRINT.md` (735 lines) covering 18 tasks across 5 sprints: CRM, Revenue, Subscriptions, Dashboard Home, Cmd+K, Related Records.
+2. **T001** — Fixed `/api/admin/metrics` crash on Vercel. Changed `subscriptions`→`muse_product_subscriptions`, computed MRR from `invoices` instead of missing `subscriptions.price_amount`, removed `canceled_at` column reference. Each section wrapped in own try/catch with `42P01`/`PGRST205` error handling.
+3. **T002** — Built `<AdminSidebar>` component with collapsible groups (Dashboard, CRM, Revenue, Subscriptions, Metrics, Support, Content, Growth, Settings, System), badge counts fetched from `/api/admin/sidebar-counts`, icon-only collapse mode on desktop, mobile overlay with hamburger trigger, active state highlights.
+4. **T003** — Built `<AdminBreadcrumbs>` component with auto-generation from URL path, custom labels for 30+ known routes, UUID detection for detail pages, override support for entity names.
+5. **T004** — Built `<Timeline>` reusable event feed component with 10 event types, color-coded icons, loading skeleton, empty state, optional action links, palette CSS variables throughout.
+6. **T005** — Updated `src/app/admin/layout.tsx` to use new sidebar (replaced old horizontal nav). Fixed security: added admin/team role check to `/api/admin/sidebar-counts` API. Added `aria-label` to all icon-only buttons (sidebar toggle, mobile menu, breadcrumbs home). Clean compilation, zero errors.
+
+**Files created/modified:**
+- `src/components/admin/sidebar.tsx` (new)
+- `src/components/admin/breadcrumbs.tsx` (new)
+- `src/components/admin/timeline.tsx` (new)
+- `src/app/admin/layout.tsx` (rewritten — sidebar replaces horizontal nav)
+- `src/app/api/admin/metrics/route.ts` (fixed)
+- `src/app/api/admin/sidebar-counts/route.ts` (new, with admin role guard)
+- `docs/ADMIN_DASHBOARD_BLUEPRINT.md` (new)
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
+**Next session should start with:** Sprint 2 — CRM. See `docs/ADMIN_DASHBOARD_BLUEPRINT.md` → Sprint 2. Requires two new DB tables: `user_tags` and `entity_notes`.
+
 ---
 
 ## Related Documentation
