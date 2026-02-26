@@ -595,6 +595,7 @@ function StandaloneAffiliateDashboard() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   const [authChecking, setAuthChecking] = useState(true)
+  const [isAdminViewer, setIsAdminViewer] = useState(false)
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<AffiliateDashboardData | null>(null)
   const [assets, setAssets] = useState<MarketingAsset[]>([])
@@ -855,6 +856,15 @@ function StandaloneAffiliateDashboard() {
         return
       }
       setUserEmail(user.email || '')
+      try {
+        const memberRes = await fetch('/api/user/membership')
+        if (memberRes.ok) {
+          const memberData = await memberRes.json()
+          if (memberData.isAppAdmin || memberData.hasAdminAccess) {
+            setIsAdminViewer(true)
+          }
+        }
+      } catch {}
       setAuthChecking(false)
     }
     checkAuth()
@@ -6870,7 +6880,7 @@ function StandaloneAffiliateDashboard() {
     )
   }
 
-  if (!data || !data.link?.is_affiliate) {
+  if (!data || (!data.link?.is_affiliate && !isAdminViewer)) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-white/10 border-gray-500/50">
