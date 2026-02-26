@@ -15,6 +15,30 @@ const N = (v: unknown): number => {
   return 0
 }
 
+if (typeof window !== 'undefined' && !(window as any).__CONSOLE_PATCHED__) {
+  (window as any).__CONSOLE_PATCHED__ = true
+  const _origErr = console.error
+  console.error = function (...args: any[]) {
+    try {
+      const full = args.map((a: any) => {
+        if (a === null || a === undefined) return String(a)
+        if (typeof a === 'string') return a
+        if (a instanceof Error) return `Error: ${a.message}\n${a.stack || ''}`
+        try { return JSON.stringify(a, null, 2) } catch { return String(a) }
+      }).join(' | ')
+      if (full.includes('Objects are not valid') || full.includes('object with keys') || full.includes('#310')) {
+        (window as any).__REACT_FULL_ERROR__ = full
+      }
+      const prev = (window as any).__REACT_ALL_ERRORS__ || []
+      if (prev.length < 10) {
+        prev.push({ ts: Date.now(), msg: full.substring(0, 2000) })
+        ;(window as any).__REACT_ALL_ERRORS__ = prev
+      }
+    } catch {}
+    _origErr.apply(console, args)
+  }
+}
+
 import { useState, useEffect, useCallback, Suspense, useRef, useMemo, Component, type ErrorInfo, type ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -422,6 +446,23 @@ function deepScanForObjects(obj: any, path: string, results: string[]): void {
   }
 }
 
+class SafeZone extends Component<{ name: string; children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { name: string; children: ReactNode }) {
+    super(props)
+    this.state = { hasError: false }
+  }
+  static getDerivedStateFromError() { return { hasError: true } }
+  componentDidCatch(error: Error) {
+    console.error(`[SafeZone "${this.props.name}" crash]`, error.message)
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div className="p-2 text-xs text-destructive bg-destructive/10 rounded">{this.props.name} failed to render</div>
+    }
+    return this.props.children
+  }
+}
+
 class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null; componentStack: string | null }> {
   constructor(props: { children: ReactNode }) {
     super(props)
@@ -435,34 +476,19 @@ class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasErr
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Affiliate Dashboard Error:', error.message)
     this.setState({ componentStack: errorInfo.componentStack || null })
-    try {
-      console.error('[COMPONENT_STACK]', errorInfo.componentStack || 'none')
-    } catch {}
-    try {
-      const diagnosticData = (typeof window !== 'undefined' && (window as any).__DASHBOARD_DIAGNOSTIC__) || null
-      if (diagnosticData) {
-        console.error('[DIAGNOSTIC_JSON]', JSON.stringify(diagnosticData, null, 2))
-      }
-    } catch (e) {
-      console.error('[DIAGNOSTIC_SERIALIZE_FAILED]', String(e))
-    }
   }
 
   render() {
     if (this.state.hasError) {
-      let decodedError = this.state.error?.message || 'Unknown error'
-      const reactUrlMatch = decodedError.match(/https:\/\/react\.dev\/errors\/\d+/)
-      let errorCode = ''
-      if (reactUrlMatch) {
-        errorCode = reactUrlMatch[0]
-      }
-      const argsMatch = decodedError.match(/args\[\]=([^&\s]+)/g)
-      let decodedArgs = ''
-      if (argsMatch) {
-        decodedArgs = argsMatch.map(a => {
-          try { return decodeURIComponent(a.replace('args[]=', '')) } catch { return a }
-        }).join(', ')
-      }
+      const decodedError = this.state.error?.message || 'Unknown error'
+
+      let fullReactError: string | null = null
+      let allErrors: string | null = null
+      try {
+        fullReactError = (typeof window !== 'undefined' && (window as any).__REACT_FULL_ERROR__) || null
+        const errs = (typeof window !== 'undefined' && (window as any).__REACT_ALL_ERRORS__) || []
+        if (errs.length > 0) allErrors = errs.map((e: any) => `[${new Date(e.ts).toISOString()}] ${e.msg}`).join('\n\n---\n\n')
+      } catch {}
 
       let diagnosticInfo: string | null = null
       let objectScanResults: string | null = null
@@ -485,21 +511,21 @@ class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasErr
                 <h2 className="text-xl font-bold mb-2" data-testid="text-dashboard-error">Dashboard Error</h2>
                 <p className="text-sm text-muted-foreground mb-4">Something went wrong loading the dashboard.</p>
               </div>
-              <div className="bg-muted/50 rounded-lg p-3 mb-4 overflow-auto max-h-[70vh]">
-                <p className="text-xs font-bold mb-1">Error Message:</p>
+              <div className="bg-muted/50 rounded-lg p-3 mb-4 overflow-auto max-h-[80vh]">
+                <p className="text-xs font-bold mb-1">Minified Error:</p>
                 <p className="text-xs font-mono text-destructive break-all" data-testid="text-error-detail">
                   {decodedError}
                 </p>
-                {decodedArgs && (
+                {fullReactError && (
                   <>
-                    <p className="text-xs font-bold mt-3 mb-1">Decoded Error Args:</p>
-                    <pre className="text-xs font-mono text-orange-600 dark:text-orange-400 break-all whitespace-pre-wrap">{decodedArgs}</pre>
+                    <p className="text-xs font-bold mt-3 mb-1 text-red-600">FULL React Error (captured from console):</p>
+                    <pre className="text-xs font-mono text-red-500 break-all whitespace-pre-wrap border border-red-300 rounded p-2 bg-red-50 dark:bg-red-950">{fullReactError}</pre>
                   </>
                 )}
                 {objectScanResults && (
                   <>
-                    <p className="text-xs font-bold mt-3 mb-1 text-red-600">Objects Found in State (potential #310 cause):</p>
-                    <pre className="text-xs font-mono text-red-500 break-all whitespace-pre-wrap">{objectScanResults}</pre>
+                    <p className="text-xs font-bold mt-3 mb-1 text-orange-600">Objects Found in State:</p>
+                    <pre className="text-xs font-mono text-orange-500 break-all whitespace-pre-wrap">{objectScanResults}</pre>
                   </>
                 )}
                 {this.state.componentStack && (
@@ -510,13 +536,17 @@ class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasErr
                     </pre>
                   </>
                 )}
+                {allErrors && (
+                  <details className="mt-3">
+                    <summary className="text-xs font-bold cursor-pointer">All Captured console.error Logs ({((typeof window !== 'undefined' && (window as any).__REACT_ALL_ERRORS__) || []).length})</summary>
+                    <pre className="text-[10px] font-mono text-muted-foreground break-all whitespace-pre-wrap mt-1 max-h-60 overflow-auto">{allErrors}</pre>
+                  </details>
+                )}
                 {diagnosticInfo && (
-                  <>
-                    <p className="text-xs font-bold mt-3 mb-1">Full State Dump:</p>
-                    <pre className="text-[10px] font-mono text-muted-foreground break-all whitespace-pre-wrap max-h-40 overflow-auto">
-                      {diagnosticInfo}
-                    </pre>
-                  </>
+                  <details className="mt-3">
+                    <summary className="text-xs font-bold cursor-pointer">Full State Dump</summary>
+                    <pre className="text-[10px] font-mono text-muted-foreground break-all whitespace-pre-wrap mt-1 max-h-40 overflow-auto">{diagnosticInfo}</pre>
+                  </details>
                 )}
               </div>
               <Button className="w-full" onClick={() => this.setState({ hasError: false, error: null, componentStack: null })} data-testid="button-retry-dashboard">
@@ -7329,79 +7359,83 @@ function StandaloneAffiliateDashboard() {
 
   return (
     <div className="min-h-screen bg-background" data-testid="page-affiliate-dashboard">
-      <header className="border-b bg-muted/30 sticky top-0 z-30">
-        <div className="flex items-center justify-between h-14 px-4 md:px-6">
-          <div className="flex items-center gap-3">
-            <button
-              className="lg:hidden p-1"
-              onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              data-testid="button-mobile-nav"
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileNavOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
-              </svg>
-            </button>
-            <Link href="/affiliate" className="font-semibold text-black dark:text-white" data-testid="link-affiliate-home">
-              {appName} Affiliates
-            </Link>
+      <SafeZone name="header">
+        <header className="border-b bg-muted/30 sticky top-0 z-30">
+          <div className="flex items-center justify-between h-14 px-4 md:px-6">
+            <div className="flex items-center gap-3">
+              <button
+                className="lg:hidden p-1"
+                onClick={() => setMobileNavOpen(!mobileNavOpen)}
+                data-testid="button-mobile-nav"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileNavOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
+                </svg>
+              </button>
+              <Link href="/affiliate" className="font-semibold text-black dark:text-white" data-testid="link-affiliate-home">
+                {appName} Affiliates
+              </Link>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate('announcements')}
+                className="relative p-2 rounded-md hover:bg-muted"
+                data-testid="button-notifications"
+              >
+                <Bell className="h-4 w-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+                )}
+              </button>
+              <span className="text-sm text-muted-foreground hidden sm:inline">{userEmail}</span>
+              <Button variant="ghost" size="sm" onClick={handleLogout} data-testid="button-logout">
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate('announcements')}
-              className="relative p-2 rounded-md hover:bg-muted"
-              data-testid="button-notifications"
-            >
-              <Bell className="h-4 w-4" />
-              {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-              )}
-            </button>
-            <span className="text-sm text-muted-foreground hidden sm:inline">{userEmail}</span>
-            <Button variant="ghost" size="sm" onClick={handleLogout} data-testid="button-logout">
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
+        </header>
+      </SafeZone>
 
       <div className="flex">
-        <aside className={`
-          ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0 fixed lg:sticky top-14 left-0 z-20
-          w-56 h-[calc(100vh-3.5rem)] bg-background border-r
-          transition-transform duration-200 ease-in-out
-          overflow-y-auto
-        `}>
-          <nav className="p-3 space-y-1" data-testid="nav-affiliate-sidebar">
-            {NAV_ITEMS.map(item => {
-              const Icon = item.icon
-              const isActive = section === item.key
-              return (
-                <button
-                  key={item.key}
-                  onClick={() => navigate(item.key)}
-                  className={`
-                    w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors
-                    ${isActive
-                      ? 'bg-primary/10 text-primary font-medium'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                    }
-                  `}
-                  data-testid={`nav-${item.key}`}
-                >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  {item.label}
-                  {item.key === 'announcements' && unreadCount > 0 && (
-                    <Badge variant="destructive" className="ml-auto text-[10px] px-1.5 py-0">{unreadCount}</Badge>
-                  )}
-                  {item.key === 'messages' && unreadMessages > 0 && (
-                    <Badge variant="destructive" className="ml-auto text-[10px] px-1.5 py-0" data-testid="badge-unread-messages">{unreadMessages}</Badge>
-                  )}
-                </button>
-              )
-            })}
-          </nav>
-        </aside>
+        <SafeZone name="sidebar">
+          <aside className={`
+            ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'}
+            lg:translate-x-0 fixed lg:sticky top-14 left-0 z-20
+            w-56 h-[calc(100vh-3.5rem)] bg-background border-r
+            transition-transform duration-200 ease-in-out
+            overflow-y-auto
+          `}>
+            <nav className="p-3 space-y-1" data-testid="nav-affiliate-sidebar">
+              {NAV_ITEMS.map(item => {
+                const Icon = item.icon
+                const isActive = section === item.key
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => navigate(item.key)}
+                    className={`
+                      w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors
+                      ${isActive
+                        ? 'bg-primary/10 text-primary font-medium'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      }
+                    `}
+                    data-testid={`nav-${item.key}`}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    {S(item.label)}
+                    {item.key === 'announcements' && unreadCount > 0 && (
+                      <Badge variant="destructive" className="ml-auto text-[10px] px-1.5 py-0">{N(unreadCount)}</Badge>
+                    )}
+                    {item.key === 'messages' && unreadMessages > 0 && (
+                      <Badge variant="destructive" className="ml-auto text-[10px] px-1.5 py-0" data-testid="badge-unread-messages">{N(unreadMessages)}</Badge>
+                    )}
+                  </button>
+                )
+              })}
+            </nav>
+          </aside>
+        </SafeZone>
 
         {mobileNavOpen && (
           <div className="fixed inset-0 bg-black/30 z-10 lg:hidden" onClick={() => setMobileNavOpen(false)} />

@@ -1,0 +1,76 @@
+Full State Dump:
+
+{
+  "section": "overview",
+  "timestamp": "2026-02-26T00:24:32.864Z",
+  "stats": {
+    "totalReferrals": "number:0",
+    "conversions": "number:0",
+    "conversionRate": "number:0",
+    "clicks": "number:0",
+    "pendingEarnings": "number:0",
+    "approvedEarnings": "number:0",
+    "paidEarnings": "number:0",
+    "totalEarnings": "number:0",
+    "effectiveRate": "number:20"
+  },
+  "tier": {
+    "current": {
+      "id": "string:11a62b40-7e1e-40ce-a04e-d3e08f4ec29e",
+      "name": "string:Starter",
+      "min_referrals": "number:0",
+      "commission_rate": "number:18",
+      "perks": "array[3]:[\"Pickles\",\"Grapes\"]"
+    },
+    "next": {
+      "id": "string:908f6110-bbd0-4e14-b807-012489e57bab",
+      "name": "string:Bronze",
+      "min_referrals": "number:15",
+      "commission_rate": "number:25",
+      "perks": "array[0]"
+    },
+    "referralsToNext": "number:15"
+  },
+  "terms": "null",
+  "earnings": {
+    "today": "number:0",
+    "thisWeek": "number:0",
+    "thisMonth": "number:0",
+    "allTime": "number:0"
+  },
+  "milestoneData": {
+    "count": 7,
+    "currentReferrals": 0,
+    "sample": {
+      "id": "string:ec9b973e-b838-45ed-8e5e-0a1379bfe680",
+      "name": "string:First Referral Award",
+      "description": "string:Welcome bonus for your first successful referral",
+      "referral_threshold": "number:1",
+      "bonus_amount_cents": "number:1200",
+      "is_active": "boolean:true",
+      "awarded": "boolean:false",
+      "progress": "number:0",
+      "referralsNeeded": "number:1"
+    }
+  },
+  "forecast": {
+    "monthSoFar": "number:0",
+    "projectedTotal": "number:0",
+    "optimistic": "number:0",
+    "pessimistic": "number:0",
+    "dailyAvg": "number:0",
+    "paceVsLastMonth": "null",
+    "daysRemaining": "number:2",
+    "tierInfo": {
+      "currentTierName": "string:Starter",
+      "nextTierName": "string:Bronze",
+      "nextTierRate": "number:25",
+      "referralsNeeded": "number:15"
+    }
+  },
+  "contests": "array[0]",
+  "leaderboard": "array[0]",
+  "funnel": "array[0]",
+  "coachTips": "array[0]",
+  "notifications": "array[0]"
+}
