@@ -2,7 +2,7 @@
 
 > **Created:** February 26, 2026
 > **Last Updated:** February 26, 2026
-> **Status:** 0 of 18 tasks complete. Sprint 1 ready to begin.
+> **Status:** 8 of 18 tasks complete. Sprint 1 + Sprint 2 done.
 > **Goal:** Transform the admin area from a flat collection of pages into a world-class relational dashboard where every record is a doorway to every related record. Every SaaS built from MuseKit inherits this.
 
 ---
@@ -11,12 +11,12 @@
 
 | Sprint | Focus | Tasks | ✅ Done | ⚠️ Partial | ❌ Not Started | Sprint Status |
 |--------|-------|-------|--------|-----------|---------------|---------------|
-| Sprint 1: Foundation | Sidebar nav, bug fix, reusable components | T001, T002, T003, T004 | 0 | 0 | 4 | **NOT STARTED** |
-| Sprint 2: CRM | People list + detail page with cross-links | T005, T006, T007, T008 | 0 | 0 | 4 | **NOT STARTED** |
+| Sprint 1: Foundation | Sidebar nav, bug fix, reusable components | T001, T002, T003, T004 | 4 | 0 | 0 | **COMPLETE** |
+| Sprint 2: CRM | People list + detail page with cross-links | T005, T006, T007, T008 | 4 | 0 | 0 | **COMPLETE** |
 | Sprint 3: Revenue & Subscriptions | Financial data views with cross-links | T009, T010, T011, T012 | 0 | 0 | 4 | **NOT STARTED** |
 | Sprint 4: Dashboard Home & Search | Command center + Cmd+K + drill-down KPIs | T013, T014, T015 | 0 | 0 | 3 | **NOT STARTED** |
 | Sprint 5: Polish & Cross-Linking | Related records sidebar, export, print, final QA | T016, T017, T018 | 0 | 0 | 3 | **NOT STARTED** |
-| **Totals** | | **18 tasks** | **0** | **0** | **18** | |
+| **Totals** | | **18 tasks** | **8** | **0** | **10** | |
 
 ---
 

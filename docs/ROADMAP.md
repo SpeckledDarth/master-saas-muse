@@ -390,6 +390,75 @@ Tasks completed:
 
 **Next session should start with:** Sprint 2 — CRM. See `docs/ADMIN_DASHBOARD_BLUEPRINT.md` → Sprint 2. Requires two new DB tables: `user_tags` and `entity_notes`.
 
+### Session: Admin Relational Dashboard — Sprint 2 CRM (February 26, 2026)
+
+**Sprint 2: CRM (People list + detail page)** — COMPLETE
+
+Tasks completed:
+1. **T005** — Built CRM aggregation APIs:
+   - `GET /api/admin/crm` — paginated user list with aggregated data: type badges (Subscriber/Affiliate/Team), plan, total revenue, health score (login recency 40% + subscription 30% + activity 30%), tags. Supports search, type/plan/status/tag filters, sort (newest/oldest/revenue/health/name), pagination.
+   - `GET /api/admin/crm/[userId]` — complete CEO-level user record: profile, subscriptions, unified transactions (invoices+payments+commissions+payouts merged chronologically), activities, tickets, notes, contracts, tags, affiliate summary. Each section in own try/catch.
+2. **T006** — Built CRM master list page at `/admin/crm`:
+   - Table with columns: Avatar+Name, Email, Type badges, Plan, Revenue, Status dot, Last Active, Health Score, Tags
+   - Search bar (debounced), filter dropdowns (Type, Status), sort selector
+   - Pagination with record count ("Showing 1-25 of X contacts")
+   - CSV export (downloads all filtered results)
+   - Click any row → navigates to detail page
+   - Loading skeleton and empty state
+3. **T007** — Built CRM detail page at `/admin/crm/[userId]`:
+   - Header: back arrow, avatar, name, email, type badges, action buttons (Impersonate, Email, View in Stripe)
+   - Inline tag management (add/remove tags with color picker)
+   - 5 summary cards: Total Revenue, Current Plan, Health Score, Member Since, Days Since Login
+   - Affiliate Summary card (shown only for affiliates): referrals, commissions, tier, conversion rate, payouts
+   - 6 tabs: Profile (editable form with save), Transactions (unified table), Activity (Timeline component), Support (ticket cards), Notes (EntityNotes component), Contracts (contract cards)
+4. **T008** — Built supporting APIs and components:
+   - Tags API at `/api/admin/crm/[userId]/tags` (GET/POST/DELETE) with duplicate check
+   - Entity Notes API at `/api/admin/entity-notes` (GET/POST/DELETE) with author name resolution and author-only delete (unless admin)
+   - `<EntityNotes>` reusable component with add/delete, author names, timestamps
+   - Created shared `src/lib/admin-auth.ts` helper (verifyAdminAccess, isErrorResponse, safeTableError) to DRY up admin role checks
+
+**Database changes (Replit Postgres):**
+- Created `user_tags` table (id, user_id, tag, color, created_by, created_at, UNIQUE user_id+tag)
+- Created `entity_notes` table (id, entity_type, entity_id, author_id, body, created_at, updated_at)
+
+**Files created:**
+- `src/lib/admin-auth.ts` (shared admin auth helper)
+- `src/app/api/admin/crm/route.ts` (CRM list API)
+- `src/app/api/admin/crm/[userId]/route.ts` (CRM detail API)
+- `src/app/api/admin/crm/[userId]/tags/route.ts` (Tags API)
+- `src/app/api/admin/entity-notes/route.ts` (Entity Notes API)
+- `src/app/admin/crm/page.tsx` (CRM list page)
+- `src/app/admin/crm/[userId]/page.tsx` (CRM detail page)
+- `src/components/admin/entity-notes.tsx` (EntityNotes component)
+
+**Supabase SQL to run BEFORE testing on Vercel:**
+```sql
+CREATE TABLE IF NOT EXISTS user_tags (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  tag TEXT NOT NULL,
+  color TEXT DEFAULT 'gray',
+  created_by UUID REFERENCES auth.users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, tag)
+);
+CREATE INDEX IF NOT EXISTS idx_user_tags_user_id ON user_tags(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_tags_tag ON user_tags(tag);
+
+CREATE TABLE IF NOT EXISTS entity_notes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  entity_type TEXT NOT NULL,
+  entity_id TEXT NOT NULL,
+  author_id UUID NOT NULL REFERENCES auth.users(id),
+  body TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, entity_id);
+```
+
+**Next session should start with:** Sprint 3 — Revenue & Subscriptions. See `docs/ADMIN_DASHBOARD_BLUEPRINT.md` → Sprint 3.
+
 ---
 
 ## Related Documentation
