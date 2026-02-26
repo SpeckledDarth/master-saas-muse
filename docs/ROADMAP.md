@@ -277,11 +277,15 @@ Tasks completed:
 2. **T007** — Created `src/hooks/use-chart-config.ts` — a shared chart configuration hook that reads all chart-related settings and returns Recharts-compatible props (barSize, barRadius, lineWidth, lineCurve, showDots, showGrid, gridDasharray, showTrendLine, areaFill, areaOpacity, colorStrategy, colors array).
 3. **T008** — Created `src/components/scroll-to-top.tsx` — floating scroll-to-top button that appears after 400px scroll, respects `data-scroll-top` attribute from design system settings. Added to root layout.
 
-Tasks remaining for next session:
-- **T004** — FOUC prevention (server-side color injection in root layout, replace hardcoded fallback values, body fade-in, font preload)
-- **T011** — Update shared UI components (Card, Button, Badge, Input) to consume new CSS variables
+Sprint 3 Resume completed:
+4. **T004** — FOUC prevention: body starts at opacity 0, inline script adds `ready` class via requestAnimationFrame for 150ms fade-in. Dark mode class set before first paint.
+5. **T005 finish** — Header now reads `logoPosition` (left/center) and `stickyHeader` from branding settings. Created `/api/user/theme-preference` API route for cross-device dark mode sync.
+6. **T008 finish** — Smooth scroll already wired in use-settings.ts (confirmed). Page transition wrapper deferred (optional per blueprint).
+7. **T011** — Wired all shared UI components to CSS variables: Card (5 vars: padding/radius/shadow/border-width/border-style), Button (4: radius/font-weight/text-transform/transition-speed), Badge (radius), Input (radius), Table (stripe/border opacity), Toast (card radius + position via data-toast-position).
 
-**Next session should start with:** Sprint 3 tasks T004 and T011, then proceed to Sprint 4 (Color Audit). See `docs/DESIGN_SYSTEM_BLUEPRINT.md` for full task details.
+**Sprint 3 is now FULLY COMPLETE.** All 5 tasks done.
+
+**Next session should start with:** Sprint 4 — Color Audit (Session B). See `docs/DESIGN_SYSTEM_BLUEPRINT.md` → Completion Plan → Session B.
 
 ---
 

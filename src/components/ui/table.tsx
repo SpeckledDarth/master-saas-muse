@@ -58,9 +58,14 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      "border-b transition-colors data-[state=selected]:bg-muted",
+      "[&:nth-child(even)]:bg-muted/[var(--table-stripe-opacity,0)]",
+      "hover:bg-muted/50",
       className
     )}
+    style={{
+      borderBottomColor: 'hsl(var(--border) / var(--table-border-opacity, 1))',
+    }}
     {...props}
   />
 ))

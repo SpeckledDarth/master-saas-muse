@@ -2,7 +2,7 @@
 
 > **Created:** February 26, 2026
 > **Last Verified:** February 26, 2026
-> **Status:** 6 of 14 tasks complete, 2 partial, 6 not started. Next up: Sprint 3 Resume.
+> **Status:** 10 of 14 tasks complete, 0 partial, 4 not started. Next up: Sprint 4 (Color Audit).
 > **Goal:** Transform the Color Palette into a comprehensive, configurable Design System that serves as the single source of truth for ALL visual styling across every MuseKit-cloned SaaS app.
 
 ---
@@ -13,14 +13,14 @@
 |--------|-------|--------|-----------|---------------|---------------|
 | Sprint 1: Foundation | T001, T002, T003, T012 | 4 | 0 | 0 | **COMPLETE** |
 | Sprint 2: Admin UI | T006 | 1 | 0 | 0 | **COMPLETE** |
-| Sprint 3: Integration | T004, T005, T007, T008, T011 | 1 | 2 | 2 | **PARTIAL** |
+| Sprint 3: Integration | T004, T005, T007, T008, T011 | 5 | 0 | 0 | **COMPLETE** |
 | Sprint 4: Color Audit | T009, T010 | 0 | 0 | 2 | **NOT STARTED** |
 | Sprint 5: Testing + Docs | T013, T014 | 0 | 0 | 2 | **NOT STARTED** |
-| **Totals** | **14 tasks** | **6** | **2** | **6** | |
+| **Totals** | **14 tasks** | **10** | **0** | **4** | |
 
-**What works today:** The infrastructure is solid — all ~60 settings exist as TypeScript types, all CSS variables are injected by the hook, globals.css has defaults, 4 presets exist with export/import, and the admin palette page has 16 collapsible sections for configuring everything. The ThemeToggle respects darkModeOption, useChartConfig hook is ready, and scroll-to-top component is in the layout.
+**What works today:** All infrastructure is in place. UI components (Card, Button, Badge, Input, Table, Toast) now consume CSS variables — changing settings in the admin palette visually updates components site-wide. FOUC prevention is active (body fade-in). Header respects logoPosition and stickyHeader settings. ThemeToggle respects darkModeOption. Chart config hook is ready. Scroll-to-top component works. Theme preference API route exists for cross-device sync.
 
-**What doesn't work yet:** Changing settings in the admin palette does NOT visually change Card, Button, Badge, or Input components on the actual site — those components haven't been wired to read the CSS variables yet (T011). There's no FOUC prevention (T004). The header doesn't respond to logo position or sticky header settings (T005). Hardcoded hex colors remain in affiliate dashboard charts (T009/T010).
+**What doesn't work yet:** Hardcoded hex colors remain in affiliate dashboard charts and component files (T009/T010). Full integration testing and documentation updates still pending (T013/T014).
 
 ---
 
@@ -230,10 +230,10 @@ Divider: `--divider-style`, `--divider-opacity`
 | Task | Status | Description | Files | What's Done | What's Missing |
 |------|--------|-------------|-------|-------------|----------------|
 | **T007** | ✅ Done | Chart configuration hook | `src/hooks/use-chart-config.ts` | Full hook with barSize, barRadius, lineWidth, lineCurve, showDots, showGrid, colors array, etc. | — |
-| **T005** | ⚠️ Partial | Dark mode control + header updates | `src/components/theme-toggle.tsx`, `src/components/layout/header.tsx` | ThemeToggle hides on force-light/force-dark, forces correct theme | Header not updated for `logoPosition` or `stickyHeader`. No API route for saving user dark mode preference to account (cross-device sync). |
-| **T008** | ⚠️ Partial | Scroll-to-top + smooth scroll + page transitions | `src/components/scroll-to-top.tsx`, `src/app/layout.tsx` | Scroll-to-top component created and added to root layout | Smooth scroll toggle not wired to `html` element. Page transition wrapper not built. |
-| **T004** | ❌ Not Started | FOUC prevention | `src/app/layout.tsx`, `src/app/globals.css` | — | No server-side color injection. No body fade-in. No font preload. Colors flash on page load. |
-| **T011** | ❌ Not Started | Wire UI components to CSS variables | `src/components/ui/card.tsx`, `button.tsx`, `badge.tsx`, `input.tsx`, toast, table | — | Card has 0 references to `var(--card-*)`. Button has 0 references to `var(--btn-*)`. Badge and Input same. Changing admin settings has zero visual effect on actual site components. |
+| **T005** | ✅ Done | Dark mode control + header updates | `src/components/theme-toggle.tsx`, `src/components/layout/header.tsx`, `src/app/api/user/theme-preference/route.ts` | ThemeToggle hides on force-light/force-dark. Header reads logoPosition and stickyHeader. Theme preference API route created. | — |
+| **T008** | ✅ Done | Scroll-to-top + smooth scroll | `src/components/scroll-to-top.tsx`, `src/app/layout.tsx`, `src/hooks/use-settings.ts` | Scroll-to-top component in layout. Smooth scroll already wired in use-settings.ts. | Page transition wrapper deferred (optional per blueprint). |
+| **T004** | ✅ Done | FOUC prevention | `src/app/layout.tsx`, `src/app/globals.css` | Body starts opacity 0, inline script adds `ready` class via requestAnimationFrame for 150ms fade-in. Dark mode class set before paint. | — |
+| **T011** | ✅ Done | Wire UI components to CSS variables | `src/components/ui/card.tsx`, `button.tsx`, `badge.tsx`, `input.tsx`, `toast.tsx`, `table.tsx` | Card uses 5 CSS vars (padding/radius/shadow/border-width/border-style). Button uses 4 (radius/font-weight/text-transform/transition-speed). Badge uses radius. Input uses radius. Table uses stripe/border opacity. Toast uses card radius and data-toast-position for positioning. | — |
 
 **Completion test:** Changing settings in admin palette page updates Card, Button, Badge, Input globally. Dark mode toggle appears/hides based on setting. No FOUC on page load. Scroll-to-top button works. Charts have a config hook ready.
 

@@ -45,6 +45,9 @@ export default function RootLayout({
                     document.documentElement.classList.remove('dark');
                   }
                 } catch (e) {}
+                requestAnimationFrame(function() {
+                  document.body.classList.add('ready');
+                });
               })();
             `,
           }}

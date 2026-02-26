@@ -90,7 +90,9 @@ export function Header() {
 
   const isAnimating = brandNameAnimated && !mounted
 
-  const isSticky = headerStyle?.sticky !== false
+  const logoPosition = branding?.logoPosition || 'left'
+  const designStickyHeader = branding?.stickyHeader !== false
+  const isSticky = designStickyHeader && headerStyle?.sticky !== false
   const isTransparent = headerStyle?.transparent ?? false
   const showBorder = headerStyle?.borderBottom !== false
   const brandingPrimary = settings?.branding?.primaryColor
@@ -133,12 +135,18 @@ export function Header() {
       }}
     >
       <div 
-        className="container mx-auto px-4 md:px-8 flex items-center justify-between gap-4 transition-all duration-300"
+        className={cn(
+          "container mx-auto px-4 md:px-8 flex items-center gap-4 transition-all duration-300",
+          logoPosition === 'center' ? "justify-center" : "justify-between"
+        )}
         style={{ height: currentHeaderHeight }}
       >
         <Link 
           href="/" 
-          className="flex items-center space-x-2 group flex-shrink-0"
+          className={cn(
+            "flex items-center space-x-2 group flex-shrink-0",
+            logoPosition === 'center' && "absolute left-1/2 -translate-x-1/2"
+          )}
           data-testid="link-home"
         >
           {branding?.logoUrl ? (

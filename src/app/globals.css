@@ -163,6 +163,11 @@
     font-family: var(--font-body, var(--font-inter, ui-sans-serif, system-ui, sans-serif));
     font-size: var(--body-size, 0.9375rem);
     line-height: var(--body-line-height, 1.6);
+    opacity: 0;
+    transition: opacity 150ms ease-in;
+  }
+  body.ready {
+    opacity: 1;
   }
   h1, h2, h3, h4, h5, h6,
   [data-slot="card-title"] {
