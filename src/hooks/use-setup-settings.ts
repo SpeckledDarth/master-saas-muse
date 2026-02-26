@@ -132,7 +132,15 @@ export function useSetupSettings(): UseSetupSettingsReturn {
   }, [userId, settings])
 
   function updateBranding<K extends keyof SiteSettings['branding']>(key: K, value: SiteSettings['branding'][K]) {
-    setSettings(prev => ({ ...prev, branding: { ...prev.branding, [key]: value } }))
+    setSettings(prev => {
+      const updated = { ...prev.branding, [key]: value }
+      if (key === 'primaryColor') {
+        delete (updated as any).successColor
+        delete (updated as any).warningColor
+        delete (updated as any).dangerColor
+      }
+      return { ...prev, branding: updated }
+    })
   }
 
   function updateSocial<K extends keyof SiteSettings['social']>(key: K, value: SiteSettings['social'][K]) {
