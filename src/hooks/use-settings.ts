@@ -566,7 +566,7 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
       }
     } else if (settings.branding.primaryColor) {
       const scale = generateShadeScaleHsl(settings.branding.primaryColor)
-      const bgShade = isDark ? scale['950'] : scale['50']
+      const bgShade = isDark ? scale['800'] : scale['100']
       if (bgShade) {
         root.style.setProperty('--background', bgShade)
         root.style.setProperty('--popover', bgShade)
@@ -575,12 +575,8 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
 
     if (settings.branding.primaryColor) {
       const scale = generateShadeScaleHsl(settings.branding.primaryColor)
-      if (!theme?.card) {
-        const cardShade = isDark ? scale['900'] : scale['50']
-        if (cardShade) root.style.setProperty('--card', cardShade)
-      }
       if (!theme?.foreground) {
-        const fgShade = isDark ? scale['50'] : scale['950']
+        const fgShade = isDark ? scale['100'] : scale['900']
         if (fgShade) {
           root.style.setProperty('--foreground', fgShade)
           root.style.setProperty('--popover-foreground', fgShade)
@@ -588,13 +584,10 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
         }
       }
       if (!theme?.border) {
-        const borderShade = isDark ? scale['700'] : scale['200']
-        if (borderShade) {
-          root.style.setProperty('--border', borderShade)
-          root.style.setProperty('--input', borderShade)
-        }
+        root.style.setProperty('--border', '0 0% 50%')
+        root.style.setProperty('--input', '0 0% 50%')
       }
-      const mutedShade = isDark ? scale['800'] : scale['100']
+      const mutedShade = isDark ? scale['700'] : scale['200']
       const mutedFgShade = isDark ? scale['300'] : scale['600']
       if (mutedShade) root.style.setProperty('--muted', mutedShade)
       if (mutedFgShade) root.style.setProperty('--muted-foreground', mutedFgShade)
