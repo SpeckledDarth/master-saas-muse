@@ -67,7 +67,7 @@ function OptionGroup({ label, children }: { label: string; children: React.React
 function ToggleGroup({ value, options, onChange }: {
   value: string
   options: { value: string; label: string }[]
-  onChange: (v: string) => void
+  onChange: (v: any) => void
 }) {
   return (
     <div className="flex rounded-md border overflow-hidden">
@@ -293,7 +293,7 @@ export function ComponentStyleSection() {
                 { value: '1', label: '1px' },
                 { value: '2', label: '2px' },
               ]}
-              onChange={v => updateBranding('cardBorderWidth', parseInt(v))}
+              onChange={v => updateBranding('cardBorderWidth', parseInt(v) as any)}
             />
           </OptionGroup>
           <OptionGroup label="Border Style">
@@ -503,7 +503,7 @@ export function InteractiveSection() {
               { value: '2', label: '2px' },
               { value: '3', label: '3px' },
             ]}
-            onChange={v => updateBranding('focusRingWidth', parseInt(v))}
+            onChange={v => updateBranding('focusRingWidth', parseInt(v) as any)}
           />
         </OptionGroup>
       </div>
@@ -622,7 +622,7 @@ export function DataVizSection() {
                 { value: '2', label: '2px' },
                 { value: '3', label: '3px' },
               ]}
-              onChange={v => updateBranding('chartLineWidth', parseInt(v))}
+              onChange={v => updateBranding('chartLineWidth', parseInt(v) as any)}
             />
           </OptionGroup>
           <OptionGroup label="Curve">
