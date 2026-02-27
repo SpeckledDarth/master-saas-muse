@@ -175,9 +175,9 @@ export default function OnboardingPage() {
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
                   completedSteps.includes(step.id)
-                    ? 'bg-primary-600 dark:bg-primary-400 border-primary-600 dark:border-primary-400 text-white dark:text-black'
+                    ? 'bg-primary border-primary text-primary-foreground'
                     : step.id === currentStep
-                    ? 'border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400'
+                    ? 'border-primary text-primary'
                     : 'border-muted text-muted-foreground'
                 }`}
               >
@@ -190,7 +190,7 @@ export default function OnboardingPage() {
               {index < activeSteps.length - 1 && (
                 <div
                   className={`w-12 h-0.5 mx-2 ${
-                    completedSteps.includes(step.id) ? 'bg-primary-600 dark:bg-primary-400' : 'bg-muted'
+                    completedSteps.includes(step.id) ? 'bg-primary' : 'bg-muted'
                   }`}
                 />
               )}
@@ -202,7 +202,7 @@ export default function OnboardingPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {activeSteps[currentStep - 1]?.icon && (
-                <span className="text-primary-600 dark:text-primary-400">
+                <span className="text-primary">
                   {(() => {
                     const Icon = activeSteps[currentStep - 1].icon
                     return <Icon className="h-5 w-5" />
@@ -316,7 +316,7 @@ export default function OnboardingPage() {
                         <span>{step.title}</span>
                       </div>
                       {completedSteps.includes(step.id) ? (
-                        <Check className="h-5 w-5 text-green-500" />
+                        <Check className="h-5 w-5 text-[hsl(var(--success))]" />
                       ) : (
                         <span className="text-sm text-muted-foreground">Skipped</span>
                       )}

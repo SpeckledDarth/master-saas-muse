@@ -58,7 +58,7 @@ export default function FunnelAdminPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
-              <BarChart3 className="h-8 w-8 text-green-600 dark:text-green-400" />
+              <BarChart3 className="h-8 w-8 text-[hsl(var(--success))]" />
               <div>
                 <div className="text-2xl font-bold" data-testid="text-funnel-completed">
                   {funnel.length > 0 ? funnel[funnel.length - 1].completed : 0}
@@ -71,7 +71,7 @@ export default function FunnelAdminPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
-              <TrendingDown className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+              <TrendingDown className="h-8 w-8 text-[hsl(var(--warning))]" />
               <div>
                 <div className="text-2xl font-bold" data-testid="text-funnel-rate">
                   {totalStarted > 0 && funnel.length > 0
@@ -115,7 +115,7 @@ export default function FunnelAdminPage() {
                         <span>{step.viewed} viewed</span>
                         <span>{step.completed} completed</span>
                         {step.dropOff > 0 && (
-                          <span className="text-orange-600 dark:text-orange-400">
+                          <span className="text-[hsl(var(--warning))]">
                             {step.dropOff}% drop-off
                           </span>
                         )}

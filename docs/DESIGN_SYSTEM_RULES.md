@@ -53,8 +53,11 @@ This document is the single source of truth for how to style components in Passi
 | `text-green-600`, `bg-green-100` | `text-[hsl(var(--success))]`, `bg-[hsl(var(--success)/0.1)]` | `--success` | Harmonized with primary color |
 | `text-amber-600`, `text-yellow-600` | `text-[hsl(var(--warning))]` | `--warning` | Harmonized with primary color |
 | `text-red-600`, `bg-red-100` | `text-[hsl(var(--danger))]`, `bg-[hsl(var(--danger)/0.1)]` | `--danger` | Harmonized with primary color |
+| `text-blue-600`, `bg-blue-50` | `text-[hsl(var(--info))]`, `bg-[hsl(var(--info)/0.1)]` | `--info` | Info/tip elements, neutral highlights |
+| `text-purple-600`, `text-orange-600` | `text-primary` or `text-[hsl(var(--warning))]` | varies | Purple→primary, Orange→warning |
+| `text-gray-400`, `text-gray-500` | `text-muted-foreground` | `--muted-foreground` | Muted/disabled text |
 | `text-primary` | `text-primary` (OK) | `--primary` | Already a CSS variable class |
-| `text-destructive` | `text-destructive` (OK) | `--destructive` | Already a CSS variable class |
+| `text-destructive` | `text-destructive` (OK) | `--destructive` | Already a CSS variable class — equivalent to `--danger` |
 | `text-muted-foreground` | `text-muted-foreground` (OK) | `--muted-foreground` | Already a CSS variable class |
 
 **Allowed Tailwind color classes** (these ARE CSS variables, not hardcoded):

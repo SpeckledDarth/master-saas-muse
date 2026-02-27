@@ -167,10 +167,10 @@ export default function FeedbackPage() {
                         variant="outline"
                         className={
                           item.nps_score >= 9
-                            ? 'border-green-500 text-green-600 dark:text-green-400'
+                            ? 'border-[hsl(var(--success))] text-[hsl(var(--success))]'
                             : item.nps_score >= 7
-                              ? 'border-yellow-500 text-yellow-600 dark:text-yellow-400'
-                              : 'border-red-500 text-red-600 dark:text-red-400'
+                              ? 'border-[hsl(var(--warning))] text-[hsl(var(--warning))]'
+                              : 'border-[hsl(var(--danger))] text-[hsl(var(--danger))]'
                         }
                         data-testid={`badge-nps-${item.id}`}
                       >

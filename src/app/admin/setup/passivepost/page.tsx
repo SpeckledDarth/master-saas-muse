@@ -341,7 +341,7 @@ function SocialKeyGroup({ group, onSaved }: { group: IntegrationGroup; onSaved: 
           {group.keys.map((k) => (
             <CircleDot
               key={k.id}
-              className={`h-2.5 w-2.5 ${k.configured ? 'text-green-500' : 'text-muted-foreground/40'}`}
+              className={`h-2.5 w-2.5 ${k.configured ? 'text-[hsl(var(--success))]' : 'text-muted-foreground/40'}`}
             />
           ))}
         </div>
@@ -434,7 +434,7 @@ export default function PassivePostPage() {
               <p className="text-sm text-muted-foreground">Enable this module in the Features tab</p>
             </div>
             {isEnabled ? (
-              <Badge variant="default" className="bg-green-600" data-testid="badge-module-status">Active</Badge>
+              <Badge variant="default" className="bg-[hsl(var(--success))]" data-testid="badge-module-status">Active</Badge>
             ) : (
               <Badge variant="secondary" data-testid="badge-module-status">Inactive</Badge>
             )}
@@ -459,13 +459,13 @@ export default function PassivePostPage() {
         }
         if (warnings.length === 0) return null
         return (
-          <Card className="border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/20" data-testid="alert-dependency-warning">
+          <Card className="border-[hsl(var(--warning)/0.5)] bg-[hsl(var(--warning)/0.1)]" data-testid="alert-dependency-warning">
             <CardContent className="pt-6">
               <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
-                <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 mt-0.5 shrink-0" />
+                <AlertTriangle className="h-5 w-5 text-[hsl(var(--warning))] mt-0.5 shrink-0" />
                 <div className="space-y-1">
                   {warnings.map((w) => (
-                    <p key={w.key} className="text-sm text-yellow-800 dark:text-yellow-200" data-testid={w.testId}>{w.message}</p>
+                    <p key={w.key} className="text-sm text-[hsl(var(--warning))]" data-testid={w.testId}>{w.message}</p>
                   ))}
                 </div>
               </div>

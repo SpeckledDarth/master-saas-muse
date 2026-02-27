@@ -326,7 +326,7 @@ export default function TeamPage() {
               <div className="grid gap-[var(--content-density-gap,1rem)] md:grid-cols-2">
                 <div className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-2">
                   <div className="flex items-center gap-2">
-                    <Crown className="h-4 w-4 text-yellow-500" />
+                    <Crown className="h-4 w-4 text-[hsl(var(--warning))]" />
                     <span className="font-semibold">Owner</span>
                   </div>
                   <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
@@ -339,7 +339,7 @@ export default function TeamPage() {
                 </div>
                 <div className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-2">
                   <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-blue-500" />
+                    <Shield className="h-4 w-4 text-[hsl(var(--info))]" />
                     <span className="font-semibold">Manager</span>
                   </div>
                   <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
@@ -352,7 +352,7 @@ export default function TeamPage() {
                 </div>
                 <div className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-2">
                   <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-green-500" />
+                    <User className="h-4 w-4 text-[hsl(var(--success))]" />
                     <span className="font-semibold">Member</span>
                   </div>
                   <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
@@ -365,7 +365,7 @@ export default function TeamPage() {
                 </div>
                 <div className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-2">
                   <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-gray-500" />
+                    <User className="h-4 w-4 text-muted-foreground" />
                     <span className="font-semibold">Viewer</span>
                   </div>
                   <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">

@@ -445,6 +445,10 @@ function resolveSemanticVars(b: SiteSettings['branding']): Record<string, string
     vars['--danger'] = harmonized.danger
   }
 
+  if (!vars['--info']) {
+    vars['--info'] = '217 91% 60%'
+  }
+
   return vars
 }
 

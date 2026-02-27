@@ -1998,10 +1998,10 @@ export default function AffiliateSettingsPage() {
       </div>
 
       {stats.flaggedCount > 0 && (
-        <Card className="border-amber-500/50" data-testid="card-fraud-alerts">
+        <Card className="border-[hsl(var(--warning)/0.5)]" data-testid="card-fraud-alerts">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              <AlertTriangle className="h-4 w-4 text-[hsl(var(--warning))]" />
               Fraud Alerts ({stats.flaggedCount})
               <HelpTooltip text="Referrals automatically flagged by our fraud detection system. Common flags include self-referrals (affiliate referred themselves), same email domain (referred user shares the affiliate's email domain), and suspicious IP volume (many clicks from the same IP address). Review each flag and take action if needed." />
             </CardTitle>
@@ -2010,7 +2010,7 @@ export default function AffiliateSettingsPage() {
             <div className="space-y-2">
               {flaggedReferrals.slice(0, 5).map(ref => (
                 <div key={ref.id} className="flex items-center gap-2 p-2 rounded border text-sm cursor-pointer" data-testid={`fraud-alert-${ref.id}`} onClick={() => { setDetailItem(ref); setDetailType('flagged_referral') }}>
-                  <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                  <AlertTriangle className="h-3.5 w-3.5 text-[hsl(var(--warning))] shrink-0" />
                   <div className="flex-1">
                     {(Array.isArray(ref.fraud_flags) ? ref.fraud_flags : []).map(f => FRAUD_FLAG_LABELS[f] || f).join(', ')}
                   </div>
@@ -2067,7 +2067,7 @@ export default function AffiliateSettingsPage() {
                 <Card data-testid="health-active-affiliates">
                   <CardContent className="pt-4 pb-3">
                     <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-green-500" />
+                      <Users className="h-4 w-4 text-[hsl(var(--success))]" />
                       <span className="text-sm text-muted-foreground">Active</span>
                     </div>
                     <p className="text-2xl font-bold mt-1">{healthData.overview.activeAffiliates}</p>
@@ -2077,7 +2077,7 @@ export default function AffiliateSettingsPage() {
                 <Card data-testid="health-dormant-affiliates">
                   <CardContent className="pt-4 pb-3">
                     <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-amber-500" />
+                      <Clock className="h-4 w-4 text-[hsl(var(--warning))]" />
                       <span className="text-sm text-muted-foreground">Dormant</span>
                     </div>
                     <p className="text-2xl font-bold mt-1">{healthData.overview.dormantAffiliates}</p>
@@ -2087,7 +2087,7 @@ export default function AffiliateSettingsPage() {
                 <Card data-testid="health-net-roi">
                   <CardContent className="pt-4 pb-3">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-green-500" />
+                      <TrendingUp className="h-4 w-4 text-[hsl(var(--success))]" />
                       <span className="text-sm text-muted-foreground">Net ROI</span>
                       <HelpTooltip text="Total revenue from referred customers minus all commissions paid and pending. This is your net profit from the affiliate program." />
                     </div>
@@ -2098,7 +2098,7 @@ export default function AffiliateSettingsPage() {
                 <Card data-testid="health-conversion-rate">
                   <CardContent className="pt-4 pb-3">
                     <div className="flex items-center gap-2">
-                      <BarChart3 className="h-4 w-4 text-blue-500" />
+                      <BarChart3 className="h-4 w-4 text-[hsl(var(--info))]" />
                       <span className="text-sm text-muted-foreground">Conversion Rate</span>
                       <HelpTooltip text="The percentage of referral clicks that result in a paid customer signup." />
                     </div>
@@ -2120,15 +2120,15 @@ export default function AffiliateSettingsPage() {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Commissions paid</span>
-                      <span className="font-medium text-red-500">-${(healthData.revenue.totalCommissionsPaid / 100).toFixed(2)}</span>
+                      <span className="font-medium text-[hsl(var(--danger))]">-${(healthData.revenue.totalCommissionsPaid / 100).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Commissions pending</span>
-                      <span className="font-medium text-amber-500">-${(healthData.revenue.totalCommissionsPending / 100).toFixed(2)}</span>
+                      <span className="font-medium text-[hsl(var(--warning))]">-${(healthData.revenue.totalCommissionsPending / 100).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm border-t pt-2">
                       <span className="font-medium">Net profit from affiliates</span>
-                      <span className="font-bold text-green-600">${(healthData.revenue.netROI / 100).toFixed(2)}</span>
+                      <span className="font-bold text-[hsl(var(--success))]">${(healthData.revenue.netROI / 100).toFixed(2)}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -2171,7 +2171,7 @@ export default function AffiliateSettingsPage() {
                       <span className="font-medium">{healthData.growth.referralsThisMonth}</span>
                     </div>
                     {healthData.alerts.flaggedReferrals > 0 && (
-                      <div className="flex justify-between text-sm text-amber-500 border-t pt-2">
+                      <div className="flex justify-between text-sm text-[hsl(var(--warning))] border-t pt-2">
                         <span className="flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Flagged referrals</span>
                         <span className="font-medium">{healthData.alerts.flaggedReferrals}</span>
                       </div>
@@ -2204,7 +2204,7 @@ export default function AffiliateSettingsPage() {
                       </div>
                       <div className="text-center p-[var(--card-padding,1.25rem)] rounded border" data-testid="attr-affiliate-revenue">
                         <p className="text-xs text-muted-foreground mb-1">Affiliate Revenue</p>
-                        <p className="text-xl font-bold text-green-600 dark:text-green-400">${(revenueAttribution.affiliateRevenue / 100).toFixed(2)}</p>
+                        <p className="text-xl font-bold text-[hsl(var(--success))]">${(revenueAttribution.affiliateRevenue / 100).toFixed(2)}</p>
                         <p className="text-[10px] text-muted-foreground">{revenueAttribution.affiliatePercentage}% of total</p>
                       </div>
                       <div className="text-center p-[var(--card-padding,1.25rem)] rounded border" data-testid="attr-direct-revenue">
@@ -2225,14 +2225,14 @@ export default function AffiliateSettingsPage() {
                         </div>
                         <div className="w-full h-6 rounded-[var(--card-radius,0.75rem)] overflow-hidden flex bg-muted">
                           <div
-                            className="bg-green-500 dark:bg-green-600 h-full flex items-center justify-center text-[10px] font-medium text-white transition-all"
+                            className="bg-[hsl(var(--success))] h-full flex items-center justify-center text-[10px] font-medium text-white transition-all"
                             style={{ width: `${Math.max(revenueAttribution.affiliatePercentage, 2)}%` }}
                             data-testid="attr-bar-affiliate"
                           >
                             {revenueAttribution.affiliatePercentage > 8 ? `${revenueAttribution.affiliatePercentage}%` : ''}
                           </div>
                           <div
-                            className="bg-blue-500 dark:bg-blue-600 h-full flex items-center justify-center text-[10px] font-medium text-white transition-all"
+                            className="bg-[hsl(var(--info))] h-full flex items-center justify-center text-[10px] font-medium text-white transition-all"
                             style={{ width: `${Math.max(100 - revenueAttribution.affiliatePercentage, 2)}%` }}
                             data-testid="attr-bar-direct"
                           >
@@ -2241,11 +2241,11 @@ export default function AffiliateSettingsPage() {
                         </div>
                         <div className="flex items-center gap-[var(--content-density-gap,1rem)] text-xs">
                           <div className="flex items-center gap-1.5">
-                            <span className="w-2.5 h-2.5 rounded-sm bg-green-500 dark:bg-green-600" />
+                            <span className="w-2.5 h-2.5 rounded-sm bg-[hsl(var(--success))]" />
                             <span className="text-muted-foreground">Affiliate</span>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="w-2.5 h-2.5 rounded-sm bg-blue-500 dark:bg-blue-600" />
+                            <span className="w-2.5 h-2.5 rounded-sm bg-[hsl(var(--info))]" />
                             <span className="text-muted-foreground">Direct</span>
                           </div>
                         </div>
@@ -2971,7 +2971,7 @@ export default function AffiliateSettingsPage() {
                               <div className="flex items-center gap-1.5">
                                 <p className="font-medium truncate">{m.name || m.email}</p>
                                 <span
-                                  className={`inline-block w-2 h-2 rounded-full shrink-0 ${health.color === 'green' ? 'bg-green-500' : health.color === 'yellow' ? 'bg-amber-500' : 'bg-red-500'}`}
+                                  className={`inline-block w-2 h-2 rounded-full shrink-0 ${health.color === 'green' ? 'bg-[hsl(var(--success))]' : health.color === 'yellow' ? 'bg-[hsl(var(--warning))]' : 'bg-[hsl(var(--danger))]'}`}
                                   title={health.label}
                                   data-testid={`health-indicator-${m.userId}`}
                                 />
@@ -3034,7 +3034,7 @@ export default function AffiliateSettingsPage() {
                                 data-testid={`button-suspend-member-${m.userId}`}
                                 title={m.suspended ? 'Unsuspend' : 'Suspend'}
                               >
-                                {suspendingMember === m.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : m.suspended ? <CheckCircle className="h-4 w-4 text-green-600" /> : <AlertTriangle className="h-4 w-4 text-amber-500" />}
+                                {suspendingMember === m.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : m.suspended ? <CheckCircle className="h-4 w-4 text-[hsl(var(--success))]" /> : <AlertTriangle className="h-4 w-4 text-[hsl(var(--warning))]" />}
                               </Button>
                               <Button
                                 variant="ghost"
@@ -3178,13 +3178,13 @@ export default function AffiliateSettingsPage() {
                             {(() => {
                               const earned = members.filter(m => m.isAffiliate && m.referrals >= ms.referral_threshold).length
                               return (
-                                <p className={`text-xs mt-0.5 ${earned > 0 ? 'text-green-600' : 'text-muted-foreground'}`} data-testid={`text-milestone-earned-${ms.id}`}>
+                                <p className={`text-xs mt-0.5 ${earned > 0 ? 'text-[hsl(var(--success))]' : 'text-muted-foreground'}`} data-testid={`text-milestone-earned-${ms.id}`}>
                                   {earned} affiliate{earned !== 1 ? 's' : ''} earned
                                 </p>
                               )
                             })()}
                           </div>
-                          <Badge variant={ms.is_active ? 'default' : 'outline'} className={ms.is_active ? 'text-xs bg-green-500/10 text-green-700 border-green-500/30' : 'text-xs'}>{ms.is_active ? 'Active' : 'Inactive'}</Badge>
+                          <Badge variant={ms.is_active ? 'default' : 'outline'} className={ms.is_active ? 'text-xs bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))] border-[hsl(var(--success)/0.3)]' : 'text-xs'}>{ms.is_active ? 'Active' : 'Inactive'}</Badge>
                         </div>
                         <div className="flex items-center gap-1">
                           <Button variant="ghost" size="sm" onClick={(e) => {
@@ -3537,8 +3537,8 @@ export default function AffiliateSettingsPage() {
                             </div>
                             {c.status === 'completed' && c.winner_user_id && (
                               <div className="flex items-center gap-1 mt-1" data-testid={`text-contest-winner-${c.id}`}>
-                                <Trophy className="h-3 w-3 text-amber-500" />
-                                <span className="text-xs font-medium text-amber-600">
+                                <Trophy className="h-3 w-3 text-[hsl(var(--warning))]" />
+                                <span className="text-xs font-medium text-[hsl(var(--warning))]">
                                   Winner: {members.find(m => m.userId === c.winner_user_id)?.email || c.winner_user_id}
                                 </span>
                               </div>
@@ -3659,7 +3659,7 @@ export default function AffiliateSettingsPage() {
                       <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <Badge variant={b.status === 'pending' ? 'outline' : b.status === 'rejected' ? 'destructive' : 'default'} className={`text-xs capitalize ${b.status === 'approved' || b.status === 'completed' ? 'bg-green-600' : ''}`}>
+                            <Badge variant={b.status === 'pending' ? 'outline' : b.status === 'rejected' ? 'destructive' : 'default'} className={`text-xs capitalize ${b.status === 'approved' || b.status === 'completed' ? 'bg-[hsl(var(--success))]' : ''}`}>
                               {b.status}
                             </Badge>
                             <span className="text-sm font-medium">${((b.total_amount_cents || 0) / 100).toFixed(2)}</span>
@@ -3728,7 +3728,7 @@ export default function AffiliateSettingsPage() {
                     <Card>
                       <CardContent className="pt-4 pb-3">
                         <div className="flex items-center gap-2 mb-1">
-                          <Mail className="h-4 w-4 text-green-500" />
+                          <Mail className="h-4 w-4 text-[hsl(var(--success))]" />
                           <span className="text-sm font-medium">Receipt Emails Sent</span>
                         </div>
                         <p className="text-sm text-muted-foreground" data-testid="text-receipt-result">

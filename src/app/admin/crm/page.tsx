@@ -24,17 +24,17 @@ interface Contact {
 
 const TYPE_COLORS: Record<string, string> = {
   Subscriber: 'bg-primary/10 text-primary',
-  Affiliate: 'bg-green-500/10 text-green-600 dark:text-green-400',
-  Team: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  Affiliate: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
+  Team: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
 }
 
 const TAG_COLORS: Record<string, string> = {
   gray: 'bg-muted text-muted-foreground',
   blue: 'bg-primary/10 text-primary',
-  green: 'bg-green-500/10 text-green-600 dark:text-green-400',
+  green: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
   red: 'bg-destructive/10 text-destructive',
-  amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  purple: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+  amber: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
+  purple: 'bg-primary/10 text-primary',
 }
 
 function formatCurrency(cents: number) {
@@ -53,14 +53,14 @@ function formatRelativeTime(dateStr: string | null) {
 }
 
 function healthColor(score: number) {
-  if (score >= 60) return 'text-green-600 dark:text-green-400'
-  if (score >= 30) return 'text-amber-600 dark:text-amber-400'
+  if (score >= 60) return 'text-[hsl(var(--success))]'
+  if (score >= 30) return 'text-[hsl(var(--warning))]'
   return 'text-destructive'
 }
 
 function healthDot(score: number) {
-  if (score >= 60) return 'bg-green-500'
-  if (score >= 30) return 'bg-amber-500'
+  if (score >= 60) return 'bg-[hsl(var(--success))]'
+  if (score >= 30) return 'bg-[hsl(var(--warning))]'
   return 'bg-destructive'
 }
 
@@ -297,7 +297,7 @@ export default function CRMPage() {
                     </td>
                     <td className="py-3 px-4 text-right font-medium tabular-nums">{formatCurrency(contact.total_revenue)}</td>
                     <td className="py-3 px-4 text-center">
-                      <span className={`inline-block h-2 w-2 rounded-full ${contact.status === 'active' ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
+                      <span className={`inline-block h-2 w-2 rounded-full ${contact.status === 'active' ? 'bg-[hsl(var(--success))]' : 'bg-muted-foreground/30'}`} />
                     </td>
                     <td className="py-3 px-4 text-muted-foreground text-xs">{formatRelativeTime(contact.last_active)}</td>
                     <td className="py-3 px-4 text-center">

@@ -274,10 +274,10 @@ export default function EmailTemplatesPage() {
         </Button>
       </div>
 
-      <Card className="bg-blue-500/10 border-blue-500/20">
+      <Card className="bg-[hsl(var(--info)/0.1)] border-[hsl(var(--info)/0.2)]">
         <CardContent className="pt-6">
           <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
-            <Info className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
+            <Info className="h-5 w-5 text-[hsl(var(--info))] mt-0.5 shrink-0" />
             <div className="text-sm">
               <p className="font-medium mb-2">Available Variables</p>
               <div className="flex flex-wrap gap-2">
@@ -510,7 +510,7 @@ export default function EmailTemplatesPage() {
                         onClick={() => insertVariable(v.name)}
                         data-testid={`variable-${v.name.replace(/[{}]/g, '')}`}
                       >
-                        <code className="bg-background px-1.5 py-0.5 rounded text-primary-600 dark:text-primary-400">{v.name}</code>
+                        <code className="bg-background px-1.5 py-0.5 rounded text-primary">{v.name}</code>
                         <span className="text-muted-foreground truncate">{v.description}</span>
                       </div>
                     ))}

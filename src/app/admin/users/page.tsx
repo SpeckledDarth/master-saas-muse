@@ -463,7 +463,7 @@ export default function UsersPage() {
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                       {user.has_subscription ? (
-                        <Badge variant="outline" className="text-green-600 border-green-600" data-testid={`badge-plan-${user.id}`}>
+                        <Badge variant="outline" className="text-[hsl(var(--success))] border-[hsl(var(--success))]" data-testid={`badge-plan-${user.id}`}>
                           <CreditCard className="h-3 w-3 mr-1" />
                           Subscribed
                         </Badge>
@@ -476,12 +476,12 @@ export default function UsersPage() {
                     <TableCell className="hidden md:table-cell">
                       <div className="flex items-center gap-2">
                         {user.email_confirmed_at ? (
-                          <Badge variant="outline" className="text-green-600 border-green-600">
+                          <Badge variant="outline" className="text-[hsl(var(--success))] border-[hsl(var(--success))]">
                             <CheckCircle className="h-3 w-3 mr-1" />
                             Verified
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+                          <Badge variant="outline" className="text-[hsl(var(--warning))] border-[hsl(var(--warning))]">
                             <XCircle className="h-3 w-3 mr-1" />
                             Pending
                           </Badge>

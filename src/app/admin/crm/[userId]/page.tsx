@@ -13,36 +13,36 @@ import { EntityNotes } from '@/components/admin/entity-notes'
 
 const TYPE_COLORS: Record<string, string> = {
   Subscriber: 'bg-primary/10 text-primary',
-  Affiliate: 'bg-green-500/10 text-green-600 dark:text-green-400',
-  Team: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  Affiliate: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
+  Team: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
 }
 
 const TAG_COLORS: Record<string, string> = {
   gray: 'bg-muted text-muted-foreground',
   blue: 'bg-primary/10 text-primary',
-  green: 'bg-green-500/10 text-green-600 dark:text-green-400',
+  green: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
   red: 'bg-destructive/10 text-destructive',
-  amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  purple: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+  amber: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
+  purple: 'bg-primary/10 text-primary',
 }
 
 const TAG_COLOR_OPTIONS = ['gray', 'blue', 'green', 'red', 'amber', 'purple']
 
 const TX_TYPE_COLORS: Record<string, string> = {
   invoice: 'bg-primary/10 text-primary',
-  payment: 'bg-green-500/10 text-green-600 dark:text-green-400',
-  commission: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  payout: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+  payment: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
+  commission: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
+  payout: 'bg-primary/10 text-primary',
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  paid: 'bg-green-500/10 text-green-600 dark:text-green-400',
-  open: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  paid: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
+  open: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
+  pending: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
   failed: 'bg-destructive/10 text-destructive',
   void: 'bg-muted text-muted-foreground',
   uncollectible: 'bg-destructive/10 text-destructive',
-  approved: 'bg-green-500/10 text-green-600 dark:text-green-400',
+  approved: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
   closed: 'bg-muted text-muted-foreground',
 }
 
@@ -62,14 +62,14 @@ function formatDateTime(dateStr: string) {
 }
 
 function healthColor(score: number) {
-  if (score >= 60) return 'text-green-600 dark:text-green-400'
-  if (score >= 30) return 'text-amber-600 dark:text-amber-400'
+  if (score >= 60) return 'text-[hsl(var(--success))]'
+  if (score >= 30) return 'text-[hsl(var(--warning))]'
   return 'text-destructive'
 }
 
 function healthDot(score: number) {
-  if (score >= 60) return 'bg-green-500'
-  if (score >= 30) return 'bg-amber-500'
+  if (score >= 60) return 'bg-[hsl(var(--success))]'
+  if (score >= 30) return 'bg-[hsl(var(--warning))]'
   return 'bg-destructive'
 }
 
@@ -559,7 +559,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                       {ticket.priority && (
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium capitalize ${
                           ticket.priority === 'high' || ticket.priority === 'urgent' ? 'bg-destructive/10 text-destructive' :
-                          ticket.priority === 'medium' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
+                          ticket.priority === 'medium' ? 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]' :
                           'bg-muted text-muted-foreground'
                         }`}>
                           {ticket.priority}

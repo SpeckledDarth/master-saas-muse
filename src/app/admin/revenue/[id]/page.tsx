@@ -10,13 +10,13 @@ import { EntityNotes } from '@/components/admin/entity-notes'
 import { RelatedRecords } from '@/components/admin/related-records'
 
 const STATUS_COLORS: Record<string, string> = {
-  paid: 'bg-green-500/10 text-green-600 dark:text-green-400',
-  open: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  paid: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
+  open: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
+  pending: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
   failed: 'bg-destructive/10 text-destructive',
   void: 'bg-muted text-muted-foreground',
-  approved: 'bg-green-500/10 text-green-600 dark:text-green-400',
-  completed: 'bg-green-500/10 text-green-600 dark:text-green-400',
+  approved: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
+  completed: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
   processing: 'bg-primary/10 text-primary',
 }
 
@@ -354,9 +354,9 @@ export default function RevenueDetailPage({ params }: { params: Promise<{ id: st
         </Button>
         <div className="flex items-center gap-2">
           {data.type === 'invoice' && <Receipt className="h-5 w-5 text-primary" />}
-          {data.type === 'payment' && <CreditCard className="h-5 w-5 text-green-600 dark:text-green-400" />}
-          {data.type === 'commission' && <DollarSign className="h-5 w-5 text-amber-600 dark:text-amber-400" />}
-          {data.type === 'payout' && <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />}
+          {data.type === 'payment' && <CreditCard className="h-5 w-5 text-[hsl(var(--success))]" />}
+          {data.type === 'commission' && <DollarSign className="h-5 w-5 text-[hsl(var(--warning))]" />}
+          {data.type === 'payout' && <Users className="h-5 w-5 text-primary" />}
           <span className="text-sm text-muted-foreground capitalize">{data.type}</span>
         </div>
       </div>

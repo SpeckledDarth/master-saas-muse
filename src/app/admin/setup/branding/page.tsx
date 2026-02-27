@@ -20,11 +20,11 @@ export default function BrandingPage() {
 
   return (
     <div className="space-y-[var(--content-density-gap,1rem)]">
-      <Card className="bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
+      <Card className="bg-[hsl(var(--info)/0.1)] border-[hsl(var(--info)/0.3)]">
         <CardHeader>
-          <CardTitle className="text-blue-800 dark:text-blue-300">Branding & Hero Tips</CardTitle>
+          <CardTitle className="text-[hsl(var(--info))]">Branding & Hero Tips</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-blue-700 dark:text-blue-400 space-y-2">
+        <CardContent className="text-sm text-[hsl(var(--info))] space-y-2">
           <p><strong>Hero Styles:</strong> Choose from 5 styles - Full Width Background (default), Split Layout, Video Background, Pattern/Texture, or Floating Mockup.</p>
           <p><strong>Animated Words:</strong> Add 2+ comma-separated words (e.g., "fast, secure, reliable") to create a cycling animation after your app name. Click outside the field to save.</p>
           <p><strong>Video Hero:</strong> Paste a YouTube embed URL, Vimeo URL, or direct .mp4 link. The video replaces the static image and plays automatically (muted, looping).</p>
@@ -629,8 +629,8 @@ export default function BrandingPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-[var(--content-density-gap,1rem)]">
-          <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
-            <p className="text-sm text-blue-700 dark:text-blue-400">
+          <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] bg-[hsl(var(--info)/0.1)] border border-[hsl(var(--info)/0.3)]">
+            <p className="text-sm text-[hsl(var(--info))]">
               <strong>How it works:</strong> Each link you add here will appear in the header navigation bar. 
               Use the toggle to show/hide links. Add badges like "New" or "Beta" to highlight new features. 
               Common links include: Pricing, About, Contact, Blog, Features.

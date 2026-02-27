@@ -378,7 +378,7 @@ function CollapsibleGroup({ group, iconMap, onSaved }: { group: IntegrationGroup
           {group.keys.map((k) => (
             <CircleDot
               key={k.id}
-              className={`h-2.5 w-2.5 ${k.configured ? 'text-green-500' : k.required ? 'text-destructive' : 'text-muted-foreground/40'}`}
+              className={`h-2.5 w-2.5 ${k.configured ? 'text-[hsl(var(--success))]' : k.required ? 'text-destructive' : 'text-muted-foreground/40'}`}
             />
           ))}
         </div>

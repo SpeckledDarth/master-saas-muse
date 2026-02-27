@@ -9,14 +9,14 @@ import { EntityNotes } from '@/components/admin/entity-notes'
 import { RelatedRecords } from '@/components/admin/related-records'
 
 const STATUS_COLORS: Record<string, string> = {
-  active: 'bg-green-500/10 text-green-600 dark:text-green-400',
+  active: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
   trialing: 'bg-primary/10 text-primary',
   canceled: 'bg-muted text-muted-foreground',
   past_due: 'bg-destructive/10 text-destructive',
-  incomplete: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  paid: 'bg-green-500/10 text-green-600 dark:text-green-400',
-  open: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  incomplete: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
+  paid: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
+  open: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
+  pending: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
   failed: 'bg-destructive/10 text-destructive',
 }
 

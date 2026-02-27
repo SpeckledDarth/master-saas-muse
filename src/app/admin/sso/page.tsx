@@ -161,10 +161,10 @@ export default function SSODashboard() {
       </div>
 
       {warning && (
-        <Card className="mb-[var(--content-density-gap,1rem)] border-yellow-500/50">
+        <Card className="mb-[var(--content-density-gap,1rem)] border-[hsl(var(--warning)/0.5)]">
           <CardContent className="pt-4 pb-4">
             <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
-              <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 shrink-0" />
+              <AlertTriangle className="h-5 w-5 text-[hsl(var(--warning))] mt-0.5 shrink-0" />
               <p className="text-sm" data-testid="text-sso-warning">{warning}</p>
             </div>
           </CardContent>

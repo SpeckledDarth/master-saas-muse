@@ -194,13 +194,13 @@ export default function TestimonialsPage() {
         </Card>
         <Card>
           <CardContent className="pt-6 text-center">
-            <div className="text-3xl font-bold text-green-600" data-testid="text-approved-count">{approvedCount}</div>
+            <div className="text-3xl font-bold text-[hsl(var(--success))]" data-testid="text-approved-count">{approvedCount}</div>
             <p className="text-sm text-muted-foreground">Approved</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6 text-center">
-            <div className="text-3xl font-bold text-yellow-600" data-testid="text-featured-count">{featuredCount}</div>
+            <div className="text-3xl font-bold text-[hsl(var(--warning))]" data-testid="text-featured-count">{featuredCount}</div>
             <p className="text-sm text-muted-foreground">Featured</p>
           </CardContent>
         </Card>
@@ -345,7 +345,7 @@ export default function TestimonialsPage() {
           {testimonials.map(t => {
             const initials = t.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
             return (
-              <Card key={t.id} className={`${t.featured ? 'border-yellow-400 dark:border-yellow-600' : ''}`} data-testid={`card-testimonial-${t.id}`}>
+              <Card key={t.id} className={`${t.featured ? 'border-[hsl(var(--warning))]' : ''}`} data-testid={`card-testimonial-${t.id}`}>
                 <CardContent className="py-4">
                   <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
                     <Avatar className="h-12 w-12 flex-shrink-0">
@@ -362,7 +362,7 @@ export default function TestimonialsPage() {
                           {t.status}
                         </Badge>
                         {t.featured && (
-                          <Badge variant="outline" className="text-xs border-yellow-400 text-yellow-600">
+                          <Badge variant="outline" className="text-xs border-[hsl(var(--warning))] text-[hsl(var(--warning))]">
                             <Star className="h-3 w-3 mr-1 fill-current" />
                             Featured
                           </Badge>
@@ -372,7 +372,7 @@ export default function TestimonialsPage() {
                       {t.rating && (
                         <div className="flex gap-0.5 mt-1">
                           {Array.from({ length: 5 }).map((_, i) => (
-                            <Star key={i} className={`h-3 w-3 ${i < t.rating! ? 'text-yellow-500 fill-current' : 'text-gray-300'}`} />
+                            <Star key={i} className={`h-3 w-3 ${i < t.rating! ? 'text-[hsl(var(--warning))] fill-current' : 'text-muted-foreground'}`} />
                           ))}
                         </div>
                       )}
@@ -380,19 +380,19 @@ export default function TestimonialsPage() {
                     <div className="flex items-center gap-1 flex-shrink-0">
                       {t.status !== 'approved' && (
                         <Button size="icon" variant="ghost" onClick={() => handleToggleStatus(t, 'approved')} title="Approve" data-testid={`button-approve-${t.id}`}>
-                          <Check className="h-4 w-4 text-green-600" />
+                          <Check className="h-4 w-4 text-[hsl(var(--success))]" />
                         </Button>
                       )}
                       {t.status === 'approved' && (
                         <Button size="icon" variant="ghost" onClick={() => handleToggleFeatured(t)} title={t.featured ? 'Unfeature' : 'Feature'} data-testid={`button-feature-${t.id}`}>
-                          <Star className={`h-4 w-4 ${t.featured ? 'text-yellow-500 fill-current' : 'text-gray-400'}`} />
+                          <Star className={`h-4 w-4 ${t.featured ? 'text-[hsl(var(--warning))] fill-current' : 'text-muted-foreground'}`} />
                         </Button>
                       )}
                       <Button size="icon" variant="ghost" onClick={() => handleEdit(t)} title="Edit" data-testid={`button-edit-${t.id}`}>
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button size="icon" variant="ghost" onClick={() => handleDelete(t.id)} title="Delete" data-testid={`button-delete-${t.id}`}>
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                        <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
                   </div>

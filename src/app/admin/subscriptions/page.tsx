@@ -9,11 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Search, Download, ChevronLeft, ChevronRight, CreditCard, AlertTriangle } from 'lucide-react'
 
 const STATUS_COLORS: Record<string, string> = {
-  active: 'bg-green-500/10 text-green-600 dark:text-green-400',
+  active: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
   trialing: 'bg-primary/10 text-primary',
   canceled: 'bg-muted text-muted-foreground',
   past_due: 'bg-destructive/10 text-destructive',
-  incomplete: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  incomplete: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
 }
 
 function formatCurrency(cents: number) {
@@ -145,7 +145,7 @@ export default function SubscriptionsPage() {
         </div>
         <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-mrr">
           <p className="text-xs text-muted-foreground mb-1">Monthly Recurring Revenue</p>
-          <p className="text-lg font-bold text-green-600 dark:text-green-400">{formatCurrency(summary.mrr)}</p>
+          <p className="text-lg font-bold text-[hsl(var(--success))]">{formatCurrency(summary.mrr)}</p>
         </div>
         <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-churn-risk">
           <p className="text-xs text-muted-foreground mb-1">Churn Risk</p>

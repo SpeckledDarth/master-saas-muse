@@ -10,21 +10,21 @@ import { Loader2, Search, Download, ChevronLeft, ChevronRight, DollarSign } from
 
 const TX_TYPE_COLORS: Record<string, string> = {
   invoice: 'bg-primary/10 text-primary',
-  payment: 'bg-green-500/10 text-green-600 dark:text-green-400',
-  commission: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  payout: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+  payment: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
+  commission: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
+  payout: 'bg-primary/10 text-primary',
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  paid: 'bg-green-500/10 text-green-600 dark:text-green-400',
-  open: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  paid: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
+  open: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
+  pending: 'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]',
   failed: 'bg-destructive/10 text-destructive',
   void: 'bg-muted text-muted-foreground',
   uncollectible: 'bg-destructive/10 text-destructive',
-  approved: 'bg-green-500/10 text-green-600 dark:text-green-400',
+  approved: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
   processing: 'bg-primary/10 text-primary',
-  completed: 'bg-green-500/10 text-green-600 dark:text-green-400',
+  completed: 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]',
 }
 
 function formatCurrency(cents: number) {
@@ -153,15 +153,15 @@ export default function RevenuePage() {
       <div className="grid grid-cols-3 gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
         <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-total-revenue">
           <p className="text-xs text-muted-foreground mb-1">Total Revenue</p>
-          <p className="text-lg font-bold text-green-600 dark:text-green-400">{formatCurrency(summary.totalRevenue)}</p>
+          <p className="text-lg font-bold text-[hsl(var(--success))]">{formatCurrency(summary.totalRevenue)}</p>
         </div>
         <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-pending-commissions">
           <p className="text-xs text-muted-foreground mb-1">Pending Commissions</p>
-          <p className="text-lg font-bold text-amber-600 dark:text-amber-400">{formatCurrency(summary.pendingCommissions)}</p>
+          <p className="text-lg font-bold text-[hsl(var(--warning))]">{formatCurrency(summary.pendingCommissions)}</p>
         </div>
         <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-outstanding-payouts">
           <p className="text-xs text-muted-foreground mb-1">Outstanding Payouts</p>
-          <p className="text-lg font-bold text-purple-600 dark:text-purple-400">{formatCurrency(summary.outstandingPayouts)}</p>
+          <p className="text-lg font-bold text-primary">{formatCurrency(summary.outstandingPayouts)}</p>
         </div>
       </div>
 

@@ -637,7 +637,38 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 **No new DB tables or Supabase migrations needed.**
 
 **Pending items for next session:**
-- Fix remaining hardcoded color violations (121 instances across 21 admin pages) — separate from spacing enforcement
+- ~~Fix remaining hardcoded color violations (121 instances across 21 admin pages)~~ **DONE** — see session below
+- Seed data for dashboard tables
+- Verify on Vercel after push
+
+---
+
+### Session — February 27, 2026 (Color Violation Fixes)
+
+**What was accomplished:**
+
+1. **Fixed all 121 hardcoded color violations across 21 admin pages** — Replaced every instance of hardcoded Tailwind color classes with design system semantic tokens:
+   - `text-green-*` / `bg-green-*` → `text-[hsl(var(--success))]` / `bg-[hsl(var(--success))]`
+   - `text-amber-*` / `text-yellow-*` → `text-[hsl(var(--warning))]`
+   - `text-red-*` → `text-[hsl(var(--danger))]` or `text-destructive`
+   - `text-blue-*` / `bg-blue-*` → `text-[hsl(var(--info))]` or `text-primary`
+   - `text-purple-*` → `text-primary`
+   - `text-orange-*` → `text-[hsl(var(--warning))]`
+   - `text-gray-*` → `text-muted-foreground`
+   - Removed redundant `dark:` variants (CSS variables handle both modes automatically)
+
+2. **Added `--info` CSS variable** — New semantic token `--info: 217 91% 60%` (blue) added to `globals.css` and `use-settings.ts` for informational UI elements (tips, info cards, neutral highlights).
+
+3. **Verification:** Zero hardcoded color violations AND zero hardcoded spacing violations remain across all admin pages. Dev server compiles clean.
+
+**Files modified:**
+- 21 admin page files (color replacements)
+- `src/app/globals.css` (added `--info` variable)
+- `src/hooks/use-settings.ts` (added `--info` default)
+
+**No new DB tables or Supabase migrations needed.**
+
+**Pending items for next session:**
 - Seed data for dashboard tables
 - Verify on Vercel after push
 

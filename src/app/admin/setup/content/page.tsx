@@ -35,11 +35,11 @@ export default function ContentPage() {
 
   return (
     <div className="space-y-[var(--content-density-gap,1rem)]">
-      <Card className="bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
+      <Card className="bg-[hsl(var(--info)/0.1)] border-[hsl(var(--info)/0.3)]">
         <CardHeader>
-          <CardTitle className="text-blue-800 dark:text-blue-300">Quick Tips for Homepage Sections</CardTitle>
+          <CardTitle className="text-[hsl(var(--info))]">Quick Tips for Homepage Sections</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-blue-700 dark:text-blue-400 space-y-2">
+        <CardContent className="text-sm text-[hsl(var(--info))] space-y-2">
           <p><strong>Enable/Disable:</strong> Use the toggle switch on each section card to show or hide it on your homepage.</p>
           <p><strong>Section Order:</strong> Sections appear on the homepage in this order: Hero → Logo Marquee → Metrics → Features → Testimonials → Process Steps → Customer Stories → Image+Text Blocks → FAQ → CTA.</p>
           <p><strong>Backgrounds:</strong> Scroll down to "Section Backgrounds" to customize each section's look (transparent, muted, gradient, or mesh).</p>
@@ -611,9 +611,9 @@ export default function ContentPage() {
                     </Button>
                   </div>
                   <div className="space-y-2">
-                    <div className="rounded-[var(--card-radius,0.75rem)] bg-primary-50 dark:bg-primary-950 p-[var(--card-padding,1.25rem)] text-center mb-2" data-testid={`metric-preview-${index}`}>
+                    <div className="rounded-[var(--card-radius,0.75rem)] bg-primary/10 p-[var(--card-padding,1.25rem)] text-center mb-2" data-testid={`metric-preview-${index}`}>
                       <div className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Preview</div>
-                      <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                      <div className="text-2xl font-bold text-primary">
                         {metric.prefix || ''}{metric.value || '0'}{metric.suffix || ''}
                       </div>
                       <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mt-1">
@@ -782,7 +782,7 @@ export default function ContentPage() {
             <div className="space-y-3">
               {(settings.content?.processSteps || []).map((step, index) => (
                 <div key={step.id} className="flex gap-[var(--content-density-gap,1rem)] items-start p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/30">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-600 dark:bg-primary-400 text-white dark:text-black font-bold text-sm shrink-0">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm shrink-0">
                     {step.number}
                   </div>
                   <div className="flex-1 space-y-2">

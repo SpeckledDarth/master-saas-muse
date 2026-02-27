@@ -205,12 +205,12 @@ export default function QueueDashboard() {
       {metrics && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-[var(--content-density-gap,1rem)] mb-8">
           {[
-            { label: 'Waiting', value: metrics.waiting, icon: Clock, color: 'text-yellow-500' },
-            { label: 'Active', value: metrics.active, icon: Activity, color: 'text-blue-500' },
-            { label: 'Completed', value: metrics.completed, icon: CheckCircle2, color: 'text-green-500' },
-            { label: 'Failed', value: metrics.failed, icon: XCircle, color: 'text-red-500' },
-            { label: 'Delayed', value: metrics.delayed, icon: Pause, color: 'text-orange-500' },
-            { label: 'Paused', value: metrics.paused, icon: Pause, color: 'text-gray-500' },
+            { label: 'Waiting', value: metrics.waiting, icon: Clock, color: 'text-[hsl(var(--warning))]' },
+            { label: 'Active', value: metrics.active, icon: Activity, color: 'text-[hsl(var(--info))]' },
+            { label: 'Completed', value: metrics.completed, icon: CheckCircle2, color: 'text-[hsl(var(--success))]' },
+            { label: 'Failed', value: metrics.failed, icon: XCircle, color: 'text-destructive' },
+            { label: 'Delayed', value: metrics.delayed, icon: Pause, color: 'text-[hsl(var(--warning))]' },
+            { label: 'Paused', value: metrics.paused, icon: Pause, color: 'text-muted-foreground' },
           ].map(({ label, value, icon: Icon, color }) => (
             <Card key={label}>
               <CardContent className="pt-4 pb-4">
@@ -270,7 +270,7 @@ export default function QueueDashboard() {
                       <span>Attempts: {job.attemptsMade}</span>
                     </div>
                     {job.failedReason && (
-                      <p className="text-xs text-red-500 mt-1 truncate">{job.failedReason}</p>
+                      <p className="text-xs text-destructive mt-1 truncate">{job.failedReason}</p>
                     )}
                   </div>
                   {jobFilter === 'failed' && (
