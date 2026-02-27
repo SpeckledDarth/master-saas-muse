@@ -1,6 +1,6 @@
 # PassivePost — Complete Feature Inventory
 
-> **Last Updated:** February 26, 2026
+> **Last Updated:** February 27, 2026
 
 PassivePost is a closed-loop business intelligence platform for content creators. This document is a complete inventory of every feature that has been built, organized by system. Each feature includes a plain-English description and the value it provides to users, administrators, or the business.
 
@@ -418,8 +418,9 @@ A comprehensive, admin-configurable design system that controls all visual styli
 | **CSS Variable Pipeline** | All 76 settings are injected as CSS variables or data attributes by `useThemeFromSettings`. Components read these variables and update in real-time when settings change. | Live preview — admins see changes instantly in the palette page without page refresh. |
 | **Component Integration** | Card (5 vars), Button (4 vars), Badge (1 var), Input (1 var), Table (2 vars), Toast (position + radius) all consume CSS variables. | Every shared UI component across all dashboards automatically updates when design settings change. |
 | **Chart Configuration Hook** | `useChartConfig()` returns Recharts-compatible props (barSize, barRadius, lineWidth, colors, etc.) derived from design settings. | All data visualizations stay consistent with the design system and update when settings change. |
-| **Semantic Color Tokens** | `--success`, `--warning`, `--danger` configurable from palette page. All status indicators, badges, and alerts use these tokens instead of hardcoded colors. | Changing one semantic color updates every status indicator across the entire affiliate dashboard (9 files audited). |
-| **Palette-Aware Color Audit** | Zero hardcoded Tailwind color classes (`text-red-600`, `bg-blue-500`, etc.) in the affiliate dashboard. All replaced with CSS variable equivalents. | Admin color changes propagate everywhere — no orphaned hardcoded colors that ignore the palette. |
+| **Semantic Color Tokens** | `--success`, `--warning`, `--danger`, `--info` configurable from palette page. All status indicators, badges, alerts, and info cards use these tokens instead of hardcoded colors. | Changing one semantic color updates every status indicator across all dashboards (32+ admin files, 9 affiliate files audited). |
+| **Palette-Aware Color Audit** | Zero hardcoded Tailwind color classes (`text-red-600`, `bg-blue-500`, etc.) across all 32+ admin pages. All replaced with CSS variable equivalents. Zero hardcoded spacing classes (`p-6`, `gap-4`, `rounded-lg`, `shadow-sm`) — all use CSS variables with fallbacks. | Admin color and spacing changes propagate everywhere — no orphaned hardcoded values that ignore the palette. |
+| **DS Wrapper Components** | `DSCard`, `DSCardHeader`, `DSCardContent` (auto-apply card padding/radius/shadow/border), `DSGrid` (auto-apply content density gap with responsive column props), `DSSection` (auto-apply section spacing). | Developers use these instead of thinking about CSS variable names — the wrappers handle it automatically. |
 | **Dark Mode Control** | Three options: user-choice (shows toggle), force-light, force-dark. Theme toggle auto-hides when forced. Dark card depth and accent brightness configurable. | Admins decide whether users can toggle dark mode or if the brand enforces a specific mode. |
 | **Scroll-to-Top Button** | Floating button appears after 400px scroll, respects `scrollToTopButton` setting. Smooth scroll configurable. | Toggleable UX enhancement for long pages. |
 | **Reduced Motion Support** | Respects `prefers-reduced-motion` media query and admin toggle. Disables transitions and animations for users who need it. | Accessibility compliance — users with motion sensitivity get a comfortable experience. |
@@ -433,9 +434,13 @@ A comprehensive, admin-configurable design system that controls all visual styli
 - `src/lib/design-presets.ts` — 4 presets + export/import utilities
 - `src/app/globals.css` — CSS variable defaults, typography, print styles, animations
 - `src/components/admin/palette/design-system-sections.tsx` — Admin UI (16 sections)
+- `src/components/ui/ds-card.tsx` — DSCard wrapper component
+- `src/components/ui/ds-grid.tsx` — DSGrid wrapper component
+- `src/components/ui/ds-section.tsx` — DSSection wrapper component
 - `src/components/scroll-to-top.tsx` — Scroll-to-top component
 - `src/components/theme-toggle.tsx` — Dark mode toggle (respects darkModeOption)
 - `src/app/layout.tsx` — FOUC prevention inline script
+- `docs/DESIGN_SYSTEM_RULES.md` — Mandatory styling reference (CSS variable mapping, Never/Always rules)
 
 **No database changes.** All settings stored in the existing `site_settings.branding` JSON column.
 

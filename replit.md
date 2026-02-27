@@ -82,7 +82,7 @@ These rules apply to EVERY session, EVERY feature, no exceptions:
 
 ### Document System
 
-The project uses multiple planning documents that serve different purposes. **Never merge them.**
+The `docs/` folder contains exactly 5 active documents. **Never merge them.** Additional reference docs (musekit guides, passivepost guides, completed blueprints, testing plans) are archived in `docs/archive/` — read them only if the user asks or if you need deep reference on a specific subsystem.
 
 | Document | Role | Updates |
 |----------|------|---------|
