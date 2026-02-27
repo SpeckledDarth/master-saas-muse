@@ -1,6 +1,6 @@
 # PassivePost — Project History & Status
 
-> **Last Updated:** February 26, 2026
+> **Last Updated:** February 27, 2026
 
 ---
 
@@ -565,6 +565,39 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 **Pending items for next session:**
 - Seed data for dashboard tables (invoices, subscriptions, commissions, etc.)
 - Verify metrics page loads correctly on Vercel after push
+
+---
+
+### Session — February 27, 2026 (Dashboard Merge + Palette Fixes)
+
+**What was accomplished:**
+
+1. **Merged `/admin` and `/admin/metrics` into a single unified Dashboard page** — Combined the Dashboard command center (KPI cards, alerts, activity timeline, sparkline) with the Metrics page (user growth chart, revenue growth chart, NPS score, ARPU, LTV, conversion rate, waterfall chart, scheduled reports) into one cohesive landing page at `/admin`. Layout flows: Header with action buttons → 6 clickable KPI cards → secondary stats row (ARPU, LTV, Conversion, NPS) → alerts → user/revenue growth charts → activity timeline + sparkline + feedback/waitlist → revenue waterfall chart + table → scheduled reports section.
+
+2. **Fixed all hardcoded color palette violations** — Replaced every instance of hardcoded Tailwind color classes with design system CSS variables:
+   - `text-green-600` → `text-[hsl(var(--success))]`
+   - `text-amber-600` / `text-yellow-600` → `text-[hsl(var(--warning))]`
+   - `text-red-600` → `text-[hsl(var(--danger))]`
+   - Alert severity styles now use `hsl(var(--warning))` instead of `amber-500`
+   - All charts now use `useChartConfig()` hook for line width, bar size, bar radius, grid visibility, grid dash style, dot visibility, line curve type, and chart colors
+   - Waterfall bars use `hsl(var(--warning))` and `hsl(var(--success))` semantic tokens
+   - NPS score uses semantic color function based on score thresholds
+
+3. **Removed redundant `/admin/metrics` route** — Deleted `src/app/admin/metrics/page.tsx`. Removed "Metrics" from sidebar nav and breadcrumb labels. Updated email links in queue workers and the metrics report API to point to `/admin` instead of `/admin/metrics`. Removed unused `BarChart3` import from sidebar.
+
+**Files modified:**
+- `src/app/admin/page.tsx` (full rewrite: merged dashboard + metrics with palette fixes)
+- `src/app/admin/metrics/page.tsx` (deleted)
+- `src/components/admin/sidebar.tsx` (removed Metrics nav item + unused import)
+- `src/components/admin/breadcrumbs.tsx` (removed metrics label)
+- `src/lib/queue/index.ts` (updated email links)
+- `src/app/api/admin/metrics/report/route.ts` (updated email link)
+
+**No new DB tables or Supabase migrations needed.**
+
+**Pending items for next session:**
+- Seed data for dashboard tables (invoices, subscriptions, commissions, etc.)
+- Verify dashboard loads correctly on Vercel after push
 
 ---
 

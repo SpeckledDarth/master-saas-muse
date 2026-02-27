@@ -9,7 +9,6 @@ const ROUTE_LABELS: Record<string, string> = {
   crm: 'CRM',
   revenue: 'Revenue',
   subscriptions: 'Subscriptions',
-  metrics: 'Metrics',
   feedback: 'Support',
   blog: 'Blog',
   analytics: 'Analytics',

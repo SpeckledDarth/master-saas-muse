@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
           <h2 style="color: #6366f1;">${periodLabel} Metrics Report</h2>
           <p>Your ${periodLabel.toLowerCase()} metrics report is ready.</p>
           <p style="margin-top: 16px;">
-            <a href="${baseUrl}/admin/metrics" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+            <a href="${baseUrl}/admin" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
               View Full Dashboard
             </a>
           </p>

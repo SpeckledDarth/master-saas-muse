@@ -10,7 +10,6 @@ import {
   BookUser,
   DollarSign,
   CreditCard,
-  BarChart3,
   MessageSquare,
   FileText,
   Mail,
@@ -76,7 +75,6 @@ function buildSections(badgeCounts: BadgeCounts): NavSection[] {
         { label: 'CRM', href: '/admin/crm', icon: BookUser, permission: (p, isAdmin) => isAdmin || !!p?.canManageUsers, badge: badgeCounts.newUsersToday },
         { label: 'Revenue', href: '/admin/revenue', icon: DollarSign, permission: (p, isAdmin) => isAdmin || !!p?.canViewAnalytics, badge: badgeCounts.failedPayments },
         { label: 'Subscriptions', href: '/admin/subscriptions', icon: CreditCard, permission: (p, isAdmin) => isAdmin || !!p?.canViewAnalytics },
-        { label: 'Metrics', href: '/admin/metrics', icon: BarChart3, permission: (p, isAdmin) => isAdmin || !!p?.canViewAnalytics },
       ],
     },
     {

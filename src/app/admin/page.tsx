@@ -1,16 +1,27 @@
 'use client'
 
 import { useEffect, useState, type ElementType } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   DollarSign, Users, UserPlus, MessageSquare, TrendingDown, CreditCard,
-  AlertTriangle, ArrowRight, Loader2, Activity,
+  AlertTriangle, ArrowRight, Loader2, Activity, Send, Bell, ArrowDown,
+  Calendar, Clock, BarChart3, Target, ThumbsUp, ListChecks,
 } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Timeline, type TimelineEvent } from '@/components/admin/timeline'
+import { useToast } from '@/hooks/use-toast'
+import { useChartConfig } from '@/hooks/use-chart-config'
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { ThemedChartTooltip } from '@/components/ui/chart-tooltip'
 
 function formatCurrency(cents: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100)
+}
+
+function formatWaterfallCurrency(val: number) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(val / 100)
 }
 
 interface KPI {
@@ -43,9 +54,48 @@ interface DashboardData {
   revenueTrend: { date: string; amount: number }[]
 }
 
+interface MetricsData {
+  totalUsers: number
+  newUsersToday: number
+  newUsersThisWeek: number
+  newUsersThisMonth: number
+  activeSubscriptions: number
+  mrr: number
+  totalFeedback: number
+  waitlistCount: number
+  userGrowth: { date: string; count: number }[]
+  revenueGrowth: { date: string; amount: number }[]
+  arpu: number
+  ltv: number
+  churnRate: number
+  conversionRate: number
+  npsScore: number
+  npsResponses: number
+  cancelledThisMonth: number
+  churnTrend: { date: string; count: number }[]
+  alertThresholds?: {
+    alertChurnThreshold?: number
+    alertMinMonthlyUsers?: number
+  }
+}
+
+interface WaterfallData {
+  label: string
+  revenue: number
+  commissions: number
+  net: number
+}
+
+interface ScheduledReportConfig {
+  weeklyReportEnabled: boolean
+  monthlyReportEnabled: boolean
+  lastWeeklyReport?: string
+  lastMonthlyReport?: string
+}
+
 const SEVERITY_STYLES: Record<string, string> = {
   danger: 'border-destructive/30 bg-destructive/5 text-destructive',
-  warning: 'border-amber-500/30 bg-amber-500/5 text-amber-600 dark:text-amber-400',
+  warning: 'border-[hsl(var(--warning))]/30 bg-[hsl(var(--warning))]/5 text-[hsl(var(--warning))]',
   info: 'border-primary/30 bg-primary/5 text-primary',
 }
 
@@ -69,7 +119,6 @@ function SparklineChart({ data }: { data: { date: string; amount: number }[] }) 
   }
 
   const maxVal = Math.max(...data.map(d => d.amount), 1)
-  const barWidth = 100 / data.length
 
   return (
     <div className="flex items-end gap-1 h-16" data-testid="chart-sparkline">
@@ -92,35 +141,163 @@ function SparklineChart({ data }: { data: { date: string; amount: number }[] }) 
   )
 }
 
+function npsColorClass(score: number) {
+  if (score >= 50) return 'text-[hsl(var(--success))]'
+  if (score >= 0) return 'text-[hsl(var(--warning))]'
+  return 'text-[hsl(var(--danger))]'
+}
+
+function kpiWarningColor(condition: boolean) {
+  return condition ? 'text-[hsl(var(--warning))]' : 'text-muted-foreground'
+}
+
+function kpiDangerColor(condition: boolean) {
+  return condition ? 'text-destructive' : 'text-muted-foreground'
+}
+
 export default function AdminDashboard() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(true)
-  const [data, setData] = useState<DashboardData | null>(null)
+  const [dashLoading, setDashLoading] = useState(true)
+  const [dashData, setDashData] = useState<DashboardData | null>(null)
+  const [metrics, setMetrics] = useState<MetricsData | null>(null)
+  const [metricsLoading, setMetricsLoading] = useState(true)
+  const [waterfall, setWaterfall] = useState<WaterfallData[]>([])
+  const [waterfallLoading, setWaterfallLoading] = useState(true)
+  const [scheduledReports, setScheduledReports] = useState<ScheduledReportConfig>({ weeklyReportEnabled: false, monthlyReportEnabled: false })
+  const [sendingReport, setSendingReport] = useState(false)
+  const [checkingAlerts, setCheckingAlerts] = useState(false)
+  const [triggeringCron, setTriggeringCron] = useState(false)
+  const { toast } = useToast()
+  const chartConfig = useChartConfig()
 
   useEffect(() => {
     async function fetchDashboard() {
       try {
         const res = await fetch('/api/admin/dashboard')
+        if (res.ok) setDashData(await res.json())
+      } catch {
+      } finally {
+        setDashLoading(false)
+      }
+    }
+
+    async function fetchMetrics() {
+      try {
+        const res = await fetch('/api/admin/metrics')
+        if (res.ok) setMetrics(await res.json())
+      } catch {
+      } finally {
+        setMetricsLoading(false)
+      }
+    }
+
+    async function fetchWaterfall() {
+      try {
+        const res = await fetch('/api/admin/revenue-waterfall')
         if (res.ok) {
-          setData(await res.json())
+          const data = await res.json()
+          setWaterfall(Array.isArray(data.waterfall?.months) ? data.waterfall.months : [])
         }
       } catch {
       } finally {
-        setLoading(false)
+        setWaterfallLoading(false)
       }
     }
+
+    async function fetchScheduledReports() {
+      try {
+        const res = await fetch('/api/admin/setup')
+        if (res.ok) {
+          const data = await res.json()
+          const sec = data.settings?.security || {}
+          setScheduledReports({
+            weeklyReportEnabled: sec.weeklyReportEnabled ?? false,
+            monthlyReportEnabled: sec.monthlyReportEnabled ?? false,
+            lastWeeklyReport: sec.lastWeeklyReport,
+            lastMonthlyReport: sec.lastMonthlyReport,
+          })
+        }
+      } catch {
+      }
+    }
+
     fetchDashboard()
+    fetchMetrics()
+    fetchWaterfall()
+    fetchScheduledReports()
   }, [])
 
-  if (loading || !data) {
+  async function handleSendReport() {
+    setSendingReport(true)
+    try {
+      const res = await fetch('/api/admin/metrics/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reportType: 'weekly' }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        toast({ title: 'Report sent', description: data.message || 'Check your email' })
+      } else {
+        toast({ title: 'Failed to send report', description: data.error, variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to send report', variant: 'destructive' })
+    } finally {
+      setSendingReport(false)
+    }
+  }
+
+  async function handleCheckAlerts() {
+    setCheckingAlerts(true)
+    try {
+      const res = await fetch('/api/admin/metrics/alerts', { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) {
+        const count = data.triggered?.length || 0
+        toast({
+          title: count > 0 ? `${count} alert(s) triggered` : 'No alerts triggered',
+          description: count > 0 ? `Alerts: ${data.triggered.join(', ')}` : data.message || 'All metrics within thresholds',
+        })
+      } else {
+        toast({ title: 'Alert check failed', description: data.error, variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to check alerts', variant: 'destructive' })
+    } finally {
+      setCheckingAlerts(false)
+    }
+  }
+
+  async function handleTriggerCron() {
+    setTriggeringCron(true)
+    try {
+      const res = await fetch('/api/cron/scheduled-reports', { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) {
+        toast({ title: 'Scheduled reports triggered', description: data.message || 'Reports have been sent.' })
+      } else {
+        toast({ title: 'Failed', description: data.error || 'Could not trigger reports', variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to trigger reports', variant: 'destructive' })
+    } finally {
+      setTriggeringCron(false)
+    }
+  }
+
+  const isInitialLoad = dashLoading && metricsLoading
+
+  if (isInitialLoad) {
     return (
-      <div className="p-6" data-testid="page-dashboard">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold" data-testid="text-admin-title">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Your command center</p>
+      <div className="p-6 space-y-6" data-testid="page-dashboard">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold" data-testid="text-admin-title">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">Your command center</p>
+          </div>
         </div>
         <KPISkeleton />
-        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 lg:grid-cols-3">
           <div className="lg:col-span-2 rounded-lg border bg-card p-4 animate-pulse">
             <div className="h-4 bg-muted rounded w-1/3 mb-4" />
             <div className="space-y-3">
@@ -144,50 +321,112 @@ export default function AdminDashboard() {
     )
   }
 
-  const { kpis, alerts, recentActivity, revenueTrend } = data
+  const kpis = dashData?.kpis
+  const alerts = dashData?.alerts ?? []
+  const recentActivity = dashData?.recentActivity ?? []
+  const revenueTrend = dashData?.revenueTrend ?? []
 
-  const kpiCards: KPI[] = [
-    { label: 'MRR', value: formatCurrency(kpis.mrr), icon: DollarSign, href: '/admin/revenue?type=invoice&status=paid', color: 'text-green-600 dark:text-green-400' },
+  const kpiCards: KPI[] = kpis ? [
+    { label: 'MRR', value: formatCurrency(kpis.mrr), icon: DollarSign, href: '/admin/revenue?type=invoice&status=paid', color: 'text-[hsl(var(--success))]' },
     { label: 'Active Subscribers', value: kpis.activeSubscribers, icon: CreditCard, href: '/admin/subscriptions?status=active', color: 'text-primary' },
     { label: 'New Users (7d)', value: kpis.newUsersThisWeek, icon: UserPlus, href: '/admin/crm?sort=newest', color: 'text-primary' },
-    { label: 'Open Tickets', value: kpis.openTickets, icon: MessageSquare, href: '/admin/feedback', color: kpis.openTickets > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground' },
-    { label: 'Churn Rate', value: `${kpis.churnRate}%`, icon: TrendingDown, href: '/admin/subscriptions?churnRisk=true', color: kpis.churnRate > 5 ? 'text-destructive' : 'text-muted-foreground' },
-    { label: 'Failed Payments', value: kpis.failedPayments, icon: AlertTriangle, href: '/admin/revenue?status=failed', color: kpis.failedPayments > 0 ? 'text-destructive' : 'text-muted-foreground' },
-  ]
+    { label: 'Open Tickets', value: kpis.openTickets, icon: MessageSquare, href: '/admin/feedback', color: kpiWarningColor(kpis.openTickets > 0) },
+    { label: 'Churn Rate', value: `${kpis.churnRate}%`, icon: TrendingDown, href: '/admin/subscriptions?churnRisk=true', color: kpiDangerColor(kpis.churnRate > 5) },
+    { label: 'Failed Payments', value: kpis.failedPayments, icon: AlertTriangle, href: '/admin/revenue?status=failed', color: kpiDangerColor(kpis.failedPayments > 0) },
+  ] : []
 
   return (
-    <div className="p-6" data-testid="page-dashboard">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold" data-testid="text-admin-title">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Your command center</p>
+    <div className="p-6 space-y-6" data-testid="page-dashboard">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold" data-testid="text-admin-title">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Your command center</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleSendReport} disabled={sendingReport} data-testid="button-send-report">
+            {sendingReport ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            <span className="ml-1">Email Report</span>
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleCheckAlerts} disabled={checkingAlerts} data-testid="button-check-alerts">
+            {checkingAlerts ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />}
+            <span className="ml-1">Check Alerts</span>
+          </Button>
+        </div>
       </div>
 
-      <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-6">
-        {kpiCards.map(kpi => {
-          const Icon = kpi.icon
-          return (
-            <Link
-              key={kpi.label}
-              href={kpi.href}
-              className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors group"
-              data-testid={`card-kpi-${kpi.label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-muted-foreground">{kpi.label}</span>
-                <Icon className={`h-4 w-4 ${kpi.color}`} />
-              </div>
-              <p className="text-xl font-bold tabular-nums">{kpi.value}</p>
-              <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                <span>View</span>
-                <ArrowRight className="h-3 w-3" />
-              </div>
-            </Link>
-          )
-        })}
-      </div>
+      {kpiCards.length > 0 && (
+        <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-6" data-testid="section-kpi-grid">
+          {kpiCards.map(kpi => {
+            const Icon = kpi.icon
+            return (
+              <Link
+                key={kpi.label}
+                href={kpi.href}
+                className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors group"
+                data-testid={`card-kpi-${kpi.label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">{kpi.label}</span>
+                  <Icon className={`h-4 w-4 ${kpi.color}`} />
+                </div>
+                <p className="text-xl font-bold tabular-nums">{kpi.value}</p>
+                <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span>View</span>
+                  <ArrowRight className="h-3 w-3" />
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      )}
+
+      {!metricsLoading && metrics && (
+        <div className="grid gap-3 grid-cols-2 md:grid-cols-4" data-testid="section-secondary-kpis">
+          <Card data-testid="card-arpu">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">ARPU</CardTitle>
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" data-testid="text-arpu">{formatCurrency(metrics.arpu ?? 0)}</div>
+              <p className="text-xs text-muted-foreground">Per user per month</p>
+            </CardContent>
+          </Card>
+          <Card data-testid="card-ltv">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">LTV</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" data-testid="text-ltv">{formatCurrency(metrics.ltv ?? 0)}</div>
+              <p className="text-xs text-muted-foreground">Estimated lifetime value</p>
+            </CardContent>
+          </Card>
+          <Card data-testid="card-conversion-rate">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+              <Target className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" data-testid="text-conversion-rate">{(metrics.conversionRate ?? 0).toFixed(1)}%</div>
+              <p className="text-xs text-muted-foreground">Free to paid</p>
+            </CardContent>
+          </Card>
+          <Card data-testid="card-nps-score">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">NPS Score</CardTitle>
+              <ThumbsUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${npsColorClass(metrics.npsScore ?? 0)}`} data-testid="text-nps-score">{metrics.npsScore ?? 0}</div>
+              <p className="text-xs text-muted-foreground">Based on {metrics.npsResponses ?? 0} responses</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {alerts.length > 0 && (
-        <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-6" data-testid="section-alerts">
+        <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" data-testid="section-alerts">
           {alerts.map(alert => (
             <Link
               key={alert.id}
@@ -206,6 +445,56 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card className="col-span-full lg:col-span-1" data-testid="card-user-growth">
+          <CardHeader>
+            <CardTitle>User Growth</CardTitle>
+            <CardDescription>New users over the last 30 days</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {metricsLoading ? (
+              <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+            ) : (
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={metrics?.userGrowth ?? []}>
+                    {chartConfig.showGrid && <CartesianGrid strokeDasharray={chartConfig.gridDasharray} className="stroke-muted" />}
+                    <XAxis dataKey="date" className="text-xs" tick={{ fontSize: 12 }} />
+                    <YAxis className="text-xs" tick={{ fontSize: 12 }} />
+                    <Tooltip content={<ThemedChartTooltip valueLabel="users" />} cursor={false} />
+                    <Line type={chartConfig.lineCurve} dataKey="count" stroke={chartConfig.colors[0]} strokeWidth={chartConfig.lineWidth} dot={chartConfig.showDots} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-full lg:col-span-1" data-testid="card-revenue-growth">
+          <CardHeader>
+            <CardTitle>Revenue Growth</CardTitle>
+            <CardDescription>Revenue over the last 30 days</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {metricsLoading ? (
+              <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+            ) : (
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={metrics?.revenueGrowth ?? []}>
+                    {chartConfig.showGrid && <CartesianGrid strokeDasharray={chartConfig.gridDasharray} className="stroke-muted" />}
+                    <XAxis dataKey="date" className="text-xs" tick={{ fontSize: 12 }} />
+                    <YAxis className="text-xs" tick={{ fontSize: 12 }} />
+                    <Tooltip content={<ThemedChartTooltip valueLabel="revenue" valueFormatter={(v) => `$${v.toLocaleString()}`} />} cursor={false} />
+                    <Line type={chartConfig.lineCurve} dataKey="amount" stroke={chartConfig.colors[1]} strokeWidth={chartConfig.lineWidth} dot={chartConfig.showDots} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2 rounded-lg border bg-card p-4" data-testid="section-activity">
           <div className="flex items-center justify-between mb-4">
@@ -217,27 +506,168 @@ export default function AdminDashboard() {
               View All
             </Link>
           </div>
-          <Timeline
-            events={recentActivity}
-            maxItems={15}
-            compact
-            emptyMessage="No recent activity"
-          />
+          {dashLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex gap-3 animate-pulse">
+                  <div className="h-8 w-8 rounded-full bg-muted" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 bg-muted rounded w-3/4" />
+                    <div className="h-2 bg-muted rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <Timeline
+              events={recentActivity}
+              maxItems={15}
+              compact
+              emptyMessage="No recent activity"
+            />
+          )}
         </div>
 
-        <div className="rounded-lg border bg-card p-4" data-testid="section-revenue-trend">
-          <h2 className="text-sm font-medium mb-4">Revenue (7 days)</h2>
-          <SparklineChart data={revenueTrend} />
-          {revenueTrend.length > 0 && (
-            <div className="mt-3 pt-3 border-t">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">7-day total</span>
-                <span className="font-medium">{formatCurrency(revenueTrend.reduce((s, d) => s + d.amount, 0))}</span>
+        <div className="space-y-4">
+          <div className="rounded-lg border bg-card p-4" data-testid="section-revenue-trend">
+            <h2 className="text-sm font-medium mb-4">Revenue (7 days)</h2>
+            <SparklineChart data={revenueTrend} />
+            {revenueTrend.length > 0 && (
+              <div className="mt-3 pt-3 border-t">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">7-day total</span>
+                  <span className="font-medium">{formatCurrency(revenueTrend.reduce((s, d) => s + d.amount, 0))}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {!metricsLoading && metrics && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-lg border bg-card p-4" data-testid="card-feedback-count">
+                <div className="flex items-center gap-2 mb-2">
+                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Feedback</span>
+                </div>
+                <p className="text-xl font-bold" data-testid="text-feedback-count">{metrics.totalFeedback ?? 0}</p>
+              </div>
+              <div className="rounded-lg border bg-card p-4" data-testid="card-waitlist-count">
+                <div className="flex items-center gap-2 mb-2">
+                  <ListChecks className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Waitlist</span>
+                </div>
+                <p className="text-xl font-bold" data-testid="text-waitlist-count">{metrics.waitlistCount ?? 0}</p>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      <Card data-testid="card-revenue-waterfall">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <ArrowDown className="h-5 w-5" />
+            <div>
+              <CardTitle>Revenue Waterfall</CardTitle>
+              <CardDescription>Monthly MRR movement breakdown</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {waterfallLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : waterfall.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-waterfall-empty">No revenue waterfall data available yet</p>
+          ) : (
+            <>
+              <div className="h-[350px]" data-testid="chart-revenue-waterfall">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={waterfall} barSize={chartConfig.barSize}>
+                    {chartConfig.showGrid && <CartesianGrid strokeDasharray={chartConfig.gridDasharray} className="stroke-muted" />}
+                    <XAxis dataKey="label" className="text-xs" tick={{ fontSize: 12 }} />
+                    <YAxis className="text-xs" tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 100).toLocaleString()}`} />
+                    <Tooltip content={<ThemedChartTooltip valueFormatter={(v) => formatWaterfallCurrency(v)} />} cursor={false} />
+                    <Legend />
+                    <Bar dataKey="revenue" name="Revenue" fill={chartConfig.colors[0]} radius={[chartConfig.barRadius, chartConfig.barRadius, 0, 0]} />
+                    <Bar dataKey="commissions" name="Commissions" fill="hsl(var(--warning))" radius={[chartConfig.barRadius, chartConfig.barRadius, 0, 0]} />
+                    <Bar dataKey="net" name="Net" fill="hsl(var(--success))" radius={[chartConfig.barRadius, chartConfig.barRadius, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-muted-foreground">
+                      <th className="text-left py-2 font-medium">Month</th>
+                      <th className="text-right py-2 font-medium">Revenue</th>
+                      <th className="text-right py-2 font-medium">Commissions</th>
+                      <th className="text-right py-2 font-medium">Net</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {waterfall.map((row) => (
+                      <tr key={row.label} className="border-b" data-testid={`row-waterfall-${row.label}`}>
+                        <td className="py-2">{row.label}</td>
+                        <td className="text-right py-2">{formatWaterfallCurrency(row.revenue)}</td>
+                        <td className="text-right py-2 text-[hsl(var(--warning))]">-{formatWaterfallCurrency(row.commissions)}</td>
+                        <td className="text-right py-2 font-medium">{formatWaterfallCurrency(row.net)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card data-testid="card-scheduled-reports">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            <div>
+              <CardTitle>Scheduled Reports</CardTitle>
+              <CardDescription>Automated report delivery via cron jobs</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3 p-3 border rounded-md">
+              <Clock className="h-5 w-5 mt-0.5 text-muted-foreground" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Weekly Report</p>
+                <p className="text-xs text-muted-foreground">Sent every Monday at 9:00 AM UTC</p>
+                <Badge variant={scheduledReports.weeklyReportEnabled ? 'default' : 'secondary'} className="mt-1" data-testid="badge-weekly-report-status">
+                  {scheduledReports.weeklyReportEnabled ? 'Enabled' : 'Disabled'}
+                </Badge>
+                {scheduledReports.lastWeeklyReport && (
+                  <p className="text-xs text-muted-foreground mt-1" data-testid="text-last-weekly">Last sent: {new Date(scheduledReports.lastWeeklyReport).toLocaleDateString()}</p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-3 border rounded-md">
+              <Calendar className="h-5 w-5 mt-0.5 text-muted-foreground" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Monthly Report</p>
+                <p className="text-xs text-muted-foreground">Sent on the 1st of each month at 9:00 AM UTC</p>
+                <Badge variant={scheduledReports.monthlyReportEnabled ? 'default' : 'secondary'} className="mt-1" data-testid="badge-monthly-report-status">
+                  {scheduledReports.monthlyReportEnabled ? 'Enabled' : 'Disabled'}
+                </Badge>
+                {scheduledReports.lastMonthlyReport && (
+                  <p className="text-xs text-muted-foreground mt-1" data-testid="text-last-monthly">Last sent: {new Date(scheduledReports.lastMonthlyReport).toLocaleDateString()}</p>
+                )}
+              </div>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleTriggerCron} disabled={triggeringCron} data-testid="button-trigger-cron">
+            {triggeringCron ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Send className="h-4 w-4 mr-1" />}
+            Run Scheduled Reports Now
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   )
 }

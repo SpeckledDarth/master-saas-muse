@@ -122,7 +122,7 @@ async function processMetricsReportJob(job: Job<MetricsReportJobData>): Promise<
         <h2 style="color: #6366f1;">${periodLabel} Metrics Report</h2>
         <p>Your scheduled ${periodLabel.toLowerCase()} metrics report is ready.</p>
         <p style="margin-top: 16px;">
-          <a href="${baseUrl}/admin/metrics" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+          <a href="${baseUrl}/admin" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
             View Full Dashboard
           </a>
         </p>
@@ -172,7 +172,7 @@ async function processMetricsAlertJob(job: Job<MetricsAlertJobData>): Promise<vo
         <h2 style="color: #ef4444;">${alertLabels[job.data.alertType] || 'Metrics Alert'}</h2>
         <p>${alertDescriptions[job.data.alertType] || 'A metric has exceeded its configured threshold.'}</p>
         <p style="margin-top: 16px;">
-          <a href="${baseUrl}/admin/metrics" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+          <a href="${baseUrl}/admin" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
             View Dashboard
           </a>
         </p>
