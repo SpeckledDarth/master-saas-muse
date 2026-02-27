@@ -27,49 +27,152 @@
 
 ### Prerequisites
 
-Before testing, ensure these SQL scripts have been run in the **Supabase SQL Editor**:
+Before testing, ensure these SQL scripts have been run in the **Supabase SQL Editor** (in order):
 
-1. `migrations/supabase/sync_013_016_plus_missing.sql` — Creates all missing tables
+1. `migrations/supabase/sync_013_016_safe.sql` — Creates all tables, indexes, ALTER statements, and RLS policies
 2. `migrations/seed/comprehensive-seed-data.sql` — Seeds test content (contests, knowledge base, assets, etc.)
-3. Sprint 2 CRM tables (if not already run):
+
+Both scripts are safe to re-run (all use `IF NOT EXISTS` and exception handling).
+
+### Test Accounts — Overview
+
+You need 4 accounts to test all perspectives. Two already exist, two need to be created.
+
+| # | Role | Email | Status | Tests |
+|---|------|-------|--------|-------|
+| 1 | **Admin** | `speckledchris@gmail.com` | Already exists | Section 1 (full admin dashboard) |
+| 2 | **Affiliate** | `kitt2002@proton.me` | Already exists | Section 3 (affiliate dashboard) |
+| 3 | **Paid User** | `speckledchris+user@gmail.com` | Needs creation | Section 4 (social features, billing) |
+| 4 | **Admin Team Member** | `speckledchris+team@gmail.com` | Needs creation | Section 2 (restricted admin access) |
+
+Gmail `+` addresses all land in the same inbox (`speckledchris@gmail.com`) but Supabase treats each as a separate account.
+
+---
+
+### 0.1 Create Account 3 — Paid User (no Stripe payment needed)
+
+**Step 1: Sign up**
+1. Open your Vercel deployment in an incognito/private window
+2. Go to `/signup`
+3. Sign up with email: `speckledchris+user@gmail.com`
+4. Confirm the email (check your Gmail inbox)
+5. Log in once to make sure the account works, then log out
+
+**Step 2: Find the new user's ID**
+
+Run this in the **Supabase SQL Editor**:
 ```sql
-CREATE TABLE IF NOT EXISTS user_tags (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  tag TEXT NOT NULL,
-  color TEXT DEFAULT 'gray',
-  created_by UUID REFERENCES auth.users(id),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(user_id, tag)
-);
-CREATE TABLE IF NOT EXISTS entity_notes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  entity_type TEXT NOT NULL,
-  entity_id TEXT NOT NULL,
-  author_id UUID NOT NULL REFERENCES auth.users(id),
-  body TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+SELECT id, email FROM auth.users WHERE email = 'speckledchris+user@gmail.com';
+```
+Copy the `id` value (a UUID like `a1b2c3d4-...`).
+
+**Step 3: Ensure the product exists in the registry**
+
+The `muse_product_subscriptions` table references `muse_products(slug)`, so the product must exist first:
+```sql
+INSERT INTO muse_products (slug, name, description, metadata_key, tier_definitions, is_active)
+VALUES (
+  'passive-post',
+  'PassivePost',
+  'Content scheduling and social media management',
+  'muse_tier',
+  '[{"id":"tier_1","name":"Starter"},{"id":"tier_2","name":"Basic"},{"id":"tier_3","name":"Premium"}]'::jsonb,
+  true
+)
+ON CONFLICT (slug) DO NOTHING;
 ```
 
-### Test Accounts Needed
+**Step 4: Simulate a Premium subscription**
 
-| Role | How to Get It | What You'll Test |
-|------|---------------|------------------|
-| **Admin** | Your main account with `admin` role in `user_roles` table | Full admin dashboard, CRM, revenue, settings |
-| **Admin Team Member** | Create a second account, add to `organization_members` with role `manager` or `member` | Admin access with restricted permissions |
-| **Affiliate** | Apply at `/affiliate/join`, then approve via admin dashboard. Or create directly in `affiliate_profiles` | Affiliate dashboard, earnings, marketing tools |
-| **Paid User** | Create a regular account, subscribe via Stripe checkout | User dashboard, social features, billing |
+Replace `YOUR_USER_ID` with the UUID from Step 2:
+```sql
+INSERT INTO muse_product_subscriptions (user_id, product_slug, tier_id, status, stripe_subscription_id)
+VALUES (
+  'YOUR_USER_ID',
+  'passive-post',
+  'tier_3',
+  'active',
+  'test_simulated_premium'
+)
+ON CONFLICT (user_id, product_slug)
+DO UPDATE SET tier_id = 'tier_3', status = 'active';
+```
 
-### 0.1 Account Verification
+**How this works:** The app checks the database FIRST for a user's subscription tier. If it finds an active row in `muse_product_subscriptions`, it uses that tier without ever calling Stripe. So this fully simulates a Premium plan.
+
+**Tier reference (for testing feature gating later):**
+
+| Tier ID | Display Name | AI Gens/Day | Posts/Day | Platforms |
+|---------|-------------|-------------|-----------|-----------|
+| `tier_1` | Starter | 5 | 1 | 2 |
+| `tier_2` | Basic | 10 | 2 | 3 |
+| `tier_3` | Premium | 100 | Unlimited | 10 |
+
+To downgrade for testing limits, change `tier_id`:
+```sql
+UPDATE muse_product_subscriptions
+SET tier_id = 'tier_1'
+WHERE user_id = 'YOUR_USER_ID' AND product_slug = 'passive-post';
+```
+
+---
+
+### 0.2 Create Account 4 — Admin Team Member
+
+**Step 1: Sign up**
+1. Open another incognito/private window
+2. Go to `/signup`
+3. Sign up with email: `speckledchris+team@gmail.com`
+4. Confirm the email, log in once, then log out
+
+**Step 2: Find the user ID and organization ID**
+
+Run in **Supabase SQL Editor**:
+```sql
+-- Get the new team member's user ID
+SELECT id, email FROM auth.users WHERE email = 'speckledchris+team@gmail.com';
+
+-- Get the organization ID (from the admin's existing org)
+SELECT id, name FROM organizations LIMIT 5;
+```
+Note both IDs.
+
+**Step 3: Add as organization member**
+
+Replace `YOUR_TEAM_USER_ID` and `YOUR_ORG_ID` with the values from Step 2:
+```sql
+INSERT INTO organization_members (organization_id, user_id, role)
+VALUES ('YOUR_ORG_ID', 'YOUR_TEAM_USER_ID', 'manager')
+ON CONFLICT DO NOTHING;
+```
+
+This gives the account access to the admin dashboard with the "manager" role. Later, you can test different role levels by changing the role:
+```sql
+UPDATE organization_members SET role = 'member' WHERE user_id = 'YOUR_TEAM_USER_ID';
+UPDATE organization_members SET role = 'viewer' WHERE user_id = 'YOUR_TEAM_USER_ID';
+```
+
+---
+
+### 0.3 Account Verification
+
+After creating all accounts, run these checks in the **Supabase SQL Editor**:
+
+| Test | SQL Query | Expected Result | Status |
+|------|-----------|-----------------|--------|
+| Admin role exists | `SELECT * FROM user_roles WHERE user_id = (SELECT id FROM auth.users WHERE email = 'speckledchris@gmail.com');` | Row with `role = 'admin'` | |
+| Affiliate profile exists | `SELECT user_id, status FROM affiliate_profiles WHERE user_id = (SELECT id FROM auth.users WHERE email = 'kitt2002@proton.me');` | Row exists with status | |
+| Paid user subscription | `SELECT tier_id, status FROM muse_product_subscriptions WHERE user_id = (SELECT id FROM auth.users WHERE email = 'speckledchris+user@gmail.com');` | `tier_3`, `active` | |
+| Team member role | `SELECT role FROM organization_members WHERE user_id = (SELECT id FROM auth.users WHERE email = 'speckledchris+team@gmail.com');` | `manager` | |
+
+Then verify by logging in:
 
 | Test | Steps | Expected Result | Status |
 |------|-------|-----------------|--------|
-| Admin account exists | Query `user_roles` for your admin user ID | Row with `role = 'admin'` exists | |
-| Team member account exists | Query `organization_members` for second account | Row with appropriate role exists | |
-| Affiliate account exists | Query `affiliate_profiles` for affiliate user | Row with affiliate data exists | |
-| Regular user account exists | Log in with a non-admin, non-affiliate account | Reaches user dashboard without redirects to admin or affiliate | |
+| Admin login | Log in as `speckledchris@gmail.com`, go to `/admin` | Admin dashboard loads | |
+| Affiliate login | Log in as `kitt2002@proton.me`, go to `/affiliate/dashboard` | Affiliate dashboard loads | |
+| Paid user login | Log in as `speckledchris+user@gmail.com`, go to `/dashboard/social` | Social dashboard loads with Premium features unlocked | |
+| Team member login | Log in as `speckledchris+team@gmail.com`, go to `/admin` | Admin dashboard loads (team member access) | |
 
 ---
 
@@ -706,13 +809,20 @@ CREATE TABLE IF NOT EXISTS entity_notes (
 
 ### 4.8 Feature Gating by Subscription Tier
 
+To test different tiers, update the `muse_product_subscriptions` row in Supabase SQL Editor:
+```sql
+UPDATE muse_product_subscriptions SET tier_id = 'tier_1' WHERE user_id = 'YOUR_USER_ID' AND product_slug = 'passive-post';  -- Starter
+UPDATE muse_product_subscriptions SET tier_id = 'tier_2' WHERE user_id = 'YOUR_USER_ID' AND product_slug = 'passive-post';  -- Basic
+UPDATE muse_product_subscriptions SET tier_id = 'tier_3' WHERE user_id = 'YOUR_USER_ID' AND product_slug = 'passive-post';  -- Premium
+```
+
 | Test | Steps | Expected Result | Status |
 |------|-------|-----------------|--------|
-| Free tier limits | On free plan, try to connect 3+ platforms | Upgrade prompt shown at limit (2 platforms for Starter) | |
-| Free tier AI limit | On free plan, generate 6+ AI posts in one day | Upgrade prompt after 5 generations | |
-| Pro tier limits | On Pro plan, verify higher limits | 10 daily AI generations, 3 platforms, 2 daily posts | |
-| Premium tier access | On Premium plan, verify full access | 100 AI generations, 10 platforms, unlimited posts | |
-| Upgrade banner | Hit a limit | Clear upgrade banner with plan comparison | |
+| Starter limits (tier_1) | Set to `tier_1`, try to connect 3+ platforms | Upgrade prompt at limit (max 2 platforms) | |
+| Starter AI limit | Set to `tier_1`, generate 6+ AI posts in one day | Upgrade prompt after 5 generations | |
+| Basic limits (tier_2) | Set to `tier_2`, verify higher limits | 10 daily AI gens, 3 platforms, 2 daily posts | |
+| Premium access (tier_3) | Set to `tier_3`, verify full access | 100 AI gens, 10 platforms, unlimited posts | |
+| Upgrade banner | Hit a limit on `tier_1` or `tier_2` | Clear upgrade banner with plan comparison | |
 
 ### 4.9 Billing & Subscription
 
