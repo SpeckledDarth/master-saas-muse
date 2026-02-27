@@ -262,20 +262,20 @@ function AdminMessagesTab() {
     finally { setSending(false) }
   }
 
-  if (loading) return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center py-[var(--section-spacing,1.5rem)]"><Loader2 className="h-6 w-6 animate-spin" /></div>
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-[var(--content-density-gap,1rem)] md:grid-cols-3">
       <Card className="md:col-span-1">
         <CardHeader><CardTitle className="text-base">Affiliate Threads</CardTitle></CardHeader>
         <CardContent className="p-0">
           {threads.length === 0 ? (
-            <p className="text-sm text-muted-foreground p-4">No messages yet.</p>
+            <p className="text-sm text-muted-foreground p-[var(--card-padding,1.25rem)]">No messages yet.</p>
           ) : (
             <div className="divide-y max-h-[500px] overflow-auto">
               {threads.map((t: any) => (
                 <button key={t.affiliate_user_id} onClick={() => openThread(t.affiliate_user_id)}
-                  className={`w-full text-left p-3 hover:bg-muted/50 transition ${selectedThread === t.affiliate_user_id ? 'bg-muted' : ''}`}
+                  className={`w-full text-left p-[var(--card-padding,1.25rem)] hover:bg-muted/50 transition ${selectedThread === t.affiliate_user_id ? 'bg-muted' : ''}`}
                   data-testid={`thread-${t.affiliate_user_id}`}>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium truncate">{t.ref_code || t.affiliate_user_id.slice(0, 8)}</span>
@@ -293,7 +293,7 @@ function AdminMessagesTab() {
         <CardContent>
           {selectedThread ? (
             <>
-              <div className="space-y-2 max-h-[400px] overflow-auto mb-4">
+              <div className="space-y-2 max-h-[400px] overflow-auto mb-[var(--content-density-gap,1rem)]">
                 {threadMessages.map((m: any) => (
                   <div key={m.id} className={`p-2 rounded text-sm max-w-[80%] ${m.sender_role === 'admin' ? 'ml-auto bg-primary/10' : 'bg-muted'}`}>
                     <p>{m.body}</p>
@@ -311,7 +311,7 @@ function AdminMessagesTab() {
               </div>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground text-center py-8">Select an affiliate thread to view messages.</p>
+            <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]">Select an affiliate thread to view messages.</p>
           )}
         </CardContent>
       </Card>
@@ -366,14 +366,14 @@ function AdminTestimonialsTab() {
     } catch { toast({ title: 'Failed to delete', variant: 'destructive' }) }
   }
 
-  if (loading) return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center py-[var(--section-spacing,1.5rem)]"><Loader2 className="h-6 w-6 animate-spin" /></div>
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card>
         <CardHeader><CardTitle className="text-base">{editingId ? 'Edit Testimonial' : 'Add Testimonial'}</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
             <div>
               <Label>Name</Label>
               <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Jane Smith" data-testid="input-testimonial-name" />
@@ -387,7 +387,7 @@ function AdminTestimonialsTab() {
             <Label>Quote</Label>
             <Textarea value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} placeholder="I earned $2,000 in my first 3 months..." data-testid="input-testimonial-quote" />
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
             <div>
               <Label>Tier Name</Label>
               <Input value={form.tier_name} onChange={e => setForm(f => ({ ...f, tier_name: e.target.value }))} placeholder="Gold" data-testid="input-testimonial-tier" />
@@ -416,7 +416,7 @@ function AdminTestimonialsTab() {
           <CardContent className="p-0">
             <div className="divide-y">
               {testimonials.map((t: any) => (
-                <div key={t.id} className="p-3 flex items-start justify-between gap-3">
+                <div key={t.id} className="p-[var(--card-padding,1.25rem)] flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-sm">{t.name}</p>
@@ -487,13 +487,13 @@ function AdminRenewalsTab() {
     setProcessingId(null)
   }
 
-  if (loading) return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center py-[var(--section-spacing,1.5rem)]"><Loader2 className="h-6 w-6 animate-spin" /></div>
 
   const filtered = filterStatus === 'all' ? renewals : renewals.filter(r => r.status === filterStatus)
   const pendingCount = renewals.filter(r => r.status === 'pending').length
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card data-testid="card-admin-renewals">
         <CardHeader>
           <div className="flex items-center justify-between flex-wrap gap-2">
@@ -520,7 +520,7 @@ function AdminRenewalsTab() {
         </CardHeader>
         <CardContent>
           {filtered.length === 0 ? (
-            <div className="text-center py-8" data-testid="text-no-admin-renewals">
+            <div className="text-center py-[var(--section-spacing,1.5rem)]" data-testid="text-no-admin-renewals">
               <RefreshCw className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
                 {filterStatus === 'all' ? 'No renewal requests yet.' : `No ${filterStatus} renewal requests.`}
@@ -529,7 +529,7 @@ function AdminRenewalsTab() {
           ) : (
             <div className="space-y-3">
               {filtered.map((r: any) => (
-                <div key={r.id} className="p-4 rounded-md border space-y-2" data-testid={`admin-renewal-${r.id}`}>
+                <div key={r.id} className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border space-y-2" data-testid={`admin-renewal-${r.id}`}>
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div>
                       <p className="text-sm font-medium">
@@ -707,7 +707,7 @@ function AffiliateCRMDrawer({
           </TabsList>
 
           <ScrollArea className="h-[55vh] mt-3">
-            <TabsContent value="profile" className="space-y-4 mt-0 pr-3">
+            <TabsContent value="profile" className="space-y-[var(--content-density-gap,1rem)] mt-0 pr-3">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm">Profile Information</CardTitle>
@@ -751,7 +751,7 @@ function AffiliateCRMDrawer({
                   <CardTitle className="text-sm">Earnings Summary</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
                     <div className="text-center p-2 rounded bg-muted/50">
                       <p className="text-lg font-bold tabular-nums" data-testid="text-crm-total-earnings">${((member.totalEarnings || 0) / 100).toFixed(2)}</p>
                       <p className="text-xs text-muted-foreground">Total</p>
@@ -765,7 +765,7 @@ function AffiliateCRMDrawer({
                       <p className="text-xs text-muted-foreground">Paid</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)] mt-3 text-sm">
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-muted-foreground" />
                       <span data-testid="text-crm-referrals">{member.referrals} referrals</span>
@@ -804,13 +804,13 @@ function AffiliateCRMDrawer({
 
             <TabsContent value="payouts" className="mt-0 pr-3">
               {loadingCrm ? (
-                <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>
+                <div className="flex justify-center py-[var(--section-spacing,1.5rem)]"><Loader2 className="h-5 w-5 animate-spin" /></div>
               ) : payouts.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-crm-no-payouts">No payouts yet.</p>
+                <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]" data-testid="text-crm-no-payouts">No payouts yet.</p>
               ) : (
                 <div className="space-y-2">
                   {payouts.map((p: any) => (
-                    <div key={p.id} className="flex items-center justify-between p-3 border rounded text-sm" data-testid={`crm-payout-${p.id}`}>
+                    <div key={p.id} className="flex items-center justify-between p-[var(--card-padding,1.25rem)] border rounded text-sm" data-testid={`crm-payout-${p.id}`}>
                       <div>
                         <p className="font-medium tabular-nums">${((p.amount_cents || 0) / 100).toFixed(2)}</p>
                         <p className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</p>
@@ -826,13 +826,13 @@ function AffiliateCRMDrawer({
 
             <TabsContent value="tickets" className="mt-0 pr-3">
               {loadingCrm ? (
-                <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>
+                <div className="flex justify-center py-[var(--section-spacing,1.5rem)]"><Loader2 className="h-5 w-5 animate-spin" /></div>
               ) : tickets.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-crm-no-tickets">No tickets found.</p>
+                <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]" data-testid="text-crm-no-tickets">No tickets found.</p>
               ) : (
                 <div className="space-y-2">
                   {tickets.map((t: any) => (
-                    <div key={t.id} className="p-3 border rounded text-sm" data-testid={`crm-ticket-${t.id}`}>
+                    <div key={t.id} className="p-[var(--card-padding,1.25rem)] border rounded text-sm" data-testid={`crm-ticket-${t.id}`}>
                       <div className="flex items-center justify-between gap-2">
                         <p className="font-medium truncate flex-1">{t.subject || `Ticket #${t.id?.slice(0, 8)}`}</p>
                         <Badge variant={t.status === 'open' ? 'destructive' : t.status === 'in_progress' ? 'secondary' : 'outline'} className="text-[10px] shrink-0">
@@ -852,13 +852,13 @@ function AffiliateCRMDrawer({
 
             <TabsContent value="activity" className="mt-0 pr-3">
               {loadingCrm ? (
-                <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>
+                <div className="flex justify-center py-[var(--section-spacing,1.5rem)]"><Loader2 className="h-5 w-5 animate-spin" /></div>
               ) : activities.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-crm-no-activity">No activity recorded.</p>
+                <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]" data-testid="text-crm-no-activity">No activity recorded.</p>
               ) : (
                 <div className="space-y-2">
                   {activities.map((a: any) => (
-                    <div key={a.id} className="flex items-start gap-3 p-3 border rounded text-sm" data-testid={`crm-activity-${a.id}`}>
+                    <div key={a.id} className="flex items-start gap-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] border rounded text-sm" data-testid={`crm-activity-${a.id}`}>
                       <Activity className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -889,13 +889,13 @@ function AffiliateCRMDrawer({
               </div>
 
               {loadingCrm ? (
-                <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>
+                <div className="flex justify-center py-[var(--section-spacing,1.5rem)]"><Loader2 className="h-5 w-5 animate-spin" /></div>
               ) : notes.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-crm-no-notes">No notes yet. Add the first note above.</p>
               ) : (
                 <div className="space-y-2">
                   {notes.map((n: any) => (
-                    <div key={n.id} className="p-3 border rounded text-sm" data-testid={`crm-note-${n.id}`}>
+                    <div key={n.id} className="p-[var(--card-padding,1.25rem)] border rounded text-sm" data-testid={`crm-note-${n.id}`}>
                       <p className="whitespace-pre-wrap">{n.body || n.subject}</p>
                       <p className="text-[10px] text-muted-foreground mt-1">{new Date(n.created_at).toLocaleString()}</p>
                     </div>
@@ -936,7 +936,7 @@ function AdminTaxInfoTab() {
     finally { setVerifying(null) }
   }
 
-  if (loading) return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center py-[var(--section-spacing,1.5rem)]"><Loader2 className="h-6 w-6 animate-spin" /></div>
 
   return (
     <Card>
@@ -946,7 +946,7 @@ function AdminTaxInfoTab() {
       </CardHeader>
       <CardContent>
         {submissions.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">No tax submissions yet.</p>
+          <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]">No tax submissions yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -1952,13 +1952,13 @@ export default function AffiliateSettingsPage() {
   }
 
   return (
-    <div className="space-y-6" data-testid="page-affiliate-admin">
+    <div className="space-y-[var(--content-density-gap,1rem)]" data-testid="page-affiliate-admin">
       <div>
         <h2 className="text-xl font-semibold" data-testid="text-affiliate-title">Affiliate Program</h2>
         <p className="text-sm text-muted-foreground">Manage your referral program, commission rates, tiers, and marketing assets.</p>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card data-testid="stat-total-affiliates">
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2">
@@ -2060,10 +2060,10 @@ export default function AffiliateSettingsPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="health" className="space-y-4 mt-4">
+        <TabsContent value="health" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           {healthData ? (
             <>
-              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 <Card data-testid="health-active-affiliates">
                   <CardContent className="pt-4 pb-3">
                     <div className="flex items-center gap-2">
@@ -2108,7 +2108,7 @@ export default function AffiliateSettingsPage() {
                 </Card>
               </div>
 
-              <div className="grid gap-4 lg:grid-cols-3">
+              <div className="grid gap-[var(--content-density-gap,1rem)] lg:grid-cols-3">
                 <Card data-testid="health-revenue-breakdown">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base">Revenue Impact</CardTitle>
@@ -2196,23 +2196,23 @@ export default function AffiliateSettingsPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4">
-                      <div className="text-center p-3 rounded border" data-testid="attr-total-revenue">
+                    <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-[var(--content-density-gap,1rem)]">
+                      <div className="text-center p-[var(--card-padding,1.25rem)] rounded border" data-testid="attr-total-revenue">
                         <p className="text-xs text-muted-foreground mb-1">Total Revenue</p>
                         <p className="text-xl font-bold">${(revenueAttribution.totalRevenue / 100).toFixed(2)}</p>
                         <p className="text-[10px] text-muted-foreground">{revenueAttribution.invoiceCount} invoices</p>
                       </div>
-                      <div className="text-center p-3 rounded border" data-testid="attr-affiliate-revenue">
+                      <div className="text-center p-[var(--card-padding,1.25rem)] rounded border" data-testid="attr-affiliate-revenue">
                         <p className="text-xs text-muted-foreground mb-1">Affiliate Revenue</p>
                         <p className="text-xl font-bold text-green-600 dark:text-green-400">${(revenueAttribution.affiliateRevenue / 100).toFixed(2)}</p>
                         <p className="text-[10px] text-muted-foreground">{revenueAttribution.affiliatePercentage}% of total</p>
                       </div>
-                      <div className="text-center p-3 rounded border" data-testid="attr-direct-revenue">
+                      <div className="text-center p-[var(--card-padding,1.25rem)] rounded border" data-testid="attr-direct-revenue">
                         <p className="text-xs text-muted-foreground mb-1">Direct Revenue</p>
                         <p className="text-xl font-bold">${(revenueAttribution.directRevenue / 100).toFixed(2)}</p>
                         <p className="text-[10px] text-muted-foreground">{100 - revenueAttribution.affiliatePercentage}% of total</p>
                       </div>
-                      <div className="text-center p-3 rounded border" data-testid="attr-commissions">
+                      <div className="text-center p-[var(--card-padding,1.25rem)] rounded border" data-testid="attr-commissions">
                         <p className="text-xs text-muted-foreground mb-1">Commissions</p>
                         <p className="text-xl font-bold">${(revenueAttribution.totalCommissionsPaid / 100).toFixed(2)}</p>
                         <p className="text-[10px] text-muted-foreground">${(revenueAttribution.totalCommissionsPending / 100).toFixed(2)} pending</p>
@@ -2223,7 +2223,7 @@ export default function AffiliateSettingsPage() {
                         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
                           <span>Revenue Split</span>
                         </div>
-                        <div className="w-full h-6 rounded-md overflow-hidden flex bg-muted">
+                        <div className="w-full h-6 rounded-[var(--card-radius,0.75rem)] overflow-hidden flex bg-muted">
                           <div
                             className="bg-green-500 dark:bg-green-600 h-full flex items-center justify-center text-[10px] font-medium text-white transition-all"
                             style={{ width: `${Math.max(revenueAttribution.affiliatePercentage, 2)}%` }}
@@ -2239,7 +2239,7 @@ export default function AffiliateSettingsPage() {
                             {(100 - revenueAttribution.affiliatePercentage) > 8 ? `${100 - revenueAttribution.affiliatePercentage}%` : ''}
                           </div>
                         </div>
-                        <div className="flex items-center gap-4 text-xs">
+                        <div className="flex items-center gap-[var(--content-density-gap,1rem)] text-xs">
                           <div className="flex items-center gap-1.5">
                             <span className="w-2.5 h-2.5 rounded-sm bg-green-500 dark:bg-green-600" />
                             <span className="text-muted-foreground">Affiliate</span>
@@ -2288,7 +2288,7 @@ export default function AffiliateSettingsPage() {
             </>
           ) : (
             <Card>
-              <CardContent className="py-8 text-center">
+              <CardContent className="py-[var(--section-spacing,1.5rem)] text-center">
                 <Activity className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">Program health data will appear here once you have affiliates and referral activity.</p>
               </CardContent>
@@ -2296,7 +2296,7 @@ export default function AffiliateSettingsPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="applications" className="space-y-4 mt-4">
+        <TabsContent value="applications" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <Card data-testid="card-applications">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
@@ -2326,8 +2326,8 @@ export default function AffiliateSettingsPage() {
               ) : (
                 <div className="space-y-3">
                   {filteredApplications.map(app => (
-                    <div key={app.id} className="p-4 rounded-md border cursor-pointer" data-testid={`application-${app.id}`} onClick={() => { setDetailItem(app); setDetailType('application') }}>
-                      <div className="flex items-start justify-between gap-3">
+                    <div key={app.id} className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border cursor-pointer" data-testid={`application-${app.id}`} onClick={() => { setDetailItem(app); setDetailType('application') }}>
+                      <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <p className="font-medium text-sm">{app.name}</p>
@@ -2412,13 +2412,13 @@ export default function AffiliateSettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-4 mt-4">
+        <TabsContent value="settings" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <Card data-testid="card-commission-settings">
             <CardHeader>
               <CardTitle className="text-base">Commission Settings</CardTitle>
               <CardDescription>Changes only apply to new affiliates. Existing affiliates keep their locked-in terms.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Program Active</Label>
@@ -2430,7 +2430,7 @@ export default function AffiliateSettingsPage() {
                   data-testid="switch-program-active"
                 />
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
                 <div>
                   <Label htmlFor="commission-rate" className="flex items-center gap-1">
                     Commission Rate (%)
@@ -2512,7 +2512,7 @@ export default function AffiliateSettingsPage() {
 
               <div className="border-t pt-4 mt-4">
                 <h4 className="text-sm font-medium mb-3">Leaderboard Settings</h4>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
                   <div>
                     <Label>Leaderboard Enabled</Label>
                     <p className="text-xs text-muted-foreground">Show a ranked leaderboard on the affiliate dashboard</p>
@@ -2545,7 +2545,7 @@ export default function AffiliateSettingsPage() {
                   Re-Engagement Settings
                   <HelpTooltip text="Automated emails sent to dormant affiliates encouraging them to start promoting again." />
                 </h4>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
                   <div>
                     <Label>Re-Engagement Emails</Label>
                     <p className="text-xs text-muted-foreground">Automatically email dormant affiliates to re-activate them</p>
@@ -2557,7 +2557,7 @@ export default function AffiliateSettingsPage() {
                   />
                 </div>
                 {settings.reengagement_enabled && (
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
                     <div>
                       <Label className="flex items-center gap-1">
                         Dormancy Threshold (days)
@@ -2577,7 +2577,7 @@ export default function AffiliateSettingsPage() {
 
               <div className="border-t pt-4 mt-4">
                 <h4 className="text-sm font-medium mb-3">Payout Automation</h4>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
                   <div>
                     <Label>Automatic Batch Generation</Label>
                     <p className="text-xs text-muted-foreground">Auto-generate payout batches on a schedule</p>
@@ -2589,7 +2589,7 @@ export default function AffiliateSettingsPage() {
                   />
                 </div>
                 {settings.auto_batch_enabled && (
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
                     <div>
                       <Label>Schedule Day of Month</Label>
                       <Input type="number" min="1" max="28" value={settings.payout_schedule_day || ''} onChange={e => setSettings(s => ({ ...s, payout_schedule_day: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-payout-schedule-day" />
@@ -2606,7 +2606,7 @@ export default function AffiliateSettingsPage() {
 
               <div className="border-t pt-4 mt-4">
                 <h4 className="text-sm font-medium mb-3">Two-Tier Referrals</h4>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
                   <div>
                     <Label>Enable Two-Tier Commissions</Label>
                     <p className="text-xs text-muted-foreground">Affiliates earn a percentage when their recruited affiliates make sales</p>
@@ -2628,7 +2628,7 @@ export default function AffiliateSettingsPage() {
 
               <div className="border-t pt-4 mt-4">
                 <h4 className="text-sm font-medium mb-3">Fraud Detection</h4>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
                   <div>
                     <Label>Enable Fraud Scoring</Label>
                     <p className="text-xs text-muted-foreground">Automatically score affiliates for suspicious behavior</p>
@@ -2667,7 +2667,7 @@ export default function AffiliateSettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="tiers" className="space-y-4 mt-4">
+        <TabsContent value="tiers" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <Card data-testid="card-tiers">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
@@ -2725,15 +2725,15 @@ export default function AffiliateSettingsPage() {
                 <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-tiers">No tiers configured. Add tiers to reward top affiliates.</p>
               ) : (
                 <>
-                  <div className="flex items-center gap-3 mb-3 text-xs">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)] mb-3 text-xs">
                     <SortableHeader label="Name" sortKey="name" currentSort={tierSort} onSort={toggleTierSort} />
                     <SortableHeader label="Min Referrals" sortKey="min_referrals" currentSort={tierSort} onSort={toggleTierSort} />
                     <SortableHeader label="Commission Rate" sortKey="commission_rate" currentSort={tierSort} onSort={toggleTierSort} />
                   </div>
                   <div className="space-y-2">
                     {sortedTiers.map(tier => (
-                      <div key={tier.id} className="flex items-center justify-between p-3 rounded-md border cursor-pointer" data-testid={`tier-${tier.id}`} onClick={() => { setDetailItem(tier); setDetailType('tier') }}>
-                        <div className="flex items-center gap-3">
+                      <div key={tier.id} className="flex items-center justify-between p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border cursor-pointer" data-testid={`tier-${tier.id}`} onClick={() => { setDetailItem(tier); setDetailType('tier') }}>
+                        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                           <Award className="h-4 w-4 text-muted-foreground" />
                           <div>
                             <p className="font-medium text-sm">{tier.name}</p>
@@ -2764,7 +2764,7 @@ export default function AffiliateSettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="assets" className="space-y-4 mt-4">
+        <TabsContent value="assets" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <Card data-testid="card-assets">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
@@ -2843,7 +2843,7 @@ export default function AffiliateSettingsPage() {
                 <p className="text-sm text-muted-foreground text-center py-4">No assets match the selected filter.</p>
               ) : (
                 <>
-                  <div className="flex items-center gap-3 mb-3 text-xs">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)] mb-3 text-xs">
                     <SortableHeader label="Title" sortKey="title" currentSort={assetSort} onSort={toggleAssetSort} />
                     <SortableHeader label="Type" sortKey="asset_type" currentSort={assetSort} onSort={toggleAssetSort} />
                   </div>
@@ -2852,8 +2852,8 @@ export default function AffiliateSettingsPage() {
                       const typeIcon = asset.asset_type === 'banner' ? FileImage : FileText
                       const TypeIcon = typeIcon
                       return (
-                        <div key={asset.id} className="flex items-center justify-between p-3 rounded-md border cursor-pointer" data-testid={`asset-${asset.id}`} onClick={() => { setDetailItem(asset); setDetailType('asset') }}>
-                          <div className="flex items-center gap-3">
+                        <div key={asset.id} className="flex items-center justify-between p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border cursor-pointer" data-testid={`asset-${asset.id}`} onClick={() => { setDetailItem(asset); setDetailType('asset') }}>
+                          <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                             <TypeIcon className="h-4 w-4 text-muted-foreground" />
                             <div>
                               <p className="font-medium text-sm">{asset.title}</p>
@@ -2878,10 +2878,10 @@ export default function AffiliateSettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="affiliates" className="space-y-4 mt-4">
+        <TabsContent value="affiliates" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <Card data-testid="card-affiliates-list">
             <CardHeader>
-              <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center justify-between flex-wrap gap-[var(--content-density-gap,1rem)]">
                 <div>
                   <CardTitle className="text-base">Affiliate Members ({members.length})</CardTitle>
                   <CardDescription>Manage all affiliates — view stats, filter by status, and remove records</CardDescription>
@@ -2914,9 +2914,9 @@ export default function AffiliateSettingsPage() {
             </CardHeader>
             <CardContent>
               {members.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-no-members">No affiliates yet. Approve applications to add affiliates.</p>
+                <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]" data-testid="text-no-members">No affiliates yet. Approve applications to add affiliates.</p>
               ) : sortedFilteredMembers.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">No affiliates match your current filters.</p>
+                <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]">No affiliates match your current filters.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -3085,7 +3085,7 @@ export default function AffiliateSettingsPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="milestones" className="space-y-4 mt-4">
+        <TabsContent value="milestones" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <Card data-testid="card-milestones">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
@@ -3158,7 +3158,7 @@ export default function AffiliateSettingsPage() {
                 <p className="text-sm text-muted-foreground text-center py-4">No milestones match the selected filter.</p>
               ) : (
                 <>
-                  <div className="flex items-center gap-3 mb-3 text-xs">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)] mb-3 text-xs">
                     <SortableHeader label="Name" sortKey="name" currentSort={milestoneSort} onSort={toggleMilestoneSort} />
                     <SortableHeader label="Threshold" sortKey="referral_threshold" currentSort={milestoneSort} onSort={toggleMilestoneSort} />
                     <SortableHeader label="Bonus Amount" sortKey="bonus_amount_cents" currentSort={milestoneSort} onSort={toggleMilestoneSort} />
@@ -3166,8 +3166,8 @@ export default function AffiliateSettingsPage() {
                   </div>
                   <div className="space-y-2">
                     {sortedFilteredMilestones.map(ms => (
-                      <div key={ms.id} className="flex items-center justify-between p-3 rounded-md border cursor-pointer" data-testid={`milestone-${ms.id}`} onClick={() => { setDetailItem(ms); setDetailType('milestone') }}>
-                        <div className="flex items-center gap-3">
+                      <div key={ms.id} className="flex items-center justify-between p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border cursor-pointer" data-testid={`milestone-${ms.id}`} onClick={() => { setDetailItem(ms); setDetailType('milestone') }}>
+                        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                           <Target className="h-4 w-4 text-muted-foreground" />
                           <div>
                             <p className="font-medium text-sm">{ms.name}</p>
@@ -3208,7 +3208,7 @@ export default function AffiliateSettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="broadcasts" className="space-y-4 mt-4">
+        <TabsContent value="broadcasts" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <Card data-testid="card-broadcasts">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
@@ -3301,12 +3301,12 @@ export default function AffiliateSettingsPage() {
                 <p className="text-sm text-muted-foreground text-center py-6">No broadcasts match the selected filter.</p>
               ) : (
                 <>
-                  <div className="flex items-center gap-3 mb-3 text-xs">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)] mb-3 text-xs">
                     <SortableHeader label="Date" sortKey="created_at" currentSort={broadcastSort} onSort={toggleBroadcastSort} />
                   </div>
                   <div className="space-y-2">
                     {sortedFilteredBroadcasts.map(bc => (
-                      <div key={bc.id} className="flex items-center justify-between p-3 rounded-md border cursor-pointer" data-testid={`broadcast-${bc.id}`} onClick={() => { setDetailItem(bc); setDetailType('broadcast') }}>
+                      <div key={bc.id} className="flex items-center justify-between p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border cursor-pointer" data-testid={`broadcast-${bc.id}`} onClick={() => { setDetailItem(bc); setDetailType('broadcast') }}>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <p className="font-medium text-sm truncate">{bc.subject}</p>
@@ -3314,7 +3314,7 @@ export default function AffiliateSettingsPage() {
                               {bc.status}
                             </Badge>
                           </div>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-1 text-xs text-muted-foreground">
                             <span>{new Date(bc.created_at).toLocaleDateString()}</span>
                             {bc.status === 'sent' && (
                               <>
@@ -3367,7 +3367,7 @@ export default function AffiliateSettingsPage() {
           </Dialog>
         </TabsContent>
 
-        <TabsContent value="networks" className="space-y-4 mt-4">
+        <TabsContent value="networks" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <Card data-testid="card-networks">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
@@ -3382,9 +3382,9 @@ export default function AffiliateSettingsPage() {
                   No affiliate networks configured yet. Networks will appear here once the database migration is run.
                 </p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-[var(--content-density-gap,1rem)]">
                   {networks.map(network => (
-                    <div key={network.id} className="p-4 rounded-md border cursor-pointer" data-testid={`network-${network.network_slug}`} onClick={() => { setEditingNetwork(network); setNetworkForm({ tracking_id: network.tracking_id || '', postback_url: network.postback_url || '', api_key: network.api_key || '' }); setNetworkEditDialog(true) }}>
+                    <div key={network.id} className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border cursor-pointer" data-testid={`network-${network.network_slug}`} onClick={() => { setEditingNetwork(network); setNetworkForm({ tracking_id: network.tracking_id || '', postback_url: network.postback_url || '', api_key: network.api_key || '' }); setNetworkEditDialog(true) }}>
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <h4 className="font-medium text-sm">{network.network_name}</h4>
@@ -3400,7 +3400,7 @@ export default function AffiliateSettingsPage() {
                         />
                       </div>
                       {network.is_active && (
-                        <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
                           <div>
                             <Label className="text-xs text-muted-foreground">Tracking ID</Label>
                             <p className="text-xs mt-0.5 truncate" data-testid={`text-tracking-${network.network_slug}`}>
@@ -3429,7 +3429,7 @@ export default function AffiliateSettingsPage() {
               <DialogTitle>{editingNetwork?.network_name || 'Network'} Settings</DialogTitle>
               <DialogDescription>Configure tracking and integration settings for this affiliate network.</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-2">
+            <div className="space-y-[var(--content-density-gap,1rem)] py-2">
               <div>
                 <Label>Tracking ID</Label>
                 <Input
@@ -3484,7 +3484,7 @@ export default function AffiliateSettingsPage() {
           </DialogContent>
         </Dialog>
 
-        <TabsContent value="contests" className="space-y-4 mt-4">
+        <TabsContent value="contests" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <Card data-testid="card-contests">
             <CardHeader className="flex-row items-center justify-between">
               <div>
@@ -3515,13 +3515,13 @@ export default function AffiliateSettingsPage() {
                 <p className="text-sm text-muted-foreground text-center py-6">No contests match the selected filter.</p>
               ) : (
                 <>
-                  <div className="flex items-center gap-3 mb-3 text-xs">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)] mb-3 text-xs">
                     <SortableHeader label="Date" sortKey="start_date" currentSort={contestSort} onSort={toggleContestSort} />
                   </div>
                   <div className="space-y-3">
                     {sortedFilteredContests.map(c => (
-                      <div key={c.id} className="p-4 rounded-md border cursor-pointer" data-testid={`contest-${c.id}`} onClick={() => { setDetailItem(c); setDetailType('contest') }}>
-                        <div className="flex items-start justify-between gap-3">
+                      <div key={c.id} className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border cursor-pointer" data-testid={`contest-${c.id}`} onClick={() => { setDetailItem(c); setDetailType('contest') }}>
+                        <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <p className="font-medium text-sm">{c.name}</p>
@@ -3530,7 +3530,7 @@ export default function AffiliateSettingsPage() {
                               </Badge>
                             </div>
                             {c.description && <p className="text-xs text-muted-foreground">{c.description}</p>}
-                            <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-1 text-xs text-muted-foreground">
                               <span>Metric: {c.metric}</span>
                               <span>Prize: ${(c.prize_amount_cents / 100).toFixed(2)}</span>
                               <span>{new Date(c.start_date).toLocaleDateString()} — {new Date(c.end_date).toLocaleDateString()}</span>
@@ -3577,7 +3577,7 @@ export default function AffiliateSettingsPage() {
                   <Label>Description</Label>
                   <Input value={contestForm.description} onChange={e => setContestForm(f => ({ ...f, description: e.target.value }))} data-testid="input-contest-description" />
                 </div>
-                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+                <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2">
                   <div>
                     <Label>Metric</Label>
                     <Select value={contestForm.metric} onValueChange={v => setContestForm(f => ({ ...f, metric: v }))}>
@@ -3598,7 +3598,7 @@ export default function AffiliateSettingsPage() {
                   <Label>Prize Description</Label>
                   <Input value={contestForm.prize_description} onChange={e => setContestForm(f => ({ ...f, prize_description: e.target.value }))} placeholder="e.g. Cash bonus + featured spotlight" data-testid="input-contest-prize-desc" />
                 </div>
-                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+                <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2">
                   <div>
                     <Label>Start Date</Label>
                     <Input type="date" value={contestForm.start_date} onChange={e => setContestForm(f => ({ ...f, start_date: e.target.value }))} data-testid="input-contest-start" />
@@ -3617,7 +3617,7 @@ export default function AffiliateSettingsPage() {
           </Dialog>
         </TabsContent>
 
-        <TabsContent value="payout-batches" className="space-y-4 mt-4">
+        <TabsContent value="payout-batches" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <Card data-testid="card-payout-batches">
             <CardHeader className="flex-row items-center justify-between gap-2">
               <div>
@@ -3655,8 +3655,8 @@ export default function AffiliateSettingsPage() {
               ) : (
                 <div className="space-y-3">
                   {filteredBatches.map(b => (
-                    <div key={b.id} className="p-4 rounded-md border cursor-pointer" data-testid={`batch-${b.id}`} onClick={() => { setDetailItem(b); setDetailType('payout_batch') }}>
-                      <div className="flex items-start justify-between gap-3">
+                    <div key={b.id} className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border cursor-pointer" data-testid={`batch-${b.id}`} onClick={() => { setDetailItem(b); setDetailType('payout_batch') }}>
+                      <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <Badge variant={b.status === 'pending' ? 'outline' : b.status === 'rejected' ? 'destructive' : 'default'} className={`text-xs capitalize ${b.status === 'approved' || b.status === 'completed' ? 'bg-green-600' : ''}`}>
@@ -3703,8 +3703,8 @@ export default function AffiliateSettingsPage() {
                 <DialogDescription>Review the batch summary and approve to process all payouts at once.</DialogDescription>
               </DialogHeader>
               {processAllSummary ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-[var(--content-density-gap,1rem)]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                     <Card>
                       <CardContent className="pt-4 pb-3">
                         <div className="flex items-center gap-2">
@@ -3755,12 +3755,12 @@ export default function AffiliateSettingsPage() {
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+                <div className="flex justify-center py-[var(--section-spacing,1.5rem)]"><Loader2 className="h-6 w-6 animate-spin" /></div>
               )}
             </DialogContent>
           </Dialog>
         </TabsContent>
-        <TabsContent value="audit" className="space-y-4 mt-4">
+        <TabsContent value="audit" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <Card data-testid="card-audit-log">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
@@ -3772,7 +3772,7 @@ export default function AffiliateSettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-muted-foreground mb-[var(--content-density-gap,1rem)]">
                 Every change to tiers, milestones, assets, broadcasts, applications, contests, settings, networks, and payouts is automatically recorded with the admin who made it.
               </p>
               <Button asChild data-testid="button-view-audit-logs">
@@ -3784,19 +3784,19 @@ export default function AffiliateSettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="messages" className="space-y-4 mt-4">
+        <TabsContent value="messages" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <AdminMessagesTab />
         </TabsContent>
 
-        <TabsContent value="testimonials" className="space-y-4 mt-4">
+        <TabsContent value="testimonials" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <AdminTestimonialsTab />
         </TabsContent>
 
-        <TabsContent value="tax-info" className="space-y-4 mt-4">
+        <TabsContent value="tax-info" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <AdminTaxInfoTab />
         </TabsContent>
 
-        <TabsContent value="renewals" className="space-y-4 mt-4">
+        <TabsContent value="renewals" className="space-y-[var(--content-density-gap,1rem)] mt-4">
           <AdminRenewalsTab />
         </TabsContent>
 

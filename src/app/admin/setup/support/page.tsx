@@ -15,7 +15,7 @@ export default function SupportPage() {
   const { settings, saving, saved, handleSave, updateSupport } = useSetupSettingsContext()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -26,7 +26,7 @@ export default function SupportPage() {
             Configure the AI-powered support chatbot widget
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable Support Widget</p>
@@ -105,7 +105,7 @@ export default function SupportPage() {
               Configure how your AI support assistant should behave
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label htmlFor="system-prompt">System Prompt</Label>
               <Textarea

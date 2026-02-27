@@ -220,23 +220,23 @@ function HeroPreview({ shades, isDark }: { shades: Record<string, string>; isDar
   const iconColor = isDark ? shades['200'] : shades['800']
   return (
     <Card>
-      <div className="p-8">
-        <div className="flex items-center gap-2 mb-4">
+      <div className="p-[var(--section-spacing,1.5rem)]">
+        <div className="flex items-center gap-2 mb-[var(--content-density-gap,1rem)]">
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            className="w-8 h-8 rounded-[var(--card-radius,0.75rem)] flex items-center justify-center"
             style={{ backgroundColor: shades[iconBgShades[0]] }}
           >
             <Zap className="w-4 h-4" style={{ color: iconColor }} />
           </div>
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            className="w-8 h-8 rounded-[var(--card-radius,0.75rem)] flex items-center justify-center"
             style={{ backgroundColor: shades[iconBgShades[1]] }}
           >
             <Star className="w-4 h-4" style={{ color: iconColor }} />
           </div>
         </div>
         <h3 className="text-[30px] font-bold mb-2 leading-tight">Increase your revenue by 3x</h3>
-        <p className="text-[15px] mb-6 max-w-xs opacity-70">
+        <p className="text-[15px] mb-[var(--content-density-gap,1rem)] max-w-xs opacity-70">
           Our platform helps you close more deals and scale faster than ever.
         </p>
         <Button
@@ -269,9 +269,9 @@ function CategoriesPreview({ shades, isDark }: { shades: Record<string, string>;
         <CardTitle className="text-[30px] leading-tight">Categories</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
           {categories.map(c => (
-            <div key={c.name} className="flex flex-col items-center gap-2 cursor-pointer hover-elevate active-elevate-2 rounded-lg p-1">
+            <div key={c.name} className="flex flex-col items-center gap-2 cursor-pointer hover-elevate active-elevate-2 rounded-[var(--card-radius,0.75rem)] p-1">
               <div
                 className="w-11 h-11 rounded-full flex items-center justify-center"
                 style={{ backgroundColor: shades[bgShades[c.bgIdx]] }}
@@ -304,7 +304,7 @@ function BudgetPreview({ shades, isDark }: { shades: Record<string, string>; isD
         {items.map(item => (
           <div key={item.name} className="space-y-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: shades[bgShades[item.bgIdx]] }}>
+              <div className="w-8 h-8 rounded-[var(--card-radius,0.75rem)] flex items-center justify-center shrink-0" style={{ backgroundColor: shades[bgShades[item.bgIdx]] }}>
                 <item.icon className="w-4 h-4" style={{ color: iconColor }} />
               </div>
               <div className="flex-1 min-w-0">
@@ -341,7 +341,7 @@ function NewsletterPreview({ shades, isDark }: { shades: Record<string, string>;
           <div
             key={item.name}
             className={cn(
-              "flex items-center gap-3 rounded-xl border-2 p-4 cursor-pointer hover-elevate active-elevate-2",
+              "flex items-center gap-[var(--content-density-gap,1rem)] rounded-xl border-2 p-[var(--card-padding,1.25rem)] cursor-pointer hover-elevate active-elevate-2",
               item.active ? 'border-current' : 'border-border'
             )}
             style={item.active ? { borderColor: activeBorderColor } : undefined}
@@ -382,7 +382,7 @@ function SchedulePreview({ shades, isDark }: { shades: Record<string, string>; i
         {events.map(e => (
           <div
             key={e.time}
-            className="flex gap-4 rounded-xl p-4 cursor-pointer hover-elevate active-elevate-2"
+            className="flex gap-[var(--content-density-gap,1rem)] rounded-xl p-[var(--card-padding,1.25rem)] cursor-pointer hover-elevate active-elevate-2"
             style={{ backgroundColor: shades[e.shade] }}
           >
             <div className="shrink-0 text-center">
@@ -452,7 +452,7 @@ function RevenueChartPreview({ shades }: { shades: Record<string, string> }) {
             <Badge variant="secondary" className="text-xs">+19%</Badge>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: shades['400'] }} />
             <span className="text-[15px] text-muted-foreground">Income</span>
@@ -468,7 +468,7 @@ function RevenueChartPreview({ shades }: { shades: Record<string, string> }) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-lg bg-muted p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] bg-muted p-[var(--card-padding,1.25rem)]">
           <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height: 140 }}>
             <path d={toPath(dataSavings)} fill="none" stroke={shades['200']} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             <path d={toPath(dataExpenses)} fill="none" stroke={shades['600']} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -492,9 +492,9 @@ function PricingPreview() {
         <CardTitle className="text-[30px] leading-tight">Pricing plans</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
           {plans.map(plan => (
-            <div key={plan.name} className={cn('rounded-xl border-2 p-5 space-y-4 cursor-pointer hover-elevate active-elevate-2', plan.featured ? 'border-primary-600 dark:border-primary-400' : 'border-border')}>
+            <div key={plan.name} className={cn('rounded-xl border-2 p-5 space-y-[var(--content-density-gap,1rem)] cursor-pointer hover-elevate active-elevate-2', plan.featured ? 'border-primary-600 dark:border-primary-400' : 'border-border')}>
               <div>
                 <p className="text-[30px] font-semibold leading-tight">{plan.name}</p>
                 <p className="text-[15px] text-muted-foreground mt-1">{plan.desc}</p>
@@ -543,7 +543,7 @@ function TicketsPreview({ shades, isDark }: { shades: Record<string, string>; is
       </CardHeader>
       <CardContent className="space-y-3">
         {tickets.map(t => (
-          <div key={t.name} className="flex items-center gap-3 rounded-xl p-2 cursor-pointer hover-elevate active-elevate-2">
+          <div key={t.name} className="flex items-center gap-[var(--content-density-gap,1rem)] rounded-xl p-2 cursor-pointer hover-elevate active-elevate-2">
             <Avatar className="h-9 w-9">
               <AvatarFallback
                 className="text-xs"
@@ -574,7 +574,7 @@ function ContinueWatchingPreview() {
         <CardTitle className="text-[30px] leading-tight">Continue Watching</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
           {courses.map(c => (
             <div key={c.title} className="space-y-2 cursor-pointer hover-elevate active-elevate-2 rounded-xl p-1">
               <div className="group relative aspect-[16/10] rounded-xl overflow-hidden">
@@ -598,7 +598,7 @@ function EmailStatsPreview() {
   return (
     <Card>
       <CardContent className="pt-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
           <div className="space-y-1">
             <p className="text-[15px] text-muted-foreground">Total Subscribers</p>
             <div className="flex items-baseline gap-2">
@@ -637,10 +637,10 @@ function FeatureCardsPreview({ shades, isDark }: { shades: Record<string, string
   return (
     <Card>
       <CardContent className="pt-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
           {features.map(f => (
             <div key={f.title} className="rounded-xl border p-5 space-y-3 cursor-pointer hover-elevate active-elevate-2">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: shades[bgShades[f.bgIdx]] }}>
+              <div className="w-10 h-10 rounded-[var(--card-radius,0.75rem)] flex items-center justify-center" style={{ backgroundColor: shades[bgShades[f.bgIdx]] }}>
                 <f.icon className="w-5 h-5" style={{ color: iconColor }} />
               </div>
               <p className="text-[30px] font-semibold leading-tight">{f.title}</p>
@@ -657,17 +657,17 @@ function ButtonShowcase() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <span className="text-[15px] text-muted-foreground w-16">Default</span>
           <span className="text-[15px] text-muted-foreground w-16">Hover</span>
           <span className="text-[15px] text-muted-foreground w-16">Active</span>
           <span className="text-[15px] text-muted-foreground w-16">Disabled</span>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-[var(--content-density-gap,1rem)]">
         <div className="space-y-1">
           <p className="text-[15px] font-medium text-muted-foreground mb-2">Primary</p>
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
             <Button size="sm" data-testid="button-primary-default">Primary</Button>
             <Button size="sm" data-testid="button-primary-hover">Primary</Button>
             <Button size="sm" data-testid="button-primary-active">Primary</Button>
@@ -677,7 +677,7 @@ function ButtonShowcase() {
         <Separator />
         <div className="space-y-1">
           <p className="text-[15px] font-medium text-muted-foreground mb-2">Secondary</p>
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
             <Button size="sm" variant="secondary" data-testid="button-secondary-default">Secondary</Button>
             <Button size="sm" variant="secondary" data-testid="button-secondary-hover">Secondary</Button>
             <Button size="sm" variant="secondary" data-testid="button-secondary-active">Secondary</Button>
@@ -687,7 +687,7 @@ function ButtonShowcase() {
         <Separator />
         <div className="space-y-1">
           <p className="text-[15px] font-medium text-muted-foreground mb-2">Tertiary</p>
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
             <Button size="sm" variant="outline" data-testid="button-tertiary-default">Tertiary</Button>
             <Button size="sm" variant="outline" data-testid="button-tertiary-hover">Tertiary</Button>
             <Button size="sm" variant="outline" data-testid="button-tertiary-active">Tertiary</Button>
@@ -736,7 +736,7 @@ function CalendarPreview() {
               <div key={i} className="flex flex-col items-center">
                 <span
                   className={cn(
-                    'text-[15px] w-8 h-8 flex items-center justify-center rounded-md tabular-nums',
+                    'text-[15px] w-8 h-8 flex items-center justify-center rounded-[var(--card-radius,0.75rem)] tabular-nums',
                     isToday && 'bg-primary-600 dark:bg-primary-400 text-white dark:text-black font-semibold',
                     hasEvent && !isToday && 'bg-secondary font-medium',
                   )}
@@ -792,7 +792,7 @@ function BarChartPreview({ shades }: { shades: Record<string, string> }) {
             <Badge variant="secondary" className="text-[15px]" data-testid="badge-barchart-growth">+16%</Badge>
           </div>
         </div>
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
           {series.map(s => (
             <div key={s.label} className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: shades[s.shade] }} />
@@ -802,8 +802,8 @@ function BarChartPreview({ shades }: { shades: Record<string, string> }) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-lg bg-muted p-4" data-testid="chart-bar-container">
-          <div className="flex items-end gap-3 h-[140px]">
+        <div className="rounded-[var(--card-radius,0.75rem)] bg-muted p-[var(--card-padding,1.25rem)]" data-testid="chart-bar-container">
+          <div className="flex items-end gap-[var(--content-density-gap,1rem)] h-[140px]">
             {months.map((month, mi) => (
               <div key={month} className="flex-1 flex flex-col items-center gap-1">
                 <div className="flex items-end gap-0.5 w-full h-[120px]">
@@ -914,8 +914,8 @@ export default function PalettePage() {
   }, [])
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-end justify-between gap-4 flex-wrap">
+    <div className="space-y-[var(--section-spacing,1.5rem)]">
+      <div className="flex items-end justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div className="space-y-2 max-w-xs">
           <ColorInput
             label="Base Color"
@@ -962,7 +962,7 @@ export default function PalettePage() {
       </div>
 
       <div>
-        <div className="flex rounded-lg overflow-hidden border">
+        <div className="flex rounded-[var(--card-radius,0.75rem)] overflow-hidden border">
           {shadeKeys.map(shade => {
             const hex = shades[shade]
             const textColor = getContrastText(hex)
@@ -990,7 +990,7 @@ export default function PalettePage() {
       </div>
 
       <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
-        <div className="flex items-end gap-4">
+        <div className="flex items-end gap-[var(--content-density-gap,1rem)]">
           <ColorInput
             label="Site Background (Light)"
             value={bgOverrides.siteBgLight || defaults.siteBgLight}
@@ -1023,32 +1023,32 @@ export default function PalettePage() {
       </div>
 
       <div
-        className="rounded-xl p-8 transition-colors duration-300 bg-background text-foreground"
+        className="rounded-xl p-[var(--section-spacing,1.5rem)] transition-colors duration-300 bg-background text-foreground"
         style={cssOverrides as React.CSSProperties}
       >
-        <p className="text-[15px] font-medium text-muted-foreground mb-6 uppercase tracking-wider">Live Preview</p>
-        <div className="space-y-6">
+        <p className="text-[15px] font-medium text-muted-foreground mb-[var(--content-density-gap,1rem)] uppercase tracking-wider">Live Preview</p>
+        <div className="space-y-[var(--content-density-gap,1rem)]">
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
             <HeroPreview shades={shades} isDark={darkMode} />
             <CategoriesPreview shades={shades} isDark={darkMode} />
             <BudgetPreview shades={shades} isDark={darkMode} />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
             <NewsletterPreview shades={shades} isDark={darkMode} />
             <SchedulePreview shades={shades} isDark={darkMode} />
             <ProfilePreview shades={shades} isDark={darkMode} />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <RevenueChartPreview shades={shades} />
             <PricingPreview />
           </div>
 
           <BarChartPreview shades={shades} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <TicketsPreview shades={shades} isDark={darkMode} />
             <ContinueWatchingPreview />
           </div>
@@ -1057,10 +1057,10 @@ export default function PalettePage() {
 
           <FeatureCardsPreview shades={shades} isDark={darkMode} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
             <ButtonShowcase />
             <CalendarPreview />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <BookCardPreview shades={shades} />
               <StatsDonutPreview shades={shades} />
             </div>

@@ -12,7 +12,7 @@ export default function SocialPage() {
   const { settings, saving, saved, handleSave, updateSocial } = useSetupSettingsContext()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">Social Links <InfoTooltip text="Displayed in your site footer. Helps with SEO and lets visitors find your brand across platforms." /></CardTitle>
@@ -20,7 +20,7 @@ export default function SocialPage() {
             Add links to your social media profiles
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label htmlFor="twitter">Twitter/X</Label>
             <Input

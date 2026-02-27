@@ -34,7 +34,7 @@ export default function ContentPage() {
   } = useSetupSettingsContext()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card className="bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
         <CardHeader>
           <CardTitle className="text-blue-800 dark:text-blue-300">Quick Tips for Homepage Sections</CardTitle>
@@ -63,8 +63,8 @@ export default function ContentPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Section Headline</Label>
               <Input
@@ -94,7 +94,7 @@ export default function ContentPage() {
             </div>
             
             {(settings.content?.featureCards ?? []).map((card, index) => (
-              <div key={card.id} className="p-4 border rounded-lg space-y-3">
+              <div key={card.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium">Feature {index + 1}</span>
                   <Button 
@@ -107,7 +107,7 @@ export default function ContentPage() {
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
                   <div className="space-y-1">
                     <Label className="text-xs">Icon</Label>
                     <Select
@@ -174,8 +174,8 @@ export default function ContentPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Section Headline</Label>
               <Input
@@ -211,7 +211,7 @@ export default function ContentPage() {
             </div>
             
             {(settings.content?.testimonials ?? []).map((t, index) => (
-              <div key={t.id} className="p-4 border rounded-lg space-y-3">
+              <div key={t.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium">Testimonial {index + 1}</span>
                   <Button 
@@ -224,7 +224,7 @@ export default function ContentPage() {
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
                   <div className="space-y-1">
                     <Label className="text-xs">Name</Label>
                     <Input
@@ -286,7 +286,7 @@ export default function ContentPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label>Section Headline</Label>
             <Input
@@ -306,7 +306,7 @@ export default function ContentPage() {
             </div>
             
             {(settings.content?.faqItems ?? []).map((faq, index) => (
-              <div key={faq.id} className="p-4 border rounded-lg space-y-3">
+              <div key={faq.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium">FAQ {index + 1}</span>
                   <Button 
@@ -360,8 +360,8 @@ export default function ContentPage() {
             />
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -381,7 +381,7 @@ export default function ContentPage() {
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Button Text</Label>
               <Input
@@ -421,7 +421,7 @@ export default function ContentPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label>Section Headline</Label>
             <Input
@@ -481,7 +481,7 @@ export default function ContentPage() {
             
             <div className="space-y-3">
               {(settings.content?.trustedLogos || []).map((logo, index) => (
-                <div key={logo.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
+                <div key={logo.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/30 space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">Logo {index + 1}</span>
                     <Button
@@ -561,7 +561,7 @@ export default function ContentPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label>Section Headline (optional)</Label>
             <Input
@@ -592,9 +592,9 @@ export default function ContentPage() {
               </Button>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               {(settings.content?.metrics || []).map((metric, index) => (
-                <div key={metric.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
+                <div key={metric.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/30 space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">Metric {index + 1}</span>
                     <Button
@@ -611,7 +611,7 @@ export default function ContentPage() {
                     </Button>
                   </div>
                   <div className="space-y-2">
-                    <div className="rounded-md bg-primary-50 dark:bg-primary-950 p-3 text-center mb-2" data-testid={`metric-preview-${index}`}>
+                    <div className="rounded-[var(--card-radius,0.75rem)] bg-primary-50 dark:bg-primary-950 p-[var(--card-padding,1.25rem)] text-center mb-2" data-testid={`metric-preview-${index}`}>
                       <div className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Preview</div>
                       <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                         {metric.prefix || ''}{metric.value || '0'}{metric.suffix || ''}
@@ -737,8 +737,8 @@ export default function ContentPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Section Headline</Label>
               <Input
@@ -781,7 +781,7 @@ export default function ContentPage() {
             
             <div className="space-y-3">
               {(settings.content?.processSteps || []).map((step, index) => (
-                <div key={step.id} className="flex gap-3 items-start p-3 border rounded-lg bg-muted/30">
+                <div key={step.id} className="flex gap-[var(--content-density-gap,1rem)] items-start p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/30">
                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-600 dark:bg-primary-400 text-white dark:text-black font-bold text-sm shrink-0">
                     {step.number}
                   </div>
@@ -863,7 +863,7 @@ export default function ContentPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-2">
               <Label>Content Blocks</Label>
@@ -890,9 +890,9 @@ export default function ContentPage() {
               </Button>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               {(settings.content?.imageTextBlocks || []).map((block, index) => (
-                <div key={block.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
+                <div key={block.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/30 space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">Block {index + 1}</span>
                     <Button
@@ -909,7 +909,7 @@ export default function ContentPage() {
                     </Button>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                     <div className="space-y-2">
                       <Label className="text-xs">Headline</Label>
                       <Input
@@ -985,7 +985,7 @@ export default function ContentPage() {
                     testId={`block-image-${index}`}
                   />
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                     <div className="space-y-2">
                       <Label className="text-xs">Button Text (optional)</Label>
                       <Input
@@ -1043,7 +1043,7 @@ export default function ContentPage() {
           </div>
         </CardHeader>
         {(settings.content?.customerStoriesEnabled ?? false) && (
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Section Headline</Label>
               <Input
@@ -1080,9 +1080,9 @@ export default function ContentPage() {
               </Button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               {(settings.content?.customerStories || []).map((story, index) => (
-                <div key={story.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
+                <div key={story.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/30 space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">Story {index + 1}</span>
                     <Button
@@ -1098,7 +1098,7 @@ export default function ContentPage() {
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                     <div className="space-y-2">
                       <Label className="text-xs">Company Name</Label>
                       <Input
@@ -1166,7 +1166,7 @@ export default function ContentPage() {
                       data-testid={`input-story-quote-${index}`}
                     />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                     <ImageUpload
                       label="Person Photo"
                       variant="avatar"
@@ -1256,7 +1256,7 @@ export default function ContentPage() {
           </div>
         </CardHeader>
         {(settings.content?.founderLetterEnabled ?? false) && (
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -1276,7 +1276,7 @@ export default function ContentPage() {
                 data-testid="input-founder-body"
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Founder Name</Label>
                 <Input
@@ -1345,8 +1345,8 @@ export default function ContentPage() {
           </div>
         </CardHeader>
         {(settings.content?.comparisonBarsEnabled ?? false) && (
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Headline</Label>
                 <Input
@@ -1366,7 +1366,7 @@ export default function ContentPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>CTA Button Text (optional)</Label>
                 <Input
@@ -1405,7 +1405,7 @@ export default function ContentPage() {
                 </Button>
               </div>
               {(settings.content?.comparisonBars?.items ?? []).map((item, index) => (
-                <div key={item.id} className="p-3 border rounded-lg bg-muted/30 space-y-2">
+                <div key={item.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/30 space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">Item {index + 1}</span>
                     <div className="flex items-center gap-2">
@@ -1499,8 +1499,8 @@ export default function ContentPage() {
           </div>
         </CardHeader>
         {(settings.content?.productShowcaseEnabled ?? false) && (
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Headline</Label>
                 <Input
@@ -1576,8 +1576,8 @@ export default function ContentPage() {
           </div>
         </CardHeader>
         {(settings.content?.bottomHeroCtaEnabled ?? false) && (
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Headline</Label>
                 <Input
@@ -1606,7 +1606,7 @@ export default function ContentPage() {
                 data-testid="input-bottom-hero-tagline"
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Button Text</Label>
                 <Input
@@ -1654,7 +1654,7 @@ export default function ContentPage() {
             <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-feature-subpages" />
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between gap-2">
             <Label>Feature Pages</Label>
             <Button
@@ -1679,7 +1679,7 @@ export default function ContentPage() {
             </Button>
           </div>
           {(settings.content?.featureSubPages || []).map((page, index) => (
-            <div key={page.id} className="p-4 border rounded-lg bg-muted/30 space-y-3">
+            <div key={page.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/30 space-y-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-medium">{page.title || `Feature Page ${index + 1}`}</span>
                 <Button
@@ -1814,8 +1814,8 @@ export default function ContentPage() {
             <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-backgrounds" />
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Features Section</Label>
               <Select
@@ -1938,7 +1938,7 @@ export default function ContentPage() {
           <CardDescription>Fan-style overlapping image layout with hover animations</CardDescription>
         </CardHeader>
         {settings.content?.imageCollageEnabled && (
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -1960,7 +1960,7 @@ export default function ContentPage() {
             <div className="space-y-2">
               <Label>Images (up to 5)</Label>
               <p className="text-xs text-muted-foreground">Upload portrait-oriented images for the best effect. They will fan out with alternating rotations.</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
                 {(settings.content?.imageCollageImages || []).map((url, i) => (
                   <div key={i} className="relative">
                     <ImageUpload
@@ -2041,7 +2041,7 @@ export default function ContentPage() {
             }
 
             return orderedSections.map((section, index) => (
-              <div key={section.id} className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">
+              <div key={section.id} className="flex items-center gap-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/30">
                 <span className="text-sm font-mono text-muted-foreground w-6 text-center">{index + 1}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{section.label}</p>
@@ -2079,7 +2079,7 @@ export default function ContentPage() {
           <CardDescription>Customize background colors for each section individually</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             {[
               { key: 'features', label: 'Features' },
               { key: 'testimonials', label: 'Testimonials' },

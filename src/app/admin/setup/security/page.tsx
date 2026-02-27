@@ -13,7 +13,7 @@ export default function SecurityPage() {
   const { settings, saving, saved, handleSave, updateSecurity } = useSetupSettingsContext()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -24,7 +24,7 @@ export default function SecurityPage() {
             Configure security settings for user authentication
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable MFA</p>
@@ -72,7 +72,7 @@ export default function SecurityPage() {
             Define password policies for user accounts
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label htmlFor="password-min-length">Minimum Length</Label>
             <Input
@@ -134,7 +134,7 @@ export default function SecurityPage() {
             Configure user session and timeout settings
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label htmlFor="session-timeout">Session Timeout</Label>
             <Input
@@ -159,7 +159,7 @@ export default function SecurityPage() {
             Configure user data access and deletion policies
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Allow Data Export</p>
@@ -196,7 +196,7 @@ export default function SecurityPage() {
             Configure automated database backup schedule (managed by Supabase)
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable Backup Notifications</p>
@@ -258,7 +258,7 @@ export default function SecurityPage() {
             Configure automatic rotation of API tokens and secrets
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable Token Rotation</p>
@@ -301,7 +301,7 @@ export default function SecurityPage() {
             Get notified when key metrics cross thresholds
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable Metric Alerts</p>

@@ -158,8 +158,8 @@ function AuditLogsContent() {
   }
 
   return (
-    <div className="py-8 px-6">
-      <div className="space-y-6">
+    <div className="py-[var(--section-spacing,1.5rem)] px-[var(--section-spacing,1.5rem)]">
+      <div className="space-y-[var(--content-density-gap,1rem)]">
         <div>
           <h1 className="text-3xl font-bold" data-testid="text-audit-logs-title">Audit Logs</h1>
           <p className="text-muted-foreground" data-testid="text-audit-logs-description">Track all administrative actions and changes across the platform</p>
@@ -167,7 +167,7 @@ function AuditLogsContent() {
 
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
               <CardTitle>Activity Log</CardTitle>
               <div className="flex items-center gap-2 flex-wrap">
                 <Select value={categoryFilter} onValueChange={handleCategoryChange}>
@@ -295,7 +295,7 @@ function AuditLogsContent() {
             <DialogTitle>Audit Log Detail</DialogTitle>
           </DialogHeader>
           {selectedLog && (
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
                 <span className="font-medium text-muted-foreground">Time</span>
                 <span>{new Date(selectedLog.created_at).toLocaleString()}</span>
@@ -353,7 +353,7 @@ function AuditLogsContent() {
 export default function AuditLogsPage() {
   return (
     <Suspense fallback={
-      <div className="py-8 px-6">
+      <div className="py-[var(--section-spacing,1.5rem)] px-[var(--section-spacing,1.5rem)]">
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>

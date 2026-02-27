@@ -7,7 +7,8 @@ import {
   AlertTriangle, ArrowRight, Loader2, Activity, Send, Bell, ArrowDown,
   Calendar, Clock, BarChart3, Target, ThumbsUp, ListChecks,
 } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardHeader, DSCardContent, DSCardTitle, DSCardDescription } from '@/components/ui/ds-card'
+import { DSGrid } from '@/components/ui/ds-grid'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Timeline, type TimelineEvent } from '@/components/admin/timeline'
@@ -101,9 +102,9 @@ const SEVERITY_STYLES: Record<string, string> = {
 
 function KPISkeleton() {
   return (
-    <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+    <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="rounded-lg border bg-card p-4 animate-pulse">
+        <div key={i} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] animate-pulse">
           <div className="h-3 bg-muted rounded w-2/3 mb-3" />
           <div className="h-7 bg-muted rounded w-1/2 mb-1" />
           <div className="h-3 bg-muted rounded w-1/3" />
@@ -289,16 +290,16 @@ export default function AdminDashboard() {
 
   if (isInitialLoad) {
     return (
-      <div className="p-6 space-y-6" data-testid="page-dashboard">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="p-[var(--section-spacing,1.5rem)] space-y-[var(--content-density-gap,1rem)]" data-testid="page-dashboard">
+        <div className="flex flex-wrap items-center justify-between gap-[var(--content-density-gap,1rem)]">
           <div>
             <h1 className="text-2xl font-bold" data-testid="text-admin-title">Dashboard</h1>
             <p className="text-sm text-muted-foreground">Your command center</p>
           </div>
         </div>
         <KPISkeleton />
-        <div className="grid gap-4 lg:grid-cols-3">
-          <div className="lg:col-span-2 rounded-lg border bg-card p-4 animate-pulse">
+        <DSGrid cols={{ default: 1, lg: 3 }}>
+          <div className="lg:col-span-2 rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] animate-pulse">
             <div className="h-4 bg-muted rounded w-1/3 mb-4" />
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -312,11 +313,11 @@ export default function AdminDashboard() {
               ))}
             </div>
           </div>
-          <div className="rounded-lg border bg-card p-4 animate-pulse">
+          <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] animate-pulse">
             <div className="h-4 bg-muted rounded w-1/2 mb-4" />
             <div className="h-20 bg-muted rounded" />
           </div>
-        </div>
+        </DSGrid>
       </div>
     )
   }
@@ -336,8 +337,8 @@ export default function AdminDashboard() {
   ] : []
 
   return (
-    <div className="p-6 space-y-6" data-testid="page-dashboard">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="p-[var(--section-spacing,1.5rem)] space-y-[var(--content-density-gap,1rem)]" data-testid="page-dashboard">
+      <div className="flex flex-wrap items-center justify-between gap-[var(--content-density-gap,1rem)]">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-admin-title">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Your command center</p>
@@ -355,14 +356,14 @@ export default function AdminDashboard() {
       </div>
 
       {kpiCards.length > 0 && (
-        <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-6" data-testid="section-kpi-grid">
+        <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-2 md:grid-cols-3 lg:grid-cols-6" data-testid="section-kpi-grid">
           {kpiCards.map(kpi => {
             const Icon = kpi.icon
             return (
               <Link
                 key={kpi.label}
                 href={kpi.href}
-                className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors group"
+                className="rounded-[var(--card-radius,0.75rem)] border-[length:var(--card-border-width,1px)] border-[var(--card-border-style,solid)] border-border bg-card p-[var(--card-padding,1.25rem)] shadow-[var(--card-shadow,0_1px_2px_0_rgb(0_0_0/0.05))] hover:bg-muted/30 transition-colors group"
                 data-testid={`card-kpi-${kpi.label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -381,57 +382,57 @@ export default function AdminDashboard() {
       )}
 
       {!metricsLoading && metrics && (
-        <div className="grid gap-3 grid-cols-2 md:grid-cols-4" data-testid="section-secondary-kpis">
-          <Card data-testid="card-arpu">
-            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">ARPU</CardTitle>
+        <DSGrid cols={{ default: 2, md: 4 }} data-testid="section-secondary-kpis">
+          <DSCard data-testid="card-arpu">
+            <DSCardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <DSCardTitle className="text-sm font-medium">ARPU</DSCardTitle>
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
+            </DSCardHeader>
+            <DSCardContent>
               <div className="text-2xl font-bold" data-testid="text-arpu">{formatCurrency(metrics.arpu ?? 0)}</div>
               <p className="text-xs text-muted-foreground">Per user per month</p>
-            </CardContent>
-          </Card>
-          <Card data-testid="card-ltv">
-            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">LTV</CardTitle>
+            </DSCardContent>
+          </DSCard>
+          <DSCard data-testid="card-ltv">
+            <DSCardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <DSCardTitle className="text-sm font-medium">LTV</DSCardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
+            </DSCardHeader>
+            <DSCardContent>
               <div className="text-2xl font-bold" data-testid="text-ltv">{formatCurrency(metrics.ltv ?? 0)}</div>
               <p className="text-xs text-muted-foreground">Estimated lifetime value</p>
-            </CardContent>
-          </Card>
-          <Card data-testid="card-conversion-rate">
-            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+            </DSCardContent>
+          </DSCard>
+          <DSCard data-testid="card-conversion-rate">
+            <DSCardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <DSCardTitle className="text-sm font-medium">Conversion Rate</DSCardTitle>
               <Target className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
+            </DSCardHeader>
+            <DSCardContent>
               <div className="text-2xl font-bold" data-testid="text-conversion-rate">{(metrics.conversionRate ?? 0).toFixed(1)}%</div>
               <p className="text-xs text-muted-foreground">Free to paid</p>
-            </CardContent>
-          </Card>
-          <Card data-testid="card-nps-score">
-            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">NPS Score</CardTitle>
+            </DSCardContent>
+          </DSCard>
+          <DSCard data-testid="card-nps-score">
+            <DSCardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <DSCardTitle className="text-sm font-medium">NPS Score</DSCardTitle>
               <ThumbsUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
+            </DSCardHeader>
+            <DSCardContent>
               <div className={`text-2xl font-bold ${npsColorClass(metrics.npsScore ?? 0)}`} data-testid="text-nps-score">{metrics.npsScore ?? 0}</div>
               <p className="text-xs text-muted-foreground">Based on {metrics.npsResponses ?? 0} responses</p>
-            </CardContent>
-          </Card>
-        </div>
+            </DSCardContent>
+          </DSCard>
+        </DSGrid>
       )}
 
       {alerts.length > 0 && (
-        <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" data-testid="section-alerts">
+        <DSGrid cols={{ default: 1, md: 2, lg: 3 }} data-testid="section-alerts">
           {alerts.map(alert => (
             <Link
               key={alert.id}
               href={alert.href}
-              className={`rounded-lg border p-3 flex items-center gap-3 hover:opacity-80 transition-opacity ${SEVERITY_STYLES[alert.severity] || SEVERITY_STYLES.info}`}
+              className={`rounded-[var(--card-radius,0.75rem)] border p-[var(--card-padding,1.25rem)] flex items-center gap-3 hover:opacity-80 transition-opacity ${SEVERITY_STYLES[alert.severity] || SEVERITY_STYLES.info}`}
               data-testid={`alert-${alert.id}`}
             >
               <AlertTriangle className="h-4 w-4 shrink-0" />
@@ -442,16 +443,16 @@ export default function AdminDashboard() {
               <ArrowRight className="h-4 w-4 shrink-0" />
             </Link>
           ))}
-        </div>
+        </DSGrid>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="col-span-full lg:col-span-1" data-testid="card-user-growth">
-          <CardHeader>
-            <CardTitle>User Growth</CardTitle>
-            <CardDescription>New users over the last 30 days</CardDescription>
-          </CardHeader>
-          <CardContent>
+      <DSGrid cols={{ default: 1, lg: 2 }}>
+        <DSCard className="col-span-full lg:col-span-1" data-testid="card-user-growth">
+          <DSCardHeader>
+            <DSCardTitle>User Growth</DSCardTitle>
+            <DSCardDescription>New users over the last 30 days</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent>
             {metricsLoading ? (
               <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
             ) : (
@@ -467,15 +468,15 @@ export default function AdminDashboard() {
                 </ResponsiveContainer>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
 
-        <Card className="col-span-full lg:col-span-1" data-testid="card-revenue-growth">
-          <CardHeader>
-            <CardTitle>Revenue Growth</CardTitle>
-            <CardDescription>Revenue over the last 30 days</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <DSCard className="col-span-full lg:col-span-1" data-testid="card-revenue-growth">
+          <DSCardHeader>
+            <DSCardTitle>Revenue Growth</DSCardTitle>
+            <DSCardDescription>Revenue over the last 30 days</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent>
             {metricsLoading ? (
               <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
             ) : (
@@ -491,12 +492,12 @@ export default function AdminDashboard() {
                 </ResponsiveContainer>
               </div>
             )}
-          </CardContent>
-        </Card>
-      </div>
+          </DSCardContent>
+        </DSCard>
+      </DSGrid>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2 rounded-lg border bg-card p-4" data-testid="section-activity">
+      <DSGrid cols={{ default: 1, lg: 3 }}>
+        <div className="lg:col-span-2 rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="section-activity">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-medium flex items-center gap-2">
               <Activity className="h-4 w-4 text-muted-foreground" />
@@ -528,8 +529,8 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        <div className="space-y-4">
-          <div className="rounded-lg border bg-card p-4" data-testid="section-revenue-trend">
+        <div className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="section-revenue-trend">
             <h2 className="text-sm font-medium mb-4">Revenue (7 days)</h2>
             <SparklineChart data={revenueTrend} />
             {revenueTrend.length > 0 && (
@@ -543,37 +544,37 @@ export default function AdminDashboard() {
           </div>
 
           {!metricsLoading && metrics && (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg border bg-card p-4" data-testid="card-feedback-count">
+            <DSGrid cols={{ default: 2 }}>
+              <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-feedback-count">
                 <div className="flex items-center gap-2 mb-2">
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">Feedback</span>
                 </div>
                 <p className="text-xl font-bold" data-testid="text-feedback-count">{metrics.totalFeedback ?? 0}</p>
               </div>
-              <div className="rounded-lg border bg-card p-4" data-testid="card-waitlist-count">
+              <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-waitlist-count">
                 <div className="flex items-center gap-2 mb-2">
                   <ListChecks className="h-4 w-4 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">Waitlist</span>
                 </div>
                 <p className="text-xl font-bold" data-testid="text-waitlist-count">{metrics.waitlistCount ?? 0}</p>
               </div>
-            </div>
+            </DSGrid>
           )}
         </div>
-      </div>
+      </DSGrid>
 
-      <Card data-testid="card-revenue-waterfall">
-        <CardHeader>
+      <DSCard data-testid="card-revenue-waterfall">
+        <DSCardHeader>
           <div className="flex items-center gap-2">
             <ArrowDown className="h-5 w-5" />
             <div>
-              <CardTitle>Revenue Waterfall</CardTitle>
-              <CardDescription>Monthly MRR movement breakdown</CardDescription>
+              <DSCardTitle>Revenue Waterfall</DSCardTitle>
+              <DSCardDescription>Monthly MRR movement breakdown</DSCardDescription>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </DSCardHeader>
+        <DSCardContent>
           {waterfallLoading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -620,22 +621,22 @@ export default function AdminDashboard() {
               </div>
             </>
           )}
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
 
-      <Card data-testid="card-scheduled-reports">
-        <CardHeader>
+      <DSCard data-testid="card-scheduled-reports">
+        <DSCardHeader>
           <div className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
             <div>
-              <CardTitle>Scheduled Reports</CardTitle>
-              <CardDescription>Automated report delivery via cron jobs</CardDescription>
+              <DSCardTitle>Scheduled Reports</DSCardTitle>
+              <DSCardDescription>Automated report delivery via cron jobs</DSCardDescription>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3 p-3 border rounded-md">
+        </DSCardHeader>
+        <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <DSGrid cols={{ default: 1, sm: 2 }}>
+            <div className="flex items-start gap-3 p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]">
               <Clock className="h-5 w-5 mt-0.5 text-muted-foreground" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Weekly Report</p>
@@ -648,7 +649,7 @@ export default function AdminDashboard() {
                 )}
               </div>
             </div>
-            <div className="flex items-start gap-3 p-3 border rounded-md">
+            <div className="flex items-start gap-3 p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]">
               <Calendar className="h-5 w-5 mt-0.5 text-muted-foreground" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Monthly Report</p>
@@ -661,13 +662,13 @@ export default function AdminDashboard() {
                 )}
               </div>
             </div>
-          </div>
+          </DSGrid>
           <Button variant="outline" size="sm" onClick={handleTriggerCron} disabled={triggeringCron} data-testid="button-trigger-cron">
             {triggeringCron ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Send className="h-4 w-4 mr-1" />}
             Run Scheduled Reports Now
           </Button>
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
     </div>
   )
 }

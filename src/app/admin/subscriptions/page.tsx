@@ -126,8 +126,8 @@ export default function SubscriptionsPage() {
   const endIdx = Math.min(page * 25, total)
 
   return (
-    <div className="p-6" data-testid="page-subscriptions">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-[var(--section-spacing,1.5rem)]" data-testid="page-subscriptions">
+      <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-subscriptions-title">Subscriptions</h1>
           <p className="text-sm text-muted-foreground">Manage all active and past subscriptions</p>
@@ -138,16 +138,16 @@ export default function SubscriptionsPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="rounded-lg border bg-card p-3" data-testid="card-total-active">
+      <div className="grid grid-cols-3 gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-total-active">
           <p className="text-xs text-muted-foreground mb-1">Total Active</p>
           <p className="text-lg font-bold">{summary.totalActive}</p>
         </div>
-        <div className="rounded-lg border bg-card p-3" data-testid="card-mrr">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-mrr">
           <p className="text-xs text-muted-foreground mb-1">Monthly Recurring Revenue</p>
           <p className="text-lg font-bold text-green-600 dark:text-green-400">{formatCurrency(summary.mrr)}</p>
         </div>
-        <div className="rounded-lg border bg-card p-3" data-testid="card-churn-risk">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-churn-risk">
           <p className="text-xs text-muted-foreground mb-1">Churn Risk</p>
           <p className={`text-lg font-bold ${summary.churnRiskCount > 0 ? 'text-destructive' : 'text-foreground'}`}>
             {summary.churnRiskCount}
@@ -155,7 +155,7 @@ export default function SubscriptionsPage() {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3 mb-4">
+      <div className="flex flex-wrap gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -204,7 +204,7 @@ export default function SubscriptionsPage() {
         {total > 0 ? `Showing ${startIdx}-${endIdx} of ${total} subscriptions` : 'No subscriptions found'}
       </div>
 
-      <div className="rounded-lg border bg-card overflow-hidden">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm" data-testid="table-subscriptions">
             <thead>

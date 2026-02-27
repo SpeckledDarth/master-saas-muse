@@ -162,7 +162,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-[var(--section-spacing,1.5rem)]">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2">Welcome to Your SaaS</h1>
@@ -215,7 +215,7 @@ export default function OnboardingPage() {
           </CardHeader>
           <CardContent>
             {currentStep === 1 && (
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 <div className="space-y-2">
                   <Label htmlFor="appName">App Name</Label>
                   <Input
@@ -236,7 +236,7 @@ export default function OnboardingPage() {
                     data-testid="input-tagline"
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                   <ColorInput
                     label="Primary Color"
                     value={branding.primaryColor}
@@ -256,11 +256,11 @@ export default function OnboardingPage() {
             )}
 
             {currentStep === 2 && (
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 <p className="text-muted-foreground">
                   Connect your Stripe account to enable subscriptions and payments.
                 </p>
-                <div className="p-4 bg-muted rounded-lg">
+                <div className="p-[var(--card-padding,1.25rem)] bg-muted rounded-[var(--card-radius,0.75rem)]">
                   <p className="font-medium mb-2">To set up Stripe:</p>
                   <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
                     <li>Go to your Stripe Dashboard</li>
@@ -278,11 +278,11 @@ export default function OnboardingPage() {
             )}
 
             {currentStep === 3 && (
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 <p className="text-muted-foreground">
                   Add your marketing content - features, testimonials, FAQ, and more.
                 </p>
-                <div className="p-4 bg-muted rounded-lg">
+                <div className="p-[var(--card-padding,1.25rem)] bg-muted rounded-[var(--card-radius,0.75rem)]">
                   <p className="font-medium mb-2">Content you can customize:</p>
                   <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
                     <li>Hero section with images or videos</li>
@@ -301,7 +301,7 @@ export default function OnboardingPage() {
             )}
 
             {currentStep === 4 && (
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 <p className="text-muted-foreground">
                   Review your setup and launch your app!
                 </p>
@@ -309,9 +309,9 @@ export default function OnboardingPage() {
                   {activeSteps.slice(0, -1).map((step) => (
                     <div
                       key={step.id}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className="flex items-center justify-between p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                         <step.icon className="h-5 w-5 text-muted-foreground" />
                         <span>{step.title}</span>
                       </div>

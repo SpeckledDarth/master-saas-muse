@@ -19,7 +19,7 @@ export default function BrandingPage() {
   const { settings, saving, saved, handleSave, setSettings, updateBranding, updateContent, addNavItem, updateNavItem, removeNavItem, updateHeaderStyle, updateFooterStyle } = useSetupSettingsContext()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card className="bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
         <CardHeader>
           <CardTitle className="text-blue-800 dark:text-blue-300">Branding & Hero Tips</CardTitle>
@@ -39,8 +39,8 @@ export default function BrandingPage() {
             Configure your app name, colors, and company information
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label htmlFor="appName">App Name</Label>
               <Input
@@ -86,7 +86,7 @@ export default function BrandingPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
             <ImageUpload
               label="Logo (Light Mode)"
               value={settings.branding.logoUrl}
@@ -129,7 +129,7 @@ export default function BrandingPage() {
           </p>
 
           {settings.branding.logoUrl && (
-            <div className="p-4 rounded-lg border bg-muted/30 space-y-4">
+            <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border bg-muted/30 space-y-[var(--content-density-gap,1rem)]">
               <p className="text-sm font-medium">Logo Size & Effects</p>
               <div className="space-y-2">
                 <Label>Logo Height: {settings.branding.logoHeight ?? 40}px</Label>
@@ -155,7 +155,7 @@ export default function BrandingPage() {
             </div>
           )}
 
-          <div className="p-4 rounded-lg border bg-muted/30 space-y-4">
+          <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border bg-muted/30 space-y-[var(--content-density-gap,1rem)]">
             <p className="text-sm font-medium">Header Animation</p>
             <div className="flex items-center gap-2">
               <Switch
@@ -220,7 +220,7 @@ export default function BrandingPage() {
           </div>
 
           {settings.content?.heroStyle === 'split' && (
-            <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+            <div className="space-y-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border bg-muted/30">
               <p className="text-sm font-medium">Split Hero Settings</p>
               <div className="space-y-2">
                 <Label>Split Hero Image</Label>
@@ -300,7 +300,7 @@ export default function BrandingPage() {
           )}
 
           {settings.content?.heroStyle === 'video' && (
-            <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+            <div className="space-y-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border bg-muted/30">
               <p className="text-sm font-medium">Video Hero Settings</p>
               <p className="text-xs text-muted-foreground mb-2">
                 The video replaces the static hero image and plays automatically in the background (muted, looping).
@@ -323,7 +323,7 @@ export default function BrandingPage() {
           )}
 
           {settings.content?.heroStyle === 'pattern' && (
-            <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+            <div className="space-y-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border bg-muted/30">
               <p className="text-sm font-medium">Pattern/Texture Settings</p>
               <p className="text-xs text-muted-foreground mb-2">
                 Upload a seamless pattern or texture that tiles over the gradient background. PNG with transparency works best.
@@ -355,7 +355,7 @@ export default function BrandingPage() {
           )}
 
           {settings.content?.heroStyle === 'floating' && (
-            <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+            <div className="space-y-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border bg-muted/30">
               <p className="text-sm font-medium">Floating Mockup Settings</p>
               <div className="space-y-2">
                 <Label>Product/Mockup Image URL</Label>
@@ -404,7 +404,7 @@ export default function BrandingPage() {
           )}
 
           {settings.content?.heroStyle === 'collage' && (
-            <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+            <div className="space-y-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border bg-muted/30">
               <p className="text-sm font-medium">Photo Collage Settings</p>
               <p className="text-xs text-muted-foreground">
                 Add 3-5 image URLs. They will overlap on desktop and display as a 2x2 grid on mobile.
@@ -450,7 +450,7 @@ export default function BrandingPage() {
             </div>
           )}
 
-          <div className="p-4 rounded-lg border bg-muted/30 space-y-2">
+          <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border bg-muted/30 space-y-2">
             <p className="text-sm font-medium">Recommended Hero Image Specs</p>
             <ul className="text-xs text-muted-foreground space-y-1">
               <li>Dimensions: <span className="font-medium text-foreground">1920 x 1080 pixels</span> (16:9 ratio)</li>
@@ -460,7 +460,7 @@ export default function BrandingPage() {
             </ul>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label htmlFor="heroSize">Hero Image Size</Label>
               <Select
@@ -485,9 +485,9 @@ export default function BrandingPage() {
       </Card>
 
       <Card>
-        <CardContent className="flex items-center justify-between gap-4 py-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-md" style={{ backgroundColor: settings.branding.primaryColor }}>
+        <CardContent className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] py-4">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
+            <div className="p-2 rounded-[var(--card-radius,0.75rem)]" style={{ backgroundColor: settings.branding.primaryColor }}>
               <Paintbrush className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -537,7 +537,7 @@ export default function BrandingPage() {
           </div>
         </CardHeader>
         {settings.announcement?.enabled && (
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Announcement Text</Label>
               <Input
@@ -550,7 +550,7 @@ export default function BrandingPage() {
                 data-testid="input-announcement-text"
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Link Text (optional)</Label>
                 <Input
@@ -576,7 +576,7 @@ export default function BrandingPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <ColorInput
                 label="Background Color"
                 value={settings.announcement?.backgroundColor ?? '#7c3aed'}
@@ -628,8 +628,8 @@ export default function BrandingPage() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
             <p className="text-sm text-blue-700 dark:text-blue-400">
               <strong>How it works:</strong> Each link you add here will appear in the header navigation bar. 
               Use the toggle to show/hide links. Add badges like "New" or "Beta" to highlight new features. 
@@ -638,7 +638,7 @@ export default function BrandingPage() {
           </div>
           <div className="space-y-3">
             {(settings.navigation?.items ?? []).map((item, index) => (
-              <div key={item.id} className="p-3 border rounded-lg bg-muted/30 space-y-3 sm:space-y-0 sm:flex sm:items-center sm:gap-3">
+              <div key={item.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/30 space-y-3 sm:space-y-0 sm:flex sm:items-center sm:gap-[var(--content-density-gap,1rem)]">
                 <div className="flex items-center justify-between sm:justify-start gap-2">
                   <Switch
                     checked={item.enabled}
@@ -710,8 +710,8 @@ export default function BrandingPage() {
             Control the look and behavior of your site header
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <ColorInput
               label="Background Color Override"
               value={settings.navigation?.headerStyle?.bgColor || ''}
@@ -743,8 +743,8 @@ export default function BrandingPage() {
               data-testid="input-header-bg-opacity"
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center justify-between gap-2 p-3 border rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
+            <div className="flex items-center justify-between gap-2 p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]">
               <Label>Sticky Header</Label>
               <Switch
                 checked={settings.navigation?.headerStyle?.sticky !== false}
@@ -752,7 +752,7 @@ export default function BrandingPage() {
                 data-testid="switch-header-sticky"
               />
             </div>
-            <div className="flex items-center justify-between gap-2 p-3 border rounded-lg">
+            <div className="flex items-center justify-between gap-2 p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]">
               <Label>Transparent</Label>
               <Switch
                 checked={settings.navigation?.headerStyle?.transparent ?? false}
@@ -760,7 +760,7 @@ export default function BrandingPage() {
                 data-testid="switch-header-transparent"
               />
             </div>
-            <div className="flex items-center justify-between gap-2 p-3 border rounded-lg">
+            <div className="flex items-center justify-between gap-2 p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]">
               <Label>Bottom Border</Label>
               <Switch
                 checked={settings.navigation?.headerStyle?.borderBottom !== false}
@@ -779,8 +779,8 @@ export default function BrandingPage() {
             Control the look of your site footer
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <ColorInput
               label="Background Color Override"
               value={settings.navigation?.footerStyle?.bgColor || ''}

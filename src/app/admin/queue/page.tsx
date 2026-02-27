@@ -152,8 +152,8 @@ export default function QueueDashboard() {
   }
 
   return (
-    <div className="py-8 px-6">
-      <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+    <div className="py-[var(--section-spacing,1.5rem)] px-[var(--section-spacing,1.5rem)]">
+      <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)] flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-queue-title">Job Queue</h1>
           <p className="text-sm text-muted-foreground">Background job processing powered by BullMQ + Upstash Redis</p>
@@ -184,7 +184,7 @@ export default function QueueDashboard() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex items-center gap-2 mb-[var(--content-density-gap,1rem)]">
         {health && (
           <>
             <Badge variant={health.connected ? 'default' : 'destructive'} data-testid="badge-redis-status">
@@ -203,7 +203,7 @@ export default function QueueDashboard() {
       </div>
 
       {metrics && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-[var(--content-density-gap,1rem)] mb-8">
           {[
             { label: 'Waiting', value: metrics.waiting, icon: Clock, color: 'text-yellow-500' },
             { label: 'Active', value: metrics.active, icon: Activity, color: 'text-blue-500' },
@@ -227,7 +227,7 @@ export default function QueueDashboard() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
             <CardTitle className="text-lg">Recent Jobs</CardTitle>
             <div className="flex items-center gap-1 flex-wrap">
               {statusFilters.map(({ key, label, icon: Icon }) => (
@@ -247,7 +247,7 @@ export default function QueueDashboard() {
         </CardHeader>
         <CardContent>
           {jobs.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8" data-testid="text-no-jobs">
+            <p className="text-center text-muted-foreground py-[var(--section-spacing,1.5rem)]" data-testid="text-no-jobs">
               No {jobFilter} jobs found
             </p>
           ) : (
@@ -255,7 +255,7 @@ export default function QueueDashboard() {
               {jobs.map((job) => (
                 <div
                   key={job.id}
-                  className="flex items-center justify-between gap-4 p-3 rounded-md border flex-wrap"
+                  className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border flex-wrap"
                   data-testid={`row-job-${job.id}`}
                 >
                   <div className="flex-1 min-w-0">
@@ -263,7 +263,7 @@ export default function QueueDashboard() {
                       <Badge variant="outline">{job.data.type}</Badge>
                       <span className="text-sm font-medium truncate">{getJobDescription(job)}</span>
                     </div>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground flex-wrap">
+                    <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-1 text-xs text-muted-foreground flex-wrap">
                       <span>ID: {job.id}</span>
                       <span>Created: {formatTime(job.createdAt)}</span>
                       {job.finishedAt && <span>Finished: {formatTime(job.finishedAt)}</span>}

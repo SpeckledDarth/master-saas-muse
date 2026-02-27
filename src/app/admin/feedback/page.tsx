@@ -102,7 +102,7 @@ export default function FeedbackPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-[var(--section-spacing,1.5rem)]">
         <div className="flex items-center justify-center min-h-[400px]">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
@@ -111,8 +111,8 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between gap-4 flex-wrap" data-testid="feedback-header">
+    <div className="p-[var(--section-spacing,1.5rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap" data-testid="feedback-header">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <MessageSquare className="h-6 w-6" />
@@ -142,7 +142,7 @@ export default function FeedbackPage() {
       {feedback.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <MessageSquare className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+            <MessageSquare className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] text-muted-foreground opacity-50" />
             <p className="text-lg font-medium mb-2">No feedback yet</p>
             <p className="text-muted-foreground">The feedback widget will collect user submissions.</p>
           </CardContent>
@@ -154,10 +154,10 @@ export default function FeedbackPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           {filteredFeedback.map((item) => (
             <Card key={item.id} data-testid={`feedback-${item.id}`}>
-              <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+              <CardHeader className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] space-y-0">
                 <div className="space-y-1 min-w-0 flex-1">
                   <CardTitle className="text-base font-medium flex items-center gap-2 flex-wrap">
                     {item.email || 'Anonymous'}

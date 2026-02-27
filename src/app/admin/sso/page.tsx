@@ -146,8 +146,8 @@ export default function SSODashboard() {
   }
 
   return (
-    <div className="py-8 px-6">
-      <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+    <div className="py-[var(--section-spacing,1.5rem)] px-[var(--section-spacing,1.5rem)]">
+      <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)] flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-sso-title">SSO / SAML</h1>
           <p className="text-sm text-muted-foreground">Configure enterprise single sign-on for your organization</p>
@@ -161,9 +161,9 @@ export default function SSODashboard() {
       </div>
 
       {warning && (
-        <Card className="mb-6 border-yellow-500/50">
+        <Card className="mb-[var(--content-density-gap,1rem)] border-yellow-500/50">
           <CardContent className="pt-4 pb-4">
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
               <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 shrink-0" />
               <p className="text-sm" data-testid="text-sso-warning">{warning}</p>
             </div>
@@ -171,12 +171,12 @@ export default function SSODashboard() {
         </Card>
       )}
 
-      <Card className="mb-6">
+      <Card className="mb-[var(--content-density-gap,1rem)]">
         <CardHeader>
           <CardTitle className="text-lg">SAML Configuration</CardTitle>
           <CardDescription>Provide these URLs to your identity provider (Okta, Azure AD, Google Workspace, etc.)</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label className="text-sm text-muted-foreground">SP Metadata URL</Label>
             <div className="flex items-center gap-2">
@@ -209,13 +209,13 @@ export default function SSODashboard() {
       </Card>
 
       {showAddForm && (
-        <Card className="mb-6">
+        <Card className="mb-[var(--content-density-gap,1rem)]">
           <CardHeader>
             <CardTitle className="text-lg">Add Identity Provider</CardTitle>
             <CardDescription>Connect an external SAML 2.0 identity provider</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleAddProvider} className="space-y-4">
+            <form onSubmit={handleAddProvider} className="space-y-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label htmlFor="metadataUrl">IdP Metadata URL</Label>
                 <Input
@@ -263,12 +263,12 @@ export default function SSODashboard() {
         </Card>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-[var(--content-density-gap,1rem)]">
         <h2 className="text-lg font-semibold">Identity Providers ({providers.length})</h2>
 
         {providers.length === 0 ? (
           <Card>
-            <CardContent className="py-8 text-center">
+            <CardContent className="py-[var(--section-spacing,1.5rem)] text-center">
               <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
               <p className="text-muted-foreground" data-testid="text-no-providers">
                 No SSO providers configured yet
@@ -282,7 +282,7 @@ export default function SSODashboard() {
           providers.map((provider) => (
             <Card key={provider.id} data-testid={`card-sso-provider-${provider.id}`}>
               <CardContent className="pt-4 pb-4">
-                <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                   <div className="space-y-2 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <Badge variant="default">

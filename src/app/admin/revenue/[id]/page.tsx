@@ -32,7 +32,7 @@ function formatDate(dateStr: string | null) {
 function PersonCard({ user, label }: { user: any; label: string }) {
   if (!user) return null
   return (
-    <Link href={`/admin/crm/${user.id}`} className="rounded-lg border bg-card p-3 hover:bg-muted/30 transition-colors block" data-testid={`card-${label.toLowerCase().replace(/\s+/g, '-')}`}>
+    <Link href={`/admin/crm/${user.id}`} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] hover:bg-muted/30 transition-colors block" data-testid={`card-${label.toLowerCase().replace(/\s+/g, '-')}`}>
       <p className="text-xs text-muted-foreground mb-1">{label}</p>
       <div className="flex items-center gap-2">
         {user.avatar_url ? (
@@ -55,7 +55,7 @@ function InvoiceDetail({ data }: { data: any }) {
   const { record, user, payment, lineItems, subscription, affiliateAttribution } = data
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold" data-testid="text-invoice-number">
@@ -63,7 +63,7 @@ function InvoiceDetail({ data }: { data: any }) {
           </h2>
           <p className="text-sm text-muted-foreground">{formatDate(record.created_at)}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-medium capitalize ${STATUS_COLORS[record.status] || 'bg-muted text-muted-foreground'}`}>
             {record.status}
           </span>
@@ -71,11 +71,11 @@ function InvoiceDetail({ data }: { data: any }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <PersonCard user={user} label="Customer" />
 
         {payment && (
-          <div className="rounded-lg border bg-card p-3" data-testid="card-payment-details">
+          <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-payment-details">
             <p className="text-xs text-muted-foreground mb-1">Payment</p>
             <p className="font-medium text-sm">{payment.card_brand || 'Card'} ****{payment.card_last4 || '****'}</p>
             <p className="text-xs text-muted-foreground">{formatDate(payment.created_at)} · {payment.status}</p>
@@ -83,7 +83,7 @@ function InvoiceDetail({ data }: { data: any }) {
         )}
 
         {subscription && (
-          <Link href={`/admin/subscriptions/${subscription.id}`} className="rounded-lg border bg-card p-3 hover:bg-muted/30 transition-colors block" data-testid="card-subscription-link">
+          <Link href={`/admin/subscriptions/${subscription.id}`} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] hover:bg-muted/30 transition-colors block" data-testid="card-subscription-link">
             <p className="text-xs text-muted-foreground mb-1">Subscription</p>
             <p className="font-medium text-sm">{subscription.tier_id || 'Active'} plan</p>
             <p className="text-xs text-muted-foreground">Period: {formatDate(record.period_start)} — {formatDate(record.period_end)}</p>
@@ -92,9 +92,9 @@ function InvoiceDetail({ data }: { data: any }) {
       </div>
 
       {affiliateAttribution && (
-        <div className="rounded-lg border bg-card p-4" data-testid="card-affiliate-attribution">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-affiliate-attribution">
           <h3 className="text-sm font-medium mb-3">Affiliate Attribution</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
             <PersonCard user={affiliateAttribution.affiliate} label="Affiliate" />
             <div>
               <p className="text-xs text-muted-foreground">Commission</p>
@@ -117,7 +117,7 @@ function InvoiceDetail({ data }: { data: any }) {
       {lineItems && lineItems.length > 0 && (
         <div data-testid="section-line-items">
           <h3 className="text-sm font-medium mb-2">Line Items</h3>
-          <div className="rounded-lg border bg-card overflow-hidden">
+          <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/30">
@@ -158,13 +158,13 @@ function PaymentDetail({ data }: { data: any }) {
   const { record, user, relatedInvoice } = data
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold" data-testid="text-payment-id">Payment {record.stripe_payment_intent_id || record.id}</h2>
           <p className="text-sm text-muted-foreground">{formatDate(record.created_at)}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-medium capitalize ${STATUS_COLORS[record.status] || 'bg-muted text-muted-foreground'}`}>
             {record.status}
           </span>
@@ -172,14 +172,14 @@ function PaymentDetail({ data }: { data: any }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <PersonCard user={user} label="Customer" />
-        <div className="rounded-lg border bg-card p-3" data-testid="card-card-details">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-card-details">
           <p className="text-xs text-muted-foreground mb-1">Card</p>
           <p className="font-medium text-sm">{record.card_brand || 'Card'} ****{record.card_last4 || '****'}</p>
         </div>
         {relatedInvoice && (
-          <Link href={`/admin/revenue/${relatedInvoice.id}`} className="rounded-lg border bg-card p-3 hover:bg-muted/30 transition-colors block" data-testid="card-related-invoice">
+          <Link href={`/admin/revenue/${relatedInvoice.id}`} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] hover:bg-muted/30 transition-colors block" data-testid="card-related-invoice">
             <p className="text-xs text-muted-foreground mb-1">Related Invoice</p>
             <p className="font-medium text-sm">{relatedInvoice.stripe_invoice_id || relatedInvoice.id}</p>
             <p className="text-xs text-muted-foreground">{formatCurrency(relatedInvoice.amount_paid_cents || 0)} · {relatedInvoice.status}</p>
@@ -194,13 +194,13 @@ function CommissionDetail({ data }: { data: any }) {
   const { record, user, relatedInvoice, referredCustomer, referral } = data
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold" data-testid="text-commission-title">Commission</h2>
           <p className="text-sm text-muted-foreground">{formatDate(record.created_at)}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-medium capitalize ${STATUS_COLORS[record.status] || 'bg-muted text-muted-foreground'}`}>
             {record.status}
           </span>
@@ -208,24 +208,24 @@ function CommissionDetail({ data }: { data: any }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-        <div className="rounded-lg border bg-card p-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)] text-sm">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]">
           <p className="text-xs text-muted-foreground">Rate</p>
           <p className="font-bold">{((record.commission_rate || 0) * 100).toFixed(0)}%</p>
         </div>
         {referral && (
-          <div className="rounded-lg border bg-card p-3">
+          <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]">
             <p className="text-xs text-muted-foreground">Referral</p>
             <p className="font-bold capitalize">{referral.status} · {formatDate(referral.created_at)}</p>
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <PersonCard user={user} label="Affiliate" />
         {referredCustomer && <PersonCard user={referredCustomer} label="Referred Customer" />}
         {relatedInvoice && (
-          <Link href={`/admin/revenue/${relatedInvoice.id}`} className="rounded-lg border bg-card p-3 hover:bg-muted/30 transition-colors block" data-testid="card-related-invoice">
+          <Link href={`/admin/revenue/${relatedInvoice.id}`} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] hover:bg-muted/30 transition-colors block" data-testid="card-related-invoice">
             <p className="text-xs text-muted-foreground mb-1">Triggering Invoice</p>
             <p className="font-medium text-sm">{relatedInvoice.stripe_invoice_id || relatedInvoice.id}</p>
             <p className="text-xs text-muted-foreground">{formatCurrency(relatedInvoice.amount_paid_cents || 0)}</p>
@@ -240,13 +240,13 @@ function PayoutDetail({ data }: { data: any }) {
   const { record, user, includedCommissions, processedBy } = data
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold" data-testid="text-payout-title">Payout</h2>
           <p className="text-sm text-muted-foreground">{formatDate(record.created_at)}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-medium capitalize ${STATUS_COLORS[record.status] || 'bg-muted text-muted-foreground'}`}>
             {record.status}
           </span>
@@ -254,10 +254,10 @@ function PayoutDetail({ data }: { data: any }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <PersonCard user={user} label="Affiliate" />
         {record.method || record.payout_method ? (
-          <div className="rounded-lg border bg-card p-3">
+          <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]">
             <p className="text-xs text-muted-foreground mb-1">Method</p>
             <p className="font-medium text-sm capitalize">{record.method || record.payout_method}</p>
           </div>
@@ -268,7 +268,7 @@ function PayoutDetail({ data }: { data: any }) {
       {includedCommissions && includedCommissions.length > 0 && (
         <div data-testid="section-included-commissions">
           <h3 className="text-sm font-medium mb-2">Included Commissions</h3>
-          <div className="rounded-lg border bg-card overflow-hidden">
+          <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/30">
@@ -331,8 +331,8 @@ export default function RevenueDetailPage({ params }: { params: Promise<{ id: st
 
   if (error || !data) {
     return (
-      <div className="p-6 text-center" data-testid="error-not-found">
-        <p className="text-muted-foreground mb-4">Transaction not found</p>
+      <div className="p-[var(--section-spacing,1.5rem)] text-center" data-testid="error-not-found">
+        <p className="text-muted-foreground mb-[var(--content-density-gap,1rem)]">Transaction not found</p>
         <Button variant="outline" onClick={() => router.push('/admin/revenue')}>Back to Revenue</Button>
       </div>
     )
@@ -347,8 +347,8 @@ export default function RevenueDetailPage({ params }: { params: Promise<{ id: st
     : `Payout`
 
   return (
-    <div className="p-6" data-testid="page-revenue-detail">
-      <div className="flex items-center gap-3 mb-6">
+    <div className="p-[var(--section-spacing,1.5rem)]" data-testid="page-revenue-detail">
+      <div className="flex items-center gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
         <Button variant="ghost" size="icon" onClick={() => router.push('/admin/revenue')} data-testid="button-back-revenue" aria-label="Back to Revenue">
           <ArrowLeft className="h-4 w-4" />
         </Button>
@@ -361,7 +361,7 @@ export default function RevenueDetailPage({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-[var(--content-density-gap,1rem)]">
         <div>
           {data.type === 'invoice' && <InvoiceDetail data={data} />}
           {data.type === 'payment' && <PaymentDetail data={data} />}

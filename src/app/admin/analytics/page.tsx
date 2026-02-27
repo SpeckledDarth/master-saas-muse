@@ -53,10 +53,10 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-4">
+      <div className="p-[var(--section-spacing,1.5rem)]">
+        <div className="animate-pulse space-y-[var(--content-density-gap,1rem)]">
           <div className="h-8 bg-muted rounded w-48" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
             <div className="h-32 bg-muted rounded" />
             <div className="h-32 bg-muted rounded" />
             <div className="h-32 bg-muted rounded" />
@@ -67,7 +67,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-[var(--section-spacing,1.5rem)] space-y-[var(--content-density-gap,1rem)]">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <TrendingUp className="h-6 w-6" />
@@ -76,7 +76,7 @@ export default function AnalyticsPage() {
         <p className="text-muted-foreground">Overview of your SaaS metrics</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -130,7 +130,7 @@ export default function AnalyticsPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -141,7 +141,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             {stats?.recentSignups && stats.recentSignups.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 {stats.recentSignups.slice(0, 5).map((signup, index) => (
                   <div key={index} className="flex items-center justify-between">
                     <span className="text-sm">{signup.email}</span>
@@ -152,7 +152,7 @@ export default function AnalyticsPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground text-center py-8">
+              <p className="text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]">
                 No signups yet
               </p>
             )}
@@ -168,7 +168,7 @@ export default function AnalyticsPage() {
             <CardDescription>User feedback submissions</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8">
+            <div className="text-center py-[var(--section-spacing,1.5rem)]">
               <div className="text-3xl font-bold mb-2">{stats?.feedbackCount || 0}</div>
               <p className="text-muted-foreground">Total submissions</p>
               <a 

@@ -250,7 +250,7 @@ export default function EmailTemplatesPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-[var(--section-spacing,1.5rem)]">
         <div className="flex items-center justify-center min-h-[400px]">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
@@ -259,8 +259,8 @@ export default function EmailTemplatesPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between gap-4 flex-wrap" data-testid="email-templates-header">
+    <div className="p-[var(--section-spacing,1.5rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap" data-testid="email-templates-header">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Mail className="h-6 w-6" />
@@ -276,7 +276,7 @@ export default function EmailTemplatesPage() {
 
       <Card className="bg-blue-500/10 border-blue-500/20">
         <CardContent className="pt-6">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
             <Info className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
             <div className="text-sm">
               <p className="font-medium mb-2">Available Variables</p>
@@ -296,9 +296,9 @@ export default function EmailTemplatesPage() {
       {templates.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            <Mail className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <Mail className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] opacity-50" />
             <p className="text-lg font-medium mb-2">No email templates yet</p>
-            <p className="mb-4">Create your first template to start sending branded emails.</p>
+            <p className="mb-[var(--content-density-gap,1rem)]">Create your first template to start sending branded emails.</p>
             <Button onClick={openCreateTemplate}>
               <Plus className="h-4 w-4 mr-2" />
               Create Template
@@ -306,10 +306,10 @@ export default function EmailTemplatesPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-[var(--content-density-gap,1rem)]">
           {templates.map((template) => (
             <Card key={template.id} data-testid={`template-${template.name}`}>
-              <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 space-y-0">
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-[var(--content-density-gap,1rem)] space-y-0">
                 <div className="min-w-0 flex-1">
                   <CardTitle className="text-lg capitalize flex items-center gap-2 flex-wrap">
                     {template.name.replace(/_/g, ' ')}
@@ -393,10 +393,10 @@ export default function EmailTemplatesPage() {
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="edit" className="flex-1 overflow-auto space-y-4 mt-4">
+            <TabsContent value="edit" className="flex-1 overflow-auto space-y-[var(--content-density-gap,1rem)] mt-4">
               {isCreateMode && (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
                     <div className="space-y-2">
                       <Label htmlFor="name">Template Name</Label>
                       <Input
@@ -437,7 +437,7 @@ export default function EmailTemplatesPage() {
                 </>
               )}
               
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-[var(--content-density-gap,1rem)]">
                 <div className="space-y-2 flex-1">
                   <Label htmlFor="subject">Subject Line</Label>
                   <Input
@@ -559,7 +559,7 @@ export default function EmailTemplatesPage() {
               Send a test version of the "{testEmailDialog?.templateName.replace(/_/g, ' ')}" template
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-[var(--content-density-gap,1rem)] py-4">
             <div className="space-y-2">
               <Label htmlFor="test-email">Recipient Email</Label>
               <Input

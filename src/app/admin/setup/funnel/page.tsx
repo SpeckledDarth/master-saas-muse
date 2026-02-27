@@ -35,7 +35,7 @@ export default function FunnelAdminPage() {
   const totalStarted = funnel.length > 0 ? funnel[0].viewed : 0
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div>
         <h2 className="text-2xl font-bold">Onboarding Funnel</h2>
         <p className="text-muted-foreground">
@@ -43,10 +43,10 @@ export default function FunnelAdminPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <Card>
           <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
               <Users className="h-8 w-8 text-primary" />
               <div>
                 <div className="text-2xl font-bold" data-testid="text-funnel-total">{totalStarted}</div>
@@ -57,7 +57,7 @@ export default function FunnelAdminPage() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
               <BarChart3 className="h-8 w-8 text-green-600 dark:text-green-400" />
               <div>
                 <div className="text-2xl font-bold" data-testid="text-funnel-completed">
@@ -70,7 +70,7 @@ export default function FunnelAdminPage() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
               <TrendingDown className="h-8 w-8 text-orange-600 dark:text-orange-400" />
               <div>
                 <div className="text-2xl font-bold" data-testid="text-funnel-rate">
@@ -97,7 +97,7 @@ export default function FunnelAdminPage() {
               <p>No onboarding data yet. Users will show up once they start the wizard.</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               {funnel.map((step, idx) => {
                 const prevViewed = idx > 0 ? funnel[idx - 1].viewed : step.viewed
                 const retentionPct = prevViewed > 0 ? Math.round((step.viewed / prevViewed) * 100) : 100
@@ -111,7 +111,7 @@ export default function FunnelAdminPage() {
                         </span>
                         <span className="font-medium">{step.name}</span>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-[var(--content-density-gap,1rem)] text-sm text-muted-foreground">
                         <span>{step.viewed} viewed</span>
                         <span>{step.completed} completed</span>
                         {step.dropOff > 0 && (

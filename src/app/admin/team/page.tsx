@@ -233,8 +233,8 @@ export default function TeamPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-4">
+      <div className="p-[var(--section-spacing,1.5rem)]">
+        <div className="animate-pulse space-y-[var(--content-density-gap,1rem)]">
           <div className="h-8 bg-muted rounded w-48" />
           <div className="h-64 bg-muted rounded" />
         </div>
@@ -243,7 +243,7 @@ export default function TeamPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-[var(--section-spacing,1.5rem)] space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -268,7 +268,7 @@ export default function TeamPage() {
                 Send an invitation to join your team
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
+            <div className="space-y-[var(--content-density-gap,1rem)] py-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
                 <Input
@@ -323,8 +323,8 @@ export default function TeamPage() {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent className="pt-0">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="p-4 border rounded-lg space-y-2">
+              <div className="grid gap-[var(--content-density-gap,1rem)] md:grid-cols-2">
+                <div className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-2">
                   <div className="flex items-center gap-2">
                     <Crown className="h-4 w-4 text-yellow-500" />
                     <span className="font-semibold">Owner</span>
@@ -337,7 +337,7 @@ export default function TeamPage() {
                     <li>Cannot be removed from the team</li>
                   </ul>
                 </div>
-                <div className="p-4 border rounded-lg space-y-2">
+                <div className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-2">
                   <div className="flex items-center gap-2">
                     <Shield className="h-4 w-4 text-blue-500" />
                     <span className="font-semibold">Manager</span>
@@ -350,7 +350,7 @@ export default function TeamPage() {
                     <li>Cannot access billing or app settings</li>
                   </ul>
                 </div>
-                <div className="p-4 border rounded-lg space-y-2">
+                <div className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-2">
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-green-500" />
                     <span className="font-semibold">Member</span>
@@ -363,7 +363,7 @@ export default function TeamPage() {
                     <li>Cannot access billing or app settings</li>
                   </ul>
                 </div>
-                <div className="p-4 border rounded-lg space-y-2">
+                <div className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-2">
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-gray-500" />
                     <span className="font-semibold">Viewer</span>
@@ -388,18 +388,18 @@ export default function TeamPage() {
         </CardHeader>
         <CardContent>
           {members.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
+            <p className="text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]">
               No team members yet. Invite someone to get started!
             </p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               {members.map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
+                  className="flex items-center justify-between p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]"
                   data-testid={`member-row-${member.id}`}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                     <Avatar>
                       <AvatarImage src={member.avatar} />
                       <AvatarFallback>
@@ -411,7 +411,7 @@ export default function TeamPage() {
                       <p className="text-sm text-muted-foreground">{member.email}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                     <Badge variant={getRoleBadgeVariant(member.role) as any} className="flex items-center gap-1">
                       {getRoleIcon(member.role)}
                       {member.role}
@@ -459,11 +459,11 @@ export default function TeamPage() {
             <CardDescription>Invitations waiting to be accepted</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               {invitations.map((invitation) => (
                 <div
                   key={invitation.id}
-                  className="flex items-center justify-between p-4 border rounded-lg bg-muted/50"
+                  className="flex items-center justify-between p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/50"
                   data-testid={`invitation-row-${invitation.id}`}
                 >
                   <div>

@@ -1,7 +1,7 @@
 # MuseKit.io - Master SaaS Muse Template
 
 ## Overview
-MuseKit.io is a production-ready, full-stack SaaS starter template designed to accelerate the launch of new SaaS products. Each SaaS product deployed using MuseKit operates with its own independent deployment, repository, database, and Stripe account, ensuring clean P&L, independent scaling, and zero cross-pollination risk. The platform aims to be a closed-loop business intelligence system for content creators, featuring robust authentication, Stripe-powered billing with feature gating, team collaboration, an administrative dashboard, pluggable AI integrations, webhook support, monitoring, analytics, E2E testing, and SEO optimization. Its vision includes a rich set of 217 features to create a competitive moat.
+MuseKit.io is a production-ready, full-stack SaaS starter template designed to accelerate the launch of new SaaS products. It aims to be a closed-loop business intelligence system for content creators, featuring robust authentication, Stripe-powered billing with feature gating, team collaboration, an administrative dashboard, pluggable AI integrations, webhook support, monitoring, analytics, E2E testing, and SEO optimization. Each SaaS product deployed using MuseKit operates with its own independent deployment, repository, database, and Stripe account, ensuring clean P&L, independent scaling, and zero cross-pollination risk. The platform's vision includes a rich set of 217 features to create a competitive moat.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -51,11 +51,12 @@ Every time code changes are made, the agent MUST complete ALL of these steps bef
 Every session MUST follow these steps IN ORDER before writing any code:
 
 1. **Read `docs/PRODUCT_IDENTITY.md`** — Understand what PassivePost actually is. This is a closed-loop business intelligence platform for content creators, NOT a generic SaaS template. The 217-feature vision is intentional. Never suggest cutting features or simplifying the affiliate program. The feature richness IS the moat.
-2. **Read `docs/FEATURE_INVENTORY.md`** — Know what's already built. Search for keywords related to what you're about to build. If something similar exists, EXTEND it — don't create a parallel system.
-3. **Read `docs/LESSONS_LEARNED.md`** — Know the anti-patterns and technical gotchas. Follow the rules to avoid repeating past mistakes.
-4. **Read `docs/ROADMAP.md`** — Know what's in progress and what's next. Check the Phase Overview table. Check the Pending Bug Fixes section — fix those before new features.
-5. **Plan with integration requirements** — For every feature you plan to build, list which existing systems it connects to. If you can't name at least one integration point, rethink the feature.
-6. **Update Session Log** in ROADMAP.md at end of every session with what was accomplished.
+2. **Read `docs/DESIGN_SYSTEM_RULES.md`** — MANDATORY before any component or UI work. Contains the complete mapping of Tailwind patterns to CSS variables, DS wrapper components (`DSCard`, `DSGrid`, `DSSection`), and Never/Always rules. Every spacing, radius, shadow, and color class must use CSS variables from the design system.
+3. **Read `docs/FEATURE_INVENTORY.md`** — Know what's already built. Search for keywords related to what you're about to build. If something similar exists, EXTEND it — don't create a parallel system.
+4. **Read `docs/LESSONS_LEARNED.md`** — Know the anti-patterns and technical gotchas. Follow the rules to avoid repeating past mistakes.
+5. **Read `docs/ROADMAP.md`** — Know what's in progress and what's next. Check the Phase Overview table. Check the Pending Bug Fixes section — fix those before new features.
+6. **Plan with integration requirements** — For every feature you plan to build, list which existing systems it connects to. If you can't name at least one integration point, rethink the feature.
+7. **Update Session Log** in ROADMAP.md at end of every session with what was accomplished.
 
 ### Integration-First Development Rules (NON-NEGOTIABLE)
 
@@ -67,12 +68,14 @@ These rules apply to EVERY session, EVERY feature, no exceptions:
 4. **AI Must Use Real Context** — Every AI feature must pull real data (commissions, referrals, tiers, contests, milestones, leaderboard position, content calendar, connected analytics). Never generate advice in a vacuum.
 5. **Cross-Dashboard Awareness** — If a feature affects one dashboard, consider how it surfaces in the others. Admin creates contest → Affiliate sees it → AI coach references it → Predictions factor it in.
 6. **Document Connections** — In your session plan, explicitly list which existing features each new feature connects to. This is how we verify integration-first development.
+7. **Design System Compliance** — Every component MUST use CSS variables from the design system for spacing, radius, shadows, and colors. Never hardcode `p-6`, `gap-4`, `rounded-lg`, or `shadow-sm`. Use `p-[var(--card-padding)]`, `gap-[var(--content-density-gap)]`, etc. See `docs/DESIGN_SYSTEM_RULES.md`.
 
 ### Key Documents
 
 | Document | Path | Purpose | When to Read |
 |----------|------|---------|-------------|
 | **Product Identity** | `docs/PRODUCT_IDENTITY.md` | What we're building and why. The closed-loop vision. Integration rules. | **Every session** — read FIRST, before anything else |
+| **Design System Rules** | `docs/DESIGN_SYSTEM_RULES.md` | CSS variable mapping, DS wrapper components, Never/Always rules for styling | **Every session** — read BEFORE any component/UI work |
 | **Feature Inventory** | `docs/FEATURE_INVENTORY.md` | Complete inventory of everything built, organized by system, with files/tables/APIs | **Every session** — read BEFORE planning any features |
 | **Lessons Learned** | `docs/LESSONS_LEARNED.md` | Technical anti-patterns, integration anti-patterns, deployment gotchas | **Every session** — read to avoid repeating mistakes |
 | **Development Roadmap** | `docs/ROADMAP.md` | Master execution tracker: phase status, sprint details, pending bugs, session history | **Every session** — read after identity/inventory/lessons |
@@ -84,6 +87,7 @@ The project uses multiple planning documents that serve different purposes. **Ne
 | Document | Role | Updates |
 |----------|------|---------|
 | `PRODUCT_IDENTITY.md` | **Product soul** — what we're building and why | Rarely — only when vision evolves |
+| `DESIGN_SYSTEM_RULES.md` | **Styling law** — CSS variable mapping, wrapper components, Never/Always rules | When design system variables change |
 | `FEATURE_INVENTORY.md` | **What exists** — complete map of built features | Every session — add new features |
 | `LESSONS_LEARNED.md` | **What we've learned** — anti-patterns and rules | Every session — add new lessons |
 | `ROADMAP.md` | **Execution state** — what's done, what's next | Every session — update progress |
@@ -92,13 +96,10 @@ The project uses multiple planning documents that serve different purposes. **Ne
 The project utilizes Next.js 16+ (App Router), React 18+, and TypeScript. Styling is managed with Tailwind CSS, shadcn/ui, and next-themes, while TanStack Query handles server state. Supabase provides PostgreSQL, authentication, RLS, and storage, supporting multi-tenancy. Deployment is exclusively on Vercel.
 
 **UI/UX Decisions:**
-The UI features dynamic branding, configurable navigation, customizable sections (hero, logo marquee, animated counters, testimonial carousels), dark/light mode, and a comprehensive admin dashboard. The admin dashboard offers a full-width layout, task-based setup navigation, and a dedicated branding page for color palette management, background overrides, font selection, and logo variants. Dark mode uses a six-layer depth system with three admin-configurable options. All marketing and public pages are fully responsive. Header and footer styling are highly configurable. Landing page components are modular and toggleable. Color models for cards use a 950-scale.
-
-**Design System Configuration:**
-A comprehensive design system is configurable from the admin palette page (`/admin/setup/palette`). It covers typography, component styling, layout, interactive states, dark mode control, data visualization, tables, loading states, notifications, forms, scroll behavior, accessibility, print styles, and dividers. It includes four built-in presets and allows export/import of settings as JSON. All settings are stored as CSS variables and data attributes, injected via `src/hooks/use-settings.ts`. Key design system files include `src/types/settings.ts`, `src/hooks/use-settings.ts`, `src/hooks/use-chart-config.ts`, `src/lib/design-presets.ts`, `src/components/admin/palette/design-system-sections.tsx`, `src/components/scroll-to-top.tsx`, and `src/app/globals.css`.
+The UI features dynamic branding, configurable navigation, customizable sections (hero, logo marquee, animated counters, testimonial carousels), dark/light mode, and a comprehensive admin dashboard. The admin dashboard offers a full-width layout, task-based setup navigation, and a dedicated branding page for color palette management, background overrides, font selection, and logo variants. Dark mode uses a six-layer depth system with three admin-configurable options. All marketing and public pages are fully responsive. Landing page components are modular and toggleable. The design system is configurable from the admin palette page (`/admin/setup/palette`), covering typography, component styling, layout, interactive states, dark mode control, data visualization, tables, and forms.
 
 **Technical Implementations:**
-Core platform features include authentication, an Admin Dashboard (analytics, user/role management, audit logging, onboarding, user impersonation), Stripe Billing, Resend Email System, Team/Organization System, Pluggable AI Integration, Webhook Integration, Markdown-based Blog/Changelog, Marketing Tools, Security (Supabase RLS, Zod, rate limiting), Monitoring (Sentry, Plausible), Queue Infrastructure (BullMQ with Upstash Redis), Rate Limiting (Upstash Redis sliding window), In-App Notifications, Metrics & Reporting, Database Backup Configuration, and API Token Rotation. The system supports multiple SaaS products via a product registry. It also incorporates a content and affiliate flywheel with cross-platform blog publishing, SEO, AI repurposing, content calendar integration, tracked referral links, commission tracking, fraud detection, performance tiers, marketing assets, and payout management. The CRM & Invoicing foundation provides universal user profiles, local invoice/payment records, affiliate payout tracking, a support ticket system, CRM activity log, marketing campaign tracking, and contract/agreement management. Dashboard enhancements include Admin CRM cards, revenue attribution, bulk payouts, affiliate health scores, quick notes, affiliate earnings statements, portfolio view, commission lifecycle, contract view, tax summary, and campaign creator. Flywheel accelerators cover churn intelligence, cohort analysis, revenue analytics, traffic insights, AI analytics/posting/conversion strategies, connected analytics dashboard, cross-platform comparison, unified financial view, predictive intelligence, content intelligence, custom date reports, weekly affiliate digest, and admin program intelligence. Product extension design rules emphasize adding new files and tables for product-specific features, using plugin patterns for queue jobs, and minimizing core file modifications.
+Core platform features include authentication, an Admin Dashboard (analytics, user/role management, audit logging, onboarding, user impersonation), Stripe Billing, Resend Email System, Team/Organization System, Pluggable AI Integration, Webhook Integration, Markdown-based Blog/Changelog, Marketing Tools, Security (Supabase RLS, Zod, rate limiting), Monitoring (Sentry, Plausible), Queue Infrastructure (BullMQ with Upstash Redis), Rate Limiting (Upstash Redis sliding window), In-App Notifications, Metrics & Reporting, Database Backup Configuration, and API Token Rotation. The system supports multiple SaaS products via a product registry. It also incorporates a content and affiliate flywheel with cross-platform blog publishing, SEO, AI repurposing, content calendar integration, tracked referral links, commission tracking, fraud detection, performance tiers, marketing assets, and payout management. A CRM & Invoicing foundation provides universal user profiles, local invoice/payment records, affiliate payout tracking, a support ticket system, CRM activity log, marketing campaign tracking, and contract/agreement management. Product extension design rules emphasize adding new files and tables for product-specific features, using plugin patterns for queue jobs, and minimizing core file modifications.
 
 ## External Dependencies
 - **Supabase**: PostgreSQL database, Authentication, Row Level Security (RLS), Storage.

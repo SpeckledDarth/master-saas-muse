@@ -350,10 +350,10 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="py-8 px-6">
+    <div className="py-[var(--section-spacing,1.5rem)] px-[var(--section-spacing,1.5rem)]">
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[var(--content-density-gap,1rem)]">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
@@ -384,7 +384,7 @@ export default function UsersPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -396,7 +396,7 @@ export default function UsersPage() {
             />
           </div>
           
-          <div className="rounded-md border">
+          <div className="rounded-[var(--card-radius,0.75rem)] border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -413,7 +413,7 @@ export default function UsersPage() {
                 {filteredUsers.map((user) => (
                   <TableRow key={user.id} data-testid={`row-user-${user.id}`}>
                     <TableCell>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                         <Avatar className="h-9 w-9">
                           <AvatarImage src={user.avatar_url || undefined} alt={user.email} />
                           <AvatarFallback>{user.email.slice(0, 2).toUpperCase()}</AvatarFallback>
@@ -525,7 +525,7 @@ export default function UsersPage() {
                 ))}
                 {filteredUsers.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-[var(--section-spacing,1.5rem)]">
                       {searchQuery ? 'No users match your search' : 'No users found'}
                     </TableCell>
                   </TableRow>
@@ -563,8 +563,8 @@ export default function UsersPage() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="overview" className="space-y-6 mt-4">
-                <div className="flex items-center gap-4">
+              <TabsContent value="overview" className="space-y-[var(--content-density-gap,1rem)] mt-4">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Avatar className="h-16 w-16">
                     <AvatarImage src={userDetail.user.avatar_url || undefined} alt={userDetail.user.email} />
                     <AvatarFallback className="text-lg">{userDetail.user.email.slice(0, 2).toUpperCase()}</AvatarFallback>
@@ -575,7 +575,7 @@ export default function UsersPage() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)] text-sm">
                   <div>
                     <Label className="text-muted-foreground">User ID</Label>
                     <p className="font-mono text-xs break-all" data-testid="text-user-id">{userDetail.user.id}</p>
@@ -611,7 +611,7 @@ export default function UsersPage() {
                     <CreditCard className="h-4 w-4" />
                     Subscription
                   </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)] text-sm">
                     <div>
                       <Label className="text-muted-foreground">Plan</Label>
                       <div className="mt-1">
@@ -676,17 +676,17 @@ export default function UsersPage() {
 
               <TabsContent value="invoices" className="mt-4">
                 {!userDetail.stripeCustomerId ? (
-                  <div className="text-center py-8 text-muted-foreground" data-testid="text-no-stripe-customer">
+                  <div className="text-center py-[var(--section-spacing,1.5rem)] text-muted-foreground" data-testid="text-no-stripe-customer">
                     <CreditCard className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>No Stripe customer</p>
                   </div>
                 ) : userDetail.invoices.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground" data-testid="text-no-invoices">
+                  <div className="text-center py-[var(--section-spacing,1.5rem)] text-muted-foreground" data-testid="text-no-invoices">
                     <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>No invoices found</p>
                   </div>
                 ) : (
-                  <div className="rounded-md border">
+                  <div className="rounded-[var(--card-radius,0.75rem)] border">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -736,7 +736,7 @@ export default function UsersPage() {
                 )}
               </TabsContent>
 
-              <TabsContent value="notes" className="mt-4 space-y-4">
+              <TabsContent value="notes" className="mt-4 space-y-[var(--content-density-gap,1rem)]">
                 <div className="space-y-3">
                   {userDetail.notes.length === 0 ? (
                     <div className="text-center py-6 text-muted-foreground" data-testid="text-no-notes">
@@ -745,7 +745,7 @@ export default function UsersPage() {
                     </div>
                   ) : (
                     userDetail.notes.map((note) => (
-                      <div key={note.id} className="border rounded-md p-3 space-y-1" data-testid={`note-${note.id}`}>
+                      <div key={note.id} className="border rounded-[var(--card-radius,0.75rem)] p-[var(--card-padding,1.25rem)] space-y-1" data-testid={`note-${note.id}`}>
                         <div className="flex items-start justify-between gap-2">
                           <p className="text-sm" data-testid={`text-note-content-${note.id}`}>{note.note}</p>
                           <Button
@@ -832,7 +832,7 @@ export default function UsersPage() {
               Send an invitation email to add a new user to your application
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label htmlFor="invite-email">Email Address</Label>
               <Input

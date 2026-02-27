@@ -155,8 +155,8 @@ export default function CRMPage() {
   const endIdx = Math.min(page * 25, total)
 
   return (
-    <div className="p-6" data-testid="page-crm">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-[var(--section-spacing,1.5rem)]" data-testid="page-crm">
+      <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-crm-title">CRM</h1>
           <p className="text-sm text-muted-foreground">Manage all contacts and customers</p>
@@ -167,7 +167,7 @@ export default function CRMPage() {
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-3 mb-4">
+      <div className="flex flex-wrap gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -217,7 +217,7 @@ export default function CRMPage() {
         {total > 0 ? `Showing ${startIdx}-${endIdx} of ${total} contacts` : 'No contacts found'}
       </div>
 
-      <div className="rounded-lg border bg-card overflow-hidden">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm" data-testid="table-crm">
             <thead>

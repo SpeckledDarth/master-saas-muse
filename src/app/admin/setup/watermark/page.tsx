@@ -64,7 +64,7 @@ export default function WatermarkAdminPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div>
         <h2 className="text-2xl font-bold">Watermark Settings</h2>
         <p className="text-muted-foreground">
@@ -82,7 +82,7 @@ export default function WatermarkAdminPage() {
             When enabled, a text line is appended to every published post
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="watermark-toggle">Enable Watermark</Label>
@@ -112,7 +112,7 @@ export default function WatermarkAdminPage() {
           </div>
 
           {settings.enabled && (
-            <div className="rounded-lg border p-4 bg-muted/30">
+            <div className="rounded-[var(--card-radius,0.75rem)] border p-[var(--card-padding,1.25rem)] bg-muted/30">
               <Label className="text-sm font-medium mb-2 block">Preview</Label>
               <div className="text-sm text-muted-foreground">
                 <p className="mb-2 text-foreground">Your post content goes here...</p>

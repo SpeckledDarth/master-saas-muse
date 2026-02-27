@@ -15,7 +15,7 @@ export default function PricingPage() {
   const { settings, saving, saved, handleSave, updatePricing } = useSetupSettingsContext()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">Free Tier Configuration <InfoTooltip text="A free plan reduces signup friction and feeds your conversion funnel. Configure what free users get access to." /></CardTitle>
@@ -23,7 +23,7 @@ export default function PricingPage() {
             Configure your free plan that appears on the pricing page
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Show Free Plan</p>
@@ -38,7 +38,7 @@ export default function PricingPage() {
 
           {(settings.pricing?.showFreePlan ?? true) && (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                 <div className="space-y-2">
                   <Label htmlFor="freePlanName">Plan Name</Label>
                   <Input
@@ -87,8 +87,8 @@ export default function PricingPage() {
             Manage your subscription tiers in Stripe Dashboard
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="p-6 border rounded-lg bg-muted/50 text-center space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="p-[var(--section-spacing,1.5rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center space-y-[var(--content-density-gap,1rem)]">
             <DollarSign className="h-12 w-12 mx-auto text-muted-foreground" />
             <div>
               <h3 className="font-semibold text-lg mb-2">Paid plans are managed in Stripe</h3>
@@ -108,7 +108,7 @@ export default function PricingPage() {
             </Button>
           </div>
           
-          <div className="text-sm space-y-4">
+          <div className="text-sm space-y-[var(--content-density-gap,1rem)]">
             <p className="font-medium">How it works:</p>
             <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
               <li>Create or edit products in Stripe Dashboard</li>
@@ -116,25 +116,25 @@ export default function PricingPage() {
               <li>Your pricing page will automatically display the updates</li>
             </ol>
 
-            <div className="border rounded-md p-4 space-y-3">
+            <div className="border rounded-[var(--card-radius,0.75rem)] p-[var(--card-padding,1.25rem)] space-y-3">
               <p className="font-medium">Stripe Product Metadata Keys</p>
               <p className="text-xs text-muted-foreground">Add these as metadata key/value pairs on each Stripe product to control how cards appear on your pricing page.</p>
-              <div className="grid gap-3">
-                <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+              <div className="grid gap-[var(--content-density-gap,1rem)]">
+                <div className="flex items-start gap-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] bg-muted/50 rounded-[var(--card-radius,0.75rem)]">
                   <code className="text-xs bg-muted px-2 py-1 rounded font-mono flex-shrink-0">features</code>
                   <div>
                     <p className="text-sm">Comma-separated list of features shown with checkmarks</p>
                     <p className="text-xs text-muted-foreground mt-1">Example: <code className="bg-muted px-1 rounded">Unlimited posts, Priority support, API access</code></p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+                <div className="flex items-start gap-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] bg-muted/50 rounded-[var(--card-radius,0.75rem)]">
                   <code className="text-xs bg-muted px-2 py-1 rounded font-mono flex-shrink-0">sort_order</code>
                   <div>
                     <p className="text-sm">Controls the left-to-right display order of cards</p>
                     <p className="text-xs text-muted-foreground mt-1">Example: <code className="bg-muted px-1 rounded">1</code>, <code className="bg-muted px-1 rounded">2</code>, <code className="bg-muted px-1 rounded">3</code> (lowest number appears first)</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+                <div className="flex items-start gap-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] bg-muted/50 rounded-[var(--card-radius,0.75rem)]">
                   <code className="text-xs bg-muted px-2 py-1 rounded font-mono flex-shrink-0">popular</code>
                   <div>
                     <p className="text-sm">Highlights the card with a border and &ldquo;Popular&rdquo; badge</p>
@@ -157,7 +157,7 @@ export default function PricingPage() {
             Choose how pricing cards are displayed on the page
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label>Cards Per Row</Label>
             <Select

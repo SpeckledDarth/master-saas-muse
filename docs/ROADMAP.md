@@ -601,6 +601,48 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 
 ---
 
+### Session — February 27, 2026 (Design System Enforcement)
+
+**What was accomplished:**
+
+1. **Audited and fixed ALL admin pages for hardcoded spacing violations** — Replaced hardcoded Tailwind spacing, border-radius, shadow, and gap classes with CSS variable equivalents across 32+ admin page files. Key replacements:
+   - `p-6`/`p-8` → `p-[var(--section-spacing,1.5rem)]`
+   - `p-3`/`p-4` → `p-[var(--card-padding,1.25rem)]`
+   - `gap-3`/`gap-4`/`gap-6` → `gap-[var(--content-density-gap,1rem)]`
+   - `rounded-lg`/`rounded-md` → `rounded-[var(--card-radius,0.75rem)]`
+   - `shadow-sm`/`shadow-md` → `shadow-[var(--card-shadow,...)]`
+   - `space-y-4`/`space-y-6` → `space-y-[var(--content-density-gap,1rem)]`
+   - `mb-4`/`mb-6` → `mb-[var(--content-density-gap,1rem)]`
+   - Micro-spacing (≤0.75rem) intentionally preserved
+
+2. **Rewrote admin dashboard page with full DS compliance** — `src/app/admin/page.tsx` now uses DSCard, DSGrid wrapper components and CSS variables throughout. All cards, grids, sections, and spacing respond to palette changes.
+
+3. **Fixed admin layout** — `src/app/admin/layout.tsx` breadcrumb/command palette wrapper now uses CSS variable spacing.
+
+4. **Updated session protocol documents:**
+   - Added `docs/DESIGN_SYSTEM_RULES.md` as step 2 in Session Start Protocol (replit.md)
+   - Added to Key Documents table and Document System table
+   - Added "Design System Compliance" as rule 7 in Integration-First Development Rules
+   - Added hardcoded spacing anti-pattern to LESSONS_LEARNED.md Common Mistakes table
+
+5. **Verification:** Zero hardcoded spacing violations remain across all admin pages. Dev server compiles clean with no errors.
+
+**Files modified:**
+- `src/app/admin/page.tsx` (full rewrite with DS compliance)
+- `src/app/admin/layout.tsx` (CSS variable spacing)
+- All 30+ admin page files under `src/app/admin/` (spacing/radius/shadow replacements)
+- `replit.md` (session protocol + key docs + integration rules updated)
+- `docs/LESSONS_LEARNED.md` (new anti-pattern entry)
+
+**No new DB tables or Supabase migrations needed.**
+
+**Pending items for next session:**
+- Fix remaining hardcoded color violations (121 instances across 21 admin pages) — separate from spacing enforcement
+- Seed data for dashboard tables
+- Verify on Vercel after push
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience

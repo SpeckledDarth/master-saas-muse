@@ -16,7 +16,7 @@ export default function PagesSetupPage() {
   const { settings, saving, saved, handleSave, updateAbout, updateContact, updateLegal, updatePricingPage, updateFAQPage, updateCustomPage, addTeamMember, updateTeamMember, removeTeamMember } = useSetupSettingsContext()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">About Page <InfoTooltip text="Tell your company's story and introduce your team. Builds trust and connection with potential customers." /></CardTitle>
@@ -24,7 +24,7 @@ export default function PagesSetupPage() {
             Configure the content for your About Us page
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <ImageUpload
             label="Hero Image"
             value={settings.pages?.about?.heroImageUrl}
@@ -38,7 +38,7 @@ export default function PagesSetupPage() {
             onPositionYChange={y => updateAbout('heroImagePositionY', y)}
             testId="about-hero-image"
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -89,7 +89,7 @@ export default function PagesSetupPage() {
               data-testid="input-about-values"
             />
           </div>
-          <div className="flex items-center justify-between gap-4 py-3 border-t">
+          <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] py-3 border-t">
             <div>
               <p className="font-medium">Show Team Section</p>
               <p className="text-sm text-muted-foreground">Display team members on the About page</p>
@@ -101,7 +101,7 @@ export default function PagesSetupPage() {
             />
           </div>
           {settings.pages?.about?.showTeam && (
-            <div className="space-y-4 pt-4">
+            <div className="space-y-[var(--content-density-gap,1rem)] pt-4">
               <div className="flex items-center justify-between gap-2">
                 <Label>Team Members</Label>
                 <Button size="sm" variant="outline" onClick={addTeamMember} data-testid="button-add-team-member">
@@ -110,14 +110,14 @@ export default function PagesSetupPage() {
                 </Button>
               </div>
               {(settings.pages?.about?.team ?? []).map(member => (
-                <div key={member.id} className="p-4 border rounded-lg space-y-3">
+                <div key={member.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-medium">{member.name || 'New Member'}</span>
                     <Button size="icon" variant="ghost" onClick={() => removeTeamMember(member.id)} data-testid={`button-remove-member-${member.id}`}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                     <div className="space-y-1">
                       <Label className="text-xs">Name</Label>
                       <Input
@@ -172,7 +172,7 @@ export default function PagesSetupPage() {
             Configure contact information and form settings
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <ImageUpload
             label="Hero Image"
             value={settings.pages?.contact?.heroImageUrl}
@@ -186,7 +186,7 @@ export default function PagesSetupPage() {
             onPositionYChange={y => updateContact('heroImagePositionY', y)}
             testId="contact-hero-image"
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -206,7 +206,7 @@ export default function PagesSetupPage() {
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Contact Email</Label>
               <Input
@@ -237,7 +237,7 @@ export default function PagesSetupPage() {
               data-testid="input-contact-address"
             />
           </div>
-          <div className="flex items-center justify-between gap-4 py-3 border-t">
+          <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] py-3 border-t">
             <div>
               <p className="font-medium">Show Contact Form</p>
               <p className="text-sm text-muted-foreground">Display a contact form for visitors</p>
@@ -267,7 +267,7 @@ export default function PagesSetupPage() {
             Edit your Terms of Service content (supports Markdown)
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label>Last Updated Date</Label>
             <Input
@@ -298,7 +298,7 @@ export default function PagesSetupPage() {
             Edit your Privacy Policy content (supports Markdown)
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label>Last Updated Date</Label>
             <Input
@@ -329,7 +329,7 @@ export default function PagesSetupPage() {
             Configure the appearance of your pricing page
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <ImageUpload
             label="Hero Image"
             value={settings.pages?.pricing?.heroImageUrl}
@@ -343,7 +343,7 @@ export default function PagesSetupPage() {
             onPositionYChange={y => updatePricingPage('heroImagePositionY', y)}
             testId="pricing-hero-image"
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -373,7 +373,7 @@ export default function PagesSetupPage() {
             Configure the appearance of your FAQ page
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <ImageUpload
             label="Hero Image"
             value={settings.pages?.faq?.heroImageUrl}
@@ -387,7 +387,7 @@ export default function PagesSetupPage() {
             onPositionYChange={y => updateFAQPage('heroImagePositionY', y)}
             testId="faq-hero-image"
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Headline</Label>
               <Input
@@ -417,9 +417,9 @@ export default function PagesSetupPage() {
             Configure up to 4 additional marketing pages with custom names
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           {(settings.pages?.customPages ?? defaultSettings.pages.customPages).map((page, index) => (
-            <div key={page.id} className="p-4 border rounded-lg space-y-4">
+            <div key={page.id} className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-[var(--content-density-gap,1rem)]">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-medium">Page {index + 1}: {page.name || 'Untitled'}</span>
                 <Switch
@@ -430,7 +430,7 @@ export default function PagesSetupPage() {
               </div>
               {page.enabled && (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                     <div className="space-y-2">
                       <Label className="text-xs">Page Name (appears in menu)</Label>
                       <Input
@@ -463,7 +463,7 @@ export default function PagesSetupPage() {
                     onPositionYChange={y => updateCustomPage(page.id, 'heroImagePositionY', y)}
                     testId={`custom-page-hero-${page.id}`}
                   />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                     <div className="space-y-2">
                       <Label className="text-xs">Headline</Label>
                       <Input

@@ -200,7 +200,7 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
 
   return (
     <div className="group" data-testid={`key-row-${keyData.id}`}>
-      <div className="grid grid-cols-[1fr_2fr_auto] items-center gap-4 py-3 px-4">
+      <div className="grid grid-cols-[1fr_2fr_auto] items-center gap-[var(--content-density-gap,1rem)] py-3 px-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-medium truncate" data-testid={`label-${keyData.id}`}>
@@ -271,7 +271,7 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
             </div>
           ) : (
             <div
-              className={`font-mono text-sm py-2 px-3 rounded-md border flex items-center cursor-pointer hover-elevate active-elevate-2 ${
+              className={`font-mono text-sm py-2 px-3 rounded-[var(--card-radius,0.75rem)] border flex items-center cursor-pointer hover-elevate active-elevate-2 ${
                 keyData.configured
                   ? 'bg-muted/40'
                   : 'bg-muted/20 border-dashed'
@@ -363,7 +363,7 @@ function CollapsibleGroup({ group, iconMap, onSaved }: { group: IntegrationGroup
     <div data-testid={`group-${group.id}`}>
       <button
         type="button"
-        className="w-full flex items-center gap-3 px-6 py-3 bg-muted/30 border-t text-left hover-elevate active-elevate-2"
+        className="w-full flex items-center gap-[var(--content-density-gap,1rem)] px-[var(--section-spacing,1.5rem)] py-3 bg-muted/30 border-t text-left hover-elevate active-elevate-2"
         onClick={() => setExpanded(!expanded)}
         data-testid={`button-toggle-${group.id}`}
       >
@@ -437,8 +437,8 @@ export default function IntegrationsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-total-summary">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -532,7 +532,7 @@ export default function IntegrationsPage() {
         </Card>
       )}
 
-      <div className="p-4 rounded-md bg-muted/30 border text-sm text-muted-foreground space-y-1" data-testid="text-env-info">
+      <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] bg-muted/30 border text-sm text-muted-foreground space-y-1" data-testid="text-env-info">
         <p>Keys can be set in two ways:</p>
         <ul className="list-disc list-inside space-y-0.5 pl-2">
           <li><Badge variant="secondary" className="text-[10px] px-1.5 py-0 mr-1">Dashboard</Badge>Saved from this page, stored in your database, takes effect immediately</li>

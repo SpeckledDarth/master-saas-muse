@@ -138,8 +138,8 @@ export default function RevenuePage() {
   const endIdx = Math.min(page * 25, total)
 
   return (
-    <div className="p-6" data-testid="page-revenue">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-[var(--section-spacing,1.5rem)]" data-testid="page-revenue">
+      <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-revenue-title">Revenue</h1>
           <p className="text-sm text-muted-foreground">All financial transactions across the platform</p>
@@ -150,22 +150,22 @@ export default function RevenuePage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="rounded-lg border bg-card p-3" data-testid="card-total-revenue">
+      <div className="grid grid-cols-3 gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-total-revenue">
           <p className="text-xs text-muted-foreground mb-1">Total Revenue</p>
           <p className="text-lg font-bold text-green-600 dark:text-green-400">{formatCurrency(summary.totalRevenue)}</p>
         </div>
-        <div className="rounded-lg border bg-card p-3" data-testid="card-pending-commissions">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-pending-commissions">
           <p className="text-xs text-muted-foreground mb-1">Pending Commissions</p>
           <p className="text-lg font-bold text-amber-600 dark:text-amber-400">{formatCurrency(summary.pendingCommissions)}</p>
         </div>
-        <div className="rounded-lg border bg-card p-3" data-testid="card-outstanding-payouts">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-outstanding-payouts">
           <p className="text-xs text-muted-foreground mb-1">Outstanding Payouts</p>
           <p className="text-lg font-bold text-purple-600 dark:text-purple-400">{formatCurrency(summary.outstandingPayouts)}</p>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3 mb-4">
+      <div className="flex flex-wrap gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -231,7 +231,7 @@ export default function RevenuePage() {
         {total > 0 ? `Showing ${startIdx}-${endIdx} of ${total} transactions` : 'No transactions found'}
       </div>
 
-      <div className="rounded-lg border bg-card overflow-hidden">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm" data-testid="table-revenue">
             <thead>

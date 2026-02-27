@@ -165,13 +165,13 @@ export default function TestimonialsPage() {
   const featuredCount = testimonials.filter(t => t.featured).length
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold" data-testid="text-testimonials-title">Testimonials</h2>
           <p className="text-muted-foreground">Manage customer testimonials displayed on your site</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <Link href="/testimonials" target="_blank">
             <Button variant="outline" size="sm" data-testid="button-view-public-page">
               <ExternalLink className="h-4 w-4 mr-2" />
@@ -185,7 +185,7 @@ export default function TestimonialsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <Card>
           <CardContent className="pt-6 text-center">
             <div className="text-3xl font-bold" data-testid="text-total-count">{testimonials.length}</div>
@@ -212,8 +212,8 @@ export default function TestimonialsPage() {
             <CardTitle>{editingId ? 'Edit Testimonial' : 'Add New Testimonial'}</CardTitle>
             <CardDescription>Fill in the customer details and their testimonial</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Name *</Label>
                 <Input
@@ -233,7 +233,7 @@ export default function TestimonialsPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Role / Title</Label>
                 <Input
@@ -269,7 +269,7 @@ export default function TestimonialsPage() {
                 data-testid="input-testimonial-quote"
               />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Avatar URL</Label>
                 <Input
@@ -289,7 +289,7 @@ export default function TestimonialsPage() {
                 />
               </div>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
               <div className="flex items-center gap-2">
                 <Label>Status</Label>
                 <Select value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v as any }))}>
@@ -312,7 +312,7 @@ export default function TestimonialsPage() {
                 <Label>Featured</Label>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-[var(--content-density-gap,1rem)]">
               <Button onClick={handleSave} disabled={saving} data-testid="button-save-testimonial">
                 {saving ? 'Saving...' : (editingId ? 'Update' : 'Add Testimonial')}
               </Button>
@@ -331,9 +331,9 @@ export default function TestimonialsPage() {
       ) : testimonials.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            <Quote className="h-12 w-12 mx-auto mb-4 opacity-30" />
+            <Quote className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] opacity-30" />
             <p className="text-lg font-medium mb-2">No testimonials yet</p>
-            <p className="mb-4">Add your first customer testimonial to display on your site</p>
+            <p className="mb-[var(--content-density-gap,1rem)]">Add your first customer testimonial to display on your site</p>
             <Button onClick={() => setShowForm(true)} data-testid="button-add-first-testimonial">
               <Plus className="h-4 w-4 mr-2" />
               Add First Testimonial
@@ -347,7 +347,7 @@ export default function TestimonialsPage() {
             return (
               <Card key={t.id} className={`${t.featured ? 'border-yellow-400 dark:border-yellow-600' : ''}`} data-testid={`card-testimonial-${t.id}`}>
                 <CardContent className="py-4">
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
                     <Avatar className="h-12 w-12 flex-shrink-0">
                       {t.avatar_url && <AvatarImage src={t.avatar_url} alt={t.name} />}
                       <AvatarFallback className="bg-primary-100 text-primary-800 dark:bg-primary-800 dark:text-primary-200">{initials}</AvatarFallback>

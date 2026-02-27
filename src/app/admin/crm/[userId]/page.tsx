@@ -213,8 +213,8 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
 
   if (!data?.user) {
     return (
-      <div className="p-6 text-center" data-testid="error-user-not-found">
-        <p className="text-muted-foreground mb-4">User not found</p>
+      <div className="p-[var(--section-spacing,1.5rem)] text-center" data-testid="error-user-not-found">
+        <p className="text-muted-foreground mb-[var(--content-density-gap,1rem)]">User not found</p>
         <Button variant="outline" onClick={() => router.push('/admin/crm')}>Back to CRM</Button>
       </div>
     )
@@ -231,12 +231,12 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
   }))
 
   return (
-    <div className="p-6" data-testid="page-crm-detail">
-      <div className="flex items-center gap-3 mb-6">
+    <div className="p-[var(--section-spacing,1.5rem)]" data-testid="page-crm-detail">
+      <div className="flex items-center gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
         <Button variant="ghost" size="icon" onClick={() => router.push('/admin/crm')} data-testid="button-back-crm" aria-label="Back to CRM">
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-1 min-w-0">
           {user.avatar_url ? (
             <img src={user.avatar_url} alt="" className="h-12 w-12 rounded-full object-cover shrink-0" />
           ) : (
@@ -278,7 +278,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-1.5 mb-4 items-center" data-testid="tags-container">
+      <div className="flex flex-wrap gap-1.5 mb-[var(--content-density-gap,1rem)] items-center" data-testid="tags-container">
         {tags.map((t: any) => (
           <span key={t.tag} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${TAG_COLORS[t.color] || TAG_COLORS.gray}`}>
             {t.tag}
@@ -322,36 +322,36 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
         )}
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
-        <div className="rounded-lg border bg-card p-3" data-testid="card-total-revenue">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-total-revenue">
           <p className="text-xs text-muted-foreground mb-1">Total Revenue</p>
           <p className="text-lg font-bold">{formatCurrency(user.totalRevenue)}</p>
         </div>
-        <div className="rounded-lg border bg-card p-3" data-testid="card-plan">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-plan">
           <p className="text-xs text-muted-foreground mb-1">Current Plan</p>
           <p className="text-lg font-bold capitalize">{user.plan}</p>
         </div>
-        <div className="rounded-lg border bg-card p-3" data-testid="card-health">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-health">
           <p className="text-xs text-muted-foreground mb-1">Health Score</p>
           <div className="flex items-center gap-2">
             <span className={`inline-block h-2.5 w-2.5 rounded-full ${healthDot(user.healthScore)}`} />
             <p className={`text-lg font-bold ${healthColor(user.healthScore)}`}>{user.healthScore}</p>
           </div>
         </div>
-        <div className="rounded-lg border bg-card p-3" data-testid="card-member-since">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-member-since">
           <p className="text-xs text-muted-foreground mb-1">Member Since</p>
           <p className="text-lg font-bold">{formatDate(user.created_at)}</p>
         </div>
-        <div className="rounded-lg border bg-card p-3" data-testid="card-last-login">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-last-login">
           <p className="text-xs text-muted-foreground mb-1">Days Since Login</p>
           <p className="text-lg font-bold">{user.daysSinceLogin > 900 ? 'Never' : user.daysSinceLogin}</p>
         </div>
       </div>
 
       {affiliateSummary && (
-        <div className="rounded-lg border bg-card p-4 mb-6" data-testid="card-affiliate-summary">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] mb-[var(--content-density-gap,1rem)]" data-testid="card-affiliate-summary">
           <h3 className="text-sm font-medium mb-3">Affiliate Summary</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-[var(--content-density-gap,1rem)] text-sm">
             <div>
               <p className="text-xs text-muted-foreground">Referrals</p>
               <p className="font-bold">{affiliateSummary.referralCount}</p>
@@ -376,7 +376,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
         </div>
       )}
 
-      <div className="border-b mb-6">
+      <div className="border-b mb-[var(--content-density-gap,1rem)]">
         <nav className="flex gap-0 overflow-x-auto" data-testid="nav-tabs">
           {TABS.map(tab => (
             <button
@@ -397,8 +397,8 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
       </div>
 
       {activeTab === 'profile' && (
-        <div className="max-w-2xl space-y-4" data-testid="tab-content-profile">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="max-w-2xl space-y-[var(--content-density-gap,1rem)]" data-testid="tab-content-profile">
+          <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Display Name</label>
               <Input
@@ -433,7 +433,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               data-testid="input-timezone"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Address</label>
               <Input
@@ -451,7 +451,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-[var(--content-density-gap,1rem)]">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">State</label>
               <Input
@@ -492,7 +492,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               <p>No transactions found</p>
             </div>
           ) : (
-            <div className="rounded-lg border bg-card overflow-hidden">
+            <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
               <table className="w-full text-sm" data-testid="table-transactions">
                 <thead>
                   <tr className="border-b bg-muted/30">
@@ -549,7 +549,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
           ) : (
             <div className="space-y-3">
               {tickets.map((ticket: any) => (
-                <div key={ticket.id} className="rounded-lg border bg-card p-4" data-testid={`ticket-${ticket.id}`}>
+                <div key={ticket.id} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid={`ticket-${ticket.id}`}>
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h4 className="font-medium text-foreground">{ticket.subject || ticket.title || 'Untitled Ticket'}</h4>
@@ -594,7 +594,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
           ) : (
             <div className="space-y-3">
               {contracts.map((contract: any) => (
-                <div key={contract.id} className="rounded-lg border bg-card p-4" data-testid={`contract-${contract.id}`}>
+                <div key={contract.id} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid={`contract-${contract.id}`}>
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h4 className="font-medium text-foreground">{contract.title || 'Untitled Contract'}</h4>
@@ -604,7 +604,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                       {contract.status || 'draft'}
                     </span>
                   </div>
-                  <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
+                  <div className="flex gap-[var(--content-density-gap,1rem)] mt-2 text-xs text-muted-foreground">
                     {contract.signed_at && <span>Signed: {formatDate(contract.signed_at)}</span>}
                     {contract.expires_at && <span>Expires: {formatDate(contract.expires_at)}</span>}
                   </div>

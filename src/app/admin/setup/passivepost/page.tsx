@@ -183,7 +183,7 @@ function SocialKeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: 
 
   return (
     <div className="group" data-testid={`key-row-${keyData.id}`}>
-      <div className="grid grid-cols-[1fr_2fr_auto] items-center gap-4 py-3 px-4">
+      <div className="grid grid-cols-[1fr_2fr_auto] items-center gap-[var(--content-density-gap,1rem)] py-3 px-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-medium truncate" data-testid={`label-${keyData.id}`}>
@@ -236,7 +236,7 @@ function SocialKeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: 
             </div>
           ) : (
             <div
-              className={`font-mono text-sm py-2 px-3 rounded-md border flex items-center cursor-pointer hover-elevate active-elevate-2 ${
+              className={`font-mono text-sm py-2 px-3 rounded-[var(--card-radius,0.75rem)] border flex items-center cursor-pointer hover-elevate active-elevate-2 ${
                 keyData.configured
                   ? 'bg-muted/40'
                   : 'bg-muted/20 border-dashed'
@@ -326,7 +326,7 @@ function SocialKeyGroup({ group, onSaved }: { group: IntegrationGroup; onSaved: 
     <div data-testid={`group-${group.id}`}>
       <button
         type="button"
-        className="w-full flex items-center gap-3 px-6 py-3 bg-muted/30 border-t text-left hover-elevate active-elevate-2"
+        className="w-full flex items-center gap-[var(--content-density-gap,1rem)] px-[var(--section-spacing,1.5rem)] py-3 bg-muted/30 border-t text-left hover-elevate active-elevate-2"
         onClick={() => setExpanded(!expanded)}
         data-testid={`button-toggle-${group.id}`}
       >
@@ -415,7 +415,7 @@ export default function PassivePostPage() {
   const isEnabled = (settings as any).features?.socialModuleEnabled
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -428,7 +428,7 @@ export default function PassivePostPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
             <div>
               <p className="font-medium" data-testid="text-module-status-label">PassivePost Module</p>
               <p className="text-sm text-muted-foreground">Enable this module in the Features tab</p>
@@ -461,7 +461,7 @@ export default function PassivePostPage() {
         return (
           <Card className="border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/20" data-testid="alert-dependency-warning">
             <CardContent className="pt-6">
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
                 <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 mt-0.5 shrink-0" />
                 <div className="space-y-1">
                   {warnings.map((w) => (
@@ -483,7 +483,7 @@ export default function PassivePostPage() {
                 Define subscription tiers with display names, Stripe metadata mappings, and rate limits. Each tier gets an auto-generated ID.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Default Tier</Label>
                 <Select
@@ -504,11 +504,11 @@ export default function PassivePostPage() {
                 <p className="text-xs text-muted-foreground">Users without a paid subscription fall back to this tier.</p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 {(socialModule.tierDefinitions || DEFAULT_TIER_DEFINITIONS).map((td: TierDefinition, idx: number) => {
                   const defs = socialModule.tierDefinitions || DEFAULT_TIER_DEFINITIONS
                   return (
-                    <div key={td.id} className="border rounded-md p-4 space-y-4">
+                    <div key={td.id} className="border rounded-[var(--card-radius,0.75rem)] p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
                       <div className="flex items-center justify-between gap-2 flex-wrap">
                         <div className="flex items-center gap-2">
                           <Badge variant="outline">{td.id}</Badge>
@@ -535,7 +535,7 @@ export default function PassivePostPage() {
                         )}
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                         <div className="space-y-2">
                           <Label>Display Name</Label>
                           <Input
@@ -563,7 +563,7 @@ export default function PassivePostPage() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
                         <div className="space-y-2">
                           <Label>AI / Day</Label>
                           <Input
@@ -676,9 +676,9 @@ export default function PassivePostPage() {
                 Connect your social media accounts
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               <div className="flex items-center justify-between py-3 border-b">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Twitter className="h-5 w-5" />
                   <div>
                     <p className="font-medium">Twitter / X</p>
@@ -695,7 +695,7 @@ export default function PassivePostPage() {
               </div>
 
               <div className="flex items-center justify-between py-3 border-b">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Linkedin className="h-5 w-5" />
                   <div>
                     <p className="font-medium">LinkedIn</p>
@@ -712,7 +712,7 @@ export default function PassivePostPage() {
               </div>
 
               <div className="flex items-center justify-between py-3 border-b">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Instagram className="h-5 w-5" />
                   <div>
                     <p className="font-medium">Instagram</p>
@@ -727,7 +727,7 @@ export default function PassivePostPage() {
               </div>
 
               <div className="flex items-center justify-between py-3 border-b">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Youtube className="h-5 w-5" />
                   <div>
                     <p className="font-medium">YouTube</p>
@@ -742,7 +742,7 @@ export default function PassivePostPage() {
               </div>
 
               <div className="flex items-center justify-between py-3 border-b">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Facebook className="h-5 w-5" />
                   <div>
                     <p className="font-medium">Facebook</p>
@@ -757,7 +757,7 @@ export default function PassivePostPage() {
               </div>
 
               <div className="flex items-center justify-between py-3 border-b">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Music className="h-5 w-5" />
                   <div>
                     <p className="font-medium">TikTok</p>
@@ -772,7 +772,7 @@ export default function PassivePostPage() {
               </div>
 
               <div className="flex items-center justify-between py-3 border-b">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <MessageSquare className="h-5 w-5" />
                   <div>
                     <p className="font-medium">Reddit</p>
@@ -787,7 +787,7 @@ export default function PassivePostPage() {
               </div>
 
               <div className="flex items-center justify-between py-3 border-b">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Image className="h-5 w-5" />
                   <div>
                     <p className="font-medium">Pinterest</p>
@@ -802,7 +802,7 @@ export default function PassivePostPage() {
               </div>
 
               <div className="flex items-center justify-between py-3 border-b">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Camera className="h-5 w-5" />
                   <div>
                     <p className="font-medium">Snapchat</p>
@@ -817,7 +817,7 @@ export default function PassivePostPage() {
               </div>
 
               <div className="flex items-center justify-between py-3">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Gamepad2 className="h-5 w-5" />
                   <div>
                     <p className="font-medium">Discord</p>
@@ -851,7 +851,7 @@ export default function PassivePostPage() {
             </CardHeader>
             <CardContent className="p-0">
               {loadingKeys ? (
-                <div className="flex items-center justify-center py-8">
+                <div className="flex items-center justify-center py-[var(--section-spacing,1.5rem)]">
                   <Loader2 className="h-6 w-6 animate-spin" />
                 </div>
               ) : (
@@ -873,7 +873,7 @@ export default function PassivePostPage() {
                 Configure how posts are created and published
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label htmlFor="brand-voice">Brand Voice</Label>
                 <Textarea
@@ -913,13 +913,13 @@ export default function PassivePostPage() {
                 Customize AI voice guidance for each industry niche
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               <p className="text-xs text-muted-foreground">
                 When a user sets their niche in Brand Preferences, the AI uses the matching guidance below to write posts that sound authentic for their industry.
               </p>
               <div className="space-y-3">
                 {(socialModule.nicheGuidance || defaultSocialModuleSettings.nicheGuidance || []).map((entry: NicheGuidanceEntry, index: number) => (
-                  <div key={entry.key + index} className="border rounded-md p-3 space-y-2" data-testid={`niche-entry-${entry.key}`}>
+                  <div key={entry.key + index} className="border rounded-[var(--card-radius,0.75rem)] p-[var(--card-padding,1.25rem)] space-y-2" data-testid={`niche-entry-${entry.key}`}>
                     <div className="flex items-center justify-between gap-2">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1">
                         <Input
@@ -983,7 +983,7 @@ export default function PassivePostPage() {
                   Configure social media monitoring and automation
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-[var(--content-density-gap,1rem)]">
                 <div className="space-y-2">
                   <Label htmlFor="trend-interval">Trend Check Interval (hours)</Label>
                   <Input
@@ -1030,7 +1030,7 @@ export default function PassivePostPage() {
                 Monitor the health of social media API connections
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               <div className="flex items-center justify-between py-3 border-b">
                 <div>
                   <p className="font-medium">Enable Status Checker</p>
@@ -1080,7 +1080,7 @@ export default function PassivePostPage() {
                 Configure the automated engagement metrics collection schedule
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label htmlFor="engagement-interval">Pull Interval (hours)</Label>
                 <Input

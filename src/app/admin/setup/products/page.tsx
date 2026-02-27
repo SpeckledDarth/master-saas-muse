@@ -268,10 +268,10 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Package className="h-5 w-5" />
@@ -290,12 +290,12 @@ export default function ProductsPage() {
         <CardContent>
           {products.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground" data-testid="text-no-products">
-              <Package className="h-12 w-12 mx-auto mb-4 opacity-30" />
+              <Package className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] opacity-30" />
               <p className="font-medium">No products registered yet</p>
               <p className="text-sm mt-1">Click &quot;Add Product&quot; to register your first product</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               {products.map((product) => (
                 <Card
                   key={product.slug}
@@ -304,7 +304,7 @@ export default function ProductsPage() {
                   onClick={() => openEditDialog(product)}
                 >
                   <CardContent className="pt-6">
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                       <div className="space-y-2 flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-semibold text-base" data-testid={`text-product-name-${product.slug}`}>
@@ -325,7 +325,7 @@ export default function ProductsPage() {
                             {product.description}
                           </p>
                         )}
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                        <div className="flex items-center gap-[var(--content-density-gap,1rem)] text-sm text-muted-foreground flex-wrap">
                           {product.stripeProductId && (
                             <span className="flex items-center gap-1" data-testid={`text-product-stripe-${product.slug}`}>
                               <CreditCard className="h-3 w-3" />
@@ -398,8 +398,8 @@ export default function ProductsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-[var(--content-density-gap,1rem)] py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label htmlFor="product-slug">Slug</Label>
                 <Input
@@ -435,7 +435,7 @@ export default function ProductsPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label htmlFor="product-stripe-id">Stripe Product ID</Label>
                 <Input
@@ -473,7 +473,7 @@ export default function ProductsPage() {
             </div>
 
             <div className="space-y-3">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <div>
                   <Label className="text-base font-semibold">Tier Definitions</Label>
                   <p className="text-sm text-muted-foreground">Define pricing tiers and their limits</p>
@@ -505,7 +505,7 @@ export default function ProductsPage() {
                       </Button>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
                       <div className="space-y-1">
                         <Label className="text-xs">Tier ID</Label>
                         <Input

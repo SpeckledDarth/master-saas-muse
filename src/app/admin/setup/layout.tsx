@@ -70,8 +70,8 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="py-8 px-6">
-      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
+    <div className="py-[var(--section-spacing,1.5rem)] px-[var(--section-spacing,1.5rem)]">
+      <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)] gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-setup-title">Setup Dashboard</h1>
           <p className="text-sm text-muted-foreground">Configure your SaaS branding, pricing, and features</p>
@@ -92,7 +92,7 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
         </Button>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex gap-[var(--content-density-gap,1rem)]">
         <nav className="w-52 shrink-0">
           <div className="space-y-5 sticky top-20">
             {sectionGroups.map((group) => (

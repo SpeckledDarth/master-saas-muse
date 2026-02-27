@@ -64,8 +64,8 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
 
   if (error || !data) {
     return (
-      <div className="p-6 text-center" data-testid="error-not-found">
-        <p className="text-muted-foreground mb-4">Subscription not found</p>
+      <div className="p-[var(--section-spacing,1.5rem)] text-center" data-testid="error-not-found">
+        <p className="text-muted-foreground mb-[var(--content-density-gap,1rem)]">Subscription not found</p>
         <Button variant="outline" onClick={() => router.push('/admin/subscriptions')}>Back to Subscriptions</Button>
       </div>
     )
@@ -74,8 +74,8 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
   const { subscription: sub, user, product, invoices, stripeCustomerId, churnIndicators } = data
 
   return (
-    <div className="p-6" data-testid="page-subscription-detail">
-      <div className="flex items-center gap-3 mb-6">
+    <div className="p-[var(--section-spacing,1.5rem)]" data-testid="page-subscription-detail">
+      <div className="flex items-center gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
         <Button variant="ghost" size="icon" onClick={() => router.push('/admin/subscriptions')} data-testid="button-back-subs" aria-label="Back to Subscriptions">
           <ArrowLeft className="h-4 w-4" />
         </Button>
@@ -92,8 +92,8 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <Link href={`/admin/crm/${user.id}`} className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors block" data-testid="card-customer">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
+        <Link href={`/admin/crm/${user.id}`} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] hover:bg-muted/30 transition-colors block" data-testid="card-customer">
           <p className="text-xs text-muted-foreground mb-2">Customer</p>
           <div className="flex items-center gap-2">
             {user.avatar_url ? (
@@ -110,7 +110,7 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
           </div>
         </Link>
 
-        <div className="rounded-lg border bg-card p-4" data-testid="card-sub-details">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-sub-details">
           <p className="text-xs text-muted-foreground mb-2">Subscription Details</p>
           <div className="space-y-1 text-sm">
             {sub.stripe_subscription_id && (
@@ -125,7 +125,7 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card p-4" data-testid="card-amount">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-amount">
           <p className="text-xs text-muted-foreground mb-2">Amount</p>
           <p className="text-2xl font-bold">{formatCurrency(sub.price_amount || 0)}</p>
           <p className="text-xs text-muted-foreground">per month</p>
@@ -133,7 +133,7 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
       </div>
 
       {churnIndicators && churnIndicators.length > 0 && (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 mb-6" data-testid="section-churn-risk">
+        <div className="rounded-[var(--card-radius,0.75rem)] border border-destructive/30 bg-destructive/5 p-[var(--card-padding,1.25rem)] mb-[var(--content-density-gap,1rem)]" data-testid="section-churn-risk">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-4 w-4 text-destructive" />
             <h3 className="text-sm font-medium text-destructive">Churn Risk Indicators</h3>
@@ -150,9 +150,9 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
       )}
 
       {invoices && invoices.length > 0 && (
-        <div className="mb-6" data-testid="section-invoice-history">
+        <div className="mb-[var(--content-density-gap,1rem)]" data-testid="section-invoice-history">
           <h3 className="text-sm font-medium mb-3">Invoice History</h3>
-          <div className="rounded-lg border bg-card overflow-hidden">
+          <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/30">
@@ -186,7 +186,7 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
         </div>
       )}
 
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-[var(--content-density-gap,1rem)]">
         {sub.stripe_subscription_id && (
           <Button variant="outline" size="sm" asChild data-testid="button-view-stripe">
             <a href={`https://dashboard.stripe.com/subscriptions/${sub.stripe_subscription_id}`} target="_blank" rel="noopener noreferrer">
@@ -203,7 +203,7 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-[var(--content-density-gap,1rem)]">
         <div>
           <h3 className="text-sm font-medium mb-3">Notes</h3>
           <EntityNotes entityType="subscription" entityId={id} />

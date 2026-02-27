@@ -17,7 +17,7 @@ export default function FeaturesPage() {
   const { settings, saving, saved, handleSave, updateFeatures, updateAI, updateWebhooks, updateWebhookEvent, webhookTesting, webhookTestResult, testWebhook, aiProviders } = useSetupSettingsContext()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">Feature Toggles <InfoTooltip text="Turn individual features on or off without deploying code changes. Disabled features are hidden from users." /></CardTitle>
@@ -25,7 +25,7 @@ export default function FeaturesPage() {
             Enable or disable features for your SaaS
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Email Authentication</p>
@@ -224,7 +224,7 @@ export default function FeaturesPage() {
             Send real-time events to n8n, Zapier, or any webhook URL when key actions happen in your app.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Enable Webhooks</p>
@@ -294,7 +294,7 @@ export default function FeaturesPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 pt-2">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)] pt-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -332,7 +332,7 @@ export default function FeaturesPage() {
               Configure which AI provider and model to use. Manage API keys in the <a href="/admin/setup/integrations" className="text-primary-600 dark:text-primary-400 underline">Integrations</a> page.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Provider</Label>
               <Select
@@ -380,7 +380,7 @@ export default function FeaturesPage() {
               </Select>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Max Tokens</Label>
                 <Input

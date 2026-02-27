@@ -30,7 +30,7 @@ function MarkdownPreview({ content }: { content: string }) {
     let processed = content
       .replace(/^### (.*$)/gm, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>')
       .replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>')
-      .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-6 mb-4">$1</h1>')
+      .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-6 mb-[var(--content-density-gap,1rem)]">$1</h1>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">$1</code>')
@@ -195,7 +195,7 @@ export default function ContentPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-[var(--section-spacing,1.5rem)]">
         <div className="flex items-center justify-center min-h-[400px]">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
@@ -206,7 +206,7 @@ export default function ContentPage() {
   function PostCard({ post }: { post: Post }) {
     return (
       <Card data-testid={`post-${post.id}`}>
-        <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
+        <CardHeader className="flex flex-row items-center justify-between gap-[var(--content-density-gap,1rem)] space-y-0">
           <div 
             className="cursor-pointer hover:opacity-80 min-w-0 flex-1"
             onClick={() => window.open(`/blog/${post.slug}`, '_blank')}
@@ -271,7 +271,7 @@ export default function ContentPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-[var(--section-spacing,1.5rem)] space-y-[var(--content-density-gap,1rem)]">
       <div data-testid="blog-header">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <FileText className="h-6 w-6" />
@@ -290,7 +290,7 @@ export default function ContentPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="blog" className="space-y-4">
+        <TabsContent value="blog" className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex justify-end">
             <Button onClick={() => openNewPost('blog')} data-testid="button-new-blog">
               <Plus className="h-4 w-4 mr-2" />
@@ -301,13 +301,13 @@ export default function ContentPage() {
           {blogPosts.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
-                <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <FileText className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] text-muted-foreground opacity-50" />
                 <p className="text-lg font-medium mb-2">No blog posts yet</p>
                 <p className="text-muted-foreground">Create your first blog post to share with your audience.</p>
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               {blogPosts.map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}
@@ -315,7 +315,7 @@ export default function ContentPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="changelog" className="space-y-4">
+        <TabsContent value="changelog" className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex justify-end">
             <Button onClick={() => openNewPost('changelog')} data-testid="button-new-changelog">
               <Plus className="h-4 w-4 mr-2" />
@@ -326,13 +326,13 @@ export default function ContentPage() {
           {changelogPosts.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
-                <Megaphone className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <Megaphone className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] text-muted-foreground opacity-50" />
                 <p className="text-lg font-medium mb-2">No changelog entries yet</p>
                 <p className="text-muted-foreground">Document your first product update or feature release.</p>
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               {changelogPosts.map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}
@@ -366,8 +366,8 @@ export default function ContentPage() {
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="edit" className="flex-1 overflow-auto space-y-4 mt-4">
-              <div className="grid grid-cols-2 gap-4">
+            <TabsContent value="edit" className="flex-1 overflow-auto space-y-[var(--content-density-gap,1rem)] mt-4">
+              <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                 <div className="space-y-2">
                   <Label htmlFor="title">Title</Label>
                   <Input

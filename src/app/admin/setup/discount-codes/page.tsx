@@ -222,13 +222,13 @@ export default function DiscountCodesPage() {
   }
 
   return (
-    <div className="space-y-6" data-testid="page-discount-codes">
+    <div className="space-y-[var(--content-density-gap,1rem)]" data-testid="page-discount-codes">
       <div>
         <h2 className="text-xl font-semibold" data-testid="text-discount-codes-title">Discount Codes</h2>
         <p className="text-sm text-muted-foreground">Create and manage promotional discount codes for your checkout.</p>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card data-testid="stat-total-codes">
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2">
@@ -269,7 +269,7 @@ export default function DiscountCodesPage() {
 
       <Card data-testid="card-discount-codes">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <div className="flex items-center gap-4 flex-1">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-1">
             <div>
               <CardTitle className="text-base">Codes</CardTitle>
               <CardDescription>Manage your discount and promotional codes</CardDescription>
@@ -312,7 +312,7 @@ export default function DiscountCodesPage() {
                   {editing ? 'Update this discount code.' : 'Create a new promotional code for your checkout.'}
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 <div>
                   <Label>Code</Label>
                   <Input
@@ -332,7 +332,7 @@ export default function DiscountCodesPage() {
                     data-testid="input-code-description"
                   />
                 </div>
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2">
                   <div>
                     <Label>Discount Type</Label>
                     <Select value={form.discount_type} onValueChange={v => setForm(f => ({ ...f, discount_type: v }))}>
@@ -357,7 +357,7 @@ export default function DiscountCodesPage() {
                     />
                   </div>
                 </div>
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2">
                   <div>
                     <Label>Duration</Label>
                     <Select value={form.duration} onValueChange={v => setForm(f => ({ ...f, duration: v }))}>
@@ -385,7 +385,7 @@ export default function DiscountCodesPage() {
                     </div>
                   )}
                 </div>
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2">
                   <div>
                     <Label>Max Total Uses</Label>
                     <Input
@@ -450,14 +450,14 @@ export default function DiscountCodesPage() {
         </CardHeader>
         <CardContent>
           {codes.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-no-codes">
+            <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]" data-testid="text-no-codes">
               No discount codes yet. Create your first one above.
             </p>
           ) : (
             <div className="space-y-2">
               {codes.map(code => (
-                <div key={code.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`code-${code.id}`}>
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div key={code.id} className="flex items-center justify-between p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border" data-testid={`code-${code.id}`}>
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-mono font-bold text-sm">{code.code}</span>
                       <Button

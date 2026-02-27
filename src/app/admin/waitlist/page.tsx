@@ -88,7 +88,7 @@ export default function WaitlistPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-[var(--section-spacing,1.5rem)]">
         <div className="flex items-center justify-center min-h-[400px]">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
@@ -97,8 +97,8 @@ export default function WaitlistPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between gap-4 flex-wrap" data-testid="waitlist-header">
+    <div className="p-[var(--section-spacing,1.5rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap" data-testid="waitlist-header">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Mail className="h-6 w-6" />
@@ -118,7 +118,7 @@ export default function WaitlistPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
@@ -146,13 +146,13 @@ export default function WaitlistPage() {
         <CardContent>
           {entries.length === 0 ? (
             <div className="text-center py-12">
-              <Mail className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <Mail className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] text-muted-foreground opacity-50" />
               <p className="text-lg font-medium mb-2">No waitlist signups yet</p>
               <p className="text-muted-foreground">Enable waitlist mode in settings to start collecting emails.</p>
             </div>
           ) : (
             <div className="space-y-2 overflow-x-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 py-2 px-4 bg-muted rounded-t-lg font-medium text-sm min-w-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-[var(--content-density-gap,1rem)] py-2 px-4 bg-muted rounded-t-lg font-medium text-sm min-w-0">
                 <span>Email</span>
                 <span className="hidden sm:block">Name</span>
                 <span className="hidden lg:block">Source</span>
@@ -160,14 +160,14 @@ export default function WaitlistPage() {
                 <span className="hidden sm:block text-right">Actions</span>
               </div>
               {filteredEntries.length === 0 ? (
-                <div className="py-8 text-center text-muted-foreground">
+                <div className="py-[var(--section-spacing,1.5rem)] text-center text-muted-foreground">
                   No entries match your search
                 </div>
               ) : (
                 filteredEntries.map((entry) => (
                   <div 
                     key={entry.id} 
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-4 py-3 px-4 border-b last:border-0 items-center"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-[var(--content-density-gap,1rem)] py-3 px-4 border-b last:border-0 items-center"
                     data-testid={`waitlist-entry-${entry.id}`}
                   >
                     <span className="truncate font-medium">{entry.email}</span>

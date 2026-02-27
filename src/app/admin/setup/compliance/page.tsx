@@ -16,7 +16,7 @@ function MarkdownPreview({ content }: { content: string }) {
     let processed = content
       .replace(/^### (.*$)/gm, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>')
       .replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>')
-      .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-6 mb-4">$1</h1>')
+      .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-6 mb-[var(--content-density-gap,1rem)]">$1</h1>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">$1</code>')
@@ -69,7 +69,7 @@ export default function CompliancePage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -80,7 +80,7 @@ export default function CompliancePage() {
             Toggle optional legal and compliance pages. Terms of Service and Privacy Policy are always enabled as core pages.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Acceptable Use Policy</p>
@@ -177,7 +177,7 @@ export default function CompliancePage() {
             Configure the cookie consent banner shown to visitors
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable Cookie Consent</p>
@@ -191,7 +191,7 @@ export default function CompliancePage() {
           </div>
 
           {settings.compliance?.cookieConsentEnabled && (
-            <div className="space-y-6">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label htmlFor="cookie-consent-text">Consent Banner Text</Label>
                 <Input
@@ -202,7 +202,7 @@ export default function CompliancePage() {
                 />
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 <Label>Cookie Categories</Label>
 
                 <div className="flex items-center justify-between py-3 border-b">
@@ -260,7 +260,7 @@ export default function CompliancePage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-          <div className="flex items-center gap-2 rounded-md bg-muted p-3 mb-4">
+          <div className="flex items-center gap-2 rounded-[var(--card-radius,0.75rem)] bg-muted p-[var(--card-padding,1.25rem)] mb-[var(--content-density-gap,1rem)]">
             <Info className="h-4 w-4 shrink-0 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
               Use {'{appName}'} and {'{supportEmail}'} as placeholders — they will be replaced with your app name and support email automatically.
@@ -275,10 +275,10 @@ export default function CompliancePage() {
             const dateValue = (settings.pages?.legal as unknown as Record<string, string>)?.[page.dateKey] ?? ''
 
             return (
-              <div key={page.key} className="border rounded-md">
+              <div key={page.key} className="border rounded-[var(--card-radius,0.75rem)]">
                 <button
                   type="button"
-                  className="flex items-center justify-between gap-2 w-full p-4 text-left"
+                  className="flex items-center justify-between gap-2 w-full p-[var(--card-padding,1.25rem)] text-left"
                   onClick={() => setExpandedPage(isExpanded ? null : page.key)}
                   data-testid={`button-expand-${page.key}`}
                 >
@@ -295,7 +295,7 @@ export default function CompliancePage() {
                 </button>
 
                 {isExpanded && (
-                  <div className="px-4 pb-4 space-y-4">
+                  <div className="px-4 pb-4 space-y-[var(--content-density-gap,1rem)]">
                     <div className="space-y-2">
                       <Label htmlFor={`date-${page.key}`}>Last Updated</Label>
                       <Input
@@ -321,7 +321,7 @@ export default function CompliancePage() {
                     </div>
 
                     {showPreview ? (
-                      <div className="border rounded-md p-4" data-testid={`preview-${page.key}`}>
+                      <div className="border rounded-[var(--card-radius,0.75rem)] p-[var(--card-padding,1.25rem)]" data-testid={`preview-${page.key}`}>
                         <MarkdownPreview content={contentValue} />
                       </div>
                     ) : (
@@ -341,7 +341,7 @@ export default function CompliancePage() {
         </CardContent>
       </Card>
 
-      <div className="flex items-center gap-2 rounded-md bg-muted p-3">
+      <div className="flex items-center gap-2 rounded-[var(--card-radius,0.75rem)] bg-muted p-[var(--card-padding,1.25rem)]">
         <AlertTriangle className="h-4 w-4 shrink-0 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
           These are starter templates. Consult a legal professional to customize them for your specific needs.
