@@ -76,9 +76,9 @@ These are not bugs per se — each page works individually — but the lack of c
 | FR-06 | Grandfathering integrity for affiliate agreements | **DECIDED** | Core term-locking already built. Audit found 6 gaps to fix. See Design Decisions below. |
 | FR-07 | Affiliate-branded discount codes | **DECIDED** | Dual-attribution (link + code). Auto-generated on approval. Affiliate self-brands from their dashboard. First-come-first-served + suggestions. Coaching notes in UI. See Design Decisions below. |
 | FR-08 | Cross-linking for all related data throughout admin | **DECIDED** | All detail pages use collapsible accordion sections to show related records. Every person name, amount, and entity reference is a clickable cross-link. See Design Decisions below. |
-| FR-09 | Broadcast performance data surfaced at higher level | Pending Discussion | Where to surface it — dashboard? separate analytics? |
-| FR-10 | Payout workflow documentation | Pending Discussion | Write operational documentation |
-| FR-11 | Feature documentation for all affiliate settings | Pending Discussion | Documentation effort, possibly in-app help |
+| FR-09 | Broadcast performance surfaced at higher level | **DECIDED** | Summary cards + trend indicator above broadcast list. Open/click rate columns in list view. Broadcast category tagging. Affiliates see broadcasts in their dashboard. See Design Decisions below. |
+| FR-10 | Payout workflow documentation | **Deferred** | Intentionally deferred until app features are more stable. Will document when the system is finalized. |
+| FR-11 | Feature documentation for all affiliate settings | **Deferred** | Intentionally deferred until app features are more stable. Will document when the system is finalized. |
 | FR-12 | Summary cards only on dashboard landing pages | **DECIDED** | KPI/summary cards appear ONLY on each dashboard's landing page (`/admin`, `/dashboard/social/overview`, `/affiliate/dashboard`). Not repeated on sub-pages. |
 | FR-13 | Settings page edit protection | **DECIDED** | Keep form layout but fields are non-editable by default. Admin clicks "Edit" button to unlock, then saves. Protects against accidental changes. See Design Decisions below. |
 | FR-14 | Admin's own account in Users list | **DECIDED** | Show ALL users including the admin's own account. Eliminates confusion. |
@@ -336,6 +336,42 @@ When both a referral link (cookie) and a discount code point to different affili
 **Stripe integration:**
 Discount codes must be validated against Stripe's coupon/promotion code system. This has not been tested yet and will need a dedicated integration pass.
 
+### 12. Broadcast Performance Surfacing (FR-09)
+
+Broadcast engagement data is currently buried in individual broadcast detail views. This decision surfaces it at the list level so the admin can assess performance at a glance.
+
+**Summary cards above the broadcast list view:**
+
+| Card | Metric | Purpose |
+|------|--------|---------|
+| **Average Open Rate** | Across all broadcasts (e.g., "72%") | Are affiliates reading your communications? A drop signals subject line or frequency issues. |
+| **Average Click Rate** | Across all broadcasts (e.g., "34%") | Is your content compelling enough to drive action? Opens without clicks means they read but didn't engage. |
+| **Best Performer** | Name + open rate of the top broadcast | Quick reference — what worked? Can you repeat the pattern? |
+| **Last Broadcast** | Date + name + open/click rates | How recent was your last communication? Long gaps signal a need to re-engage. |
+
+**Trend indicator on Average Open Rate card:**
+- Compares last 5 broadcasts vs. prior 5
+- Simple up/down arrow with percentage change
+- Tells the admin whether their communication strategy is improving over time
+
+**List view columns added:**
+- **Open Rate %** — visible in the broadcast list row
+- **Click Rate %** — visible in the broadcast list row
+- Both columns are sortable, so the admin can rank broadcasts by engagement
+
+**Broadcast category tagging (optional on creation):**
+- Categories: "Contest," "Tier Change," "Policy Update," "General"
+- Summary cards can show breakdowns by category (e.g., "Contest announcements average 85% open rate vs. Policy updates at 62%")
+- Helps the admin understand which types of communications resonate most
+
+**Affiliate-side visibility:**
+- Affiliates see broadcasts in their dashboard
+- Each broadcast is clickable to read the full message
+- Closes the loop: admin sends → affiliates receive and engage → admin sees engagement data
+
+**Future enhancement (not in this blueprint):**
+Broadcast-to-outcome correlation — did the change announced in a broadcast actually move downstream metrics (signups, revenue, affiliate activity)? This ties into the analytics flywheel and belongs in a future analytics sprint.
+
 ---
 
 ## Sprint Plan
@@ -533,10 +569,9 @@ At the end of Sprint 1, run a grep across all new component files to confirm zer
 
 The following items require further discussion before they can be planned. They are tracked here but will NOT be built until discussed and approved:
 
-**Pending Feature Requests (need discussion):**
-- **FR-09** — Broadcast performance surfaced at higher level
-- **FR-10** — Payout workflow documentation
-- **FR-11** — Feature documentation for affiliate settings
+**Intentionally Deferred (not blocked — waiting for app stability):**
+- **FR-10** — Payout workflow documentation — will be written once payout features are finalized
+- **FR-11** — Feature documentation for all affiliate settings — will be written once settings are stable
 
 **UX items needing discussion:**
 - **UX-10** (Breadcrumbs following history vs. sitemap) — Breadcrumbs showing site hierarchy is standard UX. Browser back button handles "return to where I came from." Need to discuss whether changing this is the right call.
