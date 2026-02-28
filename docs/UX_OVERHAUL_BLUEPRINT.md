@@ -106,11 +106,19 @@ These decisions were made during the Category C discussion (February 28, 2026). 
 
 All three dashboards (Admin, Affiliate, Social) use the same reusable **Dashboard Shell** template. The user learns the navigation once and it works identically everywhere. Only the content changes per page.
 
-**Visual Reference (Vercel benchmark):**
-- Top-level sidebar (open state): `attached_assets/image_1772316808365.png`
-- Drilled-down view (Flags example): `attached_assets/image_1772316861087.png`
+**Visual Reference (Vercel benchmark) — MANDATORY: Look at these images before writing any sidebar code.**
 
-These images show the exact pattern to follow. Look at them before writing any sidebar code.
+| # | File | What It Shows |
+|---|------|---------------|
+| 1 | `attached_assets/image_1772304093165.png` | **Vercel project overview — annotated.** "App Logo" arrow points to top-left (project icon + name). "User Acct Info" arrow points to bottom-left (user avatar pinned at footer). Shows Usage, Support, Settings as a separate bottom group in the sidebar. This is the structural reference for sidebar zones. |
+| 2 | `attached_assets/image_1772316808365.png` | **Vercel top-level sidebar (clean, no annotations).** Shows the flat nav list. Some items are direct links (Overview, Deployments, Logs, Analytics). Others have a `>` chevron indicating drill-down sub-pages (Observability, Firewall, AI Gateway). Usage, Support, Settings pinned near bottom. |
+| 3 | `attached_assets/image_1772303441657.png` | **Vercel top-level sidebar — annotated.** Green arrow highlights items with `>` chevrons (Flags, Agent, AI Gateway). These are the drill-down parents. Items without chevrons navigate directly. |
+| 4 | `attached_assets/image_1772303557992.png` | **Vercel drilled into "Flags" — annotated.** "Top" arrow points to the back button (labeled "Flags" with `<` arrow). "Sub" arrow points to sub-items grouped under uppercase section headers (VERCEL FLAGS, MARKETPLACE, RESOURCES). This is the drill-down pattern to replicate. |
+| 5 | `attached_assets/image_1772316861087.png` | **Vercel drilled into "Flags" — annotated (second angle).** Same drill-down view showing back button at top, grouped sub-items below. Shows "Overview" as first item inside the drilled group. |
+| 6 | `attached_assets/image_1772303665694.png` | **Vercel Deployments list page.** Sidebar in top-level state. Content area uses full remaining width. Demonstrates sidebar staying compact while data-heavy content fills the rest. |
+| 7 | `attached_assets/image_1772303695683.png` | **Vercel deployment detail page.** Shows horizontal sub-tabs (Deployment, Logs, Resources, Source, Open Graph) inside the CONTENT area — NOT in the sidebar. Tabs belong to the content, not the nav. |
+| 8 | `attached_assets/image_1772305134858.png` | **Vercel deployment detail — annotated.** Green arrows highlight Usage, Support, Settings pinned at the bottom of the sidebar as a visually separate group from the main navigation items above. |
+| 9 | `attached_assets/image_1772307185333.png` | **PassivePost CURRENT state (BEFORE).** Shows the old horizontal top-nav + sub-nav + left sidebar layout. This is what the Dashboard Shell replaces. The horizontal "Business, Support, Content, Growth, Settings, System" tabs at the top must become the vertical drill-down sidebar. |
 
 **The Dashboard Shell provides:**
 

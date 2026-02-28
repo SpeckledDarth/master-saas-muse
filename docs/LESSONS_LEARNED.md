@@ -337,6 +337,7 @@ Every visual change must be verified in both light and dark modes. The site supp
 | Showing hardcoded fallback values while data loads | FOUC — wrong numbers flash before correct data appears | Use skeleton/shimmer placeholders, or fetch data server-side |
 | Building a large plan without sprint breakdown | Session ends mid-plan; user discovers partial completion after the fact | Break plans into sprints of 3-5 tasks; each sprint fits in one session |
 | Not updating ROADMAP.md at end of session | Next session doesn't know where to resume; work gets repeated or skipped | Always update ROADMAP.md with sprint status and next steps before session ends |
+| Not cataloging reference images shared during planning | Future sessions see orphaned image files with no description; they ignore them and guess instead, building the wrong thing | When reference images are shared during a planning session, the session MUST add every image to the relevant doc (blueprint, design system, etc.) with filename + description of what it shows. Images without an index are invisible to future sessions. |
 
 ---
 
