@@ -261,7 +261,7 @@ export default function UsersPage() {
       const data = await response.json()
       if (response.ok) {
         toast({ title: 'Impersonation started', description: `Now viewing as ${data.targetUser.email}` })
-        window.location.href = '/'
+        window.location.href = '/dashboard/social/overview'
       } else {
         toast({ title: 'Failed to impersonate', description: data.error, variant: 'destructive' })
       }

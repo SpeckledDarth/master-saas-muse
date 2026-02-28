@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -1897,7 +1898,7 @@ export default function AffiliateSettingsPage() {
           { label: 'Prize Description', value: detailItem.prize_description },
           { label: 'Start Date', value: detailItem.start_date, type: 'date' },
           { label: 'End Date', value: detailItem.end_date, type: 'date' },
-          ...(detailItem.status === 'completed' && detailItem.winner ? [{ label: 'Winner', value: detailItem.winner }] : []),
+          ...(detailItem.status === 'completed' && detailItem.winner_user_id ? [{ label: 'Winner', value: members.find(m => m.userId === detailItem.winner_user_id)?.name || members.find(m => m.userId === detailItem.winner_user_id)?.email || detailItem.winner || detailItem.winner_user_id, type: 'link' as const, href: `/admin/crm/${detailItem.winner_user_id}` }] : []),
         ]
       case 'payout_batch':
         return [
@@ -2975,7 +2976,7 @@ export default function AffiliateSettingsPage() {
                           <td className="py-3 pr-3">
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <p className="font-medium truncate">{m.name || m.email}</p>
+                                <Link href={`/admin/crm/${m.userId}`} className="font-medium truncate text-primary hover:underline" onClick={(e) => e.stopPropagation()} data-testid={`link-member-crm-${m.userId}`}>{m.name || m.email}</Link>
                                 <span
                                   className={`inline-block w-2 h-2 rounded-full shrink-0 ${health.color === 'green' ? 'bg-[hsl(var(--success))]' : health.color === 'yellow' ? 'bg-[hsl(var(--warning))]' : 'bg-[hsl(var(--danger))]'}`}
                                   title={health.label}
@@ -3539,9 +3540,9 @@ export default function AffiliateSettingsPage() {
                             {c.status === 'completed' && c.winner_user_id && (
                               <div className="flex items-center gap-1 mt-1" data-testid={`text-contest-winner-${c.id}`}>
                                 <Trophy className="h-3 w-3 text-[hsl(var(--warning))]" />
-                                <span className="text-xs font-medium text-[hsl(var(--warning))]">
-                                  Winner: {members.find(m => m.userId === c.winner_user_id)?.email || c.winner_user_id}
-                                </span>
+                                <Link href={`/admin/crm/${c.winner_user_id}`} className="text-xs font-medium text-[hsl(var(--warning))] hover:underline" onClick={(e) => e.stopPropagation()} data-testid={`link-contest-winner-${c.id}`}>
+                                  Winner: {members.find(m => m.userId === c.winner_user_id)?.name || members.find(m => m.userId === c.winner_user_id)?.email || c.winner_user_id}
+                                </Link>
                               </div>
                             )}
                           </div>

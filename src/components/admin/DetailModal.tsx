@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -7,8 +8,9 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 export interface DetailField {
   label: string
   value: string | number | boolean | null | undefined
-  type?: 'text' | 'badge' | 'currency' | 'date' | 'badges' | 'percentage' | 'html'
+  type?: 'text' | 'badge' | 'currency' | 'date' | 'badges' | 'percentage' | 'html' | 'link'
   badgeVariant?: 'default' | 'secondary' | 'outline' | 'destructive'
+  href?: string
 }
 
 interface DetailModalProps {
@@ -21,7 +23,7 @@ interface DetailModalProps {
 }
 
 function formatValue(field: DetailField): React.ReactNode {
-  const { value, type, badgeVariant } = field
+  const { value, type, badgeVariant, href } = field
   if (value === null || value === undefined || value === '') {
     return <span className="text-muted-foreground italic text-xs">Not set</span>
   }
@@ -54,6 +56,12 @@ function formatValue(field: DetailField): React.ReactNode {
       return <span className="font-medium tabular-nums">{value}%</span>
     case 'html':
       return <div className="text-sm bg-muted/50 rounded p-2 max-h-32 overflow-y-auto whitespace-pre-wrap break-words">{String(value)}</div>
+    case 'link':
+      return href ? (
+        <Link href={href} className="text-sm text-primary hover:underline break-words" data-testid={`link-detail-${field.label.toLowerCase().replace(/\s+/g, '-')}`}>
+          {String(value)}
+        </Link>
+      ) : <span className="text-sm break-words">{String(value)}</span>
     default:
       if (typeof value === 'boolean') {
         return <Badge variant={value ? 'default' : 'outline'} className="text-xs">{value ? 'Yes' : 'No'}</Badge>

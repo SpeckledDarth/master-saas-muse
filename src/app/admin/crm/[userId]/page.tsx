@@ -6,10 +6,16 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, ArrowLeft, ExternalLink, Mail, UserCog, X, Plus, Tag, CreditCard, Activity, MessageSquare, FileText, ScrollText, DollarSign, Send } from 'lucide-react'
+import { Loader2, ArrowLeft, ExternalLink, Mail, UserCog, X, Plus, Tag, CreditCard, Activity, MessageSquare, FileText, ScrollText, DollarSign, Send, LayoutGrid, ChevronDown, Megaphone } from 'lucide-react'
 import { AdminBreadcrumbs } from '@/components/admin/breadcrumbs'
 import { Timeline, type TimelineEvent } from '@/components/admin/timeline'
 import { EntityNotes } from '@/components/admin/entity-notes'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 
 const TYPE_COLORS: Record<string, string> = {
   Subscriber: 'bg-primary/10 text-primary',
@@ -74,6 +80,7 @@ function healthDot(score: number) {
 }
 
 const TABS = [
+  { id: 'summary', label: 'Summary', icon: LayoutGrid },
   { id: 'profile', label: 'Profile', icon: UserCog },
   { id: 'transactions', label: 'Transactions', icon: CreditCard },
   { id: 'activity', label: 'Activity', icon: Activity },
@@ -89,7 +96,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
 
   const validTabs = TABS.map(t => t.id)
   const tabFromUrl = searchParams.get('tab')
-  const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : 'profile'
+  const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : 'summary'
 
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -211,7 +218,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
         body: JSON.stringify({ userId }),
       })
       if (res.ok) {
-        window.open('/', '_blank')
+        window.location.href = '/dashboard/social/overview'
       }
     } catch {}
   }
@@ -408,6 +415,215 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
           ))}
         </nav>
       </div>
+
+      {activeTab === 'summary' && (
+        <div data-testid="tab-content-summary">
+          <Accordion type="multiple" defaultValue={['transactions', 'support', 'activity']} className="space-y-2">
+            <AccordionItem value="transactions" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+              <AccordionTrigger className="py-3" data-testid="accordion-transactions">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Revenue & Transactions</span>
+                  <span className="text-xs text-muted-foreground ml-1">({transactions.length})</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                {transactions.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-2">No transactions found</p>
+                ) : (
+                  <div className="overflow-hidden rounded-md border">
+                    <table className="w-full text-sm" data-testid="summary-table-transactions">
+                      <thead>
+                        <tr className="border-b bg-muted/30">
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground text-xs">Type</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground text-xs">Description</th>
+                          <th className="text-right py-2 px-3 font-medium text-muted-foreground text-xs">Amount</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground text-xs">Status</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground text-xs">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {transactions.slice(0, 10).map((tx: any, i: number) => {
+                          const txHref = tx._type === 'invoice' ? `/admin/revenue/${tx.id}` : null
+                          return (
+                            <tr key={`${tx._type}-${tx.id || i}`} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
+                              <td className="py-2 px-3">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium capitalize ${TX_TYPE_COLORS[tx._type] || 'bg-muted text-muted-foreground'}`}>
+                                  {tx._type}
+                                </span>
+                              </td>
+                              <td className="py-2 px-3">
+                                {txHref ? (
+                                  <Link href={txHref} className="text-primary hover:underline text-sm" data-testid={`link-tx-${i}`}>
+                                    {tx._type === 'invoice' && `Invoice ${tx.stripe_invoice_id || tx.invoice_number || ''}`}
+                                  </Link>
+                                ) : (
+                                  <span className="text-sm">
+                                    {tx._type === 'payment' && `Payment ${tx.stripe_payment_intent_id || ''}`}
+                                    {tx._type === 'commission' && 'Commission'}
+                                    {tx._type === 'payout' && 'Payout'}
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-2 px-3 text-right font-medium tabular-nums text-sm">{formatCurrency(tx._amount)}</td>
+                              <td className="py-2 px-3">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium capitalize ${STATUS_COLORS[tx.status] || 'bg-muted text-muted-foreground'}`}>
+                                  {tx.status || 'unknown'}
+                                </span>
+                              </td>
+                              <td className="py-2 px-3 text-muted-foreground text-xs">{formatDate(tx._date)}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                    {transactions.length > 10 && (
+                      <div className="p-2 text-center border-t">
+                        <button onClick={() => setActiveTab('transactions')} className="text-xs text-primary hover:underline" data-testid="link-view-all-transactions">
+                          View all {transactions.length} transactions
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+
+            {affiliateSummary && (
+              <AccordionItem value="affiliate" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+                <AccordionTrigger className="py-3" data-testid="accordion-affiliate">
+                  <div className="flex items-center gap-2">
+                    <Megaphone className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Affiliate Activity</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-2">
+                    <div className="rounded-md border p-3 text-center">
+                      <p className="text-lg font-bold tabular-nums">{affiliateSummary.referrals ?? 0}</p>
+                      <p className="text-xs text-muted-foreground">Referrals</p>
+                    </div>
+                    <div className="rounded-md border p-3 text-center">
+                      <p className="text-lg font-bold tabular-nums">{formatCurrency(affiliateSummary.totalEarnings ?? 0)}</p>
+                      <p className="text-xs text-muted-foreground">Total Earnings</p>
+                    </div>
+                    <div className="rounded-md border p-3 text-center">
+                      <p className="text-lg font-bold tabular-nums">{formatCurrency(affiliateSummary.pendingEarnings ?? 0)}</p>
+                      <p className="text-xs text-muted-foreground">Pending</p>
+                    </div>
+                    <div className="rounded-md border p-3 text-center">
+                      <p className="text-lg font-bold tabular-nums">{affiliateSummary.tier ?? 'Standard'}</p>
+                      <p className="text-xs text-muted-foreground">Tier</p>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+
+            <AccordionItem value="support" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+              <AccordionTrigger className="py-3" data-testid="accordion-support">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Support Tickets</span>
+                  <span className="text-xs text-muted-foreground ml-1">({tickets.length})</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                {tickets.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-2">No support tickets</p>
+                ) : (
+                  <div className="space-y-2 py-1">
+                    {tickets.slice(0, 5).map((ticket: any) => (
+                      <Link
+                        key={ticket.id}
+                        href={`/admin/feedback/${ticket.id}`}
+                        className="flex items-start justify-between gap-2 rounded-md border p-3 hover:bg-muted/30 transition-colors"
+                        data-testid={`link-ticket-${ticket.id}`}
+                      >
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-primary hover:underline truncate">{ticket.subject || ticket.title || 'Untitled Ticket'}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{formatDate(ticket.created_at)}</p>
+                        </div>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium capitalize shrink-0 ${STATUS_COLORS[ticket.status] || 'bg-muted text-muted-foreground'}`}>
+                          {ticket.status}
+                        </span>
+                      </Link>
+                    ))}
+                    {tickets.length > 5 && (
+                      <button onClick={() => setActiveTab('support')} className="text-xs text-primary hover:underline w-full text-center py-1" data-testid="link-view-all-tickets">
+                        View all {tickets.length} tickets
+                      </button>
+                    )}
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="activity" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+              <AccordionTrigger className="py-3" data-testid="accordion-activity">
+                <div className="flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Activity Timeline</span>
+                  <span className="text-xs text-muted-foreground ml-1">({timelineEvents.length})</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <Timeline events={timelineEvents.slice(0, 10)} emptyMessage="No activity recorded" />
+                {timelineEvents.length > 10 && (
+                  <button onClick={() => setActiveTab('activity')} className="text-xs text-primary hover:underline w-full text-center py-1 mt-2" data-testid="link-view-all-activity">
+                    View all {timelineEvents.length} events
+                  </button>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="contracts" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+              <AccordionTrigger className="py-3" data-testid="accordion-contracts">
+                <div className="flex items-center gap-2">
+                  <ScrollText className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Contracts</span>
+                  <span className="text-xs text-muted-foreground ml-1">({contracts.length})</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                {contracts.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-2">No contracts</p>
+                ) : (
+                  <div className="space-y-2 py-1">
+                    {contracts.map((contract: any) => (
+                      <div key={contract.id} className="flex items-start justify-between gap-2 rounded-md border p-3" data-testid={`summary-contract-${contract.id}`}>
+                        <div>
+                          <p className="text-sm font-medium">{contract.title || 'Untitled Contract'}</p>
+                          <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
+                            {contract.type && <span className="capitalize">{contract.type}</span>}
+                            {contract.signed_at && <span>Signed: {formatDate(contract.signed_at)}</span>}
+                            {contract.expires_at && <span>Expires: {formatDate(contract.expires_at)}</span>}
+                          </div>
+                        </div>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium capitalize shrink-0 ${STATUS_COLORS[contract.status] || 'bg-muted text-muted-foreground'}`}>
+                          {contract.status || 'draft'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="notes" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+              <AccordionTrigger className="py-3" data-testid="accordion-notes">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Notes</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <EntityNotes entityType="user" entityId={userId} />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      )}
 
       {activeTab === 'profile' && (
         <div className="max-w-2xl space-y-[var(--content-density-gap,1rem)]" data-testid="tab-content-profile">

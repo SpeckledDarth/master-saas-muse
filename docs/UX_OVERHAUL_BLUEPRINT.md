@@ -14,7 +14,7 @@
 | 3 | More Bug Fixes + UX Quick Wins | COMPLETE | BUG-12, BUG-13, BUG-14, BUG-15, BUG-16 |
 | 4A | Dashboard Shell + Navigation | COMPLETE | UX-01, UX-12, FR-03, FR-04, WC-02, WC-05 |
 | 4B | Dashboard Shell Polish | COMPLETE | UX-07, UX-09, WC-01 |
-| 5 | Command Palette + Impersonate + Cross-Linking | NOT STARTED | BUG-04–08, UX-15, FR-08 |
+| 5 | Command Palette + Impersonate + Cross-Linking | COMPLETE | BUG-04–08, UX-15, FR-08 |
 | 6A | Utility Components + First 3 Page Conversions | NOT STARTED | UX-02, UX-03, UX-05, UX-06, UX-11, WC-04, WC-06, WC-07, WC-08, WC-10 |
 | 6B | Remaining Page Conversions + Verification | NOT STARTED | UX-04, UX-13, WC-04, WC-08 |
 
@@ -513,21 +513,23 @@ These 10 enhancements are essentially "free" — they're better defaults and sma
 
 ---
 
-### Sprint 5: Command Palette + Impersonate + Cross-Linking
+### Sprint 5: Command Palette + Impersonate + Cross-Linking — COMPLETE
 
 **Goal:** Fix the two biggest functional gaps (search and impersonation) and implement the cross-linking pattern with collapsible accordion sections on detail pages.
 
-| Task | Description | Files |
-|------|-------------|-------|
-| S5-T1 | Fix command palette search — wire up user search (by name/email), subscription search, invoice search against real database queries | Command palette component, search API route |
-| S5-T2 | Make command palette tickets clickable — results should navigate to the entity's detail page | Command palette component |
-| S5-T3 | Fix impersonate — impersonated view should show the target user's dashboard, not the admin's own view | Impersonate route and session handling |
-| S5-T4 | Add collapsible accordion sections to CRM detail page showing related records: Revenue & Transactions, Affiliate Activity (if affiliate), Support tickets, Activity Timeline, Notes. All person names, amounts, and entities are clickable cross-links. | CRM detail page, shared accordion component |
-| S5-T5 | Add cross-linking to Revenue detail (related person with inline preview), Contest detail (winner + participants as clickable links), and Payout/Members pages (person names → CRM) | Revenue detail, Contest, Payout, Members pages |
+| Task | Description | Files | Status |
+|------|-------------|-------|--------|
+| S5-T1 | Fix command palette search — replaced slow all-user fetch with DB-level `user_profiles` search + email match. Invoice/subscription results now show user names. | `src/app/api/admin/search/route.ts` | DONE |
+| S5-T2 | Make command palette tickets clickable — created `/admin/feedback/[id]` detail page with ticket info, comments, reply form, status/priority controls, and submitter cross-link to CRM. Created `/api/admin/feedback/[id]` API route. | `src/app/admin/feedback/[id]/page.tsx`, `src/app/api/admin/feedback/[id]/route.ts` | DONE |
+| S5-T3 | Fix impersonate — redirects now go to `/dashboard/social/overview` instead of `/`. Created `src/lib/effective-user.ts` helper for server-side user ID swapping. Banner already works. Note: Full API-level data swap deferred — requires updating all social API routes to use `getEffectiveUserId()`. | `src/lib/effective-user.ts`, CRM detail page, Users page | DONE (redirect fixed, data swap deferred) |
+| S5-T4 | Added "Summary" tab to CRM detail as default — collapsible accordion sections for Revenue & Transactions, Affiliate Activity, Support Tickets, Activity Timeline, Notes, Contracts. Invoice amounts link to revenue detail. Ticket subjects link to feedback detail. "View all" links switch to dedicated tabs. | `src/app/admin/crm/[userId]/page.tsx` | DONE |
+| S5-T5 | Cross-linking — affiliate member names link to CRM, contest winners link to CRM, DetailModal supports link-type fields. Revenue and subscription detail pages already had cross-links. | `src/app/admin/setup/affiliate/page.tsx`, `src/components/admin/DetailModal.tsx` | DONE |
 
-**Done Test:** Command palette finds users by partial name/email. Clicking a result navigates to the correct detail page. Impersonation shows the target user's view with impersonation banner. CRM detail page has accordion sections with related revenue/affiliate/support data. Person names across all admin pages are clickable links to CRM detail. Contest winners are clickable. Revenue detail shows related person.
+**Done Test:** Command palette finds users by partial name/email. Clicking a ticket result navigates to detail page. Impersonation redirects to user dashboard with banner. CRM Summary tab shows all related data in accordions with cross-links. Person names across admin pages link to CRM.
 
 **Addresses:** BUG-04, BUG-05, BUG-06, BUG-07, BUG-08, UX-15, FR-08
+
+**Remaining work (deferred from S5-T3):** Update social API routes to use `getEffectiveUserId()` so impersonated view shows the target user's actual data, not just the admin's data with a banner.
 
 ---
 

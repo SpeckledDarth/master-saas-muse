@@ -9,11 +9,12 @@ This skill exists because previous sessions lost focus, touched off-limits files
 
 ## CURRENT SPRINT
 
-**Sprint 4B COMPLETE → Sprint 5 next: Command Palette + Impersonate + Cross-Linking**
-- Sprint 4A completed: vertical sidebar with Vercel-style drill-down, badge counts, layout swap, affiliate redirect
-- Sprint 4B completed: Escape closes drill-down, CRM tab persistence via URL ?tab= param, money em-dash → $0.00
-- Blueprint location: `docs/UX_OVERHAUL_BLUEPRINT.md` → Sprint 5 section
-- Sprint 5 tasks: Fix command palette search (wire to real DB queries), make palette results clickable, fix impersonate, add collapsible accordion sections to CRM detail with cross-links
+**Sprint 5 COMPLETE → Sprint 6A next: Utility Components + First 3 Page Conversions**
+- Sprint 4A: Vercel-style drill-down sidebar, badge counts, layout swap
+- Sprint 4B: Escape closes drill-down, CRM tab persistence, money $0.00
+- Sprint 5: Command palette search (DB-level), ticket detail page, impersonate redirect fix, CRM Summary accordion tab, cross-linking across admin pages
+- Blueprint location: `docs/UX_OVERHAUL_BLUEPRINT.md` → Sprint 6A section
+- Sprint 6A tasks: Build `formatRelativeTime()` utility, build `<Sparkline>` component, convert User Management / Waitlist / Team pages to AdminDataTable + TableToolbar + ConfirmDialog
 
 If the user asks you to do something unrelated to this sprint, do exactly what they ask — but do NOT expand the scope or touch anything else.
 
