@@ -120,6 +120,41 @@ Use these instead of raw shadcn components:
 - `animate-pulse`, `animate-spin` — animations
 - `truncate`, `tabular-nums`, `whitespace-nowrap` — text utilities
 
+## UX Standards — Admin Data Pages
+
+All admin pages showing data lists MUST use these shared components. No exceptions.
+
+### Mandatory Components
+
+| Component | Import | Use For |
+|---|---|---|
+| `<AdminDataTable>` | `@/components/admin/data-table` | All data tables (sorting, pagination, clickable rows, selectable checkboxes, loading skeleton, coaching-language empty states) |
+| `<TableToolbar>` | `@/components/admin/table-toolbar` | Search + filter bar above every table (X clear button, filter dropdowns, "Clear All", built-in CSV export) |
+| `<ConfirmDialog>` | `@/components/admin/confirm-dialog` | All destructive confirmations. NEVER use `window.confirm()` or `confirm()`. |
+
+### Patterns
+
+- **List pages:** TableToolbar at top → AdminDataTable below. Entire rows are clickable. Sortable columns show arrow indicators. Pagination at bottom.
+- **Detail pages:** Breadcrumbs → summary header → collapsible accordion sections with cross-linked related data.
+- **Confirmations:** `<ConfirmDialog variant="destructive">` for all delete/remove/reject actions.
+- **Money:** Always `$X.XX` format. Never em-dash for zero. Use `tabular-nums` class.
+- **Status dots:** Small colored dots + text using `--success`, `--danger`, `--warning`. Not large badges.
+- **Empty states:** Coaching-language text guiding the admin toward the next action.
+
+### CSV Export
+
+Built into `<TableToolbar>` via the `csvExport` prop:
+
+```tsx
+<TableToolbar
+  csvExport={{
+    filename: 'users-export',
+    headers: ['Name', 'Email', 'Role'],
+    getRows: () => data.map(u => [u.name, u.email, u.role]),
+  }}
+/>
+```
+
 ## Key Files
 
 - `docs/DESIGN_SYSTEM_RULES.md` — Full reference (read if you need more detail)
@@ -128,4 +163,8 @@ Use these instead of raw shadcn components:
 - `src/components/ui/ds-card.tsx` — DSCard wrapper
 - `src/components/ui/ds-grid.tsx` — DSGrid wrapper
 - `src/components/ui/ds-section.tsx` — DSSection wrapper
+- `src/components/admin/data-table.tsx` — AdminDataTable (shared data table)
+- `src/components/admin/table-toolbar.tsx` — TableToolbar (shared search/filter bar)
+- `src/components/admin/confirm-dialog.tsx` — ConfirmDialog (shared confirmation dialog)
+- `src/lib/csv-export.ts` — CSV export utility
 - `src/app/globals.css` — CSS variable defaults

@@ -674,6 +674,34 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 
 ---
 
+### Session — February 28, 2026 (UX Overhaul Blueprint — Sprint 1)
+
+**Sprint 1: Shared UX Components + Standards** — COMPLETE
+
+**What was accomplished:**
+
+1. **Built `<AdminDataTable>` component** (`src/components/admin/data-table.tsx`) — Reusable data table using shadcn Table with: typed column definitions, clickable rows, column sorting (asc/desc with arrow indicators), coaching-language empty state props, loading skeleton, pagination ("Showing X–Y of Z" with prev/next), optional select-row checkbox column for future bulk actions. All styling uses design system CSS variables.
+
+2. **Built `<TableToolbar>` component** (`src/components/admin/table-toolbar.tsx`) — Consistent search + filter bar with: search input with X clear button, filter dropdowns via Select component, "Clear All" button when any filter is active, built-in CSV export button via `csvExport` prop, actions slot for custom buttons. All styling uses design system CSS variables.
+
+3. **Built `<ConfirmDialog>` component** (`src/components/admin/confirm-dialog.tsx`) — Wraps shadcn AlertDialog with standard confirmation pattern. Supports `default` and `destructive` variants, loading state, custom labels. Replaces all `window.confirm()` / `confirm()` calls.
+
+4. **Built CSV export utility** (`src/lib/csv-export.ts`) — `exportToCsv()` function that takes headers + rows, generates properly escaped CSV content, and triggers browser download.
+
+5. **Added UX Standards section to `docs/DESIGN_SYSTEM_RULES.md`** — Defines the ONE correct pattern for list views, detail views, confirmations, money display, status indicators, and coaching-language empty states with per-page examples.
+
+6. **Updated `design-system` agent skill** (`.agents/skills/design-system/SKILL.md`) — Added UX Standards section covering mandatory components, patterns, and CSV export usage so all future sessions enforce these standards automatically.
+
+7. **Updated UX Overhaul Blueprint** — Reorganized from 6 sprints to 8 sprints (Sprint 4 split into 4A/4B, Sprint 6 split into 6A/6B) ensuring all sprints stay within the 3-5 task guideline from Lessons Learned.
+
+**Design system compliance:** Zero hardcoded color classes, zero hardcoded spacing on cards, zero hardcoded shadows across all new files. Verified via grep.
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
+**Next session should start with:** Sprint 2 — Critical Bug Fixes. See `docs/UX_OVERHAUL_BLUEPRINT.md` → Sprint 2.
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience

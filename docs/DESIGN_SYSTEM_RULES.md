@@ -205,3 +205,74 @@ Use these instead of raw shadcn components to get automatic palette compliance:
 - `mb-2`, `mt-1`, `ml-1` — micro-spacing between inline elements within a component
 - `animate-pulse`, `animate-spin` — animations
 - `truncate`, `tabular-nums`, `whitespace-nowrap` — text utilities
+
+---
+
+## UX Standards — Admin Dashboard Patterns
+
+All admin data pages MUST follow these patterns. Using any other pattern creates inconsistency that requires rework.
+
+### Shared Components (MANDATORY)
+
+Every admin page showing a data list MUST use these components:
+
+| Component | Import | Purpose |
+|---|---|---|
+| `<AdminDataTable>` | `@/components/admin/data-table` | All data tables. Provides sorting, pagination, clickable rows, selectable checkboxes, loading skeleton, coaching-language empty states. |
+| `<TableToolbar>` | `@/components/admin/table-toolbar` | Search + filter bar above every table. Includes X clear button on search, filter dropdowns, "Clear All" reset, built-in CSV export. |
+| `<ConfirmDialog>` | `@/components/admin/confirm-dialog` | All destructive confirmations. Replaces `window.confirm()` and `confirm()`. Supports loading state. |
+
+### List View Pattern
+
+1. **Toolbar at top:** `<TableToolbar>` with search (always has X clear button) + filter dropdowns side by side.
+2. **Data table below:** `<AdminDataTable>` with clickable rows (entire row is clickable, cursor pointer). No card wrapper around the table.
+3. **Clickable column headers:** Sortable columns show arrow indicator for sort direction.
+4. **Status indicators:** Small colored dots + text using semantic tokens (`--success`, `--danger`, `--warning`). Not large badges.
+5. **Pagination:** "Showing X–Y of Z" with prev/next at bottom.
+6. **Empty state:** Coaching-language text that guides the admin toward action, not generic "No results."
+7. **CSV export:** Available via TableToolbar on every list page.
+
+### Detail View Pattern
+
+1. **Breadcrumb at top:** Full hierarchy path, each segment clickable.
+2. **Summary header:** Key facts at a glance + action buttons.
+3. **Collapsible accordion sections:** Related data in expandable sections. Multiple can be open.
+4. **Cross-linking:** Person names, amounts, and entity references are clickable links to their detail pages.
+
+### Confirmation Pattern
+
+- **All destructive actions** (delete, remove, reject) use `<ConfirmDialog variant="destructive">`.
+- **Never use** `window.confirm()` or `confirm()`.
+- The dialog shows a clear title, description of consequences, and loading state during async operations.
+
+### Money Display
+
+- Always format as `$X.XX` (e.g., `$0.00`, `$127.50`).
+- Never use em-dash (—) for zero amounts.
+- Use `tabular-nums` class for numeric columns so digits align vertically.
+
+### Status Indicators
+
+Use small colored dots + text label. Do not use large badges for row-level status.
+
+```tsx
+<span className="inline-flex items-center gap-1.5">
+  <span className="h-2 w-2 rounded-full bg-[hsl(var(--success))]" />
+  <span className="text-sm">Active</span>
+</span>
+```
+
+### Empty States — Coaching Language
+
+Every table's empty state should coach the admin toward the next action:
+
+| Page | Empty Message | Empty Description |
+|---|---|---|
+| Users | No users yet | Users will appear here once people sign up for your product. |
+| Affiliates | No affiliates yet | Share your affiliate program link to start recruiting partners. |
+| Revenue | No revenue recorded | Revenue will appear here once customers complete payments. |
+| Tickets | No support tickets | Your users haven't submitted any tickets yet — that's a good sign! |
+| Feedback | No feedback received | Feedback will appear here when users submit it through the widget. |
+| Waitlist | No waitlist entries | Share your waitlist page to start collecting signups. |
+| Team | No team members | Invite team members to help manage your product. |
+| Audit Logs | No audit entries | Actions will be logged here as you and your team use the admin dashboard. |
