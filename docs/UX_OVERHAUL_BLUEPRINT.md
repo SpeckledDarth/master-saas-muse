@@ -68,8 +68,8 @@ These are not bugs per se — each page works individually — but the lack of c
 
 | ID | Request | Status | Decision |
 |----|---------|--------|----------|
-| FR-01 | Add first name + last name fields to CRM detail (keep display name too) | Pending Discussion | Pros/cons of adding fields vs. using display name parsing |
-| FR-02 | File upload capability for marketing assets (not just URL links) | Pending Discussion | Supabase Storage integration, file size limits, CDN |
+| FR-01 | Full contact fields on user profile + CRM | **DECIDED** | Add all standard contact fields. 1-to-1 fields on profile table; 1-to-many fields (phones, emails, addresses, social links) in related tables. See Design Decisions below. |
+| FR-02 | File upload for marketing assets (not just URL links) | **DECIDED** | Upload files directly from admin dashboard to Supabase Storage. Affiliates can view and download from their dashboard. 10MB limit, common formats. See Design Decisions below. |
 | FR-03 | Move Affiliate admin pages to top-level (`/admin/affiliate`) | **DECIDED** | Affiliates promoted to own top-level sidebar group. URL changes from `/admin/setup/affiliate` to `/admin/affiliate`. See Design Decisions below. |
 | FR-04 | System-wide vertical sidebar navigation for all dashboards | **DECIDED** | All dashboards use the same Dashboard Shell with vertical drill-down sidebar. No horizontal nav inside dashboards. See Design Decisions below. |
 | FR-05 | Best practice defaults for all affiliate settings | Pending Discussion | Define what "best practice" means for each setting |
@@ -184,6 +184,46 @@ They are NOT repeated on sub-pages. When you drill into a sub-section (e.g., Aff
 ### 5. Users List Completeness (FR-14)
 
 The Users list shows ALL users, including the currently logged-in admin's own account. No records are hidden. This eliminates confusion about whether the list is complete.
+
+### 6. Full Contact Fields (FR-01)
+
+The user profile currently only stores display name, email, and avatar. This decision expands it to a world-class contact record, future-proofing for email personalization, SMS/2FA, invoicing, and CRM use.
+
+**Fields directly on the user profile (1-to-1):**
+- First name
+- Last name
+- Company / organization name
+- Job title
+- Timezone
+- Bio / notes
+- Website URL
+
+Display name remains as-is — it's used throughout the app for display purposes. First + last name are separate fields filled in when available.
+
+**Fields in related tables (1-to-many):**
+
+Each related table follows the same pattern: user_id, label (user-chosen, e.g. "Mobile," "Work," "Home"), the value, and an is_primary flag.
+
+| Related Table | Columns | Notes |
+|---------------|---------|-------|
+| `user_phone_numbers` | user_id, label, phone_number, is_primary | Future-proofs for SMS notifications, 2FA |
+| `user_email_addresses` | user_id, label, email, is_primary, is_verified | Auth email stays on main profile; these are additional contact emails |
+| `user_addresses` | user_id, label, street, city, state, zip, country, is_primary | Future-proofs for invoicing, shipping |
+| `user_social_links` | user_id, platform (LinkedIn, Twitter, Instagram, etc.), url | No is_primary needed — one per platform |
+
+The CRM detail page shows each category as a section with an "Add" button. The is_primary flag determines which entry is used as the default when the system needs one (e.g., sending an SMS, generating an invoice).
+
+### 7. Marketing Asset File Upload (FR-02)
+
+The current marketing assets page only supports pasting URL links. This decision adds direct file upload so admins can upload actual creative files (banners, ad copy PNGs, PDFs) from the dashboard.
+
+**Implementation:**
+- **Storage:** Supabase Storage bucket (`affiliate-assets`)
+- **Upload:** Admin uploads files from the marketing assets page in the admin dashboard
+- **Limits:** 10MB per file; allowed formats: PNG, JPG, GIF, SVG, PDF, DOCX, XLSX
+- **Database:** Asset record stores both a `file_url` (Supabase Storage public URL) and the original `file_name`, `file_size`, `file_type` metadata
+- **Affiliate view:** Affiliates see assets on their dashboard with a download button. They can preview images inline and download any file type.
+- **Existing URL-only assets:** Continue to work. The upload is an additional option, not a replacement. An asset can have a URL link, an uploaded file, or both.
 
 ---
 
@@ -383,8 +423,6 @@ At the end of Sprint 1, run a grep across all new component files to confirm zer
 The following items require further discussion before they can be planned. They are tracked here but will NOT be built until discussed and approved:
 
 **Pending Feature Requests (need discussion):**
-- **FR-01** — First/last name fields in CRM
-- **FR-02** — File upload for marketing assets (Supabase Storage)
 - **FR-05** — Best practice defaults for affiliate settings
 - **FR-06** — Grandfathering mechanism for setting changes
 - **FR-07** — Affiliate-branded discount codes
