@@ -3,7 +3,7 @@
 > **Created:** February 28, 2026
 > **Status:** Awaiting Build Approval
 > **Scope:** Fix all UI/UX inconsistencies and bugs found during human QA testing of the Admin Dashboard (Sections 0.3–1.20e of Testing Plan)
-> **Estimated Sessions:** 6 sprints (one session each)
+> **Estimated Sessions:** 8 sprints (one session each)
 
 ---
 
@@ -380,22 +380,22 @@ These 10 enhancements are essentially "free" — they're better defaults and sma
 
 | # | Enhancement | Sprint | Cost |
 |---|------------|--------|------|
-| WC-01 | **Keyboard shortcuts** — `Cmd/Ctrl+K` opens command palette, `Cmd/Ctrl+/` focuses sidebar search, `Escape` closes drill-down and returns to top-level sidebar | Sprint 4 | Free — wiring events to existing components |
-| WC-02 | **Recently visited** — small "Recent" section at top of sidebar showing 3-5 most recently visited pages for quick navigation | Sprint 4 | Free — building sidebar from scratch anyway |
+| WC-01 | **Keyboard shortcuts** — `Cmd/Ctrl+K` opens command palette, `Cmd/Ctrl+/` focuses sidebar search, `Escape` closes drill-down and returns to top-level sidebar | Sprint 4B | Free — wiring events to existing components |
+| WC-02 | **Recently visited** — small "Recent" section at top of sidebar showing 3-5 most recently visited pages for quick navigation | Sprint 4A | Free — building sidebar from scratch anyway |
 | WC-03 | **Coaching-language empty states** — instead of generic "No results found," each table has contextual coaching text that guides the admin toward action (e.g., "No affiliates yet. Share your affiliate program link to start recruiting partners.") | Sprint 1 | Free — just string content in the empty state prop |
-| WC-04 | **Relative timestamps with absolute tooltip** — all dates show "3 hours ago," "Yesterday," "Feb 14" with full absolute timestamp on hover. One utility function used everywhere. | Sprint 6 | Free — one function, applied during page conversions |
-| WC-05 | **Sidebar nav badge counts** — small count badges on nav items showing actionable quantities (Tickets (3), Applications (2), Payouts (1)). Attention magnets that tell the admin where to act without clicking through every page. | Sprint 4 | Free — building sidebar from scratch anyway |
-| WC-06 | **Inline health indicators on list rows** — small colored dot (green/yellow/red) next to each row based on simple rules: CRM (active/trial/churned), Affiliates (earning/dormant/flagged), Revenue (paid/pending/overdue) | Sprint 6 | Free — applying status indicator pattern already defined in Design Decision #2 |
-| WC-07 | **CSV export on every list page** — one utility function that serializes visible table data to CSV and triggers browser download. Built into TableToolbar, available on every page that uses it. | Sprint 1 (utility) + Sprint 6 (application) | Free — one function in Sprint 1, auto-available to all pages in Sprint 6 |
-| WC-08 | **Toast notifications for all mutations** — consistent success/error toasts on every save, create, update, delete action. Currently inconsistent — some pages show feedback, some don't. | Sprint 6 | Free — one line per mutation during page conversions |
+| WC-04 | **Relative timestamps with absolute tooltip** — all dates show "3 hours ago," "Yesterday," "Feb 14" with full absolute timestamp on hover. One utility function used everywhere. | Sprint 6A | Free — one function, applied during page conversions |
+| WC-05 | **Sidebar nav badge counts** — small count badges on nav items showing actionable quantities (Tickets (3), Applications (2), Payouts (1)). Attention magnets that tell the admin where to act without clicking through every page. | Sprint 4A | Free — building sidebar from scratch anyway |
+| WC-06 | **Inline health indicators on list rows** — small colored dot (green/yellow/red) next to each row based on simple rules: CRM (active/trial/churned), Affiliates (earning/dormant/flagged), Revenue (paid/pending/overdue) | Sprint 6A | Free — applying status indicator pattern already defined in Design Decision #2 |
+| WC-07 | **CSV export on every list page** — one utility function that serializes visible table data to CSV and triggers browser download. Built into TableToolbar, available on every page that uses it. | Sprint 1 (utility) + Sprint 6A/6B (application) | Free — one function in Sprint 1, auto-available to all pages in Sprint 6A/6B |
+| WC-08 | **Toast notifications for all mutations** — consistent success/error toasts on every save, create, update, delete action. Currently inconsistent — some pages show feedback, some don't. | Sprint 6A + 6B | Free — one line per mutation during page conversions |
 | WC-09 | **Bulk action checkboxes (foundation)** — add optional select-row checkbox column to AdminDataTable. Enables future bulk actions (bulk role change, bulk approve applications, bulk close tickets). | Sprint 1 | Low-cost — few lines in the data table component |
-| WC-10 | **Sparkline mini-charts in key list rows** — tiny 30-day trend line (thin SVG) in Revenue and Affiliate Members rows giving instant trend visibility without clicking into detail. One small reusable component. | Sprint 6 | Low-cost — one small SVG component, applied to 2-3 pages |
+| WC-10 | **Sparkline mini-charts in key list rows** — tiny 30-day trend line (thin SVG) in Revenue and Affiliate Members rows giving instant trend visibility without clicking into detail. One small reusable component. | Sprint 6A | Low-cost — one small SVG component, applied to 2-3 pages |
 
 ---
 
 ## Sprint Plan
 
-Each sprint is designed to complete in one session (3-5 tasks, clear done-test). Sprints are ordered by dependency and impact.
+8 sprints, each designed to complete in one session (3-5 tasks, clear done-test). Sprints are ordered by dependency and impact. Every sprint starts clean and ends clean.
 
 ---
 
@@ -453,22 +453,35 @@ Each sprint is designed to complete in one session (3-5 tasks, clear done-test).
 
 ---
 
-### Sprint 4: Dashboard Shell + Navigation Overhaul
+### Sprint 4A: Dashboard Shell + Navigation Overhaul
 
-**Goal:** Build the Dashboard Shell component and apply it to the admin dashboard. This implements the Vercel-benchmarked navigation pattern: vertical sidebar with drill-down sub-menus, user account pinned at bottom, no horizontal nav, no top header bar inside dashboards.
+**Goal:** Build the Dashboard Shell component and apply it to the admin dashboard. This is the big structural work — vertical sidebar with drill-down sub-menus, user account pinned at bottom, no horizontal nav, no top header bar inside dashboards.
 
 | Task | Description | Files |
 |------|-------------|-------|
-| S4-T1 | Build the Dashboard Shell component — reusable layout with sidebar (three zones: logo at top, search + nav in middle, user account pinned at bottom), drill-down sub-menu behavior, breadcrumb bar in content area, responsive breakpoints (desktop/tablet/mobile), "Recently Visited" section at top of nav showing 3-5 most recent pages (WC-02) | `src/components/layout/dashboard-shell.tsx` |
-| S4-T2 | Build admin sidebar nav content — define all nav groups (Dashboard, People, Money, Affiliates, Support, Content, Settings, System) with sub-items and drill-down definitions. Move Affiliates to top-level (`/admin/affiliate`). Move Users/Team into "People" group near top. Add badge counts on actionable items: Tickets, Applications, Payouts (WC-05). | `src/components/admin/admin-sidebar.tsx` |
-| S4-T3 | Update admin layout to use Dashboard Shell. Remove horizontal top-nav. Remove top header bar. Content area gets full remaining width. | `src/app/admin/layout.tsx` |
-| S4-T4 | Add keyboard shortcuts — `Cmd/Ctrl+K` opens command palette, `Cmd/Ctrl+/` focuses sidebar search, `Escape` closes drill-down and returns to top-level sidebar (WC-01) | Dashboard Shell component |
-| S4-T5 | Fix CRM detail tab persistence — use URL search params so refreshing preserves the active tab | `src/app/admin/crm/[userId]/page.tsx` |
-| S4-T6 | Standardize money display — show "$0.00" everywhere (never em-dash for money) and apply across admin pages | All admin pages showing currency |
+| S4A-T1 | Build the Dashboard Shell component — reusable layout with sidebar (three zones: logo at top, search + nav in middle, user account pinned at bottom), drill-down sub-menu behavior, breadcrumb bar in content area, responsive breakpoints (desktop/tablet/mobile), "Recently Visited" section at top of nav showing 3-5 most recent pages (WC-02) | `src/components/layout/dashboard-shell.tsx` |
+| S4A-T2 | Build admin sidebar nav content — define all nav groups (Dashboard, People, Money, Affiliates, Support, Content, Settings, System) with sub-items and drill-down definitions. Move Affiliates to top-level (`/admin/affiliate`). Move Users/Team into "People" group near top. Add badge counts on actionable items: Tickets, Applications, Payouts (WC-05). | `src/components/admin/admin-sidebar.tsx` |
+| S4A-T3 | Update admin layout to use Dashboard Shell. Remove horizontal top-nav. Remove top header bar. Content area gets full remaining width. | `src/app/admin/layout.tsx` |
 
-**Done Test:** Admin dashboard uses the Dashboard Shell with vertical sidebar. Drill-down sub-menus work (e.g., clicking Affiliates replaces sidebar with affiliate sub-items + back button). User account is pinned at sidebar bottom. "Recently Visited" shows last 3-5 pages. Badge counts appear on Tickets/Applications/Payouts. Keyboard shortcuts work. No horizontal nav or top header bar visible. Mobile sidebar works (hamburger overlay). Affiliates accessible at `/admin/affiliate`. CRM detail refresh preserves tab. Money displays consistently.
+**Done Test:** Admin dashboard uses the Dashboard Shell with vertical sidebar. Drill-down sub-menus work (e.g., clicking Affiliates replaces sidebar with affiliate sub-items + back button). User account is pinned at sidebar bottom. "Recently Visited" shows last 3-5 pages. Badge counts appear on Tickets/Applications/Payouts. No horizontal nav or top header bar visible. Mobile sidebar works (hamburger overlay). Affiliates accessible at `/admin/affiliate`.
 
-**Addresses:** UX-01, UX-07, UX-09, UX-12, FR-03, FR-04, WC-01, WC-02, WC-05
+**Addresses:** UX-01, UX-12, FR-03, FR-04, WC-02, WC-05
+
+---
+
+### Sprint 4B: Dashboard Shell Polish + Quick Fixes
+
+**Goal:** Add keyboard shortcuts, fix CRM tab persistence, and standardize money display across all admin pages. These are polish items that build on the Dashboard Shell from Sprint 4A.
+
+| Task | Description | Files |
+|------|-------------|-------|
+| S4B-T1 | Add keyboard shortcuts — `Cmd/Ctrl+K` opens command palette, `Cmd/Ctrl+/` focuses sidebar search, `Escape` closes drill-down and returns to top-level sidebar (WC-01) | Dashboard Shell component |
+| S4B-T2 | Fix CRM detail tab persistence — use URL search params so refreshing preserves the active tab | `src/app/admin/crm/[userId]/page.tsx` |
+| S4B-T3 | Standardize money display — show "$0.00" everywhere (never em-dash for money) and apply across admin pages | All admin pages showing currency |
+
+**Done Test:** Keyboard shortcuts work (`Cmd/Ctrl+K` opens palette, `Cmd/Ctrl+/` focuses search, `Escape` closes drill-down). CRM detail refresh preserves the active tab. Money displays consistently as "$0.00" format across all admin pages — no em-dashes for zero amounts.
+
+**Addresses:** UX-07, UX-09, WC-01
 
 ---
 
@@ -490,23 +503,37 @@ Each sprint is designed to complete in one session (3-5 tasks, clear done-test).
 
 ---
 
-### Sprint 6: Admin Page Conversions to Shared Components
+### Sprint 6A: Utility Components + First 3 Page Conversions
 
-**Goal:** Convert admin pages to use the shared AdminDataTable, TableToolbar, and ConfirmDialog components built in Sprint 1. This is where the systemic UX consistency gets applied.
+**Goal:** Build the utility components (relative timestamps, sparkline), then convert the first 3 admin pages to use the shared AdminDataTable, TableToolbar, and ConfirmDialog built in Sprint 1.
 
 | Task | Description | Files |
 |------|-------------|-------|
-| S6-T1 | Convert User Management page — replace eye icon with clickable rows, add TableToolbar, protect role editing behind intentional action (edit button → dialog), use ConfirmDialog for delete. Add health dot indicators (WC-06): green=active, yellow=trial, red=churned. Use relative timestamps (WC-04). Add toast on all mutations (WC-08). | User management admin page |
-| S6-T2 | Convert Waitlist page — replace div grid with AdminDataTable, add toolbar with search + filters. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Waitlist admin page |
-| S6-T3 | Convert Team page — replace Card list with AdminDataTable, add ConfirmDialog for remove, replace `confirm()`. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Team admin page |
-| S6-T4 | Convert Feedback page — replace Card list with AdminDataTable, add toolbar with status filter, replace `confirm()` for delete. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Feedback admin page |
-| S6-T5 | Convert Audit Logs page — apply AdminDataTable, ensure consistent row click → dialog pattern. Use relative timestamps (WC-04). | Audit Logs admin page |
-| S6-T6 | Build `<Sparkline>` mini-chart component (thin SVG, 30-day trend). Apply to Revenue list (revenue trend per user) and Affiliate Members list (referral trend per affiliate) (WC-10). | `src/components/admin/sparkline.tsx`, Revenue page, Members page |
-| S6-T7 | Build `formatRelativeTime()` utility function — returns "3 hours ago," "Yesterday," "Feb 14" with full ISO timestamp available for tooltip. Used by all converted pages (WC-04). | `src/lib/format-relative-time.ts` |
+| S6A-T1 | Build `formatRelativeTime()` utility function — returns "3 hours ago," "Yesterday," "Feb 14" with full ISO timestamp available for tooltip. Used by all converted pages (WC-04). | `src/lib/format-relative-time.ts` |
+| S6A-T2 | Build `<Sparkline>` mini-chart component (thin SVG, 30-day trend). Apply to Revenue list (revenue trend per user) and Affiliate Members list (referral trend per affiliate) (WC-10). | `src/components/admin/sparkline.tsx`, Revenue page, Members page |
+| S6A-T3 | Convert User Management page — replace eye icon with clickable rows, add TableToolbar, protect role editing behind intentional action (edit button → dialog), use ConfirmDialog for delete. Add health dot indicators (WC-06): green=active, yellow=trial, red=churned. Use relative timestamps (WC-04). Add toast on all mutations (WC-08). | User management admin page |
+| S6A-T4 | Convert Waitlist page — replace div grid with AdminDataTable, add toolbar with search + filters. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Waitlist admin page |
+| S6A-T5 | Convert Team page — replace Card list with AdminDataTable, add ConfirmDialog for remove, replace `confirm()`. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Team admin page |
+
+**Done Test:** `formatRelativeTime()` returns correct relative strings with absolute tooltip data. Sparkline renders 30-day SVG trend lines on Revenue and Members rows. User Management, Waitlist, and Team pages all use AdminDataTable + TableToolbar + ConfirmDialog. Clickable rows work. Health dots appear on User rows. Relative timestamps on all 3 converted pages. Toast on every mutation. No browser `confirm()` calls on converted pages. CSV export works from each toolbar.
+
+**Addresses:** UX-02, UX-03, UX-05, UX-06, UX-11, WC-04, WC-06, WC-07, WC-08, WC-10
+
+---
+
+### Sprint 6B: Remaining Page Conversions + Final Verification
+
+**Goal:** Convert the last 2 admin pages and verify consistency across all converted pages.
+
+| Task | Description | Files |
+|------|-------------|-------|
+| S6B-T1 | Convert Feedback page — replace Card list with AdminDataTable, add toolbar with status filter, replace `confirm()` for delete. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Feedback admin page |
+| S6B-T2 | Convert Audit Logs page — apply AdminDataTable, ensure consistent row click → dialog pattern. Use relative timestamps (WC-04). | Audit Logs admin page |
+| S6B-T3 | Final consistency verification — confirm all 5 converted pages use identical patterns: same table component, same toolbar, same confirmation dialogs, same relative timestamps, same toast behavior, CSV export on every toolbar. Verify no browser `confirm()` calls remain anywhere in admin. Verify health dots on User and Affiliate rows. | All converted admin pages |
 
 **Done Test:** All 5 converted pages use the same table component, same toolbar pattern, same confirmation dialogs. Rows are clickable where detail views exist. No browser `confirm()` calls remain on any converted page. All dates show relative timestamps with absolute tooltip on hover. Health dots appear on User and Affiliate rows. Toast notifications confirm every mutation. Sparklines show 30-day trends on Revenue and Affiliate Members rows. CSV export works from every toolbar.
 
-**Addresses:** UX-02, UX-03, UX-04, UX-05, UX-06, UX-11, UX-13, WC-04, WC-06, WC-07, WC-08, WC-10
+**Addresses:** UX-04, UX-13, WC-04, WC-08
 
 ---
 
@@ -613,10 +640,28 @@ The following items require further discussion before they can be planned. They 
 1. Each sprint starts by reading this blueprint and confirming which sprint is current.
 2. At the end of each sprint, update this document: mark sprint as COMPLETE, note any carryover items.
 3. If a sprint can't finish, document exactly what's done and what remains.
-4. Sprint dependencies: Sprint 1 must complete before Sprint 6. Sprint 4 (Dashboard Shell) should complete before applying the Shell to other dashboards in future work. All other sprints are independent and can run in any order.
-5. After Sprint 6, the team will assess whether a second blueprint is needed for the Affiliate Dashboard restructure and applying the Dashboard Shell to all three dashboards.
+4. Sprint dependencies:
+   - Sprint 1 must complete before Sprint 6A/6B (shared components used in page conversions).
+   - Sprint 4A must complete before Sprint 4B (Shell must exist before polish).
+   - Sprint 6A must complete before Sprint 6B (utilities built in 6A, remaining pages + verification in 6B).
+   - Sprint 4A (Dashboard Shell) should complete before applying the Shell to other dashboards in future work.
+   - Sprints 2, 3, and 5 are independent of each other and can run in any order.
+5. After Sprint 6B, the team will assess whether a second blueprint is needed for the Affiliate Dashboard restructure and applying the Dashboard Shell to all three dashboards.
 6. FR-13 (settings page edit protection) is now decided — Sprint 3 can proceed with this pattern.
 7. Grandfathering gaps (GAP-1 through GAP-6) should be scheduled in a future sprint or added to an existing sprint that touches affiliate logic.
+
+**Sprint summary (8 sprints, 3-5 tasks each):**
+
+| Sprint | Tasks | Focus |
+|--------|-------|-------|
+| 1 | 5 | Shared UX components + standards |
+| 2 | 5 | Critical bug fixes |
+| 3 | 5 | More bug fixes + UX quick wins |
+| 4A | 3 | Dashboard Shell (structural) |
+| 4B | 3 | Shell polish + quick fixes |
+| 5 | 5 | Command palette + impersonate + cross-linking |
+| 6A | 5 | Utility components + first 3 page conversions |
+| 6B | 3 | Remaining page conversions + final verification |
 
 ---
 
