@@ -74,7 +74,7 @@ These are not bugs per se — each page works individually — but the lack of c
 | FR-04 | System-wide vertical sidebar navigation for all dashboards | **DECIDED** | All dashboards use the same Dashboard Shell with vertical drill-down sidebar. No horizontal nav inside dashboards. See Design Decisions below. |
 | FR-05 | Best practice defaults for all affiliate settings | **DECIDED** | 9 defaults agreed (20% commission, 60-day cookie, $50 min payout, etc.). Info icon tooltips on every field. "Reset to Best Practices" button. See Design Decisions below. |
 | FR-06 | Grandfathering integrity for affiliate agreements | **DECIDED** | Core term-locking already built. Audit found 6 gaps to fix. See Design Decisions below. |
-| FR-07 | Affiliate-branded discount codes | Pending Discussion | UUID-based tracking with branded alias overlay |
+| FR-07 | Affiliate-branded discount codes | **DECIDED** | Dual-attribution (link + code). Auto-generated on approval. Affiliate self-brands from their dashboard. First-come-first-served + suggestions. Coaching notes in UI. See Design Decisions below. |
 | FR-08 | Cross-linking for all related data throughout admin | **DECIDED** | All detail pages use collapsible accordion sections to show related records. Every person name, amount, and entity reference is a clickable cross-link. See Design Decisions below. |
 | FR-09 | Broadcast performance data surfaced at higher level | Pending Discussion | Where to surface it — dashboard? separate analytics? |
 | FR-10 | Payout workflow documentation | Pending Discussion | Write operational documentation |
@@ -290,6 +290,52 @@ The tooltip text doubles as in-app documentation — admins can learn what each 
 
 These gaps will be addressed in the sprint plan. GAP-1 through GAP-4 are schema/logic fixes. GAP-5 is a UI verification. GAP-6 is an audit trail addition.
 
+### 11. Affiliate-Branded Discount Codes (FR-07)
+
+**Dual-Attribution Model:** Every affiliate has two independent paths to earn referral credit:
+1. **Referral link** — traditional URL with cookie tracking. Works for digital content (blog posts, social media, YouTube descriptions).
+2. **Discount code** — a branded, memorable code. Works for verbal/audio content (podcasts, live streams, in-person mentions) where listeners can't click a link but can remember a code.
+
+Both paths are valid. If a customer uses a code, the affiliate gets credit even without a cookie, even years later (under the latest active terms). This is the long-tail value — a podcast episode from 3 years ago still works if the host said "use code STEELE40."
+
+**Auto-generation on affiliate approval:**
+- When an affiliate is approved, the system auto-generates a default discount code based on their name + the current discount percentage (e.g., "STEELE20")
+- The affiliate can then rename/brand it from their dashboard
+
+**Affiliate self-branding from their dashboard:**
+- Affiliates see their discount code(s) on their dashboard
+- They can rename their code to anything they want (subject to rules below)
+- They can see usage stats (how many times used, revenue generated)
+
+**Naming collision policy — Option B: First-come, first-served + suggestions:**
+- Codes are globally unique. Whoever claims a code name first owns it.
+- If a requested code is taken, the system shows a coaching message and auto-suggests 3-4 alternatives based on the affiliate's name, discount percentage, or username.
+- Taken message: *"That code is already claimed by another partner. Try something unique to your personal brand — your podcast name, your channel name, or a nickname your audience knows you by."*
+- Suggestions example: "JSTEELE40, STEELE40OFF, JAES40"
+
+**Code rules:**
+- Uppercase, alphanumeric only, 4-20 characters. No spaces, no special characters.
+- Reserved words blocked: "DISCOUNT," "FREE," "TEST," "ADMIN," "PASSIVEPOST," and similar common/brand words.
+- One active branded code per affiliate by default. Admin can grant additional codes if needed.
+- Rename limit: once per 30 days, to prevent confusion if old content already references the current code name.
+
+**Coaching notes in the affiliate dashboard UI:**
+
+On the code creation/management screen:
+> *"Your discount code is your personal brand in action. Choose something memorable that your audience will associate with YOU — your name, your show, your catchphrase. Great codes are short, easy to say out loud, and easy to remember. Codes are first-come, first-served — the more unique to your brand, the better!"*
+
+After code creation (pro tip):
+> *"Pro tip: Say your code out loud. If it's easy to say on a podcast or livestream, your audience is more likely to remember it."*
+
+On the code performance section:
+> *"Every use of your code earns you commission. Share it in your bio, your email signature, your content descriptions. Even if someone uses your code 5 years from now, you'll still earn credit under your active terms."*
+
+**Attribution conflict resolution:**
+When both a referral link (cookie) and a discount code point to different affiliates for the same conversion, the existing `attribution_conflict_policy` setting determines who gets credit. The default is first-touch (the first referral method used wins).
+
+**Stripe integration:**
+Discount codes must be validated against Stripe's coupon/promotion code system. This has not been tested yet and will need a dedicated integration pass.
+
 ---
 
 ## Sprint Plan
@@ -488,7 +534,6 @@ At the end of Sprint 1, run a grep across all new component files to confirm zer
 The following items require further discussion before they can be planned. They are tracked here but will NOT be built until discussed and approved:
 
 **Pending Feature Requests (need discussion):**
-- **FR-07** — Affiliate-branded discount codes
 - **FR-09** — Broadcast performance surfaced at higher level
 - **FR-10** — Payout workflow documentation
 - **FR-11** — Feature documentation for affiliate settings
