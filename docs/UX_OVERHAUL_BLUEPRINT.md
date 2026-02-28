@@ -199,6 +199,83 @@ Each sprint is designed to complete in one session (3-5 tasks, clear done-test).
 
 ---
 
+## Design System Compliance — Mandatory for All Sprints
+
+The Color Palette page (`/admin/setup/palette`) is the single source of truth for ALL visual styling across the entire app — all three dashboards plus marketing pages. Every shared component built in this blueprint and every page conversion MUST consume CSS variables from the design system. No hardcoded Tailwind spacing, colors, radius, or shadows. This rule has been violated in past sessions, costing days of rework.
+
+### CSS Variables Each Shared Component Must Use
+
+**AdminDataTable (`src/components/admin/data-table.tsx`)**
+
+| Visual Property | CSS Variable | Never Use |
+|----------------|-------------|-----------|
+| Table container padding | `--card-padding` | `p-4`, `p-6` |
+| Table container radius | `--card-radius` | `rounded-lg`, `rounded-md` |
+| Table container shadow | `--card-shadow` | `shadow-sm`, `shadow-md` |
+| Table container border | `--card-border-width`, `--card-border-style` | `border`, `border-2` |
+| Row stripe effect | `--table-stripe-opacity` | `bg-gray-50`, `bg-muted/50` with hardcoded opacity |
+| Row border lines | `--table-border-opacity` | `border-b` with hardcoded opacity |
+| Row hover effect | `--hover-transform`, `--transition-speed` | `hover:bg-gray-100`, hardcoded transitions |
+| Row hover background | `bg-muted` (allowed Tailwind class) | `bg-gray-50`, `bg-slate-100` |
+| Header background | `bg-muted` (allowed Tailwind class) | `bg-gray-100`, `bg-slate-50` |
+| Header text | `text-muted-foreground` (allowed) | `text-gray-500`, `text-slate-600` |
+| Empty state text | `text-muted-foreground` (allowed) | `text-gray-400`, `text-gray-500` |
+| Status colors in cells | `--success`, `--warning`, `--danger`, `--info` | `text-green-600`, `text-red-500`, `text-amber-600` |
+| Content gap (between toolbar and table) | `--content-density-gap` | `gap-4`, `space-y-4` |
+
+**TableToolbar (`src/components/admin/table-toolbar.tsx`)**
+
+| Visual Property | CSS Variable | Never Use |
+|----------------|-------------|-----------|
+| Toolbar spacing | `--content-density-gap` | `gap-3`, `gap-4` |
+| Search input radius | `--input-radius` | `rounded-md` |
+| Filter/sort button radius | `--btn-radius` | `rounded-lg`, `rounded-full` |
+| Button font weight | `--btn-font-weight` | `font-medium` (hardcoded) |
+| Transition speed | `--transition-speed` | `transition-all duration-200` |
+| Clear button (X) color | `text-muted-foreground` (allowed) | `text-gray-400` |
+
+**ConfirmDialog (`src/components/admin/confirm-dialog.tsx`)**
+
+| Visual Property | CSS Variable | Never Use |
+|----------------|-------------|-----------|
+| Dialog container radius | `--card-radius` | `rounded-lg` |
+| Destructive button color | `text-destructive` / `bg-destructive` (allowed) | `bg-red-600`, `text-red-500` |
+| Button radius | `--btn-radius` | `rounded-md` |
+| Transition speed | `--transition-speed` | hardcoded `duration-200` |
+
+### Wrapper Component Usage
+
+Where possible, shared components should compose the DS wrapper components:
+
+- **DSCard** (`@/components/ui/ds-card`) — Use as the outer container for AdminDataTable. Automatically applies `--card-padding`, `--card-radius`, `--card-shadow`, `--card-border-width`, `--card-border-style`.
+- **DSSection** (`@/components/ui/ds-section`) — Use for spacing between major page sections (e.g., between toolbar and table, between table and pagination).
+- **DSGrid** (`@/components/ui/ds-grid`) — Use for stat card layouts above tables. Automatically applies `--content-density-gap`.
+
+### Sprint 6 Conversion Rule
+
+When converting existing admin pages (Sprint 6), the conversion includes removing hardcoded styling. Every page touched must be audited for:
+
+1. Hardcoded Tailwind color classes (`text-green-*`, `bg-red-*`, `text-blue-*`, etc.) → replace with semantic tokens
+2. Hardcoded spacing (`p-4`, `gap-4`, `space-y-6`) → replace with CSS variable classes
+3. Hardcoded radius (`rounded-lg`, `rounded-md`) → replace with CSS variable classes
+4. Hardcoded shadows (`shadow-sm`, `shadow-md`) → replace with CSS variable classes
+5. Hardcoded chart colors → use `useChartConfig()` hook
+
+**Allowed exceptions** (per `docs/DESIGN_SYSTEM_RULES.md`):
+- Font sizes: `text-xs`, `text-sm`, `text-lg`, `text-2xl`
+- Font weights in body text: `font-bold`, `font-medium`, `font-semibold`
+- Icon sizes: `w-4`, `h-4`, `w-8`, `h-8`
+- Micro-spacing (≤0.75rem): `mb-2`, `mt-1`, `ml-1`
+- Chart container heights: `min-h-[400px]`, `h-[300px]`
+- Animations: `animate-pulse`, `animate-spin`
+- Text utilities: `truncate`, `tabular-nums`, `whitespace-nowrap`
+
+### Verification Step
+
+At the end of Sprint 1, run a grep across all new component files to confirm zero hardcoded color classes, zero hardcoded spacing on cards, and zero hardcoded shadows. This is a pass/fail gate before Sprint 1 can be marked complete.
+
+---
+
 ## Items NOT In This Blueprint
 
 The following items from the test results require discussion before they can be planned. They are tracked here but will NOT be built until discussed and approved:
