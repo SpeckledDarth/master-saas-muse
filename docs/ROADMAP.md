@@ -772,6 +772,45 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 
 **Next session should start with:** Sprint 4B — Dashboard Shell Polish + Quick Fixes (keyboard shortcuts, CRM tab persistence, money display standardization).
 
+### Session — February 28, 2026 (UX Overhaul Blueprint — Sprint 5 + Sprint 6A)
+
+**Sprint 5: Command Palette + Impersonate + Cross-Linking** — COMPLETE
+**Sprint 6A: Utility Components + First 3 Page Conversions** — COMPLETE
+
+**What was accomplished:**
+
+**Sprint 5:**
+
+1. **Fixed command palette search (BUG-04/05/06)** — Replaced slow all-user fetch with DB-level `user_profiles` search. Invoice and subscription results now show user names.
+
+2. **Created ticket detail page (BUG-07)** — New `/admin/feedback/[id]` page with ticket info, comments, reply form (internal note toggle), status/priority controls, submitter cross-link to CRM. API route at `/api/admin/feedback/[id]` with GET/PATCH/POST.
+
+3. **Fixed impersonation redirect (BUG-08)** — Redirects now go to `/dashboard/social/overview`. Created `getEffectiveUserId()` server helper at `src/lib/effective-user.ts`. Full API-level data swap deferred.
+
+4. **CRM Summary accordion tab (FR-08)** — New default "Summary" tab with collapsible sections for Revenue, Affiliate Activity, Support Tickets, Activity Timeline, Notes, Contracts. Cross-links to detail pages.
+
+5. **Cross-linking (FR-08)** — Affiliate member names link to CRM. Contest winners link to CRM. DetailModal supports link-type fields.
+
+**Sprint 6A:**
+
+1. **Built `formatRelativeTime()` utility** — At `src/lib/format-relative-time.tsx`. Exports `formatRelativeTime()`, `formatAbsoluteTime()`, and `<RelativeTime>` component with tooltip.
+
+2. **Built `<Sparkline>` component** — At `src/components/admin/sparkline.tsx`. Pure SVG polyline, design system compliant colors.
+
+3. **Converted User Management page** — AdminDataTable with sorting/pagination/clickable rows, TableToolbar with search + role filter + CSV, ConfirmDialog for delete, health dot indicators (green=subscribed, yellow=pending, red=inactive), RelativeTime for all timestamps.
+
+4. **Converted Waitlist page** — AdminDataTable with sorting, TableToolbar with search + referral source filter + CSV, ConfirmDialog (replaced browser confirm()), RelativeTime for dates.
+
+5. **Converted Team page** — Two AdminDataTables (members + invitations), TableToolbar with search + role filter + CSV, ConfirmDialog for remove/cancel (replaced confirm()), RelativeTime for all dates. Kept Role Permissions collapsible and Invite dialog.
+
+**Files created:** `src/lib/format-relative-time.tsx`, `src/components/admin/sparkline.tsx`, `src/app/admin/feedback/[id]/page.tsx`, `src/app/api/admin/feedback/[id]/route.ts`, `src/lib/effective-user.ts`
+
+**Files modified:** `src/app/api/admin/search/route.ts`, `src/app/admin/crm/[userId]/page.tsx`, `src/app/admin/setup/affiliate/page.tsx`, `src/components/admin/DetailModal.tsx`, `src/app/admin/users/page.tsx`, `src/app/admin/waitlist/page.tsx`, `src/app/admin/team/page.tsx`
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
+**Next session should start with:** Sprint 6B — Remaining Page Conversions (Feedback, Audit Logs) + Final Verification + Wire Sparkline into Revenue/Members rows.
+
 ---
 
 ## Related Documentation

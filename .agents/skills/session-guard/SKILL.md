@@ -9,12 +9,11 @@ This skill exists because previous sessions lost focus, touched off-limits files
 
 ## CURRENT SPRINT
 
-**Sprint 5 COMPLETE → Sprint 6A next: Utility Components + First 3 Page Conversions**
-- Sprint 4A: Vercel-style drill-down sidebar, badge counts, layout swap
-- Sprint 4B: Escape closes drill-down, CRM tab persistence, money $0.00
-- Sprint 5: Command palette search (DB-level), ticket detail page, impersonate redirect fix, CRM Summary accordion tab, cross-linking across admin pages
-- Blueprint location: `docs/UX_OVERHAUL_BLUEPRINT.md` → Sprint 6A section
-- Sprint 6A tasks: Build `formatRelativeTime()` utility, build `<Sparkline>` component, convert User Management / Waitlist / Team pages to AdminDataTable + TableToolbar + ConfirmDialog
+**Sprint 6A COMPLETE → Sprint 6B next: Remaining Page Conversions + Final Verification**
+- Sprint 5: Command palette search, ticket detail page, impersonate redirect fix, CRM Summary accordion tab, cross-linking
+- Sprint 6A: Built formatRelativeTime utility + Sparkline component. Converted User Management, Waitlist, Team pages to AdminDataTable + TableToolbar + ConfirmDialog. Zero confirm() calls. Health dots on users. Relative timestamps everywhere.
+- Blueprint location: `docs/UX_OVERHAUL_BLUEPRINT.md` → Sprint 6B section
+- Sprint 6B tasks: Convert Feedback page and Audit Logs page to AdminDataTable pattern. Final consistency verification across all 5 converted pages. Wire Sparkline into Revenue and Affiliate Members rows.
 
 If the user asks you to do something unrelated to this sprint, do exactly what they ask — but do NOT expand the scope or touch anything else.
 

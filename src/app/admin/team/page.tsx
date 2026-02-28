@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,8 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useToast } from '@/hooks/use-toast'
-import { Users, Mail, UserPlus, Trash2, Shield, User, Crown, Info, ChevronDown, ChevronUp } from 'lucide-react'
+import { Users, Mail, UserPlus, Trash2, Shield, User, Crown, Info, ChevronDown, ChevronUp, RotateCw } from 'lucide-react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { AdminDataTable, ColumnDef } from '@/components/admin/data-table'
+import { TableToolbar } from '@/components/admin/table-toolbar'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
+import { RelativeTime } from '@/lib/format-relative-time'
 
 interface TeamMember {
   id: number
@@ -48,6 +52,12 @@ export default function TeamPage() {
   const [sending, setSending] = useState(false)
   const [rolesInfoOpen, setRolesInfoOpen] = useState(false)
   const [permissions, setPermissions] = useState<UserPermissions | null>(null)
+  const [memberSearch, setMemberSearch] = useState('')
+  const [roleFilter, setRoleFilter] = useState('all')
+  const [confirmRemove, setConfirmRemove] = useState<{ open: boolean; memberId: number | null; name: string }>({ open: false, memberId: null, name: '' })
+  const [confirmCancel, setConfirmCancel] = useState<{ open: boolean; invitationId: number | null; email: string }>({ open: false, invitationId: null, email: '' })
+  const [removingMember, setRemovingMember] = useState(false)
+  const [cancellingInvite, setCancellingInvite] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -61,22 +71,21 @@ export default function TeamPage() {
         fetch('/api/admin/invitations'),
         fetch('/api/user/membership')
       ])
-      
+
       const membersData = await membersRes.json()
       const invitationsData = await invitationsRes.json()
       const permissionsData = await permissionsRes.json()
-      
+
       setMembers(membersData.members || [])
       setInvitations(invitationsData.invitations || [])
-      
-      // Determine permissions based on role
+
       const isOwner = permissionsData.isAppAdmin || permissionsData.teamRole === 'owner'
       const isManager = permissionsData.teamRole === 'manager'
       setPermissions({
         isAppAdmin: permissionsData.isAppAdmin,
         teamRole: permissionsData.teamRole,
-        canManageTeam: isOwner, // Only owners can change roles and remove members
-        canInviteMembers: isOwner || isManager // Owners and managers can invite
+        canManageTeam: isOwner,
+        canInviteMembers: isOwner || isManager
       })
     } catch (error) {
       console.error('Error fetching team data:', error)
@@ -86,41 +95,30 @@ export default function TeamPage() {
   }
 
   async function handleInvite() {
-    console.log('[Team Invite] handleInvite called')
-    if (!inviteEmail) {
-      console.log('[Team Invite] No email, returning')
-      return
-    }
+    if (!inviteEmail) return
     setSending(true)
-    console.log('[Team Invite] Starting invite for:', inviteEmail, 'role:', inviteRole)
-    
+
     try {
       const res = await fetch('/api/admin/team', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'invite', email: inviteEmail, role: inviteRole })
       })
-      
-      console.log('[Team Invite] Response status:', res.status)
+
       const data = await res.json()
-      console.log('[Team Invite] Response data:', JSON.stringify(data, null, 2))
-      
+
       if (res.ok) {
         toast({ title: 'Invitation sent', description: `Invitation sent to ${inviteEmail}` })
         setInviteEmail('')
         setInviteDialogOpen(false)
         fetchData()
       } else {
-        const errorMsg = data.error || 'Failed to send invitation'
-        console.error('[Team Invite] Error details:', data.details)
-        toast({ title: 'Error', description: errorMsg, variant: 'destructive' })
+        toast({ title: 'Error', description: data.error || 'Failed to send invitation', variant: 'destructive' })
       }
     } catch (error) {
-      console.error('[Team Invite] Error:', error)
       toast({ title: 'Error', description: 'Failed to send invitation', variant: 'destructive' })
     } finally {
       setSending(false)
-      console.log('[Team Invite] Complete')
     }
   }
 
@@ -131,17 +129,17 @@ export default function TeamPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'update_role', memberId, role: newRole })
       })
-      
+
       const data = await res.json()
-      
+
       if (res.ok) {
         toast({ title: 'Role updated' })
         fetchData()
       } else {
-        toast({ 
-          title: 'Error', 
-          description: data.error || 'Failed to update role', 
-          variant: 'destructive' 
+        toast({
+          title: 'Error',
+          description: data.error || 'Failed to update role',
+          variant: 'destructive'
         })
       }
     } catch (error) {
@@ -149,47 +147,55 @@ export default function TeamPage() {
     }
   }
 
-  async function handleRemoveMember(memberId: number) {
-    if (!confirm('Are you sure you want to remove this team member?')) return
-    
+  async function handleRemoveMember() {
+    if (!confirmRemove.memberId) return
+    setRemovingMember(true)
+
     try {
       const res = await fetch('/api/admin/team', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'remove', memberId })
+        body: JSON.stringify({ action: 'remove', memberId: confirmRemove.memberId })
       })
-      
+
       const data = await res.json()
-      
+
       if (res.ok) {
         toast({ title: 'Member removed' })
         fetchData()
       } else {
-        toast({ 
-          title: 'Error', 
-          description: data.error || 'Failed to remove member', 
-          variant: 'destructive' 
+        toast({
+          title: 'Error',
+          description: data.error || 'Failed to remove member',
+          variant: 'destructive'
         })
       }
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to remove member', variant: 'destructive' })
+    } finally {
+      setRemovingMember(false)
+      setConfirmRemove({ open: false, memberId: null, name: '' })
     }
   }
 
-  async function handleCancelInvitation(invitationId: number) {
-    if (!confirm('Are you sure you want to cancel this invitation?')) return
-    
+  async function handleCancelInvitation() {
+    if (!confirmCancel.invitationId) return
+    setCancellingInvite(true)
+
     try {
-      const res = await fetch(`/api/admin/invitations?id=${invitationId}`, {
+      const res = await fetch(`/api/admin/invitations?id=${confirmCancel.invitationId}`, {
         method: 'DELETE'
       })
-      
+
       if (res.ok) {
         toast({ title: 'Invitation cancelled' })
         fetchData()
       }
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to cancel invitation', variant: 'destructive' })
+    } finally {
+      setCancellingInvite(false)
+      setConfirmCancel({ open: false, invitationId: null, email: '' })
     }
   }
 
@@ -200,9 +206,9 @@ export default function TeamPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'resend', invitationId })
       })
-      
+
       const data = await res.json()
-      
+
       if (res.ok) {
         toast({ title: 'Invitation resent', description: 'A new invitation email has been sent' })
         fetchData()
@@ -231,28 +237,172 @@ export default function TeamPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="p-[var(--section-spacing,1.5rem)]">
-        <div className="animate-pulse space-y-[var(--content-density-gap,1rem)]">
-          <div className="h-8 bg-muted rounded w-48" />
-          <div className="h-64 bg-muted rounded" />
+  const filteredMembers = useMemo(() => {
+    let result = members
+    if (memberSearch) {
+      const q = memberSearch.toLowerCase()
+      result = result.filter(m =>
+        m.name?.toLowerCase().includes(q) ||
+        m.email?.toLowerCase().includes(q)
+      )
+    }
+    if (roleFilter !== 'all') {
+      result = result.filter(m => m.role === roleFilter)
+    }
+    return result
+  }, [members, memberSearch, roleFilter])
+
+  const memberColumns: ColumnDef<TeamMember>[] = useMemo(() => [
+    {
+      id: 'member',
+      header: 'Member',
+      accessorFn: (row) => (
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
+          <Avatar>
+            <AvatarImage src={row.avatar} />
+            <AvatarFallback>
+              {row.name?.charAt(0)?.toUpperCase() || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="font-medium" data-testid={`text-member-name-${row.id}`}>{row.name}</p>
+            <p className="text-sm text-muted-foreground" data-testid={`text-member-email-${row.id}`}>{row.email}</p>
+          </div>
         </div>
-      </div>
-    )
-  }
+      ),
+      sortable: true,
+      sortValue: (row) => row.name?.toLowerCase() || '',
+    },
+    {
+      id: 'role',
+      header: 'Role',
+      accessorFn: (row) => (
+        <Badge variant={getRoleBadgeVariant(row.role) as any} className="flex items-center gap-1 w-fit">
+          {getRoleIcon(row.role)}
+          {row.role}
+        </Badge>
+      ),
+      sortable: true,
+      sortValue: (row) => row.role,
+    },
+    {
+      id: 'joined',
+      header: 'Joined',
+      accessorFn: (row) => <RelativeTime date={row.joined_at} />,
+      sortable: true,
+      sortValue: (row) => row.joined_at || '',
+      hideOnMobile: true,
+    },
+    {
+      id: 'actions',
+      header: '',
+      accessorFn: (row) => {
+        if (row.role === 'owner' || !permissions?.canManageTeam) return null
+        return (
+          <div className="flex items-center gap-2 justify-end" onClick={(e) => e.stopPropagation()}>
+            <Select
+              value={row.role}
+              onValueChange={(value) => handleUpdateRole(row.id, value)}
+            >
+              <SelectTrigger className="w-28" data-testid={`select-role-${row.id}`}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="manager">Manager</SelectItem>
+                <SelectItem value="member">Member</SelectItem>
+                <SelectItem value="viewer">Viewer</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => setConfirmRemove({ open: true, memberId: row.id, name: row.name })}
+              data-testid={`button-remove-${row.id}`}
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          </div>
+        )
+      },
+      className: 'text-right',
+    },
+  ], [permissions])
+
+  const invitationColumns: ColumnDef<Invitation>[] = useMemo(() => [
+    {
+      id: 'email',
+      header: 'Email',
+      accessorFn: (row) => (
+        <p className="font-medium" data-testid={`text-invite-email-${row.id}`}>{row.email}</p>
+      ),
+      sortable: true,
+      sortValue: (row) => row.email.toLowerCase(),
+    },
+    {
+      id: 'role',
+      header: 'Role',
+      accessorFn: (row) => <Badge variant="outline">{row.role}</Badge>,
+      sortable: true,
+      sortValue: (row) => row.role,
+    },
+    {
+      id: 'sent',
+      header: 'Sent',
+      accessorFn: (row) => <RelativeTime date={row.created_at} />,
+      sortable: true,
+      sortValue: (row) => row.created_at || '',
+      hideOnMobile: true,
+    },
+    {
+      id: 'expires',
+      header: 'Expires',
+      accessorFn: (row) => <RelativeTime date={row.expires_at} />,
+      sortable: true,
+      sortValue: (row) => row.expires_at || '',
+      hideOnMobile: true,
+    },
+    {
+      id: 'actions',
+      header: '',
+      accessorFn: (row) => {
+        if (!permissions?.canInviteMembers) return null
+        return (
+          <div className="flex items-center gap-2 justify-end" onClick={(e) => e.stopPropagation()}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleResendInvitation(row.id)}
+              data-testid={`button-resend-invite-${row.id}`}
+            >
+              <RotateCw className="h-3 w-3 mr-1" />
+              Resend
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setConfirmCancel({ open: true, invitationId: row.id, email: row.email })}
+              data-testid={`button-cancel-invite-${row.id}`}
+            >
+              Cancel
+            </Button>
+          </div>
+        )
+      },
+      className: 'text-right',
+    },
+  ], [permissions])
 
   return (
     <div className="p-[var(--section-spacing,1.5rem)] space-y-[var(--content-density-gap,1rem)]">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+          <h1 className="text-2xl font-bold flex items-center gap-2" data-testid="text-page-title">
             <Users className="h-6 w-6" />
             Team Management
           </h1>
-          <p className="text-muted-foreground">Manage your team members and invitations</p>
+          <p className="text-muted-foreground" data-testid="text-page-description">Manage your team members and invitations</p>
         </div>
-        
+
         {permissions?.canInviteMembers && (
           <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
             <DialogTrigger asChild>
@@ -311,7 +461,7 @@ export default function TeamPage() {
         <Card>
           <CollapsibleTrigger asChild>
             <CardHeader className="cursor-pointer hover-elevate active-elevate-2">
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
                 <span className="flex items-center gap-2">
                   <Info className="h-5 w-5" />
                   Role Permissions Reference
@@ -381,126 +531,81 @@ export default function TeamPage() {
         </Card>
       </Collapsible>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Team Members ({members.length})</CardTitle>
-          <CardDescription>People who have access to your application</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {members.length === 0 ? (
-            <p className="text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]">
-              No team members yet. Invite someone to get started!
-            </p>
-          ) : (
-            <div className="space-y-[var(--content-density-gap,1rem)]">
-              {members.map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]"
-                  data-testid={`member-row-${member.id}`}
-                >
-                  <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
-                    <Avatar>
-                      <AvatarImage src={member.avatar} />
-                      <AvatarFallback>
-                        {member.name?.charAt(0)?.toUpperCase() || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{member.name}</p>
-                      <p className="text-sm text-muted-foreground">{member.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
-                    <Badge variant={getRoleBadgeVariant(member.role) as any} className="flex items-center gap-1">
-                      {getRoleIcon(member.role)}
-                      {member.role}
-                    </Badge>
-                    {member.role !== 'owner' && permissions?.canManageTeam && (
-                      <div className="flex items-center gap-2">
-                        <Select
-                          value={member.role}
-                          onValueChange={(value) => handleUpdateRole(member.id, value)}
-                        >
-                          <SelectTrigger className="w-28" data-testid={`select-role-${member.id}`}>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="manager">Manager</SelectItem>
-                            <SelectItem value="member">Member</SelectItem>
-                            <SelectItem value="viewer">Viewer</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleRemoveMember(member.id)}
-                          data-testid={`button-remove-${member.id}`}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <div className="space-y-[var(--content-density-gap,1rem)]">
+        <h2 className="text-lg font-semibold" data-testid="text-members-heading">Team Members ({members.length})</h2>
+        <TableToolbar
+          search={memberSearch}
+          onSearchChange={setMemberSearch}
+          searchPlaceholder="Search members..."
+          filters={[
+            {
+              id: 'role',
+              label: 'Roles',
+              options: [
+                { label: 'Owner', value: 'owner' },
+                { label: 'Manager', value: 'manager' },
+                { label: 'Member', value: 'member' },
+                { label: 'Viewer', value: 'viewer' },
+              ],
+              value: roleFilter,
+              onChange: setRoleFilter,
+            },
+          ]}
+          csvExport={{
+            filename: 'team-members',
+            headers: ['Name', 'Email', 'Role', 'Joined'],
+            getRows: () => members.map(m => [m.name, m.email, m.role, m.joined_at || '']),
+          }}
+          data-testid="members-toolbar"
+        />
+        <AdminDataTable
+          columns={memberColumns}
+          data={filteredMembers}
+          loading={loading}
+          emptyMessage="No team members yet"
+          emptyDescription="Invite someone to get started! Use the Invite Member button above."
+          getRowId={(row) => String(row.id)}
+          data-testid="members-table"
+        />
+      </div>
 
-      {invitations.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
-              Pending Invitations ({invitations.length})
-            </CardTitle>
-            <CardDescription>Invitations waiting to be accepted</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-[var(--content-density-gap,1rem)]">
-              {invitations.map((invitation) => (
-                <div
-                  key={invitation.id}
-                  className="flex items-center justify-between p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/50"
-                  data-testid={`invitation-row-${invitation.id}`}
-                >
-                  <div>
-                    <p className="font-medium">{invitation.email}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Expires {new Date(invitation.expires_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">{invitation.role}</Badge>
-                    {permissions?.canInviteMembers && (
-                      <>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleResendInvitation(invitation.id)}
-                          data-testid={`button-resend-invite-${invitation.id}`}
-                        >
-                          Resend
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleCancelInvitation(invitation.id)}
-                          data-testid={`button-cancel-invite-${invitation.id}`}
-                        >
-                          Cancel
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <div className="space-y-[var(--content-density-gap,1rem)]">
+        <h2 className="text-lg font-semibold flex items-center gap-2" data-testid="text-invitations-heading">
+          <Mail className="h-5 w-5" />
+          Pending Invitations ({invitations.length})
+        </h2>
+        <AdminDataTable
+          columns={invitationColumns}
+          data={invitations}
+          loading={loading}
+          emptyMessage="No pending invitations"
+          emptyDescription="All invitations have been accepted or there are none yet."
+          getRowId={(row) => String(row.id)}
+          data-testid="invitations-table"
+        />
+      </div>
+
+      <ConfirmDialog
+        open={confirmRemove.open}
+        onOpenChange={(open) => { if (!open) setConfirmRemove({ open: false, memberId: null, name: '' }) }}
+        title="Remove Team Member"
+        description={`Are you sure you want to remove ${confirmRemove.name} from the team? They will lose access immediately.`}
+        confirmLabel="Remove"
+        variant="destructive"
+        loading={removingMember}
+        onConfirm={handleRemoveMember}
+      />
+
+      <ConfirmDialog
+        open={confirmCancel.open}
+        onOpenChange={(open) => { if (!open) setConfirmCancel({ open: false, invitationId: null, email: '' }) }}
+        title="Cancel Invitation"
+        description={`Are you sure you want to cancel the invitation to ${confirmCancel.email}? The invitation link will no longer work.`}
+        confirmLabel="Cancel Invitation"
+        variant="destructive"
+        loading={cancellingInvite}
+        onConfirm={handleCancelInvitation}
+      />
     </div>
   )
 }

@@ -15,7 +15,7 @@
 | 4A | Dashboard Shell + Navigation | COMPLETE | UX-01, UX-12, FR-03, FR-04, WC-02, WC-05 |
 | 4B | Dashboard Shell Polish | COMPLETE | UX-07, UX-09, WC-01 |
 | 5 | Command Palette + Impersonate + Cross-Linking | COMPLETE | BUG-04–08, UX-15, FR-08 |
-| 6A | Utility Components + First 3 Page Conversions | NOT STARTED | UX-02, UX-03, UX-05, UX-06, UX-11, WC-04, WC-06, WC-07, WC-08, WC-10 |
+| 6A | Utility Components + First 3 Page Conversions | COMPLETE | UX-02, UX-03, UX-05, UX-06, UX-11, WC-04, WC-06, WC-07, WC-08, WC-10 |
 | 6B | Remaining Page Conversions + Verification | NOT STARTED | UX-04, UX-13, WC-04, WC-08 |
 
 ---
@@ -533,19 +533,21 @@ These 10 enhancements are essentially "free" — they're better defaults and sma
 
 ---
 
-### Sprint 6A: Utility Components + First 3 Page Conversions
+### Sprint 6A: Utility Components + First 3 Page Conversions — COMPLETE
 
 **Goal:** Build the utility components (relative timestamps, sparkline), then convert the first 3 admin pages to use the shared AdminDataTable, TableToolbar, and ConfirmDialog built in Sprint 1.
 
-| Task | Description | Files |
-|------|-------------|-------|
-| S6A-T1 | Build `formatRelativeTime()` utility function — returns "3 hours ago," "Yesterday," "Feb 14" with full ISO timestamp available for tooltip. Used by all converted pages (WC-04). | `src/lib/format-relative-time.ts` |
-| S6A-T2 | Build `<Sparkline>` mini-chart component (thin SVG, 30-day trend). Apply to Revenue list (revenue trend per user) and Affiliate Members list (referral trend per affiliate) (WC-10). | `src/components/admin/sparkline.tsx`, Revenue page, Members page |
-| S6A-T3 | Convert User Management page — replace eye icon with clickable rows, add TableToolbar, protect role editing behind intentional action (edit button → dialog), use ConfirmDialog for delete. Add health dot indicators (WC-06): green=active, yellow=trial, red=churned. Use relative timestamps (WC-04). Add toast on all mutations (WC-08). | User management admin page |
-| S6A-T4 | Convert Waitlist page — replace div grid with AdminDataTable, add toolbar with search + filters. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Waitlist admin page |
-| S6A-T5 | Convert Team page — replace Card list with AdminDataTable, add ConfirmDialog for remove, replace `confirm()`. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Team admin page |
+| Task | Description | Files | Status |
+|------|-------------|-------|--------|
+| S6A-T1 | Built `formatRelativeTime()` utility — returns "Just now", "3m ago", "Yesterday", "Feb 14" etc. Also `formatAbsoluteTime()` and `<RelativeTime>` component with tooltip. | `src/lib/format-relative-time.tsx` | DONE |
+| S6A-T2 | Built `<Sparkline>` SVG polyline component — configurable width/height/color/strokeWidth, design system compliant default colors. | `src/components/admin/sparkline.tsx` | DONE |
+| S6A-T3 | Converted User Management — AdminDataTable with sorting/pagination/clickable rows, TableToolbar with search + role filter + CSV, ConfirmDialog for delete, health dot indicators (green=subscribed, yellow=pending, red=inactive), RelativeTime for all timestamps. | `src/app/admin/users/page.tsx` | DONE |
+| S6A-T4 | Converted Waitlist — AdminDataTable with sorting, TableToolbar with search + referral source filter + CSV, ConfirmDialog for delete (replaced browser confirm()), RelativeTime for signup dates. | `src/app/admin/waitlist/page.tsx` | DONE |
+| S6A-T5 | Converted Team — Two AdminDataTables (members + invitations), TableToolbar with search + role filter + CSV, ConfirmDialog for remove member and cancel invitation (replaced confirm()), RelativeTime for all dates. Kept Role Permissions collapsible and Invite dialog. | `src/app/admin/team/page.tsx` | DONE |
 
-**Done Test:** `formatRelativeTime()` returns correct relative strings with absolute tooltip data. Sparkline renders 30-day SVG trend lines on Revenue and Members rows. User Management, Waitlist, and Team pages all use AdminDataTable + TableToolbar + ConfirmDialog. Clickable rows work. Health dots appear on User rows. Relative timestamps on all 3 converted pages. Toast on every mutation. No browser `confirm()` calls on converted pages. CSV export works from each toolbar.
+**Done Test:** All 3 converted pages use AdminDataTable + TableToolbar + ConfirmDialog. Zero browser `confirm()` calls. Health dots on User rows. Relative timestamps on all pages. Toast on all mutations. CSV export in every toolbar. Clickable rows on User Management.
+
+**Note:** Sparkline component built but not yet wired into Revenue list or Affiliate Members list rows — those pages are being converted in Sprint 6B.
 
 **Addresses:** UX-02, UX-03, UX-05, UX-06, UX-11, WC-04, WC-06, WC-07, WC-08, WC-10
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
@@ -10,11 +10,14 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, Search, Users, Eye, Trash2, UserPlus, Download, Mail, Calendar, Clock, Shield, CheckCircle, XCircle, Crown, UserCog, User, Eye as ViewerIcon, ExternalLink, MessageSquare, FileText, StickyNote, Plus, CreditCard, UserCheck } from 'lucide-react'
+import { Loader2, Users, Eye, Trash2, UserPlus, Mail, Clock, Crown, UserCog, User, Eye as ViewerIcon, ExternalLink, MessageSquare, FileText, StickyNote, Plus, CreditCard, UserCheck } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { AdminDataTable, ColumnDef } from '@/components/admin/data-table'
+import { TableToolbar, FilterDef } from '@/components/admin/table-toolbar'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
+import { formatRelativeTime, formatAbsoluteTime } from '@/lib/format-relative-time'
 
 interface UserWithRole {
   id: string
@@ -51,10 +54,55 @@ interface UserDetail {
   stripePortalUrl: string | null
 }
 
+function HealthDot({ user }: { user: UserWithRole }) {
+  const now = Date.now()
+  const lastLogin = user.last_sign_in_at ? new Date(user.last_sign_in_at).getTime() : 0
+  const daysSinceLogin = lastLogin ? Math.floor((now - lastLogin) / (1000 * 60 * 60 * 24)) : Infinity
+
+  if (user.has_subscription) {
+    return (
+      <span
+        className="inline-block h-2 w-2 rounded-full bg-[hsl(var(--success))]"
+        title="Subscribed"
+        data-testid={`health-dot-${user.id}`}
+      />
+    )
+  }
+
+  if (!user.email_confirmed_at) {
+    return (
+      <span
+        className="inline-block h-2 w-2 rounded-full bg-[hsl(var(--warning))]"
+        title="Email pending verification"
+        data-testid={`health-dot-${user.id}`}
+      />
+    )
+  }
+
+  if (daysSinceLogin > 30) {
+    return (
+      <span
+        className="inline-block h-2 w-2 rounded-full bg-[hsl(var(--danger))]"
+        title="Inactive (no login >30 days)"
+        data-testid={`health-dot-${user.id}`}
+      />
+    )
+  }
+
+  return (
+    <span
+      className="inline-block h-2 w-2 rounded-full bg-[hsl(var(--success))]"
+      title="Active"
+      data-testid={`health-dot-${user.id}`}
+    />
+  )
+}
+
 export default function UsersPage() {
   const [users, setUsers] = useState<UserWithRole[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [roleFilter, setRoleFilter] = useState('all')
   const [updatingRole, setUpdatingRole] = useState<string | null>(null)
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null)
   const [userDetail, setUserDetail] = useState<UserDetail | null>(null)
@@ -79,22 +127,13 @@ export default function UsersPage() {
     try {
       const response = await fetch('/api/admin/users')
       const data = await response.json()
-      
       if (response.ok && data.users) {
         setUsers(data.users)
       } else {
-        toast({
-          title: 'Failed to load users',
-          description: data.error || 'Unknown error',
-          variant: 'destructive',
-        })
+        toast({ title: 'Failed to load users', description: data.error || 'Unknown error', variant: 'destructive' })
       }
     } catch (error) {
-      toast({
-        title: 'Failed to load users',
-        description: 'Please try again',
-        variant: 'destructive',
-      })
+      toast({ title: 'Failed to load users', description: 'Please try again', variant: 'destructive' })
     } finally {
       setLoading(false)
     }
@@ -125,16 +164,13 @@ export default function UsersPage() {
 
   async function handleRoleChange(userId: string, newRole: string) {
     setUpdatingRole(userId)
-    
     try {
       const response = await fetch('/api/admin/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, role: newRole })
       })
-      
       const data = await response.json()
-      
       if (response.ok) {
         toast({ title: 'Role updated', description: `User role changed to ${newRole}` })
         setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u))
@@ -151,14 +187,9 @@ export default function UsersPage() {
   async function handleDeleteUser() {
     if (!userToDelete) return
     setDeleting(true)
-    
     try {
-      const response = await fetch(`/api/admin/users?userId=${userToDelete.id}`, {
-        method: 'DELETE'
-      })
-      
+      const response = await fetch(`/api/admin/users?userId=${userToDelete.id}`, { method: 'DELETE' })
       const data = await response.json()
-      
       if (response.ok) {
         toast({ title: 'User deleted', description: 'User has been removed from the system' })
         setUsers(users.filter(u => u.id !== userToDelete.id))
@@ -178,18 +209,14 @@ export default function UsersPage() {
       toast({ title: 'Email required', variant: 'destructive' })
       return
     }
-    
     setInviting(true)
-    
     try {
       const response = await fetch('/api/admin/team', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'invite', email: inviteEmail, role: inviteRole })
       })
-      
       const data = await response.json()
-      
       if (response.ok) {
         toast({ title: 'Invitation sent', description: `Invitation sent to ${inviteEmail}` })
         setShowInviteDialog(false)
@@ -233,9 +260,7 @@ export default function UsersPage() {
     if (!selectedUser) return
     setDeletingNoteId(noteId)
     try {
-      const response = await fetch(`/api/admin/notes?noteId=${noteId}`, {
-        method: 'DELETE'
-      })
+      const response = await fetch(`/api/admin/notes?noteId=${noteId}`, { method: 'DELETE' })
       const data = await response.json()
       if (response.ok) {
         toast({ title: 'Note deleted' })
@@ -272,269 +297,235 @@ export default function UsersPage() {
     }
   }
 
-  function exportToCSV() {
-    const headers = ['Email', 'Name', 'Role', 'Provider', 'Joined', 'Last Login', 'Email Verified']
-    const rows = users.map(user => [
-      user.email,
-      user.name || '',
-      user.role || 'No role',
-      user.provider,
-      new Date(user.created_at).toLocaleDateString(),
-      user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : 'Never',
-      user.email_confirmed_at ? 'Yes' : 'No'
-    ])
-    
-    const csvContent = [headers.join(','), ...rows.map(row => row.map(cell => `"${cell}"`).join(','))].join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = `users-export-${new Date().toISOString().split('T')[0]}.csv`
-    link.click()
-    
-    toast({ title: 'Export complete', description: `Exported ${users.length} users` })
-  }
-
-  function getRoleIcon(role: string) {
-    switch (role) {
-      case 'owner': return <Crown className="h-3 w-3" />
-      case 'manager': return <UserCog className="h-3 w-3" />
-      case 'member': return <User className="h-3 w-3" />
-      case 'viewer': return <ViewerIcon className="h-3 w-3" />
-      default: return null
-    }
-  }
-
-  function getRoleBadgeVariant(role: string): 'default' | 'secondary' | 'outline' {
-    switch (role) {
-      case 'owner': return 'default'
-      case 'manager': return 'secondary'
-      default: return 'outline'
-    }
-  }
-
   function formatDate(dateString: string | null) {
     if (!dateString) return 'Never'
-    return new Date(dateString).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
     })
   }
 
-  function formatTimeAgo(dateString: string | null) {
-    if (!dateString) return 'Never'
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-    
-    if (diffDays === 0) return 'Today'
-    if (diffDays === 1) return 'Yesterday'
-    if (diffDays < 7) return `${diffDays} days ago`
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
-    return formatDate(dateString)
+  const filteredUsers = useMemo(() => {
+    let result = users
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      result = result.filter(user =>
+        user.email.toLowerCase().includes(q) ||
+        (user.name && user.name.toLowerCase().includes(q)) ||
+        user.id.toLowerCase().includes(q)
+      )
+    }
+    if (roleFilter !== 'all') {
+      result = result.filter(user => (user.role || 'member') === roleFilter)
+    }
+    return result
+  }, [users, searchQuery, roleFilter])
+
+  const roleFilterDef: FilterDef = {
+    id: 'role',
+    label: 'Roles',
+    options: [
+      { label: 'Owner', value: 'owner' },
+      { label: 'Manager', value: 'manager' },
+      { label: 'Member', value: 'member' },
+      { label: 'Viewer', value: 'viewer' },
+    ],
+    value: roleFilter,
+    onChange: setRoleFilter,
   }
 
-  const filteredUsers = users.filter(user => 
-    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (user.name && user.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    user.id.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    )
-  }
+  const columns: ColumnDef<UserWithRole>[] = useMemo(() => [
+    {
+      id: 'user',
+      header: 'User',
+      accessorFn: (user) => (
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
+          <div className="relative">
+            <Avatar className="h-9 w-9">
+              <AvatarImage src={user.avatar_url || undefined} alt={user.email} />
+              <AvatarFallback>{user.email.slice(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <span className="absolute -bottom-0.5 -right-0.5">
+              <HealthDot user={user} />
+            </span>
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium truncate">{user.name || user.email.split('@')[0]}</span>
+            <span className="text-sm text-muted-foreground truncate">{user.email}</span>
+          </div>
+        </div>
+      ),
+      sortable: true,
+      sortValue: (user) => (user.name || user.email).toLowerCase(),
+    },
+    {
+      id: 'role',
+      header: 'Role',
+      accessorFn: (user) => (
+        <div onClick={(e) => e.stopPropagation()}>
+          <Select
+            value={user.role || 'member'}
+            onValueChange={(value) => handleRoleChange(user.id, value)}
+            disabled={updatingRole === user.id}
+          >
+            <SelectTrigger className="w-[130px]" data-testid={`select-role-${user.id}`}>
+              {updatingRole === user.id ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <SelectValue placeholder="Set role" />
+              )}
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="owner">
+                <div className="flex items-center gap-2">
+                  <Crown className="h-3 w-3" /> Owner
+                </div>
+              </SelectItem>
+              <SelectItem value="manager">
+                <div className="flex items-center gap-2">
+                  <UserCog className="h-3 w-3" /> Manager
+                </div>
+              </SelectItem>
+              <SelectItem value="member">
+                <div className="flex items-center gap-2">
+                  <User className="h-3 w-3" /> Member
+                </div>
+              </SelectItem>
+              <SelectItem value="viewer">
+                <div className="flex items-center gap-2">
+                  <ViewerIcon className="h-3 w-3" /> Viewer
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      ),
+    },
+    {
+      id: 'plan',
+      header: 'Plan',
+      hideOnMobile: true,
+      accessorFn: (user) => user.has_subscription ? (
+        <Badge variant="outline" className="text-[hsl(var(--success))] border-[hsl(var(--success))]" data-testid={`badge-plan-${user.id}`}>
+          <CreditCard className="h-3 w-3 mr-1" />
+          Subscribed
+        </Badge>
+      ) : (
+        <Badge variant="secondary" data-testid={`badge-plan-${user.id}`}>
+          Free
+        </Badge>
+      ),
+    },
+    {
+      id: 'lastActive',
+      header: 'Last Active',
+      hideOnMobile: true,
+      accessorFn: (user) => (
+        <div className="flex items-center gap-1 text-muted-foreground">
+          <Clock className="h-3 w-3" />
+          <span title={formatAbsoluteTime(user.last_sign_in_at)}>{formatRelativeTime(user.last_sign_in_at)}</span>
+        </div>
+      ),
+      sortable: true,
+      sortValue: (user) => user.last_sign_in_at ? new Date(user.last_sign_in_at).getTime() : 0,
+    },
+    {
+      id: 'joined',
+      header: 'Joined',
+      hideOnMobile: true,
+      accessorFn: (user) => (
+        <span className="text-muted-foreground">
+          <span title={formatAbsoluteTime(user.created_at)}>{formatRelativeTime(user.created_at)}</span>
+        </span>
+      ),
+      sortable: true,
+      sortValue: (user) => new Date(user.created_at).getTime(),
+    },
+    {
+      id: 'actions',
+      header: '',
+      className: 'text-right w-[80px]',
+      accessorFn: (user) => (
+        <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleViewUser(user)}
+            data-testid={`button-view-user-${user.id}`}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setUserToDelete(user)}
+            className="text-destructive"
+            data-testid={`button-delete-user-${user.id}`}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    },
+  ], [updatingRole, users])
 
   return (
-    <div className="py-[var(--section-spacing,1.5rem)] px-[var(--section-spacing,1.5rem)]">
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[var(--content-density-gap,1rem)]">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                User Management
-              </CardTitle>
-              <CardDescription>
-                View and manage all users in your application ({users.length} total)
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={exportToCSV}
-                data-testid="button-export-users"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
-              <Button 
-                size="sm" 
-                onClick={() => setShowInviteDialog(true)}
-                data-testid="button-invite-user"
-              >
-                <UserPlus className="h-4 w-4 mr-2" />
-                Invite User
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by email, name, or ID..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-              data-testid="input-search-users"
-            />
-          </div>
-          
-          <div className="rounded-[var(--card-radius,0.75rem)] border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead className="hidden md:table-cell">Plan</TableHead>
-                  <TableHead className="hidden md:table-cell">Status</TableHead>
-                  <TableHead className="hidden lg:table-cell">Last Active</TableHead>
-                  <TableHead className="hidden lg:table-cell">Joined</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.id} data-testid={`row-user-${user.id}`}>
-                    <TableCell>
-                      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src={user.avatar_url || undefined} alt={user.email} />
-                          <AvatarFallback>{user.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{user.name || user.email.split('@')[0]}</span>
-                          <span className="text-sm text-muted-foreground">{user.email}</span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        value={user.role || 'member'}
-                        onValueChange={(value) => handleRoleChange(user.id, value)}
-                        disabled={updatingRole === user.id}
-                      >
-                        <SelectTrigger className="w-[130px]" data-testid={`select-role-${user.id}`}>
-                          {updatingRole === user.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <SelectValue placeholder="Set role" />
-                          )}
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="owner">
-                            <div className="flex items-center gap-2">
-                              <Crown className="h-3 w-3" /> Owner
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="manager">
-                            <div className="flex items-center gap-2">
-                              <UserCog className="h-3 w-3" /> Manager
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="member">
-                            <div className="flex items-center gap-2">
-                              <User className="h-3 w-3" /> Member
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="viewer">
-                            <div className="flex items-center gap-2">
-                              <ViewerIcon className="h-3 w-3" /> Viewer
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {user.has_subscription ? (
-                        <Badge variant="outline" className="text-[hsl(var(--success))] border-[hsl(var(--success))]" data-testid={`badge-plan-${user.id}`}>
-                          <CreditCard className="h-3 w-3 mr-1" />
-                          Subscribed
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" data-testid={`badge-plan-${user.id}`}>
-                          Free
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      <div className="flex items-center gap-2">
-                        {user.email_confirmed_at ? (
-                          <Badge variant="outline" className="text-[hsl(var(--success))] border-[hsl(var(--success))]">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Verified
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-[hsl(var(--warning))] border-[hsl(var(--warning))]">
-                            <XCircle className="h-3 w-3 mr-1" />
-                            Pending
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {formatTimeAgo(user.last_sign_in_at)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {formatDate(user.created_at)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleViewUser(user)}
-                          data-testid={`button-view-user-${user.id}`}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setUserToDelete(user)}
-                          className="text-destructive hover:text-destructive"
-                          data-testid={`button-delete-user-${user.id}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {filteredUsers.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-[var(--section-spacing,1.5rem)]">
-                      {searchQuery ? 'No users match your search' : 'No users found'}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="py-[var(--section-spacing,1.5rem)] px-[var(--section-spacing,1.5rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[var(--content-density-gap,1rem)]">
+        <div>
+          <h1 className="text-xl font-semibold flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            User Management
+          </h1>
+          <p className="text-sm text-muted-foreground" data-testid="text-user-count">
+            {users.length} total users
+          </p>
+        </div>
+      </div>
+
+      <TableToolbar
+        search={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search by email, name, or ID..."
+        filters={[roleFilterDef]}
+        csvExport={{
+          filename: `users-export-${new Date().toISOString().split('T')[0]}`,
+          headers: ['Email', 'Name', 'Role', 'Provider', 'Joined', 'Last Login', 'Email Verified'],
+          getRows: () => filteredUsers.map(user => [
+            user.email,
+            user.name || '',
+            user.role || 'No role',
+            user.provider,
+            new Date(user.created_at).toLocaleDateString(),
+            user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : 'Never',
+            user.email_confirmed_at ? 'Yes' : 'No'
+          ]),
+        }}
+        actions={
+          <Button
+            size="sm"
+            onClick={() => setShowInviteDialog(true)}
+            data-testid="button-invite-user"
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            Invite User
+          </Button>
+        }
+        data-testid="users-toolbar"
+      />
+
+      <AdminDataTable
+        columns={columns}
+        data={filteredUsers}
+        loading={loading}
+        emptyMessage={searchQuery || roleFilter !== 'all' ? 'No users match your filters' : 'No users yet'}
+        emptyDescription="Invite your first user to get started."
+        onRowClick={handleViewUser}
+        getRowId={(user) => user.id}
+        pageSize={20}
+        data-testid="users-table"
+      />
 
       <Dialog open={!!selectedUser} onOpenChange={(open) => { if (!open) { setSelectedUser(null); setUserDetail(null); setNewNote(''); } }}>
         <DialogContent className="sm:max-w-2xl">
@@ -574,7 +565,7 @@ export default function UsersPage() {
                     <p className="text-muted-foreground" data-testid="text-user-email">{userDetail.user.email}</p>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)] text-sm">
                   <div>
                     <Label className="text-muted-foreground">User ID</Label>
@@ -598,11 +589,13 @@ export default function UsersPage() {
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Joined</Label>
-                    <p data-testid="text-user-joined">{formatDate(userDetail.user.created_at)}</p>
+                    <p data-testid="text-user-joined"><span title={formatAbsoluteTime(userDetail.user.created_at)}>{formatRelativeTime(userDetail.user.created_at)}</span></p>
                   </div>
                   <div className="col-span-2">
                     <Label className="text-muted-foreground">Last Sign In</Label>
-                    <p data-testid="text-user-last-signin">{userDetail.user.last_sign_in_at ? formatDate(userDetail.user.last_sign_in_at) : 'Never signed in'}</p>
+                    <p data-testid="text-user-last-signin">
+                      <span title={formatAbsoluteTime(userDetail.user.last_sign_in_at)}>{formatRelativeTime(userDetail.user.last_sign_in_at)}</span>
+                    </p>
                   </div>
                 </div>
 
@@ -700,9 +693,9 @@ export default function UsersPage() {
                         {userDetail.invoices.map((invoice) => (
                           <TableRow key={invoice.id} data-testid={`row-invoice-${invoice.id}`}>
                             <TableCell data-testid={`text-invoice-date-${invoice.id}`}>
-                              {formatDate(invoice.created)}
+                              <span title={formatAbsoluteTime(invoice.created)}>{formatRelativeTime(invoice.created)}</span>
                             </TableCell>
-                            <TableCell data-testid={`text-invoice-amount-${invoice.id}`}>
+                            <TableCell className="tabular-nums" data-testid={`text-invoice-amount-${invoice.id}`}>
                               ${(invoice.amount_paid / 100).toFixed(2)}
                             </TableCell>
                             <TableCell>
@@ -753,7 +746,7 @@ export default function UsersPage() {
                             size="icon"
                             onClick={() => handleDeleteNote(note.id)}
                             disabled={deletingNoteId === note.id}
-                            className="text-destructive hover:text-destructive shrink-0"
+                            className="text-destructive shrink-0"
                             data-testid={`button-delete-note-${note.id}`}
                           >
                             {deletingNoteId === note.id ? (
@@ -764,7 +757,7 @@ export default function UsersPage() {
                           </Button>
                         </div>
                         <p className="text-xs text-muted-foreground" data-testid={`text-note-meta-${note.id}`}>
-                          {note.created_by_email} &middot; {formatDate(note.created_at)}
+                          {note.created_by_email} &middot; <span title={formatAbsoluteTime(note.created_at)}>{formatRelativeTime(note.created_at)}</span>
                         </p>
                       </div>
                     ))
@@ -801,28 +794,16 @@ export default function UsersPage() {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete User</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete <strong>{userToDelete?.email}</strong>? 
-              This action cannot be undone. The user will be permanently removed from the system.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteUser}
-              disabled={deleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Delete User
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={!!userToDelete}
+        onOpenChange={(open) => { if (!open) setUserToDelete(null) }}
+        title="Delete User"
+        description={`Are you sure you want to delete ${userToDelete?.email}? This action cannot be undone. The user will be permanently removed from the system.`}
+        confirmLabel="Delete User"
+        variant="destructive"
+        loading={deleting}
+        onConfirm={handleDeleteUser}
+      />
 
       <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
         <DialogContent className="sm:max-w-md">

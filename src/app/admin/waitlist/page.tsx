@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { useState, useEffect, useMemo } from 'react'
 import { useToast } from '@/hooks/use-toast'
-import { Mail, Download, Users, Trash2, Loader2, Search } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { Mail, Trash2 } from 'lucide-react'
+import { AdminDataTable, ColumnDef } from '@/components/admin/data-table'
+import { TableToolbar, FilterDef } from '@/components/admin/table-toolbar'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
+import { formatRelativeTime, formatAbsoluteTime } from '@/lib/format-relative-time'
 
 interface WaitlistEntry {
   id: number
@@ -19,8 +19,10 @@ interface WaitlistEntry {
 export default function WaitlistPage() {
   const [entries, setEntries] = useState<WaitlistEntry[]>([])
   const [loading, setLoading] = useState(true)
-  const [deleting, setDeleting] = useState<number | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [sourceFilter, setSourceFilter] = useState('all')
+  const [deleteTarget, setDeleteTarget] = useState<WaitlistEntry | null>(null)
+  const [deleting, setDeleting] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -39,13 +41,12 @@ export default function WaitlistPage() {
     }
   }
 
-  async function handleDelete(entryId: number, email: string) {
-    if (!confirm(`Remove "${email}" from the waitlist?`)) return
-
-    setDeleting(entryId)
+  async function handleDeleteConfirm() {
+    if (!deleteTarget) return
+    setDeleting(true)
     try {
-      const res = await fetch(`/api/waitlist?id=${entryId}`, { method: 'DELETE' })
-      
+      const res = await fetch(`/api/waitlist?id=${deleteTarget.id}`, { method: 'DELETE' })
+
       if (res.ok) {
         toast({ title: 'Entry removed' })
         fetchEntries()
@@ -56,45 +57,98 @@ export default function WaitlistPage() {
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to delete entry', variant: 'destructive' })
     } finally {
-      setDeleting(null)
+      setDeleting(false)
+      setDeleteTarget(null)
     }
   }
 
-  function exportCSV() {
-    const headers = ['Email', 'Name', 'Referral Source', 'Date']
-    const rows = entries.map(e => [
-      e.email,
-      e.name || '',
-      e.referral_source || '',
-      new Date(e.created_at).toLocaleDateString(),
-    ])
-    
-    const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `waitlist-${new Date().toISOString().split('T')[0]}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
-    
-    toast({ title: 'Exported!', description: `${entries.length} entries exported to CSV` })
-  }
+  const sourceOptions = useMemo(() => {
+    const sources = new Set<string>()
+    entries.forEach(e => {
+      if (e.referral_source) sources.add(e.referral_source)
+    })
+    return Array.from(sources).sort().map(s => ({ label: s, value: s }))
+  }, [entries])
 
-  const filteredEntries = entries.filter(entry => 
-    entry.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (entry.name && entry.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  )
+  const filteredEntries = useMemo(() => {
+    return entries.filter(entry => {
+      const matchesSearch =
+        !searchTerm ||
+        entry.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (entry.name && entry.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
-  if (loading) {
-    return (
-      <div className="p-[var(--section-spacing,1.5rem)]">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin" />
+      const matchesSource =
+        sourceFilter === 'all' || entry.referral_source === sourceFilter
+
+      return matchesSearch && matchesSource
+    })
+  }, [entries, searchTerm, sourceFilter])
+
+  const columns: ColumnDef<WaitlistEntry>[] = [
+    {
+      id: 'email',
+      header: 'Email',
+      accessorFn: (row) => <span className="truncate font-medium">{row.email}</span>,
+      sortable: true,
+      sortValue: (row) => row.email,
+    },
+    {
+      id: 'name',
+      header: 'Name',
+      accessorFn: (row) => <span className="text-muted-foreground">{row.name || '-'}</span>,
+      sortable: true,
+      sortValue: (row) => row.name || '',
+      hideOnMobile: true,
+    },
+    {
+      id: 'source',
+      header: 'Source',
+      accessorFn: (row) => <span className="text-muted-foreground">{row.referral_source || '-'}</span>,
+      hideOnMobile: true,
+    },
+    {
+      id: 'date',
+      header: 'Signed Up',
+      accessorFn: (row) => (
+        <span className="text-muted-foreground" title={formatAbsoluteTime(row.created_at)}>
+          {formatRelativeTime(row.created_at)}
+        </span>
+      ),
+      sortable: true,
+      sortValue: (row) => new Date(row.created_at).getTime(),
+      hideOnMobile: true,
+    },
+    {
+      id: 'actions',
+      header: '',
+      accessorFn: (row) => (
+        <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            onClick={() => setDeleteTarget(row)}
+            className="text-destructive hover:text-destructive/80 p-1"
+            data-testid={`button-delete-entry-${row.id}`}
+            aria-label={`Remove ${row.email}`}
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
         </div>
-      </div>
-    )
-  }
+      ),
+      className: 'w-[60px]',
+    },
+  ]
+
+  const filters: FilterDef[] = sourceOptions.length > 0
+    ? [
+        {
+          id: 'source',
+          label: 'Source',
+          options: sourceOptions,
+          value: sourceFilter,
+          onChange: setSourceFilter,
+        },
+      ]
+    : []
 
   return (
     <div className="p-[var(--section-spacing,1.5rem)] space-y-[var(--content-density-gap,1rem)]">
@@ -108,97 +162,51 @@ export default function WaitlistPage() {
             {entries.length} people waiting for launch
           </p>
         </div>
-        {entries.length > 0 && (
-          <Button onClick={exportCSV} variant="outline" data-testid="button-export-csv">
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
-        )}
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Signups
-                <Badge variant="secondary">{entries.length}</Badge>
-              </CardTitle>
-              <CardDescription>
-                People who signed up for early access
-              </CardDescription>
-            </div>
-            {entries.length > 0 && (
-              <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by email or name..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9"
-                  data-testid="input-search"
-                />
-              </div>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {entries.length === 0 ? (
-            <div className="text-center py-12">
-              <Mail className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] text-muted-foreground opacity-50" />
-              <p className="text-lg font-medium mb-2">No waitlist signups yet</p>
-              <p className="text-muted-foreground">Enable waitlist mode in settings to start collecting emails.</p>
-            </div>
-          ) : (
-            <div className="space-y-2 overflow-x-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-[var(--content-density-gap,1rem)] py-2 px-4 bg-muted rounded-t-lg font-medium text-sm min-w-0">
-                <span>Email</span>
-                <span className="hidden sm:block">Name</span>
-                <span className="hidden lg:block">Source</span>
-                <span className="hidden lg:block">Date</span>
-                <span className="hidden sm:block text-right">Actions</span>
-              </div>
-              {filteredEntries.length === 0 ? (
-                <div className="py-[var(--section-spacing,1.5rem)] text-center text-muted-foreground">
-                  No entries match your search
-                </div>
-              ) : (
-                filteredEntries.map((entry) => (
-                  <div 
-                    key={entry.id} 
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-[var(--content-density-gap,1rem)] py-3 px-4 border-b last:border-0 items-center"
-                    data-testid={`waitlist-entry-${entry.id}`}
-                  >
-                    <span className="truncate font-medium">{entry.email}</span>
-                    <span className="text-muted-foreground">{entry.name || '-'}</span>
-                    <span className="text-muted-foreground">{entry.referral_source || '-'}</span>
-                    <span className="text-muted-foreground">
-                      {new Date(entry.created_at).toLocaleDateString()}
-                    </span>
-                    <div className="flex sm:justify-end">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => handleDelete(entry.id, entry.email)}
-                        disabled={deleting === entry.id}
-                        className="text-destructive hover:text-destructive"
-                        data-testid={`button-delete-entry-${entry.id}`}
-                      >
-                        {deleting === entry.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <TableToolbar
+        search={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search by email or name..."
+        filters={filters}
+        csvExport={
+          entries.length > 0
+            ? {
+                filename: `waitlist-${new Date().toISOString().split('T')[0]}`,
+                headers: ['Email', 'Name', 'Referral Source', 'Date'],
+                getRows: () =>
+                  entries.map(e => [
+                    e.email,
+                    e.name || '',
+                    e.referral_source || '',
+                    new Date(e.created_at).toLocaleDateString(),
+                  ]),
+              }
+            : undefined
+        }
+        data-testid="waitlist-toolbar"
+      />
+
+      <AdminDataTable
+        columns={columns}
+        data={filteredEntries}
+        loading={loading}
+        emptyMessage="No waitlist signups yet"
+        emptyDescription="Enable waitlist mode in settings to start collecting emails."
+        getRowId={(row) => String(row.id)}
+        data-testid="waitlist-table"
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+        title="Remove from waitlist"
+        description={`Are you sure you want to remove "${deleteTarget?.email}" from the waitlist? This action cannot be undone.`}
+        confirmLabel="Remove"
+        variant="destructive"
+        loading={deleting}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   )
 }
