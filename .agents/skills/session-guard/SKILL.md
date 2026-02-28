@@ -37,6 +37,13 @@ Read these three files IN ORDER before planning or coding:
 If doing UI work, also load the `design-system` skill.
 If the blueprint references a visual pattern or UI benchmark, LOOK AT the reference images before coding. Do not interpret text descriptions alone — the images are the source of truth.
 
+## NO GUESSING — ASK FIRST
+
+- If you are unsure what something should look like, how it should behave, or what the user intended — ASK. Do not guess, assume, or interpret loosely.
+- Always check `attached_assets/` for reference images before building any UI. The blueprint's Visual Reference table catalogs what each image shows. Look at the actual images.
+- If the blueprint or docs don't answer your question, ask the user before writing code. A 30-second question saves hours of rework.
+- If your plan differs from what the blueprint describes, STOP and ask. Do not build your own version.
+
 ## SCOPE LOCK
 
 - Do exactly what the user asked. Nothing more.
@@ -54,3 +61,4 @@ Before ending any session, you MUST:
 2. Update THIS SKILL's **DO NOT TOUCH** section if anything changed
 3. Update `docs/ROADMAP.md` with the session log
 4. Update `docs/UX_OVERHAUL_BLUEPRINT.md` progress tracker if a sprint was completed
+5. If reference images were shared during this session, catalog them in the relevant doc (blueprint, design system, etc.) with filename + description. Orphaned images are invisible to future sessions.
