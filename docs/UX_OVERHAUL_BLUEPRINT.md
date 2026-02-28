@@ -106,6 +106,12 @@ These decisions were made during the Category C discussion (February 28, 2026). 
 
 All three dashboards (Admin, Affiliate, Social) use the same reusable **Dashboard Shell** template. The user learns the navigation once and it works identically everywhere. Only the content changes per page.
 
+**Visual Reference (Vercel benchmark):**
+- Top-level sidebar (open state): `attached_assets/image_1772316808365.png`
+- Drilled-down view (Flags example): `attached_assets/image_1772316861087.png`
+
+These images show the exact pattern to follow. Look at them before writing any sidebar code.
+
 **The Dashboard Shell provides:**
 
 | Zone | Contents | Behavior |
@@ -480,8 +486,6 @@ These 10 enhancements are essentially "free" — they're better defaults and sma
 **Done Test:** Admin dashboard uses vertical sidebar. User account pinned at sidebar bottom. "Recently Visited" shows last 3-5 pages. Badge counts appear on Tickets/Applications/Payouts/Users/Revenue. No horizontal nav visible. Mobile sidebar works (hamburger overlay via SidebarTrigger). Affiliates accessible at `/admin/affiliate` (redirects to `/admin/setup/affiliate`). Breadcrumbs and command palette in content header.
 
 **Addresses:** UX-01, UX-12, FR-03, FR-04, WC-02, WC-05
-
-**Note:** Drill-down sub-menus (clicking a group to replace sidebar with sub-items + back button) were not implemented in this sprint. The sidebar uses the standard shadcn/ui group-based layout matching the Social Dashboard pattern. Drill-down behavior can be added in Sprint 4B if desired.
 
 ---
 

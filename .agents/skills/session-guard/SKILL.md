@@ -35,6 +35,7 @@ Read these three files IN ORDER before planning or coding:
 3. `docs/LESSONS_LEARNED.md` — Know the anti-patterns so you don't repeat them
 
 If doing UI work, also load the `design-system` skill.
+If the blueprint references a visual pattern or UI benchmark, LOOK AT the reference images before coding. Do not interpret text descriptions alone — the images are the source of truth.
 
 ## SCOPE LOCK
 
