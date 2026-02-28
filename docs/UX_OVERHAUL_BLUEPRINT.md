@@ -13,7 +13,7 @@
 | 2 | Critical Bug Fixes | COMPLETE | BUG-01, BUG-02, BUG-03, BUG-09, BUG-10, BUG-11 |
 | 3 | More Bug Fixes + UX Quick Wins | COMPLETE | BUG-12, BUG-13, BUG-14, BUG-15, BUG-16 |
 | 4A | Dashboard Shell + Navigation | COMPLETE | UX-01, UX-12, FR-03, FR-04, WC-02, WC-05 |
-| 4B | Dashboard Shell Polish | NOT STARTED | UX-07, UX-09, WC-01 |
+| 4B | Dashboard Shell Polish | COMPLETE | UX-07, UX-09, WC-01 |
 | 5 | Command Palette + Impersonate + Cross-Linking | NOT STARTED | BUG-04–08, UX-15, FR-08 |
 | 6A | Utility Components + First 3 Page Conversions | NOT STARTED | UX-02, UX-03, UX-05, UX-06, UX-11, WC-04, WC-06, WC-07, WC-08, WC-10 |
 | 6B | Remaining Page Conversions + Verification | NOT STARTED | UX-04, UX-13, WC-04, WC-08 |
@@ -497,17 +497,17 @@ These 10 enhancements are essentially "free" — they're better defaults and sma
 
 ---
 
-### Sprint 4B: Dashboard Shell Polish + Quick Fixes
+### Sprint 4B: Dashboard Shell Polish + Quick Fixes — COMPLETE
 
 **Goal:** Add keyboard shortcuts, fix CRM tab persistence, and standardize money display across all admin pages. These are polish items that build on the Dashboard Shell from Sprint 4A.
 
-| Task | Description | Files |
-|------|-------------|-------|
-| S4B-T1 | Add keyboard shortcuts — `Cmd/Ctrl+K` opens command palette, `Cmd/Ctrl+/` focuses sidebar search, `Escape` closes drill-down and returns to top-level sidebar (WC-01) | Dashboard Shell component |
-| S4B-T2 | Fix CRM detail tab persistence — use URL search params so refreshing preserves the active tab | `src/app/admin/crm/[userId]/page.tsx` |
-| S4B-T3 | Standardize money display — show "$0.00" everywhere (never em-dash for money) and apply across admin pages | All admin pages showing currency |
+| Task | Description | Files | Status |
+|------|-------------|-------|--------|
+| S4B-T1 | Add keyboard shortcuts — `Cmd/Ctrl+K` opens command palette (already worked), `Escape` closes drill-down and returns to top-level sidebar (WC-01). Note: `Cmd/Ctrl+/` deferred — no sidebar search bar exists yet; search lives in command palette via Cmd+K. | `src/components/admin/admin-sidebar.tsx` | DONE |
+| S4B-T2 | Fix CRM detail tab persistence — use URL search params (`?tab=`) so refreshing preserves the active tab | `src/app/admin/crm/[userId]/page.tsx` | DONE |
+| S4B-T3 | Standardize money display — show "$0.00" everywhere (never em-dash for money). Fixed affiliate member table zero-earnings display. All other money fields already used `formatCurrency()` which formats zeros correctly. | `src/app/admin/setup/affiliate/page.tsx` | DONE |
 
-**Done Test:** Keyboard shortcuts work (`Cmd/Ctrl+K` opens palette, `Cmd/Ctrl+/` focuses search, `Escape` closes drill-down). CRM detail refresh preserves the active tab. Money displays consistently as "$0.00" format across all admin pages — no em-dashes for zero amounts.
+**Done Test:** `Cmd/Ctrl+K` opens palette, `Escape` closes drill-down. CRM detail refresh preserves the active tab via `?tab=` URL param. Money displays consistently as "$0.00" format — no em-dashes for zero amounts.
 
 **Addresses:** UX-07, UX-09, WC-01
 

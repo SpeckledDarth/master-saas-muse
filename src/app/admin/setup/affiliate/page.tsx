@@ -3018,7 +3018,7 @@ export default function AffiliateSettingsPage() {
                             {(m.totalEarnings || 0) > 0 ? (
                               <p className="font-medium">${((m.totalEarnings || 0) / 100).toFixed(2)}</p>
                             ) : (
-                              <p className="text-xs text-muted-foreground">—</p>
+                              <p className="text-xs text-muted-foreground">$0.00</p>
                             )}
                             {(m.pendingEarnings || 0) > 0 && (
                               <p className="text-xs text-muted-foreground">${((m.pendingEarnings || 0) / 100).toFixed(2)} pending</p>

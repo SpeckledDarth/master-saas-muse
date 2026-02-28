@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, use } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -85,10 +85,23 @@ const TABS = [
 export default function CRMDetailPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = use(params)
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const validTabs = TABS.map(t => t.id)
+  const tabFromUrl = searchParams.get('tab')
+  const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : 'profile'
 
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('profile')
+  const [activeTab, setActiveTabState] = useState(initialTab)
+
+  const setActiveTab = useCallback((tab: string) => {
+    setActiveTabState(tab)
+    const url = new URL(window.location.href)
+    url.searchParams.set('tab', tab)
+    window.history.replaceState({}, '', url.toString())
+  }, [])
+
   const [tags, setTags] = useState<any[]>([])
   const [newTag, setNewTag] = useState('')
   const [newTagColor, setNewTagColor] = useState('gray')

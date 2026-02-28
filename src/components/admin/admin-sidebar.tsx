@@ -328,6 +328,17 @@ export function AdminSidebarNav({ isAppAdmin, permissions }: AdminSidebarNavProp
   }
 
   useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && activeGroup !== null) {
+        e.preventDefault()
+        handleBack()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [activeGroup])
+
+  useEffect(() => {
     const supabase = supabaseRef.current
     if (!supabase) return
     supabase.auth.getSession().then(({ data: { session } }) => {
