@@ -374,6 +374,25 @@ Broadcast-to-outcome correlation — did the change announced in a broadcast act
 
 ---
 
+## World-Class Enhancements
+
+These 10 enhancements are essentially "free" — they're better defaults and small additions folded into work we're already doing. Each is mapped to the sprint where it naturally fits.
+
+| # | Enhancement | Sprint | Cost |
+|---|------------|--------|------|
+| WC-01 | **Keyboard shortcuts** — `Cmd/Ctrl+K` opens command palette, `Cmd/Ctrl+/` focuses sidebar search, `Escape` closes drill-down and returns to top-level sidebar | Sprint 4 | Free — wiring events to existing components |
+| WC-02 | **Recently visited** — small "Recent" section at top of sidebar showing 3-5 most recently visited pages for quick navigation | Sprint 4 | Free — building sidebar from scratch anyway |
+| WC-03 | **Coaching-language empty states** — instead of generic "No results found," each table has contextual coaching text that guides the admin toward action (e.g., "No affiliates yet. Share your affiliate program link to start recruiting partners.") | Sprint 1 | Free — just string content in the empty state prop |
+| WC-04 | **Relative timestamps with absolute tooltip** — all dates show "3 hours ago," "Yesterday," "Feb 14" with full absolute timestamp on hover. One utility function used everywhere. | Sprint 6 | Free — one function, applied during page conversions |
+| WC-05 | **Sidebar nav badge counts** — small count badges on nav items showing actionable quantities (Tickets (3), Applications (2), Payouts (1)). Attention magnets that tell the admin where to act without clicking through every page. | Sprint 4 | Free — building sidebar from scratch anyway |
+| WC-06 | **Inline health indicators on list rows** — small colored dot (green/yellow/red) next to each row based on simple rules: CRM (active/trial/churned), Affiliates (earning/dormant/flagged), Revenue (paid/pending/overdue) | Sprint 6 | Free — applying status indicator pattern already defined in Design Decision #2 |
+| WC-07 | **CSV export on every list page** — one utility function that serializes visible table data to CSV and triggers browser download. Built into TableToolbar, available on every page that uses it. | Sprint 1 (utility) + Sprint 6 (application) | Free — one function in Sprint 1, auto-available to all pages in Sprint 6 |
+| WC-08 | **Toast notifications for all mutations** — consistent success/error toasts on every save, create, update, delete action. Currently inconsistent — some pages show feedback, some don't. | Sprint 6 | Free — one line per mutation during page conversions |
+| WC-09 | **Bulk action checkboxes (foundation)** — add optional select-row checkbox column to AdminDataTable. Enables future bulk actions (bulk role change, bulk approve applications, bulk close tickets). | Sprint 1 | Low-cost — few lines in the data table component |
+| WC-10 | **Sparkline mini-charts in key list rows** — tiny 30-day trend line (thin SVG) in Revenue and Affiliate Members rows giving instant trend visibility without clicking into detail. One small reusable component. | Sprint 6 | Low-cost — one small SVG component, applied to 2-3 pages |
+
+---
+
 ## Sprint Plan
 
 Each sprint is designed to complete in one session (3-5 tasks, clear done-test). Sprints are ordered by dependency and impact.
@@ -387,14 +406,14 @@ Each sprint is designed to complete in one session (3-5 tasks, clear done-test).
 | Task | Description | Files |
 |------|-------------|-------|
 | S1-T1 | Write UX Standards rules section in `docs/DESIGN_SYSTEM_RULES.md` — define the ONE correct pattern for tables, toolbars, detail views, confirmations, empty states, loading states, pagination, money formatting, search clear buttons | `docs/DESIGN_SYSTEM_RULES.md` |
-| S1-T2 | Build `<AdminDataTable>` — reusable data table component using shadcn Table with: column definitions, clickable rows, sort state, empty state, loading skeleton, pagination | `src/components/admin/data-table.tsx` |
-| S1-T3 | Build `<TableToolbar>` — consistent search + filter + sort bar with: search input (with X clear button), filter dropdowns, sort selector, optional CSV export, optional date range, "Clear All" reset | `src/components/admin/table-toolbar.tsx` |
+| S1-T2 | Build `<AdminDataTable>` — reusable data table component using shadcn Table with: column definitions, clickable rows, sort state, coaching-language empty state prop (WC-03), loading skeleton, pagination, optional select-row checkbox column for future bulk actions (WC-09) | `src/components/admin/data-table.tsx` |
+| S1-T3 | Build `<TableToolbar>` — consistent search + filter + sort bar with: search input (with X clear button), filter dropdowns, sort selector, CSV export utility function built-in (WC-07), optional date range, "Clear All" reset | `src/components/admin/table-toolbar.tsx`, `src/lib/csv-export.ts` |
 | S1-T4 | Build `<ConfirmDialog>` — wraps shadcn AlertDialog with standard destructive confirmation pattern. Replaces all `confirm()` calls. | `src/components/admin/confirm-dialog.tsx` |
 | S1-T5 | Update the `design-system` agent skill with UX Standards rules so all future sessions enforce them automatically | `.agents/skills/design-system/SKILL.md` |
 
-**Done Test:** All 3 components render correctly in isolation. UX Standards section exists in design system rules. Agent skill updated. No pages converted yet — that's Sprint 6.
+**Done Test:** All 3 components render correctly in isolation. Empty states show coaching language. CSV export downloads a file. Checkbox column toggles row selection. UX Standards section exists in design system rules. Agent skill updated. No pages converted yet — that's Sprint 6.
 
-**Addresses:** UX-02, UX-05, UX-06, UX-08 (foundations only — application happens in later sprints)
+**Addresses:** UX-02, UX-05, UX-06, UX-08, WC-03, WC-07, WC-09 (foundations only — application happens in later sprints)
 
 ---
 
@@ -440,15 +459,16 @@ Each sprint is designed to complete in one session (3-5 tasks, clear done-test).
 
 | Task | Description | Files |
 |------|-------------|-------|
-| S4-T1 | Build the Dashboard Shell component — reusable layout with sidebar (three zones: logo at top, search + nav in middle, user account pinned at bottom), drill-down sub-menu behavior, breadcrumb bar in content area, responsive breakpoints (desktop/tablet/mobile) | `src/components/layout/dashboard-shell.tsx` |
-| S4-T2 | Build admin sidebar nav content — define all nav groups (Dashboard, People, Money, Affiliates, Support, Content, Settings, System) with sub-items and drill-down definitions. Move Affiliates to top-level (`/admin/affiliate`). Move Users/Team into "People" group near top. | `src/components/admin/admin-sidebar.tsx` |
+| S4-T1 | Build the Dashboard Shell component — reusable layout with sidebar (three zones: logo at top, search + nav in middle, user account pinned at bottom), drill-down sub-menu behavior, breadcrumb bar in content area, responsive breakpoints (desktop/tablet/mobile), "Recently Visited" section at top of nav showing 3-5 most recent pages (WC-02) | `src/components/layout/dashboard-shell.tsx` |
+| S4-T2 | Build admin sidebar nav content — define all nav groups (Dashboard, People, Money, Affiliates, Support, Content, Settings, System) with sub-items and drill-down definitions. Move Affiliates to top-level (`/admin/affiliate`). Move Users/Team into "People" group near top. Add badge counts on actionable items: Tickets, Applications, Payouts (WC-05). | `src/components/admin/admin-sidebar.tsx` |
 | S4-T3 | Update admin layout to use Dashboard Shell. Remove horizontal top-nav. Remove top header bar. Content area gets full remaining width. | `src/app/admin/layout.tsx` |
-| S4-T4 | Fix CRM detail tab persistence — use URL search params so refreshing preserves the active tab | `src/app/admin/crm/[userId]/page.tsx` |
-| S4-T5 | Standardize money display — show "$0.00" everywhere (never em-dash for money) and apply across admin pages | All admin pages showing currency |
+| S4-T4 | Add keyboard shortcuts — `Cmd/Ctrl+K` opens command palette, `Cmd/Ctrl+/` focuses sidebar search, `Escape` closes drill-down and returns to top-level sidebar (WC-01) | Dashboard Shell component |
+| S4-T5 | Fix CRM detail tab persistence — use URL search params so refreshing preserves the active tab | `src/app/admin/crm/[userId]/page.tsx` |
+| S4-T6 | Standardize money display — show "$0.00" everywhere (never em-dash for money) and apply across admin pages | All admin pages showing currency |
 
-**Done Test:** Admin dashboard uses the Dashboard Shell with vertical sidebar. Drill-down sub-menus work (e.g., clicking Affiliates replaces sidebar with affiliate sub-items + back button). User account is pinned at sidebar bottom. No horizontal nav or top header bar visible. Mobile sidebar works (hamburger overlay). Affiliates accessible at `/admin/affiliate`. CRM detail refresh preserves tab. Money displays consistently.
+**Done Test:** Admin dashboard uses the Dashboard Shell with vertical sidebar. Drill-down sub-menus work (e.g., clicking Affiliates replaces sidebar with affiliate sub-items + back button). User account is pinned at sidebar bottom. "Recently Visited" shows last 3-5 pages. Badge counts appear on Tickets/Applications/Payouts. Keyboard shortcuts work. No horizontal nav or top header bar visible. Mobile sidebar works (hamburger overlay). Affiliates accessible at `/admin/affiliate`. CRM detail refresh preserves tab. Money displays consistently.
 
-**Addresses:** UX-01, UX-07, UX-09, UX-12, FR-03, FR-04
+**Addresses:** UX-01, UX-07, UX-09, UX-12, FR-03, FR-04, WC-01, WC-02, WC-05
 
 ---
 
@@ -476,15 +496,17 @@ Each sprint is designed to complete in one session (3-5 tasks, clear done-test).
 
 | Task | Description | Files |
 |------|-------------|-------|
-| S6-T1 | Convert User Management page — replace eye icon with clickable rows, add TableToolbar, protect role editing behind intentional action (edit button → dialog), use ConfirmDialog for delete | User management admin page |
-| S6-T2 | Convert Waitlist page — replace div grid with AdminDataTable, add toolbar with search + filters | Waitlist admin page |
-| S6-T3 | Convert Team page — replace Card list with AdminDataTable, add ConfirmDialog for remove, replace `confirm()` | Team admin page |
-| S6-T4 | Convert Feedback page — replace Card list with AdminDataTable, add toolbar with status filter, replace `confirm()` for delete | Feedback admin page |
-| S6-T5 | Convert Audit Logs page — apply AdminDataTable, ensure consistent row click → dialog pattern | Audit Logs admin page |
+| S6-T1 | Convert User Management page — replace eye icon with clickable rows, add TableToolbar, protect role editing behind intentional action (edit button → dialog), use ConfirmDialog for delete. Add health dot indicators (WC-06): green=active, yellow=trial, red=churned. Use relative timestamps (WC-04). Add toast on all mutations (WC-08). | User management admin page |
+| S6-T2 | Convert Waitlist page — replace div grid with AdminDataTable, add toolbar with search + filters. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Waitlist admin page |
+| S6-T3 | Convert Team page — replace Card list with AdminDataTable, add ConfirmDialog for remove, replace `confirm()`. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Team admin page |
+| S6-T4 | Convert Feedback page — replace Card list with AdminDataTable, add toolbar with status filter, replace `confirm()` for delete. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Feedback admin page |
+| S6-T5 | Convert Audit Logs page — apply AdminDataTable, ensure consistent row click → dialog pattern. Use relative timestamps (WC-04). | Audit Logs admin page |
+| S6-T6 | Build `<Sparkline>` mini-chart component (thin SVG, 30-day trend). Apply to Revenue list (revenue trend per user) and Affiliate Members list (referral trend per affiliate) (WC-10). | `src/components/admin/sparkline.tsx`, Revenue page, Members page |
+| S6-T7 | Build `formatRelativeTime()` utility function — returns "3 hours ago," "Yesterday," "Feb 14" with full ISO timestamp available for tooltip. Used by all converted pages (WC-04). | `src/lib/format-relative-time.ts` |
 
-**Done Test:** All 5 converted pages use the same table component, same toolbar pattern, same confirmation dialogs. Rows are clickable where detail views exist. No browser `confirm()` calls remain on any converted page.
+**Done Test:** All 5 converted pages use the same table component, same toolbar pattern, same confirmation dialogs. Rows are clickable where detail views exist. No browser `confirm()` calls remain on any converted page. All dates show relative timestamps with absolute tooltip on hover. Health dots appear on User and Affiliate rows. Toast notifications confirm every mutation. Sparklines show 30-day trends on Revenue and Affiliate Members rows. CSV export works from every toolbar.
 
-**Addresses:** UX-02, UX-03, UX-04, UX-05, UX-06, UX-11, UX-13
+**Addresses:** UX-02, UX-03, UX-04, UX-05, UX-06, UX-11, UX-13, WC-04, WC-06, WC-07, WC-08, WC-10
 
 ---
 
@@ -580,6 +602,9 @@ The following items require further discussion before they can be planned. They 
 - **Affiliate Dashboard restructure** (breaking the 7,400-line monolith into route-based pages) — deserves its own blueprint after the Admin Dashboard is solid.
 - **Social Dashboard consistency audit** — already fairly consistent. Will audit after admin work is complete.
 - **Apply Dashboard Shell to Affiliate and Social dashboards** — after the Shell is proven on Admin (Sprint 4), apply to the other two dashboards in a future sprint.
+- **Connected Analytics & BI Layer** — merge Content data (scheduler) + Performance data (Plausible/GA) + Revenue data (affiliate/Stripe) into a unified intelligence layer. Enables questions no siloed tool can answer. Full vision documented in `docs/CONNECTED_DATA_VISION.md`.
+- **AI Coaching Layer** — feed connected data into AI (Grok/xAI) + n8n automation. AI identifies insights, n8n drafts actions, low-risk auto-executes, high-risk queues for admin approval. Serves admin, users, and affiliates. Depends on Connected Analytics layer. Full vision documented in `docs/CONNECTED_DATA_VISION.md`.
+- **Build sequence:** UX Overhaul (current blueprint) → Connected Analytics → AI Coaching Layer.
 
 ---
 
