@@ -1,9 +1,22 @@
 # UX Overhaul Blueprint — PassivePost Admin Dashboard
 
 > **Created:** February 28, 2026
-> **Status:** Awaiting Build Approval
+> **Status:** In Progress — Sprint 2
 > **Scope:** Fix all UI/UX inconsistencies and bugs found during human QA testing of the Admin Dashboard (Sections 0.3–1.20e of Testing Plan)
 > **Estimated Sessions:** 8 sprints (one session each)
+
+## Progress Tracker
+
+| Sprint | Name | Status | Bugs/Issues Addressed |
+|--------|------|--------|----------------------|
+| 1 | Shared UX Components + Standards | COMPLETE | UX-02, UX-05, UX-06, UX-08, WC-03, WC-07, WC-09 |
+| 2 | Critical Bug Fixes | IN PROGRESS | BUG-01, BUG-02, BUG-03, BUG-09, BUG-10, BUG-11 |
+| 3 | More Bug Fixes + UX Quick Wins | NOT STARTED | BUG-12, BUG-13, BUG-14, BUG-15, BUG-16 |
+| 4A | Dashboard Shell + Navigation | NOT STARTED | UX-01, UX-12, FR-03, FR-04, WC-02, WC-05 |
+| 4B | Dashboard Shell Polish | NOT STARTED | UX-07, UX-09, WC-01 |
+| 5 | Command Palette + Impersonate + Cross-Linking | NOT STARTED | BUG-04–08, UX-15, FR-08 |
+| 6A | Utility Components + First 3 Page Conversions | NOT STARTED | UX-02, UX-03, UX-05, UX-06, UX-11, WC-04, WC-06, WC-07, WC-08, WC-10 |
+| 6B | Remaining Page Conversions + Verification | NOT STARTED | UX-04, UX-13, WC-04, WC-08 |
 
 ---
 
@@ -629,8 +642,8 @@ The following items require further discussion before they can be planned. They 
 - **Affiliate Dashboard restructure** (breaking the 7,400-line monolith into route-based pages) — deserves its own blueprint after the Admin Dashboard is solid.
 - **Social Dashboard consistency audit** — already fairly consistent. Will audit after admin work is complete.
 - **Apply Dashboard Shell to Affiliate and Social dashboards** — after the Shell is proven on Admin (Sprint 4), apply to the other two dashboards in a future sprint.
-- **Connected Analytics & BI Layer** — merge Content data (scheduler) + Performance data (Plausible/GA) + Revenue data (affiliate/Stripe) into a unified intelligence layer. Enables questions no siloed tool can answer. Full vision documented in `docs/FUTURE PLAN - CONNECTED_DATA_VISION.md`.
-- **AI Coaching Layer** — feed connected data into AI (Grok/xAI) + n8n automation. AI identifies insights, n8n drafts actions, low-risk auto-executes, high-risk queues for admin approval. Serves admin, users, and affiliates. Depends on Connected Analytics layer. Full vision documented in `docs/FUTURE PLAN - CONNECTED_DATA_VISION.md`.
+- **Connected Analytics & BI Layer** — merge Content data (scheduler) + Performance data (Plausible/GA) + Revenue data (affiliate/Stripe) into a unified intelligence layer. Enables questions no siloed tool can answer. Full vision documented in `docs/FUTURE_PLAN_CONNECTED_DATA_VISION.md`.
+- **AI Coaching Layer** — feed connected data into AI (Grok/xAI) + n8n automation. AI identifies insights, n8n drafts actions, low-risk auto-executes, high-risk queues for admin approval. Serves admin, users, and affiliates. Depends on Connected Analytics layer. Full vision documented in `docs/FUTURE_PLAN_CONNECTED_DATA_VISION.md`.
 - **Build sequence:** UX Overhaul (current blueprint) → Connected Analytics → AI Coaching Layer.
 
 ---
