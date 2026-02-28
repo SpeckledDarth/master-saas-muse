@@ -72,15 +72,15 @@ These are not bugs per se — each page works individually — but the lack of c
 | FR-02 | File upload for marketing assets (not just URL links) | **DECIDED** | Upload files directly from admin dashboard to Supabase Storage. Affiliates can view and download from their dashboard. 10MB limit, common formats. See Design Decisions below. |
 | FR-03 | Move Affiliate admin pages to top-level (`/admin/affiliate`) | **DECIDED** | Affiliates promoted to own top-level sidebar group. URL changes from `/admin/setup/affiliate` to `/admin/affiliate`. See Design Decisions below. |
 | FR-04 | System-wide vertical sidebar navigation for all dashboards | **DECIDED** | All dashboards use the same Dashboard Shell with vertical drill-down sidebar. No horizontal nav inside dashboards. See Design Decisions below. |
-| FR-05 | Best practice defaults for all affiliate settings | Pending Discussion | Define what "best practice" means for each setting |
-| FR-06 | Grandfathering mechanism for setting changes | Pending Discussion | Complex business logic, retroactive vs. prospective |
+| FR-05 | Best practice defaults for all affiliate settings | **DECIDED** | 9 defaults agreed (20% commission, 60-day cookie, $50 min payout, etc.). Info icon tooltips on every field. "Reset to Best Practices" button. See Design Decisions below. |
+| FR-06 | Grandfathering integrity for affiliate agreements | **DECIDED** | Core term-locking already built. Audit found 6 gaps to fix. See Design Decisions below. |
 | FR-07 | Affiliate-branded discount codes | Pending Discussion | UUID-based tracking with branded alias overlay |
 | FR-08 | Cross-linking for all related data throughout admin | **DECIDED** | All detail pages use collapsible accordion sections to show related records. Every person name, amount, and entity reference is a clickable cross-link. See Design Decisions below. |
 | FR-09 | Broadcast performance data surfaced at higher level | Pending Discussion | Where to surface it — dashboard? separate analytics? |
 | FR-10 | Payout workflow documentation | Pending Discussion | Write operational documentation |
 | FR-11 | Feature documentation for all affiliate settings | Pending Discussion | Documentation effort, possibly in-app help |
 | FR-12 | Summary cards only on dashboard landing pages | **DECIDED** | KPI/summary cards appear ONLY on each dashboard's landing page (`/admin`, `/dashboard/social/overview`, `/affiliate/dashboard`). Not repeated on sub-pages. |
-| FR-13 | Settings as read-only cards vs. open forms | Pending Discussion | UX pattern for settings pages — needs deciding before Sprint 3 |
+| FR-13 | Settings page edit protection | **DECIDED** | Keep form layout but fields are non-editable by default. Admin clicks "Edit" button to unlock, then saves. Protects against accidental changes. See Design Decisions below. |
 | FR-14 | Admin's own account in Users list | **DECIDED** | Show ALL users including the admin's own account. Eliminates confusion. |
 
 ---
@@ -224,6 +224,71 @@ The current marketing assets page only supports pasting URL links. This decision
 - **Database:** Asset record stores both a `file_url` (Supabase Storage public URL) and the original `file_name`, `file_size`, `file_type` metadata
 - **Affiliate view:** Affiliates see assets on their dashboard with a download button. They can preview images inline and download any file type.
 - **Existing URL-only assets:** Continue to work. The upload is an additional option, not a replacement. An asset can have a URL link, an uploaded file, or both.
+
+### 8. Settings Page Edit Protection (FR-13)
+
+The current settings pages (affiliate commission, leaderboard, payout, re-engagement, etc.) display all fields as open, always-editable form inputs. This creates risk of accidental changes.
+
+**Decided pattern:**
+- Keep the current form layout and grouping — don't change to a card-based layout
+- All fields render as **non-editable by default** (visually styled as read-only, showing current values clearly)
+- Each logical group of fields has an **"Edit" button** that unlocks those fields for editing
+- Once in edit mode, the admin can modify the group of related fields, then **Save** or **Cancel**
+- After saving, fields return to non-editable state
+- This protects against accidental changes while keeping the familiar form layout
+- Groups that edit together: Commission Settings (rate, duration, min payout, cookie, attribution), Leaderboard Settings, Re-Engagement Settings, Payout Automation, Two-Tier Referrals, Fraud Detection, Surveys
+
+This pattern applies to all settings pages across the admin dashboard, not just affiliate settings.
+
+### 9. Best Practice Defaults + Info Tooltips (FR-05)
+
+Every affiliate settings field gets:
+1. An **info icon (ⓘ)** next to the field label that shows a tooltip on hover explaining what the field does and why the default was chosen
+2. A global **"Reset to Best Practices"** button that restores all settings to the agreed defaults with one click
+
+**Agreed defaults:**
+
+| Setting | Default Value | Tooltip Reasoning |
+|---------|---------------|-------------------|
+| Commission Rate | 20% | Industry standard for SaaS recurring. High enough to attract affiliates, sustainable for the business. |
+| Commission Type | Recurring | Incentivizes affiliates to bring quality, long-term customers rather than one-time signups. |
+| Cookie Duration | 60 days | Generous enough to capture delayed conversions. 30 is stingy, 90+ is unusual for SaaS. |
+| Minimum Payout | $50 | Low enough to not frustrate new affiliates, high enough to avoid micro-payout processing costs. |
+| Payout Frequency | Monthly | Standard in the industry. Weekly is too operationally heavy, quarterly frustrates affiliates. |
+| Earning Residual Period | 12 months | Full year of recurring commissions motivates affiliates to bring customers who stick around. |
+| Auto-Approve Applications | No (manual review) | Prevents fraud and low-quality affiliates. Quality over quantity for a growing program. |
+| Attribution Conflict Policy | First-touch (first referrer gets credit) | Simple, clear, avoids disputes between affiliates. Easy to explain and defend. |
+| Tier System | Enabled, 3 tiers (Bronze/Silver/Gold) | Gamification drives affiliate performance. Escalating rates reward top performers. |
+
+The tooltip text doubles as in-app documentation — admins can learn what each setting does without leaving the page.
+
+### 10. Grandfathering Integrity (FR-06)
+
+**The rule:** Once an affiliate is approved under specific terms, those terms are locked for the duration of their agreement. If the admin changes global settings, the change only affects affiliates enrolled after the change. Existing affiliates keep their original terms until their agreement expires. New terms can be offered but never override existing agreements.
+
+**What's already built and working:**
+
+| Component | Location | Status |
+|-----------|----------|--------|
+| Term locking on approval | `src/lib/affiliate/index.ts` → `lockInAffiliateTerms()` | Working — copies global commission rate and duration months into `referral_links` record |
+| Commission rate protection | `src/lib/affiliate/index.ts` → `getCommissionRate()` | Working — uses locked rate as floor, only overrides if performance tier offers higher rate |
+| Expiration enforcement | `src/app/api/stripe/webhook/route.ts` | Working — checks `locked_at` + `locked_duration_months` to expire the commission window |
+| Contracts table with versioning | `src/app/api/contracts/[id]/route.ts` | Working — editing an active contract creates a new version, marks old as "superseded" |
+| Two-step signing | Contract PATCH endpoint | Working — affiliate signs, admin countersigns |
+| Commission renewals | `commission_renewals` table | Exists — tracks `original_end_date`, `renewed_end_date`, status |
+
+**Gaps found during audit (must be fixed):**
+
+| Gap | Issue | Fix Required |
+|-----|-------|-------------|
+| **GAP-1** | No auto-contract on affiliate approval — affiliate can be earning commissions with no formal agreement on file | When `lockInAffiliateTerms()` runs, automatically generate a contract record with the locked values as structured data, not just freeform text |
+| **GAP-2** | Contract body is freeform text with no link to actual locked values — admin could write "30% commission" in contract text while code enforces 20% | Add structured `terms` JSONB field to contracts table that stores the actual locked values (rate, duration, cookie, min payout). Contract body remains for legal text, but `terms` field is the source of truth. |
+| **GAP-3** | Cookie duration not locked per affiliate — changing global cookie duration affects existing affiliates' attribution window | Add `locked_cookie_duration_days` to `referral_links` and populate it in `lockInAffiliateTerms()` |
+| **GAP-4** | Min payout threshold not locked per affiliate — increasing global min payout could delay existing affiliates' payouts | Add `locked_min_payout_cents` to `referral_links` and populate it in `lockInAffiliateTerms()` |
+| **GAP-5** | Affiliate-facing contract view needs verification — unclear if affiliates can see active terms, expiration, remaining months in a clear summary | Verify and fix the affiliate dashboard contract section to show: active agreement terms, effective date, expiration date, months remaining, signed status |
+| **GAP-6** | No audit trail for global settings changes — when admin changes commission rate from 25% to 20%, no audit log entry is created | Add audit log entries for all affiliate settings changes, capturing old value → new value |
+
+These gaps will be addressed in the sprint plan. GAP-1 through GAP-4 are schema/logic fixes. GAP-5 is a UI verification. GAP-6 is an audit trail addition.
 
 ---
 
@@ -423,13 +488,10 @@ At the end of Sprint 1, run a grep across all new component files to confirm zer
 The following items require further discussion before they can be planned. They are tracked here but will NOT be built until discussed and approved:
 
 **Pending Feature Requests (need discussion):**
-- **FR-05** — Best practice defaults for affiliate settings
-- **FR-06** — Grandfathering mechanism for setting changes
 - **FR-07** — Affiliate-branded discount codes
 - **FR-09** — Broadcast performance surfaced at higher level
 - **FR-10** — Payout workflow documentation
 - **FR-11** — Feature documentation for affiliate settings
-- **FR-13** — Settings as read-only cards vs. open forms (needs deciding before Sprint 3)
 
 **UX items needing discussion:**
 - **UX-10** (Breadcrumbs following history vs. sitemap) — Breadcrumbs showing site hierarchy is standard UX. Browser back button handles "return to where I came from." Need to discuss whether changing this is the right call.
@@ -448,7 +510,8 @@ The following items require further discussion before they can be planned. They 
 3. If a sprint can't finish, document exactly what's done and what remains.
 4. Sprint dependencies: Sprint 1 must complete before Sprint 6. Sprint 4 (Dashboard Shell) should complete before applying the Shell to other dashboards in future work. All other sprints are independent and can run in any order.
 5. After Sprint 6, the team will assess whether a second blueprint is needed for the Affiliate Dashboard restructure and applying the Dashboard Shell to all three dashboards.
-6. FR-13 (settings page UX pattern) must be decided before Sprint 3 begins, since Sprint 3 touches the same settings pages.
+6. FR-13 (settings page edit protection) is now decided — Sprint 3 can proceed with this pattern.
+7. Grandfathering gaps (GAP-1 through GAP-6) should be scheduled in a future sprint or added to an existing sprint that touches affiliate logic.
 
 ---
 
