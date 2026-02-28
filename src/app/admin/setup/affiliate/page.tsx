@@ -25,6 +25,7 @@ import DetailModal, { DetailField } from '@/components/admin/DetailModal'
 import HelpTooltip from '@/components/admin/HelpTooltip'
 import SortableHeader from '@/components/admin/SortableHeader'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Sparkline } from '@/components/admin/sparkline'
 
 interface Settings {
   commission_rate: number
@@ -138,6 +139,7 @@ interface AffiliateMember {
   joinedAt: string
   lastSignIn: string | null
   applicationStatus: string | null
+  earningsTrend: number[]
 }
 
 interface AdminStats {
@@ -2959,6 +2961,9 @@ export default function AffiliateSettingsPage() {
                             {memberSort.key === 'totalEarnings' ? (memberSort.dir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
                           </button>
                         </th>
+                        <th className="pb-2 px-3 font-medium text-center hidden lg:table-cell">
+                          <span className="text-muted-foreground">30d Trend</span>
+                        </th>
                         <th className="pb-2 px-3 font-medium text-right">
                           <button onClick={() => toggleMemberSort('joinedAt')} className="flex items-center gap-1 hover:text-foreground text-muted-foreground ml-auto" data-testid="sort-joined">
                             Joined
@@ -3023,6 +3028,13 @@ export default function AffiliateSettingsPage() {
                             )}
                             {(m.pendingEarnings || 0) > 0 && (
                               <p className="text-xs text-muted-foreground">${((m.pendingEarnings || 0) / 100).toFixed(2)} pending</p>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-center hidden lg:table-cell">
+                            {m.earningsTrend && m.earningsTrend.some((v: number) => v > 0) ? (
+                              <Sparkline data={m.earningsTrend} width={60} height={16} color="hsl(var(--success))" />
+                            ) : (
+                              <span className="text-[10px] text-muted-foreground">—</span>
                             )}
                           </td>
                           <td className="py-3 px-3 text-right">

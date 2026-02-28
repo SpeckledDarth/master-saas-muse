@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, Search, Download, ChevronLeft, ChevronRight, DollarSign } from 'lucide-react'
+import { Sparkline } from '@/components/admin/sparkline'
 
 const TX_TYPE_COLORS: Record<string, string> = {
   invoice: 'bg-primary/10 text-primary',
@@ -52,7 +53,7 @@ export default function RevenuePage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
-  const [summary, setSummary] = useState({ totalRevenue: 0, pendingCommissions: 0, outstandingPayouts: 0 })
+  const [summary, setSummary] = useState({ totalRevenue: 0, pendingCommissions: 0, outstandingPayouts: 0, dailyTrend: [] as number[] })
   const [loading, setLoading] = useState(true)
 
   const [search, setSearch] = useState('')
@@ -82,7 +83,7 @@ export default function RevenuePage() {
         setTransactions(data.transactions || [])
         setTotal(data.total || 0)
         setTotalPages(data.totalPages || 1)
-        setSummary(data.summary || { totalRevenue: 0, pendingCommissions: 0, outstandingPayouts: 0 })
+        setSummary(data.summary || { totalRevenue: 0, pendingCommissions: 0, outstandingPayouts: 0, dailyTrend: [] })
       }
     } catch {
     } finally {
@@ -153,7 +154,13 @@ export default function RevenuePage() {
       <div className="grid grid-cols-3 gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
         <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-total-revenue">
           <p className="text-xs text-muted-foreground mb-1">Total Revenue</p>
-          <p className="text-lg font-bold text-[hsl(var(--success))]">{formatCurrency(summary.totalRevenue)}</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-lg font-bold text-[hsl(var(--success))]">{formatCurrency(summary.totalRevenue)}</p>
+            {summary.dailyTrend.length >= 2 && (
+              <Sparkline data={summary.dailyTrend} width={80} height={20} color="hsl(var(--success))" />
+            )}
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-1">30-day trend</p>
         </div>
         <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-pending-commissions">
           <p className="text-xs text-muted-foreground mb-1">Pending Commissions</p>

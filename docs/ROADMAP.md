@@ -831,6 +831,26 @@ Completed the UX Overhaul Blueprint by executing Sprint 6B — converting the la
 
 ---
 
+### Session — February 28, 2026 (Gap Closure: Sparkline Wiring + Discount Code Detail View)
+
+Closed 3 gaps found during full blueprint audit: wired Sparklines into Revenue and Affiliate Members, made discount codes clickable, and corrected the Sprint 6B Done Test.
+
+1. **Wired Sparkline into Revenue page** — Added `dailyTrend` (30-day daily revenue array) to the `/api/admin/revenue` response, computed from already-loaded transaction data without extra DB queries. Imported the shared `Sparkline` component into the Revenue page and added it to the Total Revenue summary card with "30-day trend" label.
+
+2. **Wired Sparkline into Affiliate Members table** — Added `earningsTrend` (30-day commission array per member) to the `/api/affiliate/members` response, computed from already-loaded commission data. Added a "30d Trend" column to the Members table showing a sparkline per affiliate (hidden on small screens via `hidden lg:table-cell`). Shows em-dash when no earnings data exists.
+
+3. **Made discount codes clickable (UX-13)** — Added a detail dialog that opens when clicking a discount code row. Shows code name, status badge, discount value, duration, usage stats, revenue impact, linked affiliate (with CRM cross-link), Stripe IDs, and action buttons (Edit, Copy Code). All action buttons use `stopPropagation` to prevent triggering the detail dialog.
+
+4. **Analyzed duplicate sparkline implementations** — Confirmed `SparklineChart` in `admin/page.tsx` (bar chart with day labels) and 3 visualization types in `flywheel-reports.tsx` (dual bars, progress bars) are intentionally different from the shared SVG polyline `Sparkline`. Documented the distinction rather than forcing consolidation.
+
+5. **Updated Sprint 6B Done Test** — Corrected the Done Test in the blueprint to accurately reflect what was built, including sparkline placement and discount code clickability. Added WC-10 to the addressed items.
+
+**Files modified:** `src/app/admin/revenue/page.tsx`, `src/app/api/admin/revenue/route.ts`, `src/app/admin/setup/affiliate/page.tsx`, `src/app/api/affiliate/members/route.ts`, `src/app/admin/setup/discount-codes/page.tsx`, `docs/UX_OVERHAUL_BLUEPRINT.md`
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience

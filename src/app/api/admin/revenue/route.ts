@@ -212,6 +212,18 @@ export async function GET(request: NextRequest) {
     const pendingCommissions = commissionItems.filter(t => t.status === 'pending').reduce((s, t) => s + t.amount_cents, 0)
     const outstandingPayouts = payoutItems.filter(t => t.status === 'pending' || t.status === 'processing').reduce((s, t) => s + t.amount_cents, 0)
 
+    const dailyTrend: number[] = []
+    const now = new Date()
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now)
+      d.setDate(d.getDate() - i)
+      const dayStr = d.toISOString().slice(0, 10)
+      const dayTotal = transactions
+        .filter(t => (t.type === 'invoice' || t.type === 'payment') && (t.status === 'paid' || t.status === 'succeeded') && t.date.slice(0, 10) === dayStr)
+        .reduce((sum, t) => sum + t.amount_cents, 0)
+      dailyTrend.push(dayTotal)
+    }
+
     const total = transactions.length
     const start = (page - 1) * limit
     const paginated = transactions.slice(start, start + limit)
@@ -222,7 +234,7 @@ export async function GET(request: NextRequest) {
       page,
       limit,
       totalPages: Math.ceil(total / limit),
-      summary: { totalRevenue, pendingCommissions, outstandingPayouts },
+      summary: { totalRevenue, pendingCommissions, outstandingPayouts, dailyTrend },
     })
   } catch (err) {
     console.error('Revenue list error:', err)

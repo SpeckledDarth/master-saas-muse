@@ -13,8 +13,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import {
   Loader2, Plus, Trash2, Pencil, Copy, Check, Tag,
   Percent, DollarSign, TicketPercent, Pause, Play, Archive,
+  ExternalLink, Calendar, Clock, Users, Hash, Link2,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import NextLink from 'next/link'
 
 interface DiscountCode {
   id: string
@@ -79,6 +81,7 @@ export default function DiscountCodesPage() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
+  const [detailCode, setDetailCode] = useState<DiscountCode | null>(null)
   const { toast } = useToast()
 
   const fetchData = useCallback(async () => {
@@ -456,7 +459,7 @@ export default function DiscountCodesPage() {
           ) : (
             <div className="space-y-2">
               {codes.map(code => (
-                <div key={code.id} className="flex items-center justify-between p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border" data-testid={`code-${code.id}`}>
+                <div key={code.id} className="flex items-center justify-between p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border cursor-pointer hover-elevate transition-colors" onClick={() => setDetailCode(code)} data-testid={`code-${code.id}`}>
                   <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-mono font-bold text-sm">{code.code}</span>
@@ -464,7 +467,7 @@ export default function DiscountCodesPage() {
                         variant="ghost"
                         size="sm"
                         className="h-6 w-6 p-0"
-                        onClick={() => handleCopy(code.code)}
+                        onClick={(e) => { e.stopPropagation(); handleCopy(code.code) }}
                         data-testid={`button-copy-${code.id}`}
                       >
                         {copied === code.code ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
@@ -488,7 +491,7 @@ export default function DiscountCodesPage() {
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-1 shrink-0" onClick={e => e.stopPropagation()}>
                     {code.status === 'active' && (
                       <Button variant="ghost" size="sm" onClick={() => handleStatusChange(code, 'paused')} title="Pause" data-testid={`button-pause-${code.id}`}>
                         <Pause className="h-3.5 w-3.5" />
@@ -512,6 +515,151 @@ export default function DiscountCodesPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={!!detailCode} onOpenChange={(open) => { if (!open) setDetailCode(null) }}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" data-testid="dialog-code-detail">
+          {detailCode && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono">{detailCode.code}</span>
+                  <Badge variant={STATUS_BADGES[detailCode.status] as any || 'outline'} className="text-xs capitalize">
+                    {detailCode.status}
+                  </Badge>
+                </DialogTitle>
+                <DialogDescription>
+                  {detailCode.description || 'No description provided'}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-[var(--content-density-gap,1rem)]">
+                <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Percent className="h-3 w-3" /> Discount</p>
+                    <p className="text-sm font-medium" data-testid="detail-discount-value">
+                      {detailCode.discount_type === 'percentage'
+                        ? `${detailCode.discount_value}% off`
+                        : `$${(detailCode.discount_value / 100).toFixed(2)} off`
+                      }
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> Duration</p>
+                    <p className="text-sm font-medium" data-testid="detail-duration">
+                      {detailCode.duration === 'once' && 'First payment only'}
+                      {detailCode.duration === 'repeating' && `${detailCode.duration_months} months`}
+                      {detailCode.duration === 'forever' && 'Forever'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" /> Usage Count</p>
+                    <p className="text-sm font-medium tabular-nums" data-testid="detail-usage-count">
+                      {detailCode.total_uses}{detailCode.max_uses ? ` / ${detailCode.max_uses}` : ''} redemptions
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="h-3 w-3" /> Per-User Limit</p>
+                    <p className="text-sm font-medium tabular-nums" data-testid="detail-per-user-limit">
+                      {detailCode.max_uses_per_user} per user
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1"><DollarSign className="h-3 w-3" /> Revenue Impact</p>
+                    <p className="text-sm font-medium tabular-nums" data-testid="detail-revenue-impact">
+                      ${(detailCode.total_discount_cents / 100).toFixed(2)} discounted
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Tag className="h-3 w-3" /> Stackable</p>
+                    <p className="text-sm font-medium" data-testid="detail-stackable">
+                      {detailCode.stackable ? 'Yes' : 'No'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" /> Created</p>
+                    <p className="text-sm font-medium" data-testid="detail-created-at">
+                      {new Date(detailCode.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" /> Last Updated</p>
+                    <p className="text-sm font-medium" data-testid="detail-updated-at">
+                      {new Date(detailCode.updated_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+
+                {detailCode.expires_at && (
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" /> Expires</p>
+                    <p className="text-sm font-medium" data-testid="detail-expires-at">
+                      {new Date(detailCode.expires_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </p>
+                  </div>
+                )}
+
+                {detailCode.min_plan && (
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Minimum Plan</p>
+                    <p className="text-sm font-medium capitalize" data-testid="detail-min-plan">{detailCode.min_plan}</p>
+                  </div>
+                )}
+
+                {detailCode.affiliate_user_id && (
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Link2 className="h-3 w-3" /> Linked Affiliate</p>
+                    <NextLink
+                      href={`/admin/crm/${detailCode.affiliate_user_id}`}
+                      className="inline-flex items-center gap-1 text-sm font-medium text-foreground hover:underline"
+                      data-testid="link-affiliate-crm"
+                    >
+                      View in CRM <ExternalLink className="h-3 w-3" />
+                    </NextLink>
+                  </div>
+                )}
+
+                {(detailCode.stripe_coupon_id || detailCode.stripe_promotion_code_id) && (
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Stripe Integration</p>
+                    <div className="text-xs text-muted-foreground space-y-0.5">
+                      {detailCode.stripe_coupon_id && <p data-testid="detail-stripe-coupon">Coupon: {detailCode.stripe_coupon_id}</p>}
+                      {detailCode.stripe_promotion_code_id && <p data-testid="detail-stripe-promo">Promo: {detailCode.stripe_promotion_code_id}</p>}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => { setDetailCode(null); openEdit(detailCode) }}
+                    data-testid="button-detail-edit"
+                  >
+                    <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => { handleCopy(detailCode.code) }}
+                    data-testid="button-detail-copy"
+                  >
+                    {copied === detailCode.code ? <Check className="h-3.5 w-3.5 mr-1" /> : <Copy className="h-3.5 w-3.5 mr-1" />}
+                    Copy Code
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

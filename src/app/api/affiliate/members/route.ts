@@ -79,9 +79,15 @@ export async function GET() {
 
     const { data: commissions } = await admin
       .from('affiliate_commissions')
-      .select('affiliate_user_id, commission_amount_cents, status')
+      .select('affiliate_user_id, commission_amount_cents, status, created_at')
 
     const earningsMap: Record<string, { pending: number; approved: number; paid: number }> = {}
+    const trendMap: Record<string, Record<string, number>> = {}
+    const now = new Date()
+    const thirtyDaysAgo = new Date(now)
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29)
+    const trendStartStr = thirtyDaysAgo.toISOString().slice(0, 10)
+
     for (const c of commissions || []) {
       if (!earningsMap[c.affiliate_user_id]) {
         earningsMap[c.affiliate_user_id] = { pending: 0, approved: 0, paid: 0 }
@@ -89,6 +95,24 @@ export async function GET() {
       if (c.status === 'pending') earningsMap[c.affiliate_user_id].pending += c.commission_amount_cents
       else if (c.status === 'approved') earningsMap[c.affiliate_user_id].approved += c.commission_amount_cents
       else if (c.status === 'paid') earningsMap[c.affiliate_user_id].paid += c.commission_amount_cents
+
+      if (c.created_at && c.created_at.slice(0, 10) >= trendStartStr) {
+        const dayStr = c.created_at.slice(0, 10)
+        if (!trendMap[c.affiliate_user_id]) trendMap[c.affiliate_user_id] = {}
+        trendMap[c.affiliate_user_id][dayStr] = (trendMap[c.affiliate_user_id][dayStr] || 0) + (c.commission_amount_cents || 0)
+      }
+    }
+
+    function buildTrendArray(userId: string): number[] {
+      const userTrend = trendMap[userId] || {}
+      const trend: number[] = []
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(now)
+        d.setDate(d.getDate() - i)
+        const dayStr = d.toISOString().slice(0, 10)
+        trend.push(userTrend[dayStr] || 0)
+      }
+      return trend
     }
 
     const members = links.map((link: any) => {
@@ -128,6 +152,7 @@ export async function GET() {
         joinedAt: link.created_at,
         lastSignIn: userData.lastSignIn,
         applicationStatus: appData?.status || null,
+        earningsTrend: buildTrendArray(link.user_id),
       }
     })
 
