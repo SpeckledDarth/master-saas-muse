@@ -44,9 +44,7 @@ export function Header() {
   const { resolvedTheme } = useTheme()
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const isSocialDashboard = pathname?.startsWith('/dashboard/social')
-  const isAffiliateDashboard = pathname?.startsWith('/affiliate/dashboard')
-  const hideHeader = isSocialDashboard || isAffiliateDashboard
+  const hideHeader = pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard') || pathname?.startsWith('/affiliate/dashboard')
 
   useEffect(() => {
     if (hideHeader) return

@@ -181,9 +181,36 @@ export async function GET(request: NextRequest) {
         transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     }
 
-    const totalRevenue = transactions.filter(t => t.type === 'invoice' && t.status === 'paid').reduce((s, t) => s + t.amount_cents, 0)
-    const pendingCommissions = transactions.filter(t => t.type === 'commission' && t.status === 'pending').reduce((s, t) => s + t.amount_cents, 0)
-    const outstandingPayouts = transactions.filter(t => t.type === 'payout' && (t.status === 'pending' || t.status === 'processing')).reduce((s, t) => s + t.amount_cents, 0)
+    let revenueItems: { amount_cents: number; status: string }[] = []
+    let commissionItems: { amount_cents: number; status: string }[] = []
+    let payoutItems: { amount_cents: number; status: string }[] = []
+    try {
+      const [invRes, payRes, comRes, poRes] = await Promise.all([
+        adminClient.from('invoices').select('id, amount_paid_cents, amount_due_cents, status'),
+        adminClient.from('payments').select('amount_cents, status, invoice_id'),
+        adminClient.from('affiliate_commissions').select('amount_cents, status'),
+        adminClient.from('affiliate_payouts').select('amount_cents, status'),
+      ])
+      if (!invRes.error && invRes.data) {
+        const invoiceIds = new Set(invRes.data.map((inv: any) => inv.id))
+        revenueItems = invRes.data.map((inv: any) => ({ amount_cents: inv.amount_paid_cents || inv.amount_due_cents || 0, status: inv.status || 'unknown' }))
+        if (!payRes.error && payRes.data) {
+          for (const p of payRes.data) {
+            if (!p.invoice_id || !invoiceIds.has(p.invoice_id)) {
+              revenueItems.push({ amount_cents: p.amount_cents || 0, status: p.status || 'unknown' })
+            }
+          }
+        }
+      } else if (!payRes.error && payRes.data) {
+        revenueItems = payRes.data.map((p: any) => ({ amount_cents: p.amount_cents || 0, status: p.status || 'unknown' }))
+      }
+      if (!comRes.error && comRes.data) commissionItems = comRes.data.map((c: any) => ({ amount_cents: c.amount_cents || 0, status: c.status || 'pending' }))
+      if (!poRes.error && poRes.data) payoutItems = poRes.data.map((p: any) => ({ amount_cents: p.amount_cents || 0, status: p.status || 'pending' }))
+    } catch {}
+
+    const totalRevenue = revenueItems.filter(t => t.status === 'paid' || t.status === 'succeeded').reduce((s, t) => s + t.amount_cents, 0)
+    const pendingCommissions = commissionItems.filter(t => t.status === 'pending').reduce((s, t) => s + t.amount_cents, 0)
+    const outstandingPayouts = payoutItems.filter(t => t.status === 'pending' || t.status === 'processing').reduce((s, t) => s + t.amount_cents, 0)
 
     const total = transactions.length
     const start = (page - 1) * limit

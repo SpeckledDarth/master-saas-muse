@@ -55,6 +55,7 @@ interface Milestone {
   description: string | null
   is_active: boolean
   sort_order: number
+  earned_count?: number
 }
 
 interface Broadcast {
@@ -3175,14 +3176,9 @@ export default function AffiliateSettingsPage() {
                               {ms.referral_threshold} referrals = ${(ms.bonus_amount_cents / 100).toFixed(2)} bonus
                             </p>
                             {ms.description && <p className="text-xs text-muted-foreground italic">{ms.description}</p>}
-                            {(() => {
-                              const earned = members.filter(m => m.isAffiliate && m.referrals >= ms.referral_threshold).length
-                              return (
-                                <p className={`text-xs mt-0.5 ${earned > 0 ? 'text-[hsl(var(--success))]' : 'text-muted-foreground'}`} data-testid={`text-milestone-earned-${ms.id}`}>
-                                  {earned} affiliate{earned !== 1 ? 's' : ''} earned
-                                </p>
-                              )
-                            })()}
+                            <p className={`text-xs mt-0.5 ${(ms.earned_count || 0) > 0 ? 'text-[hsl(var(--success))]' : 'text-muted-foreground'}`} data-testid={`text-milestone-earned-${ms.id}`}>
+                              {ms.earned_count || 0} affiliate{(ms.earned_count || 0) !== 1 ? 's' : ''} earned
+                            </p>
                           </div>
                           <Badge variant={ms.is_active ? 'default' : 'outline'} className={ms.is_active ? 'text-xs bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))] border-[hsl(var(--success)/0.3)]' : 'text-xs'}>{ms.is_active ? 'Active' : 'Inactive'}</Badge>
                         </div>

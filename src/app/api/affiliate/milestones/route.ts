@@ -30,17 +30,29 @@ export async function GET(request: NextRequest) {
       const auth = await requireAdmin()
       if (!auth) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
 
-      const { data, error } = await admin
-        .from('affiliate_milestones')
-        .select('*')
-        .order('referral_threshold', { ascending: true })
+      const [milestonesRes, awardsRes] = await Promise.all([
+        admin.from('affiliate_milestones').select('*').order('referral_threshold', { ascending: true }),
+        admin.from('affiliate_milestone_awards').select('milestone_id'),
+      ])
 
-      if (error) {
-        if (error.code === '42P01') return NextResponse.json({ milestones: [], note: 'Table not created yet' })
-        return NextResponse.json({ error: error.message }, { status: 500 })
+      if (milestonesRes.error) {
+        if (milestonesRes.error.code === '42P01') return NextResponse.json({ milestones: [], note: 'Table not created yet' })
+        return NextResponse.json({ error: milestonesRes.error.message }, { status: 500 })
       }
 
-      return NextResponse.json({ milestones: data || [] })
+      const awardCounts = new Map<string, number>()
+      if (!awardsRes.error && awardsRes.data) {
+        for (const a of awardsRes.data) {
+          awardCounts.set(a.milestone_id, (awardCounts.get(a.milestone_id) || 0) + 1)
+        }
+      }
+
+      const milestones = (milestonesRes.data || []).map((m: any) => ({
+        ...m,
+        earned_count: awardCounts.get(m.id) || 0,
+      }))
+
+      return NextResponse.json({ milestones })
     }
 
     const supabase = await createClient()

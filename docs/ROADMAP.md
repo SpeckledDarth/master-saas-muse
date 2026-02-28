@@ -700,6 +700,28 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 
 **Next session should start with:** Sprint 2 — Critical Bug Fixes. See `docs/UX_OVERHAUL_BLUEPRINT.md` → Sprint 2.
 
+### Session — February 28, 2026 (UX Overhaul Blueprint — Sprint 2)
+
+**Sprint 2: Critical Bug Fixes** — COMPLETE
+
+**What was accomplished:**
+
+1. **Fixed login redirect (BUG-01/02)** — Extended `/api/user/role` to return `isTeamMember` and `hasActiveSubscription`. Updated login page to redirect: admin → `/admin`, team member → `/admin`, affiliate → `/affiliate/dashboard`, paid subscriber → `/dashboard/social/overview`. Updated auth callback route with same role-based redirect for OAuth/magic link logins.
+
+2. **Hidden marketing header on dashboards (BUG-03)** — Updated `src/components/layout/header.tsx` to hide for all `/admin/*`, `/dashboard/*`, and `/affiliate/dashboard/*` routes. Previously only hid for `/dashboard/social` and `/affiliate/dashboard`.
+
+3. **Fixed Revenue summary $0.00 (BUG-09)** — Root cause: summary stats were calculated from the filtered transaction list (filters could zero it out), and only checked for status `'paid'` while payments use `'succeeded'`. Fix: summary now queries all invoices + payments independently of filters, accepts both `'paid'` and `'succeeded'` statuses, and deduplicates payments that have a matching invoice_id to prevent double-counting.
+
+4. **Fixed CRM revenue column empty (BUG-10)** — Same root cause as BUG-09. Fix: CRM revenue aggregation now accepts both `'paid'` and `'succeeded'` invoice statuses, and also includes standalone payments (deduplicated against invoices by invoice_id).
+
+5. **Fixed milestone earned count (BUG-11)** — Root cause: "affiliates earned" count was calculated client-side by filtering members whose referral count exceeded the threshold, meaning a new milestone immediately showed existing qualifying affiliates. Fix: admin milestone API now queries `affiliate_milestone_awards` table to count actual awards per milestone. UI displays `earned_count` from API instead of live calculation.
+
+**Files modified:** `src/app/api/user/role/route.ts`, `src/app/(auth)/login/page.tsx`, `src/app/auth/callback/route.ts`, `src/components/layout/header.tsx`, `src/app/api/admin/revenue/route.ts`, `src/app/api/admin/crm/route.ts`, `src/app/api/affiliate/milestones/route.ts`, `src/app/admin/setup/affiliate/page.tsx`
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
+**Next session should start with:** Sprint 3 — More Bug Fixes + UX Quick Wins (BUG-12 through BUG-16).
+
 ---
 
 ## Related Documentation

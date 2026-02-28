@@ -10,7 +10,7 @@
 | Sprint | Name | Status | Bugs/Issues Addressed |
 |--------|------|--------|----------------------|
 | 1 | Shared UX Components + Standards | COMPLETE | UX-02, UX-05, UX-06, UX-08, WC-03, WC-07, WC-09 |
-| 2 | Critical Bug Fixes | IN PROGRESS | BUG-01, BUG-02, BUG-03, BUG-09, BUG-10, BUG-11 |
+| 2 | Critical Bug Fixes | COMPLETE | BUG-01, BUG-02, BUG-03, BUG-09, BUG-10, BUG-11 |
 | 3 | More Bug Fixes + UX Quick Wins | NOT STARTED | BUG-12, BUG-13, BUG-14, BUG-15, BUG-16 |
 | 4A | Dashboard Shell + Navigation | NOT STARTED | UX-01, UX-12, FR-03, FR-04, WC-02, WC-05 |
 | 4B | Dashboard Shell Polish | NOT STARTED | UX-07, UX-09, WC-01 |
@@ -430,17 +430,17 @@ These 10 enhancements are essentially "free" — they're better defaults and sma
 
 ---
 
-### Sprint 2: Critical Bug Fixes
+### Sprint 2: Critical Bug Fixes — COMPLETE
 
 **Goal:** Fix the highest-impact functional bugs that make the product feel broken. These are independent of the UX component work.
 
-| Task | Description | Files |
-|------|-------------|-------|
-| S2-T1 | Fix login redirect — paid users should land on `/dashboard/social/overview`, team members on `/admin` (not homepage) | Auth callback route or middleware |
-| S2-T2 | Hide marketing header/banner on all dashboard routes (`/admin/*`, `/dashboard/*`, `/affiliate/*`) | `src/components/layout/header.tsx` |
-| S2-T3 | Fix Revenue summary stats showing $0.00 — trace the aggregation query and fix the data path | `src/app/admin/revenue/page.tsx`, related API route |
-| S2-T4 | Fix CRM list revenue column showing empty — verify the join/query matches the Revenue page's data source | `src/app/admin/crm/page.tsx`, related API route |
-| S2-T5 | Fix milestone earned count — newly created milestones should show 0, not a hardcoded number | Milestone component or API route |
+| Task | Description | Files | Status |
+|------|-------------|-------|--------|
+| S2-T1 | Fix login redirect — paid users should land on `/dashboard/social/overview`, team members on `/admin` (not homepage) | `src/app/api/user/role/route.ts`, `src/app/(auth)/login/page.tsx`, `src/app/auth/callback/route.ts` | DONE |
+| S2-T2 | Hide marketing header/banner on all dashboard routes (`/admin/*`, `/dashboard/*`, `/affiliate/*`) | `src/components/layout/header.tsx` | DONE |
+| S2-T3 | Fix Revenue summary stats showing $0.00 — summary now uses unfiltered data, accepts both 'paid' and 'succeeded' statuses, deduplicates invoice+payment records | `src/app/api/admin/revenue/route.ts` | DONE |
+| S2-T4 | Fix CRM list revenue column showing empty — now accepts both 'paid' and 'succeeded' statuses, includes payments (deduplicated against invoices) | `src/app/api/admin/crm/route.ts` | DONE |
+| S2-T5 | Fix milestone earned count — now uses actual `affiliate_milestone_awards` table instead of live threshold calculation | `src/app/api/affiliate/milestones/route.ts`, `src/app/admin/setup/affiliate/page.tsx` | DONE |
 
 **Done Test:** Login as paid user → lands on social dashboard. Login as team member → lands on admin. No marketing header on any dashboard. Revenue stats show real numbers. CRM revenue column matches Revenue page data. New milestones show 0 earned.
 

@@ -50,12 +50,12 @@ export async function GET(request: NextRequest) {
   }
 
   if (authenticated) {
+    const admin = createAdminClient()
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const refCode = request.cookies.get('pp_ref')?.value
         if (refCode) {
-          const admin = createAdminClient()
           const { data: existing } = await admin
             .from('affiliate_referrals')
             .select('id')
@@ -84,6 +84,29 @@ export async function GET(request: NextRequest) {
                 updated_at: new Date().toISOString(),
               }).eq('id', affiliateLink.id)
             }
+          }
+        }
+
+        if (sanitizedNext === '/') {
+          try {
+            const [roleRes, memberRes, subRes] = await Promise.all([
+              admin.from('user_roles').select('role').eq('user_id', user.id).maybeSingle(),
+              admin.from('organization_members').select('role').eq('user_id', user.id).limit(1).maybeSingle(),
+              admin.from('subscriptions').select('status').eq('user_id', user.id).in('status', ['active', 'trialing']).limit(1).maybeSingle(),
+            ])
+
+            const role = roleRes.data?.role
+            if (role === 'admin' || memberRes.data) {
+              return NextResponse.redirect(new URL('/admin', request.url))
+            }
+            if (role === 'affiliate') {
+              return NextResponse.redirect(new URL('/affiliate/dashboard', request.url))
+            }
+            if (subRes.data) {
+              return NextResponse.redirect(new URL('/dashboard/social/overview', request.url))
+            }
+          } catch (roleErr) {
+            console.error('Role-based redirect in callback:', roleErr)
           }
         }
       }

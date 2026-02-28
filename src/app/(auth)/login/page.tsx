@@ -77,12 +77,20 @@ function LoginForm() {
       const roleRes = await fetch('/api/user/role')
       if (roleRes.ok) {
         const roleData = await roleRes.json()
+        if (roleData.role === 'admin') {
+          router.push('/admin')
+          return
+        }
+        if (roleData.isTeamMember) {
+          router.push('/admin')
+          return
+        }
         if (roleData.role === 'affiliate') {
           router.push('/affiliate/dashboard')
           return
         }
-        if (roleData.role === 'admin') {
-          router.push('/admin')
+        if (roleData.hasActiveSubscription) {
+          router.push('/dashboard/social/overview')
           return
         }
       }

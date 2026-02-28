@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     } catch {}
 
     try {
-      const { data, error } = await adminClient.from('invoices').select('user_id, amount_paid_cents, status')
+      const { data, error } = await adminClient.from('invoices').select('id, user_id, amount_paid_cents, status')
       if (!error && data) invoices = data
     } catch {}
 
@@ -99,10 +99,22 @@ export async function GET(request: NextRequest) {
     const affiliateSet = new Set(affiliateProfiles.map(a => a.user_id))
     const orgMemberSet = new Map(orgMembers.map(m => [m.user_id, m.role]))
 
+    const invoiceIds = new Set(invoices.map((inv: any) => inv.id).filter(Boolean))
     const revenueByUser = new Map<string, number>()
     for (const inv of invoices) {
-      if (inv.status === 'paid' && inv.user_id) {
+      if ((inv.status === 'paid' || inv.status === 'succeeded') && inv.user_id) {
         revenueByUser.set(inv.user_id, (revenueByUser.get(inv.user_id) || 0) + (inv.amount_paid_cents || 0))
+      }
+    }
+
+    let payments: any[] = []
+    try {
+      const { data, error } = await adminClient.from('payments').select('user_id, amount_cents, status, invoice_id')
+      if (!error && data) payments = data
+    } catch {}
+    for (const p of payments) {
+      if (p.status === 'succeeded' && p.user_id && (!p.invoice_id || !invoiceIds.has(p.invoice_id))) {
+        revenueByUser.set(p.user_id, (revenueByUser.get(p.user_id) || 0) + (p.amount_cents || 0))
       }
     }
 
