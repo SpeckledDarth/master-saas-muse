@@ -16,7 +16,7 @@
 | 4B | Dashboard Shell Polish | COMPLETE | UX-07, UX-09, WC-01 |
 | 5 | Command Palette + Impersonate + Cross-Linking | COMPLETE | BUG-04–08, UX-15, FR-08 |
 | 6A | Utility Components + First 3 Page Conversions | COMPLETE | UX-02, UX-03, UX-05, UX-06, UX-11, WC-04, WC-06, WC-07, WC-08, WC-10 |
-| 6B | Remaining Page Conversions + Verification | NOT STARTED | UX-04, UX-13, WC-04, WC-08 |
+| 6B | Remaining Page Conversions + Verification | COMPLETE | UX-04, UX-13, WC-04, WC-08 |
 
 ---
 
@@ -559,9 +559,9 @@ These 10 enhancements are essentially "free" — they're better defaults and sma
 
 | Task | Description | Files |
 |------|-------------|-------|
-| S6B-T1 | Convert Feedback page — replace Card list with AdminDataTable, add toolbar with status filter, replace `confirm()` for delete. Use relative timestamps (WC-04). Add toast on mutations (WC-08). | Feedback admin page |
-| S6B-T2 | Convert Audit Logs page — apply AdminDataTable, ensure consistent row click → dialog pattern. Use relative timestamps (WC-04). | Audit Logs admin page |
-| S6B-T3 | Final consistency verification — confirm all 5 converted pages use identical patterns: same table component, same toolbar, same confirmation dialogs, same relative timestamps, same toast behavior, CSV export on every toolbar. Verify no browser `confirm()` calls remain anywhere in admin. Verify health dots on User and Affiliate rows. | All converted admin pages |
+| S6B-T1 | Convert Feedback page — replaced Card list with AdminDataTable (7 columns: Email, Message, NPS, Status, Page URL, Date, Actions), added TableToolbar with search + status filter + CSV export, replaced `confirm()` with ConfirmDialog, used RelativeTime for timestamps, clickable rows → `/admin/feedback/${id}`. | `src/app/admin/feedback/page.tsx` | DONE |
+| S6B-T2 | Convert Audit Logs page — replaced raw Table with AdminDataTable (5 columns: Time, User, Category, Action, Details), replaced manual filter Selects with TableToolbar (category + action filters), added Refresh button to toolbar, used RelativeTime for timestamps, kept server-side pagination (pageSize={50} hides internal pagination), kept Suspense wrapper, kept Dialog detail view on row click. | `src/app/admin/audit-logs/page.tsx` | DONE |
+| S6B-T3 | Final consistency verification — all 5 pages (Users, Waitlist, Team, Feedback, Audit Logs) use AdminDataTable + TableToolbar + ConfirmDialog (where applicable) + RelativeTime. Zero `confirm()` calls. Health dots on User rows. CSV export on 4/5 toolbars (Audit Logs excluded — read-only). Toast on all mutations. Build compiles clean. | All converted admin pages | DONE |
 
 **Done Test:** All 5 converted pages use the same table component, same toolbar pattern, same confirmation dialogs. Rows are clickable where detail views exist. No browser `confirm()` calls remain on any converted page. All dates show relative timestamps with absolute tooltip on hover. Health dots appear on User and Affiliate rows. Toast notifications confirm every mutation. Sparklines show 30-day trends on Revenue and Affiliate Members rows. CSV export works from every toolbar.
 

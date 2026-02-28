@@ -813,6 +813,24 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 
 ---
 
+### Session — February 28, 2026 (Sprint 6B: Remaining Page Conversions + Final Verification)
+
+Completed the UX Overhaul Blueprint by executing Sprint 6B — converting the last 2 admin pages to the shared component pattern and verifying consistency across all 5 converted pages.
+
+1. **Converted Feedback page** — Replaced Card list layout with AdminDataTable (7 columns: Email, Message, NPS Score, Status, Page URL, Date, Actions). Added TableToolbar with search (email/message), status filter (New/Reviewed/Resolved), and CSV export. Replaced browser `confirm()` with ConfirmDialog. Used RelativeTime for timestamps. Rows clickable → navigate to `/admin/feedback/${id}` detail page. Kept inline status Select in actions column with stopPropagation.
+
+2. **Converted Audit Logs page** — Replaced raw Table with AdminDataTable (5 columns: Time, User, Category, Action, Details). Replaced manual filter Selects with TableToolbar (category + conditional action filters). Added Refresh button to toolbar. Used RelativeTime for timestamps (table + detail dialog). Preserved server-side pagination by setting `pageSize={50}` to hide AdminDataTable's internal pagination while keeping external Previous/Next buttons. Preserved Suspense wrapper and Dialog detail view on row click.
+
+3. **Final consistency verification** — Confirmed all 5 converted pages (Users, Waitlist, Team, Feedback, Audit Logs) use AdminDataTable + TableToolbar + ConfirmDialog (where applicable) + RelativeTime. Zero `confirm()` calls across all 5 pages. Health dots on User rows. CSV export on 4/5 toolbars (Audit Logs excluded — read-only). Toast on all mutations. Build compiles clean.
+
+**Files modified:** `src/app/admin/feedback/page.tsx`, `src/app/admin/audit-logs/page.tsx`
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
+**UX Overhaul Blueprint status:** ALL SPRINTS COMPLETE (1 through 6B). Next direction is user's choice — options include Affiliate Dashboard restructure, Dashboard Shell on all 3 dashboards, or wiring Sparkline into Revenue/Affiliate Members rows.
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience

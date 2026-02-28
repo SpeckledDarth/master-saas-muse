@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useState, useCallback, Suspense } from 'react'
+import { useEffect, useState, useCallback, Suspense, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Loader2, RefreshCw } from 'lucide-react'
+import { AdminDataTable, ColumnDef } from '@/components/admin/data-table'
+import { TableToolbar, FilterDef } from '@/components/admin/table-toolbar'
+import { RelativeTime } from '@/lib/format-relative-time'
 
 interface AuditLog {
   id: string
@@ -130,6 +130,82 @@ function AuditLogsContent() {
     setActionFilter('all')
   }
 
+  const columns: ColumnDef<AuditLog>[] = useMemo(() => [
+    {
+      id: 'time',
+      header: 'Time',
+      accessorFn: (row) => (
+        <RelativeTime date={row.created_at} className="text-sm text-muted-foreground whitespace-nowrap" />
+      ),
+    },
+    {
+      id: 'user',
+      header: 'User',
+      accessorFn: (row) => <span className="text-sm">{row.userEmail}</span>,
+    },
+    {
+      id: 'category',
+      header: 'Category',
+      accessorFn: (row) => {
+        const label = getCategoryLabel(row.action)
+        return label ? <Badge variant="outline" className="text-xs">{label}</Badge> : null
+      },
+      hideOnMobile: true,
+    },
+    {
+      id: 'action',
+      header: 'Action',
+      accessorFn: (row) => (
+        <Badge variant={getActionBadgeVariant(row.action)} className="capitalize">
+          {formatAction(row.action)}
+        </Badge>
+      ),
+    },
+    {
+      id: 'details',
+      header: 'Details',
+      accessorFn: (row) => (
+        <span className="text-sm text-muted-foreground max-w-[400px] truncate block">
+          {formatDetails(row)}
+        </span>
+      ),
+      hideOnMobile: true,
+    },
+  ], [])
+
+  const filters: FilterDef[] = useMemo(() => {
+    const result: FilterDef[] = [
+      {
+        id: 'category',
+        label: 'Categories',
+        options: [
+          { label: 'Affiliate', value: 'affiliate' },
+          { label: 'Users', value: 'user' },
+          { label: 'Settings', value: 'settings' },
+        ],
+        value: categoryFilter,
+        onChange: handleCategoryChange,
+      },
+    ]
+    if (categoryFilter === 'all') {
+      result.push({
+        id: 'action',
+        label: 'Actions',
+        options: [
+          { label: 'Settings Updated', value: 'settings_updated' },
+          { label: 'Impersonation Started', value: 'user_impersonation_started' },
+          { label: 'Impersonation Ended', value: 'user_impersonation_ended' },
+          { label: 'Role Changed', value: 'user_role_changed' },
+          { label: 'User Invited', value: 'user_invited' },
+          { label: 'User Removed', value: 'user_removed' },
+        ],
+        value: actionFilter,
+        onChange: setActionFilter,
+      })
+    }
+    return result
+  }, [categoryFilter, actionFilter, handleCategoryChange])
+
   const renderMetadataValue = (value: unknown, depth = 0): React.ReactNode => {
     if (value === null || value === undefined) return <span className="text-muted-foreground">-</span>
     if (typeof value === 'boolean') return <Badge variant={value ? 'default' : 'outline'}>{value ? 'Yes' : 'No'}</Badge>
@@ -165,128 +241,61 @@ function AuditLogsContent() {
           <p className="text-muted-foreground" data-testid="text-audit-logs-description">Track all administrative actions and changes across the platform</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
-              <CardTitle>Activity Log</CardTitle>
-              <div className="flex items-center gap-2 flex-wrap">
-                <Select value={categoryFilter} onValueChange={handleCategoryChange}>
-                  <SelectTrigger className="w-full sm:w-[160px]" data-testid="select-category-filter">
-                    <SelectValue placeholder="All categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="affiliate">Affiliate</SelectItem>
-                    <SelectItem value="user">Users</SelectItem>
-                    <SelectItem value="settings">Settings</SelectItem>
-                  </SelectContent>
-                </Select>
-                {categoryFilter === 'all' && (
-                  <Select value={actionFilter} onValueChange={setActionFilter}>
-                    <SelectTrigger className="w-full sm:w-[200px]" data-testid="select-action-filter">
-                      <SelectValue placeholder="All actions" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Actions</SelectItem>
-                      <SelectItem value="settings_updated">Settings Updated</SelectItem>
-                      <SelectItem value="user_impersonation_started">Impersonation Started</SelectItem>
-                      <SelectItem value="user_impersonation_ended">Impersonation Ended</SelectItem>
-                      <SelectItem value="user_role_changed">Role Changed</SelectItem>
-                      <SelectItem value="user_invited">User Invited</SelectItem>
-                      <SelectItem value="user_removed">User Removed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-                <Button variant="outline" size="icon" onClick={fetchLogs} disabled={loading} data-testid="button-refresh-audit">
-                  <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="flex items-center justify-center py-12" data-testid="loading-audit-logs">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              </div>
-            ) : logs.length === 0 ? (
-              <div className="text-center py-12" data-testid="empty-audit-logs">
-                <p className="text-muted-foreground">No audit logs found</p>
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
-                <Table data-testid="table-audit-logs">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Time</TableHead>
-                      <TableHead>User</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Action</TableHead>
-                      <TableHead>Details</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {logs.map(log => (
-                      <TableRow
-                        key={log.id}
-                        className="cursor-pointer hover:bg-muted/50"
-                        data-testid={`row-audit-log-${log.id}`}
-                        onClick={() => setSelectedLog(log)}
-                      >
-                        <TableCell className="text-sm text-muted-foreground whitespace-nowrap" data-testid={`text-time-${log.id}`}>
-                          {new Date(log.created_at).toLocaleString()}
-                        </TableCell>
-                        <TableCell className="text-sm" data-testid={`text-user-${log.id}`}>
-                          {log.userEmail}
-                        </TableCell>
-                        <TableCell data-testid={`text-category-${log.id}`}>
-                          {getCategoryLabel(log.action) && (
-                            <Badge variant="outline" className="text-xs">{getCategoryLabel(log.action)}</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell data-testid={`text-action-${log.id}`}>
-                          <Badge variant={getActionBadgeVariant(log.action)} className="capitalize">
-                            {formatAction(log.action)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground max-w-[400px] truncate" data-testid={`text-details-${log.id}`}>
-                          {formatDetails(log)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                </div>
+        <TableToolbar
+          filters={filters}
+          actions={
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={fetchLogs}
+              disabled={loading}
+              data-testid="button-refresh-audit"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
+          }
+          data-testid="toolbar-audit-logs"
+        />
 
-                <div className="flex items-center justify-between gap-2 mt-4">
-                  <p className="text-sm text-muted-foreground" data-testid="text-pagination-info">
-                    Page {page} of {totalPages} ({total} total)
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page <= 1}
-                      onClick={() => setPage(p => p - 1)}
-                      data-testid="button-previous-page"
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page >= totalPages}
-                      onClick={() => setPage(p => p + 1)}
-                      data-testid="button-next-page"
-                    >
-                      Next
-                    </Button>
-                  </div>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+        <AdminDataTable
+          columns={columns}
+          data={logs}
+          loading={loading}
+          emptyMessage="No audit logs found"
+          emptyDescription="No activity has been recorded yet."
+          onRowClick={(log) => setSelectedLog(log)}
+          getRowId={(log) => log.id}
+          pageSize={50}
+          data-testid="table-audit-logs"
+        />
+
+        {!loading && logs.length > 0 && (
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm text-muted-foreground" data-testid="text-pagination-info">
+              Page {page} of {totalPages} ({total} total)
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page <= 1}
+                onClick={() => setPage(p => p - 1)}
+                data-testid="button-previous-page"
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages}
+                onClick={() => setPage(p => p + 1)}
+                data-testid="button-next-page"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Dialog open={!!selectedLog} onOpenChange={(open) => { if (!open) setSelectedLog(null) }}>
@@ -298,7 +307,7 @@ function AuditLogsContent() {
             <div className="space-y-[var(--content-density-gap,1rem)]">
               <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
                 <span className="font-medium text-muted-foreground">Time</span>
-                <span>{new Date(selectedLog.created_at).toLocaleString()}</span>
+                <RelativeTime date={selectedLog.created_at} />
 
                 <span className="font-medium text-muted-foreground">User</span>
                 <span>{selectedLog.userEmail}</span>
@@ -312,7 +321,7 @@ function AuditLogsContent() {
                 </Badge>
 
                 <span className="font-medium text-muted-foreground">Raw Action</span>
-                <code className="text-xs bg-muted px-1 py-0.5 rounded break-all">{selectedLog.action}</code>
+                <code className="text-xs bg-muted px-1 py-0.5 rounded-[var(--badge-radius,0.25rem)] break-all">{selectedLog.action}</code>
 
                 {selectedLog.target_type && (
                   <>
@@ -324,7 +333,7 @@ function AuditLogsContent() {
                 {selectedLog.target_id && (
                   <>
                     <span className="font-medium text-muted-foreground">Target ID</span>
-                    <code className="text-xs bg-muted px-1 py-0.5 rounded break-all">{selectedLog.target_id}</code>
+                    <code className="text-xs bg-muted px-1 py-0.5 rounded-[var(--badge-radius,0.25rem)] break-all">{selectedLog.target_id}</code>
                   </>
                 )}
               </div>
