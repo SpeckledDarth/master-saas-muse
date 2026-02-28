@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
         metric: metric || 'referrals',
         start_date,
         end_date,
-        prize_description: prize_description || null,
+        prize_description: prize_description || '',
         prize_amount_cents: prize_amount_cents || 0,
         status: autoStatus,
       })
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
           metric: metric || 'referrals',
           start_date,
           end_date,
-          prize_description: prize_description || null,
+          prize_description: prize_description || '',
           prize_amount_cents: prize_amount_cents || 0,
         })
         .select()

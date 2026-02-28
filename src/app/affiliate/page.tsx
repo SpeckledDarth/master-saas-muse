@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useSettings } from '@/hooks/use-settings'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { DollarSign, Users, BarChart, Megaphone, Clock, Shield, ArrowRight, CheckCircle } from 'lucide-react'
+import { DollarSign, Users, BarChart, Megaphone, Clock, Shield, ArrowRight, CheckCircle, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 function TestimonialsSection() {
@@ -67,12 +67,23 @@ export default function AffiliateLandingPage() {
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data?.settings) setProgramSettings(data.settings)
+        else setProgramSettings({ commission_rate: 20, commission_duration_months: 12 })
       })
-      .catch(() => {})
+      .catch(() => {
+        setProgramSettings({ commission_rate: 20, commission_duration_months: 12 })
+      })
   }, [])
 
   const commissionRate = programSettings?.commission_rate ?? 20
   const commissionDuration = programSettings?.commission_duration_months ?? 12
+
+  if (!programSettings) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen">

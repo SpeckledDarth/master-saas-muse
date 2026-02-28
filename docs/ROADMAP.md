@@ -722,6 +722,28 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 
 **Next session should start with:** Sprint 3 — More Bug Fixes + UX Quick Wins (BUG-12 through BUG-16).
 
+### Session — February 28, 2026 (UX Overhaul Blueprint — Sprint 3)
+
+**Sprint 3: More Bug Fixes + UX Quick Wins** — COMPLETE
+
+**What was accomplished:**
+
+1. **Fixed commission rate FOUC (BUG-12)** — Affiliate landing page now shows a loading spinner until settings are fetched from the API. Eliminates the flash of the hardcoded 20% default before the real value loads. Added error fallback so the page still renders with defaults if the API fails.
+
+2. **Fixed contest creation error (BUG-13)** — Root cause: `prize_description` was being sent as `NULL` (via `|| null`) to a `NOT NULL` database column, causing a constraint violation. Fix: changed to `|| ''` (empty string). Also improved error reporting in the frontend — contest save errors now show the actual API error message instead of a generic "Failed to save contest."
+
+3. **Fixed payout batch approval status (BUG-14)** — Added optimistic UI update: immediately after the API confirms success, the batch status in the local state is updated to the correct value (`approved` or `rejected`) before the full data refetch. This prevents any UI lag or race condition showing the wrong status.
+
+4. **Added payout batch duplicate prevention (BUG-15)** — The generate endpoint now checks for an existing pending batch before creating a new one. Returns a clear error message: "A pending payout batch already exists. Please approve or reject it before creating a new one."
+
+5. **Fixed affiliate admin sub-banner layout (BUG-16)** — Changed the TabsList from `flex-wrap` (which caused multi-row overflow and layout overlap) to horizontal scroll (`overflow-x-auto`). Tabs now scroll in a single row without overlapping content below.
+
+**Files modified:** `src/app/affiliate/page.tsx`, `src/app/api/affiliate/contests/route.ts`, `src/app/api/affiliate/payout-batches/route.ts`, `src/app/admin/setup/affiliate/page.tsx`
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
+**Next session should start with:** Sprint 4A — Dashboard Shell + Navigation Overhaul.
+
 ---
 
 ## Related Documentation

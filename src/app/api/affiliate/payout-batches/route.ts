@@ -167,6 +167,19 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'No affiliates meet minimum payout threshold' }, { status: 400 })
       }
 
+      const { data: existingPending } = await auth.admin
+        .from('affiliate_payout_batches')
+        .select('id')
+        .eq('status', 'pending')
+        .maybeSingle()
+
+      if (existingPending) {
+        return NextResponse.json(
+          { error: 'A pending payout batch already exists. Please approve or reject it before creating a new one.' },
+          { status: 400 }
+        )
+      }
+
       const totalCents = eligible.reduce((sum: number, a: any) => sum + a.pending_earnings_cents, 0)
 
       const batchFields: Record<string, any> = {

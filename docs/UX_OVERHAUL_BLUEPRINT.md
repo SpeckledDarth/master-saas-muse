@@ -11,7 +11,7 @@
 |--------|------|--------|----------------------|
 | 1 | Shared UX Components + Standards | COMPLETE | UX-02, UX-05, UX-06, UX-08, WC-03, WC-07, WC-09 |
 | 2 | Critical Bug Fixes | COMPLETE | BUG-01, BUG-02, BUG-03, BUG-09, BUG-10, BUG-11 |
-| 3 | More Bug Fixes + UX Quick Wins | NOT STARTED | BUG-12, BUG-13, BUG-14, BUG-15, BUG-16 |
+| 3 | More Bug Fixes + UX Quick Wins | COMPLETE | BUG-12, BUG-13, BUG-14, BUG-15, BUG-16 |
 | 4A | Dashboard Shell + Navigation | NOT STARTED | UX-01, UX-12, FR-03, FR-04, WC-02, WC-05 |
 | 4B | Dashboard Shell Polish | NOT STARTED | UX-07, UX-09, WC-01 |
 | 5 | Command Palette + Impersonate + Cross-Linking | NOT STARTED | BUG-04–08, UX-15, FR-08 |
@@ -448,17 +448,17 @@ These 10 enhancements are essentially "free" — they're better defaults and sma
 
 ---
 
-### Sprint 3: More Bug Fixes + UX Quick Wins
+### Sprint 3: More Bug Fixes + UX Quick Wins — COMPLETE
 
 **Goal:** Fix remaining high-priority bugs and apply quick UX improvements that don't require full page conversions.
 
-| Task | Description | Files |
-|------|-------------|-------|
-| S3-T1 | Fix commission rate FOUC — show skeleton/loading state instead of stale value while fetching | Affiliate settings/landing components |
-| S3-T2 | Fix contest creation error — debug and fix the save failure | Contest API route and form |
-| S3-T3 | Fix payout batch approval showing "Rejected" — trace the status update logic | Payout batch API route |
-| S3-T4 | Add payout batch duplicate prevention — prevent creating new batch when pending batch exists | Payout batch API route |
-| S3-T5 | Fix affiliate admin sub-banner rendering (layout/overlap) | Affiliate admin page layout |
+| Task | Description | Files | Status |
+|------|-------------|-------|--------|
+| S3-T1 | Fix commission rate FOUC — show loading spinner until settings are fetched, with error fallback to defaults | `src/app/affiliate/page.tsx` | DONE |
+| S3-T2 | Fix contest creation error — `prize_description` was sending NULL to NOT NULL column; now sends empty string; improved error reporting in UI | `src/app/api/affiliate/contests/route.ts`, `src/app/admin/setup/affiliate/page.tsx` | DONE |
+| S3-T3 | Fix payout batch approval showing "Rejected" — added optimistic UI update so status reflects immediately before refetch | `src/app/admin/setup/affiliate/page.tsx` | DONE |
+| S3-T4 | Add payout batch duplicate prevention — API now checks for existing pending batch before generating a new one | `src/app/api/affiliate/payout-batches/route.ts` | DONE |
+| S3-T5 | Fix affiliate admin sub-banner rendering — changed TabsList from `flex-wrap` to horizontal scroll to prevent vertical overflow | `src/app/admin/setup/affiliate/page.tsx` | DONE |
 
 **Done Test:** Commission rate loads without flash. Contests can be created. Payout approval shows correct status. Cannot create duplicate batches. Sub-banner renders correctly.
 

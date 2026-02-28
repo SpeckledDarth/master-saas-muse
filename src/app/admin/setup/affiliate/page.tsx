@@ -1614,14 +1614,17 @@ export default function AffiliateSettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      if (!res.ok) throw new Error('Failed')
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || 'Failed to save contest')
+      }
       toast({ title: editingContest ? 'Contest updated' : 'Contest created' })
       setContestDialog(false)
       setEditingContest(null)
       setContestForm({ name: '', description: '', metric: 'referrals', start_date: '', end_date: '', prize_description: '', prize_amount_cents: 10000 })
       fetchData()
-    } catch {
-      toast({ title: 'Error', description: 'Failed to save contest', variant: 'destructive' })
+    } catch (err: any) {
+      toast({ title: 'Error', description: err?.message || 'Failed to save contest', variant: 'destructive' })
     }
   }
 
@@ -1734,6 +1737,8 @@ export default function AffiliateSettingsPage() {
         body: JSON.stringify({ action: 'approve', batch_id: batchId, status: action }),
       })
       if (!res.ok) throw new Error('Failed')
+
+      setPayoutBatches(prev => prev.map(b => b.id === batchId ? { ...b, status: action } : b))
       toast({ title: `Batch ${action}` })
 
       if (action === 'approved') {
@@ -2024,7 +2029,7 @@ export default function AffiliateSettingsPage() {
       )}
 
       <Tabs value={activeTab} onValueChange={(value) => { setActiveTab(value); window.history.replaceState(null, '', `?tab=${value}`) }} data-testid="tabs-affiliate-admin">
-        <TabsList className="flex-wrap">
+        <TabsList className="flex overflow-x-auto scrollbar-hide w-full justify-start">
           <TabsTrigger value="health" data-testid="tab-health">
             <Activity className="h-3.5 w-3.5 mr-1" /> Health
           </TabsTrigger>
