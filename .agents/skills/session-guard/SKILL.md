@@ -9,9 +9,9 @@ This skill exists because previous sessions lost focus, touched off-limits files
 
 ## CURRENT SPRINT
 
-**Sprint 4B: Dashboard Shell Polish + Quick Fixes**
+**Sprint 4A COMPLETE → Sprint 4B next: Dashboard Shell Polish + Quick Fixes**
+- Sprint 4A completed: vertical sidebar with Vercel-style drill-down (top-level groups with chevrons, drill into sub-items with back button, auto-drill based on URL), badge counts, layout swap, affiliate redirect
 - Blueprint location: `docs/UX_OVERHAUL_BLUEPRINT.md` → Sprint 4B section
-- Previous sprint (4A) completed: vertical sidebar, badge counts, layout swap, affiliate redirect
 - Sprint 4B tasks: keyboard shortcuts (Cmd+K, Cmd+/, Escape), CRM tab persistence via URL params, standardize money display ("$0.00" not em-dash)
 
 If the user asks you to do something unrelated to this sprint, do exactly what they ask — but do NOT expand the scope or touch anything else.

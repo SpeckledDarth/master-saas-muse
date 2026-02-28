@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import {
   LayoutDashboard,
@@ -36,6 +36,8 @@ import {
   TrendingUp,
   BarChart3,
   ChevronUp,
+  ChevronRight,
+  ChevronLeft,
   ExternalLink,
   LogOut,
   Clock,
@@ -78,6 +80,7 @@ interface NavItem {
 
 interface NavGroup {
   group: string
+  groupIcon: LucideIcon
   items: NavItem[]
 }
 
@@ -104,12 +107,14 @@ function buildNavGroups(isAppAdmin: boolean, permissions: TeamPermissions | null
   const allGroups: (NavGroup & { visible?: boolean })[] = [
     {
       group: 'Dashboard',
+      groupIcon: LayoutDashboard,
       items: [
         { title: 'Overview', href: '/admin', icon: LayoutDashboard },
       ],
     },
     {
       group: 'People',
+      groupIcon: Users,
       items: [
         { title: 'Users', href: '/admin/users', icon: Users, permission: (p, a) => a || !!p?.canManageUsers, badgeKey: 'newUsersToday' },
         { title: 'Team', href: '/admin/team', icon: UserCog, permission: (p, a) => a || !!p?.canManageTeam },
@@ -118,6 +123,7 @@ function buildNavGroups(isAppAdmin: boolean, permissions: TeamPermissions | null
     },
     {
       group: 'Money',
+      groupIcon: DollarSign,
       items: [
         { title: 'Revenue', href: '/admin/revenue', icon: DollarSign, permission: (p, a) => a || !!p?.canViewAnalytics, badgeKey: 'failedPayments' },
         { title: 'Subscriptions', href: '/admin/subscriptions', icon: CreditCard, permission: (p, a) => a || !!p?.canViewAnalytics },
@@ -125,6 +131,7 @@ function buildNavGroups(isAppAdmin: boolean, permissions: TeamPermissions | null
     },
     {
       group: 'Affiliates',
+      groupIcon: Megaphone,
       visible: isAppAdmin || !!permissions?.canEditSettings,
       items: [
         { title: 'Affiliate Program', href: '/admin/setup/affiliate', icon: Megaphone, permission: (p, a) => a || !!p?.canEditSettings, badgeKey: 'pendingApplications' },
@@ -134,6 +141,7 @@ function buildNavGroups(isAppAdmin: boolean, permissions: TeamPermissions | null
     },
     {
       group: 'Support',
+      groupIcon: MessageSquare,
       visible: isAppAdmin || !!permissions?.canManageUsers,
       items: [
         { title: 'Tickets', href: '/admin/feedback', icon: MessageSquare, permission: (p, a) => a || !!p?.canManageUsers, badgeKey: 'openTickets' },
@@ -142,6 +150,7 @@ function buildNavGroups(isAppAdmin: boolean, permissions: TeamPermissions | null
     },
     {
       group: 'Content',
+      groupIcon: FileText,
       visible: isAppAdmin || !!permissions?.canEditContent || !!permissions?.canManageUsers,
       items: [
         { title: 'Blog', href: '/admin/blog', icon: FileText, permission: (p, a) => a || !!p?.canEditContent },
@@ -150,6 +159,7 @@ function buildNavGroups(isAppAdmin: boolean, permissions: TeamPermissions | null
     },
     {
       group: 'Settings',
+      groupIcon: Settings,
       visible: isAppAdmin || !!permissions?.canEditSettings,
       items: [
         { title: 'Branding', href: '/admin/setup/branding', icon: Paintbrush, permission: (p, a) => a || !!p?.canEditSettings },
@@ -171,6 +181,7 @@ function buildNavGroups(isAppAdmin: boolean, permissions: TeamPermissions | null
     },
     {
       group: 'System',
+      groupIcon: BarChart3,
       visible: isAppAdmin || !!permissions?.canManageUsers || !!permissions?.canManageTeam || !!permissions?.canViewAnalytics,
       items: [
         { title: 'Analytics', href: '/admin/analytics', icon: TrendingUp, permission: (p, a) => a || !!p?.canViewAnalytics },
@@ -187,6 +198,7 @@ function buildNavGroups(isAppAdmin: boolean, permissions: TeamPermissions | null
     .filter(g => g.visible !== false)
     .map(g => ({
       group: g.group,
+      groupIcon: g.groupIcon,
       items: g.items.filter(item => {
         if (!item.permission) return true
         return item.permission(permissions, isAppAdmin)
@@ -258,6 +270,27 @@ function addRecentPage(href: string, title: string) {
   } catch {}
 }
 
+function findGroupForPath(navGroups: NavGroup[], pathname: string): string | null {
+  if (pathname === '/admin') return null
+  for (const group of navGroups) {
+    if (group.group === 'Dashboard') continue
+    for (const item of group.items) {
+      if (isActive(pathname, item.href)) return group.group
+    }
+  }
+  return null
+}
+
+function getGroupBadgeTotal(group: NavGroup, badgeCounts: BadgeCounts): number {
+  let total = 0
+  for (const item of group.items) {
+    if (item.badgeKey) {
+      total += (badgeCounts as any)[item.badgeKey] || 0
+    }
+  }
+  return total
+}
+
 interface AdminSidebarNavProps {
   isAppAdmin: boolean
   permissions: TeamPermissions | null
@@ -268,12 +301,30 @@ export function AdminSidebarNav({ isAppAdmin, permissions }: AdminSidebarNavProp
   const [user, setUser] = useState<User | null>(null)
   const [badgeCounts, setBadgeCounts] = useState<BadgeCounts>({ openTickets: 0, newUsersToday: 0, failedPayments: 0, pendingApplications: 0, pendingPayouts: 0 })
   const [recentPages, setRecentPages] = useState<RecentPage[]>([])
+  const [activeGroup, setActiveGroup] = useState<string | null>(null)
+  const manualOverrideRef = useRef(false)
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
 
   if (typeof window !== 'undefined' && !supabaseRef.current) {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       supabaseRef.current = createClient()
     }
+  }
+
+  const navGroups = useMemo(() => buildNavGroups(isAppAdmin, permissions), [isAppAdmin, permissions])
+
+  useEffect(() => {
+    if (manualOverrideRef.current) {
+      manualOverrideRef.current = false
+      return
+    }
+    const detectedGroup = findGroupForPath(navGroups, pathname)
+    setActiveGroup(detectedGroup)
+  }, [pathname, navGroups])
+
+  const handleBack = () => {
+    manualOverrideRef.current = true
+    setActiveGroup(null)
   }
 
   useEffect(() => {
@@ -316,12 +367,13 @@ export function AdminSidebarNav({ isAppAdmin, permissions }: AdminSidebarNavProp
     window.location.href = '/'
   }
 
-  const navGroups = buildNavGroups(isAppAdmin, permissions)
   const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Admin'
   const initials = displayName.slice(0, 2).toUpperCase()
   const avatarUrl = user?.user_metadata?.avatar_url
 
   const filteredRecent = recentPages.filter(p => p.href !== pathname).slice(0, 3)
+
+  const drilledGroup = activeGroup ? navGroups.find(g => g.group === activeGroup) : null
 
   return (
     <Sidebar>
@@ -338,41 +390,106 @@ export function AdminSidebarNav({ isAppAdmin, permissions }: AdminSidebarNavProp
       </SidebarHeader>
 
       <SidebarContent>
-        {filteredRecent.length > 0 && (
+        {activeGroup === null ? (
           <>
+            {filteredRecent.length > 0 && (
+              <>
+                <SidebarGroup>
+                  <SidebarGroupLabel>
+                    <Clock className="h-3 w-3 mr-1" />
+                    Recent
+                  </SidebarGroupLabel>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {filteredRecent.map((page) => (
+                        <SidebarMenuItem key={page.href}>
+                          <SidebarMenuButton
+                            asChild
+                            size="sm"
+                            data-testid={`nav-recent-${page.title.toLowerCase().replace(/\s+/g, '-')}`}
+                          >
+                            <Link href={page.href}>
+                              <span className="text-muted-foreground">{page.title}</span>
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
+                <SidebarSeparator />
+              </>
+            )}
+
             <SidebarGroup>
-              <SidebarGroupLabel>
-                <Clock className="h-3 w-3 mr-1" />
-                Recent
-              </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {filteredRecent.map((page) => (
-                    <SidebarMenuItem key={page.href}>
-                      <SidebarMenuButton
-                        asChild
-                        size="sm"
-                        data-testid={`nav-recent-${page.title.toLowerCase().replace(/\s+/g, '-')}`}
-                      >
-                        <Link href={page.href}>
-                          <span className="text-muted-foreground">{page.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
+                  {navGroups.map((group) => {
+                    if (group.group === 'Dashboard') {
+                      const overviewItem = group.items[0]
+                      return (
+                        <SidebarMenuItem key={group.group}>
+                          <SidebarMenuButton
+                            asChild
+                            isActive={pathname === '/admin'}
+                            data-testid="nav-overview"
+                          >
+                            <Link href={overviewItem.href}>
+                              <overviewItem.icon className="h-4 w-4" />
+                              <span>{overviewItem.title}</span>
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      )
+                    }
+
+                    const groupBadge = getGroupBadgeTotal(group, badgeCounts)
+                    const GroupIcon = group.groupIcon
+                    const hasActiveChild = group.items.some(item => isActive(pathname, item.href))
+
+                    return (
+                      <SidebarMenuItem key={group.group}>
+                        <SidebarMenuButton
+                          onClick={() => setActiveGroup(group.group)}
+                          isActive={hasActiveChild}
+                          data-testid={`nav-group-${group.group.toLowerCase()}`}
+                        >
+                          <GroupIcon className="h-4 w-4" />
+                          <span className="flex-1">{group.group}</span>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto" />
+                        </SidebarMenuButton>
+                        {groupBadge > 0 && (
+                          <SidebarMenuBadge data-testid={`badge-group-${group.group.toLowerCase()}`}>
+                            {groupBadge}
+                          </SidebarMenuBadge>
+                        )}
+                      </SidebarMenuItem>
+                    )
+                  })}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
-            <SidebarSeparator />
           </>
-        )}
-
-        {navGroups.map((group) => (
-          <SidebarGroup key={group.group}>
-            <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
+        ) : drilledGroup ? (
+          <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                {group.items.map((item) => {
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={handleBack}
+                    data-testid="nav-back"
+                    className="gap-1"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    <span className="font-medium">{drilledGroup.group}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+            <SidebarSeparator className="my-1" />
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {drilledGroup.items.map((item) => {
                   const active = isActive(pathname, item.href)
                   const badgeCount = item.badgeKey ? (badgeCounts as any)[item.badgeKey] : 0
                   return (
@@ -398,7 +515,7 @@ export function AdminSidebarNav({ isAppAdmin, permissions }: AdminSidebarNavProp
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-        ))}
+        ) : null}
       </SidebarContent>
 
       <SidebarFooter className="p-4">
