@@ -602,8 +602,8 @@ The following items require further discussion before they can be planned. They 
 - **Affiliate Dashboard restructure** (breaking the 7,400-line monolith into route-based pages) — deserves its own blueprint after the Admin Dashboard is solid.
 - **Social Dashboard consistency audit** — already fairly consistent. Will audit after admin work is complete.
 - **Apply Dashboard Shell to Affiliate and Social dashboards** — after the Shell is proven on Admin (Sprint 4), apply to the other two dashboards in a future sprint.
-- **Connected Analytics & BI Layer** — merge Content data (scheduler) + Performance data (Plausible/GA) + Revenue data (affiliate/Stripe) into a unified intelligence layer. Enables questions no siloed tool can answer. Full vision documented in `docs/FUTURE PLAN - CONNECTED_DATA_VISION.md`.
-- **AI Coaching Layer** — feed connected data into AI (Grok/xAI) + n8n automation. AI identifies insights, n8n drafts actions, low-risk auto-executes, high-risk queues for admin approval. Serves admin, users, and affiliates. Depends on Connected Analytics layer. Full vision documented in `docs/FUTURE PLAN - CONNECTED_DATA_VISION.md`.
+- **Connected Analytics & BI Layer** — merge Content data (scheduler) + Performance data (Plausible/GA) + Revenue data (affiliate/Stripe) into a unified intelligence layer. Enables questions no siloed tool can answer. Full vision documented in `docs/FUTURE_PLAN_CONNECTED_DATA_VISION.md`.
+- **AI Coaching Layer** — feed connected data into AI (Grok/xAI) + n8n automation. AI identifies insights, n8n drafts actions, low-risk auto-executes, high-risk queues for admin approval. Serves admin, users, and affiliates. Depends on Connected Analytics layer. Full vision documented in `docs/FUTURE_PLAN_CONNECTED_DATA_VISION.md`.
 - **Build sequence:** UX Overhaul (current blueprint) → Connected Analytics → AI Coaching Layer.
 
 ---
