@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const EMPTY_COUNTS = { openTickets: 0, newUsersToday: 0, failedPayments: 0 }
+const EMPTY_COUNTS = { openTickets: 0, newUsersToday: 0, failedPayments: 0, pendingApplications: 0, pendingPayouts: 0 }
 
 export async function GET() {
   try {
@@ -38,6 +38,8 @@ export async function GET() {
     let openTickets = 0
     let newUsersToday = 0
     let failedPayments = 0
+    let pendingApplications = 0
+    let pendingPayouts = 0
 
     try {
       const { count, error } = await adminClient
@@ -71,8 +73,30 @@ export async function GET() {
       }
     } catch {}
 
-    return NextResponse.json({ openTickets, newUsersToday, failedPayments })
+    try {
+      const { count, error } = await adminClient
+        .from('affiliate_applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending')
+
+      if (!error && count !== null) {
+        pendingApplications = count
+      }
+    } catch {}
+
+    try {
+      const { count, error } = await adminClient
+        .from('affiliate_payout_batches')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending')
+
+      if (!error && count !== null) {
+        pendingPayouts = count
+      }
+    } catch {}
+
+    return NextResponse.json({ openTickets, newUsersToday, failedPayments, pendingApplications, pendingPayouts })
   } catch {
-    return NextResponse.json({ openTickets: 0, newUsersToday: 0, failedPayments: 0 })
+    return NextResponse.json(EMPTY_COUNTS)
   }
 }

@@ -52,16 +52,13 @@ Every time code changes are made, the agent MUST complete ALL of these steps bef
 
 ### Session Start Protocol (MANDATORY — DO NOT SKIP)
 
-Every session MUST follow these steps IN ORDER before writing any code:
+**BEFORE ANY WORK: Load the `session-guard` skill and follow it completely.** No exceptions. No skipping. The session-guard contains the current sprint, the off-limits list, and the mandatory reads. It is updated at the end of every session so the next session knows exactly where to pick up.
 
-1. **Load `business-philosophy` skill** — Understand the core principles: affiliates are partners, coaching-first UX, dual-attribution, grandfathering is sacred, labor hierarchy, flywheel conversion play. These are non-negotiable.
-2. **Read `docs/PRODUCT_IDENTITY.md`** — Understand what PassivePost actually is. The 217-feature vision is intentional. Never suggest cutting features or simplifying the affiliate program.
-3. **Read `docs/DESIGN_SYSTEM_RULES.md`** — MANDATORY before any component or UI work. Contains CSS variable mapping, DS wrapper components (`DSCard`, `DSGrid`, `DSSection`), and Never/Always rules.
-4. **Read `docs/FEATURE_INVENTORY.md`** — Know what's already built. Search for keywords related to what you're about to build. If something similar exists, EXTEND it.
-5. **Read `docs/LESSONS_LEARNED.md`** — Know the anti-patterns and technical gotchas.
-6. **Read `docs/ROADMAP.md`** — Know what's in progress and what's next.
-7. **Plan with integration requirements** — For every feature, list which existing systems it connects to.
-8. **Update Session Log** in ROADMAP.md at end of every session.
+Additional skills to load when relevant:
+- **`build-checklist`** — Load when delivering work to the user
+- **`design-system`** — Load when touching any UI component
+- **`business-philosophy`** — Load when making product decisions or touching affiliate logic
+- **`project-context`** — Load when planning features or making architectural decisions
 
 ### Document System
 

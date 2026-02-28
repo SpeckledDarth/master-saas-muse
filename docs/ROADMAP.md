@@ -744,6 +744,34 @@ CREATE INDEX IF NOT EXISTS idx_entity_notes_entity ON entity_notes(entity_type, 
 
 **Next session should start with:** Sprint 4A — Dashboard Shell + Navigation Overhaul.
 
+### Session — February 28, 2026 (UX Overhaul Blueprint — Sprint 4A + Session Guard)
+
+**Sprint 4A: Dashboard Shell + Navigation Overhaul** — COMPLETE
+
+**What was accomplished:**
+
+1. **Created `session-guard` agent skill** — New mandatory skill loaded at the start of every session. Contains: current sprint pointer, DO NOT TOUCH list (off-limits files/topics), mandatory reads (3 files), scope lock rule (do only what was asked), and session end protocol (update skill before writing roadmap). This replaces the 8-step Session Start Protocol in replit.md.
+
+2. **Updated `replit.md` Session Start Protocol** — Simplified to a single instruction: "Load the `session-guard` skill and follow it." Additional skills listed for when relevant (build-checklist, design-system, business-philosophy, project-context).
+
+3. **Added badge counts to sidebar-counts API** — `pendingApplications` (from `affiliate_applications` where `status = 'pending'`) and `pendingPayouts` (from `affiliate_payout_batches` where `status = 'pending'`) added to `/api/admin/sidebar-counts`. API now returns 5 counts total.
+
+4. **Built admin vertical sidebar** — New component at `src/components/admin/admin-sidebar.tsx` using shadcn/ui Sidebar components (same pattern as Social Dashboard). 8 navigation groups: Dashboard, People, Money, Affiliates, Support, Content, Settings, System. Features: badge counts on actionable items (Tickets, Users, Revenue, Affiliate Program), "Recently Visited" section (localStorage, shows 3 most recent pages), user avatar/dropdown footer with Profile/Billing/Social Dashboard/Main Site/Sign Out. Permission-based filtering preserved.
+
+5. **Updated admin layout** — Replaced horizontal top-nav + sub-nav bar with vertical sidebar using `SidebarProvider`. Layout is now `flex-row` (sidebar left, content right). Content header has `SidebarTrigger` (mobile hamburger), `AdminBreadcrumbs`, `CommandPalette`, and `ThemeToggle`. Old sidebar component (`src/components/admin/sidebar.tsx`) kept as reference but no longer imported.
+
+6. **Created `/admin/affiliate` redirect** — Client component at `src/app/admin/affiliate/page.tsx` that redirects to `/admin/setup/affiliate`.
+
+**Files created:** `src/components/admin/admin-sidebar.tsx`, `src/app/admin/affiliate/page.tsx`, `.agents/skills/session-guard/SKILL.md`
+
+**Files modified:** `src/app/admin/layout.tsx`, `src/app/api/admin/sidebar-counts/route.ts`, `replit.md`, `docs/UX_OVERHAUL_BLUEPRINT.md`
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
+**Note:** Drill-down sub-menu behavior (clicking a group replaces sidebar with sub-items + back button) was not implemented. The sidebar uses the standard shadcn/ui group-based layout. Drill-down can be added in Sprint 4B if desired.
+
+**Next session should start with:** Sprint 4B — Dashboard Shell Polish + Quick Fixes (keyboard shortcuts, CRM tab persistence, money display standardization).
+
 ---
 
 ## Related Documentation

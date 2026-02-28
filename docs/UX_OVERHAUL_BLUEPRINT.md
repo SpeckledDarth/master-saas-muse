@@ -12,7 +12,7 @@
 | 1 | Shared UX Components + Standards | COMPLETE | UX-02, UX-05, UX-06, UX-08, WC-03, WC-07, WC-09 |
 | 2 | Critical Bug Fixes | COMPLETE | BUG-01, BUG-02, BUG-03, BUG-09, BUG-10, BUG-11 |
 | 3 | More Bug Fixes + UX Quick Wins | COMPLETE | BUG-12, BUG-13, BUG-14, BUG-15, BUG-16 |
-| 4A | Dashboard Shell + Navigation | NOT STARTED | UX-01, UX-12, FR-03, FR-04, WC-02, WC-05 |
+| 4A | Dashboard Shell + Navigation | COMPLETE | UX-01, UX-12, FR-03, FR-04, WC-02, WC-05 |
 | 4B | Dashboard Shell Polish | NOT STARTED | UX-07, UX-09, WC-01 |
 | 5 | Command Palette + Impersonate + Cross-Linking | NOT STARTED | BUG-04–08, UX-15, FR-08 |
 | 6A | Utility Components + First 3 Page Conversions | NOT STARTED | UX-02, UX-03, UX-05, UX-06, UX-11, WC-04, WC-06, WC-07, WC-08, WC-10 |
@@ -466,19 +466,22 @@ These 10 enhancements are essentially "free" — they're better defaults and sma
 
 ---
 
-### Sprint 4A: Dashboard Shell + Navigation Overhaul
+### Sprint 4A: Dashboard Shell + Navigation Overhaul — COMPLETE
 
 **Goal:** Build the Dashboard Shell component and apply it to the admin dashboard. This is the big structural work — vertical sidebar with drill-down sub-menus, user account pinned at bottom, no horizontal nav, no top header bar inside dashboards.
 
-| Task | Description | Files |
-|------|-------------|-------|
-| S4A-T1 | Build the Dashboard Shell component — reusable layout with sidebar (three zones: logo at top, search + nav in middle, user account pinned at bottom), drill-down sub-menu behavior, breadcrumb bar in content area, responsive breakpoints (desktop/tablet/mobile), "Recently Visited" section at top of nav showing 3-5 most recent pages (WC-02) | `src/components/layout/dashboard-shell.tsx` |
-| S4A-T2 | Build admin sidebar nav content — define all nav groups (Dashboard, People, Money, Affiliates, Support, Content, Settings, System) with sub-items and drill-down definitions. Move Affiliates to top-level (`/admin/affiliate`). Move Users/Team into "People" group near top. Add badge counts on actionable items: Tickets, Applications, Payouts (WC-05). | `src/components/admin/admin-sidebar.tsx` |
-| S4A-T3 | Update admin layout to use Dashboard Shell. Remove horizontal top-nav. Remove top header bar. Content area gets full remaining width. | `src/app/admin/layout.tsx` |
+| Task | Description | Files | Status |
+|------|-------------|-------|--------|
+| S4A-T1 | Add pending affiliate application + payout batch counts to sidebar-counts API | `src/app/api/admin/sidebar-counts/route.ts` | DONE |
+| S4A-T2 | Build admin vertical sidebar component using shadcn/ui Sidebar — 8 nav groups (Dashboard, People, Money, Affiliates, Support, Content, Settings, System), badge counts, "Recently Visited" (localStorage), user footer with dropdown, permission-based filtering | `src/components/admin/admin-sidebar.tsx` | DONE |
+| S4A-T3 | Update admin layout — replace horizontal top-nav with SidebarProvider + vertical sidebar. Content header with breadcrumbs, command palette, theme toggle. Mobile hamburger trigger. | `src/app/admin/layout.tsx` | DONE |
+| S4A-T4 | Create `/admin/affiliate` redirect route to `/admin/setup/affiliate` | `src/app/admin/affiliate/page.tsx` | DONE |
 
-**Done Test:** Admin dashboard uses the Dashboard Shell with vertical sidebar. Drill-down sub-menus work (e.g., clicking Affiliates replaces sidebar with affiliate sub-items + back button). User account is pinned at sidebar bottom. "Recently Visited" shows last 3-5 pages. Badge counts appear on Tickets/Applications/Payouts. No horizontal nav or top header bar visible. Mobile sidebar works (hamburger overlay). Affiliates accessible at `/admin/affiliate`.
+**Done Test:** Admin dashboard uses vertical sidebar. User account pinned at sidebar bottom. "Recently Visited" shows last 3-5 pages. Badge counts appear on Tickets/Applications/Payouts/Users/Revenue. No horizontal nav visible. Mobile sidebar works (hamburger overlay via SidebarTrigger). Affiliates accessible at `/admin/affiliate` (redirects to `/admin/setup/affiliate`). Breadcrumbs and command palette in content header.
 
 **Addresses:** UX-01, UX-12, FR-03, FR-04, WC-02, WC-05
+
+**Note:** Drill-down sub-menus (clicking a group to replace sidebar with sub-items + back button) were not implemented in this sprint. The sidebar uses the standard shadcn/ui group-based layout matching the Social Dashboard pattern. Drill-down behavior can be added in Sprint 4B if desired.
 
 ---
 

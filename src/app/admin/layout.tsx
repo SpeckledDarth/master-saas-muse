@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Loader2 } from 'lucide-react'
 import { getTeamPermissions, type TeamRole, type TeamPermissions } from '@/lib/team-permissions'
-import { AdminSidebar } from '@/components/admin/sidebar'
+import { AdminSidebarNav } from '@/components/admin/admin-sidebar'
 import { AdminBreadcrumbs } from '@/components/admin/breadcrumbs'
 import { CommandPalette } from '@/components/admin/command-palette'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 
 export default function AdminLayout({
   children,
@@ -84,16 +86,31 @@ export default function AdminLayout({
     return null
   }
 
+  const sidebarStyle = {
+    '--sidebar-width': '16rem',
+    '--sidebar-width-icon': '3rem',
+  }
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <AdminSidebar isAppAdmin={isAppAdmin} permissions={permissions} />
-      <main className="flex-1 min-w-0">
-        <div className="px-[var(--section-spacing,1.5rem)] pt-[var(--content-density-gap,1rem)] flex items-center justify-between">
-          <AdminBreadcrumbs />
-          <CommandPalette />
+    <SidebarProvider style={sidebarStyle as React.CSSProperties}>
+      <div className="flex min-h-screen w-full">
+        <AdminSidebarNav isAppAdmin={isAppAdmin} permissions={permissions} />
+        <div className="flex flex-col flex-1 min-w-0">
+          <header className="flex items-center justify-between gap-2 border-b px-4 py-2" data-testid="admin-content-header">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger data-testid="button-admin-sidebar-toggle" className="md:hidden" />
+              <AdminBreadcrumbs />
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <CommandPalette />
+              <ThemeToggle />
+            </div>
+          </header>
+          <main className="flex-1 overflow-y-auto">
+            {children}
+          </main>
         </div>
-        {children}
-      </main>
-    </div>
+      </div>
+    </SidebarProvider>
   )
 }
