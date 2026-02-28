@@ -64,26 +64,126 @@ These are not bugs per se — each page works individually — but the lack of c
 | UX-14 | Date filter fields lack a "Clear All" option — must individually clear each date field | Revenue page |
 | UX-15 | Contest winner info not shown in contest detail view, and winner name is not cross-linked to CRM | Contests tab |
 
-### Category C: Feature Requests (Need Discussion Before Building)
+### Category C: Feature Requests
 
-These are new features or design changes the tester requested. They require a conversation before implementation because they involve product decisions, workflow changes, or scope expansion.
+| ID | Request | Status | Decision |
+|----|---------|--------|----------|
+| FR-01 | Add first name + last name fields to CRM detail (keep display name too) | Pending Discussion | Pros/cons of adding fields vs. using display name parsing |
+| FR-02 | File upload capability for marketing assets (not just URL links) | Pending Discussion | Supabase Storage integration, file size limits, CDN |
+| FR-03 | Move Affiliate admin pages to top-level (`/admin/affiliate`) | **DECIDED** | Affiliates promoted to own top-level sidebar group. URL changes from `/admin/setup/affiliate` to `/admin/affiliate`. See Design Decisions below. |
+| FR-04 | System-wide vertical sidebar navigation for all dashboards | **DECIDED** | All dashboards use the same Dashboard Shell with vertical drill-down sidebar. No horizontal nav inside dashboards. See Design Decisions below. |
+| FR-05 | Best practice defaults for all affiliate settings | Pending Discussion | Define what "best practice" means for each setting |
+| FR-06 | Grandfathering mechanism for setting changes | Pending Discussion | Complex business logic, retroactive vs. prospective |
+| FR-07 | Affiliate-branded discount codes | Pending Discussion | UUID-based tracking with branded alias overlay |
+| FR-08 | Cross-linking for all related data throughout admin | **DECIDED** | All detail pages use collapsible accordion sections to show related records. Every person name, amount, and entity reference is a clickable cross-link. See Design Decisions below. |
+| FR-09 | Broadcast performance data surfaced at higher level | Pending Discussion | Where to surface it — dashboard? separate analytics? |
+| FR-10 | Payout workflow documentation | Pending Discussion | Write operational documentation |
+| FR-11 | Feature documentation for all affiliate settings | Pending Discussion | Documentation effort, possibly in-app help |
+| FR-12 | Summary cards only on dashboard landing pages | **DECIDED** | KPI/summary cards appear ONLY on each dashboard's landing page (`/admin`, `/dashboard/social/overview`, `/affiliate/dashboard`). Not repeated on sub-pages. |
+| FR-13 | Settings as read-only cards vs. open forms | Pending Discussion | UX pattern for settings pages — needs deciding before Sprint 3 |
+| FR-14 | Admin's own account in Users list | **DECIDED** | Show ALL users including the admin's own account. Eliminates confusion. |
 
-| ID | Request | Tester's Context | Discussion Needed |
-|----|---------|-------------------|-------------------|
-| FR-01 | Add first name + last name fields to CRM detail (keep display name too) | "I want more information from users for potential email personalization" | Pros/cons of adding fields vs. using display name parsing |
-| FR-02 | File upload capability for marketing assets (not just URL links) | "We cannot simply rely on URL link only. Needs to connect to Supabase storage" | Supabase Storage integration, file size limits, CDN |
-| FR-03 | Move Affiliate admin pages to top-level (`/admin/affiliate`) instead of buried in `/admin/setup/affiliate` | "These will be accessed more than most and should have front priority" | Full admin sitemap reassessment |
-| FR-04 | System-wide vertical sidebar navigation for all dashboards | "Minimize, if not remove, horizontal navigation while in any of the dashboards" | Sidebar design, mobile behavior, collapsible states |
-| FR-05 | Best practice defaults for all affiliate settings with ability to "Reset to Best Practice" | "I always want a way to return to Best Practice regardless of changes" | Define what "best practice" means for each setting |
-| FR-06 | Grandfathering mechanism — setting changes honored for existing affiliates enrolled under previous terms | "All changes should be tracked in audit logs; affiliates must be grandfathered" | Complex business logic, retroactive vs. prospective |
-| FR-07 | Affiliate-branded discount codes — affiliates choose their own code names (e.g., "STEELE40") | "Push the labor and decision of this to the affiliate directly" | UUID-based tracking with branded alias overlay |
-| FR-08 | Cross-linking for all related data throughout the entire admin (person → CRM, amount → detail, winner → profile) | "If a person/user is shown, I should be able to click on the name and be directed to the User details tab" | Audit every page for cross-link opportunities |
-| FR-09 | Broadcast performance data surfaced at a higher level (not just in detail view) | "Right now this is basically hidden intel" | Where to surface it — dashboard? separate analytics? |
-| FR-10 | Payout workflow documentation — clear explanation of how auto-batch, generate, approve/reject works | "I need clear understanding how the code works" | Write operational documentation |
-| FR-11 | Detailed feature documentation for all configurable affiliate settings | "We need a document to explain all of these so planning can be done offline" | Documentation effort, possibly in-app help |
-| FR-12 | Recurring metrics cards should only appear on the Affiliate Health landing page, not every sub-tab | "This is high level summary and should be on the landing page only" | Review which summary cards appear where |
-| FR-13 | Affiliate settings should use clickable cards that expand into editable modals (instead of always-open form fields) | "I want to see current settings but not be open editable fields" | UX pattern for settings pages |
-| FR-14 | Clarify whether admin's own account should appear in Users list | "My personal admin account is not shown — maybe intentional?" | Clarify user list filtering logic |
+---
+
+## Design Decisions — Agreed
+
+These decisions were made during the Category C discussion (February 28, 2026). They are binding for all sprints in this blueprint and all future sessions. Benchmarked against the Vercel Dashboard UX patterns.
+
+### 1. Dashboard Shell Pattern (FR-03 + FR-04)
+
+All three dashboards (Admin, Affiliate, Social) use the same reusable **Dashboard Shell** template. The user learns the navigation once and it works identically everywhere. Only the content changes per page.
+
+**The Dashboard Shell provides:**
+
+| Zone | Contents | Behavior |
+|------|----------|----------|
+| **Sidebar — Top** | App logo (admin-configured from palette) | Always visible |
+| **Sidebar — Search** | Search bar | Always visible, just below logo |
+| **Sidebar — Navigation** | Nav items with drill-down sub-menus | Scrollable if needed |
+| **Sidebar — Bottom** | User avatar, username, account actions (settings, sign out, switch dashboard) | Pinned to bottom, always visible |
+| **Content Area** | Breadcrumbs at top, then page content | Full remaining width — no top header bar |
+
+**Drill-down sub-menu behavior (Vercel pattern):**
+- Top-level items that have children show a `>` chevron
+- Clicking a parent item REPLACES the entire sidebar content with that section's sub-items + a `< Back` button at the top
+- Sub-items can be grouped under small uppercase section labels for visual hierarchy
+- Clicking `< Back` returns to the top-level sidebar
+
+**No horizontal navigation inside any dashboard.** Horizontal nav is only used on marketing/public-facing pages. All dashboard navigation is vertical, inside the sidebar.
+
+**No top header bar inside dashboards.** By placing the user account in the sidebar, the entire right side of the screen is freed for content. No header consuming vertical space.
+
+**Responsive behavior:**
+- **Desktop:** Sidebar visible, content fills remaining width
+- **Tablet:** Sidebar collapses to icon-only mode (or hides behind hamburger), content goes full width
+- **Mobile:** Sidebar hidden, thin top bar with hamburger opens sidebar as overlay
+
+**Admin sidebar groupings (top to bottom):**
+
+| Group | Items | Notes |
+|-------|-------|-------|
+| Dashboard | Overview (home) | Always first |
+| People `>` | CRM, Users, Team | Users/Team moved up from "System" for high-frequency access |
+| Money `>` | Revenue, Subscriptions, Metrics | Financial data together |
+| Affiliates `>` | Overview, Applications, Members, Tiers, Milestones, Assets, Broadcasts, Contests, Payouts, Networks, Discount Codes, Settings, Audit | Promoted from `/admin/setup/affiliate` to top-level `/admin/affiliate` |
+| Support `>` | Tickets, Feedback | Support-related |
+| Content `>` | Blog, Changelog, Waitlist, Queue | Content management |
+| Settings `>` | Branding/Palette, General Settings | System configuration |
+| System `>` | Audit Logs | Low-frequency admin tools |
+
+### 2. List View Pattern (Benchmarked from Vercel)
+
+All data list pages follow the same pattern:
+
+- **Toolbar at top:** Search input (with X clear button) + filter dropdowns side by side in a clean horizontal row. "Clear All" button when any filter is active. Optional CSV export button.
+- **Data table below:** Clean, data-first layout. No card wrapper around the table itself. Airy row spacing with generous padding for visual delight.
+- **Clickable rows:** Entire row is clickable (cursor pointer). Navigates to detail page.
+- **Clickable column headers:** Click to sort ascending/descending. Arrow indicator shows current sort direction.
+- **Status indicators:** Small colored dots + text (using semantic tokens: `--success`, `--danger`, `--warning`). Not large badges.
+- **Pagination:** "Showing X–Y of Z" with prev/next controls at bottom.
+
+### 3. Detail View Pattern (Benchmarked from Vercel)
+
+All detail pages follow the same pattern:
+
+- **Breadcrumb at top:** Shows full hierarchy path (e.g., `Admin > People > CRM > Jane Roberts`). Each segment is clickable.
+- **Summary header:** Key facts at a glance (name, status, key metrics). Action buttons in the header (Edit, Impersonate, Email, etc.).
+- **Collapsible accordion sections below:** Each section shows related data. Users expand what they need. Multiple sections can be open at once.
+- **Cross-linking in every accordion:** Person names, amounts, entity references are all clickable links to their respective detail pages.
+
+**Example — CRM detail page for "Jane Roberts":**
+- Summary header: name, email, status, plan, health score
+- `>` Profile (editable fields)
+- `>` Revenue & Transactions (invoices, payments, commissions from revenue tables)
+- `>` Affiliate Activity (if affiliate: referrals, earnings, tier, contests won)
+- `>` Support (tickets)
+- `>` Activity Timeline (all events)
+- `>` Notes
+
+**Example — Revenue detail page for a transaction:**
+- Summary header: amount, type, status, date
+- `>` Related Person (clickable link to CRM + inline preview of key stats)
+- `>` Related Subscription (if applicable, clickable link)
+- `>` Audit Trail
+
+**Example — Contest detail page:**
+- Summary header: name, status, metric, prize, date range
+- `>` Winner (if completed — clickable link to CRM + winning stats)
+- `>` Participants (table of affiliates, each clickable)
+- `>` Related Payouts (if prize paid, clickable)
+
+### 4. Summary Cards Placement (FR-12)
+
+KPI/summary cards appear ONLY on each dashboard's landing page:
+- `/admin` — Admin overview KPIs (MRR, Active Subscribers, etc.)
+- `/dashboard/social/overview` — User dashboard KPIs
+- `/affiliate/dashboard` — Affiliate overview KPIs
+
+They are NOT repeated on sub-pages. When you drill into a sub-section (e.g., Affiliates > Members), you see the Members list — not the overview cards again.
+
+### 5. Users List Completeness (FR-14)
+
+The Users list shows ALL users, including the currently logged-in admin's own account. No records are hidden. This eliminates confusion about whether the list is complete.
 
 ---
 
@@ -147,35 +247,37 @@ Each sprint is designed to complete in one session (3-5 tasks, clear done-test).
 
 ---
 
-### Sprint 4: Admin Sidebar + Navigation
+### Sprint 4: Dashboard Shell + Navigation Overhaul
 
-**Goal:** Replace the admin horizontal top-nav with a proper vertical sidebar matching the other dashboards. Fix navigation-related UX issues.
+**Goal:** Build the Dashboard Shell component and apply it to the admin dashboard. This implements the Vercel-benchmarked navigation pattern: vertical sidebar with drill-down sub-menus, user account pinned at bottom, no horizontal nav, no top header bar inside dashboards.
 
 | Task | Description | Files |
 |------|-------------|-------|
-| S4-T1 | Build admin vertical sidebar component with all current nav groups, collapsible sections, mobile hamburger behavior, badge counts | `src/components/admin/admin-sidebar.tsx` |
-| S4-T2 | Update admin layout to use sidebar instead of horizontal top-nav. Reorder nav: move System (Users, Team, Audit Logs) higher in the list | `src/app/admin/layout.tsx` |
-| S4-T3 | Fix CRM detail tab persistence — use URL search params so refreshing preserves the active tab | `src/app/admin/crm/[userId]/page.tsx` |
-| S4-T4 | Standardize money display — pick one rule (show "$0.00" everywhere, never em-dash for money) and apply across admin pages | All admin pages showing currency |
+| S4-T1 | Build the Dashboard Shell component — reusable layout with sidebar (three zones: logo at top, search + nav in middle, user account pinned at bottom), drill-down sub-menu behavior, breadcrumb bar in content area, responsive breakpoints (desktop/tablet/mobile) | `src/components/layout/dashboard-shell.tsx` |
+| S4-T2 | Build admin sidebar nav content — define all nav groups (Dashboard, People, Money, Affiliates, Support, Content, Settings, System) with sub-items and drill-down definitions. Move Affiliates to top-level (`/admin/affiliate`). Move Users/Team into "People" group near top. | `src/components/admin/admin-sidebar.tsx` |
+| S4-T3 | Update admin layout to use Dashboard Shell. Remove horizontal top-nav. Remove top header bar. Content area gets full remaining width. | `src/app/admin/layout.tsx` |
+| S4-T4 | Fix CRM detail tab persistence — use URL search params so refreshing preserves the active tab | `src/app/admin/crm/[userId]/page.tsx` |
+| S4-T5 | Standardize money display — show "$0.00" everywhere (never em-dash for money) and apply across admin pages | All admin pages showing currency |
 
-**Done Test:** Admin dashboard has a vertical sidebar. Mobile sidebar works. System items appear near the top. CRM detail refresh preserves tab. Money displays consistently everywhere.
+**Done Test:** Admin dashboard uses the Dashboard Shell with vertical sidebar. Drill-down sub-menus work (e.g., clicking Affiliates replaces sidebar with affiliate sub-items + back button). User account is pinned at sidebar bottom. No horizontal nav or top header bar visible. Mobile sidebar works (hamburger overlay). Affiliates accessible at `/admin/affiliate`. CRM detail refresh preserves tab. Money displays consistently.
 
-**Addresses:** UX-01, UX-07, UX-09, UX-12
+**Addresses:** UX-01, UX-07, UX-09, UX-12, FR-03, FR-04
 
 ---
 
 ### Sprint 5: Command Palette + Impersonate + Cross-Linking
 
-**Goal:** Fix the two biggest functional gaps (search and impersonation) and add cross-linking.
+**Goal:** Fix the two biggest functional gaps (search and impersonation) and implement the cross-linking pattern with collapsible accordion sections on detail pages.
 
 | Task | Description | Files |
 |------|-------------|-------|
 | S5-T1 | Fix command palette search — wire up user search (by name/email), subscription search, invoice search against real database queries | Command palette component, search API route |
 | S5-T2 | Make command palette tickets clickable — results should navigate to the entity's detail page | Command palette component |
 | S5-T3 | Fix impersonate — impersonated view should show the target user's dashboard, not the admin's own view | Impersonate route and session handling |
-| S5-T4 | Add cross-linking throughout admin: person names link to CRM detail, amounts link to transaction detail, contest winners link to CRM | Revenue, Contests, Payouts, Members pages |
+| S5-T4 | Add collapsible accordion sections to CRM detail page showing related records: Revenue & Transactions, Affiliate Activity (if affiliate), Support tickets, Activity Timeline, Notes. All person names, amounts, and entities are clickable cross-links. | CRM detail page, shared accordion component |
+| S5-T5 | Add cross-linking to Revenue detail (related person with inline preview), Contest detail (winner + participants as clickable links), and Payout/Members pages (person names → CRM) | Revenue detail, Contest, Payout, Members pages |
 
-**Done Test:** Command palette finds users by partial name/email. Clicking a result navigates to the correct detail page. Impersonation shows the target user's view with impersonation banner. Person names and key data are clickable across admin pages.
+**Done Test:** Command palette finds users by partial name/email. Clicking a result navigates to the correct detail page. Impersonation shows the target user's view with impersonation banner. CRM detail page has accordion sections with related revenue/affiliate/support data. Person names across all admin pages are clickable links to CRM detail. Contest winners are clickable. Revenue detail shows related person.
 
 **Addresses:** BUG-04, BUG-05, BUG-06, BUG-07, BUG-08, UX-15, FR-08
 
@@ -278,13 +380,26 @@ At the end of Sprint 1, run a grep across all new component files to confirm zer
 
 ## Items NOT In This Blueprint
 
-The following items from the test results require discussion before they can be planned. They are tracked here but will NOT be built until discussed and approved:
+The following items require further discussion before they can be planned. They are tracked here but will NOT be built until discussed and approved:
 
-- **FR-01 through FR-14** — All feature requests listed in Category C above
-- **UX-10** (Breadcrumbs following history vs. sitemap) — This is a design philosophy question. Browser back button handles the "return to where I came from" case. Breadcrumbs showing the site hierarchy is standard UX. Need to discuss whether changing this is the right call.
-- **Affiliate Dashboard restructure** (breaking the 7,400-line monolith) — This is a significant effort that deserves its own blueprint after the Admin Dashboard is solid.
-- **Social Dashboard consistency audit** — The social dashboard is already fairly consistent. Will audit after admin work is complete.
-- **Discount code workflow redesign** (FR-07) — Requires product design discussion about affiliate self-service vs. admin control.
+**Pending Feature Requests (need discussion):**
+- **FR-01** — First/last name fields in CRM
+- **FR-02** — File upload for marketing assets (Supabase Storage)
+- **FR-05** — Best practice defaults for affiliate settings
+- **FR-06** — Grandfathering mechanism for setting changes
+- **FR-07** — Affiliate-branded discount codes
+- **FR-09** — Broadcast performance surfaced at higher level
+- **FR-10** — Payout workflow documentation
+- **FR-11** — Feature documentation for affiliate settings
+- **FR-13** — Settings as read-only cards vs. open forms (needs deciding before Sprint 3)
+
+**UX items needing discussion:**
+- **UX-10** (Breadcrumbs following history vs. sitemap) — Breadcrumbs showing site hierarchy is standard UX. Browser back button handles "return to where I came from." Need to discuss whether changing this is the right call.
+
+**Future blueprint work:**
+- **Affiliate Dashboard restructure** (breaking the 7,400-line monolith into route-based pages) — deserves its own blueprint after the Admin Dashboard is solid.
+- **Social Dashboard consistency audit** — already fairly consistent. Will audit after admin work is complete.
+- **Apply Dashboard Shell to Affiliate and Social dashboards** — after the Shell is proven on Admin (Sprint 4), apply to the other two dashboards in a future sprint.
 
 ---
 
@@ -293,8 +408,9 @@ The following items from the test results require discussion before they can be 
 1. Each sprint starts by reading this blueprint and confirming which sprint is current.
 2. At the end of each sprint, update this document: mark sprint as COMPLETE, note any carryover items.
 3. If a sprint can't finish, document exactly what's done and what remains.
-4. Sprint dependencies: Sprint 1 must complete before Sprint 6. All other sprints are independent and can run in any order.
-5. After Sprint 6, the team will assess whether a second blueprint is needed for the Affiliate Dashboard restructure.
+4. Sprint dependencies: Sprint 1 must complete before Sprint 6. Sprint 4 (Dashboard Shell) should complete before applying the Shell to other dashboards in future work. All other sprints are independent and can run in any order.
+5. After Sprint 6, the team will assess whether a second blueprint is needed for the Affiliate Dashboard restructure and applying the Dashboard Shell to all three dashboards.
+6. FR-13 (settings page UX pattern) must be decided before Sprint 3 begins, since Sprint 3 touches the same settings pages.
 
 ---
 
