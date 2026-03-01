@@ -9,13 +9,12 @@ This skill exists because previous sessions lost focus, touched off-limits files
 
 ## CURRENT SPRINT
 
-**Sprints 1–9B COMPLETE — Sprint 9C is NEXT**
-- Sprints 7/8/9 have been restructured into 7 sub-sprints: 7A, 7B, 8A, 8B, 9A, 9B, 9C
+**ALL 15 SPRINTS COMPLETE — UX Overhaul Blueprint is FINISHED**
+- Sprints 7/8/9 were restructured into 7 sub-sprints: 7A, 7B, 8A, 8B, 9A, 9B, 9C
 - All 9 errata issues in `docs/BLUEPRINT_ERRATA.md` have been FIXED and applied to the blueprint
 - Blueprint location: `docs/UX_OVERHAUL_BLUEPRINT.md`
-- **Next sprint: 9C** — Settings Edit-Protection on Remaining Pages (3 tasks: Branding, Compliance, Security+Support+Pricing)
-- Dependencies: None — 9C is independent.
-- **Remaining sprints:** 9C (1 of 15 total remaining)
+- **No remaining sprints.** The UX Overhaul Blueprint is fully complete.
+- **Next work:** User determines next priorities (Supabase migrations, launch prep, etc.)
 
 If the user asks you to do something unrelated to this sprint, do exactly what they ask — but do NOT expand the scope or touch anything else.
 

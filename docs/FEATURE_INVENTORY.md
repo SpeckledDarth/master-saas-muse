@@ -1,6 +1,6 @@
 # PassivePost — Complete Feature Inventory
 
-> **Last Updated:** February 27, 2026
+> **Last Updated:** March 1, 2026
 
 PassivePost is a closed-loop business intelligence platform for content creators. This document is a complete inventory of every feature that has been built, organized by system. Each feature includes a plain-English description and the value it provides to users, administrators, or the business.
 
@@ -350,7 +350,7 @@ The admin dashboard provides platform owners with the tools to manage the busine
 | **Related Records Sidebar** | Auto-populated sidebar on detail pages showing related entities from other types (other invoices, subscriptions, tickets by same customer). | Context without navigation — see the full picture without leaving the page. |
 | **Admin Print Styles** | Print-friendly CSS that hides sidebar, navigation, action buttons. Clean typography for detail page printing. | Printable invoices and records for offline use or client communication. |
 | **ConfirmDialog System** | All destructive/irreversible admin actions (delete, remove, role change) use a consistent confirmation dialog instead of browser `confirm()`. Applied across all admin pages: integrations, passivepost, affiliate, email templates, blog, SSO, users. | Professional UX — prevents accidental destructive actions with a branded, accessible dialog. |
-| **EditableSettingsGroup** | Reusable component that wraps settings sections in read-only mode by default with an Edit button to unlock. Each group saves independently. Uses DSCard wrapper, `<fieldset disabled>` pattern, and design system CSS variables. | Edit protection — prevents accidental changes to critical settings. Groups isolate changes so saving one section doesn't risk others. |
+| **EditableSettingsGroup** | Reusable component that wraps settings sections in read-only mode by default with an Edit button to unlock. Each group saves independently. Uses DSCard wrapper, `<fieldset disabled>` pattern, and design system CSS variables. Applied to all admin settings pages: Affiliate (7 groups), Branding (5 groups), Compliance (3 groups), Security (7 groups), Support (2 groups), Pricing (2 groups). | Edit protection — prevents accidental changes to critical settings. Groups isolate changes so saving one section doesn't risk others. |
 | **Role Change Confirmation** | Changing a user's role on the Users page requires confirmation dialog showing "Change role from X to Y?" before the API call. | Safety net — role changes affect permissions and access, so they deserve explicit confirmation. |
 | **Revenue Clear Dates** | Conditional "Clear Dates" button on the Revenue page that appears when date filters are active, resetting both date range and pagination. | UX convenience — one-click filter reset instead of manually clearing two date fields. |
 

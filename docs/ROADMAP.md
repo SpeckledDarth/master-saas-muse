@@ -954,6 +954,27 @@ ALTER TABLE affiliate_assets ADD COLUMN IF NOT EXISTS file_type TEXT;
 
 ---
 
+### Session — March 1, 2026 (UX Overhaul Blueprint — Sprint 9C — FINAL SPRINT)
+
+**Sprint 9C: Settings Edit-Protection on Remaining Pages** — COMPLETE
+
+Applied the EditableSettingsGroup component to the 5 remaining admin settings pages, replacing Card/CardHeader/CardContent wrappers and removing the single SaveButton at the bottom of each page. Each logical group now has its own independent Edit/Save/Cancel controls.
+
+Pages converted:
+1. **Support** (2 groups) — Support Widget, AI Support Configuration
+2. **Pricing** (2 editable groups + 1 read-only DSCard) — Free Tier Configuration, Card Layout, Paid Pricing Plans (read-only Stripe link card)
+3. **Security** (7 groups) — Authentication Security, Password Requirements, Session Management, User Data Rights, Database Backups, API Token Rotation, Metrics Alerts
+4. **Compliance** (3 groups) — Compliance Pages, Cookie Consent Banner, Edit Legal Pages
+5. **Branding** (5 editable groups + 2 passthrough) — Branding Identity & Hero, Announcement Bar, Navigation Menu, Header Styling, Footer Styling (plus Color Palette link card and FontPicker component kept as-is)
+
+**No database changes.** Sprint 9C is UI-only.
+
+**Files modified:** `src/app/admin/setup/branding/page.tsx`, `src/app/admin/setup/compliance/page.tsx`, `src/app/admin/setup/security/page.tsx`, `src/app/admin/setup/support/page.tsx`, `src/app/admin/setup/pricing/page.tsx`, `docs/UX_OVERHAUL_BLUEPRINT.md`, `.agents/skills/session-guard/SKILL.md`, `docs/ROADMAP.md`, `docs/FEATURE_INVENTORY.md`
+
+**Blueprint status:** ALL 15 OF 15 SPRINTS COMPLETE. The UX Overhaul Blueprint is finished.
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience
