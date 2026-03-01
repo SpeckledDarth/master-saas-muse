@@ -1,64 +1,11 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Palette, Paintbrush, FileText, BookOpen, DollarSign, Globe, Settings, Save, Check, Loader2, Scale, MessageCircle, Shield, KeyRound, Package, Quote, Stamp, BarChart3, Tag } from 'lucide-react'
+import { Save, Check, Loader2 } from 'lucide-react'
 import { SetupSettingsProvider, useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
-const sectionGroups = [
-  {
-    label: 'Brand Identity',
-    items: [
-      { id: 'branding', label: 'Branding', icon: Palette, href: '/admin/setup/branding' },
-      { id: 'palette', label: 'Color Palette', icon: Paintbrush, href: '/admin/setup/palette' },
-    ],
-  },
-  {
-    label: 'Content',
-    items: [
-      { id: 'content', label: 'Homepage', icon: FileText, href: '/admin/setup/content' },
-      { id: 'pages', label: 'Pages', icon: BookOpen, href: '/admin/setup/pages' },
-      { id: 'testimonials', label: 'Testimonials', icon: Quote, href: '/admin/setup/testimonials' },
-    ],
-  },
-  {
-    label: 'Business',
-    items: [
-      { id: 'pricing', label: 'Pricing', icon: DollarSign, href: '/admin/setup/pricing' },
-      { id: 'products', label: 'Products', icon: Package, href: '/admin/setup/products' },
-    ],
-  },
-  {
-    label: 'Platform',
-    items: [
-      { id: 'features', label: 'Features', icon: Settings, href: '/admin/setup/features' },
-      { id: 'social', label: 'Social Links', icon: Globe, href: '/admin/setup/social' },
-      { id: 'support', label: 'Support', icon: MessageCircle, href: '/admin/setup/support' },
-      { id: 'integrations', label: 'Integrations', icon: KeyRound, href: '/admin/setup/integrations' },
-      { id: 'watermark', label: 'Watermark', icon: Stamp, href: '/admin/setup/watermark' },
-      { id: 'funnel', label: 'Onboarding Funnel', icon: BarChart3, href: '/admin/setup/funnel' },
-    ],
-  },
-  {
-    label: 'Growth',
-    items: [
-      { id: 'affiliate', label: 'Affiliate Program', icon: DollarSign, href: '/admin/setup/affiliate' },
-      { id: 'discount-codes', label: 'Discount Codes', icon: Tag, href: '/admin/setup/discount-codes' },
-    ],
-  },
-  {
-    label: 'Legal & Security',
-    items: [
-      { id: 'compliance', label: 'Compliance', icon: Scale, href: '/admin/setup/compliance' },
-      { id: 'security', label: 'Security', icon: Shield, href: '/admin/setup/security' },
-    ],
-  },
-]
-
 function SetupLayoutInner({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
   const ctx = useSetupSettingsContext()
 
   if (ctx.loading) {
@@ -92,40 +39,8 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
         </Button>
       </div>
 
-      <div className="flex gap-[var(--content-density-gap,1rem)]">
-        <nav className="w-52 shrink-0">
-          <div className="space-y-5 sticky top-20">
-            {sectionGroups.map((group) => (
-              <div key={group.label}>
-                <div className="px-2 mb-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider" data-testid={`nav-group-${group.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                  {group.label}
-                </div>
-                <div className="space-y-0.5">
-                  {group.items.map((section) => {
-                    const isActive = pathname === section.href || (pathname === '/admin/setup' && section.id === 'branding')
-                    return (
-                      <Link key={section.id} href={section.href}>
-                        <Button
-                          variant={isActive ? 'secondary' : 'ghost'}
-                          size="sm"
-                          className="w-full justify-start"
-                          data-testid={`tab-${section.id}`}
-                        >
-                          <section.icon className="h-4 w-4 mr-2" />
-                          {section.label}
-                        </Button>
-                      </Link>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        </nav>
-
-        <main className="flex-1 min-w-0">
-          {children}
-        </main>
+      <div className="min-w-0">
+        {children}
       </div>
     </div>
   )

@@ -21,7 +21,7 @@ export function Footer() {
   const pathname = usePathname()
   const { settings, loading } = useSettings()
 
-  if (pathname?.startsWith('/dashboard/social') || pathname?.startsWith('/affiliate/dashboard')) {
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard') || pathname?.startsWith('/affiliate/dashboard')) {
     return null
   }
   
