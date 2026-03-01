@@ -1046,6 +1046,8 @@ export default function PalettePage() {
       <div
         className="rounded-[var(--card-radius,0.75rem)] p-[var(--section-spacing,1.5rem)] transition-colors duration-300 bg-background text-foreground"
         style={cssOverrides as React.CSSProperties}
+        {...((typoColors.headingColorLight || typoColors.headingColorDark) ? {'data-custom-heading-color': ''} : {})}
+        {...((typoColors.bodyColorLight || typoColors.bodyColorDark) ? {'data-custom-body-color': ''} : {})}
       >
         <p className="text-[15px] font-medium text-muted-foreground mb-[var(--content-density-gap,1rem)] uppercase tracking-wider">Live Preview</p>
         <div className="space-y-[var(--content-density-gap,1rem)]">

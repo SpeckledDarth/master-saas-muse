@@ -492,6 +492,17 @@ function applyDesignSystemVars(root: HTMLElement, b: SiteSettings['branding'], i
     root.style.setProperty(key, value)
   }
 
+  if (allVars['--heading-color']) {
+    root.setAttribute('data-custom-heading-color', '')
+  } else {
+    root.removeAttribute('data-custom-heading-color')
+  }
+  if (allVars['--body-color']) {
+    root.setAttribute('data-custom-body-color', '')
+  } else {
+    root.removeAttribute('data-custom-body-color')
+  }
+
   if (b.smoothScroll) {
     root.style.setProperty('scroll-behavior', 'smooth')
   } else if (b.smoothScroll === false) {
@@ -673,7 +684,7 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
         }
       }
 
-      applyDesignSystemVars(root, settings.branding)
+      applyDesignSystemVars(root, settings.branding, isDark)
     }
     
     const observer = new MutationObserver((mutations) => {

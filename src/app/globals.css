@@ -206,11 +206,11 @@
   }
 }
 
-:is(h1, h2, h3, h4, h5, h6) {
-  color: var(--heading-color, inherit);
+[data-custom-heading-color] :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--heading-color) !important;
 }
-body, [style*="--body-color"] {
-  color: var(--body-color, hsl(var(--foreground)));
+[data-custom-body-color] {
+  color: var(--body-color) !important;
 }
 
 @layer base {
