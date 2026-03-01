@@ -250,52 +250,93 @@ export function TypographySection() {
         </OptionGroup>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
-        <OptionGroup label="Heading Color Mode">
-          <ToggleGroup
-            value={b.headingColorMode || 'foreground'}
-            options={[
-              { value: 'foreground', label: 'Default' },
-              { value: 'primary', label: 'Primary' },
-              { value: 'gradient', label: 'Gradient' },
-            ]}
-            onChange={v => updateBranding('headingColorMode', v)}
-          />
-        </OptionGroup>
-        <OptionGroup label="Heading Color">
+      <OptionGroup label="Heading Color Mode">
+        <ToggleGroup
+          value={b.headingColorMode || 'foreground'}
+          options={[
+            { value: 'foreground', label: 'Default' },
+            { value: 'primary', label: 'Primary' },
+            { value: 'gradient', label: 'Gradient' },
+          ]}
+          onChange={v => updateBranding('headingColorMode', v)}
+        />
+      </OptionGroup>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+        <OptionGroup label="Heading Color (Light)">
           <div className="flex items-center gap-2">
             <ColorInput
-              value={b.headingColor || ''}
-              onChange={v => updateBranding('headingColor', v)}
-              data-testid="input-heading-color"
+              value={b.headingColorLight || ''}
+              onChange={v => updateBranding('headingColorLight', v)}
+              data-testid="input-heading-color-light"
             />
-            {b.headingColor && (
+            {b.headingColorLight && (
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-8 text-xs"
-                onClick={() => updateBranding('headingColor', undefined)}
-                data-testid="button-clear-heading-color"
+                onClick={() => updateBranding('headingColorLight', undefined)}
+                data-testid="button-clear-heading-color-light"
               >
                 Clear
               </Button>
             )}
           </div>
         </OptionGroup>
-        <OptionGroup label="Body Text Color">
+        <OptionGroup label="Heading Color (Dark)">
           <div className="flex items-center gap-2">
             <ColorInput
-              value={b.bodyColor || ''}
-              onChange={v => updateBranding('bodyColor', v)}
-              data-testid="input-body-color"
+              value={b.headingColorDark || ''}
+              onChange={v => updateBranding('headingColorDark', v)}
+              data-testid="input-heading-color-dark"
             />
-            {b.bodyColor && (
+            {b.headingColorDark && (
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-8 text-xs"
-                onClick={() => updateBranding('bodyColor', undefined)}
-                data-testid="button-clear-body-color"
+                onClick={() => updateBranding('headingColorDark', undefined)}
+                data-testid="button-clear-heading-color-dark"
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        </OptionGroup>
+        <OptionGroup label="Body Color (Light)">
+          <div className="flex items-center gap-2">
+            <ColorInput
+              value={b.bodyColorLight || ''}
+              onChange={v => updateBranding('bodyColorLight', v)}
+              data-testid="input-body-color-light"
+            />
+            {b.bodyColorLight && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => updateBranding('bodyColorLight', undefined)}
+                data-testid="button-clear-body-color-light"
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        </OptionGroup>
+        <OptionGroup label="Body Color (Dark)">
+          <div className="flex items-center gap-2">
+            <ColorInput
+              value={b.bodyColorDark || ''}
+              onChange={v => updateBranding('bodyColorDark', v)}
+              data-testid="input-body-color-dark"
+            />
+            {b.bodyColorDark && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => updateBranding('bodyColorDark', undefined)}
+                data-testid="button-clear-body-color-dark"
               >
                 Clear
               </Button>
@@ -342,10 +383,10 @@ export function TypographySection() {
       <Card className="bg-muted/30">
         <CardContent className="p-[var(--card-padding,1.25rem)] space-y-2">
           <p className="text-xs text-muted-foreground">Preview</p>
-          <h1 data-testid="text-preview-h1" style={{ fontFamily: b.headingFont && b.headingFont !== 'system' ? `"${b.headingFont}", sans-serif` : undefined, color: b.headingColor || undefined }}>Heading One</h1>
-          <h2 data-testid="text-preview-h2" style={{ fontFamily: b.headingFont && b.headingFont !== 'system' ? `"${b.headingFont}", sans-serif` : undefined, color: b.headingColor || undefined }}>Heading Two</h2>
-          <h3 data-testid="text-preview-h3" style={{ fontFamily: b.headingFont && b.headingFont !== 'system' ? `"${b.headingFont}", sans-serif` : undefined, color: b.headingColor || undefined }}>Heading Three</h3>
-          <p data-testid="text-preview-body" style={{ fontFamily: b.bodyFont && b.bodyFont !== 'system' ? `"${b.bodyFont}", sans-serif` : undefined, color: b.bodyColor || undefined }}>Body text looks like this. The quick brown fox jumps over the lazy dog.</p>
+          <h1 data-testid="text-preview-h1" style={{ fontFamily: b.headingFont && b.headingFont !== 'system' ? `"${b.headingFont}", sans-serif` : undefined, color: b.headingColorLight || undefined }}>Heading One</h1>
+          <h2 data-testid="text-preview-h2" style={{ fontFamily: b.headingFont && b.headingFont !== 'system' ? `"${b.headingFont}", sans-serif` : undefined, color: b.headingColorLight || undefined }}>Heading Two</h2>
+          <h3 data-testid="text-preview-h3" style={{ fontFamily: b.headingFont && b.headingFont !== 'system' ? `"${b.headingFont}", sans-serif` : undefined, color: b.headingColorLight || undefined }}>Heading Three</h3>
+          <p data-testid="text-preview-body" style={{ fontFamily: b.bodyFont && b.bodyFont !== 'system' ? `"${b.bodyFont}", sans-serif` : undefined, color: b.bodyColorLight || undefined }}>Body text looks like this. The quick brown fox jumps over the lazy dog.</p>
         </CardContent>
       </Card>
     </Section>

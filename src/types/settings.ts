@@ -52,8 +52,10 @@ export interface BrandingSettings {
   h3LetterSpacing?: string
   h3TextTransform?: 'none' | 'uppercase' | 'capitalize'
   headingColorMode?: 'primary' | 'foreground' | 'gradient'
-  headingColor?: string
-  bodyColor?: string
+  headingColorLight?: string
+  headingColorDark?: string
+  bodyColorLight?: string
+  bodyColorDark?: string
   bodyFontSize?: string
   bodyLineHeight?: string
 

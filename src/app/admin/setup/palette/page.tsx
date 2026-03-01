@@ -157,11 +157,24 @@ function getShadeScaleVars(shades: Record<string, string>): Record<string, strin
   return vars
 }
 
-function getCssOverrides(shades: Record<string, string>, dark: boolean, overrides?: BgOverrides): Record<string, string> {
+interface TypoColorOverrides {
+  headingColorLight?: string
+  headingColorDark?: string
+  bodyColorLight?: string
+  bodyColorDark?: string
+}
+
+function getCssOverrides(shades: Record<string, string>, dark: boolean, overrides?: BgOverrides, typoColors?: TypoColorOverrides): Record<string, string> {
   const shade850 = interpolateHex(shades['800'], shades['900'], 0.5)
   const shade750 = interpolateHex(shades['700'], shades['800'], 0.5)
   const defaults = getDefaultBgs(shades)
   const scaleVars = getShadeScaleVars(shades)
+
+  const headingColor = dark ? typoColors?.headingColorDark : typoColors?.headingColorLight
+  const bodyColor = dark ? typoColors?.bodyColorDark : typoColors?.bodyColorLight
+  const typoVars: Record<string, string> = {}
+  if (headingColor) typoVars['--heading-color'] = headingColor
+  if (bodyColor) typoVars['--body-color'] = bodyColor
 
   const siteBg = dark
     ? (overrides?.siteBgDark || defaults.siteBgDark)
@@ -170,6 +183,7 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean, override
   if (dark) {
     return {
       ...scaleVars,
+      ...typoVars,
       '--background': hexToHslString(siteBg),
       '--foreground': hexToHslString(shades['50']),
       '--card': hexToHslString(siteBg),
@@ -193,6 +207,7 @@ function getCssOverrides(shades: Record<string, string>, dark: boolean, override
   }
   return {
     ...scaleVars,
+    ...typoVars,
     '--background': hexToHslString(siteBg),
     '--foreground': hexToHslString(shades['900']),
     '--card': hexToHslString(siteBg),
@@ -885,7 +900,13 @@ export default function PalettePage() {
 
   const shades = useMemo(() => generateShadeScale(localColor), [localColor])
   const defaults = useMemo(() => getDefaultBgs(shades), [shades])
-  const cssOverrides = useMemo(() => getCssOverrides(shades, darkMode, bgOverrides), [shades, darkMode, bgOverrides])
+  const typoColors: TypoColorOverrides = useMemo(() => ({
+    headingColorLight: settings.branding.headingColorLight,
+    headingColorDark: settings.branding.headingColorDark,
+    bodyColorLight: settings.branding.bodyColorLight,
+    bodyColorDark: settings.branding.bodyColorDark,
+  }), [settings.branding.headingColorLight, settings.branding.headingColorDark, settings.branding.bodyColorLight, settings.branding.bodyColorDark])
+  const cssOverrides = useMemo(() => getCssOverrides(shades, darkMode, bgOverrides, typoColors), [shades, darkMode, bgOverrides, typoColors])
 
   const handleColorChange = useCallback((hex: string) => {
     setLocalColor(hex)
@@ -914,7 +935,7 @@ export default function PalettePage() {
   }, [])
 
   return (
-    <div className="space-y-[var(--section-spacing,1.5rem)]">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-end justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div className="space-y-2 max-w-xs">
           <ColorInput
@@ -1023,8 +1044,8 @@ export default function PalettePage() {
       </div>
 
       <div
-        className="rounded-[var(--card-radius,0.75rem)] p-[var(--section-spacing,1.5rem)] transition-colors duration-300 bg-background text-foreground"
-        style={cssOverrides as React.CSSProperties}
+        className="rounded-[var(--card-radius,0.75rem)] p-[var(--section-spacing,1.5rem)] transition-colors duration-300 bg-background"
+        style={{ ...cssOverrides, color: (cssOverrides as any)['--body-color'] || `hsl(${(cssOverrides as any)['--foreground'] || '0 0% 0%'})` } as React.CSSProperties}
       >
         <p className="text-[15px] font-medium text-muted-foreground mb-[var(--content-density-gap,1rem)] uppercase tracking-wider">Live Preview</p>
         <div className="space-y-[var(--content-density-gap,1rem)]">

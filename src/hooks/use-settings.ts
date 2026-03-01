@@ -318,7 +318,7 @@ function getFontFamily(value: string): string {
   return `"${value}"${fallback}`
 }
 
-function resolveTypographyVars(b: SiteSettings['branding']): Record<string, string> {
+function resolveTypographyVars(b: SiteSettings['branding'], isDark?: boolean): Record<string, string> {
   const vars: Record<string, string> = {}
   if (b.h1FontSize !== undefined) vars['--h1-size'] = b.h1FontSize
   if (b.h1FontWeight !== undefined) vars['--h1-weight'] = b.h1FontWeight
@@ -334,8 +334,14 @@ function resolveTypographyVars(b: SiteSettings['branding']): Record<string, stri
   if (b.h3TextTransform !== undefined) vars['--h3-transform'] = b.h3TextTransform
   if (b.bodyFontSize !== undefined) vars['--body-size'] = b.bodyFontSize
   if (b.bodyLineHeight !== undefined) vars['--body-line-height'] = b.bodyLineHeight
-  if (b.headingColor) vars['--heading-color'] = b.headingColor
-  if (b.bodyColor) vars['--body-color'] = b.bodyColor
+  const headingColor = isDark
+    ? (b.headingColorDark || (b as any).headingColor)
+    : (b.headingColorLight || (b as any).headingColor)
+  const bodyColor = isDark
+    ? (b.bodyColorDark || (b as any).bodyColor)
+    : (b.bodyColorLight || (b as any).bodyColor)
+  if (headingColor) vars['--heading-color'] = headingColor
+  if (bodyColor) vars['--body-color'] = bodyColor
   return vars
 }
 
@@ -470,9 +476,9 @@ function resolveDividerVars(b: SiteSettings['branding']): Record<string, string>
   return vars
 }
 
-function applyDesignSystemVars(root: HTMLElement, b: SiteSettings['branding']) {
+function applyDesignSystemVars(root: HTMLElement, b: SiteSettings['branding'], isDark?: boolean) {
   const allVars = {
-    ...resolveTypographyVars(b),
+    ...resolveTypographyVars(b, isDark),
     ...resolveComponentVars(b),
     ...resolveLayoutVars(b),
     ...resolveInteractiveVars(b),
@@ -599,7 +605,7 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
       if (mutedFgShade) root.style.setProperty('--muted-foreground', mutedFgShade)
     }
 
-    applyDesignSystemVars(root, settings.branding)
+    applyDesignSystemVars(root, settings.branding, isDark)
   }, [settings?.branding, resolvedTheme])
   
   useEffect(() => {
