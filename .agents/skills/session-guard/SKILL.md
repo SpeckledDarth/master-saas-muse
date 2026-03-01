@@ -98,19 +98,24 @@ These files and topics are OFF-LIMITS unless the user explicitly asks:
 1. `docs/FUTURE PLAN - CONNECTED_DATA_VISION.md` — do not read, modify, reference, or suggest changes
 2. Do NOT suggest cutting features or simplifying the affiliate program — the 217-feature vision is intentional
 3. Do NOT suggest using Replit preview/webview — the user tests on Vercel only
-4. Do NOT create new documentation files — the 5 docs in `docs/` are sufficient
+4. Do NOT create new documentation files in `docs/` without user approval. Design docs from the brainstorming process go in `docs/plans/`
 5. Do NOT modify files unrelated to the current task — if you think something else needs fixing, mention it and wait for approval
 
 ## MANDATORY READS (before writing any code)
 
-Read these three files IN ORDER before planning or coding:
+Read these files IN ORDER before planning or coding:
 
 1. `docs/ROADMAP.md` — Read the LAST session log entry to understand where things left off
-2. `docs/UX_OVERHAUL_BLUEPRINT.md` — Read the CURRENT SPRINT section (identified above) to understand what needs to be built
-3. `docs/LESSONS_LEARNED.md` — Know the anti-patterns so you don't repeat them
+2. `docs/LESSONS_LEARNED.md` — Know the anti-patterns so you don't repeat them
 
 If doing UI work, also load the `design-system` skill.
-If the blueprint references a visual pattern or UI benchmark, LOOK AT the reference images before coding. Do not interpret text descriptions alone — the images are the source of truth.
+
+**Additional context available when needed:**
+- `docs/musekit/` — MuseKit architecture, admin guide, affiliate system, setup guide, and more (9 docs)
+- `docs/passivepost/` — PassivePost features, architecture, product guide, sitemap, blog publishing, and more (8 docs)
+- `docs/UX-UI Dashboard Cleanup/` — Full history of the 15-sprint UX overhaul (ALL COMPLETE). Reference if doing dashboard styling work.
+- `docs/plans/` — Design docs created during the brainstorming process
+- `docs/ADMIN_DASHBOARD_BLUEPRINT.md`, `docs/CRM_INVOICING_BRAINSTORM.md`, `docs/DESIGN_SYSTEM_BLUEPRINT.md`, `docs/FEATURE_DISCOVERY_GUIDE.md` — Detailed blueprints and brainstorms for major subsystems
 
 ## NO GUESSING — ASK FIRST
 

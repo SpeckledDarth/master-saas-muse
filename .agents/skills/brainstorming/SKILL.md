@@ -12,12 +12,16 @@ Help turn ideas into fully formed designs and specs through natural collaborativ
 Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design and get user approval.
 
 <HARD-GATE>
-Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
+Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it.
+
+**This gate applies to:** New features, UI changes, product decisions, architectural changes, and any creative/design work.
+
+**This gate does NOT apply to:** Bug fixes, color/compliance fixes, tasks where the user provides an explicit implementation plan, or tasks where the user explicitly says to just do it. For these exempt tasks, proceed directly with implementation.
 </HARD-GATE>
 
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
-Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
+Every non-exempt project goes through this process. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
 
 ## Checklist
 
@@ -27,8 +31,8 @@ You MUST create a task for each of these items and complete them in order:
 2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 3. **Propose 2-3 approaches** — with trade-offs and your recommendation
 4. **Present design** — in sections scaled to their complexity, get user approval after each section
-5. **Write design doc** — save to `docs/plans/YYYY-MM-DD-<topic>-design.md` and commit
-6. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+5. **Write design doc** — save to `docs/plans/YYYY-MM-DD-<topic>-design.md`
+6. **Transition to implementation** — create a session plan in `.local/session_plan.md` using the standard task format (T001, T002, etc.) and propose it for user approval
 
 ## Process Flow
 
@@ -40,7 +44,7 @@ digraph brainstorming {
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
     "Write design doc" [shape=box];
-    "Invoke writing-plans skill" [shape=doublecircle];
+    "Create session plan" [shape=doublecircle];
 
     "Explore project context" -> "Ask clarifying questions";
     "Ask clarifying questions" -> "Propose 2-3 approaches";
@@ -48,11 +52,11 @@ digraph brainstorming {
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
     "User approves design?" -> "Write design doc" [label="yes"];
-    "Write design doc" -> "Invoke writing-plans skill";
+    "Write design doc" -> "Create session plan";
 }
 ```
 
-**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is writing-plans.
+**The terminal state is creating the session plan.** After the design is approved and documented, create a session plan in `.local/session_plan.md` using the standard task format (T001, T002, etc.) and propose it for user approval. Do NOT skip the session plan step.
 
 ## The Process
 
@@ -79,12 +83,10 @@ digraph brainstorming {
 
 **Documentation:**
 - Write the validated design to `docs/plans/YYYY-MM-DD-<topic>-design.md`
-- Use elements-of-style:writing-clearly-and-concisely skill if available
-- Commit the design document to git
 
 **Implementation:**
-- Invoke the writing-plans skill to create a detailed implementation plan
-- Do NOT invoke any other skill. writing-plans is the next step.
+- Create a session plan in `.local/session_plan.md` using the standard task format (T001, T002, etc.)
+- Propose the session plan for user approval before any implementation begins
 
 ## Key Principles
 

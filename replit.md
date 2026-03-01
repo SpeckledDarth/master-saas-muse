@@ -75,25 +75,24 @@ Additional skills to load when relevant:
 
 ### Document System
 
-The `docs/` folder contains exactly 5 active documents. **Never merge them. Never create new ones.** Additional reference docs are archived in `docs/archive/` — read them only if the user asks or if you need deep reference on a specific subsystem.
+The `docs/` folder contains active project documents. **Do not create new docs without user approval.** Design docs from the brainstorming process go in `docs/plans/`.
 
-| Document | Role | Updates |
+| Folder / Document | Role | Updates |
 |----------|------|---------|
 | `PRODUCT_IDENTITY.md` | **Product soul** — what we're building and why | Rarely — only when vision evolves |
 | `DESIGN_SYSTEM_RULES.md` | **Styling law** — CSS variable mapping, wrapper components, Never/Always rules | When design system variables change |
 | `FEATURE_INVENTORY.md` | **What exists** — complete map of built features | Every session — add new features |
 | `LESSONS_LEARNED.md` | **What we've learned** — anti-patterns and rules | Every session — add new lessons |
 | `ROADMAP.md` | **Execution state** — what's done, what's next | Every session — update progress |
-
-### UX-UI Dashboard Cleanup Folder
-
-The `docs/UX-UI Dashboard Cleanup/` folder tracks the full history of the dashboard UX overhaul. **Load these when doing any color/Card compliance work.**
-
-| Document | Role | Status |
-|----------|------|--------|
-| `UX_OVERHAUL_BLUEPRINT.md` | Original 15-sprint UX plan | ALL 15 SPRINTS COMPLETE |
-| `BLUEPRINT_ERRATA.md` | 9 corrections to the original plan | ALL 9 ISSUES FIXED |
-| `COLOR_MODEL_COMPLIANCE.md` | 39 color violations + 72 Card→DSCard migrations | ALL 11 SPRINTS COMPLETE |
+| `TESTING_PLAN.md` | **QA reference** — testing all features by user type | When features are added/changed |
+| `ADMIN_DASHBOARD_BLUEPRINT.md` | Admin dashboard build plan | Reference |
+| `CRM_INVOICING_BRAINSTORM.md` | CRM & invoicing design decisions | Reference |
+| `DESIGN_SYSTEM_BLUEPRINT.md` | Design system architecture | Reference |
+| `FEATURE_DISCOVERY_GUIDE.md` | Feature discovery reference | Reference |
+| `docs/musekit/` | **MuseKit docs** — architecture, admin guide, affiliate system, setup, master plan, checklist (9 docs) | When MuseKit core changes |
+| `docs/passivepost/` | **PassivePost docs** — features, architecture, product guide, sitemap, blog publishing, flywheel plan (8 docs) | When PassivePost features change |
+| `docs/plans/` | **Design docs** — brainstorming outputs, created with user approval | When brainstorming new features |
+| `docs/UX-UI Dashboard Cleanup/` | **UX overhaul history** — blueprint, errata, color compliance (ALL COMPLETE) | Reference for dashboard styling |
 
 ## System Architecture
 The project is built on Next.js 16+ (App Router), React 18+, and TypeScript, utilizing Tailwind CSS, shadcn/ui, and next-themes for styling. TanStack Query manages server state. Supabase provides PostgreSQL, authentication, RLS, and storage, supporting multi-tenancy. Deployment is exclusively on Vercel.
