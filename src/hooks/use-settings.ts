@@ -320,20 +320,20 @@ function getFontFamily(value: string): string {
 
 function resolveTypographyVars(b: SiteSettings['branding']): Record<string, string> {
   const vars: Record<string, string> = {}
-  if (b.h1FontSize) vars['--h1-size'] = b.h1FontSize
-  if (b.h1FontWeight) vars['--h1-weight'] = b.h1FontWeight
-  if (b.h1LetterSpacing) vars['--h1-spacing'] = b.h1LetterSpacing
-  if (b.h1TextTransform) vars['--h1-transform'] = b.h1TextTransform
-  if (b.h2FontSize) vars['--h2-size'] = b.h2FontSize
-  if (b.h2FontWeight) vars['--h2-weight'] = b.h2FontWeight
-  if (b.h2LetterSpacing) vars['--h2-spacing'] = b.h2LetterSpacing
-  if (b.h2TextTransform) vars['--h2-transform'] = b.h2TextTransform
-  if (b.h3FontSize) vars['--h3-size'] = b.h3FontSize
-  if (b.h3FontWeight) vars['--h3-weight'] = b.h3FontWeight
-  if (b.h3LetterSpacing) vars['--h3-spacing'] = b.h3LetterSpacing
-  if (b.h3TextTransform) vars['--h3-transform'] = b.h3TextTransform
-  if (b.bodyFontSize) vars['--body-size'] = b.bodyFontSize
-  if (b.bodyLineHeight) vars['--body-line-height'] = b.bodyLineHeight
+  if (b.h1FontSize !== undefined) vars['--h1-size'] = b.h1FontSize
+  if (b.h1FontWeight !== undefined) vars['--h1-weight'] = b.h1FontWeight
+  if (b.h1LetterSpacing !== undefined) vars['--h1-spacing'] = b.h1LetterSpacing
+  if (b.h1TextTransform !== undefined) vars['--h1-transform'] = b.h1TextTransform
+  if (b.h2FontSize !== undefined) vars['--h2-size'] = b.h2FontSize
+  if (b.h2FontWeight !== undefined) vars['--h2-weight'] = b.h2FontWeight
+  if (b.h2LetterSpacing !== undefined) vars['--h2-spacing'] = b.h2LetterSpacing
+  if (b.h2TextTransform !== undefined) vars['--h2-transform'] = b.h2TextTransform
+  if (b.h3FontSize !== undefined) vars['--h3-size'] = b.h3FontSize
+  if (b.h3FontWeight !== undefined) vars['--h3-weight'] = b.h3FontWeight
+  if (b.h3LetterSpacing !== undefined) vars['--h3-spacing'] = b.h3LetterSpacing
+  if (b.h3TextTransform !== undefined) vars['--h3-transform'] = b.h3TextTransform
+  if (b.bodyFontSize !== undefined) vars['--body-size'] = b.bodyFontSize
+  if (b.bodyLineHeight !== undefined) vars['--body-line-height'] = b.bodyLineHeight
   return vars
 }
 
@@ -352,19 +352,19 @@ function resolveComponentVars(b: SiteSettings['branding']): Record<string, strin
   const badgeRadiusMap = { pill: '9999px', rounded: '0.375rem', square: '0.125rem' }
   const fontWeightMap = { medium: '500', semibold: '600', bold: '700' }
 
-  if (b.cardPadding) vars['--card-padding'] = paddingMap[b.cardPadding] || paddingMap.default
-  if (b.cardBorderRadius) vars['--card-radius'] = radiusMap[b.cardBorderRadius] || radiusMap.lg
-  if (b.cardShadow) vars['--card-shadow'] = shadowMap[b.cardShadow] || shadowMap.sm
+  if (b.cardPadding !== undefined) vars['--card-padding'] = paddingMap[b.cardPadding] || paddingMap.default
+  if (b.cardBorderRadius !== undefined) vars['--card-radius'] = radiusMap[b.cardBorderRadius] || radiusMap.lg
+  if (b.cardShadow !== undefined) vars['--card-shadow'] = shadowMap[b.cardShadow] || shadowMap.sm
   if (b.cardBorderWidth !== undefined) vars['--card-border-width'] = `${b.cardBorderWidth}px`
-  if (b.cardBorderStyle) vars['--card-border-style'] = b.cardBorderStyle === 'none' ? 'none' : b.cardBorderStyle
+  if (b.cardBorderStyle !== undefined) vars['--card-border-style'] = b.cardBorderStyle === 'none' ? 'none' : b.cardBorderStyle
   const btnRadiusMap = { pill: '9999px', rounded: '0.375rem' }
-  if (b.buttonRadius) vars['--btn-radius'] = btnRadiusMap[b.buttonRadius] || btnRadiusMap.pill
-  if (b.buttonSize) vars['--btn-padding'] = btnPadMap[b.buttonSize] || btnPadMap.default
-  if (b.buttonFontWeight) vars['--btn-font-weight'] = fontWeightMap[b.buttonFontWeight] || fontWeightMap.semibold
-  if (b.buttonTextTransform) vars['--btn-text-transform'] = b.buttonTextTransform
-  if (b.badgeShape) vars['--badge-radius'] = badgeRadiusMap[b.badgeShape] || badgeRadiusMap.pill
+  if (b.buttonRadius !== undefined) vars['--btn-radius'] = btnRadiusMap[b.buttonRadius] || btnRadiusMap.pill
+  if (b.buttonSize !== undefined) vars['--btn-padding'] = btnPadMap[b.buttonSize] || btnPadMap.default
+  if (b.buttonFontWeight !== undefined) vars['--btn-font-weight'] = fontWeightMap[b.buttonFontWeight] || fontWeightMap.semibold
+  if (b.buttonTextTransform !== undefined) vars['--btn-text-transform'] = b.buttonTextTransform
+  if (b.badgeShape !== undefined) vars['--badge-radius'] = badgeRadiusMap[b.badgeShape] || badgeRadiusMap.pill
 
-  if (b.inputStyleMatch) {
+  if (b.inputStyleMatch !== undefined && b.inputStyleMatch) {
     vars['--input-radius'] = vars['--card-radius'] || radiusMap.lg
   }
 
@@ -377,11 +377,11 @@ function resolveLayoutVars(b: SiteSettings['branding']): Record<string, string> 
   const sectionMap = { compact: '2rem', default: '3.5rem', spacious: '5rem' }
   const sidebarMap = { narrow: '14rem', default: '16rem', wide: '18rem' }
 
-  if (b.contentDensity) vars['--content-density-gap'] = gapMap[b.contentDensity] || gapMap.default
-  if (b.sectionSpacing) vars['--section-spacing'] = sectionMap[b.sectionSpacing] || sectionMap.default
-  if (b.sidebarWidth) vars['--sidebar-width'] = sidebarMap[b.sidebarWidth] || sidebarMap.default
-  if (b.containerMaxWidth) vars['--container-max-width'] = b.containerMaxWidth
-  if (b.pageHeaderStyle) vars['--page-header-size'] = b.pageHeaderStyle === 'compact' ? '1.5rem' : '2.25rem'
+  if (b.contentDensity !== undefined) vars['--content-density-gap'] = gapMap[b.contentDensity] || gapMap.default
+  if (b.sectionSpacing !== undefined) vars['--section-spacing'] = sectionMap[b.sectionSpacing] || sectionMap.default
+  if (b.sidebarWidth !== undefined) vars['--sidebar-width'] = sidebarMap[b.sidebarWidth] || sidebarMap.default
+  if (b.containerMaxWidth !== undefined) vars['--container-max-width'] = b.containerMaxWidth
+  if (b.pageHeaderStyle !== undefined) vars['--page-header-size'] = b.pageHeaderStyle === 'compact' ? '1.5rem' : '2.25rem'
   return vars
 }
 
@@ -397,13 +397,13 @@ function resolveInteractiveVars(b: SiteSettings['branding']): Record<string, str
   }
   const speedMap = { fast: '100ms', normal: '200ms', slow: '350ms', none: '0ms' }
 
-  if (b.hoverEffect) {
+  if (b.hoverEffect !== undefined) {
     vars['--hover-transform'] = hoverTransformMap[b.hoverEffect] || 'none'
     vars['--hover-shadow'] = hoverShadowMap[b.hoverEffect] || 'none'
   }
-  if (b.animationSpeed) vars['--transition-speed'] = speedMap[b.animationSpeed] || speedMap.normal
-  if (b.focusRingWidth) vars['--focus-ring-width'] = `${b.focusRingWidth}px`
-  if (b.buttonClickFeedback) vars['--click-scale'] = '0.97'
+  if (b.animationSpeed !== undefined) vars['--transition-speed'] = speedMap[b.animationSpeed] || speedMap.normal
+  if (b.focusRingWidth !== undefined) vars['--focus-ring-width'] = `${b.focusRingWidth}px`
+  if (b.buttonClickFeedback === true) vars['--click-scale'] = '0.97'
   if (b.buttonClickFeedback === false) vars['--click-scale'] = '1'
   return vars
 }
@@ -413,9 +413,9 @@ function resolveChartVars(b: SiteSettings['branding']): Record<string, string> {
   const barSizeMap = { thin: '12', default: '20', thick: '32' }
   const barRadiusMap = { none: '0', sm: '2', md: '4' }
 
-  if (b.chartBarThickness) vars['--chart-bar-size'] = barSizeMap[b.chartBarThickness] || barSizeMap.default
-  if (b.chartBarRadius) vars['--chart-bar-radius'] = barRadiusMap[b.chartBarRadius] || barRadiusMap.sm
-  if (b.chartLineWidth) vars['--chart-line-width'] = `${b.chartLineWidth}`
+  if (b.chartBarThickness !== undefined) vars['--chart-bar-size'] = barSizeMap[b.chartBarThickness] || barSizeMap.default
+  if (b.chartBarRadius !== undefined) vars['--chart-bar-radius'] = barRadiusMap[b.chartBarRadius] || barRadiusMap.sm
+  if (b.chartLineWidth !== undefined) vars['--chart-line-width'] = `${b.chartLineWidth}`
   if (b.chartAreaOpacity !== undefined) vars['--chart-area-opacity'] = `${b.chartAreaOpacity}`
   return vars
 }

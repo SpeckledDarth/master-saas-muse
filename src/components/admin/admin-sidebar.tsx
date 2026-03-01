@@ -40,7 +40,6 @@ import {
   ChevronLeft,
   ExternalLink,
   LogOut,
-  Clock,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -92,14 +91,6 @@ interface BadgeCounts {
   pendingPayouts: number
 }
 
-const RECENT_PAGES_KEY = 'admin-recent-pages'
-const MAX_RECENT = 5
-
-interface RecentPage {
-  href: string
-  title: string
-  timestamp: number
-}
 
 function buildNavGroups(isAppAdmin: boolean, permissions: TeamPermissions | null): NavGroup[] {
   const can = (check: (p: TeamPermissions | null, isAdmin: boolean) => boolean) => check(permissions, isAppAdmin)
@@ -212,63 +203,6 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(href + '/')
 }
 
-const ROUTE_TITLE_MAP: Record<string, string> = {
-  '/admin': 'Overview',
-  '/admin/users': 'Users',
-  '/admin/team': 'Team',
-  '/admin/crm': 'CRM',
-  '/admin/revenue': 'Revenue',
-  '/admin/subscriptions': 'Subscriptions',
-  '/admin/setup/affiliate': 'Affiliate Program',
-  '/admin/setup/discount-codes': 'Discount Codes',
-  '/admin/setup/funnel': 'Onboarding Funnel',
-  '/admin/feedback': 'Tickets',
-  '/admin/waitlist': 'Waitlist',
-  '/admin/blog': 'Blog',
-  '/admin/email-templates': 'Email Templates',
-  '/admin/setup/branding': 'Branding',
-  '/admin/setup/palette': 'Color Palette',
-  '/admin/setup/content': 'Homepage',
-  '/admin/setup/pages': 'Pages',
-  '/admin/setup/pricing': 'Pricing',
-  '/admin/setup/products': 'Products',
-  '/admin/setup/features': 'Features',
-  '/admin/setup/social': 'Social Links',
-  '/admin/setup/support': 'Support Config',
-  '/admin/setup/integrations': 'Integrations',
-  '/admin/setup/testimonials': 'Testimonials',
-  '/admin/setup/watermark': 'Watermark',
-  '/admin/setup/compliance': 'Compliance',
-  '/admin/setup/security': 'Security',
-  '/admin/setup/passivepost': 'PassivePost',
-  '/admin/analytics': 'Analytics',
-  '/admin/audit-logs': 'Audit Logs',
-  '/admin/queue': 'Queue',
-  '/admin/sso': 'SSO',
-  '/admin/onboarding': 'Onboarding Wizard',
-  '/admin/metrics': 'Metrics',
-  '/admin/affiliate': 'Affiliate Program',
-}
-
-function getRecentPages(): RecentPage[] {
-  if (typeof window === 'undefined') return []
-  try {
-    const stored = localStorage.getItem(RECENT_PAGES_KEY)
-    if (!stored) return []
-    return JSON.parse(stored) as RecentPage[]
-  } catch {
-    return []
-  }
-}
-
-function addRecentPage(href: string, title: string) {
-  if (typeof window === 'undefined') return
-  try {
-    const pages = getRecentPages().filter(p => p.href !== href)
-    pages.unshift({ href, title, timestamp: Date.now() })
-    localStorage.setItem(RECENT_PAGES_KEY, JSON.stringify(pages.slice(0, MAX_RECENT)))
-  } catch {}
-}
 
 function findGroupForPath(navGroups: NavGroup[], pathname: string): string | null {
   if (pathname === '/admin') return null
@@ -300,7 +234,6 @@ export function AdminSidebarNav({ isAppAdmin, permissions }: AdminSidebarNavProp
   const pathname = usePathname()
   const [user, setUser] = useState<User | null>(null)
   const [badgeCounts, setBadgeCounts] = useState<BadgeCounts>({ openTickets: 0, newUsersToday: 0, failedPayments: 0, pendingApplications: 0, pendingPayouts: 0 })
-  const [recentPages, setRecentPages] = useState<RecentPage[]>([])
   const [activeGroup, setActiveGroup] = useState<string | null>(null)
   const manualOverrideRef = useRef(false)
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
@@ -363,14 +296,6 @@ export function AdminSidebarNav({ isAppAdmin, permissions }: AdminSidebarNavProp
     fetchCounts()
   }, [])
 
-  useEffect(() => {
-    const title = ROUTE_TITLE_MAP[pathname]
-    if (title) {
-      addRecentPage(pathname, title)
-    }
-    setRecentPages(getRecentPages())
-  }, [pathname])
-
   const handleSignOut = async () => {
     const supabase = supabaseRef.current
     if (!supabase) return
@@ -381,8 +306,6 @@ export function AdminSidebarNav({ isAppAdmin, permissions }: AdminSidebarNavProp
   const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Admin'
   const initials = displayName.slice(0, 2).toUpperCase()
   const avatarUrl = user?.user_metadata?.avatar_url
-
-  const filteredRecent = recentPages.filter(p => p.href !== pathname).slice(0, 3)
 
   const drilledGroup = activeGroup ? navGroups.find(g => g.group === activeGroup) : null
 
@@ -403,35 +326,6 @@ export function AdminSidebarNav({ isAppAdmin, permissions }: AdminSidebarNavProp
       <SidebarContent>
         {activeGroup === null ? (
           <>
-            {filteredRecent.length > 0 && (
-              <>
-                <SidebarGroup>
-                  <SidebarGroupLabel>
-                    <Clock className="h-3 w-3 mr-1" />
-                    Recent
-                  </SidebarGroupLabel>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      {filteredRecent.map((page) => (
-                        <SidebarMenuItem key={page.href}>
-                          <SidebarMenuButton
-                            asChild
-                            size="sm"
-                            data-testid={`nav-recent-${page.title.toLowerCase().replace(/\s+/g, '-')}`}
-                          >
-                            <Link href={page.href}>
-                              <span className="text-muted-foreground">{page.title}</span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </SidebarGroup>
-                <SidebarSeparator />
-              </>
-            )}
-
             <SidebarGroup>
               <SidebarGroupContent>
                 <SidebarMenu>
