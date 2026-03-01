@@ -456,7 +456,7 @@ export default function SupportPage() {
             const p = priorityConfig[ticket.priority] || priorityConfig.medium
             const SIcon = s.icon
             return (
-              <Card
+              <DSCard
                 key={ticket.id}
                 className="cursor-pointer hover-elevate"
                 onClick={() => setSelectedTicket(ticket)}
