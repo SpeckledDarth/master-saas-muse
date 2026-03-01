@@ -1044,8 +1044,8 @@ export default function PalettePage() {
       </div>
 
       <div
-        className="rounded-[var(--card-radius,0.75rem)] p-[var(--section-spacing,1.5rem)] transition-colors duration-300 bg-background"
-        style={{ ...cssOverrides, color: (cssOverrides as any)['--body-color'] || `hsl(${(cssOverrides as any)['--foreground'] || '0 0% 0%'})` } as React.CSSProperties}
+        className="rounded-[var(--card-radius,0.75rem)] p-[var(--section-spacing,1.5rem)] transition-colors duration-300 bg-background text-foreground"
+        style={cssOverrides as React.CSSProperties}
       >
         <p className="text-[15px] font-medium text-muted-foreground mb-[var(--content-density-gap,1rem)] uppercase tracking-wider">Live Preview</p>
         <div className="space-y-[var(--content-density-gap,1rem)]">

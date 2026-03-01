@@ -195,13 +195,6 @@
   }
   h4 { font-size: 1.125rem; }
 
-  :is(h1, h2, h3) {
-    color: var(--heading-color, inherit);
-  }
-  body {
-    color: var(--body-color, hsl(var(--foreground)));
-  }
-
   [data-heading-color="primary"] :is(h1, h2, h3) {
     color: hsl(var(--primary));
   }
@@ -211,6 +204,13 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+}
+
+:is(h1, h2, h3, h4, h5, h6) {
+  color: var(--heading-color, inherit);
+}
+body, [style*="--body-color"] {
+  color: var(--body-color, hsl(var(--foreground)));
 }
 
 @layer base {
