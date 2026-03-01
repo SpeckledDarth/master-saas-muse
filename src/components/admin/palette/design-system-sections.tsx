@@ -19,10 +19,11 @@ import { Slider } from '@/components/ui/slider'
 import {
   ChevronDown, Type, Layers, Layout, MousePointer,
   Moon, BarChart3, Table2, Loader2, Bell, FormInput,
-  Accessibility, Printer, Minus, Palette, Upload, Download, RotateCcw
+  Accessibility, Printer, Minus, Palette, Upload, Download, RotateCcw, Check
 } from 'lucide-react'
-import { useState, useRef, type ElementType, type ReactNode } from 'react'
+import { useState, useRef, useMemo, type ElementType, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { useToast } from '@/hooks/use-toast'
 import type { BrandingSettings } from '@/types/settings'
 import { designPresets, exportDesignConfig, importDesignConfig, type DesignPresetName } from '@/lib/design-presets'
 
@@ -96,7 +97,7 @@ export function TypographySection() {
   const b = settings.branding
 
   return (
-    <Section title="Typography" icon={Type}>
+    <Section title="Typography" icon={Type} defaultOpen>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {(['h1', 'h2', 'h3'] as const).map(tag => {
           const sizeKey = `${tag}FontSize` as keyof BrandingSettings
@@ -246,7 +247,7 @@ export function ComponentStyleSection() {
   const b = settings.branding
 
   return (
-    <Section title="Component Style" icon={Layers}>
+    <Section title="Component Style" icon={Layers} defaultOpen>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="space-y-3 p-3 border rounded-md">
           <h4 className="text-sm font-medium">Cards</h4>
@@ -1045,8 +1046,21 @@ export function PrintSection() {
 
 export function PresetsSection() {
   const { settings, updateBranding } = useSetupSettingsContext()
+  const { toast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [importStatus, setImportStatus] = useState<string | null>(null)
+
+  const activePreset = useMemo(() => {
+    const b = settings.branding
+    for (const preset of designPresets) {
+      const allMatch = Object.entries(preset.settings).every(([key, value]) => {
+        const current = b[key as keyof BrandingSettings]
+        return current === value
+      })
+      if (allMatch) return preset.name
+    }
+    return null
+  }, [settings.branding])
 
   const applyPreset = (name: DesignPresetName) => {
     const preset = designPresets.find(p => p.name === name)
@@ -1054,6 +1068,10 @@ export function PresetsSection() {
     for (const [key, value] of Object.entries(preset.settings)) {
       updateBranding(key as keyof BrandingSettings, value)
     }
+    toast({
+      title: `${preset.label} applied`,
+      description: 'Click Save to keep your changes.',
+    })
   }
 
   const handleExport = () => {
@@ -1096,17 +1114,30 @@ export function PresetsSection() {
   return (
     <Section title="Presets & Reset" icon={Palette} defaultOpen>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-        {designPresets.map(preset => (
-          <button
-            key={preset.name}
-            onClick={() => applyPreset(preset.name)}
-            className="p-3 border rounded-lg text-left hover:bg-muted/50 transition-colors space-y-1"
-            data-testid={`preset-${preset.name}`}
-          >
-            <span className="text-sm font-medium">{preset.label}</span>
-            <p className="text-xs text-muted-foreground">{preset.description}</p>
-          </button>
-        ))}
+        {designPresets.map(preset => {
+          const isActive = activePreset === preset.name
+          return (
+            <button
+              key={preset.name}
+              onClick={() => applyPreset(preset.name)}
+              className={cn(
+                "p-3 border-2 rounded-lg text-left transition-all space-y-1 relative",
+                isActive
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                  : "border-border hover:bg-muted/50 hover:border-muted-foreground/30"
+              )}
+              data-testid={`preset-${preset.name}`}
+            >
+              {isActive && (
+                <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                  <Check className="w-3 h-3 text-primary-foreground" />
+                </span>
+              )}
+              <span className={cn("text-sm font-medium", isActive && "text-primary")}>{preset.label}</span>
+              <p className="text-xs text-muted-foreground">{preset.description}</p>
+            </button>
+          )
+        })}
       </div>
 
       <div className="flex flex-wrap gap-2">

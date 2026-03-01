@@ -10,6 +10,7 @@ interface UseSetupSettingsReturn {
   loading: boolean
   saving: boolean
   saved: boolean
+  saveError: string | null
   settings: SiteSettings
   setSettings: React.Dispatch<React.SetStateAction<SiteSettings>>
   handleSave: () => Promise<void>
@@ -72,6 +73,7 @@ export function useSetupSettings(): UseSetupSettingsReturn {
   const [userId, setUserId] = useState<string | null>(null)
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings)
   const [aiProviders, setAiProviders] = useState<{ id: string; name: string; envKey: string; models: { id: string; name: string }[] }[]>([])
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [webhookTesting, setWebhookTesting] = useState(false)
   const [webhookTestResult, setWebhookTestResult] = useState<{ success: boolean; status?: number; error?: string } | null>(null)
 
@@ -112,20 +114,32 @@ export function useSetupSettings(): UseSetupSettingsReturn {
 
     setSaving(true)
     setSaved(false)
+    setSaveError(null)
 
-    const response = await fetch('/api/admin/setup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ settings }),
-    })
+    try {
+      const response = await fetch('/api/admin/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ settings }),
+      })
 
-    if (response.ok) {
-      setSaved(true)
-      setTimeout(() => {
-        setSaved(false)
-        window.location.reload()
-      }, 1000)
+      if (response.ok) {
+        setSaved(true)
+        setTimeout(() => {
+          setSaved(false)
+          window.location.reload()
+        }, 1000)
+      } else {
+        let errorMsg = 'Failed to save settings'
+        try {
+          const data = await response.json()
+          if (data.error) errorMsg = data.error
+        } catch {}
+        setSaveError(errorMsg)
+      }
+    } catch (err) {
+      setSaveError((err as Error).message || 'Network error — could not save')
     }
 
     setSaving(false)
@@ -339,7 +353,7 @@ export function useSetupSettings(): UseSetupSettingsReturn {
   }
 
   return {
-    loading, saving, saved, settings, setSettings, handleSave, aiProviders,
+    loading, saving, saved, saveError, settings, setSettings, handleSave, aiProviders,
     updateBranding, updateSocial, updateFeatures, updateAI, updateWebhooks, updateWebhookEvent,
     updatePricing, updateContent, updateCTA, updateAbout, updateContact, updateLegal,
     updatePricingPage, updateFAQPage, updateCustomPage, updatePlan, updateNavigation,

@@ -23,20 +23,25 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
           <h1 className="text-2xl font-bold" data-testid="text-setup-title">Setup Dashboard</h1>
           <p className="text-sm text-muted-foreground">Configure your SaaS branding, pricing, and features</p>
         </div>
-        <Button
-          onClick={ctx.handleSave}
-          disabled={ctx.saving}
-          data-testid="button-save-settings"
-        >
-          {ctx.saving ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          ) : ctx.saved ? (
-            <Check className="h-4 w-4 mr-2" />
-          ) : (
-            <Save className="h-4 w-4 mr-2" />
+        <div className="flex items-center gap-3">
+          {ctx.saveError && (
+            <p className="text-sm text-destructive" data-testid="text-save-error">{ctx.saveError}</p>
           )}
-          {ctx.saved ? 'Saved!' : 'Save Changes'}
-        </Button>
+          <Button
+            onClick={ctx.handleSave}
+            disabled={ctx.saving}
+            data-testid="button-save-settings"
+          >
+            {ctx.saving ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : ctx.saved ? (
+              <Check className="h-4 w-4 mr-2" />
+            ) : (
+              <Save className="h-4 w-4 mr-2" />
+            )}
+            {ctx.saved ? 'Saved!' : 'Save Changes'}
+          </Button>
+        </div>
       </div>
 
       <div className="min-w-0">
