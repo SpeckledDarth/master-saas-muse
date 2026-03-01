@@ -9,12 +9,12 @@ This skill exists because previous sessions lost focus, touched off-limits files
 
 ## CURRENT SPRINT
 
-**Sprint 6B COMPLETE + Gap Closure COMPLETE — UX Overhaul Blueprint fully executed**
-- Sprint 6A: Built formatRelativeTime utility + Sparkline component. Converted User Management, Waitlist, Team pages to AdminDataTable + TableToolbar + ConfirmDialog.
-- Sprint 6B: Converted Feedback + Audit Logs pages. Final consistency verification passed — all 5 pages use same patterns, zero confirm() calls, RelativeTime everywhere, CSV export on applicable pages.
-- Gap Closure: Wired shared Sparkline into Revenue summary card (30-day trend) and Affiliate Members table (30-day earnings trend per member). Made discount codes clickable with detail dialog (UX-13). Documented intentional divergence of local sparkline implementations (bar charts vs SVG polyline). Fixed Done Test.
-- Blueprint location: `docs/UX_OVERHAUL_BLUEPRINT.md` — ALL SPRINTS COMPLETE (1 through 6B, all gaps closed)
-- Next: User decides direction — options include Affiliate Dashboard restructure, Dashboard Shell on all 3 dashboards, or other feature work.
+**Sprints 1–6B COMPLETE — Sprint 7A is NEXT**
+- Sprints 7/8/9 have been restructured into 7 sub-sprints: 7A, 7B, 8A, 8B, 9A, 9B, 9C
+- All 9 errata issues in `docs/BLUEPRINT_ERRATA.md` have been FIXED and applied to the blueprint
+- Blueprint location: `docs/UX_OVERHAUL_BLUEPRINT.md`
+- **Next sprint: 7A** — Confirm Dialogs + Small UX Fixes + EditableSettingsGroup Component (3 tasks, all files under 52KB)
+- Dependencies: 7A must complete before 7B. 7A must complete before 9C. 8A must complete before 8B. Groups 7x, 8x, 9x are independent of each other.
 
 If the user asks you to do something unrelated to this sprint, do exactly what they ask — but do NOT expand the scope or touch anything else.
 

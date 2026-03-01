@@ -1,9 +1,9 @@
 # UX Overhaul Blueprint — PassivePost Admin Dashboard
 
 > **Created:** February 28, 2026
-> **Status:** Sprints 1–6B COMPLETE — Sprints 7–9 NOT STARTED
+> **Status:** Sprints 1–6B COMPLETE — Sprints 7A–9C NOT STARTED (restructured from 3 sprints to 7 sub-sprints)
 > **Scope:** Fix all UI/UX inconsistencies, bugs, and implement all agreed Feature Requests from human QA testing of the Admin Dashboard (Sections 0.3–1.20e of Testing Plan)
-> **Estimated Sessions:** 11 sprints (one session each)
+> **Estimated Sessions:** 15 sprints (one session each)
 
 ## Progress Tracker
 
@@ -17,9 +17,13 @@
 | 5 | Command Palette + Impersonate + Cross-Linking | COMPLETE | BUG-04–08, UX-15, FR-08 |
 | 6A | Utility Components + First 3 Page Conversions | COMPLETE | UX-02, UX-03, UX-05, UX-06, UX-11, WC-04, WC-06, WC-07, WC-08, WC-10 |
 | 6B | Remaining Page Conversions + Verification | COMPLETE | UX-04, UX-13, WC-04, WC-08 |
-| 7 | Quick Fixes + Settings Protection | NOT STARTED | UX-06 (remaining), UX-11, UX-14, FR-05, FR-13 |
-| 8 | Contact Fields + Grandfathering | NOT STARTED | FR-01, FR-06 (GAP-1–6) |
-| 9 | Discount Codes + Broadcasts + File Upload | NOT STARTED | FR-02, FR-07, FR-09, FR-13 (continued) |
+| 7A | Confirm Dialogs + Small UX Fixes + EditableSettingsGroup Component | NOT STARTED | UX-06 (remaining), UX-11, UX-14, FR-13 (component only) |
+| 7B | Affiliate Settings Edit-Protection + Best Practices Reset | NOT STARTED | FR-05, FR-13 (affiliate settings) |
+| 8A | Contact Fields: Database + API + CRM UI | NOT STARTED | FR-01 |
+| 8B | Grandfathering Gaps | NOT STARTED | FR-06 (GAP-1–6) |
+| 9A | Discount Code Auto-Generation + Self-Branding | NOT STARTED | FR-07 |
+| 9B | Broadcast Summary Cards + File Upload | NOT STARTED | FR-02, FR-09 |
+| 9C | Settings Edit-Protection on Remaining Pages | NOT STARTED | FR-13 (remaining pages) |
 
 ---
 
@@ -576,56 +580,113 @@ These 10 enhancements are essentially "free" — they're better defaults and sma
 
 ---
 
-### Sprint 7: Quick Fixes + Settings Protection
+### Sprint 7A: Confirm Dialogs + Small UX Fixes + EditableSettingsGroup Component
 
-**Goal:** Eliminate the last browser `confirm()` calls across all admin pages, fix remaining UX issues (role confirmation, date clear), build the reusable settings edit-protection component, apply it to affiliate settings, and add the "Reset to Best Practices" button.
+**Goal:** Replace every remaining browser `confirm()` call with the shared ConfirmDialog component, fix two small UX issues (role confirmation, date clear), and build the reusable EditableSettingsGroup component. All files touched in this sprint are under 52KB. No large file refactors.
 
 | Task | Description | Files |
 |------|-------------|-------|
-| S7-T1 | Replace 7 remaining browser `confirm()` calls with ConfirmDialog — integrations (1), passivepost (1), affiliate (2: delete affiliate record, delete application), email-templates (1), blog (1), sso (1). After this, zero `confirm()` calls should remain in any admin page. | `src/app/admin/setup/integrations/page.tsx`, `src/app/admin/setup/passivepost/page.tsx`, `src/app/admin/setup/affiliate/page.tsx`, `src/app/admin/email-templates/page.tsx`, `src/app/admin/blog/page.tsx`, `src/app/admin/sso/page.tsx` |
-| S7-T2 | UX-11: Add role change confirmation on Users page — wrap role Select in a ConfirmDialog ("Change role from X to Y?") before firing the API call. UX-14: Add "Clear Dates" button next to Revenue page date filters that resets dateFrom and dateTo in one click. | `src/app/admin/users/page.tsx`, `src/app/admin/revenue/page.tsx` |
-| S7-T3 | Build reusable `<EditableSettingsGroup>` component (FR-13 foundation). **Props:** `title: string` (group heading), `description?: string` (optional subtext), `children: ReactNode` (the form fields), `onSave: () => Promise<void>` (called when Save clicked), `isSaving?: boolean` (shows spinner on Save button). **Internal state:** `isEditing` boolean (default `false`). **When not editing:** renders a header row with `title` + pencil-icon "Edit" button; wraps `children` in a `<fieldset disabled>` so all nested inputs, selects, switches, and sliders appear grayed out and non-interactive. **When editing:** "Edit" button replaced by "Save" (primary) and "Cancel" (ghost) buttons; `<fieldset>` is no longer disabled so all fields become interactive. **On Save:** calls `onSave()`, awaits completion, then sets `isEditing` back to `false`. **On Cancel:** sets `isEditing` to `false` without saving. **Container:** `<DSCard>` with design system padding (`--card-padding`), radius (`--card-radius`), shadow (`--card-shadow`). All styling uses design system CSS variables — no hardcoded colors, spacing, radius, or shadows. | `src/components/admin/editable-settings-group.tsx` |
-| S7-T4 | Apply EditableSettingsGroup to Affiliate Settings page (FR-13). Groups: Commission Settings (rate, duration, min payout, cookie, attribution), Leaderboard Settings, Re-Engagement Settings, Payout Automation, Two-Tier Referrals, Fraud Detection, Surveys. Each group editable independently. | `src/app/admin/setup/affiliate/page.tsx` |
-| S7-T5 | Add "Reset to Best Practices" button (FR-05) at top of affiliate settings. Restores all 9 agreed defaults (20% commission, recurring, 60-day cookie, $50 min payout, monthly, 12-month residual, manual review, first-touch, 3 tiers enabled). ConfirmDialog before reset. See Design Decision #9 ("Best Practice Defaults + Info Tooltips") in this document for the authoritative table of all 9 defaults with tooltip reasoning text. | `src/app/admin/setup/affiliate/page.tsx` |
+| S7A-T1 | Replace 7 remaining browser `confirm()` calls with ConfirmDialog — integrations (1), passivepost (1), affiliate (2: delete affiliate record, delete application), email-templates (1), blog (1), sso (1). After this, zero `confirm()` calls should remain in any admin page. | `src/app/admin/setup/integrations/page.tsx` (21KB), `src/app/admin/setup/passivepost/page.tsx` (51KB), `src/app/admin/setup/affiliate/page.tsx` (212KB — only the 2 confirm calls, no other changes), `src/app/admin/email-templates/page.tsx` (24KB), `src/app/admin/blog/page.tsx` (17KB), `src/app/admin/sso/page.tsx` (13KB) |
+| S7A-T2 | UX-11: Add role change confirmation on Users page — wrap role Select in a ConfirmDialog ("Change role from X to Y?") before firing the API call. UX-14: Add "Clear Dates" button next to Revenue page date filters that resets dateFrom and dateTo in one click. | `src/app/admin/users/page.tsx` (36KB), `src/app/admin/revenue/page.tsx` (15KB) |
+| S7A-T3 | Build reusable `<EditableSettingsGroup>` component (FR-13 foundation). **Props:** `title: string` (group heading), `description?: string` (optional subtext), `children: ReactNode` (the form fields), `onSave: () => Promise<void>` (called when Save clicked), `isSaving?: boolean` (shows spinner on Save button). **Internal state:** `isEditing` boolean (default `false`). **When not editing:** renders a header row with `title` + pencil-icon "Edit" button; wraps `children` in a `<fieldset disabled>` so all nested inputs, selects, switches, and sliders appear grayed out and non-interactive. **When editing:** "Edit" button replaced by "Save" (primary) and "Cancel" (ghost) buttons; `<fieldset>` is no longer disabled so all fields become interactive. **On Save:** calls `onSave()`, awaits completion, then sets `isEditing` back to `false`. **On Cancel:** sets `isEditing` to `false` without saving. **Container:** `<DSCard>` with design system padding (`--card-padding`), radius (`--card-radius`), shadow (`--card-shadow`). All styling uses design system CSS variables — no hardcoded colors, spacing, radius, or shadows. | `src/components/admin/editable-settings-group.tsx` (NEW FILE) |
 
-**Done Test:** `grep -r 'confirm(' src/app/admin/` returns zero results. Role change on Users page shows confirmation dialog before firing. Revenue date filters have a Clear Dates button. All affiliate settings groups are read-only by default with Edit button to unlock. "Reset to Best Practices" button exists and restores all 9 defaults with confirmation.
+**Done Test:** Running `grep -rn "confirm(" src/app/admin/ | grep -v ConfirmDialog | grep -v onConfirm | grep -v confirmText | grep -v confirmLabel | grep -v confirmButton | grep -v import | grep -v "//"` returns zero results (this filters out legitimate uses like ConfirmDialog props and imports — only raw browser `confirm()` calls would remain). Role change on Users page shows confirmation dialog before firing. Revenue date filters have a Clear Dates button. EditableSettingsGroup component exists, renders correctly with disabled fieldset pattern, and toggles between read-only and edit modes.
 
-**Addresses:** UX-06 (remaining `confirm()` calls), UX-11, UX-14, FR-05, FR-13 (affiliate settings)
+**Addresses:** UX-06 (remaining `confirm()` calls), UX-11, UX-14, FR-13 (component only)
 
 ---
 
-### Sprint 8: Contact Fields + Grandfathering (Database Work)
+### Sprint 7B: Affiliate Settings Edit-Protection + Best Practices Reset
 
-**Goal:** Create the 4 contact-related database tables from FR-01, add profile fields, build API routes, wire into the CRM detail page, and fix all 6 grandfathering gaps from FR-06.
+**Goal:** Apply the EditableSettingsGroup component (built in 7A) to the affiliate settings page, and add the "Reset to Best Practices" button. This sprint focuses entirely on one large file (`src/app/admin/setup/affiliate/page.tsx`, 212KB). The file is large because it contains all affiliate admin tabs (Members, Applications, Settings, Broadcasts, etc.) in a single monolith.
 
 | Task | Description | Files |
 |------|-------------|-------|
-| S8-T1 | Create FR-01 database tables + profile columns. Tables: `user_phone_numbers` (user_id, label, phone_number, is_primary), `user_email_addresses` (user_id, label, email, is_primary, is_verified), `user_addresses` (user_id, label, street, city, state, zip, country, is_primary), `user_social_links` (user_id, platform, url). Add columns to `user_profiles`: first_name, last_name, company, job_title, website. Run on Replit Postgres, provide Supabase SQL. | `migrations/core/018_contact_fields.sql` |
-| S8-T2 | Build CRUD API routes for each contact table: `/api/admin/crm/[userId]/phones`, `/api/admin/crm/[userId]/emails`, `/api/admin/crm/[userId]/addresses`, `/api/admin/crm/[userId]/social-links` (each: GET, POST, PUT, DELETE). Update `/api/user/profile` to accept and return the new 1-to-1 fields. | New routes under `src/app/api/admin/crm/[userId]/`, `src/app/api/user/profile/route.ts` |
-| S8-T3 | Wire contact sections into CRM detail page. Add accordion sections to the Summary tab: Phone Numbers, Email Addresses, Addresses, Social Links — each with Add button, inline edit/delete, is_primary indicator. Add first_name, last_name, company, job_title, website to Profile tab. | `src/app/admin/crm/[userId]/page.tsx` |
-| S8-T4 | Fix grandfathering gaps GAP-1 through GAP-6 (FR-06). GAP-1: Auto-generate contract when `lockInAffiliateTerms()` runs. GAP-2: Use contracts `metadata` JSONB to store structured locked values (rate, duration, cookie, min payout). GAP-3: Add `locked_cookie_duration_days` to referral_links + populate in lockInAffiliateTerms. GAP-4: Add `locked_min_payout_cents` to referral_links + populate in lockInAffiliateTerms. GAP-5: Verify affiliate dashboard shows active terms, expiration, months remaining. GAP-6: Add audit log entries for affiliate settings changes (old value → new value). | `src/lib/affiliate/index.ts`, migration SQL (referral_links columns), `src/app/admin/setup/affiliate/page.tsx` |
+| S7B-T1 | Apply EditableSettingsGroup to Affiliate Settings page (FR-13). Wrap each settings section in its own EditableSettingsGroup. Groups: Commission Settings (rate, duration, min payout, cookie, attribution), Leaderboard Settings, Re-Engagement Settings, Payout Automation, Two-Tier Referrals, Fraud Detection, Surveys. Each group editable independently — editing one group does not unlock others. Each group's "Save" button calls the existing settings save API for that group's fields only. | `src/app/admin/setup/affiliate/page.tsx` (212KB) |
+| S7B-T2 | Add "Reset to Best Practices" button (FR-05) at top of affiliate settings. Restores all 9 agreed defaults (20% commission, recurring, 60-day cookie, $50 min payout, monthly, 12-month residual, manual review, first-touch, 3 tiers enabled). ConfirmDialog before reset. See Design Decision #9 ("Best Practice Defaults + Info Tooltips") in this document for the authoritative table of all 9 defaults with tooltip reasoning text. | `src/app/admin/setup/affiliate/page.tsx` (212KB) |
 
-**Done Test:** All 4 contact tables exist in Replit Postgres. CRUD API routes return 200 with correct data. CRM detail page shows Phone, Email, Address, Social Link sections with add/edit/delete. Profile tab shows first/last name, company, job title, website. `lockInAffiliateTerms()` locks all 4 values (rate, duration, cookie, min payout) and auto-creates a contract with structured terms. Changing affiliate settings creates an audit log entry. Supabase migration SQL provided to user.
+**Done Test:** All affiliate settings groups are read-only by default with Edit button to unlock. Clicking Edit on one group does NOT unlock other groups. Save returns the group to read-only. Cancel discards changes and returns to read-only. "Reset to Best Practices" button exists at the top of settings, shows a ConfirmDialog before resetting, and restores all 9 values from Design Decision #9.
 
-**Addresses:** FR-01, FR-06 (GAP-1 through GAP-6)
+**Addresses:** FR-05, FR-13 (affiliate settings)
 
 ---
 
-### Sprint 9: Discount Codes + Broadcasts + File Upload + Settings Protection (Remaining)
+### Sprint 8A: Contact Fields — Database + API + CRM UI
 
-**Goal:** Complete the branded discount code auto-generation and self-branding flow, add broadcast summary cards and engagement columns, implement marketing asset file upload, and apply settings edit-protection to remaining high-priority setup pages.
+**Goal:** Create the 4 contact-related database tables from FR-01, add profile columns, build all CRUD API routes, and wire everything into the CRM detail page. This sprint creates new files (migration, API routes) and modifies one existing page (CRM detail, 42KB). No large file refactors.
 
 | Task | Description | Files |
 |------|-------------|-------|
-| S9-T1 | Auto-generate branded discount code on affiliate approval (FR-07). After creating referral link in approval flow, auto-generate a code based on name + discount percentage (e.g., "STEELE20"). Validation: uppercase, alphanumeric, 4-20 chars, reserved words blocked. Collision handling: auto-suffix with numbers. | `src/app/api/affiliate/applications/review/route.ts`, `src/app/api/affiliate/discount-codes/route.ts` |
-| S9-T2 | Affiliate self-branding for discount codes (FR-07 continued). Allow renaming from affiliate dashboard with 30-day cooldown. Collision detection with 3-4 auto-suggested alternatives. Coaching text as specified in blueprint (personal brand guidance, pro tips, performance tips). | `src/app/affiliate/dashboard/page.tsx`, `src/app/api/affiliate/discount-codes/route.ts` |
-| S9-T3 | Broadcast summary cards + list enhancements (FR-09). Add 4 summary cards above broadcast list: Average Open Rate (with trend arrow — last 5 vs prior 5), Average Click Rate, Best Performer (name + open rate), Last Broadcast (date + name + rates). Add Open Rate % and Click Rate % sortable columns to list. Add category tagging on creation (Contest, Tier Change, Policy Update, General). | `src/app/admin/setup/affiliate/page.tsx` |
-| S9-T4 | Marketing asset file upload (FR-02). Build `FileUpload` component (reuse ImageUpload pattern) supporting PNG, JPG, GIF, SVG, PDF, DOCX, XLSX (10MB limit). Wire into "Add Asset" dialog — toggle between URL input and file upload. Upload to Supabase Storage bucket `affiliate-assets`. Store file_url, file_name, file_size, file_type on asset record. Affiliates see download button on their dashboard. | `src/components/admin/file-upload.tsx`, `src/app/admin/setup/affiliate/page.tsx`, `src/app/api/affiliate/assets/route.ts` |
-| S9-T5 | Apply EditableSettingsGroup to remaining high-priority setup pages (FR-13 continued). Pages: Branding, Compliance, Security, Support, Pricing. Lower-priority pages (features, content, social, passivepost, watermark) keep current behavior. | `src/app/admin/setup/branding/page.tsx`, `src/app/admin/setup/compliance/page.tsx`, `src/app/admin/setup/security/page.tsx`, `src/app/admin/setup/support/page.tsx`, `src/app/admin/setup/pricing/page.tsx` |
+| S8A-T1 | Create FR-01 database tables + profile columns. Tables: `user_phone_numbers` (id, user_id, label, phone_number, is_primary, created_at), `user_email_addresses` (id, user_id, label, email, is_primary, is_verified, created_at), `user_addresses` (id, user_id, label, street, city, state, zip, country, is_primary, created_at), `user_social_links` (id, user_id, platform, url, created_at). Add columns to `user_profiles` via ALTER TABLE ADD COLUMN IF NOT EXISTS: first_name, last_name, company, job_title, website. Run on Replit Postgres, provide Supabase SQL. **Important context:** `user_profiles` already has basic 1-to-1 contact columns (`phone`, `address_line1`, `address_line2`, `city`, `state`, `postal_code`, `country`) from migration `011_crm_foundation.sql`. Those existing columns remain as-is for primary contact info. The new `user_phone_numbers` and `user_addresses` tables handle the 1-to-many pattern (multiple phones, multiple addresses per user). Do not remove or modify the existing columns. | `migrations/core/017_contact_fields.sql` (NEW FILE) |
+| S8A-T2 | Build CRUD API routes for each contact table: `/api/admin/crm/[userId]/phones`, `/api/admin/crm/[userId]/emails`, `/api/admin/crm/[userId]/addresses`, `/api/admin/crm/[userId]/social-links` (each: GET, POST, PUT, DELETE). Update `/api/user/profile` to accept and return the new 1-to-1 fields (first_name, last_name, company, job_title, website). **Boundary:** These routes are MuseKit core (CRM is core infrastructure, not PassivePost-specific). They belong outside `/social/` directories per the boundary rules in the project-context skill. | New route files under `src/app/api/admin/crm/[userId]/phones/route.ts`, `src/app/api/admin/crm/[userId]/emails/route.ts`, `src/app/api/admin/crm/[userId]/addresses/route.ts`, `src/app/api/admin/crm/[userId]/social-links/route.ts` (all NEW FILES), `src/app/api/user/profile/route.ts` (existing, modify) |
+| S8A-T3 | Wire contact sections into CRM detail page. Add accordion sections to the Summary tab: Phone Numbers, Email Addresses, Addresses, Social Links — each with Add button, inline edit/delete, is_primary indicator. Add first_name, last_name, company, job_title, website to the Profile tab. Use design system components (DSCard, ConfirmDialog for delete). | `src/app/admin/crm/[userId]/page.tsx` (42KB) |
 
-**Done Test:** Approving an affiliate application auto-creates a linked discount code. Affiliates can rename their code from their dashboard (30-day limit enforced, coaching text visible, collision suggestions shown). Broadcast tab shows 4 summary cards with real data. Open/click rate columns visible and sortable in broadcast list. Category tagging available on broadcast creation. Admin can upload files to Supabase Storage from the marketing assets dialog. Affiliates can download uploaded files. Branding, Compliance, Security, Support, and Pricing settings pages are read-only by default with Edit button to unlock.
+**Done Test:** All 4 contact tables exist in Replit Postgres. CRUD API routes return 200 with correct data (test each: GET returns list, POST creates record, PUT updates record, DELETE removes record). CRM detail page shows Phone, Email, Address, Social Link accordion sections with add/edit/delete and is_primary indicator. Profile tab shows first_name, last_name, company, job_title, website fields. Supabase migration SQL provided to user.
 
-**Addresses:** FR-02, FR-07, FR-09, FR-13 (remaining pages)
+**Addresses:** FR-01
+
+---
+
+### Sprint 8B: Grandfathering Gaps (FR-06)
+
+**Goal:** Fix all 6 grandfathering gaps found during the FR-06 audit. This sprint touches critical business logic in `src/lib/affiliate/index.ts` (8KB), adds ALTER TABLE statements to the migration file from 8A, and adds audit logging to the affiliate settings page (212KB — targeted changes only, not a full refactor). This is the most business-critical sprint — grandfathering is a core integrity promise per the business philosophy.
+
+| Task | Description | Files |
+|------|-------------|-------|
+| S8B-T1 | Fix GAP-1 and GAP-2: When `lockInAffiliateTerms()` runs, auto-generate a contract record with structured locked values. Add a `terms` JSONB field to the contracts table (via ALTER TABLE ADD COLUMN IF NOT EXISTS in `migrations/core/017_contact_fields.sql`) that stores the actual locked values: `{ commission_rate, duration_months, cookie_duration_days, min_payout_cents }`. The contract body remains for legal text, but the `terms` field is the machine-readable source of truth. | `src/lib/affiliate/index.ts` (8KB), `migrations/core/017_contact_fields.sql` |
+| S8B-T2 | Fix GAP-3 and GAP-4: Add `locked_cookie_duration_days` (INTEGER) and `locked_min_payout_cents` (INTEGER) columns to `referral_links` via ALTER TABLE ADD COLUMN IF NOT EXISTS in `migrations/core/017_contact_fields.sql`. Update `lockInAffiliateTerms()` to populate both new columns from the current global affiliate settings when locking terms. | `src/lib/affiliate/index.ts` (8KB), `migrations/core/017_contact_fields.sql` |
+| S8B-T3 | Fix GAP-5: Verify that the affiliate dashboard contract section shows active agreement terms, effective date, expiration date, months remaining, and signed status. If any of these are missing or incorrect, fix the display. Do NOT refactor the affiliate dashboard monolith — make targeted fixes only. | `src/app/affiliate/dashboard/page.tsx` (361KB — read the contract section only, make targeted fixes) |
+| S8B-T4 | Fix GAP-6: Add audit log entries for affiliate settings changes. When the admin saves changed affiliate settings, create an audit log entry capturing the old value and new value for each changed field. | `src/app/admin/setup/affiliate/page.tsx` (212KB — add audit logging to the existing save handler, no other changes) |
+
+**Done Test:** `lockInAffiliateTerms()` locks all 4 values (rate, duration, cookie, min payout) and auto-creates a contract with structured `terms` JSONB. `referral_links` table has `locked_cookie_duration_days` and `locked_min_payout_cents` columns. Affiliate dashboard contract section shows active terms, expiration, and months remaining. Changing affiliate settings creates an audit log entry with old and new values. **Critical verification:** Changing global commission rate does NOT change `locked_commission_rate` on existing `referral_links` rows — only affiliates enrolled after the change get the new rate. Supabase migration SQL provided to user (same file as 8A, run once).
+
+**Addresses:** FR-06 (GAP-1 through GAP-6)
+
+---
+
+### Sprint 9A: Discount Code Auto-Generation + Self-Branding (FR-07)
+
+**Goal:** Implement the dual-attribution discount code system. Auto-generate a branded discount code when an affiliate is approved, and allow affiliates to rename their code from their dashboard with coaching text. This sprint touches two API route files (both under 11KB) and the affiliate dashboard monolith (361KB — targeted changes to the discount code section only, not a full refactor). See Design Decision #11 ("Affiliate-Branded Discount Codes") for the full specification including naming rules, coaching text, and collision policy.
+
+| Task | Description | Files |
+|------|-------------|-------|
+| S9A-T1 | Auto-generate branded discount code on affiliate approval (FR-07). After creating referral link in the approval flow, auto-generate a code based on affiliate name + discount percentage (e.g., "STEELE20"). Validation: uppercase, alphanumeric only, 4-20 characters. Reserved words blocked: "DISCOUNT", "FREE", "TEST", "ADMIN", "PASSIVEPOST" and similar. Collision handling: if code exists, auto-suffix with incrementing numbers (e.g., "STEELE20" taken → try "STEELE201", "STEELE202"). One active branded code per affiliate by default. | `src/app/api/affiliate/applications/review/route.ts` (11KB), `src/app/api/affiliate/discount-codes/route.ts` (3KB) |
+| S9A-T2 | Affiliate self-branding for discount codes (FR-07 continued). Add a rename UI in the affiliate dashboard's discount code section. 30-day cooldown between renames (enforce server-side, show remaining days in UI). Collision detection: if requested code is taken, show coaching message and 3-4 auto-suggested alternatives based on affiliate name/username/discount. Coaching text as specified in Design Decision #11: personal brand guidance on creation, pro tip about saying code out loud, performance tip about sharing everywhere. | `src/app/affiliate/dashboard/page.tsx` (361KB — discount code section only), `src/app/api/affiliate/discount-codes/route.ts` (3KB) |
+
+**Done Test:** Approving an affiliate application auto-creates a linked discount code (e.g., "STEELE20"). Code follows naming rules (uppercase, alphanumeric, 4-20 chars). Reserved words are blocked. Collisions handled with numeric suffix. Affiliates can see their code on their dashboard. Affiliates can rename their code (30-day cooldown enforced). Taking a taken code shows coaching message + 3-4 suggestions. Coaching text is visible on the discount code management section.
+
+**Addresses:** FR-07
+
+---
+
+### Sprint 9B: Broadcast Summary Cards + Marketing Asset File Upload
+
+**Goal:** Surface broadcast engagement data at the list level with summary cards and sortable columns, and add file upload capability for marketing assets. This sprint adds features to the affiliate settings page (212KB — targeted additions to the broadcasts tab and marketing assets tab) and creates one new component.
+
+| Task | Description | Files |
+|------|-------------|-------|
+| S9B-T1 | Broadcast summary cards + list enhancements (FR-09). Add 4 summary cards above broadcast list: Average Open Rate (with trend arrow — compare last 5 broadcasts vs prior 5), Average Click Rate, Best Performer (broadcast name + open rate), Last Broadcast (date + name + open/click rates). Add Open Rate % and Click Rate % sortable columns to the broadcast list. Add category tagging on broadcast creation with options: Contest, Tier Change, Policy Update, General. See Design Decision #12 ("Broadcast Performance Surfacing") for full specification. | `src/app/admin/setup/affiliate/page.tsx` (212KB — broadcasts tab section only) |
+| S9B-T2 | Marketing asset file upload (FR-02). Build `FileUpload` component (reuse the existing ImageUpload pattern from `src/components/admin/image-upload.tsx` if it exists, otherwise create fresh) supporting PNG, JPG, GIF, SVG, PDF, DOCX, XLSX (10MB limit). Wire into the "Add Asset" dialog on the marketing assets tab — add a toggle between URL input and file upload. Upload to Supabase Storage bucket `affiliate-assets`. Store file_url, file_name, file_size, file_type on the asset record. Affiliates see a download button on their dashboard for uploaded files. **Prerequisite:** The `affiliate-assets` bucket must be created in Supabase Storage (public read access for download URLs, authenticated upload) before this feature can work on Vercel. Include bucket creation instructions in the Supabase migration inventory provided to the user. | `src/components/admin/file-upload.tsx` (NEW FILE), `src/app/admin/setup/affiliate/page.tsx` (212KB — marketing assets tab section only), `src/app/api/affiliate/assets/route.ts` (9KB) |
+
+**Done Test:** Broadcast tab shows 4 summary cards with real data computed from existing broadcasts. Trend arrow on Average Open Rate card shows up/down/flat based on last 5 vs prior 5. Open Rate % and Click Rate % columns visible and sortable in broadcast list. Category tagging dropdown available on broadcast creation dialog. Admin can upload files (PNG, PDF, etc.) from the marketing assets "Add Asset" dialog. Uploaded files stored in Supabase Storage. Affiliates can download uploaded files from their dashboard. Supabase Storage bucket creation instructions provided to user.
+
+**Addresses:** FR-02, FR-09
+
+---
+
+### Sprint 9C: Settings Edit-Protection on Remaining Pages (FR-13 continued)
+
+**Goal:** Apply the EditableSettingsGroup component (built in Sprint 7A, proven on affiliate settings in Sprint 7B) to 5 more high-priority settings pages. This is repetitive pattern application — same component, different pages. All target files are under 43KB. Lower-priority pages (features, content, social, passivepost, watermark) keep their current behavior for now.
+
+| Task | Description | Files |
+|------|-------------|-------|
+| S9C-T1 | Apply EditableSettingsGroup to the Branding settings page. Identify logical groupings of settings fields (e.g., Logo & Favicon, Brand Colors, Typography, Social Links). Wrap each group in EditableSettingsGroup. Each group editable independently. | `src/app/admin/setup/branding/page.tsx` (43KB) |
+| S9C-T2 | Apply EditableSettingsGroup to the Compliance settings page. Identify logical groupings (e.g., Privacy Policy, Terms of Service, Cookie Consent, Data Retention). Wrap each group in EditableSettingsGroup. | `src/app/admin/setup/compliance/page.tsx` (18KB) |
+| S9C-T3 | Apply EditableSettingsGroup to the Security, Support, and Pricing settings pages. These are the three smallest files. Security: group by authentication settings, session settings, rate limiting. Support: group by contact info, help center settings. Pricing: group by plan configuration, trial settings. Wrap each group in EditableSettingsGroup. | `src/app/admin/setup/security/page.tsx` (18KB), `src/app/admin/setup/support/page.tsx` (7KB), `src/app/admin/setup/pricing/page.tsx` (10KB) |
+
+**Done Test:** All 5 settings pages (Branding, Compliance, Security, Support, Pricing) show fields as read-only by default. Each logical group has its own "Edit" button. Clicking Edit unlocks only that group. Save returns the group to read-only. Cancel discards changes. No hardcoded colors, spacing, radius, or shadows — all styling uses design system CSS variables.
+
+**Addresses:** FR-13 (remaining pages)
 
 ---
 
@@ -729,7 +790,7 @@ The following items require further discussion or are intentionally deferred. Th
 - **Build sequence:** UX Overhaul (current blueprint) → Connected Analytics → AI Coaching Layer.
 
 **Feature Requests now assigned to sprints (moved from this section):**
-- FR-01 → Sprint 8 | FR-02 → Sprint 9 | FR-05 → Sprint 7 | FR-06 → Sprint 8 | FR-07 → Sprint 9 | FR-09 → Sprint 9 | FR-13 → Sprints 7 + 9
+- FR-01 → Sprint 8A | FR-02 → Sprint 9B | FR-05 → Sprint 7B | FR-06 → Sprint 8B | FR-07 → Sprint 9A | FR-09 → Sprint 9B | FR-13 → Sprints 7A (component) + 7B (affiliate) + 9C (remaining pages)
 
 ---
 
@@ -744,28 +805,32 @@ The following items require further discussion or are intentionally deferred. Th
    - Sprint 6A must complete before Sprint 6B (utilities built in 6A, remaining pages + verification in 6B).
    - Sprint 4A (Dashboard Shell) should complete before applying the Shell to other dashboards in future work.
    - Sprints 2, 3, and 5 are independent of each other and can run in any order.
-   - Sprint 7 T3 (EditableSettingsGroup component) must complete before T4 (applying it to affiliate settings) and before Sprint 9 T5 (applying it to other settings pages).
-   - Sprint 7 T4 must complete before T5 ("Reset to Best Practices" relies on the edit-protection pattern being in place).
-   - Sprint 8 T1 (database tables) must complete before T2 (API routes) and T3 (CRM UI), and before T4 (grandfathering needs the same migration file for new referral_links columns).
-   - Sprint 9 T1 (auto-generate codes) must complete before T2 (self-branding flow).
-   - Sprints 7, 8, and 9 are independent of each other at the sprint level (can run in any order), but tasks within each sprint have the dependencies noted above.
-5. After Sprint 9, the blueprint is fully complete. Next step: assess whether a second blueprint is needed for the Affiliate Dashboard restructure and applying the Dashboard Shell to all three dashboards.
+   - Sprint 7A must complete before Sprint 7B (EditableSettingsGroup component must exist before it can be applied to affiliate settings).
+   - Sprint 7A must complete before Sprint 9C (EditableSettingsGroup component must exist before it can be applied to other settings pages).
+   - Sprint 8A must complete before Sprint 8B (migration file with contact tables must exist before grandfathering ALTER TABLE statements are added to it; also the migration must be run before GAP fixes can be tested).
+   - Sprint 9A T1 (auto-generate codes) must complete before T2 (self-branding relies on codes existing).
+   - Sprints 7A/7B, 8A/8B, and 9A/9B/9C are independent of each other at the group level (7x can run before or after 8x or 9x), but within each group the A/B/C ordering must be respected.
+5. After Sprint 9C, the blueprint is fully complete. Next step: assess whether a second blueprint is needed for the Affiliate Dashboard restructure and applying the Dashboard Shell to all three dashboards.
 
-**Sprint summary (11 sprints, 3-5 tasks each):**
+**Sprint summary (15 sprints, 1-5 tasks each, each fits in one session):**
 
-| Sprint | Tasks | Focus |
-|--------|-------|-------|
-| 1 | 5 | Shared UX components + standards |
-| 2 | 5 | Critical bug fixes |
-| 3 | 5 | More bug fixes + UX quick wins |
-| 4A | 4 | Dashboard Shell (structural) |
-| 4B | 3 | Shell polish + quick fixes |
-| 5 | 5 | Command palette + impersonate + cross-linking |
-| 6A | 5 | Utility components + first 3 page conversions |
-| 6B | 5 | Remaining page conversions + final verification |
-| 7 | 5 | Quick fixes + settings protection |
-| 8 | 4 | Contact fields + grandfathering (database work) |
-| 9 | 5 | Discount codes + broadcasts + file upload + settings protection (remaining) |
+| Sprint | Tasks | Largest File Touched | Focus |
+|--------|-------|---------------------|-------|
+| 1 | 5 | N/A (new files) | Shared UX components + standards |
+| 2 | 5 | Various (under 50KB) | Critical bug fixes |
+| 3 | 5 | Various (under 50KB) | More bug fixes + UX quick wins |
+| 4A | 4 | Layout (new shell) | Dashboard Shell (structural) |
+| 4B | 3 | Various (under 50KB) | Shell polish + quick fixes |
+| 5 | 5 | Various (under 50KB) | Command palette + impersonate + cross-linking |
+| 6A | 5 | Various (under 50KB) | Utility components + first 3 page conversions |
+| 6B | 5 | Various (under 50KB) | Remaining page conversions + final verification |
+| 7A | 3 | 51KB (passivepost settings) | Confirm dialogs + small UX fixes + EditableSettingsGroup component |
+| 7B | 2 | 212KB (affiliate settings) | Affiliate settings edit-protection + best practices reset |
+| 8A | 3 | 42KB (CRM detail) | Contact fields: database + API + CRM UI |
+| 8B | 4 | 361KB (affiliate dashboard, targeted) | Grandfathering gaps (critical business logic) |
+| 9A | 2 | 361KB (affiliate dashboard, targeted) | Discount code auto-generation + self-branding |
+| 9B | 2 | 212KB (affiliate settings, targeted) | Broadcast summary cards + file upload |
+| 9C | 3 | 43KB (branding settings) | Settings edit-protection on remaining pages |
 
 ---
 

@@ -1,6 +1,6 @@
 # PassivePost — Project History & Status
 
-> **Last Updated:** February 27, 2026
+> **Last Updated:** March 1, 2026
 
 ---
 
@@ -848,6 +848,31 @@ Closed 3 gaps found during full blueprint audit: wired Sparklines into Revenue a
 **Files modified:** `src/app/admin/revenue/page.tsx`, `src/app/api/admin/revenue/route.ts`, `src/app/admin/setup/affiliate/page.tsx`, `src/app/api/affiliate/members/route.ts`, `src/app/admin/setup/discount-codes/page.tsx`, `docs/UX_OVERHAUL_BLUEPRINT.md`
 
 **No database changes.** No new environment variables. No Supabase migrations needed.
+
+---
+
+### Session — March 1, 2026 (Blueprint Errata + Sprint Restructuring)
+
+Documentation-only session. No code changes.
+
+1. **Applied all 9 errata fixes** to `docs/UX_OVERHAUL_BLUEPRINT.md` — wrong migration number (018→017), missing user_profiles context from migration 011, vague migration file reference, missing Supabase Storage bucket prerequisite, missing MuseKit boundary note, missing Design Decision #9 reference, vague component spec, loose grep pattern in Done Test, missing grandfathering non-regression check in Done Test. All tracked in `docs/BLUEPRINT_ERRATA.md` (9/9 FIXED).
+
+2. **Restructured Sprints 7/8/9 into 7 sub-sprints** — Original sprints were too large for single sessions (affiliate settings = 212KB, affiliate dashboard = 361KB). New structure:
+   - **7A** (3 tasks): Confirm dialogs + small UX fixes + EditableSettingsGroup component. All files under 52KB.
+   - **7B** (2 tasks): Apply EditableSettingsGroup to affiliate settings + best practices reset. Single large file focus (212KB).
+   - **8A** (3 tasks): Contact fields database + API routes + CRM UI. New files + one 42KB page.
+   - **8B** (4 tasks): Grandfathering gaps. Critical business logic in affiliate index (8KB) + targeted changes to large files.
+   - **9A** (2 tasks): Discount code auto-generation + self-branding. Two small API files + targeted dashboard changes.
+   - **9B** (2 tasks): Broadcast summary cards + file upload. Targeted additions to affiliate settings + new component.
+   - **9C** (3 tasks): Settings edit-protection on 5 remaining pages (all under 43KB).
+
+3. **Updated blueprint Progress Tracker** — 3 rows replaced with 7 sub-sprint rows. Sprint Continuity Rules updated with new dependency chain. Summary table updated (11→15 sprints).
+
+4. **Updated session-guard** — Current sprint set to 7A with dependency notes.
+
+**Files modified:** `docs/UX_OVERHAUL_BLUEPRINT.md`, `docs/BLUEPRINT_ERRATA.md`, `.agents/skills/session-guard/SKILL.md`, `docs/ROADMAP.md`
+
+**No database changes.** No new environment variables. No code changes.
 
 ---
 
