@@ -1,32 +1,29 @@
 'use client'
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton, InfoTooltip } from '../components'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { InfoTooltip } from '../components'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { MessageCircle } from 'lucide-react'
 import { ColorInput } from '@/components/admin/color-input'
+import { EditableSettingsGroup } from '@/components/admin/editable-settings-group'
 
 export default function SupportPage() {
-  const { settings, saving, saved, handleSave, updateSupport } = useSetupSettingsContext()
+  const { settings, saving, handleSave, updateSupport } = useSetupSettingsContext()
+
+  const onSave = async () => { await handleSave() }
 
   return (
     <div className="space-y-[var(--content-density-gap,1rem)]">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
-            Support Widget <InfoTooltip text="A floating chatbot that provides instant help to visitors on every page of your site." />
-          </CardTitle>
-          <CardDescription>
-            Configure the AI-powered support chatbot widget
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Support Widget"
+        description="Configure the AI-powered support chatbot widget"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable Support Widget</p>
@@ -94,18 +91,17 @@ export default function SupportPage() {
               </div>
             </>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
       {settings.support?.enabled && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">AI Support Configuration <InfoTooltip text="Controls how the AI assistant responds to user questions. Customize the personality and knowledge base." /></CardTitle>
-            <CardDescription>
-              Configure how your AI support assistant should behave
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+        <EditableSettingsGroup
+          title="AI Support Configuration"
+          description="Configure how your AI support assistant should behave"
+          onSave={onSave}
+          isSaving={saving}
+        >
+          <div className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label htmlFor="system-prompt">System Prompt</Label>
               <Textarea
@@ -133,16 +129,9 @@ export default function SupportPage() {
                 data-testid="switch-log-chats"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </EditableSettingsGroup>
       )}
-
-      <SaveButton
-        saving={saving}
-        saved={saved}
-        onClick={handleSave}
-        testId="button-save-support-settings"
-      />
     </div>
   )
 }

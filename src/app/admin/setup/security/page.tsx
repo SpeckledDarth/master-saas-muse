@@ -1,30 +1,27 @@
 'use client'
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton, InfoTooltip } from '../components'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { InfoTooltip } from '../components'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Shield, Database, RefreshCw, Bell } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { EditableSettingsGroup } from '@/components/admin/editable-settings-group'
 
 export default function SecurityPage() {
-  const { settings, saving, saved, handleSave, updateSecurity } = useSetupSettingsContext()
+  const { settings, saving, handleSave, updateSecurity } = useSetupSettingsContext()
+
+  const onSave = async () => { await handleSave() }
 
   return (
     <div className="space-y-[var(--content-density-gap,1rem)]">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Authentication Security <InfoTooltip text="Protect user accounts with multi-factor authentication and CAPTCHA to prevent automated attacks." />
-          </CardTitle>
-          <CardDescription>
-            Configure security settings for user authentication
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Authentication Security"
+        description="Configure security settings for user authentication"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable MFA</p>
@@ -62,17 +59,16 @@ export default function SecurityPage() {
               data-testid="switch-captcha-enabled"
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">Password Requirements <InfoTooltip text="Stronger password rules reduce the risk of account compromise. Balance security with user convenience." /></CardTitle>
-          <CardDescription>
-            Define password policies for user accounts
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Password Requirements"
+        description="Define password policies for user accounts"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label htmlFor="password-min-length">Minimum Length</Label>
             <Input
@@ -124,17 +120,16 @@ export default function SecurityPage() {
               data-testid="switch-password-require-special"
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">Session Management <InfoTooltip text="Controls how long users stay logged in before being asked to re-authenticate." /></CardTitle>
-          <CardDescription>
-            Configure user session and timeout settings
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Session Management"
+        description="Configure user session and timeout settings"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label htmlFor="session-timeout">Session Timeout</Label>
             <Input
@@ -149,17 +144,16 @@ export default function SecurityPage() {
               Minutes of inactivity before automatic logout. Set to 0 for no timeout.
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">User Data Rights <InfoTooltip text="GDPR and CCPA compliance — give users the ability to export or delete their personal data." /></CardTitle>
-          <CardDescription>
-            Configure user data access and deletion policies
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="User Data Rights"
+        description="Configure user data access and deletion policies"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Allow Data Export</p>
@@ -183,20 +177,16 @@ export default function SecurityPage() {
               data-testid="switch-account-deletion-enabled"
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            Database Backups <InfoTooltip text="Automated backup notifications ensure you know your data is safe. Actual backups are managed by Supabase." />
-          </CardTitle>
-          <CardDescription>
-            Configure automated database backup schedule (managed by Supabase)
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Database Backups"
+        description="Configure automated database backup schedule (managed by Supabase)"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable Backup Notifications</p>
@@ -245,20 +235,16 @@ export default function SecurityPage() {
               </div>
             </>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <RefreshCw className="h-5 w-5" />
-            API Token Rotation <InfoTooltip text="Regularly changing API secrets limits damage from potential security leaks." />
-          </CardTitle>
-          <CardDescription>
-            Configure automatic rotation of API tokens and secrets
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="API Token Rotation"
+        description="Configure automatic rotation of API tokens and secrets"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable Token Rotation</p>
@@ -288,20 +274,16 @@ export default function SecurityPage() {
               </p>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            Metrics Alerts <InfoTooltip text="Automatic email warnings when business KPIs like churn rate or user growth move in the wrong direction." />
-          </CardTitle>
-          <CardDescription>
-            Get notified when key metrics cross thresholds
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Metrics Alerts"
+        description="Get notified when key metrics cross thresholds"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable Metric Alerts</p>
@@ -381,15 +363,8 @@ export default function SecurityPage() {
               </div>
             </>
           )}
-        </CardContent>
-      </Card>
-
-      <SaveButton
-        saving={saving}
-        saved={saved}
-        onClick={handleSave}
-        testId="button-save-security"
-      />
+        </div>
+      </EditableSettingsGroup>
     </div>
   )
 }

@@ -1,22 +1,25 @@
 'use client'
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { MiniSaveButton, SaveButton, IconComponent, iconOptions, InfoTooltip } from '../components'
+import { InfoTooltip } from '../components'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { Plus, Trash2, Palette } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { ImageUpload } from '@/components/admin/image-upload'
 import { ColorInput } from '@/components/admin/color-input'
 import { FontPicker } from '@/components/admin/font-picker'
 import Link from 'next/link'
 import { Paintbrush } from 'lucide-react'
+import { EditableSettingsGroup } from '@/components/admin/editable-settings-group'
 
 export default function BrandingPage() {
   const { settings, saving, saved, handleSave, setSettings, updateBranding, updateContent, addNavItem, updateNavItem, removeNavItem, updateHeaderStyle, updateFooterStyle } = useSetupSettingsContext()
+
+  const onSave = async () => { await handleSave() }
 
   return (
     <div className="space-y-[var(--content-density-gap,1rem)]">
@@ -32,14 +35,13 @@ export default function BrandingPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">Branding Settings <InfoTooltip text="Define your brand identity — name, colors, and logo. These appear across your app header, emails, and browser tabs." /></CardTitle>
-          <CardDescription>
-            Configure your app name, colors, and company information
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Branding Identity & Hero"
+        description="Configure your app name, colors, company information, and hero section"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label htmlFor="appName">App Name</Label>
@@ -478,11 +480,9 @@ export default function BrandingPage() {
               </Select>
               <p className="text-xs text-muted-foreground">How the image scales to fit</p>
             </div>
-            
           </div>
-
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
       <Card>
         <CardContent className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] py-4">
@@ -514,127 +514,125 @@ export default function BrandingPage() {
         onHeadingGradientChange={(enabled) => updateBranding('headingGradient', enabled)}
       />
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between gap-2">
+      <EditableSettingsGroup
+        title="Announcement Bar"
+        description="Display a top banner for promotions or announcements"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="flex items-center justify-between py-3 border-b">
             <div>
-              <CardTitle className="flex items-center gap-2">Announcement Bar <InfoTooltip text="A top-of-page banner for promotions, product launches, or important updates. Visitors can dismiss it." /></CardTitle>
-              <CardDescription>
-                Display a top banner for promotions or announcements
-              </CardDescription>
+              <p className="font-medium">Enable Announcement Bar</p>
+              <p className="text-sm text-muted-foreground">Show a top-of-page banner for promotions or important updates</p>
             </div>
-            <div className="flex items-center gap-2">
-              <MiniSaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-announcement" />
-              <Switch
-                checked={settings.announcement?.enabled ?? false}
-                onCheckedChange={checked => setSettings(prev => ({
-                  ...prev,
-                  announcement: { ...prev.announcement!, enabled: checked }
-                }))}
-                data-testid="switch-announcement-enabled"
-              />
-            </div>
+            <Switch
+              checked={settings.announcement?.enabled ?? false}
+              onCheckedChange={checked => setSettings(prev => ({
+                ...prev,
+                announcement: { ...prev.announcement!, enabled: checked }
+              }))}
+              data-testid="switch-announcement-enabled"
+            />
           </div>
-        </CardHeader>
-        {settings.announcement?.enabled && (
-          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
-            <div className="space-y-2">
-              <Label>Announcement Text</Label>
-              <Input
-                value={settings.announcement?.text ?? ''}
-                onChange={e => setSettings(prev => ({
-                  ...prev,
-                  announcement: { ...prev.announcement!, text: e.target.value }
-                }))}
-                placeholder="Introducing our new feature!"
-                data-testid="input-announcement-text"
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
-              <div className="space-y-2">
-                <Label>Link Text (optional)</Label>
-                <Input
-                  value={settings.announcement?.linkText ?? ''}
-                  onChange={e => setSettings(prev => ({
-                    ...prev,
-                    announcement: { ...prev.announcement!, linkText: e.target.value }
-                  }))}
-                  placeholder="Learn more"
-                  data-testid="input-announcement-link-text"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Link URL (optional)</Label>
-                <Input
-                  value={settings.announcement?.linkUrl ?? ''}
-                  onChange={e => setSettings(prev => ({
-                    ...prev,
-                    announcement: { ...prev.announcement!, linkUrl: e.target.value }
-                  }))}
-                  placeholder="/features"
-                  data-testid="input-announcement-link-url"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
-              <ColorInput
-                label="Background Color"
-                value={settings.announcement?.backgroundColor ?? '#7c3aed'}
-                onChange={hex => setSettings(prev => ({
-                  ...prev,
-                  announcement: { ...prev.announcement!, backgroundColor: hex }
-                }))}
-                defaultValue="#7c3aed"
-                testId="input-announcement-bg-color"
-              />
-              <ColorInput
-                label="Text Color"
-                value={settings.announcement?.textColor ?? '#ffffff'}
-                onChange={hex => setSettings(prev => ({
-                  ...prev,
-                  announcement: { ...prev.announcement!, textColor: hex }
-                }))}
-                defaultValue="#ffffff"
-                testId="input-announcement-text-color"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={settings.announcement?.dismissible ?? true}
-                onCheckedChange={checked => setSettings(prev => ({
-                  ...prev,
-                  announcement: { ...prev.announcement!, dismissible: checked }
-                }))}
-                data-testid="switch-announcement-dismissible"
-              />
-              <Label>Allow users to dismiss</Label>
-            </div>
-          </CardContent>
-        )}
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <CardTitle className="flex items-center gap-2">Navigation Menu <InfoTooltip text="Controls which links appear in the top navigation bar. Add badges to highlight new or upcoming features." /></CardTitle>
-              <CardDescription>
-                Configure which links appear in the top navigation bar of your website
-              </CardDescription>
+          {settings.announcement?.enabled && (
+            <>
+              <div className="space-y-2">
+                <Label>Announcement Text</Label>
+                <Input
+                  value={settings.announcement?.text ?? ''}
+                  onChange={e => setSettings(prev => ({
+                    ...prev,
+                    announcement: { ...prev.announcement!, text: e.target.value }
+                  }))}
+                  placeholder="Introducing our new feature!"
+                  data-testid="input-announcement-text"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+                <div className="space-y-2">
+                  <Label>Link Text (optional)</Label>
+                  <Input
+                    value={settings.announcement?.linkText ?? ''}
+                    onChange={e => setSettings(prev => ({
+                      ...prev,
+                      announcement: { ...prev.announcement!, linkText: e.target.value }
+                    }))}
+                    placeholder="Learn more"
+                    data-testid="input-announcement-link-text"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Link URL (optional)</Label>
+                  <Input
+                    value={settings.announcement?.linkUrl ?? ''}
+                    onChange={e => setSettings(prev => ({
+                      ...prev,
+                      announcement: { ...prev.announcement!, linkUrl: e.target.value }
+                    }))}
+                    placeholder="/features"
+                    data-testid="input-announcement-link-url"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+                <ColorInput
+                  label="Background Color"
+                  value={settings.announcement?.backgroundColor ?? '#7c3aed'}
+                  onChange={hex => setSettings(prev => ({
+                    ...prev,
+                    announcement: { ...prev.announcement!, backgroundColor: hex }
+                  }))}
+                  defaultValue="#7c3aed"
+                  testId="input-announcement-bg-color"
+                />
+                <ColorInput
+                  label="Text Color"
+                  value={settings.announcement?.textColor ?? '#ffffff'}
+                  onChange={hex => setSettings(prev => ({
+                    ...prev,
+                    announcement: { ...prev.announcement!, textColor: hex }
+                  }))}
+                  defaultValue="#ffffff"
+                  testId="input-announcement-text-color"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={settings.announcement?.dismissible ?? true}
+                  onCheckedChange={checked => setSettings(prev => ({
+                    ...prev,
+                    announcement: { ...prev.announcement!, dismissible: checked }
+                  }))}
+                  data-testid="switch-announcement-dismissible"
+                />
+                <Label>Allow users to dismiss</Label>
+              </div>
+            </>
+          )}
+        </div>
+      </EditableSettingsGroup>
+
+      <EditableSettingsGroup
+        title="Navigation Menu"
+        description="Configure which links appear in the top navigation bar of your website"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] bg-[hsl(var(--info)/0.1)] border border-[hsl(var(--info)/0.3)] flex-1">
+              <p className="text-sm text-[hsl(var(--info))]">
+                <strong>How it works:</strong> Each link you add here will appear in the header navigation bar. 
+                Use the toggle to show/hide links. Add badges like "New" or "Beta" to highlight new features. 
+                Common links include: Pricing, About, Contact, Blog, Features.
+              </p>
             </div>
             <Button onClick={addNavItem} size="sm" data-testid="button-add-nav-item">
               <Plus className="h-4 w-4 mr-2" />
               Add Link
             </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
-          <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] bg-[hsl(var(--info)/0.1)] border border-[hsl(var(--info)/0.3)]">
-            <p className="text-sm text-[hsl(var(--info))]">
-              <strong>How it works:</strong> Each link you add here will appear in the header navigation bar. 
-              Use the toggle to show/hide links. Add badges like "New" or "Beta" to highlight new features. 
-              Common links include: Pricing, About, Contact, Blog, Features.
-            </p>
           </div>
           <div className="space-y-3">
             {(settings.navigation?.items ?? []).map((item, index) => (
@@ -700,17 +698,16 @@ export default function BrandingPage() {
               </p>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">Header Styling <InfoTooltip text="Customize the appearance of the top navigation header including background color, text color, and behavior." /></CardTitle>
-          <CardDescription>
-            Control the look and behavior of your site header
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Header Styling"
+        description="Control the look and behavior of your site header"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <ColorInput
               label="Background Color Override"
@@ -769,17 +766,16 @@ export default function BrandingPage() {
               />
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">Footer Styling <InfoTooltip text="Customize the appearance of your site footer including background color, text color, and layout style." /></CardTitle>
-          <CardDescription>
-            Control the look of your site footer
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Footer Styling"
+        description="Control the look of your site footer"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <ColorInput
               label="Background Color Override"
@@ -855,12 +851,8 @@ export default function BrandingPage() {
               </SelectContent>
             </Select>
           </div>
-        </CardContent>
-      </Card>
-
-      <div className="flex justify-end pt-6">
-        <SaveButton saving={saving} saved={saved} onClick={handleSave} testId="button-save-branding" />
-      </div>
+        </div>
+      </EditableSettingsGroup>
     </div>
   )
 }

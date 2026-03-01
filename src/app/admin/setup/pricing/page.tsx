@@ -1,29 +1,31 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { DollarSign, Loader2, Save, Check, LayoutGrid } from 'lucide-react'
+import { DollarSign, LayoutGrid } from 'lucide-react'
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton, InfoTooltip } from '../components'
+import { InfoTooltip } from '../components'
+import { EditableSettingsGroup } from '@/components/admin/editable-settings-group'
+import { DSCard, DSCardContent } from '@/components/ui/ds-card'
 
 export default function PricingPage() {
-  const { settings, saving, saved, handleSave, updatePricing } = useSetupSettingsContext()
+  const { settings, saving, handleSave, updatePricing } = useSetupSettingsContext()
+
+  const onSave = async () => { await handleSave() }
 
   return (
     <div className="space-y-[var(--content-density-gap,1rem)]">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">Free Tier Configuration <InfoTooltip text="A free plan reduces signup friction and feeds your conversion funnel. Configure what free users get access to." /></CardTitle>
-          <CardDescription>
-            Configure your free plan that appears on the pricing page
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Free Tier Configuration"
+        description="Configure your free plan that appears on the pricing page"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Show Free Plan</p>
@@ -77,17 +79,22 @@ export default function PricingPage() {
               </div>
             </>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">Paid Pricing Plans <InfoTooltip text="Revenue-generating subscription tiers managed through Stripe. Changes in Stripe automatically sync to your pricing page." /></CardTitle>
-          <CardDescription>
-            Manage your subscription tiers in Stripe Dashboard
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <DSCard>
+        <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <h3
+                className="text-base font-semibold text-foreground flex items-center gap-2"
+                style={{ fontSize: 'var(--h3-size, 1.125rem)', fontWeight: 'var(--h3-weight, 600)' }}
+              >
+                Paid Pricing Plans <InfoTooltip text="Revenue-generating subscription tiers managed through Stripe. Changes in Stripe automatically sync to your pricing page." />
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">Manage your subscription tiers in Stripe Dashboard</p>
+            </div>
+          </div>
           <div className="p-[var(--section-spacing,1.5rem)] border rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center space-y-[var(--content-density-gap,1rem)]">
             <DollarSign className="h-12 w-12 mx-auto text-muted-foreground" />
             <div>
@@ -144,20 +151,16 @@ export default function PricingPage() {
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <LayoutGrid className="h-5 w-5" />
-            Card Layout <InfoTooltip text="Control how pricing cards are arranged on your pricing page. Auto will choose the best layout based on the number of plans." />
-          </CardTitle>
-          <CardDescription>
-            Choose how pricing cards are displayed on the page
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Card Layout"
+        description="Choose how pricing cards are displayed on the page"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label>Cards Per Row</Label>
             <Select
@@ -178,17 +181,8 @@ export default function PricingPage() {
               Auto mode shows 2 columns for 2 plans, 3 columns for 3 plans, and 4 columns for 4+ plans
             </p>
           </div>
-        </CardContent>
-      </Card>
-
-      <div className="flex justify-end pt-6">
-        <SaveButton 
-          saving={saving}
-          saved={saved}
-          onClick={handleSave}
-          testId="button-save-pricing"
-        />
-      </div>
+        </div>
+      </EditableSettingsGroup>
     </div>
   )
 }

@@ -2,14 +2,14 @@
 
 import { useState, useMemo } from 'react'
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
-import { SaveButton, InfoTooltip } from '../components'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { InfoTooltip } from '../components'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
-import { Shield, ChevronDown, ChevronRight, Eye, EyeOff, Cookie, AlertTriangle, Info } from 'lucide-react'
+import { ChevronDown, ChevronRight, Eye, EyeOff, AlertTriangle, Info } from 'lucide-react'
+import { EditableSettingsGroup } from '@/components/admin/editable-settings-group'
 
 function MarkdownPreview({ content }: { content: string }) {
   const html = useMemo(() => {
@@ -54,7 +54,7 @@ const legalPages: LegalPageConfig[] = [
 ]
 
 export default function CompliancePage() {
-  const { settings, saving, saved, handleSave, updateCompliance, updateLegal } = useSetupSettingsContext()
+  const { settings, saving, handleSave, updateCompliance, updateLegal } = useSetupSettingsContext()
   const [expandedPage, setExpandedPage] = useState<string | null>(null)
   const [previewPages, setPreviewPages] = useState<Record<string, boolean>>({})
 
@@ -68,19 +68,17 @@ export default function CompliancePage() {
     return settings.compliance?.[page.toggleKey as keyof typeof settings.compliance] as boolean ?? false
   }
 
+  const onSave = async () => { await handleSave() }
+
   return (
     <div className="space-y-[var(--content-density-gap,1rem)]">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Compliance Pages <InfoTooltip text="Legal pages protect your business and build user trust. Terms and Privacy Policy are always enabled." />
-          </CardTitle>
-          <CardDescription>
-            Toggle optional legal and compliance pages. Terms of Service and Privacy Policy are always enabled as core pages.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Compliance Pages"
+        description="Toggle optional legal and compliance pages. Terms of Service and Privacy Policy are always enabled as core pages."
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Acceptable Use Policy</p>
@@ -164,20 +162,16 @@ export default function CompliancePage() {
               data-testid="switch-security-policy-enabled"
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Cookie className="h-5 w-5" />
-            Cookie Consent Banner <InfoTooltip text="Required by GDPR and similar privacy laws for EU visitors. Lets users choose which cookies to accept." />
-          </CardTitle>
-          <CardDescription>
-            Configure the cookie consent banner shown to visitors
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <EditableSettingsGroup
+        title="Cookie Consent Banner"
+        description="Configure the cookie consent banner shown to visitors"
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Enable Cookie Consent</p>
@@ -249,17 +243,16 @@ export default function CompliancePage() {
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">Edit Legal Pages <InfoTooltip text="Customize your legal documents with Markdown formatting. Use placeholders for dynamic values." /></CardTitle>
-          <CardDescription>
-            Edit the content for each legal page. Click a page name to expand its editor.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
+      <EditableSettingsGroup
+        title="Edit Legal Pages"
+        description="Edit the content for each legal page. Click a page name to expand its editor."
+        onSave={onSave}
+        isSaving={saving}
+      >
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center gap-2 rounded-[var(--card-radius,0.75rem)] bg-muted p-[var(--card-padding,1.25rem)] mb-[var(--content-density-gap,1rem)]">
             <Info className="h-4 w-4 shrink-0 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
@@ -338,8 +331,8 @@ export default function CompliancePage() {
               </div>
             )
           })}
-        </CardContent>
-      </Card>
+        </div>
+      </EditableSettingsGroup>
 
       <div className="flex items-center gap-2 rounded-[var(--card-radius,0.75rem)] bg-muted p-[var(--card-padding,1.25rem)]">
         <AlertTriangle className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -347,13 +340,6 @@ export default function CompliancePage() {
           These are starter templates. Consult a legal professional to customize them for your specific needs.
         </p>
       </div>
-
-      <SaveButton
-        saving={saving}
-        saved={saved}
-        onClick={handleSave}
-        testId="button-save-compliance"
-      />
     </div>
   )
 }
