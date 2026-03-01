@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { Mail, Edit2, Info, Plus, Trash2, Send, Eye, Code, Loader2 } from 'lucide-react'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 
 interface EmailTemplate {
   id: number
@@ -202,15 +203,16 @@ export default function EmailTemplatesPage() {
     }
   }
 
-  async function handleDelete(templateId: number, templateName: string) {
-    if (!confirm(`Are you sure you want to delete the "${templateName.replace(/_/g, ' ')}" template?`)) {
-      return
-    }
-    
-    setDeleting(templateId)
+  const [templateToDelete, setTemplateToDelete] = useState<{ id: number; name: string } | null>(null)
+
+  async function handleConfirmDelete() {
+    if (!templateToDelete) return
+    const { id } = templateToDelete
+    setTemplateToDelete(null)
+    setDeleting(id)
     
     try {
-      const res = await fetch(`/api/admin/email-templates?id=${templateId}`, {
+      const res = await fetch(`/api/admin/email-templates?id=${id}`, {
         method: 'DELETE',
       })
       
@@ -341,7 +343,7 @@ export default function EmailTemplatesPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(template.id, template.name)}
+                    onClick={() => setTemplateToDelete({ id: template.id, name: template.name })}
                     disabled={deleting === template.id}
                     data-testid={`button-delete-${template.name}`}
                     className="text-destructive hover:text-destructive"
@@ -586,6 +588,16 @@ export default function EmailTemplatesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!templateToDelete}
+        onOpenChange={(open) => { if (!open) setTemplateToDelete(null) }}
+        title="Delete Template"
+        description={`Are you sure you want to delete the "${templateToDelete?.name.replace(/_/g, ' ')}" template?`}
+        confirmLabel="Delete"
+        variant="destructive"
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }

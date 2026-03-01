@@ -104,6 +104,7 @@ export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [updatingRole, setUpdatingRole] = useState<string | null>(null)
+  const [pendingRoleChange, setPendingRoleChange] = useState<{ userId: string; currentRole: string; newRole: string } | null>(null)
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null)
   const [userDetail, setUserDetail] = useState<UserDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
@@ -182,6 +183,13 @@ export default function UsersPage() {
     } finally {
       setUpdatingRole(null)
     }
+  }
+
+  function handleConfirmRoleChange() {
+    if (!pendingRoleChange) return
+    const { userId, newRole } = pendingRoleChange
+    setPendingRoleChange(null)
+    handleRoleChange(userId, newRole)
   }
 
   async function handleDeleteUser() {
@@ -366,7 +374,7 @@ export default function UsersPage() {
         <div onClick={(e) => e.stopPropagation()}>
           <Select
             value={user.role || 'member'}
-            onValueChange={(value) => handleRoleChange(user.id, value)}
+            onValueChange={(value) => setPendingRoleChange({ userId: user.id, currentRole: user.role || 'member', newRole: value })}
             disabled={updatingRole === user.id}
           >
             <SelectTrigger className="w-[130px]" data-testid={`select-role-${user.id}`}>
@@ -803,6 +811,15 @@ export default function UsersPage() {
         variant="destructive"
         loading={deleting}
         onConfirm={handleDeleteUser}
+      />
+
+      <ConfirmDialog
+        open={!!pendingRoleChange}
+        onOpenChange={(open) => { if (!open) setPendingRoleChange(null) }}
+        title="Change User Role"
+        description={`Change role from "${pendingRoleChange?.currentRole}" to "${pendingRoleChange?.newRole}"?`}
+        confirmLabel="Change Role"
+        onConfirm={handleConfirmRoleChange}
       />
 
       <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>

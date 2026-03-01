@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, Plus, Trash2, Shield, Globe, Copy, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 
 interface SSODomain {
   id: string
@@ -113,11 +114,12 @@ export default function SSODashboard() {
     }
   }
 
-  const handleDelete = async (providerId: string) => {
-    if (!confirm('Are you sure you want to remove this SSO provider? Users from these domains will no longer be able to use SSO login.')) {
-      return
-    }
+  const [providerToDelete, setProviderToDelete] = useState<string | null>(null)
 
+  const handleConfirmDelete = async () => {
+    if (!providerToDelete) return
+    const providerId = providerToDelete
+    setProviderToDelete(null)
     setDeleteLoading(providerId)
     try {
       await fetch('/api/admin/sso', {
@@ -309,7 +311,7 @@ export default function SSODashboard() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDelete(provider.id)}
+                    onClick={() => setProviderToDelete(provider.id)}
                     disabled={deleteLoading === provider.id}
                     data-testid={`button-delete-sso-${provider.id}`}
                   >
@@ -326,6 +328,16 @@ export default function SSODashboard() {
           ))
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!providerToDelete}
+        onOpenChange={(open) => { if (!open) setProviderToDelete(null) }}
+        title="Remove SSO Provider"
+        description="Are you sure you want to remove this SSO provider? Users from these domains will no longer be able to use SSO login."
+        confirmLabel="Remove"
+        variant="destructive"
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }

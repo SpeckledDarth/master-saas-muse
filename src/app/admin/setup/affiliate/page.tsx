@@ -26,6 +26,7 @@ import HelpTooltip from '@/components/admin/HelpTooltip'
 import SortableHeader from '@/components/admin/SortableHeader'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sparkline } from '@/components/admin/sparkline'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 
 interface Settings {
   commission_rate: number
@@ -1172,9 +1173,10 @@ export default function AffiliateSettingsPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const handleDeleteMember = async (userId: string, email: string) => {
-    if (!confirm(`Are you sure you want to delete the affiliate record for ${email}? This will remove their referral link, commissions, referrals, and application data. This cannot be undone.`)) return
+  const [memberToDelete, setMemberToDelete] = useState<{ userId: string; email: string } | null>(null)
+  const [appToDelete, setAppToDelete] = useState<{ appId: string; email: string } | null>(null)
 
+  const handleDeleteMember = async (userId: string, email: string) => {
     setDeletingMember(userId)
     try {
       const res = await fetch(`/api/affiliate/members?userId=${userId}`, { method: 'DELETE' })
@@ -1254,8 +1256,6 @@ export default function AffiliateSettingsPage() {
   }
 
   const handleDeleteApplication = async (appId: string, email: string) => {
-    if (!confirm(`Delete the application from ${email}? This cannot be undone.`)) return
-
     setDeletingApp(appId)
     try {
       const res = await fetch(`/api/affiliate/applications?id=${appId}`, { method: 'DELETE' })
@@ -2404,7 +2404,7 @@ export default function AffiliateSettingsPage() {
                             size="sm"
                             variant="ghost"
                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                            onClick={(e) => { e.stopPropagation(); handleDeleteApplication(app.id, app.email) }}
+                            onClick={(e) => { e.stopPropagation(); setAppToDelete({ appId: app.id, email: app.email }) }}
                             disabled={deletingApp === app.id}
                             data-testid={`button-delete-app-${app.id}`}
                           >
@@ -3069,7 +3069,7 @@ export default function AffiliateSettingsPage() {
                                 variant="ghost"
                                 size="icon"
                                 className="text-destructive"
-                                onClick={(e) => { e.stopPropagation(); handleDeleteMember(m.userId, m.email) }}
+                                onClick={(e) => { e.stopPropagation(); setMemberToDelete({ userId: m.userId, email: m.email }) }}
                                 disabled={deletingMember === m.userId}
                                 data-testid={`button-delete-member-${m.userId}`}
                               >
@@ -3831,6 +3831,26 @@ export default function AffiliateSettingsPage() {
         onRecalcFraud={handleRecalcFraud}
         suspendingMember={suspendingMember}
         recalcFraud={recalcFraud}
+      />
+
+      <ConfirmDialog
+        open={!!memberToDelete}
+        onOpenChange={(open) => { if (!open) setMemberToDelete(null) }}
+        title="Delete Affiliate"
+        description={`Are you sure you want to delete the affiliate record for ${memberToDelete?.email}? This will remove their referral link, commissions, referrals, and application data. This cannot be undone.`}
+        confirmLabel="Delete Affiliate"
+        variant="destructive"
+        onConfirm={() => { if (memberToDelete) handleDeleteMember(memberToDelete.userId, memberToDelete.email) }}
+      />
+
+      <ConfirmDialog
+        open={!!appToDelete}
+        onOpenChange={(open) => { if (!open) setAppToDelete(null) }}
+        title="Delete Application"
+        description={`Delete the application from ${appToDelete?.email}? This cannot be undone.`}
+        confirmLabel="Delete"
+        variant="destructive"
+        onConfirm={() => { if (appToDelete) handleDeleteApplication(appToDelete.appId, appToDelete.email) }}
       />
     </div>
   )

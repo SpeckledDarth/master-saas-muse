@@ -12,6 +12,7 @@ import {
   Pencil, Save, Trash2, Eye, EyeOff, Check, X, CircleDot,
   ChevronDown, ChevronRight
 } from 'lucide-react'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 
 interface IntegrationKey {
   id: string
@@ -166,8 +167,10 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
     }
   }
 
-  async function handleDelete() {
-    if (!confirm(`Remove the saved value for ${keyData.label}? This cannot be undone.`)) return
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  async function handleConfirmDelete() {
+    setShowDeleteConfirm(false)
     setDeleting(true)
     setError(null)
     try {
@@ -333,7 +336,7 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
             <Button
               variant="ghost"
               size="icon"
-              onClick={handleDelete}
+              onClick={() => setShowDeleteConfirm(true)}
               disabled={deleting}
               title="Remove value"
               data-testid={`button-delete-${keyData.id}`}
@@ -346,6 +349,15 @@ function KeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: () => 
       {error && (
         <p className="text-xs text-destructive px-4 pb-2" data-testid={`error-${keyData.id}`}>{error}</p>
       )}
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="Remove Integration Value"
+        description={`Remove the saved value for ${keyData.label}? This cannot be undone.`}
+        confirmLabel="Remove"
+        variant="destructive"
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }

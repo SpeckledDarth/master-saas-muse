@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Switch } from '@/components/ui/switch'
 import { useToast } from '@/hooks/use-toast'
 import { FileText, Plus, Edit2, Trash2, Eye, EyeOff, Megaphone, ExternalLink, Loader2, Code } from 'lucide-react'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 
 interface Post {
   id: number
@@ -149,12 +150,15 @@ export default function ContentPage() {
     }
   }
 
-  async function handleDelete(postId: number, postTitle: string) {
-    if (!confirm(`Are you sure you want to delete "${postTitle}"?`)) return
-    
-    setDeleting(postId)
+  const [postToDelete, setPostToDelete] = useState<{ id: number; title: string } | null>(null)
+
+  async function handleConfirmDelete() {
+    if (!postToDelete) return
+    const { id } = postToDelete
+    setPostToDelete(null)
+    setDeleting(id)
     try {
-      const res = await fetch(`/api/admin/posts?id=${postId}`, { method: 'DELETE' })
+      const res = await fetch(`/api/admin/posts?id=${id}`, { method: 'DELETE' })
       
       if (res.ok) {
         toast({ title: 'Post deleted' })
@@ -247,7 +251,7 @@ export default function ContentPage() {
             <Button 
               size="icon" 
               variant="ghost" 
-              onClick={() => handleDelete(post.id, post.title)} 
+              onClick={() => setPostToDelete({ id: post.id, title: post.title })} 
               title="Delete"
               disabled={deleting === post.id}
               className="text-destructive hover:text-destructive"
@@ -459,6 +463,16 @@ export default function ContentPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!postToDelete}
+        onOpenChange={(open) => { if (!open) setPostToDelete(null) }}
+        title="Delete Post"
+        description={`Are you sure you want to delete "${postToDelete?.title}"?`}
+        confirmLabel="Delete"
+        variant="destructive"
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }

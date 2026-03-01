@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Search, Download, ChevronLeft, ChevronRight, DollarSign } from 'lucide-react'
+import { Loader2, Search, Download, ChevronLeft, ChevronRight, DollarSign, X } from 'lucide-react'
 import { Sparkline } from '@/components/admin/sparkline'
 
 const TX_TYPE_COLORS: Record<string, string> = {
@@ -232,6 +232,18 @@ export default function RevenuePage() {
           className="w-[150px]"
           data-testid="input-date-to"
         />
+        {(dateFrom || dateTo) && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => { setDateFrom(''); setDateTo(''); setPage(1) }}
+            className="text-muted-foreground"
+            data-testid="button-clear-dates"
+          >
+            <X className="h-3 w-3 mr-1" />
+            Clear Dates
+          </Button>
+        )}
       </div>
 
       <div className="text-xs text-muted-foreground mb-2" data-testid="text-record-count">

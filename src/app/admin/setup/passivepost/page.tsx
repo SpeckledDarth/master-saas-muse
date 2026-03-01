@@ -16,6 +16,7 @@ import {
   AlertTriangle, KeyRound, ChevronDown, ChevronRight, CircleDot,
   ExternalLink, Loader2, Pencil, Check, X, Eye, EyeOff, Trash2, Plus, BookOpen
 } from 'lucide-react'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 import { DEFAULT_TIER_DEFINITIONS, defaultSocialModuleSettings } from '@/lib/social/types'
 import type { NicheGuidanceEntry, TierDefinition } from '@/lib/social/types'
 
@@ -149,8 +150,10 @@ function SocialKeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: 
     }
   }
 
-  async function handleDelete() {
-    if (!confirm(`Remove the saved value for ${keyData.label}? This cannot be undone.`)) return
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  async function handleConfirmDelete() {
+    setShowDeleteConfirm(false)
     setDeleting(true)
     setError(null)
     try {
@@ -298,7 +301,7 @@ function SocialKeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: 
             <Button
               variant="ghost"
               size="icon"
-              onClick={handleDelete}
+              onClick={() => setShowDeleteConfirm(true)}
               disabled={deleting}
               title="Remove value"
               data-testid={`button-delete-${keyData.id}`}
@@ -311,6 +314,15 @@ function SocialKeyRow({ keyData, onSaved }: { keyData: IntegrationKey; onSaved: 
       {error && (
         <p className="text-xs text-destructive px-4 pb-2" data-testid={`error-${keyData.id}`}>{error}</p>
       )}
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="Remove Integration Value"
+        description={`Remove the saved value for ${keyData.label}? This cannot be undone.`}
+        confirmLabel="Remove"
+        variant="destructive"
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }
