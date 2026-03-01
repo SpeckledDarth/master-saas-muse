@@ -925,6 +925,35 @@ Tasks completed:
 
 ---
 
+### Session — March 1, 2026 (UX Overhaul Blueprint — Sprint 9B)
+
+**Sprint 9B: Broadcast Summary Cards + Marketing Asset File Upload** — COMPLETE
+
+Tasks completed:
+1. **S9B-T1** — Added 4 broadcast summary cards above the broadcast list: Average Open Rate (with trend arrow comparing last 5 vs prior 5 broadcasts), Average Click Rate, Best Performer (name + open rate), Last Broadcast (date + name + open/click rates). Added Open Rate % and Click Rate % sortable columns to the broadcast list. Added category tagging dropdown on broadcast creation dialog (Contest, Tier Change, Policy Update, General). Category badges display in broadcast list rows.
+
+2. **S9B-T2** — Built FileUpload component (`src/components/admin/file-upload.tsx`) supporting PNG, JPG, GIF, SVG, PDF, DOCX, XLSX with 10MB limit. Added URL/Upload toggle in the "Add Asset" dialog on the marketing assets tab. Upload goes to Supabase Storage `affiliate-assets` bucket. Stores file_url, file_name, file_size, file_type on the asset record. Affiliate dashboard shows Download button (with download icon) for assets with file URLs.
+
+**Database changes (Replit Postgres):**
+- `affiliate_broadcasts` — added `category TEXT` column
+- `affiliate_assets` — added `file_size INTEGER` and `file_type TEXT` columns
+
+**Supabase migration SQL** (banked in `migrations/core/017_contact_fields.sql`):
+```sql
+ALTER TABLE affiliate_broadcasts ADD COLUMN IF NOT EXISTS category TEXT;
+ALTER TABLE affiliate_assets ADD COLUMN IF NOT EXISTS file_size INTEGER;
+ALTER TABLE affiliate_assets ADD COLUMN IF NOT EXISTS file_type TEXT;
+```
+
+**Supabase Storage prerequisite:** Create `affiliate-assets` bucket in Supabase Storage dashboard (public read access for download URLs, authenticated upload) before file upload works on Vercel.
+
+**Files created:** `src/components/admin/file-upload.tsx`, `src/app/api/affiliate/assets/upload/route.ts`
+**Files modified:** `src/app/admin/setup/affiliate/page.tsx`, `src/app/api/affiliate/assets/route.ts`, `src/app/api/admin/affiliate/broadcasts/route.ts`, `src/app/affiliate/dashboard/page.tsx`, `migrations/core/017_contact_fields.sql`, `docs/UX_OVERHAUL_BLUEPRINT.md`, `.agents/skills/session-guard/SKILL.md`, `docs/ROADMAP.md`
+
+**Blueprint status:** 14 of 15 sprints complete (1 through 9B). Next sprint: 9C. Remaining: 9C only.
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience

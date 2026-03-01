@@ -4344,8 +4344,8 @@ function StandaloneAffiliateDashboard() {
                         )}
                         {asset.file_url && (
                           <Button variant="outline" size="sm" asChild data-testid={`button-download-asset-${asset.id}`}>
-                            <a href={asset.file_url} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-3.5 w-3.5" />
+                            <a href={asset.file_url} target="_blank" rel="noopener noreferrer" download={asset.file_name || true}>
+                              <Download className="h-3.5 w-3.5" />
                             </a>
                           </Button>
                         )}

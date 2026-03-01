@@ -136,6 +136,7 @@ These tools give affiliates everything they need to promote effectively — from
 | **Starter Kit** | A curated bundle of essential materials for new affiliates: best links, top-performing content, quick-start guide. | Eliminates the "where do I start?" problem — new affiliates can begin promoting immediately. |
 | **Knowledge Base** | Searchable help articles organized by category with view tracking. Admin creates and manages content. | Self-service support reduces tickets — affiliates find answers without waiting for help. |
 | **Promotional Calendar** | Admin-set upcoming campaigns with countdown timers, content suggestions, and linked assets. | Affiliates can plan their content around product launches and promotions for maximum impact. |
+| **Asset File Upload** | Admin can upload files (PNG, JPG, GIF, SVG, PDF, DOCX, XLSX, 10MB limit) directly via FileUpload component. Toggle between URL input and file upload in the Add Asset dialog. Stores to Supabase Storage. Affiliates see download button. | Eliminates external hosting — admins upload assets once, affiliates download directly from the platform. |
 | **Asset Usage Analytics** | Tracks downloads, copies, and views for every marketing asset. Shows which assets perform best. | Data-driven asset management — admins know what affiliates actually use and can create more of what works. |
 | **Top Performer Badges** | Visual badges on assets that have driven the most conversions. | Social proof within the toolkit — affiliates gravitate toward proven materials. |
 
@@ -153,7 +154,7 @@ These features keep the relationship between program administrators and affiliat
 
 | Feature | What It Does | Value |
 |---------|-------------|-------|
-| **Broadcasts** | Admin sends email announcements to all affiliates (or segments like top performers or dormant affiliates) with open/click tracking. | One-to-many communication for program updates, promotions, and tips without needing a separate email tool. |
+| **Broadcasts** | Admin sends email announcements to all affiliates (or segments like top performers or dormant affiliates) with open/click tracking. Summary cards show avg open rate (with trend), avg click rate, best performer, and last broadcast. Open/click rate columns are sortable. Category tagging (Contest, Tier Change, Policy Update, General) available on creation. | One-to-many communication for program updates, promotions, and tips without needing a separate email tool. |
 | **In-App Messaging** | Two-way message threads between admin and individual affiliates, with unread indicators. | Private, contextual communication — conversations live alongside the affiliate's data, not in a disconnected inbox. |
 | **Drip Sequences** | Automated 3-email onboarding series: Welcome (immediate), Tips (24 hours), Strategy (72 hours). | Guides new affiliates through their critical first week when they're most likely to engage or drop off. |
 | **Announcements** | Admin-created news items that appear on the affiliate dashboard. | Persistent updates visible to all affiliates, even those who don't read emails. |

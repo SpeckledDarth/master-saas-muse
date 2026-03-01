@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
     if (userRole?.role !== 'admin') return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
 
     const body = await request.json()
-    const { title, description, asset_type, content, file_url, file_name, sort_order, category } = body
+    const { title, description, asset_type, content, file_url, file_name, file_size, file_type, sort_order, category } = body
 
     if (!title || !asset_type) {
       return NextResponse.json({ error: 'Title and asset type required' }, { status: 400 })
@@ -135,6 +135,8 @@ export async function POST(request: NextRequest) {
 
     const insertData: any = { title, description, asset_type, content, file_url, file_name, sort_order: sort_order || 0 }
     if (category) insertData.category = category
+    if (file_size) insertData.file_size = file_size
+    if (file_type) insertData.file_type = file_type
 
     const { data, error } = await admin
       .from('affiliate_assets')

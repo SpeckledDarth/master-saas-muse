@@ -68,3 +68,10 @@ ALTER TABLE referral_links ADD COLUMN IF NOT EXISTS locked_min_payout_cents INTE
 
 -- Sprint 9A: Discount code rename cooldown tracking
 ALTER TABLE affiliate_discount_codes ADD COLUMN IF NOT EXISTS last_renamed_at TIMESTAMPTZ;
+
+-- Sprint 9B: Broadcast category tagging
+ALTER TABLE affiliate_broadcasts ADD COLUMN IF NOT EXISTS category TEXT;
+
+-- Sprint 9B: Marketing asset file metadata
+ALTER TABLE affiliate_assets ADD COLUMN IF NOT EXISTS file_size INTEGER;
+ALTER TABLE affiliate_assets ADD COLUMN IF NOT EXISTS file_type TEXT;

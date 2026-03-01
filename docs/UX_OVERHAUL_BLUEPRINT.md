@@ -22,7 +22,7 @@
 | 8A | Contact Fields: Database + API + CRM UI | COMPLETE | FR-01 |
 | 8B | Grandfathering Gaps | COMPLETE | FR-06 (GAP-1–6) |
 | 9A | Discount Code Auto-Generation + Self-Branding | COMPLETE | FR-07 |
-| 9B | Broadcast Summary Cards + File Upload | NOT STARTED | FR-02, FR-09 |
+| 9B | Broadcast Summary Cards + File Upload | COMPLETE | FR-02, FR-09 |
 | 9C | Settings Edit-Protection on Remaining Pages | NOT STARTED | FR-13 (remaining pages) |
 
 ---

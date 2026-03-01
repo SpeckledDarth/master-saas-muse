@@ -52,7 +52,7 @@ async function updateBroadcast(admin: any, id: string, updates: Record<string, a
 
   if (error) {
     if (error.message?.includes('column') || error.code === '42703') {
-      const coreFields = ['status', 'subject', 'body', 'audience_filter']
+      const coreFields = ['status', 'subject', 'body', 'audience_filter', 'category']
       const minimal: Record<string, any> = {}
       for (const key of coreFields) {
         if (key in updates) minimal[key] = updates[key]
@@ -101,19 +101,22 @@ export async function POST(request: NextRequest) {
     if (!auth) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
 
     const body = await request.json()
-    const { subject, body: messageBody, audience_filter } = body
+    const { subject, body: messageBody, audience_filter, category } = body
 
     if (!subject || !messageBody) {
       return NextResponse.json({ error: 'Subject and body are required' }, { status: 400 })
     }
 
-    const data = await insertBroadcast(auth.admin, {
+    const insertFields: Record<string, any> = {
       subject,
       body: messageBody,
       audience_filter: audience_filter || { type: 'all' },
       status: 'draft',
       sent_by: auth.user.id,
-    })
+    }
+    if (category) insertFields.category = category
+
+    const data = await insertBroadcast(auth.admin, insertFields)
 
     logAuditEvent({ admin_user_id: auth.user.id, admin_email: auth.user.email!, action: 'create', entity_type: 'broadcast', entity_id: data.id, entity_name: subject, details: { audience_filter: audience_filter || { type: 'all' } } })
 
@@ -205,6 +208,9 @@ export async function PATCH(request: NextRequest) {
     if (subject !== undefined) updates.subject = subject
     if (messageBody !== undefined) updates.body = messageBody
     if (audience_filter !== undefined) updates.audience_filter = audience_filter
+
+    const { category } = body
+    if (category !== undefined) updates.category = category
 
     await updateBroadcast(auth.admin, id, updates)
 

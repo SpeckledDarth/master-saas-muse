@@ -28,6 +28,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sparkline } from '@/components/admin/sparkline'
 import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 import { EditableSettingsGroup } from '@/components/admin/editable-settings-group'
+import { FileUpload } from '@/components/admin/file-upload'
 
 interface Settings {
   commission_rate: number
@@ -73,6 +74,7 @@ interface Broadcast {
   status: string
   sent_at: string | null
   created_at: string
+  category: string | null
 }
 
 interface HealthData {
@@ -100,6 +102,8 @@ interface Asset {
   content: string | null
   file_url: string | null
   file_name: string | null
+  file_size: number | null
+  file_type: string | null
   sort_order: number
   active: boolean
 }
@@ -1037,7 +1041,7 @@ export default function AffiliateSettingsPage() {
 
   const [assetDialog, setAssetDialog] = useState(false)
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null)
-  const [assetForm, setAssetForm] = useState({ title: '', description: '', asset_type: 'banner', content: '', file_url: '' })
+  const [assetForm, setAssetForm] = useState({ title: '', description: '', asset_type: 'banner', content: '', file_url: '', file_name: '', file_size: 0, file_type: '', upload_mode: 'url' as 'url' | 'upload' })
 
   const [applications, setApplications] = useState<Application[]>([])
   const [appFilter, setAppFilter] = useState('all')
@@ -1056,7 +1060,7 @@ export default function AffiliateSettingsPage() {
 
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([])
   const [broadcastDialog, setBroadcastDialog] = useState(false)
-  const [broadcastForm, setBroadcastForm] = useState({ subject: '', body: '', audience_type: 'all' })
+  const [broadcastForm, setBroadcastForm] = useState({ subject: '', body: '', audience_type: 'all', category: '' })
   const [sendingBroadcast, setSendingBroadcast] = useState<string | null>(null)
   const [editingBroadcast, setEditingBroadcast] = useState<Broadcast | null>(null)
   const [sendConfirmBroadcast, setSendConfirmBroadcast] = useState<Broadcast | null>(null)
@@ -1362,10 +1366,21 @@ export default function AffiliateSettingsPage() {
       return assetSort.dir === 'asc' ? Number(aVal) - Number(bVal) : Number(bVal) - Number(aVal)
     })
 
+  const getBroadcastOpenRate = (bc: Broadcast) => bc.sent_count > 0 ? (bc.opened_count / bc.sent_count) * 100 : 0
+  const getBroadcastClickRate = (bc: Broadcast) => bc.sent_count > 0 ? (bc.clicked_count / bc.sent_count) * 100 : 0
+
   const sortedFilteredBroadcasts = broadcasts
     .filter(bc => broadcastFilter === 'all' || bc.status === broadcastFilter)
     .sort((a, b) => {
       const key = broadcastSort.key
+      if (key === 'open_rate') {
+        const diff = getBroadcastOpenRate(a) - getBroadcastOpenRate(b)
+        return broadcastSort.dir === 'asc' ? diff : -diff
+      }
+      if (key === 'click_rate') {
+        const diff = getBroadcastClickRate(a) - getBroadcastClickRate(b)
+        return broadcastSort.dir === 'asc' ? diff : -diff
+      }
       const aVal = (a as any)[key] ?? ''
       const bVal = (b as any)[key] ?? ''
       if (typeof aVal === 'string' && typeof bVal === 'string') {
@@ -1373,6 +1388,25 @@ export default function AffiliateSettingsPage() {
       }
       return broadcastSort.dir === 'asc' ? Number(aVal) - Number(bVal) : Number(bVal) - Number(aVal)
     })
+
+  const sentBroadcasts = broadcasts.filter(bc => bc.status === 'sent')
+  const broadcastStats = (() => {
+    if (sentBroadcasts.length === 0) return null
+    const avgOpenRate = sentBroadcasts.reduce((sum, bc) => sum + getBroadcastOpenRate(bc), 0) / sentBroadcasts.length
+    const avgClickRate = sentBroadcasts.reduce((sum, bc) => sum + getBroadcastClickRate(bc), 0) / sentBroadcasts.length
+    const bestPerformer = sentBroadcasts.reduce((best, bc) => getBroadcastOpenRate(bc) > getBroadcastOpenRate(best) ? bc : best, sentBroadcasts[0])
+    const lastBroadcast = sentBroadcasts.reduce((latest, bc) => new Date(bc.sent_at || bc.created_at) > new Date(latest.sent_at || latest.created_at) ? bc : latest, sentBroadcasts[0])
+    let trendDirection: 'up' | 'down' | 'flat' = 'flat'
+    let trendValue = 0
+    if (sentBroadcasts.length >= 10) {
+      const sorted = [...sentBroadcasts].sort((a, b) => new Date(b.sent_at || b.created_at).getTime() - new Date(a.sent_at || a.created_at).getTime())
+      const last5Avg = sorted.slice(0, 5).reduce((s, bc) => s + getBroadcastOpenRate(bc), 0) / 5
+      const prior5Avg = sorted.slice(5, 10).reduce((s, bc) => s + getBroadcastOpenRate(bc), 0) / 5
+      trendValue = prior5Avg > 0 ? ((last5Avg - prior5Avg) / prior5Avg) * 100 : 0
+      trendDirection = trendValue > 1 ? 'up' : trendValue < -1 ? 'down' : 'flat'
+    }
+    return { avgOpenRate, avgClickRate, bestPerformer, lastBroadcast, trendDirection, trendValue }
+  })()
 
   const sortedFilteredContests = contests
     .filter(c => {
@@ -1488,7 +1522,8 @@ export default function AffiliateSettingsPage() {
   const saveAsset = async () => {
     try {
       const method = editingAsset ? 'PUT' : 'POST'
-      const body = editingAsset ? { id: editingAsset.id, ...assetForm } : assetForm
+      const { upload_mode, ...formFields } = assetForm
+      const body = editingAsset ? { id: editingAsset.id, ...formFields } : formFields
       const res = await fetch('/api/affiliate/assets', {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -1498,7 +1533,7 @@ export default function AffiliateSettingsPage() {
       toast({ title: editingAsset ? 'Asset updated' : 'Asset created' })
       setAssetDialog(false)
       setEditingAsset(null)
-      setAssetForm({ title: '', description: '', asset_type: 'banner', content: '', file_url: '' })
+      setAssetForm({ title: '', description: '', asset_type: 'banner', content: '', file_url: '', file_name: '', file_size: 0, file_type: '', upload_mode: 'url' })
       fetchData()
     } catch {
       toast({ title: 'Error', description: 'Failed to save asset', variant: 'destructive' })
@@ -1607,8 +1642,8 @@ export default function AffiliateSettingsPage() {
     try {
       const method = editingBroadcast ? 'PATCH' : 'POST'
       const payload = editingBroadcast
-        ? { id: editingBroadcast.id, subject: broadcastForm.subject, body: broadcastForm.body, audience_filter: { type: broadcastForm.audience_type } }
-        : { subject: broadcastForm.subject, body: broadcastForm.body, audience_filter: { type: broadcastForm.audience_type } }
+        ? { id: editingBroadcast.id, subject: broadcastForm.subject, body: broadcastForm.body, audience_filter: { type: broadcastForm.audience_type }, category: broadcastForm.category || null }
+        : { subject: broadcastForm.subject, body: broadcastForm.body, audience_filter: { type: broadcastForm.audience_type }, category: broadcastForm.category || null }
       const res = await fetch('/api/admin/affiliate/broadcasts', {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -1618,7 +1653,7 @@ export default function AffiliateSettingsPage() {
       toast({ title: editingBroadcast ? 'Broadcast updated' : 'Broadcast draft created' })
       setBroadcastDialog(false)
       setEditingBroadcast(null)
-      setBroadcastForm({ subject: '', body: '', audience_type: 'all' })
+      setBroadcastForm({ subject: '', body: '', audience_type: 'all', category: '' })
       fetchData()
     } catch {
       toast({ title: 'Error', description: `Failed to ${editingBroadcast ? 'update' : 'create'} broadcast`, variant: 'destructive' })
@@ -2917,7 +2952,7 @@ export default function AffiliateSettingsPage() {
                     ))}
                   </SelectContent>
                 </Select>
-                <Dialog open={assetDialog} onOpenChange={(open) => { setAssetDialog(open); if (!open) { setEditingAsset(null); setAssetForm({ title: '', description: '', asset_type: 'banner', content: '', file_url: '' }) } }}>
+                <Dialog open={assetDialog} onOpenChange={(open) => { setAssetDialog(open); if (!open) { setEditingAsset(null); setAssetForm({ title: '', description: '', asset_type: 'banner', content: '', file_url: '', file_name: '', file_size: 0, file_type: '', upload_mode: 'url' }) } }}>
                   <DialogTrigger asChild>
                     <Button size="sm" data-testid="button-add-asset">
                       <Plus className="h-4 w-4 mr-1" /> Add Asset
@@ -2957,9 +2992,52 @@ export default function AffiliateSettingsPage() {
                         </div>
                       )}
                       {(['banner', 'video', 'video_tutorial', 'case_study', 'one_pager'].includes(assetForm.asset_type)) && (
-                        <div>
-                          <Label>{(assetForm.asset_type === 'video' || assetForm.asset_type === 'video_tutorial') ? 'Video URL' : assetForm.asset_type === 'banner' ? 'Image URL' : 'File URL'}</Label>
-                          <Input value={assetForm.file_url} onChange={e => setAssetForm(f => ({ ...f, file_url: e.target.value }))} placeholder="https://..." data-testid="input-asset-file-url" />
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Label className="mb-0">File Source</Label>
+                            <div className="flex items-center gap-1 ml-auto">
+                              <Button
+                                type="button"
+                                variant={assetForm.upload_mode === 'url' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setAssetForm(f => ({ ...f, upload_mode: 'url' }))}
+                                data-testid="button-mode-url"
+                              >
+                                URL
+                              </Button>
+                              <Button
+                                type="button"
+                                variant={assetForm.upload_mode === 'upload' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setAssetForm(f => ({ ...f, upload_mode: 'upload' }))}
+                                data-testid="button-mode-upload"
+                              >
+                                Upload
+                              </Button>
+                            </div>
+                          </div>
+                          {assetForm.upload_mode === 'url' ? (
+                            <div>
+                              <Input value={assetForm.file_url} onChange={e => setAssetForm(f => ({ ...f, file_url: e.target.value }))} placeholder="https://..." data-testid="input-asset-file-url" />
+                            </div>
+                          ) : (
+                            <FileUpload
+                              onUpload={(result) => {
+                                setAssetForm(f => ({
+                                  ...f,
+                                  file_url: result.file_url,
+                                  file_name: result.file_name,
+                                  file_size: result.file_size,
+                                  file_type: result.file_type,
+                                }))
+                              }}
+                            />
+                          )}
+                          {assetForm.file_url && assetForm.upload_mode === 'upload' && (
+                            <p className="text-xs text-green-600 flex items-center gap-1">
+                              <CheckCircle className="h-3 w-3" /> Uploaded: {assetForm.file_name || 'File ready'}
+                            </p>
+                          )}
                         </div>
                       )}
                       <Button onClick={saveAsset} className="w-full" data-testid="button-save-asset">
@@ -2995,7 +3073,7 @@ export default function AffiliateSettingsPage() {
                             </div>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setEditingAsset(asset); setAssetForm({ title: asset.title, description: asset.description || '', asset_type: asset.asset_type, content: asset.content || '', file_url: asset.file_url || '' }); setAssetDialog(true) }} data-testid={`button-edit-asset-${asset.id}`}>
+                            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setEditingAsset(asset); setAssetForm({ title: asset.title, description: asset.description || '', asset_type: asset.asset_type, content: asset.content || '', file_url: asset.file_url || '', file_name: asset.file_name || '', file_size: asset.file_size || 0, file_type: asset.file_type || '', upload_mode: (asset.file_type || asset.file_name) ? 'upload' : 'url' }); setAssetDialog(true) }} data-testid={`button-edit-asset-${asset.id}`}>
                               <Pencil className="h-3.5 w-3.5" />
                             </Button>
                             <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); deleteAsset(asset.id) }} data-testid={`button-delete-asset-${asset.id}`}>
@@ -3368,13 +3446,13 @@ export default function AffiliateSettingsPage() {
                     <SelectItem value="sent">Sent</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button size="sm" onClick={() => { setEditingBroadcast(null); setBroadcastForm({ subject: '', body: '', audience_type: 'all' }); setBroadcastDialog(true) }} data-testid="button-add-broadcast">
+                <Button size="sm" onClick={() => { setEditingBroadcast(null); setBroadcastForm({ subject: '', body: '', audience_type: 'all', category: '' }); setBroadcastDialog(true) }} data-testid="button-add-broadcast">
                   <Plus className="h-4 w-4 mr-1" /> New Broadcast
                 </Button>
               </div>
               <Dialog open={broadcastDialog} onOpenChange={(open) => {
                 setBroadcastDialog(open)
-                if (!open) { setEditingBroadcast(null); setBroadcastForm({ subject: '', body: '', audience_type: 'all' }) }
+                if (!open) { setEditingBroadcast(null); setBroadcastForm({ subject: '', body: '', audience_type: 'all', category: '' }) }
               }}>
                 <DialogContent className="max-w-lg" data-testid="dialog-broadcast-form">
                   <DialogHeader>
@@ -3421,6 +3499,21 @@ export default function AffiliateSettingsPage() {
                       </Select>
                     </div>
                     <div>
+                      <Label>Category <span className="text-muted-foreground text-xs font-normal">(optional)</span></Label>
+                      <Select value={broadcastForm.category || '_none'} onValueChange={v => setBroadcastForm(f => ({ ...f, category: v === '_none' ? '' : v }))}>
+                        <SelectTrigger data-testid="select-broadcast-category">
+                          <SelectValue placeholder="Select category..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="_none">No Category</SelectItem>
+                          <SelectItem value="contest">Contest</SelectItem>
+                          <SelectItem value="tier_change">Tier Change</SelectItem>
+                          <SelectItem value="policy_update">Policy Update</SelectItem>
+                          <SelectItem value="general">General</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
                       <Label>Body</Label>
                       <Textarea value={broadcastForm.body} onChange={e => setBroadcastForm(f => ({ ...f, body: e.target.value }))} placeholder="Write your message here..." rows={6} data-testid="input-broadcast-body" />
                     </div>
@@ -3432,6 +3525,44 @@ export default function AffiliateSettingsPage() {
               </Dialog>
             </CardHeader>
             <CardContent>
+              {broadcastStats && (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]" data-testid="broadcast-summary-cards">
+                  <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border" data-testid="card-avg-open-rate">
+                    <p className="text-xs text-muted-foreground mb-1">Avg Open Rate</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-2xl font-bold">{broadcastStats.avgOpenRate.toFixed(1)}%</p>
+                      {broadcastStats.trendDirection !== 'flat' && (
+                        <span className={`flex items-center text-xs font-medium ${broadcastStats.trendDirection === 'up' ? 'text-green-600' : 'text-red-500'}`} data-testid="trend-indicator">
+                          {broadcastStats.trendDirection === 'up' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                          {Math.abs(broadcastStats.trendValue).toFixed(1)}%
+                        </span>
+                      )}
+                      {broadcastStats.trendDirection === 'flat' && sentBroadcasts.length >= 10 && (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </div>
+                    {sentBroadcasts.length < 10 && (
+                      <p className="text-[10px] text-muted-foreground mt-1">Trend available after 10 broadcasts</p>
+                    )}
+                  </div>
+                  <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border" data-testid="card-avg-click-rate">
+                    <p className="text-xs text-muted-foreground mb-1">Avg Click Rate</p>
+                    <p className="text-2xl font-bold">{broadcastStats.avgClickRate.toFixed(1)}%</p>
+                  </div>
+                  <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border" data-testid="card-best-performer">
+                    <p className="text-xs text-muted-foreground mb-1">Best Performer</p>
+                    <p className="text-sm font-medium truncate">{broadcastStats.bestPerformer.subject}</p>
+                    <p className="text-xs text-muted-foreground">{getBroadcastOpenRate(broadcastStats.bestPerformer).toFixed(1)}% open rate</p>
+                  </div>
+                  <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border" data-testid="card-last-broadcast">
+                    <p className="text-xs text-muted-foreground mb-1">Last Broadcast</p>
+                    <p className="text-sm font-medium truncate">{broadcastStats.lastBroadcast.subject}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(broadcastStats.lastBroadcast.sent_at || broadcastStats.lastBroadcast.created_at).toLocaleDateString()} · {getBroadcastOpenRate(broadcastStats.lastBroadcast).toFixed(0)}% open · {getBroadcastClickRate(broadcastStats.lastBroadcast).toFixed(0)}% click
+                    </p>
+                  </div>
+                </div>
+              )}
               {broadcasts.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-broadcasts">
                   No broadcasts yet. Create one to communicate with your affiliates.
@@ -3442,6 +3573,8 @@ export default function AffiliateSettingsPage() {
                 <>
                   <div className="flex items-center gap-[var(--content-density-gap,1rem)] mb-3 text-xs">
                     <SortableHeader label="Date" sortKey="created_at" currentSort={broadcastSort} onSort={toggleBroadcastSort} />
+                    <SortableHeader label="Open Rate %" sortKey="open_rate" currentSort={broadcastSort} onSort={toggleBroadcastSort} />
+                    <SortableHeader label="Click Rate %" sortKey="click_rate" currentSort={broadcastSort} onSort={toggleBroadcastSort} />
                   </div>
                   <div className="space-y-2">
                     {sortedFilteredBroadcasts.map(bc => (
@@ -3455,11 +3588,12 @@ export default function AffiliateSettingsPage() {
                           </div>
                           <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-1 text-xs text-muted-foreground">
                             <span>{new Date(bc.created_at).toLocaleDateString()}</span>
+                            {bc.category && <Badge variant="outline" className="text-[10px] capitalize" data-testid={`badge-broadcast-category-${bc.id}`}>{bc.category.replace('_', ' ')}</Badge>}
                             {bc.status === 'sent' && (
                               <>
                                 <span>Sent: {bc.sent_count}</span>
-                                <span>Opened: {bc.opened_count}</span>
-                                <span>Clicked: {bc.clicked_count}</span>
+                                <span>Open: {getBroadcastOpenRate(bc).toFixed(1)}%</span>
+                                <span>Click: {getBroadcastClickRate(bc).toFixed(1)}%</span>
                               </>
                             )}
                           </div>
@@ -3467,7 +3601,7 @@ export default function AffiliateSettingsPage() {
                         <div className="flex items-center gap-1 shrink-0 ml-3">
                           {bc.status === 'draft' && (
                             <>
-                              <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setEditingBroadcast(bc); setBroadcastForm({ subject: bc.subject, body: bc.body, audience_type: bc.audience_filter?.type || 'all' }); setBroadcastDialog(true) }} data-testid={`button-edit-broadcast-${bc.id}`}>
+                              <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setEditingBroadcast(bc); setBroadcastForm({ subject: bc.subject, body: bc.body, audience_type: bc.audience_filter?.type || 'all', category: bc.category || '' }); setBroadcastDialog(true) }} data-testid={`button-edit-broadcast-${bc.id}`}>
                                 <Pencil className="h-3.5 w-3.5" />
                               </Button>
                               <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSendConfirmBroadcast(bc) }} disabled={sendingBroadcast === bc.id} data-testid={`button-send-broadcast-${bc.id}`}>
