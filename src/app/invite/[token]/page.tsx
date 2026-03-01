@@ -126,7 +126,7 @@ export default function InvitePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
-          <CardContent className="flex flex-col items-center py-12">
+          <CardContent className="flex flex-col items-center py-[var(--section-spacing,3.5rem)]">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             <p className="mt-4 text-muted-foreground">Verifying invitation...</p>
           </CardContent>
@@ -139,7 +139,7 @@ export default function InvitePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
-          <CardContent className="flex flex-col items-center py-12">
+          <CardContent className="flex flex-col items-center py-[var(--section-spacing,3.5rem)]">
             <CheckCircle className="h-12 w-12 text-[hsl(var(--success))]" />
             <h2 className="mt-4 text-xl font-semibold">Welcome to the team!</h2>
             <p className="mt-2 text-muted-foreground">Redirecting to dashboard...</p>
@@ -153,7 +153,7 @@ export default function InvitePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
-          <CardContent className="flex flex-col items-center py-12">
+          <CardContent className="flex flex-col items-center py-[var(--section-spacing,3.5rem)]">
             <XCircle className="h-12 w-12 text-destructive" />
             <h2 className="mt-4 text-xl font-semibold">Invalid Invitation</h2>
             <p className="mt-2 text-muted-foreground text-center">
@@ -169,7 +169,7 @@ export default function InvitePage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-[var(--card-padding,1.25rem)]">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
@@ -180,8 +180,8 @@ export default function InvitePage() {
             You&apos;ve been invited to join as a {invitation.role}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="rounded-lg bg-muted p-4 space-y-2">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="rounded-[var(--card-radius,0.75rem)] bg-muted p-[var(--card-padding,1.25rem)] space-y-2">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Email:</span>
               <span className="font-medium">{invitation.email}</span>

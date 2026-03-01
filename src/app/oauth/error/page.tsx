@@ -36,7 +36,7 @@ function OAuthErrorContent() {
             Connection Failed
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <p className="text-center text-muted-foreground" data-testid="text-oauth-error-message">
             We couldn&apos;t connect your {platformName} account.
           </p>
@@ -95,7 +95,7 @@ function OAuthErrorContent() {
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-[var(--content-density-gap,1rem)] pt-2">
             <Button asChild variant="outline" className="flex-1" data-testid="button-back-to-social">
               <Link href="/dashboard/social">
                 <ArrowLeft className="mr-2 h-4 w-4" />

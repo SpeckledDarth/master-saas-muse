@@ -20,7 +20,7 @@ export default function FeaturesPage() {
   const appName = settings?.branding?.appName || 'Our Platform'
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
       <title>{`Features | ${appName}`}</title>
       <meta name="description" content={`Discover what makes ${appName} the best choice. Explore our powerful features built for speed, security, and accessibility.`} />
       <meta property="og:title" content={`Features | ${appName}`} />
@@ -37,7 +37,7 @@ export default function FeaturesPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)] mb-12">
         <Card className="hover-elevate" data-testid="card-feature-speed">
           <CardHeader>
             <Zap className="h-10 w-10 text-foreground mb-2" />

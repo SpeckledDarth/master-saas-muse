@@ -102,7 +102,7 @@ export function FileUpload({ onUpload, uploading = false, disabled = false }: Fi
   return (
     <div className="space-y-2">
       <div
-        className={`relative border-2 border-dashed rounded-[var(--card-radius,0.75rem)] p-6 text-center transition-colors ${
+        className={`relative border-2 border-dashed rounded-[var(--card-radius,0.75rem)] p-[var(--card-padding,1.25rem)] text-center transition-colors ${
           dragActive ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
         } ${disabled || busy ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}
         onDragOver={(e) => { e.preventDefault(); setDragActive(true) }}

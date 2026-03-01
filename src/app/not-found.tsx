@@ -11,7 +11,7 @@ export default function NotFound() {
   const { settings } = useSettings()
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-[var(--card-padding,1.25rem)]">
       <div className="text-center max-w-md">
         <div className="mb-8">
           <h1 className="text-9xl font-bold text-primary-600 dark:text-primary-400" data-testid="text-404">
@@ -26,7 +26,7 @@ export default function NotFound() {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-[var(--content-density-gap,1rem)] justify-center">
           <Link href="/" data-testid="link-home">
             <Button className="w-full sm:w-auto" data-testid="button-go-home">
               <Home className="h-4 w-4 mr-2" />
@@ -48,7 +48,7 @@ export default function NotFound() {
           <p className="text-sm text-muted-foreground mb-4" data-testid="text-helpful-links">
             Here are some helpful links:
           </p>
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="flex flex-wrap gap-[var(--content-density-gap,1rem)] justify-center">
             <Link 
               href="/features" 
               className="text-sm text-primary-600 dark:text-primary-400 hover:underline"

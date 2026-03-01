@@ -217,7 +217,7 @@ export default function TicketDetailPage() {
   if (!ticket) {
     return (
       <div className="p-[var(--section-spacing,1.5rem)]">
-        <div className="text-center py-12">
+        <div className="text-center py-[var(--section-spacing,3.5rem)]">
           <p className="text-muted-foreground">Ticket not found</p>
           <Button variant="outline" onClick={() => router.push('/admin/feedback')} className="mt-4" data-testid="button-back-to-feedback">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -275,9 +275,9 @@ export default function TicketDetailPage() {
                 )}
               </DSCardTitle>
             </DSCardHeader>
-            <DSCardContent className="space-y-4">
+            <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
               {comments.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-comments">
+                <p className="text-sm text-muted-foreground text-center py-[var(--card-padding,1.25rem)]" data-testid="text-no-comments">
                   No messages yet. Add a reply below.
                 </p>
               ) : (
@@ -285,7 +285,7 @@ export default function TicketDetailPage() {
                   {comments.map((comment) => (
                     <div
                       key={comment.id}
-                      className={`rounded-md p-3 border ${comment.is_internal ? 'border-dashed bg-muted/50' : ''}`}
+                      className={`rounded-[var(--card-radius,0.75rem)] p-3 border ${comment.is_internal ? 'border-dashed bg-muted/50' : ''}`}
                       data-testid={`comment-${comment.id}`}
                     >
                       <div className="flex items-center justify-between gap-2 mb-1 flex-wrap">
@@ -350,7 +350,7 @@ export default function TicketDetailPage() {
             <DSCardHeader>
               <DSCardTitle className="text-base">Details</DSCardTitle>
             </DSCardHeader>
-            <DSCardContent className="space-y-4">
+            <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
               <div>
                 <Label className="text-xs text-muted-foreground">Status</Label>
                 <Select

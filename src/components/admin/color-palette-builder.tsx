@@ -108,7 +108,7 @@ function ShadeStrip({
         <span className="text-sm font-medium">{label}</span>
         <span className="text-xs text-muted-foreground">{baseColor}</span>
       </div>
-      <div className="flex rounded-md overflow-hidden border">
+      <div className="flex rounded-[var(--card-radius,0.75rem)] overflow-hidden border">
         {shadeKeys.map((shade) => {
           const hex = shades[shade]
           const textColor = getContrastText(hex)
@@ -152,8 +152,8 @@ function LivePreview({
   return (
     <div className="space-y-3">
       <p className="text-sm font-medium">Live Preview</p>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="p-4 rounded-md border space-y-3" style={{ backgroundColor: '#ffffff' }}>
+      <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+        <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border space-y-3" style={{ backgroundColor: '#ffffff' }}>
           <p className="text-xs font-medium" style={{ color: '#374151' }}>Light Mode</p>
           <div className="flex gap-2">
             <div className="px-3 py-1.5 rounded-md text-xs font-medium text-white" style={{ backgroundColor: primaryColor }}>
@@ -178,7 +178,7 @@ function LivePreview({
             Sample link text with accent color
           </p>
         </div>
-        <div className="p-4 rounded-md border space-y-3" style={{ backgroundColor: '#0a0a1a' }}>
+        <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border space-y-3" style={{ backgroundColor: '#0a0a1a' }}>
           <p className="text-xs font-medium" style={{ color: '#e5e7eb' }}>Dark Mode</p>
           <div className="flex gap-2">
             <div className="px-3 py-1.5 rounded-md text-xs font-medium text-white" style={{ backgroundColor: primaryColor }}>
@@ -274,7 +274,7 @@ export function ColorPaletteBuilder({
           Pick your brand colors and see auto-generated shade scales for light and dark modes
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-[var(--content-density-gap,1rem)]">
         <div className="flex flex-wrap gap-2">
           {presetPalettes.map((preset) => (
             <button
@@ -300,7 +300,7 @@ export function ColorPaletteBuilder({
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
           <ColorInput
             label="Primary Color"
             value={localPrimary}

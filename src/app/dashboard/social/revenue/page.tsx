@@ -193,8 +193,8 @@ export default function RevenueROIPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-revenue-title">
             Revenue & ROI
@@ -222,7 +222,7 @@ export default function RevenueROIPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-roi-calculator">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
             <CardTitle className="text-base flex items-center gap-2">
@@ -236,9 +236,9 @@ export default function RevenueROIPage() {
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 {roiData && (
-                  <div className="text-center p-4 rounded-md border" data-testid="section-roi-total">
+                  <div className="text-center p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border" data-testid="section-roi-total">
                     <DollarSign className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
                     <p className="text-3xl font-bold" data-testid="text-roi-total">${roiData.totalROI.toLocaleString()}</p>
                     <p className="text-sm text-muted-foreground">Estimated Total ROI</p>
@@ -268,7 +268,7 @@ export default function RevenueROIPage() {
                     { key: 'commentValue' as const, label: 'Comment Value' },
                     { key: 'likeValue' as const, label: 'Like Value' },
                   ]).map(item => (
-                    <div key={item.key} className="flex items-center justify-between gap-3">
+                    <div key={item.key} className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
                       <Label htmlFor={`roi-${item.key}`} className="text-sm shrink-0">{item.label}</Label>
                       <Input
                         id={`roi-${item.key}`}
@@ -305,28 +305,28 @@ export default function RevenueROIPage() {
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : costData ? (
-              <div className="space-y-4">
-                <div className="text-center p-4 rounded-md border" data-testid="section-cost-savings">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
+                <div className="text-center p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border" data-testid="section-cost-savings">
                   <TrendingUp className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
                   <p className="text-3xl font-bold" data-testid="text-cost-saved">${costData.totalSaved.toLocaleString()}</p>
                   <p className="text-sm text-muted-foreground">Total Savings</p>
                   <Badge variant="secondary" className="mt-2" data-testid="badge-savings-percent">{costData.savingsPercent}% saved</Badge>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 rounded-md border text-center">
+                <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+                  <div className="p-3 rounded-[var(--card-radius,0.75rem)] border text-center">
                     <p className="text-lg font-bold" data-testid="text-cost-hourly">${costData.hourlyRate}</p>
                     <p className="text-xs text-muted-foreground">Hourly Rate</p>
                   </div>
-                  <div className="p-3 rounded-md border text-center">
+                  <div className="p-3 rounded-[var(--card-radius,0.75rem)] border text-center">
                     <p className="text-lg font-bold" data-testid="text-cost-total-posts">{costData.totalPosts}</p>
                     <p className="text-xs text-muted-foreground">Total Posts</p>
                   </div>
-                  <div className="p-3 rounded-md border text-center">
+                  <div className="p-3 rounded-[var(--card-radius,0.75rem)] border text-center">
                     <p className="text-lg font-bold" data-testid="text-cost-ai-posts">{costData.aiPosts}</p>
                     <p className="text-xs text-muted-foreground">AI Posts</p>
                   </div>
-                  <div className="p-3 rounded-md border text-center">
+                  <div className="p-3 rounded-[var(--card-radius,0.75rem)] border text-center">
                     <p className="text-lg font-bold" data-testid="text-cost-manual-posts">{costData.manualPosts}</p>
                     <p className="text-xs text-muted-foreground">Manual Posts</p>
                   </div>
@@ -345,7 +345,7 @@ export default function RevenueROIPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground py-4" data-testid="text-cost-empty">Unable to load cost data</p>
+              <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]" data-testid="text-cost-empty">Unable to load cost data</p>
             )}
           </CardContent>
         </Card>
@@ -364,9 +364,9 @@ export default function RevenueROIPage() {
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : reportCard ? (
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row items-center gap-6">
-                <div className={`flex items-center justify-center w-24 h-24 rounded-md ${GRADE_BG[reportCard.grade] || 'bg-muted'}`} data-testid="section-report-grade">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
+              <div className="flex flex-col sm:flex-row items-center gap-[var(--content-density-gap,1rem)]">
+                <div className={`flex items-center justify-center w-24 h-24 rounded-[var(--card-radius,0.75rem)] ${GRADE_BG[reportCard.grade] || 'bg-muted'}`} data-testid="section-report-grade">
                   <span className={`text-5xl font-bold ${GRADE_COLORS[reportCard.grade] || 'text-foreground'}`} data-testid="text-report-grade">
                     {reportCard.grade}
                   </span>
@@ -377,7 +377,7 @@ export default function RevenueROIPage() {
                     <span className="text-sm text-muted-foreground" data-testid="text-flywheel-score">{reportCard.flywheelScore} / 100</span>
                   </div>
                   <Progress value={reportCard.flywheelScore} data-testid="progress-flywheel" />
-                  <div className="flex items-center gap-4 flex-wrap text-sm text-muted-foreground mt-2">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap text-sm text-muted-foreground mt-2">
                     <span data-testid="text-report-posts">{reportCard.totalPosts} posts</span>
                     <span data-testid="text-report-blogs">{reportCard.totalBlogs} blogs</span>
                     <span data-testid="text-report-engagement">{reportCard.totalEngagement} engagements</span>
@@ -407,9 +407,9 @@ export default function RevenueROIPage() {
                 })}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                 {reportCard.topPost && (
-                  <div className="p-4 rounded-md border space-y-1" data-testid="section-top-post">
+                  <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border space-y-1" data-testid="section-top-post">
                     <div className="flex items-center gap-2">
                       <TrendingUp className="h-3.5 w-3.5 text-[hsl(var(--success))]" />
                       <span className="text-sm font-medium">Top Post</span>
@@ -420,7 +420,7 @@ export default function RevenueROIPage() {
                   </div>
                 )}
                 {reportCard.worstPost && (
-                  <div className="p-4 rounded-md border space-y-1" data-testid="section-worst-post">
+                  <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border space-y-1" data-testid="section-worst-post">
                     <div className="flex items-center gap-2">
                       <TrendingUp className="h-3.5 w-3.5 text-[hsl(var(--danger))] rotate-180" />
                       <span className="text-sm font-medium">Worst Post</span>
@@ -447,7 +447,7 @@ export default function RevenueROIPage() {
               )}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground py-4" data-testid="text-report-empty">Unable to load report card</p>
+            <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]" data-testid="text-report-empty">Unable to load report card</p>
           )}
         </CardContent>
       </Card>

@@ -80,9 +80,9 @@ export default function ContactPage() {
         testId="contact"
       />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-        <div className="space-y-6">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
+        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <Card>
             <CardHeader>
               <CardTitle data-testid="text-get-in-touch">Get in Touch</CardTitle>
@@ -90,9 +90,9 @@ export default function ContactPage() {
                 Reach out to us through any of these channels
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               {(contact?.email || branding?.supportEmail) && (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Mail className="h-5 w-5 text-muted-foreground" />
                   <a 
                     href={`mailto:${contact?.email || branding?.supportEmail}`}
@@ -104,7 +104,7 @@ export default function ContactPage() {
                 </div>
               )}
               {contact?.phone && (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Phone className="h-5 w-5 text-muted-foreground" />
                   <a 
                     href={`tel:${contact.phone}`}
@@ -116,7 +116,7 @@ export default function ContactPage() {
                 </div>
               )}
               {contact?.address && (
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
                   <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <span className="text-muted-foreground whitespace-pre-wrap" data-testid="text-address">
                     {contact.address}
@@ -137,7 +137,7 @@ export default function ContactPage() {
             </CardHeader>
             <CardContent>
               {submitted ? (
-                <div className="text-center py-8">
+                <div className="text-center py-[var(--section-spacing,3.5rem)]">
                   <Check className="h-12 w-12 text-[hsl(var(--success))] mx-auto mb-4" />
                   <p className="text-lg font-medium mb-2" data-testid="text-success">
                     Message Sent!
@@ -155,7 +155,7 @@ export default function ContactPage() {
                   </Button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-[var(--content-density-gap,1rem)]">
                   <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
                     <Input

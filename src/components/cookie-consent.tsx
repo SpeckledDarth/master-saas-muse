@@ -37,9 +37,9 @@ export function CookieConsent({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4">
+    <div className="fixed bottom-0 left-0 right-0 z-50 p-[var(--card-padding,1.25rem)]">
       <div className="mx-auto max-w-4xl rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] shadow-lg">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-[var(--content-density-gap,1rem)] sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-card-foreground">
             {text}
             {' '}

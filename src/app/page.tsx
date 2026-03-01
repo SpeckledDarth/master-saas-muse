@@ -65,10 +65,10 @@ export default function HomePage() {
     return (
       <div className="flex flex-col min-h-screen">
         <section className="relative min-h-[400px] md:min-h-[600px] flex items-center justify-center overflow-hidden bg-muted/50">
-          <div className="relative z-10 container mx-auto px-4 text-center">
+          <div className="relative z-10 container mx-auto px-[var(--card-padding,1.25rem)] text-center">
             <div className="h-12 md:h-16 w-48 md:w-64 mx-auto mb-6 bg-muted animate-pulse rounded" />
             <div className="h-6 md:h-8 w-64 md:w-96 mx-auto mb-8 bg-muted animate-pulse rounded" />
-            <div className="flex gap-4 justify-center">
+            <div className="flex gap-[var(--content-density-gap,1rem)] justify-center">
               <div className="h-12 w-36 bg-muted animate-pulse rounded" />
               <div className="h-12 w-36 bg-muted animate-pulse rounded" />
             </div>
@@ -120,7 +120,7 @@ export default function HomePage() {
   }
 
   const renderHeroContent = (isDark: boolean) => (
-    <div className="relative z-10 container mx-auto px-4 text-center">
+    <div className="relative z-10 container mx-auto px-[var(--card-padding,1.25rem)] text-center">
       <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${isDark ? 'text-white' : 'text-foreground'}`}>
         {heroAnimatedWords.length > 0 ? (
           <AnimatedWords words={heroAnimatedWords} className={isDark ? 'text-white' : ''} />
@@ -131,7 +131,7 @@ export default function HomePage() {
       <p className={`text-xl md:text-2xl mb-8 max-w-2xl mx-auto ${isDark ? 'text-white/90' : 'text-muted-foreground'}`}>
         <AppTagline />
       </p>
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      <div className="flex flex-col sm:flex-row gap-[var(--content-density-gap,1rem)] justify-center">
         <Button size="lg" asChild data-testid="button-get-started">
           <Link href="/signup">
             Get Started Free
@@ -252,9 +252,9 @@ export default function HomePage() {
       return (
         <section className="relative min-h-[400px] md:min-h-[600px] flex items-center justify-center overflow-hidden" data-testid="section-hero-floating">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/30" />
-          <div className="relative z-10 container mx-auto px-4 flex justify-center">
+          <div className="relative z-10 container mx-auto px-[var(--card-padding,1.25rem)] flex justify-center">
             <div className="grid grid-cols-1 md:grid-cols-[auto_auto] items-center" style={{ gap: `${floatingGap * 4}px` }}>
-              <div className="text-center md:text-left space-y-6 max-w-lg">
+              <div className="text-center md:text-left space-y-[var(--content-density-gap,1rem)] max-w-lg">
                 <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold text-foreground">
                   {heroAnimatedWords.length > 0 ? (
                     <AnimatedWords words={heroAnimatedWords} />
@@ -265,7 +265,7 @@ export default function HomePage() {
                 <p className="text-xl md:text-2xl text-muted-foreground">
                   <AppTagline />
                 </p>
-                <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                <div className="flex flex-wrap gap-[var(--content-density-gap,1rem)] justify-center md:justify-start">
                   <Button size="lg" asChild data-testid="button-get-started">
                     <Link href="/signup">
                       Get Started Free
@@ -320,7 +320,7 @@ export default function HomePage() {
                 return (
                   <div
                     key={i}
-                    className="absolute rounded-lg overflow-hidden shadow-xl"
+                    className="absolute rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-xl"
                     style={{
                       top: pos.top,
                       left: pos.left,
@@ -343,7 +343,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="relative z-10 container mx-auto px-4">
+          <div className="relative z-10 container mx-auto px-[var(--card-padding,1.25rem)]">
             <div className="max-w-lg">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
                 {heroAnimatedWords.length > 0 ? (
@@ -355,7 +355,7 @@ export default function HomePage() {
               <p className="text-lg md:text-xl text-muted-foreground mb-8">
                 <AppTagline />
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-[var(--content-density-gap,1rem)]">
                 <Button size="lg" asChild data-testid="button-get-started">
                   <Link href="/signup">
                     Get Started Free
@@ -371,10 +371,10 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="lg:hidden mt-8 px-4">
-            <div className="grid grid-cols-2 gap-3">
+          <div className="lg:hidden mt-8 px-[var(--card-padding,1.25rem)]">
+            <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               {collageImages.slice(0, 4).map((url, i) => (
-                <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-lg">
+                <div key={i} className="relative aspect-[4/3] rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-[var(--card-shadow)]">
                   <Image src={url} alt="" fill className="object-cover" unoptimized data-testid={`img-hero-collage-mobile-${i}`} />
                 </div>
               ))}
@@ -444,8 +444,8 @@ export default function HomePage() {
           
           case 'features':
             return featuresEnabled && (content?.featureCards?.length ?? 0) > 0 ? (
-              <section key="features" className={`py-12 md:py-20 ${!content?.sectionColors?.features ? (getSectionBg('features') || 'bg-muted/50') : ''}`} style={getSectionColor('features')} data-testid="section-features">
-                <div className="container mx-auto px-4">
+              <section key="features" className={`py-[var(--section-spacing,3.5rem)] md:py-20 ${!content?.sectionColors?.features ? (getSectionBg('features') || 'bg-muted/50') : ''}`} style={getSectionColor('features')} data-testid="section-features">
+                <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
                   <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">
                     {content?.featuresHeadline || 'Everything you need'}
                   </h2>
@@ -454,7 +454,7 @@ export default function HomePage() {
                       {content.featuresSubheadline}
                     </p>
                   )}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)] md:gap-[var(--content-density-gap,1rem)]">
                     {content?.featureCards?.map((card, idx) => (
                       <FeatureCard key={card.id} icon={card.icon} title={card.title} description={card.description} index={idx} />
                     ))}
@@ -470,12 +470,12 @@ export default function HomePage() {
                 <TestimonialCarousel testimonials={content?.testimonials || []} headline={content?.testimonialsHeadline} />
               </div>
             ) : (
-              <section key="testimonials" className={`py-12 md:py-20 ${!content?.sectionColors?.testimonials ? getSectionBg('testimonials') : ''}`} style={getSectionColor('testimonials')} data-testid="section-testimonials">
-                <div className="container mx-auto px-4">
+              <section key="testimonials" className={`py-[var(--section-spacing,3.5rem)] md:py-20 ${!content?.sectionColors?.testimonials ? getSectionBg('testimonials') : ''}`} style={getSectionColor('testimonials')} data-testid="section-testimonials">
+                <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
                   <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
                     {content?.testimonialsHeadline || 'What our customers say'}
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)] md:gap-[var(--content-density-gap,1rem)] max-w-4xl mx-auto">
                     {content?.testimonials?.map((testimonial) => (
                       <TestimonialCard key={testimonial.id} name={testimonial.name} role={testimonial.role} company={testimonial.company} quote={testimonial.quote} avatarUrl={testimonial.avatarUrl} companyLogoUrl={testimonial.companyLogoUrl} />
                     ))}
@@ -529,12 +529,12 @@ export default function HomePage() {
 
           case 'faq':
             return faqEnabled && (content?.faqItems?.length ?? 0) > 0 ? (
-              <section key="faq" className={`py-12 md:py-20 ${!content?.sectionColors?.faq ? (getSectionBg('faq') || 'bg-muted/50') : ''}`} style={getSectionColor('faq')} data-testid="section-faq">
-                <div className="container mx-auto px-4 max-w-3xl">
+              <section key="faq" className={`py-[var(--section-spacing,3.5rem)] md:py-20 ${!content?.sectionColors?.faq ? (getSectionBg('faq') || 'bg-muted/50') : ''}`} style={getSectionColor('faq')} data-testid="section-faq">
+                <div className="container mx-auto px-[var(--card-padding,1.25rem)] max-w-3xl">
                   <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
                     {content?.faqHeadline || 'Frequently asked questions'}
                   </h2>
-                  <div className="space-y-4">
+                  <div className="space-y-[var(--content-density-gap,1rem)]">
                     {content?.faqItems?.map((faq) => (
                       <FAQItem key={faq.id} question={faq.question} answer={faq.answer} />
                     ))}
@@ -545,8 +545,8 @@ export default function HomePage() {
 
           case 'cta':
             return ctaEnabled ? (
-              <section key="cta" className={`py-12 md:py-20 ${!content?.sectionColors?.cta ? getSectionBg('cta') : ''}`} style={getSectionColor('cta')} data-testid="section-cta">
-                <div className="container mx-auto px-4 text-center">
+              <section key="cta" className={`py-[var(--section-spacing,3.5rem)] md:py-20 ${!content?.sectionColors?.cta ? getSectionBg('cta') : ''}`} style={getSectionColor('cta')} data-testid="section-cta">
+                <div className="container mx-auto px-[var(--card-padding,1.25rem)] text-center">
                   <h2 className="text-2xl md:text-3xl font-bold mb-6">
                     {content?.cta?.headline || 'Ready to get started?'}
                   </h2>
@@ -600,7 +600,7 @@ function TestimonialCard({ name, role, company, quote, avatarUrl, companyLogoUrl
     <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] text-card-foreground relative" data-testid={`card-testimonial-${name.toLowerCase().replace(/\s+/g, '-')}`}>
       <Quote className="absolute top-4 right-4 h-8 w-8 text-primary-200 dark:text-primary-800" />
       <p className="text-black/70 dark:text-white/70 mb-6 italic leading-relaxed">&quot;{quote}&quot;</p>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
         <Avatar className="h-12 w-12">
           {avatarUrl && <AvatarImage src={avatarUrl} alt={name} />}
           <AvatarFallback className="bg-primary-100 text-primary-800 dark:bg-primary-800 dark:text-primary-200 font-medium">{initials}</AvatarFallback>
@@ -627,7 +627,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
     >
       <Button
         variant="ghost"
-        className="w-full px-6 py-4 h-auto text-left flex items-center justify-between gap-2 rounded-none"
+        className="w-full px-[var(--card-padding,1.25rem)] py-[var(--card-padding,1.25rem)] h-auto text-left flex items-center justify-between gap-2 rounded-none"
         onClick={() => setIsOpen(!isOpen)}
         data-testid={`button-faq-toggle-${question.toLowerCase().replace(/\s+/g, '-').substring(0, 20)}`}
       >
@@ -635,7 +635,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
       </Button>
       <div 
-        className={`px-6 text-muted-foreground transition-all duration-200 overflow-hidden ${isOpen ? 'max-h-96 pb-4 opacity-100' : 'max-h-0 pb-0 opacity-0'}`}
+        className={`px-[var(--card-padding,1.25rem)] text-muted-foreground transition-all duration-200 overflow-hidden ${isOpen ? 'max-h-96 pb-[var(--card-padding,1.25rem)] opacity-100' : 'max-h-0 pb-0 opacity-0'}`}
       >
         {answer}
       </div>

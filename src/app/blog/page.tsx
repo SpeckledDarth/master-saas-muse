@@ -43,7 +43,7 @@ export default async function BlogPage() {
     .order('published_at', { ascending: false })
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <Badge variant="secondary" className="mb-4">
@@ -59,7 +59,7 @@ export default async function BlogPage() {
 
         {!posts || posts.length === 0 ? (
           <Card className="text-center">
-            <CardContent className="py-12">
+            <CardContent className="py-[var(--section-spacing,3.5rem)]">
               <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium mb-2">No posts yet</h3>
               <p className="text-muted-foreground">
@@ -68,7 +68,7 @@ export default async function BlogPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-[var(--content-density-gap,1rem)]">
             {posts.map((post) => (
               <Link key={post.id} href={`/blog/${post.slug}`}>
                 <Card className="hover-elevate transition-all cursor-pointer group">

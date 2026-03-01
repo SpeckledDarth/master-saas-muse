@@ -26,7 +26,7 @@ export default function FunnelAdminPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-[var(--section-spacing,3.5rem)]">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     )
@@ -92,7 +92,7 @@ export default function FunnelAdminPage() {
         </DSCardHeader>
         <DSCardContent>
           {funnel.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="text-center py-[var(--section-spacing,3.5rem)] text-muted-foreground">
               <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-20" />
               <p>No onboarding data yet. Users will show up once they start the wizard.</p>
             </div>

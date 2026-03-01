@@ -216,8 +216,8 @@ export default function ContentIntelligencePage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-intelligence-title">
             Content Intelligence <HelpTooltip text="AI-powered analysis tools that help you understand and improve your content strategy across all platforms." />
@@ -242,7 +242,7 @@ export default function ContentIntelligencePage() {
             <HelpTooltip text="Paste any content and get an AI-powered quality grade with scores for readability, SEO, engagement, and platform fit." />
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label htmlFor="grade-content">Content to Grade</Label>
             <Textarea
@@ -254,7 +254,7 @@ export default function ContentIntelligencePage() {
               data-testid="textarea-grade-content"
             />
           </div>
-          <div className="flex items-end gap-3 flex-wrap">
+          <div className="flex items-end gap-[var(--content-density-gap,1rem)] flex-wrap">
             <div className="space-y-2">
               <Label htmlFor="grade-platform">Platform</Label>
               <Select value={gradePlatform} onValueChange={setGradePlatform}>
@@ -276,8 +276,8 @@ export default function ContentIntelligencePage() {
           </div>
 
           {gradeResult && (
-            <div className="mt-4 space-y-4 border-t pt-4" data-testid="section-grade-results">
-              <div className="flex items-center gap-4 flex-wrap">
+            <div className="mt-4 space-y-[var(--content-density-gap,1rem)] border-t pt-4" data-testid="section-grade-results">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <div className="text-center">
                   <span className={`text-5xl font-bold ${GRADE_COLORS[gradeResult.grade] || 'text-foreground'}`} data-testid="text-grade-letter">
                     {gradeResult.grade}
@@ -331,8 +331,8 @@ export default function ContentIntelligencePage() {
             <HelpTooltip text="Enter a topic and get a complete content brief with title suggestions, structured outline, keywords, and length recommendations." />
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label htmlFor="brief-topic">Topic</Label>
               <Input
@@ -360,7 +360,7 @@ export default function ContentIntelligencePage() {
           </Button>
 
           {briefResult && (
-            <div className="mt-4 space-y-4 border-t pt-4" data-testid="section-brief-results">
+            <div className="mt-4 space-y-[var(--content-density-gap,1rem)] border-t pt-4" data-testid="section-brief-results">
               <div className="space-y-2">
                 <p className="text-sm font-medium">Title Suggestions</p>
                 <div className="space-y-1">
@@ -399,7 +399,7 @@ export default function ContentIntelligencePage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-6 flex-wrap text-sm">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap text-sm">
                 <div className="flex items-center gap-1.5">
                   <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
                   <span className="text-muted-foreground">Length:</span>
@@ -416,7 +416,7 @@ export default function ContentIntelligencePage() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-content-dna">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
             <CardTitle className="text-base flex items-center gap-2">
@@ -431,7 +431,7 @@ export default function ContentIntelligencePage() {
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : dna ? (
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 <div>
                   <p className="text-sm font-medium mb-2">Top Topics</p>
                   {dna.topTopics.length > 0 ? (
@@ -479,13 +479,13 @@ export default function ContentIntelligencePage() {
 
                 <div>
                   <p className="text-sm font-medium mb-2">AI vs Manual Performance</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 rounded-md border text-center">
+                  <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+                    <div className="p-3 rounded-[var(--card-radius,0.75rem)] border text-center">
                       <Sparkles className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
                       <p className="text-lg font-bold" data-testid="text-dna-ai-engagement">{dna.aiVsManual.aiAvgEngagement}</p>
                       <p className="text-xs text-muted-foreground">AI avg engagement</p>
                     </div>
-                    <div className="p-3 rounded-md border text-center">
+                    <div className="p-3 rounded-[var(--card-radius,0.75rem)] border text-center">
                       <BarChart3 className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
                       <p className="text-lg font-bold" data-testid="text-dna-manual-engagement">{dna.aiVsManual.manualAvgEngagement}</p>
                       <p className="text-xs text-muted-foreground">Manual avg engagement</p>
@@ -494,7 +494,7 @@ export default function ContentIntelligencePage() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground py-4">Unable to load content DNA</p>
+              <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">Unable to load content DNA</p>
             )}
           </CardContent>
         </Card>
@@ -513,7 +513,7 @@ export default function ContentIntelligencePage() {
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : contentMix ? (
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 {contentMix.total > 0 ? (
                   <>
                     <div className="space-y-3">
@@ -535,16 +535,16 @@ export default function ContentIntelligencePage() {
                         )
                       })}
                     </div>
-                    <div className="p-3 rounded-md border">
+                    <div className="p-3 rounded-[var(--card-radius,0.75rem)] border">
                       <p className="text-sm text-muted-foreground" data-testid="text-mix-recommendation">{contentMix.recommendation}</p>
                     </div>
                   </>
                 ) : (
-                  <p className="text-sm text-muted-foreground py-4">No content analyzed yet. Start posting to see your content mix.</p>
+                  <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">No content analyzed yet. Start posting to see your content mix.</p>
                 )}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground py-4">Unable to load content mix</p>
+              <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">Unable to load content mix</p>
             )}
           </CardContent>
         </Card>
@@ -565,7 +565,7 @@ export default function ContentIntelligencePage() {
             ) : fatigueAlerts.length > 0 ? (
               <div className="space-y-3" data-testid="list-fatigue-alerts">
                 {fatigueAlerts.map((alert, i) => (
-                  <div key={i} className="p-3 rounded-md border space-y-1" data-testid={`fatigue-alert-${i}`}>
+                  <div key={i} className="p-3 rounded-[var(--card-radius,0.75rem)] border space-y-1" data-testid={`fatigue-alert-${i}`}>
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <span className="text-sm font-medium capitalize" data-testid={`text-fatigue-topic-${i}`}>{alert.topic}</span>
                       <div className="flex items-center gap-2">
@@ -581,7 +581,7 @@ export default function ContentIntelligencePage() {
                 ))}
               </div>
             ) : (
-              <div className="py-4 text-center">
+              <div className="py-[var(--card-padding,1.25rem)] text-center">
                 <p className="text-sm text-muted-foreground" data-testid="text-no-fatigue">No topic fatigue detected</p>
               </div>
             )}
@@ -603,7 +603,7 @@ export default function ContentIntelligencePage() {
               </div>
             ) : toneDrift ? (
               toneDrift.configured === false ? (
-                <div className="py-4 text-center">
+                <div className="py-[var(--card-padding,1.25rem)] text-center">
                   <Shield className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                   <p className="text-sm text-muted-foreground" data-testid="text-tone-not-configured">
                     Set up your brand voice in settings to use this feature
@@ -615,8 +615,8 @@ export default function ContentIntelligencePage() {
                   </Link>
                 </div>
               ) : (
-                <div className="space-y-4" data-testid="section-tone-results">
-                  <div className="flex items-center gap-4 flex-wrap">
+                <div className="space-y-[var(--content-density-gap,1rem)]" data-testid="section-tone-results">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
                     <div className="text-center">
                       <p className={`text-3xl font-bold ${(toneDrift.alignment ?? 0) >= 70 ? 'text-[hsl(var(--success))]' : (toneDrift.alignment ?? 0) >= 40 ? 'text-[hsl(var(--warning))]' : 'text-[hsl(var(--danger))]'}`} data-testid="text-tone-alignment">
                         {toneDrift.alignment ?? 0}
@@ -645,7 +645,7 @@ export default function ContentIntelligencePage() {
                 </div>
               )
             ) : (
-              <p className="text-sm text-muted-foreground py-4">Unable to load tone drift data</p>
+              <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">Unable to load tone drift data</p>
             )}
           </CardContent>
         </Card>
@@ -666,7 +666,7 @@ export default function ContentIntelligencePage() {
             ) : cannibalization.length > 0 ? (
               <div className="space-y-3" data-testid="list-cannibalization-pairs">
                 {cannibalization.map((pair, i) => (
-                  <div key={i} className="p-3 rounded-md border space-y-2" data-testid={`cannibalization-pair-${i}`}>
+                  <div key={i} className="p-3 rounded-[var(--card-radius,0.75rem)] border space-y-2" data-testid={`cannibalization-pair-${i}`}>
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate" data-testid={`text-cannib-article1-${i}`}>{pair.article1.title || 'Untitled'}</p>
@@ -682,7 +682,7 @@ export default function ContentIntelligencePage() {
                 ))}
               </div>
             ) : (
-              <div className="py-4 text-center">
+              <div className="py-[var(--card-padding,1.25rem)] text-center">
                 <p className="text-sm text-muted-foreground" data-testid="text-no-cannibalization">No content cannibalization detected</p>
               </div>
             )}

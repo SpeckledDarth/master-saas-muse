@@ -128,7 +128,7 @@ export function QuickGenerateFab() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 pt-2">
+          <div className="space-y-[var(--content-density-gap,1rem)] pt-2">
             <div className="space-y-2">
               <label className="text-sm font-medium">Platform</label>
               <Select value={platform} onValueChange={setPlatform}>
@@ -167,7 +167,7 @@ export function QuickGenerateFab() {
 
             {result && (
               <div className="space-y-3">
-                <div className="rounded-md border p-4 space-y-2" data-testid="card-fab-result">
+                <div className="rounded-[var(--card-radius,0.75rem)] border p-[var(--card-padding,1.25rem)] space-y-2" data-testid="card-fab-result">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline" className="text-xs capitalize">{platform}</Badge>
                     <Badge variant="secondary" className="text-xs">AI Generated</Badge>

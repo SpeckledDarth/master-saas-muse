@@ -23,7 +23,7 @@ function SetupLayoutInner({ children }: { children: React.ReactNode }) {
           <h1 className="text-2xl font-bold" data-testid="text-setup-title">Setup Dashboard</h1>
           <p className="text-sm text-muted-foreground">Configure your SaaS branding, pricing, and features</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           {ctx.saveError && (
             <p className="text-sm text-destructive" data-testid="text-save-error">{ctx.saveError}</p>
           )}

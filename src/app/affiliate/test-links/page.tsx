@@ -30,7 +30,7 @@ const links = [
 
 export default function AffiliateTestLinksPage() {
   return (
-    <div className="min-h-screen bg-background p-6 md:p-12">
+    <div className="min-h-screen bg-background p-[var(--card-padding,1.25rem)] md:p-[var(--section-spacing,3.5rem)]">
       <div className="mx-auto max-w-2xl">
         <div className="mb-8">
           <Link href="/affiliate" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4">
@@ -40,15 +40,15 @@ export default function AffiliateTestLinksPage() {
           <p className="text-muted-foreground mt-2">Quick navigation to all affiliate routes. Remove this page before launch.</p>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           {links.map(section => (
             <div key={section.section}>
               <h2 className="text-lg font-semibold mb-3 text-muted-foreground">{section.section}</h2>
               <div className="space-y-3">
                 {section.items.map(item => (
                   <Card key={item.href}>
-                    <CardContent className="flex items-center gap-4 p-4">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <CardContent className="flex items-center gap-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)]">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--card-radius,0.75rem)] bg-primary/10 text-primary">
                         <item.icon className="h-5 w-5" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -69,7 +69,7 @@ export default function AffiliateTestLinksPage() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-lg border border-dashed border-[hsl(var(--warning)/0.5)] bg-[hsl(var(--warning)/0.05)] p-4 text-sm text-[hsl(var(--warning))]">
+        <div className="mt-10 rounded-[var(--card-radius,0.75rem)] border border-dashed border-[hsl(var(--warning)/0.5)] bg-[hsl(var(--warning)/0.05)] p-[var(--card-padding,1.25rem)] text-sm text-[hsl(var(--warning))]">
           This is a temporary developer page. Remember to remove <code className="font-mono">/affiliate/test-links</code> before going live.
         </div>
       </div>

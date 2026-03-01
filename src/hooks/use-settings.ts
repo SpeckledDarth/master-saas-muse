@@ -334,6 +334,8 @@ function resolveTypographyVars(b: SiteSettings['branding']): Record<string, stri
   if (b.h3TextTransform !== undefined) vars['--h3-transform'] = b.h3TextTransform
   if (b.bodyFontSize !== undefined) vars['--body-size'] = b.bodyFontSize
   if (b.bodyLineHeight !== undefined) vars['--body-line-height'] = b.bodyLineHeight
+  if (b.headingColor) vars['--heading-color'] = b.headingColor
+  if (b.bodyColor) vars['--body-color'] = b.bodyColor
   return vars
 }
 

@@ -20,7 +20,7 @@ export default function DocsPage() {
   const appName = settings?.branding?.appName || 'Our Platform'
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
       <title>{`Documentation | ${appName}`}</title>
       <meta name="description" content={`Everything you need to get started with ${appName}. Guides, API reference, FAQ, and support resources.`} />
       <meta property="og:title" content={`Documentation | ${appName}`} />
@@ -37,7 +37,7 @@ export default function DocsPage() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+      <div className="grid md:grid-cols-2 gap-[var(--content-density-gap,1rem)] max-w-4xl mx-auto mb-12">
         <Card className="hover-elevate" data-testid="card-docs-getting-started">
           <CardHeader>
             <BookOpen className="h-10 w-10 text-foreground mb-2" />
@@ -99,7 +99,7 @@ export default function DocsPage() {
         </Card>
       </div>
 
-      <div className="text-center bg-muted/50 rounded-lg p-8 max-w-2xl mx-auto" data-testid="section-docs-coming-soon">
+      <div className="text-center bg-muted/50 rounded-[var(--card-radius,0.75rem)] p-8 max-w-2xl mx-auto" data-testid="section-docs-coming-soon">
         <h2 className="text-2xl font-semibold mb-4" data-testid="text-docs-coming-soon-title">Documentation Coming Soon</h2>
         <p className="text-muted-foreground mb-6" data-testid="text-docs-coming-soon-desc">
           We are actively building out comprehensive documentation. In the meantime, feel free to explore or contact us with any questions.

@@ -177,7 +177,7 @@ export default function BrandPreferencesPage() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="p-[var(--card-padding,1.25rem)]">
         <Card data-testid="error-state-brand">
           <CardContent className="py-12 text-center">
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -193,7 +193,7 @@ export default function BrandPreferencesPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Brand Preferences</h1>
         <p className="text-muted-foreground mt-1">
@@ -223,7 +223,7 @@ export default function BrandPreferencesPage() {
             These preferences are used when generating AI content for your social media posts.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label htmlFor="niche">Business Niche <HelpTooltip text="Your industry or trade. AI uses this to write relevant, on-topic posts for your business." /></Label>
             <Input
@@ -384,7 +384,7 @@ export default function BrandPreferencesPage() {
           </CardTitle>
           <CardDescription>Teach AI to write exactly like you</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           {voiceProfile && (
             <Card className="border-primary/30 bg-primary/5" data-testid="card-voice-profile">
               <CardContent className="pt-4 space-y-3">
@@ -393,7 +393,7 @@ export default function BrandPreferencesPage() {
                   <Badge variant="secondary">Active</Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">{voiceProfile.summary}</p>
-                <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)] text-sm">
                   <div><span className="font-medium">Tone:</span> {voiceProfile.tone}</div>
                   <div><span className="font-medium">Sentence Style:</span> {voiceProfile.sentenceStyle}</div>
                   <div><span className="font-medium">Emoji Usage:</span> {voiceProfile.emojiUsage}</div>
@@ -410,7 +410,7 @@ export default function BrandPreferencesPage() {
                 {voiceProfile.promptTemplate && (
                   <div className="mt-2">
                     <span className="text-sm font-medium">AI Prompt Template:</span>
-                    <pre className="mt-1 text-xs bg-muted p-3 rounded-md overflow-x-auto whitespace-pre-wrap">{voiceProfile.promptTemplate}</pre>
+                    <pre className="mt-1 text-xs bg-muted p-3 rounded-[var(--card-radius,0.75rem)] overflow-x-auto whitespace-pre-wrap">{voiceProfile.promptTemplate}</pre>
                   </div>
                 )}
               </CardContent>

@@ -27,7 +27,7 @@ function getCharColor(length: number, limit: number): string {
 function TwitterPreview({ content, userName }: { content: string; userName: string }) {
   return (
     <div className="space-y-3">
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
         <Avatar className="h-10 w-10 flex-shrink-0">
           <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
@@ -63,7 +63,7 @@ function TwitterPreview({ content, userName }: { content: string; userName: stri
 function LinkedInPreview({ content, userName }: { content: string; userName: string }) {
   return (
     <div className="space-y-3">
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
         <Avatar className="h-12 w-12 flex-shrink-0">
           <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
@@ -104,7 +104,7 @@ function FacebookPreview({ content, userName, mediaUrls }: { content: string; us
 
   return (
     <div className="space-y-3">
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
         <Avatar className="h-10 w-10 flex-shrink-0">
           <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
@@ -123,7 +123,7 @@ function FacebookPreview({ content, userName, mediaUrls }: { content: string; us
         let hostname = 'link'
         try { hostname = new URL(mediaUrls[0]).hostname } catch {}
         return (
-          <div className="border rounded-md p-3 bg-muted/50" data-testid="preview-link-card">
+          <div className="border rounded-[var(--card-radius,0.75rem)] p-3 bg-muted/50" data-testid="preview-link-card">
             <span className="text-xs text-muted-foreground uppercase">{hostname}</span>
             <p className="text-sm font-medium mt-1">Link Preview</p>
           </div>
@@ -163,7 +163,7 @@ export function PostPreview({ content, platform, mediaUrls, userName = 'User' }:
             {content.length} / {limit}
           </span>
         </div>
-        <div className="border rounded-md p-4">
+        <div className="border rounded-[var(--card-radius,0.75rem)] p-[var(--card-padding,1.25rem)]">
           {platform === 'twitter' && <TwitterPreview content={content} userName={userName} />}
           {platform === 'linkedin' && <LinkedInPreview content={content} userName={userName} />}
           {platform === 'facebook' && <FacebookPreview content={content} userName={userName} mediaUrls={mediaUrls} />}

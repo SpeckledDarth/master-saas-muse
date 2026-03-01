@@ -207,7 +207,7 @@ function LoginForm() {
             We've sent a magic link to <strong data-testid="text-magic-link-email">{email}</strong>
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <p className="text-sm text-muted-foreground text-center" data-testid="text-magic-link-instructions">
             Click the link in your email to sign in instantly.
           </p>
@@ -230,7 +230,7 @@ function LoginForm() {
         <CardTitle className="text-2xl">Welcome back</CardTitle>
         <CardDescription>Sign in to your account</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-[var(--content-density-gap,1rem)]">
         {(features.googleOAuth || features.githubOAuth || features.appleOAuth || features.twitterOAuth) && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -293,7 +293,7 @@ function LoginForm() {
           </>
         )}
 
-        <form onSubmit={handleEmailLogin} className="space-y-4">
+        <form onSubmit={handleEmailLogin} className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input

@@ -79,7 +79,7 @@ export default function AffiliateLoginPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-white/10 border-border">
-          <CardContent className="pt-8 pb-6 text-center">
+          <CardContent className="pt-8 pb-[var(--card-padding,1.25rem)] text-center">
             <div className="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto mb-4">
               <Mail className="h-8 w-8 text-primary-600 dark:text-primary-400" />
             </div>
@@ -112,7 +112,7 @@ export default function AffiliateLoginPage() {
           </CardHeader>
           <CardContent>
             {mode === 'magic' ? (
-              <form onSubmit={handleMagicLink} className="space-y-4">
+              <form onSubmit={handleMagicLink} className="space-y-[var(--content-density-gap,1rem)]">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   <Input
@@ -127,7 +127,7 @@ export default function AffiliateLoginPage() {
                 </div>
 
                 {error && (
-                  <div className="text-sm text-destructive bg-destructive/10 rounded-lg p-3" data-testid="text-login-error">
+                  <div className="text-sm text-destructive bg-destructive/10 rounded-[var(--card-radius,0.75rem)] p-3" data-testid="text-login-error">
                     {error}
                   </div>
                 )}
@@ -149,7 +149,7 @@ export default function AffiliateLoginPage() {
                 </div>
               </form>
             ) : (
-              <form onSubmit={handlePasswordLogin} className="space-y-4">
+              <form onSubmit={handlePasswordLogin} className="space-y-[var(--content-density-gap,1rem)]">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   <Input
@@ -182,7 +182,7 @@ export default function AffiliateLoginPage() {
                 </div>
 
                 {error && (
-                  <div className="text-sm text-destructive bg-destructive/10 rounded-lg p-3" data-testid="text-login-error">
+                  <div className="text-sm text-destructive bg-destructive/10 rounded-[var(--card-radius,0.75rem)] p-3" data-testid="text-login-error">
                     {error}
                   </div>
                 )}

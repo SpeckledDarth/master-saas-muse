@@ -28,7 +28,7 @@ export function Footer() {
   if (loading || !settings) {
     return (
       <footer className="border-t bg-muted/40">
-        <div className="container py-8 md:py-12">
+        <div className="container py-[var(--section-spacing,3.5rem)]">
           <div className="h-8 w-32 bg-muted animate-pulse rounded" />
         </div>
       </footer>
@@ -73,11 +73,11 @@ export function Footer() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
         </div>
       )}
-      <div className={cn("container mx-auto px-4 md:px-8 py-8 md:py-12", footerStyle?.bgImage && "relative z-10")}>
+      <div className={cn("container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]", footerStyle?.bgImage && "relative z-10")}>
         <div className={cn(
-          layout === 'centered' ? "flex flex-col items-center text-center gap-6" :
-          layout === 'minimal' ? "flex flex-col md:flex-row items-center justify-between gap-4" :
-          "grid grid-cols-2 md:grid-cols-4 gap-8"
+          layout === 'centered' ? "flex flex-col items-center text-center gap-[var(--content-density-gap,1rem)]" :
+          layout === 'minimal' ? "flex flex-col md:flex-row items-center justify-between gap-[var(--content-density-gap,1rem)]" :
+          "grid grid-cols-2 md:grid-cols-4 gap-[var(--content-density-gap,1rem)]"
         )}>
           <div className={cn(
             layout === 'default' && "col-span-2 md:col-span-1",
@@ -102,7 +102,7 @@ export function Footer() {
             </p>
             
             {hasSocialLinks && (
-              <div className="flex items-center gap-3 mt-4">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-4">
                 {social.twitter && (
                   <a 
                     href={social.twitter} 

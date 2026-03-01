@@ -255,7 +255,7 @@ export function exportDesignConfig(branding: BrandingSettings): string {
     'h1FontSize', 'h1FontWeight', 'h1LetterSpacing', 'h1TextTransform',
     'h2FontSize', 'h2FontWeight', 'h2LetterSpacing', 'h2TextTransform',
     'h3FontSize', 'h3FontWeight', 'h3LetterSpacing', 'h3TextTransform',
-    'headingColorMode', 'bodyFontSize', 'bodyLineHeight',
+    'headingColorMode', 'headingColor', 'bodyColor', 'bodyFontSize', 'bodyLineHeight',
     'cardPadding', 'cardBorderRadius', 'cardShadow', 'cardBorderWidth', 'cardBorderStyle',
     'inputStyleMatch', 'buttonRadius', 'buttonSize', 'buttonFontWeight', 'buttonTextTransform',
     'badgeShape',

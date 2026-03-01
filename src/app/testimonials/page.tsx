@@ -61,8 +61,8 @@ export default function TestimonialsPage() {
       <meta property="og:type" content="website" />
       <meta property="og:url" content="/testimonials" />
       <link rel="canonical" href="/testimonials" />
-      <section className="py-16 md:py-24 bg-gradient-to-br from-primary/10 via-background to-accent/10">
-        <div className="container mx-auto px-4 text-center">
+      <section className="py-[var(--section-spacing,3.5rem)] md:py-24 bg-gradient-to-br from-primary/10 via-background to-accent/10">
+        <div className="container mx-auto px-[var(--card-padding,1.25rem)] text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4" data-testid="text-wall-title">
             Wall of Love
           </h1>
@@ -73,9 +73,9 @@ export default function TestimonialsPage() {
       </section>
 
       {stats && (stats.totalUsers > 0 || stats.totalPosts > 0) && (
-        <section className="py-12 border-b">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+        <section className="py-[var(--section-spacing,3.5rem)] border-b">
+          <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-[var(--content-density-gap,1rem)] max-w-4xl mx-auto">
               {stats.totalUsers > 0 && (
                 <div className="text-center" data-testid="stat-users">
                   <Users className="h-6 w-6 mx-auto mb-2 text-primary" />
@@ -108,10 +108,10 @@ export default function TestimonialsPage() {
       )}
 
       {featured.length > 0 && (
-        <section className="py-16">
-          <div className="container mx-auto px-4">
+        <section className="py-[var(--section-spacing,3.5rem)]">
+          <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
             <h2 className="text-2xl font-bold text-center mb-10">Featured Stories</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)] max-w-5xl mx-auto">
               {featured.map(t => (
                 <TestimonialCard key={t.id} testimonial={t} large />
               ))}
@@ -121,12 +121,12 @@ export default function TestimonialsPage() {
       )}
 
       {regular.length > 0 && (
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
+        <section className="py-[var(--section-spacing,3.5rem)] bg-muted/30">
+          <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
             {featured.length > 0 && (
               <h2 className="text-2xl font-bold text-center mb-10">More Customer Stories</h2>
             )}
-            <div className="columns-1 md:columns-2 lg:columns-3 gap-6 max-w-6xl mx-auto">
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-[var(--content-density-gap,1rem)] max-w-6xl mx-auto">
               {regular.map(t => (
                 <div key={t.id} className="break-inside-avoid mb-6">
                   <TestimonialCard testimonial={t} />
@@ -139,15 +139,15 @@ export default function TestimonialsPage() {
 
       {testimonials.length === 0 && (
         <section className="py-24">
-          <div className="container mx-auto px-4 text-center text-muted-foreground">
+          <div className="container mx-auto px-[var(--card-padding,1.25rem)] text-center text-muted-foreground">
             <Quote className="h-16 w-16 mx-auto mb-4 opacity-20" />
             <p className="text-lg">No testimonials yet. Check back soon!</p>
           </div>
         </section>
       )}
 
-      <section className="py-16 bg-primary/5">
-        <div className="container mx-auto px-4 text-center">
+      <section className="py-[var(--section-spacing,3.5rem)] bg-primary/5">
+        <div className="container mx-auto px-[var(--card-padding,1.25rem)] text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to join them?</h2>
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
             Start your journey today and see why our customers love us
@@ -180,7 +180,7 @@ function TestimonialCard({ testimonial: t, large = false }: { testimonial: Testi
           ))}
         </div>
       )}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
         <Avatar className={large ? 'h-14 w-14' : 'h-10 w-10'}>
           {t.avatar_url && <AvatarImage src={t.avatar_url} alt={t.name} />}
           <AvatarFallback className="bg-primary-100 text-primary-800 dark:bg-primary-800 dark:text-primary-200 text-sm font-medium">

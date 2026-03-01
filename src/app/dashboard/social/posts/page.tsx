@@ -349,7 +349,7 @@ export default function SocialPostsPage() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="p-[var(--card-padding,1.25rem)]">
         <Card data-testid="error-state-posts">
           <CardContent className="py-12 text-center">
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -366,7 +366,7 @@ export default function SocialPostsPage() {
 
   if (moduleDisabled) {
     return (
-      <div className="p-6">
+      <div className="p-[var(--card-padding,1.25rem)]">
         <Card>
           <CardHeader>
             <CardTitle data-testid="text-social-disabled-title">Social Module Not Enabled</CardTitle>
@@ -380,8 +380,8 @@ export default function SocialPostsPage() {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap mb-6">
+    <div className="p-[var(--card-padding,1.25rem)]">
+      <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap mb-6">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-posts-title">Social Posts <HelpTooltip text="Create, schedule, and manage all your social media posts from one place." /></h1>
           <p className="text-muted-foreground mt-1" data-testid="text-posts-description">
@@ -404,7 +404,7 @@ export default function SocialPostsPage() {
                 Describe your topic and style, and AI will generate a post for you.
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label htmlFor="ai-platform">Platform</Label>
                 <Select value={aiPlatform} onValueChange={setAiPlatform}>
@@ -502,7 +502,7 @@ export default function SocialPostsPage() {
         <CardHeader>
           <CardTitle className="text-lg">Create Post <HelpTooltip text="Write a new post, choose a platform, and save it as a draft or schedule it for later." /></CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label htmlFor="post-platform">Platform</Label>
             <Select value={platform} onValueChange={setPlatform}>
@@ -672,9 +672,9 @@ export default function SocialPostsPage() {
         <div className="space-y-3">
           {posts.map(post => (
             <Card key={post.id} className="cursor-pointer hover-elevate active-elevate-2" onClick={() => setDetailPost(post)} data-testid={`card-post-${post.id}`}>
-              <CardContent className="py-4">
-                <div className="flex flex-row items-start justify-between gap-3 flex-wrap">
-                  <div className="flex items-start gap-3 min-w-0 flex-1">
+              <CardContent className="py-[var(--card-padding,1.25rem)]">
+                <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
+                  <div className="flex items-start gap-[var(--content-density-gap,1rem)] min-w-0 flex-1">
                     <PlatformIconCircle platform={post.platform} />
                     <div className="min-w-0 flex-1">
                       <p
@@ -716,7 +716,7 @@ export default function SocialPostsPage() {
                         </p>
                       )}
                       {post.status === 'posted' && (post.engagement_likes || post.engagement_shares || post.engagement_comments || post.engagement_clicks) && (
-                        <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground" data-testid={`engagement-${post.id}`}>
+                        <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-1.5 text-xs text-muted-foreground" data-testid={`engagement-${post.id}`}>
                           {typeof post.engagement_likes === 'number' && (
                             <span className="flex items-center gap-1" data-testid={`likes-${post.id}`}>
                               <Heart className="h-3 w-3" /> {post.engagement_likes.toLocaleString()}
@@ -791,7 +791,7 @@ export default function SocialPostsPage() {
             <DialogTitle data-testid="text-edit-dialog-title">Edit Post</DialogTitle>
             <DialogDescription>Update your post content below.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-[var(--content-density-gap,1rem)]">
             <Textarea
               value={editContent}
               onChange={e => setEditContent(e.target.value)}

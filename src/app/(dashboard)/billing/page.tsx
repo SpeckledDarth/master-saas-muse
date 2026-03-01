@@ -317,7 +317,7 @@ export default function BillingPage() {
         <p className="text-muted-foreground mt-2">Manage your subscription and billing information</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-[var(--content-density-gap,1rem)]">
         {subscriptionError ? (
           <DSCard data-testid="card-subscription-error">
             <DSCardContent className="py-8 text-center">
@@ -331,8 +331,8 @@ export default function BillingPage() {
         ) : (
         <DSCard data-testid="card-subscription-status">
           <DSCardHeader>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                 <div className={`p-2 rounded-md ${tierInfo.color}`}>
                   <TierIcon className="h-5 w-5" />
                 </div>
@@ -346,9 +346,9 @@ export default function BillingPage() {
               </Badge>
             </div>
           </DSCardHeader>
-          <DSCardContent className="space-y-4">
+          <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
             {subscription && subscription.status !== 'free' && subscription.currentPeriodEnd && (
-              <div className="flex items-center justify-between gap-4 py-3 border-t flex-wrap">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] py-3 border-t flex-wrap">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <div>
@@ -372,7 +372,7 @@ export default function BillingPage() {
               </div>
             )}
 
-            <div className="flex gap-3 pt-2 flex-wrap">
+            <div className="flex gap-[var(--content-density-gap,1rem)] pt-2 flex-wrap">
               {!subscription || subscription.status === 'free' ? (
                 <Button onClick={() => router.push('/pricing')} data-testid="button-upgrade">
                   <Sparkles className="h-4 w-4 mr-2" />
@@ -412,7 +412,7 @@ export default function BillingPage() {
               </div>
             </DSCardHeader>
             <DSCardContent>
-              <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <div>
                   <p className="text-sm text-muted-foreground" data-testid="text-next-payment-info">
                     {subscription.cancelAtPeriodEnd
@@ -503,7 +503,7 @@ export default function BillingPage() {
               <DSCardDescription>Your activity this {usageInsights.monthName}</DSCardDescription>
             </DSCardHeader>
             <DSCardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
                 <div className="space-y-1">
                   <p className="text-2xl font-bold" data-testid="text-posts-this-month">{usageInsights.postsThisMonth}</p>
                   <p className="text-sm text-muted-foreground">Posts this month</p>
@@ -539,7 +539,7 @@ export default function BillingPage() {
           </DSCardHeader>
           <DSCardContent>
             {subscription && subscription.status !== 'free' ? (
-              <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <p className="text-sm text-muted-foreground">
                   Your payment method is managed through Stripe. Click &quot;Manage Subscription&quot; above to update your card or payment details.
                 </p>
@@ -568,7 +568,7 @@ export default function BillingPage() {
 
         <DSCard data-testid="card-invoice-history">
           <DSCardHeader>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
               <div className="flex items-center gap-2">
                 <Receipt className="h-5 w-5 text-muted-foreground" />
                 <DSCardTitle className="text-lg">Invoice History</DSCardTitle>
@@ -687,7 +687,7 @@ export default function BillingPage() {
             )}
           </DSCardContent>
           {totalPages > 1 && (
-            <CardFooter className="flex items-center justify-between gap-4 flex-wrap">
+            <CardFooter className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
               <p className="text-sm text-muted-foreground" data-testid="text-invoice-count">
                 Showing {invoicePage * PAGE_SIZE + 1}–{Math.min((invoicePage + 1) * PAGE_SIZE, invoiceTotal)} of {invoiceTotal}
               </p>
@@ -754,8 +754,8 @@ export default function BillingPage() {
               </Button>
             </div>
           ) : selectedInvoice ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)] text-sm">
                 <div>
                   <p className="text-muted-foreground">Date</p>
                   <p className="font-medium" data-testid="text-detail-date">{formatDate(selectedInvoice.created_at)}</p>

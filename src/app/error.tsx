@@ -17,7 +17,7 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-[var(--card-padding,1.25rem)]">
       <div className="text-center max-w-md">
         <div className="mb-8">
           <AlertTriangle className="h-16 w-16 text-destructive mx-auto mb-4" />
@@ -30,7 +30,7 @@ export default function Error({
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-[var(--content-density-gap,1rem)] justify-center">
           <Button 
             onClick={() => reset()}
             data-testid="button-try-again"

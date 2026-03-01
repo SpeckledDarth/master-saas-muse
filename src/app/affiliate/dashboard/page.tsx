@@ -519,15 +519,15 @@ class DashboardErrorBoundary extends Component<{ children: ReactNode }, { hasErr
       } catch {}
 
       return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-[var(--card-padding,1.25rem)]">
           <Card className="w-full max-w-2xl">
-            <CardContent className="pt-8 pb-6">
+            <CardContent className="pt-8 pb-[var(--card-padding,1.25rem)]">
               <div className="text-center mb-4">
                 <AlertTriangle className="h-12 w-12 mx-auto mb-3 text-destructive" />
                 <h2 className="text-xl font-bold mb-2" data-testid="text-dashboard-error">Dashboard Error</h2>
                 <p className="text-sm text-muted-foreground mb-4">Something went wrong loading the dashboard.</p>
               </div>
-              <div className="bg-muted/50 rounded-lg p-3 mb-4 overflow-auto max-h-[80vh]">
+              <div className="bg-muted/50 rounded-[var(--card-radius,0.75rem)] p-3 mb-4 overflow-auto max-h-[80vh]">
                 <p className="text-xs font-bold mb-1">Minified Error:</p>
                 <p className="text-xs font-mono text-destructive break-all" data-testid="text-error-detail">
                   {decodedError}
@@ -2050,8 +2050,8 @@ function StandaloneAffiliateDashboard() {
       case 'share_link':
         return (
           <Card data-testid="card-share-link">
-            <CardContent className="pt-5 pb-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <CardContent className="pt-5 pb-[var(--card-padding,1.25rem)]">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-[var(--content-density-gap,1rem)]">
                 <div className="flex-1 min-w-0 w-full">
                   <p className="text-sm font-medium mb-1">Your Referral Link</p>
                   <div className="flex items-center gap-2">
@@ -2105,7 +2105,7 @@ function StandaloneAffiliateDashboard() {
 
       case 'quick_stats':
         return (
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <Card data-testid="stat-clicks">
               <CardContent className="pt-4 pb-3">
                 <div className="flex items-center gap-2">
@@ -2150,7 +2150,7 @@ function StandaloneAffiliateDashboard() {
         if (!data?.tier?.current) return null
         return (
           <Card data-testid="card-tier-progress">
-            <CardContent className="pt-5 pb-4">
+            <CardContent className="pt-5 pb-[var(--card-padding,1.25rem)]">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Award className="h-4 w-4 text-primary" />
@@ -2250,8 +2250,8 @@ function StandaloneAffiliateDashboard() {
                   const isActive = contest.status === 'active' && now >= start && now <= end
                   const daysLeft = isActive ? Math.max(0, Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))) : null
                   return (
-                    <div key={contest.id} className={`p-4 rounded-md border ${isActive ? 'border-[hsl(var(--warning)/0.5)]' : ''}`} data-testid={`contest-${contest.id}`}>
-                      <div className="flex items-start justify-between gap-3">
+                    <div key={contest.id} className={`p-[var(--card-padding,1.25rem)] rounded-md border ${isActive ? 'border-[hsl(var(--warning)/0.5)]' : ''}`} data-testid={`contest-${contest.id}`}>
+                      <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-medium text-sm">{S(contest.name)}</span>
@@ -2260,7 +2260,7 @@ function StandaloneAffiliateDashboard() {
                             </Badge>
                           </div>
                           {contest.description && <p className="text-xs text-muted-foreground">{S(contest.description)}</p>}
-                          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-2 text-xs text-muted-foreground">
                             <span>Metric: {S(contest.metric)}</span>
                             <span>Prize: ${((contest.prize_amount_cents || 0) / 100).toFixed(2)}</span>
                             {contest.prize_description && <span>{S(contest.prize_description)}</span>}
@@ -2365,7 +2365,7 @@ function StandaloneAffiliateDashboard() {
             </CardHeader>
             <CardContent>
               {leaderboard.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-leaderboard">No data for this period yet.</p>
+                <p className="text-sm text-muted-foreground text-center py-[var(--card-padding,1.25rem)]" data-testid="text-no-leaderboard">No data for this period yet.</p>
               ) : (
                 <div className="space-y-1.5">
                   {leaderboard.map(entry => (
@@ -2516,7 +2516,7 @@ function StandaloneAffiliateDashboard() {
               })}
             </div>
           ) : (
-            <div className="text-center py-6" data-testid="text-no-coach-tips">
+            <div className="text-center py-[var(--card-padding,1.25rem)]" data-testid="text-no-coach-tips">
               <Target className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
               <p className="text-sm text-muted-foreground mb-1">Get personalized coaching tips</p>
               <p className="text-xs text-muted-foreground">Click "Get Tips" to analyze your performance and receive actionable advice.</p>
@@ -2549,13 +2549,13 @@ function StandaloneAffiliateDashboard() {
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : youtubeAnalytics?.connected ? (
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <CheckCircle className="h-3.5 w-3.5 text-[hsl(var(--success))]" />
                 <span>Connected as <span className="font-medium text-foreground">{S(youtubeAnalytics.account?.displayName || youtubeAnalytics.account?.username)}</span></span>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
                 <div className="p-3 rounded-md border" data-testid="stat-yt-videos">
                   <div className="flex items-center gap-1.5 mb-1">
                     <Play className="h-3.5 w-3.5 text-muted-foreground" />
@@ -2592,7 +2592,7 @@ function StandaloneAffiliateDashboard() {
                     <Activity className="h-3.5 w-3.5" />
                     Referral Attribution
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-[var(--content-density-gap,1rem)] text-center">
                     <div>
                       <p className="text-lg font-bold">{N(youtubeAnalytics.attribution.youtubeClicks)}</p>
                       <p className="text-[10px] text-muted-foreground">YouTube Clicks</p>
@@ -2619,14 +2619,14 @@ function StandaloneAffiliateDashboard() {
                   <p className="text-sm font-medium mb-2">Recent Videos</p>
                   <div className="space-y-2">
                     {youtubeAnalytics.videos.slice(0, 5).map((video: any) => (
-                      <div key={video.id} className="flex items-center justify-between gap-3 p-2 rounded-md border" data-testid={`video-${video.id}`}>
+                      <div key={video.id} className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] p-2 rounded-md border" data-testid={`video-${video.id}`}>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{S(video.title)}</p>
                           <p className="text-[10px] text-muted-foreground">
                             {new Date(String(video.publishedAt || '')).toLocaleDateString()}
                           </p>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
+                        <div className="flex items-center gap-[var(--content-density-gap,1rem)] text-xs text-muted-foreground shrink-0">
                           <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {N(video.views).toLocaleString()}</span>
                           <span className="flex items-center gap-1"><ThumbsUp className="h-3 w-3" /> {N(video.likes)}</span>
                           <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" /> {N(video.comments)}</span>
@@ -2638,7 +2638,7 @@ function StandaloneAffiliateDashboard() {
               )}
             </div>
           ) : (
-            <div className="text-center py-6">
+            <div className="text-center py-[var(--card-padding,1.25rem)]">
               <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
                 <Youtube className="h-6 w-6 text-muted-foreground" />
               </div>
@@ -2666,7 +2666,7 @@ function StandaloneAffiliateDashboard() {
               <CardDescription>Unlock badges as you grow your affiliate business</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
                 {BADGES.map(badge => {
                   let earned = false
                   try { earned = badge.check() } catch {}
@@ -2674,7 +2674,7 @@ function StandaloneAffiliateDashboard() {
                   return (
                     <div
                       key={badge.id}
-                      className={`p-3 rounded-lg border text-center transition-all ${earned ? 'border-primary/40 bg-primary/5' : 'border-muted bg-muted/20 opacity-50'}`}
+                      className={`p-3 rounded-[var(--card-radius,0.75rem)] border text-center transition-all ${earned ? 'border-primary/40 bg-primary/5' : 'border-muted bg-muted/20 opacity-50'}`}
                       data-testid={`badge-${badge.id}`}
                     >
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 ${earned ? 'bg-primary/10' : 'bg-muted'}`}>
@@ -2732,7 +2732,7 @@ function StandaloneAffiliateDashboard() {
                   {new Date(data.payoutSchedule.nextPayoutDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
               </div>
-              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                 <div>
                   <p className="text-xs text-muted-foreground">Available Balance</p>
                   <p className="text-lg font-bold" data-testid="text-payout-balance">
@@ -2765,8 +2765,8 @@ function StandaloneAffiliateDashboard() {
         if (!data?.tierPromotionCelebration) return null
         return (
           <Card className="border-[hsl(var(--warning)/0.3)] bg-gradient-to-r from-[hsl(var(--warning)/0.05)] to-[hsl(var(--warning)/0.08)] dark:from-[hsl(var(--warning)/0.1)] dark:to-[hsl(var(--warning)/0.12)]" data-testid="card-tier-celebration">
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center gap-3">
+            <CardContent className="pt-5 pb-[var(--card-padding,1.25rem)]">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                 <div className="w-12 h-12 rounded-full bg-[hsl(var(--warning)/0.1)] flex items-center justify-center">
                   <Award className="h-6 w-6 text-[hsl(var(--warning))]" />
                 </div>
@@ -2789,7 +2789,7 @@ function StandaloneAffiliateDashboard() {
   }
 
   const renderOverview = () => (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-lg font-semibold" data-testid="text-overview-heading">Dashboard</h2>
         <div className="flex items-center gap-2">
@@ -2884,12 +2884,12 @@ function StandaloneAffiliateDashboard() {
               data-testid={`widget-wrapper-${widgetId}`}
             >
               <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
-                <div className="cursor-grab active:cursor-grabbing p-1.5 rounded-md bg-background/80 border shadow-sm" data-testid={`drag-handle-${widgetId}`}>
+                <div className="cursor-grab active:cursor-grabbing p-1.5 rounded-md bg-background/80 border shadow-[var(--card-shadow)]" data-testid={`drag-handle-${widgetId}`}>
                   <GripVertical className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <button
                   onClick={() => hideWidget(widgetId)}
-                  className="p-1.5 rounded-md bg-background/80 border shadow-sm"
+                  className="p-1.5 rounded-md bg-background/80 border shadow-[var(--card-shadow)]"
                   data-testid={`button-hide-widget-${widgetId}`}
                 >
                   <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -2897,7 +2897,7 @@ function StandaloneAffiliateDashboard() {
               </div>
               {content || (
                 <Card className="border-dashed opacity-50">
-                  <CardContent className="py-6 text-center">
+                  <CardContent className="py-[var(--card-padding,1.25rem)] text-center">
                     <p className="text-sm text-muted-foreground">{S(config?.label)} (no data)</p>
                   </CardContent>
                 </Card>
@@ -2938,7 +2938,7 @@ function StandaloneAffiliateDashboard() {
     }, null)
 
     return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-lg font-semibold" data-testid="text-referrals-heading">Referrals ({data.referrals.length})</h2>
         <div className="flex gap-2 flex-wrap">
@@ -2986,8 +2986,8 @@ function StandaloneAffiliateDashboard() {
       </div>
 
       {referralView === 'portfolio' ? (
-        <div className="space-y-4">
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <Card data-testid="stat-portfolio-value">
               <CardContent className="pt-4 pb-3">
                 <div className="flex items-center gap-2">
@@ -3042,7 +3042,7 @@ function StandaloneAffiliateDashboard() {
                     const monthlyLTV = daysSinceSignup > 0 ? (revenue / daysSinceSignup) * 30 : 0
                     return (
                       <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`portfolio-referral-${ref.id}`}>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                           <div className="w-8 h-8 rounded-full bg-[hsl(var(--success)/0.1)] flex items-center justify-center">
                             <UserCheck className="h-4 w-4 text-[hsl(var(--success))]" />
                           </div>
@@ -3077,7 +3077,7 @@ function StandaloneAffiliateDashboard() {
                 <div className="space-y-2">
                   {trialReferrals.map(ref => (
                     <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`portfolio-trial-${ref.id}`}>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                         <div className="w-8 h-8 rounded-full bg-[hsl(var(--warning)/0.1)] flex items-center justify-center">
                           <Clock className="h-4 w-4 text-[hsl(var(--warning))]" />
                         </div>
@@ -3110,7 +3110,7 @@ function StandaloneAffiliateDashboard() {
                     const revenue = referralCommissions[ref.id] || 0
                     return (
                       <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border opacity-75" data-testid={`portfolio-churned-${ref.id}`}>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                           <div className="w-8 h-8 rounded-full bg-[hsl(var(--danger)/0.1)] flex items-center justify-center">
                             <UserX className="h-4 w-4 text-[hsl(var(--danger))]" />
                           </div>
@@ -3148,7 +3148,7 @@ function StandaloneAffiliateDashboard() {
             <div className="space-y-2">
               {filteredReferrals.map(ref => (
                 <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`referral-${ref.id}`}>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                     <Badge variant={STATUS_COLORS[ref.status] as any || 'outline'} className="text-xs capitalize">
                       {S(ref.status).replace('_', ' ')}
                     </Badge>
@@ -3184,7 +3184,7 @@ function StandaloneAffiliateDashboard() {
                 .map(([tag, srcData]) => (
                   <div key={tag} className="flex items-center justify-between p-3 rounded-md border" data-testid={`source-${tag}`}>
                     <Badge variant="outline" className="text-xs font-mono">{tag}</Badge>
-                    <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-[var(--content-density-gap,1rem)] text-sm">
                       <span>{srcData.referrals} signup{srcData.referrals !== 1 ? 's' : ''}</span>
                       <span className="text-muted-foreground">{srcData.converted} converted</span>
                       <span className="font-medium">
@@ -3215,9 +3215,9 @@ function StandaloneAffiliateDashboard() {
         </CardHeader>
         <CardContent>
           {renewalsLoading ? (
-            <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+            <div className="flex justify-center py-[var(--card-padding,1.25rem)]"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               {expiringReferrals.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-sm font-medium flex items-center gap-1.5">
@@ -3326,7 +3326,7 @@ function StandaloneAffiliateDashboard() {
               )}
 
               {expiringReferrals.length === 0 && renewals.length === 0 && (
-                <div className="text-center py-6" data-testid="text-no-renewals">
+                <div className="text-center py-[var(--card-padding,1.25rem)]" data-testid="text-no-renewals">
                   <RefreshCw className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
                   <p className="text-sm text-muted-foreground">No expiring referrals or renewal requests at this time.</p>
                 </div>
@@ -3344,7 +3344,7 @@ function StandaloneAffiliateDashboard() {
   const renderEarnings = () => {
     if (!data) return null
     return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold" data-testid="text-earnings-heading">Earnings ({data.commissions.length})</h2>
         <div className="flex gap-2">
@@ -3371,7 +3371,7 @@ function StandaloneAffiliateDashboard() {
         </div>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="pt-4 pb-3">
             <span className="text-xs text-muted-foreground">Pending</span>
@@ -3446,7 +3446,7 @@ function StandaloneAffiliateDashboard() {
                     onClick={() => setExpandedCommission(isExpanded ? null : com.id)}
                     data-testid={`button-expand-commission-${com.id}`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                       {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" /> : <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />}
                       <Badge variant={STATUS_COLORS[com.status] as any || 'outline'} className="text-xs capitalize">
                         {S(com.status)}
@@ -3463,7 +3463,7 @@ function StandaloneAffiliateDashboard() {
                     </span>
                   </button>
                   {isExpanded && (
-                    <div className="px-3 pb-4 pt-1 border-t" data-testid={`lifecycle-${com.id}`}>
+                    <div className="px-3 pb-[var(--card-padding,1.25rem)] pt-1 border-t" data-testid={`lifecycle-${com.id}`}>
                       <p className="text-xs font-medium text-muted-foreground mb-3 ml-7">Commission Lifecycle</p>
                       <div className="flex items-start gap-0 overflow-x-auto pb-1 ml-7">
                         {lifecycleSteps.map((step, i) => (
@@ -3536,7 +3536,7 @@ function StandaloneAffiliateDashboard() {
               </p>
             </div>
             {(data.secondTierCommissions?.length || 0) === 0 ? (
-              <div className="text-center py-6" data-testid="text-no-second-tier">
+              <div className="text-center py-[var(--card-padding,1.25rem)]" data-testid="text-no-second-tier">
                 <Users className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">
                   No second-tier commissions yet. Share your affiliate link with potential partners to start earning!
@@ -3546,7 +3546,7 @@ function StandaloneAffiliateDashboard() {
               <div className="space-y-2">
                 {data.secondTierCommissions!.map(stc => (
                   <div key={stc.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`second-tier-commission-${stc.id}`}>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                       <Badge variant="secondary" className="text-xs">
                         Tier 2
                       </Badge>
@@ -3577,7 +3577,7 @@ function StandaloneAffiliateDashboard() {
           <CardDescription>Generate a printable earnings statement for your records</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="flex items-end gap-3 flex-wrap">
+          <div className="flex items-end gap-[var(--content-density-gap,1rem)] flex-wrap">
             <div>
               <Label className="text-xs">Period</Label>
               <Select value={statementPeriod} onValueChange={(v: 'current_month' | 'last_month' | 'custom') => setStatementPeriod(v)}>
@@ -3667,7 +3667,7 @@ function StandaloneAffiliateDashboard() {
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         ) : financialSubTab === 'overview' ? (
-          <div className="space-y-4">
+          <div className="space-y-[var(--content-density-gap,1rem)]">
             {financialTools?.sleepEarnings > 0 && (
               <Card data-testid="card-sleep-earnings">
                 <CardContent className="pt-4 pb-3">
@@ -3700,7 +3700,7 @@ function StandaloneAffiliateDashboard() {
                   <CardDescription>Based on your current month performance</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                     <div className="p-3 rounded-md bg-muted/50 text-center">
                       <p className="text-xs text-muted-foreground">Daily Avg</p>
                       <p className="text-sm font-bold" data-testid="text-daily-avg">
@@ -3753,7 +3753,7 @@ function StandaloneAffiliateDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-medium">Your Share</span>
@@ -3769,7 +3769,7 @@ function StandaloneAffiliateDashboard() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-medium">Platform Share</span>
@@ -3804,7 +3804,7 @@ function StandaloneAffiliateDashboard() {
                   <CardDescription>How your affiliate earnings compare to your subscription</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
+                  <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-3">
                     <div className="p-3 rounded-md bg-muted/50 text-center">
                       <p className="text-xs text-muted-foreground">Subscription</p>
                       <p className="text-sm font-bold">-${((financialTools.expenseOffset.subscriptionCostCents || 0) / 100).toFixed(2)}</p>
@@ -3845,7 +3845,7 @@ function StandaloneAffiliateDashboard() {
                   <div className="space-y-2">
                     {financialTools.churnAlerts.slice(0, 5).map((alert: any, i: number) => (
                       <div key={i} className="flex items-center justify-between p-3 rounded-md border" data-testid={`churn-alert-${i}`}>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                           <div className="w-8 h-8 rounded-full bg-[hsl(var(--danger)/0.1)] flex items-center justify-center">
                             <UserX className="h-4 w-4 text-[hsl(var(--danger))]" />
                           </div>
@@ -3922,7 +3922,7 @@ function StandaloneAffiliateDashboard() {
             )}
           </div>
         ) : financialSubTab === 'referrals' ? (
-          <div className="space-y-4">
+          <div className="space-y-[var(--content-density-gap,1rem)]">
             {financialTools?.earningsByReferral && financialTools.earningsByReferral.length > 0 ? (
               <Card data-testid="card-earnings-by-referral">
                 <CardHeader className="pb-2">
@@ -3975,7 +3975,7 @@ function StandaloneAffiliateDashboard() {
             )}
           </div>
         ) : financialSubTab === 'history' ? (
-          <div className="space-y-4">
+          <div className="space-y-[var(--content-density-gap,1rem)]">
             {financialTools?.multiYearHistory && financialTools.multiYearHistory.length > 0 ? (
               <Card data-testid="card-multi-year-history">
                 <CardHeader className="pb-2">
@@ -3993,7 +3993,7 @@ function StandaloneAffiliateDashboard() {
                           <span className="text-sm font-bold">{S(yr.year)}</span>
                           <span className="text-sm font-bold text-primary">${(N(yr.earnings) / 100).toFixed(2)}</span>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
                           <div>
                             <p className="text-[10px] text-muted-foreground">Commissions</p>
                             <p className="text-xs font-medium">{N(yr.commissions)}</p>
@@ -4024,7 +4024,7 @@ function StandaloneAffiliateDashboard() {
             )}
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-[var(--content-density-gap,1rem)]">
             <Card data-testid="card-commission-calculator">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -4034,7 +4034,7 @@ function StandaloneAffiliateDashboard() {
                 <CardDescription>Estimate your potential earnings</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
+                <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-3">
                   <div>
                     <Label className="text-xs">Referrals</Label>
                     <Input
@@ -4077,7 +4077,7 @@ function StandaloneAffiliateDashboard() {
                   const monthlyEarning = refs * price * (rate / 100)
                   const annualEarning = monthlyEarning * 12
                   return (
-                    <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+                    <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2">
                       <div className="p-3 rounded-md bg-muted/50 text-center">
                         <p className="text-xs text-muted-foreground">Monthly Earnings</p>
                         <p className="text-lg font-bold" data-testid="text-calc-monthly">${monthlyEarning.toFixed(2)}</p>
@@ -4195,7 +4195,7 @@ function StandaloneAffiliateDashboard() {
   const renderPayouts = () => {
     if (!data) return null
     return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold" data-testid="text-payouts-heading">Payouts ({data.payouts.length})</h2>
         <Select value={payoutSort} onValueChange={(v: 'newest' | 'oldest') => setPayoutSort(v)}>
@@ -4220,7 +4220,7 @@ function StandaloneAffiliateDashboard() {
             <div className="space-y-2">
               {sortedPayouts.map(payout => (
                 <div key={payout.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`payout-${payout.id}`}>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                     <Badge variant={STATUS_COLORS[payout.status] as any || 'outline'} className="text-xs capitalize">
                       {S(payout.status)}
                     </Badge>
@@ -4240,11 +4240,11 @@ function StandaloneAffiliateDashboard() {
       <PayoutHistoryPanel />
 
       {/* Partner Experience Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <EarningsGoalSetter />
         <ReferralOfMonth />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <AffiliateManagerCard />
         <GracePeriodNotice />
       </div>
@@ -4265,7 +4265,7 @@ function StandaloneAffiliateDashboard() {
       })
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-[var(--content-density-gap,1rem)]">
         <h2 className="text-lg font-semibold" data-testid="text-assets-heading">Resource Center</h2>
         <p className="text-sm text-muted-foreground -mt-2">Swipe files, templates, guides, and more to help you promote and earn</p>
 
@@ -4322,8 +4322,8 @@ function StandaloneAffiliateDashboard() {
               return (
                 <Card key={asset.id} data-testid={`asset-${asset.id}`}>
                   <CardContent className="pt-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3">
+                    <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
+                      <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
                         <Icon className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
                         <div>
                           <p className="font-medium text-sm">{S(asset.title)}</p>
@@ -4536,7 +4536,7 @@ function StandaloneAffiliateDashboard() {
   }, [section, loadMessages])
 
   const renderTools = () => (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <h2 className="text-lg font-semibold" data-testid="text-tools-heading">Affiliate Tools</h2>
 
       <Card data-testid="card-deep-link-generator">
@@ -4548,7 +4548,7 @@ function StandaloneAffiliateDashboard() {
           <CardDescription>Create referral links to specific pages with optional source tracking and UTM tags</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
             <div>
               <Label className="text-xs">Target Page</Label>
               <Select value={deepLinkPage} onValueChange={setDeepLinkPage}>
@@ -4594,8 +4594,8 @@ function StandaloneAffiliateDashboard() {
           <CardDescription>Generate a QR code for your referral link — great for events, business cards, and presentations</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center gap-4">
-            <div className="bg-white p-4 rounded-lg" data-testid="qr-code-container">
+          <div className="flex flex-col items-center gap-[var(--content-density-gap,1rem)]">
+            <div className="bg-white p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)]" data-testid="qr-code-container">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data?.link?.shareUrl || "")}`}
                 alt="Referral QR Code"
@@ -4665,7 +4665,7 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Your personal brand in action — share your code with potential customers</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="p-3 rounded-md bg-muted/30 text-xs text-muted-foreground" data-testid="text-code-coaching">
             Your discount code is your personal brand in action. Choose something memorable that your audience will associate with YOU — your name, your show, your catchphrase. Great codes are short, easy to say out loud, and easy to remember. Codes are first-come, first-served — the more unique to your brand, the better!
           </div>
@@ -4789,7 +4789,7 @@ function StandaloneAffiliateDashboard() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-4 space-y-3">
+            <div className="text-center py-[var(--card-padding,1.25rem)] space-y-3">
               <p className="text-sm text-muted-foreground">You don't have a promo code yet. Request one below!</p>
             </div>
           )}
@@ -4868,14 +4868,14 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Create a personalized landing page with your branding and referral link built in</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           {landingPageLoading ? (
-            <div className="flex items-center justify-center py-6">
+            <div className="flex items-center justify-center py-[var(--card-padding,1.25rem)]">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : (
             <>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
                 <div>
                   <Label className="text-xs">Headline</Label>
                   <Input
@@ -4907,7 +4907,7 @@ function StandaloneAffiliateDashboard() {
                   data-testid="input-lp-bio"
                 />
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
                 <div>
                   <Label className="text-xs">Photo URL</Label>
                   <Input
@@ -5000,8 +5000,8 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Generate platform-specific promotional posts with your referral link automatically embedded</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-2">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
             <div>
               <Label className="text-xs">Platform</Label>
               <Select value={promoPlatform} onValueChange={setPromoPlatform}>
@@ -5103,8 +5103,8 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Generate complete promotional emails with your referral link</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-3">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-3">
             <div>
               <Label className="text-xs">Purpose</Label>
               <Select value={aiEmailPurpose} onValueChange={setAiEmailPurpose}>
@@ -5173,8 +5173,8 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Get a structured blog post outline with SEO keywords and your referral link</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-3">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-3">
             <div>
               <Label className="text-xs">Topic / Angle</Label>
               <Input value={aiBlogTopic} onChange={e => setAiBlogTopic(e.target.value)} placeholder="e.g. productivity tips, tool review..." className="mt-1" data-testid="input-ai-blog-topic" />
@@ -5269,8 +5269,8 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Create video scripts with hooks, sections, and CTAs for YouTube and more</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-3">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-3">
             <div>
               <Label className="text-xs">Video Type</Label>
               <Select value={aiVideoType} onValueChange={setAiVideoType}>
@@ -5384,8 +5384,8 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Generate ad variations for Facebook, Instagram, Google, and more</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-3">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-3">
             <div>
               <Label className="text-xs">Ad Platform</Label>
               <Select value={aiAdPlatform} onValueChange={setAiAdPlatform}>
@@ -5460,8 +5460,8 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Generate niche-specific content tailored to your audience's pain points</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-3">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-3">
             <div>
               <Label className="text-xs">Your Niche</Label>
               <Input value={aiAudienceNiche} onChange={e => setAiAudienceNiche(e.target.value)} placeholder="e.g. fitness coaches, SaaS founders..." className="mt-1" data-testid="input-ai-audience-niche" />
@@ -5543,8 +5543,8 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Create personalized pitches based on prospect information</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-2">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
             <div>
               <Label className="text-xs">Prospect Info</Label>
               <Input value={aiPitchProspect} onChange={e => setAiPitchProspect(e.target.value)} placeholder="e.g. Fitness coach with 10k followers..." className="mt-1" data-testid="input-ai-pitch-prospect" />
@@ -5621,8 +5621,8 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Get smart responses to counter common objections from prospects</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-2">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
             <div>
               <Label className="text-xs">The Objection</Label>
               <Input value={aiObjection} onChange={e => setAiObjection(e.target.value)} placeholder='e.g. "It is too expensive", "I already use X"' className="mt-1" data-testid="input-ai-objection" />
@@ -5677,8 +5677,8 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Get creative, actionable promotion strategies tailored to your niche</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-3">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-3">
             <div>
               <Label className="text-xs">Your Niche</Label>
               <Input value={aiPromoNiche} onChange={e => setAiPromoNiche(e.target.value)} placeholder="e.g. personal finance, health & wellness..." className="mt-1" data-testid="input-ai-promo-niche" />
@@ -5751,7 +5751,7 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Get data-driven tips to improve your conversion rate and follow-up templates</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div>
             <Label className="text-xs">Scenario / Context (optional)</Label>
             <Input value={aiConversionScenario} onChange={e => setAiConversionScenario(e.target.value)} placeholder="e.g. lots of clicks but few signups, trying email outreach..." className="mt-1" data-testid="input-ai-conversion-scenario" />
@@ -5838,7 +5838,7 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Get a personalized first-week action plan based on your current progress</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <Button onClick={() => generateAiTool('onboarding', '/api/affiliate/ai-onboarding-advisor', {})} disabled={aiToolGenerating && aiToolActive === 'onboarding'} data-testid="button-ai-onboarding-generate">
             {aiToolGenerating && aiToolActive === 'onboarding' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
             Get My Action Plan
@@ -5885,7 +5885,7 @@ function StandaloneAffiliateDashboard() {
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-muted-foreground">Your Week Plan:</p>
                   {aiToolResult.weekPlan.map((day: any, i: number) => (
-                    <div key={i} className="p-2 rounded-md bg-muted/40 flex items-start gap-3" data-testid={`week-plan-day-${i}`}>
+                    <div key={i} className="p-2 rounded-md bg-muted/40 flex items-start gap-[var(--content-density-gap,1rem)]" data-testid={`week-plan-day-${i}`}>
                       <div className="shrink-0 w-12 text-center">
                         <p className="text-xs font-bold">Day {day.day}</p>
                         <Badge variant={day.priority === 'high' ? 'default' : day.priority === 'low' ? 'outline' : 'secondary'} className="text-[10px] mt-0.5">
@@ -5928,7 +5928,7 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Receive real-time notifications when events occur on your affiliate account</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           {webhookSecret && (
             <div className="p-3 rounded-md bg-[hsl(var(--warning)/0.05)] dark:bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.2)] dark:border-[hsl(var(--warning)/0.3)] space-y-2">
               <div className="flex items-center gap-2">
@@ -5981,7 +5981,7 @@ function StandaloneAffiliateDashboard() {
           </div>
 
           {webhooksLoading ? (
-            <div className="flex items-center justify-center py-4">
+            <div className="flex items-center justify-center py-[var(--card-padding,1.25rem)]">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : webhooks.length > 0 ? (
@@ -6095,11 +6095,11 @@ function StandaloneAffiliateDashboard() {
       </Card>
 
       {/* Marketing Toolkit */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <LinkShortener />
         <QRCodeGenerator referralUrl={data?.link?.shareUrl || ''} />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <MediaKitPage />
         <CopyPasteCaptions referralCode={data?.link?.ref_code || ''} referralUrl={data?.link?.shareUrl || ''} />
       </div>
@@ -6110,7 +6110,7 @@ function StandaloneAffiliateDashboard() {
   )
 
   const renderAnnouncements = () => (
-    <div className="space-y-4">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <h2 className="text-lg font-semibold" data-testid="text-announcements-heading">News & Notifications</h2>
 
       {notifications.length === 0 ? (
@@ -6127,7 +6127,7 @@ function StandaloneAffiliateDashboard() {
           {notifications.map(n => (
             <Card key={n.id} className={!n.read ? 'border-primary/30' : ''} data-testid={`notification-${n.id}`}>
               <CardContent className="pt-4 pb-3">
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
                   <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.read ? 'bg-primary' : 'bg-muted'}`} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{S(n.title)}</p>
@@ -6150,7 +6150,7 @@ function StandaloneAffiliateDashboard() {
   }
 
   const renderAccount = () => (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold" data-testid="text-account-heading">Account Settings</h2>
         <Button onClick={saveProfile} disabled={profileSaving} size="sm" data-testid="button-save-profile">
@@ -6164,7 +6164,7 @@ function StandaloneAffiliateDashboard() {
           <CardTitle className="text-base">Account Info</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div>
               <Label className="text-xs text-muted-foreground">Email</Label>
               <p className="text-sm font-medium">{userEmail}</p>
@@ -6201,19 +6201,19 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Your affiliate contract and commission rate details</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           {contractsLoading ? (
-            <div className="flex items-center justify-center py-4">
+            <div className="flex items-center justify-center py-[var(--card-padding,1.25rem)]">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : contracts.length === 0 ? (
-            <div className="text-center py-6" data-testid="text-no-contracts">
+            <div className="text-center py-[var(--card-padding,1.25rem)]" data-testid="text-no-contracts">
               <FileText className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">No contracts found.</p>
               {data?.terms && (
-                <div className="mt-4 p-4 rounded-md bg-muted/40">
+                <div className="mt-4 p-[var(--card-padding,1.25rem)] rounded-md bg-muted/40">
                   <p className="text-sm font-medium">Your Current Terms</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)] mt-3 text-sm">
                     <div>
                       <span className="text-xs text-muted-foreground">Commission Rate</span>
                       <p className="font-medium">{S(data?.terms.rate)}%</p>
@@ -6241,8 +6241,8 @@ function StandaloneAffiliateDashboard() {
                 const isExpanded = expandedContract === contract.id
                 return (
                   <div key={contract.id} className={`rounded-md border ${isActive ? 'border-primary/30' : ''}`} data-testid={`contract-${contract.id}`}>
-                    <div className="p-4">
-                      <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div className="p-[var(--card-padding,1.25rem)]">
+                      <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-medium text-sm">{S(contract.title)}</span>
@@ -6256,7 +6256,7 @@ function StandaloneAffiliateDashboard() {
                               <Badge variant="outline" className="text-[10px]">v{contract.version}</Badge>
                             )}
                           </div>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground flex-wrap">
+                          <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-1 text-xs text-muted-foreground flex-wrap">
                             {contract.effective_date && (
                               <span>Effective: {new Date(contract.effective_date).toLocaleDateString()}</span>
                             )}
@@ -6305,7 +6305,7 @@ function StandaloneAffiliateDashboard() {
                           : null
                         return (
                           <div className="mt-3 p-3 rounded-md bg-muted/40" data-testid={`contract-terms-${contract.id}`}>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-[var(--content-density-gap,1rem)] text-sm">
                               <div>
                                 <span className="text-xs text-muted-foreground">Commission Rate</span>
                                 <p className="font-medium">{terms.commission_rate}%</p>
@@ -6340,7 +6340,7 @@ function StandaloneAffiliateDashboard() {
                       })()}
                     </div>
                     {isExpanded && contract.body && (
-                      <div className="border-t px-4 py-3">
+                      <div className="border-t px-[var(--card-padding,1.25rem)] py-3">
                         <div className="prose prose-sm dark:prose-invert max-w-none text-sm whitespace-pre-wrap" data-testid={`text-contract-body-${contract.id}`}>
                           {S(contract.body)}
                         </div>
@@ -6364,8 +6364,8 @@ function StandaloneAffiliateDashboard() {
           <CardTitle className="text-base">Profile</CardTitle>
           <CardDescription>Your public display name and contact information</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
             <div>
               <Label className="text-xs">Display Name</Label>
               <Input value={profile.display_name || ''} onChange={e => updateProfile('display_name', e.target.value)} placeholder="How you appear on leaderboards" className="mt-1" data-testid="input-display-name" />
@@ -6391,7 +6391,7 @@ function StandaloneAffiliateDashboard() {
           <CardTitle className="text-base">Mailing Address</CardTitle>
           <CardDescription>Used for tax documents and correspondence</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div>
             <Label className="text-xs">Legal Name (for tax documents)</Label>
             <Input value={profile.legal_name || ''} onChange={e => updateProfile('legal_name', e.target.value)} placeholder="Full legal name" className="mt-1" data-testid="input-legal-name" />
@@ -6404,7 +6404,7 @@ function StandaloneAffiliateDashboard() {
             <Label className="text-xs">Address Line 2</Label>
             <Input value={profile.address_line2 || ''} onChange={e => updateProfile('address_line2', e.target.value)} placeholder="Apt, Suite, Unit (optional)" className="mt-1" data-testid="input-address2" />
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-3">
             <div>
               <Label className="text-xs">City</Label>
               <Input value={profile.city || ''} onChange={e => updateProfile('city', e.target.value)} className="mt-1" data-testid="input-city" />
@@ -6435,7 +6435,7 @@ function StandaloneAffiliateDashboard() {
           <CardTitle className="text-base">Payout Preferences</CardTitle>
           <CardDescription>How you'd like to receive your earnings</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div>
             <Label className="text-xs">Payout Method</Label>
             <Select value={profile.payout_method || 'paypal'} onValueChange={v => updateProfile('payout_method', v)}>
@@ -6463,7 +6463,7 @@ function StandaloneAffiliateDashboard() {
                 <Label className="text-xs">Bank Name</Label>
                 <Input value={profile.payout_bank_name || ''} onChange={e => updateProfile('payout_bank_name', e.target.value)} className="mt-1" data-testid="input-bank-name" />
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
                 <div>
                   <Label className="text-xs">Routing Number</Label>
                   <Input value={profile.payout_bank_routing || ''} onChange={e => updateProfile('payout_bank_routing', e.target.value)} type="password" className="mt-1" data-testid="input-bank-routing" />
@@ -6495,9 +6495,9 @@ function StandaloneAffiliateDashboard() {
             )}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           {taxInfoLoading ? (
-            <div className="flex items-center justify-center py-4">
+            <div className="flex items-center justify-center py-[var(--card-padding,1.25rem)]">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : (
@@ -6519,7 +6519,7 @@ function StandaloneAffiliateDashboard() {
                 <Input value={taxForm.legal_name} onChange={e => setTaxForm(prev => ({ ...prev, legal_name: e.target.value }))} placeholder="Full legal name" className="mt-1" data-testid="input-tax-legal-name" />
               </div>
               {taxForm.form_type === 'w9' && (
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
                   <div>
                     <Label className="text-xs">Tax ID Type</Label>
                     <Select value={taxForm.tax_id_type} onValueChange={v => setTaxForm(prev => ({ ...prev, tax_id_type: v }))}>
@@ -6542,7 +6542,7 @@ function StandaloneAffiliateDashboard() {
                 <Label className="text-xs">Address</Label>
                 <Input value={taxForm.address_line1} onChange={e => setTaxForm(prev => ({ ...prev, address_line1: e.target.value }))} placeholder="Street address" className="mt-1" data-testid="input-tax-address" />
               </div>
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-3">
                 <div>
                   <Label className="text-xs">City</Label>
                   <Input value={taxForm.address_city} onChange={e => setTaxForm(prev => ({ ...prev, address_city: e.target.value }))} className="mt-1" data-testid="input-tax-city" />
@@ -6560,7 +6560,7 @@ function StandaloneAffiliateDashboard() {
                 <Label className="text-xs">Country</Label>
                 <Input value={taxForm.address_country} onChange={e => setTaxForm(prev => ({ ...prev, address_country: e.target.value }))} className="mt-1" data-testid="input-tax-country" />
               </div>
-              <div className="flex items-center gap-3 pt-2">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)] pt-2">
                 <Button onClick={saveTaxInfo} disabled={taxInfoSaving} size="sm" data-testid="button-save-tax-info">
                   {taxInfoSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
                   {taxInfo ? 'Update Tax Info' : 'Submit Tax Info'}
@@ -6591,7 +6591,7 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Generate API keys to access your affiliate data programmatically</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-end gap-2">
             <div className="flex-1">
               <Label className="text-xs">Key Name</Label>
@@ -6637,7 +6637,7 @@ function StandaloneAffiliateDashboard() {
           )}
 
           {apiKeysLoading ? (
-            <div className="flex items-center justify-center py-4">
+            <div className="flex items-center justify-center py-[var(--card-padding,1.25rem)]">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : apiKeys.length === 0 ? (
@@ -6653,7 +6653,7 @@ function StandaloneAffiliateDashboard() {
                         {k.is_active ? 'Active' : 'Revoked'}
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                    <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-0.5 flex-wrap">
                       <code className="text-[10px] font-mono text-muted-foreground">{k.api_key_prefix}...</code>
                       <span className="text-[10px] text-muted-foreground">
                         Created {new Date(k.created_at).toLocaleDateString()}
@@ -6701,9 +6701,9 @@ function StandaloneAffiliateDashboard() {
           </CardTitle>
           <CardDescription>Verified earnings badges you can embed on your website</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           {badgesLoading ? (
-            <div className="flex items-center justify-center py-4">
+            <div className="flex items-center justify-center py-[var(--card-padding,1.25rem)]">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : earnedBadges.length > 0 ? (
@@ -6740,7 +6740,7 @@ function StandaloneAffiliateDashboard() {
               })}
             </div>
           ) : (
-            <div className="text-center py-4">
+            <div className="text-center py-[var(--card-padding,1.25rem)]">
               <p className="text-sm text-muted-foreground">No badges earned yet. Keep growing your earnings!</p>
               {badgeTiers.length > 0 && (
                 <div className="mt-3 space-y-1">
@@ -6764,7 +6764,7 @@ function StandaloneAffiliateDashboard() {
             </CardTitle>
             <CardDescription>Share your feedback about the affiliate program</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div>
               <Label className="text-xs mb-2 block">Rating</Label>
               <div className="flex items-center gap-1" data-testid="survey-rating-stars">
@@ -6873,7 +6873,7 @@ function StandaloneAffiliateDashboard() {
   )
 
   const renderMessages = () => (
-    <div className="space-y-4">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-lg font-semibold" data-testid="text-messages-heading">Messages</h2>
         <Button variant="outline" size="sm" onClick={loadMessages} disabled={messagesLoading} data-testid="button-refresh-messages">
@@ -6946,7 +6946,7 @@ function StandaloneAffiliateDashboard() {
   )
 
   const renderSupport = () => (
-    <div className="space-y-4">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <h2 className="text-lg font-semibold" data-testid="text-support-heading">Help & Support</h2>
 
       <Card>
@@ -7043,15 +7043,15 @@ function StandaloneAffiliateDashboard() {
 
   if (!data || (!data.link?.is_affiliate && !isAdminViewer)) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-[var(--card-padding,1.25rem)]">
         <Card className="w-full max-w-md bg-white/10 border-border">
-          <CardContent className="pt-8 pb-6 text-center">
+          <CardContent className="pt-8 pb-[var(--card-padding,1.25rem)] text-center">
             <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <h2 className="text-xl font-bold text-black dark:text-white mb-2" data-testid="text-no-affiliate">Not an Affiliate Yet</h2>
             <p className="text-muted-foreground mb-6">
               Your account doesn't have affiliate access. If you recently applied, your application may still be under review.
             </p>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-[var(--content-density-gap,1rem)]">
               <Link href="/affiliate/join">
                 <Button className="w-full" data-testid="button-apply">Apply to Program</Button>
               </Link>
@@ -7181,7 +7181,7 @@ function StandaloneAffiliateDashboard() {
     })
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-[var(--content-density-gap,1rem)]">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold flex items-center gap-2" data-testid="text-analytics-title">
             <BarChart3 className="h-5 w-5" />
@@ -7376,7 +7376,7 @@ function StandaloneAffiliateDashboard() {
           </CardContent>
         </Card>
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-[var(--content-density-gap,1rem)] lg:grid-cols-2">
           <Card data-testid="card-performance-benchmarks">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -7386,7 +7386,7 @@ function StandaloneAffiliateDashboard() {
               <CardDescription>How you compare to the program average</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 <div className="text-center py-3">
                   <div className="relative inline-flex items-center justify-center">
                     <svg viewBox="0 0 100 100" className="w-28 h-28">
@@ -7407,7 +7407,7 @@ function StandaloneAffiliateDashboard() {
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                   <div className="p-3 rounded-md bg-muted/50 text-center">
                     <p className="text-xs text-muted-foreground">Your Earnings</p>
                     <p className="text-sm font-bold" data-testid="text-your-earnings">${(bm.yourEarnings / 100).toFixed(2)}</p>
@@ -7439,7 +7439,7 @@ function StandaloneAffiliateDashboard() {
             </CardHeader>
             <CardContent>
               {sources.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-sources">No source data available yet. Use source tags on your links to track performance.</p>
+                <p className="text-sm text-muted-foreground text-center py-[var(--card-padding,1.25rem)]" data-testid="text-no-sources">No source data available yet. Use source tags on your links to track performance.</p>
               ) : (
                 <div className="space-y-3">
                   {sources.map((s, i) => (
@@ -7466,7 +7466,7 @@ function StandaloneAffiliateDashboard() {
         </div>
 
         {chartLoading && (
-          <div className="flex items-center justify-center py-4">
+          <div className="flex items-center justify-center py-[var(--card-padding,1.25rem)]">
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mr-2" />
             <span className="text-sm text-muted-foreground">Updating charts...</span>
           </div>
@@ -7515,8 +7515,8 @@ function StandaloneAffiliateDashboard() {
     <div className="min-h-screen bg-background" data-testid="page-affiliate-dashboard">
       <SafeZone name="header">
         <header className="border-b bg-muted/30 sticky top-0 z-30">
-          <div className="flex items-center justify-between h-14 px-4 md:px-6">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between h-14 px-[var(--card-padding,1.25rem)] md:px-[var(--card-padding,1.25rem)]">
+            <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
               <button
                 className="lg:hidden p-1"
                 onClick={() => setMobileNavOpen(!mobileNavOpen)}
@@ -7595,7 +7595,7 @@ function StandaloneAffiliateDashboard() {
           <div className="fixed inset-0 bg-black/30 z-10 lg:hidden" onClick={() => setMobileNavOpen(false)} />
         )}
 
-        <main className="flex-1 min-w-0 p-4 md:p-6 lg:p-8 max-w-4xl">
+        <main className="flex-1 min-w-0 p-[var(--card-padding,1.25rem)] md:p-[var(--card-padding,1.25rem)] lg:p-8 max-w-4xl">
           {renderSection()}
         </main>
       </div>
@@ -7603,8 +7603,8 @@ function StandaloneAffiliateDashboard() {
       {showTour && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40" data-testid="tour-overlay">
           <Card className="relative z-[101] w-full max-w-md mx-4 shadow-2xl border bg-[var(--card-bg)]">
-            <CardContent className="pt-6 pb-4">
-              <div className="text-center space-y-4">
+            <CardContent className="pt-6 pb-[var(--card-padding,1.25rem)]">
+              <div className="text-center space-y-[var(--content-density-gap,1rem)]">
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                   {(() => {
                     const StepIcon = TOUR_STEPS[tourStep].icon

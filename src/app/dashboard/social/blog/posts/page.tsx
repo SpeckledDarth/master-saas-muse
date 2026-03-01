@@ -160,9 +160,9 @@ export default function BlogPostsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-3">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <Link href="/dashboard/social/blog">
             <Button variant="ghost" size="icon" data-testid="button-back-blog-posts">
               <ArrowLeft className="h-4 w-4" />
@@ -184,7 +184,7 @@ export default function BlogPostsPage() {
         </Link>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-[var(--content-density-gap,1rem)]">
         <div className="flex gap-2 flex-wrap">
           {STATUS_TABS.map(tab => (
             <Button
@@ -231,8 +231,8 @@ export default function BlogPostsPage() {
         <div className="space-y-3">
           {filteredPosts.map(post => (
             <Card key={post.id} className="hover-elevate" data-testid={`card-blog-post-${post.id}`}>
-              <CardContent className="py-4">
-                <div className="flex flex-row items-start justify-between gap-3">
+              <CardContent className="py-[var(--card-padding,1.25rem)]">
+                <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)]">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       {getStatusIcon(post.status)}

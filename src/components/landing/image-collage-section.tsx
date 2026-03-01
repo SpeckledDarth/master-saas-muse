@@ -15,7 +15,7 @@ export function ImageCollageSection({ images, headline, subheadline }: ImageColl
   const displayImages = images.slice(0, 5)
 
   return (
-    <section className="py-16 md:py-24 overflow-hidden" data-testid="section-image-collage">
+    <section className="py-[var(--section-spacing,3.5rem)] md:py-24 overflow-hidden" data-testid="section-image-collage">
       <style>{`
         .collage-card {
           --rotation: 0deg;
@@ -34,7 +34,7 @@ export function ImageCollageSection({ images, headline, subheadline }: ImageColl
           transform: scale(1.05);
         }
       `}</style>
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
         {(headline || subheadline) && (
           <div className="text-center mb-12">
             {headline && <h2 className="text-2xl md:text-3xl font-bold mb-3">{headline}</h2>}
@@ -48,7 +48,7 @@ export function ImageCollageSection({ images, headline, subheadline }: ImageColl
             return (
               <div
                 key={i}
-                className="collage-card relative w-40 h-52 md:w-52 md:h-64 lg:w-60 lg:h-72 rounded-xl overflow-hidden shadow-lg cursor-pointer flex-shrink-0"
+                className="collage-card relative w-40 h-52 md:w-52 md:h-64 lg:w-60 lg:h-72 rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-[var(--card-shadow)] cursor-pointer flex-shrink-0"
                 style={{
                   '--rotation': `${rotation}deg`,
                   zIndex,

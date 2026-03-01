@@ -44,7 +44,7 @@ export default function ResetPasswordPage() {
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleResetPassword}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             {message && (
               <div
                 className={`p-3 rounded-md text-sm ${
@@ -70,7 +70,7 @@ export default function ResetPasswordPage() {
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-4">
+          <CardFooter className="flex flex-col gap-[var(--content-density-gap,1rem)]">
             <Button 
               type="submit" 
               className="w-full" 

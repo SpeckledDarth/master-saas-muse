@@ -103,7 +103,7 @@ export function WeeklyChallengesPanel() {
 
   if (challenges.length === 0) return (
     <div data-testid="challenges-empty" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
-      <p className="text-sm text-muted-foreground py-4">No active challenges right now. Check back soon!</p>
+      <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">No active challenges right now. Check back soon!</p>
     </div>
   );
 
@@ -116,7 +116,7 @@ export function WeeklyChallengesPanel() {
         </div>
         <div className="space-y-3">
           {challenges.map(ch => (
-            <div key={ch.id} className="p-3 rounded-md border" data-testid={`challenge-${ch.id}`}>
+            <div key={ch.id} className="p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`challenge-${ch.id}`}>
               <div className="flex items-center justify-between mb-1">
                 <span className="font-medium text-sm">{String(ch.name ?? '')}</span>
                 <div className="flex items-center gap-2">
@@ -131,7 +131,7 @@ export function WeeklyChallengesPanel() {
                 </div>
               </div>
               {ch.description && <p className="text-xs text-muted-foreground mb-2">{String(ch.description)}</p>}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                 <div className="flex-1">
                   <div className="h-2 bg-muted rounded-full overflow-hidden" role="progressbar" aria-valuenow={Math.min(100, ch.progress_pct)} aria-valuemin={0} aria-valuemax={100} aria-label={`${ch.name} progress: ${ch.progress_count} of ${ch.target_count}`}>
                     <div
@@ -209,7 +209,7 @@ export function CaseStudyLibrary() {
 
   if (studies.length === 0) return (
     <div data-testid="case-studies-empty" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
-      <p className="text-sm text-muted-foreground py-4">No success stories available yet.</p>
+      <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">No success stories available yet.</p>
     </div>
   );
 
@@ -219,7 +219,7 @@ export function CaseStudyLibrary() {
         <h3 className="font-semibold text-sm mb-3">Success Stories</h3>
         <div className="space-y-3">
           {studies.map(study => (
-            <div key={study.id} className="rounded-md border overflow-hidden" data-testid={`case-study-${study.id}`}>
+            <div key={study.id} className="rounded-[var(--card-radius,0.75rem)] border overflow-hidden" data-testid={`case-study-${study.id}`}>
               <div className="p-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
@@ -336,7 +336,7 @@ export function PromotionQuizPanel() {
         Take a short quiz about your content style and audience. Our AI will generate a personalized 30-day promotion playbook just for you.
       </p>
       {previousResult && (
-        <div className="p-2 rounded-md bg-muted/50 mb-3">
+        <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/50 mb-3">
           <p className="text-[10px] text-muted-foreground">You completed this quiz on {new Date(previousResult.completed_at || previousResult.date).toLocaleDateString()}.</p>
         </div>
       )}
@@ -350,7 +350,7 @@ export function PromotionQuizPanel() {
   );
 
   if (step === 'loading') return (
-    <div data-testid="quiz-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center py-8">
+    <div data-testid="quiz-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center py-[var(--section-spacing,3.5rem)]">
       <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-3" role="status" aria-label="Generating playbook" />
       <p className="text-sm font-medium">Generating your playbook...</p>
       <p className="text-xs text-muted-foreground mt-1">Our AI is analyzing your profile and building a custom plan.</p>
@@ -484,7 +484,7 @@ export function AudienceAnalyzerPanel() {
   );
 
   if (loading) return (
-    <div data-testid="audience-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center py-8">
+    <div data-testid="audience-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center py-[var(--section-spacing,3.5rem)]">
       <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-3" role="status" aria-label="Analyzing audience" />
       <p className="text-sm font-medium">Analyzing your audience...</p>
       <p className="text-xs text-muted-foreground mt-1">Crunching click data, conversions, and platform metrics.</p>
@@ -507,13 +507,13 @@ export function AudienceAnalyzerPanel() {
         </div>
 
         {insights.ai_persona && (
-          <div className="p-3 rounded-md bg-muted/30 border mb-3" data-testid="text-ai-persona">
+          <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/30 border mb-3" data-testid="text-ai-persona">
             <p className="text-[10px] font-medium text-muted-foreground mb-1">AI Audience Persona</p>
             <p className="text-xs leading-relaxed whitespace-pre-wrap">{insights.ai_persona}</p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
           {insights.top_sources && insights.top_sources.length > 0 && (
             <div data-testid="audience-top-sources" role="list" aria-label="Top traffic sources">
               <p className="text-[10px] font-medium text-muted-foreground mb-1.5">Top Traffic Sources</p>

@@ -172,7 +172,7 @@ export function SocialSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="p-[var(--card-padding,1.25rem)]">
         <Link href="/dashboard/social/overview" className="flex items-center gap-2" data-testid="link-social-home">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <Sparkles className="h-4 w-4" />
@@ -211,7 +211,7 @@ export function SocialSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter className="p-4 space-y-2">
+      <SidebarFooter className="p-[var(--card-padding,1.25rem)] space-y-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild data-testid="nav-back-dashboard">

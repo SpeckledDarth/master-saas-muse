@@ -67,7 +67,7 @@ export default function PartnersPage() {
       <meta property="og:url" content="/partners" />
       <link rel="canonical" href="/partners" />
 
-      <div className="max-w-5xl mx-auto px-4 py-12">
+      <div className="max-w-5xl mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2" data-testid="text-directory-title">Our Partners</h1>
           <p className="text-muted-foreground" data-testid="text-directory-subtitle">
@@ -83,7 +83,7 @@ export default function PartnersPage() {
             onChange={e => setSearch(e.target.value)}
             placeholder="Search partners..."
             aria-label="Search partners"
-            className="min-w-0 w-full sm:min-w-[200px] text-sm border rounded-lg px-4 py-2 bg-background"
+            className="min-w-0 w-full sm:min-w-[200px] text-sm border rounded-[var(--card-radius,0.75rem)] px-[var(--card-padding,1.25rem)] py-2 bg-background"
             data-testid="input-directory-search"
           />
           {tiers.length > 0 && (
@@ -91,7 +91,7 @@ export default function PartnersPage() {
               value={tierFilter}
               onChange={e => setTierFilter(e.target.value)}
               aria-label="Filter by tier"
-              className="text-sm border rounded-lg px-3 py-2 bg-background"
+              className="text-sm border rounded-[var(--card-radius,0.75rem)] px-3 py-2 bg-background"
               data-testid="select-directory-tier"
             >
               <option value="all">All Tiers</option>
@@ -101,9 +101,9 @@ export default function PartnersPage() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="animate-pulse rounded-lg border p-5">
+              <div key={i} className="animate-pulse rounded-[var(--card-radius,0.75rem)] border p-[var(--card-padding,1.25rem)]">
                 <div className="h-12 w-12 bg-muted rounded-full mb-3" />
                 <div className="h-4 bg-muted rounded w-2/3 mb-2" />
                 <div className="h-3 bg-muted rounded w-full" />
@@ -111,18 +111,18 @@ export default function PartnersPage() {
             ))}
           </div>
         ) : affiliates.length === 0 ? (
-          <div className="text-center py-16" data-testid="text-no-partners">
+          <div className="text-center py-[var(--section-spacing,3.5rem)]" data-testid="text-no-partners">
             <p className="text-lg text-muted-foreground">No partners found.</p>
             <p className="text-sm text-muted-foreground mt-1">
               {search || tierFilter !== 'all' ? 'Try adjusting your search.' : 'Check back soon!'}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label="Partner directory">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]" role="list" aria-label="Partner directory">
             {affiliates.map(aff => (
               <div key={aff.id} role="listitem" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] hover:shadow-[var(--card-shadow)] transition-shadow" data-testid={`partner-card-${aff.id}`}>
                 <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
                       {(aff.display_name || '?')[0].toUpperCase()}
                     </div>

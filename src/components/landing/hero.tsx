@@ -42,14 +42,14 @@ export function Hero() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20" />
       )}
 
-      <div className="relative z-10 container mx-auto px-4 text-center">
+      <div className="relative z-10 container mx-auto px-[var(--card-padding,1.25rem)] text-center">
         <h1 className={`text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-6 ${heroImageUrl ? 'text-white' : ''}`}>
           <AppName />
         </h1>
         <p className={`text-lg md:text-xl max-w-2xl mx-auto mb-10 ${heroImageUrl ? 'text-white/90' : 'text-muted-foreground'}`}>
           <AppTagline />
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-[var(--content-density-gap,1rem)]">
           <Button size="lg" asChild data-testid="button-hero-cta">
             <Link href="/signup">
               Get Started Free

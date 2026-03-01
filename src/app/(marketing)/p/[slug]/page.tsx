@@ -27,7 +27,7 @@ export default function CustomPage() {
 
   if (!page) {
     return (
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Page Not Found</h1>
           <p className="text-muted-foreground mb-8">
@@ -55,7 +55,7 @@ export default function CustomPage() {
         testId={`custom-${page.slug}`}
       />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
         <div className="max-w-4xl mx-auto space-y-12">
           {hasContent && (
             <Card>
@@ -72,7 +72,7 @@ export default function CustomPage() {
           {hasSections && (
             <div className="space-y-12">
               {page.sections.map((section) => (
-                <section key={section.id} className="space-y-4">
+                <section key={section.id} className="space-y-[var(--content-density-gap,1rem)]">
                   {section.type === 'text' && (
                     <Card>
                       <CardContent className="p-8">
@@ -86,13 +86,13 @@ export default function CustomPage() {
                     </Card>
                   )}
                   {(section.type === 'image-left' || section.type === 'image-right') && (
-                    <div className={`grid md:grid-cols-2 gap-8 items-center ${section.type === 'image-right' ? 'md:flex-row-reverse' : ''}`}>
+                    <div className={`grid md:grid-cols-2 gap-[var(--content-density-gap,1rem)] items-center ${section.type === 'image-right' ? 'md:flex-row-reverse' : ''}`}>
                       {section.imageUrl && (
                         <div className={section.type === 'image-right' ? 'md:order-2' : ''}>
                           <img
                             src={section.imageUrl}
                             alt={section.headline || ''}
-                            className="rounded-lg w-full object-cover"
+                            className="rounded-[var(--card-radius,0.75rem)] w-full object-cover"
                           />
                         </div>
                       )}
@@ -111,10 +111,10 @@ export default function CustomPage() {
                       {section.headline && (
                         <h2 className="text-2xl font-semibold mb-6 text-center">{section.headline}</h2>
                       )}
-                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
                         {section.cards.map((card) => (
                           <Card key={card.id} className="hover-elevate">
-                            <CardContent className="p-6">
+                            <CardContent className="p-[var(--card-padding,1.25rem)]">
                               <h3 className="font-semibold mb-2">{card.title}</h3>
                               <p className="text-sm text-muted-foreground">{card.description}</p>
                             </CardContent>

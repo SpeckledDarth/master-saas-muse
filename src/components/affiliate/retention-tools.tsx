@@ -80,7 +80,7 @@ export function EarningsProjectionsPanel() {
   const maxProjected = Math.max(...(data.monthlyProjections || []).map(m => m.optimistic), 1);
 
   return (
-    <div data-testid="earnings-projections" className="space-y-4">
+    <div data-testid="earnings-projections" className="space-y-[var(--content-density-gap,1rem)]">
       <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">This Month's Pace</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -118,7 +118,7 @@ export function EarningsProjectionsPanel() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-4 mt-3 text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-3 text-[10px] text-muted-foreground">
             <span className="flex items-center gap-1"><span className="w-3 h-2 bg-[hsl(var(--chart-1))] rounded inline-block" /> Projected</span>
             <span className="flex items-center gap-1"><span className="w-3 h-2 bg-[hsl(var(--chart-1)/0.3)] dark:bg-[hsl(var(--chart-1)/0.2)] rounded inline-block" /> Optimistic</span>
           </div>
@@ -272,7 +272,7 @@ export function PayoutHistoryPanel() {
   );
 
   return (
-    <div data-testid="payout-history-panel" className="space-y-4">
+    <div data-testid="payout-history-panel" className="space-y-[var(--content-density-gap,1rem)]">
       <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="font-semibold text-sm">Payout History</h3>
@@ -339,7 +339,7 @@ export function PayoutHistoryPanel() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground text-center py-4">No payouts found for the selected filters.</p>
+          <p className="text-sm text-muted-foreground text-center py-[var(--card-padding,1.25rem)]">No payouts found for the selected filters.</p>
         )}
 
         {data && data.totalPages > 1 && (
@@ -400,7 +400,7 @@ export function TaxCenterPanel() {
   const needs1099 = grossCents >= 60000;
 
   return (
-    <div data-testid="tax-center-panel" className="space-y-4">
+    <div data-testid="tax-center-panel" className="space-y-[var(--content-density-gap,1rem)]">
       <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-sm">Tax Summary</h3>
@@ -429,7 +429,7 @@ export function TaxCenterPanel() {
             <div className="h-16 bg-muted rounded" />
           </div>
         ) : error ? (
-          <div className="text-center py-4">
+          <div className="text-center py-[var(--card-padding,1.25rem)]">
             <p className="text-sm text-muted-foreground">{error}</p>
             <button onClick={() => loadSummary(selectedYear)} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-tax">Retry</button>
           </div>
@@ -447,7 +447,7 @@ export function TaxCenterPanel() {
             </div>
 
             {needs1099 && (
-              <div className="p-3 bg-[hsl(var(--warning)/0.05)] dark:bg-[hsl(var(--warning)/0.1)] rounded-lg border border-[hsl(var(--warning)/0.2)] dark:border-[hsl(var(--warning)/0.3)] mb-3" data-testid="notice-1099">
+              <div className="p-3 bg-[hsl(var(--warning)/0.05)] dark:bg-[hsl(var(--warning)/0.1)] rounded-[var(--card-radius,0.75rem)] border border-[hsl(var(--warning)/0.2)] dark:border-[hsl(var(--warning)/0.3)] mb-3" data-testid="notice-1099">
                 <p className="text-xs font-medium text-[hsl(var(--warning))]">1099-NEC Likely Required</p>
                 <p className="text-[10px] text-[hsl(var(--warning))] mt-0.5">Your {selectedYear} earnings exceed $600. You should receive a 1099-NEC form. Make sure your tax information is up to date.</p>
               </div>
@@ -487,7 +487,7 @@ export function TaxCenterPanel() {
             </div>
           </>
         ) : (
-          <p className="text-sm text-muted-foreground text-center py-4">No earnings data found for {selectedYear}.</p>
+          <p className="text-sm text-muted-foreground text-center py-[var(--card-padding,1.25rem)]">No earnings data found for {selectedYear}.</p>
         )}
       </div>
     </div>
@@ -613,7 +613,7 @@ export function BulkRenewalButton({ expiringReferrals, onSuccess }: { expiringRe
           Renew All ({expiringReferrals.length})
         </button>
       ) : (
-        <div className="p-3 rounded-lg border bg-muted/20 space-y-2">
+        <div className="p-3 rounded-[var(--card-radius,0.75rem)] border bg-muted/20 space-y-2">
           <p className="text-xs font-medium">Bulk Renewal — {expiringReferrals.length} referrals</p>
           <select value={checkInType} onChange={e => setCheckInType(e.target.value as any)} className="text-xs border rounded px-2 py-1 bg-background w-full" data-testid="select-bulk-checkin-type">
             <option value="email">Email Check-in</option>

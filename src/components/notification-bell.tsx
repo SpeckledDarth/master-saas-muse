@@ -100,7 +100,7 @@ export function NotificationBell() {
         </div>
         <div className="max-h-[400px] overflow-y-auto" data-testid="list-notifications">
           {notifications.length === 0 ? (
-            <div className="p-6 text-center text-sm text-muted-foreground" data-testid="text-no-notifications">
+            <div className="p-[var(--card-padding,1.25rem)] text-center text-sm text-muted-foreground" data-testid="text-no-notifications">
               No notifications yet
             </div>
           ) : (
@@ -109,7 +109,7 @@ export function NotificationBell() {
               return (
                 <button
                   key={n.id}
-                  className={`w-full text-left p-3 border-b last:border-b-0 hover-elevate active-elevate-2 flex gap-3 ${!n.read ? 'bg-muted/50' : ''}`}
+                  className={`w-full text-left p-3 border-b last:border-b-0 hover-elevate active-elevate-2 flex gap-[var(--content-density-gap,1rem)] ${!n.read ? 'bg-muted/50' : ''}`}
                   onClick={() => markRead(n.id, n.link)}
                   data-testid={`notification-item-${n.id}`}
                 >

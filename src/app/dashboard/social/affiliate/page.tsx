@@ -165,7 +165,7 @@ export default function AffiliateDashboardPage() {
 
   if (!data || !data.link?.is_affiliate) {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-4" data-testid="affiliate-activate-prompt">
+      <div className="max-w-2xl mx-auto py-12 px-[var(--card-padding,1.25rem)]" data-testid="affiliate-activate-prompt">
         <Card>
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
@@ -176,19 +176,19 @@ export default function AffiliateDashboardPage() {
               Join our affiliate program and earn commissions when people you refer become paying customers.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="text-center p-4 rounded-lg border">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+            <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-3">
+              <div className="text-center p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border">
                 <Share2 className="h-6 w-6 mx-auto mb-2 text-primary" />
                 <p className="font-medium text-sm">Share Your Link</p>
                 <p className="text-xs text-muted-foreground mt-1">Get a unique referral link to share</p>
               </div>
-              <div className="text-center p-4 rounded-lg border">
+              <div className="text-center p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border">
                 <Users className="h-6 w-6 mx-auto mb-2 text-primary" />
                 <p className="font-medium text-sm">Friends Sign Up</p>
                 <p className="text-xs text-muted-foreground mt-1">When they subscribe, you earn</p>
               </div>
-              <div className="text-center p-4 rounded-lg border">
+              <div className="text-center p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border">
                 <DollarSign className="h-6 w-6 mx-auto mb-2 text-primary" />
                 <p className="font-medium text-sm">Get Paid</p>
                 <p className="text-xs text-muted-foreground mt-1">Recurring commissions on every payment</p>
@@ -211,15 +211,15 @@ export default function AffiliateDashboardPage() {
     : 100
 
   return (
-    <div className="space-y-6 max-w-5xl" data-testid="page-affiliate-dashboard">
+    <div className="space-y-[var(--content-density-gap,1rem)] max-w-5xl" data-testid="page-affiliate-dashboard">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-affiliate-heading">Affiliate Dashboard</h1>
         <p className="text-sm text-muted-foreground">Track your referrals, earnings, and access marketing materials.</p>
       </div>
 
       <Card data-testid="card-share-link">
-        <CardContent className="pt-5 pb-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+        <CardContent className="pt-5 pb-[var(--card-padding,1.25rem)]">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-[var(--content-density-gap,1rem)]">
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium mb-1">Your Referral Link</p>
               <div className="flex items-center gap-2">
@@ -248,7 +248,7 @@ export default function AffiliateDashboardPage() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-2 lg:grid-cols-4">
         <Card data-testid="stat-clicks">
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2">
@@ -290,7 +290,7 @@ export default function AffiliateDashboardPage() {
 
       {data.tier.current && (
         <Card data-testid="card-tier-progress">
-          <CardContent className="pt-5 pb-4">
+          <CardContent className="pt-5 pb-[var(--card-padding,1.25rem)]">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Award className="h-4 w-4 text-primary" />
@@ -332,8 +332,8 @@ export default function AffiliateDashboardPage() {
               ) : (
                 <div className="space-y-2">
                   {data.referrals.map(ref => (
-                    <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`referral-${ref.id}`}>
-                      <div className="flex items-center gap-3">
+                    <div key={ref.id} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`referral-${ref.id}`}>
+                      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                         <Badge variant={STATUS_COLORS[ref.status] as any || 'outline'} className="text-xs capitalize">
                           {ref.status.replace('_', ' ')}
                         </Badge>
@@ -360,8 +360,8 @@ export default function AffiliateDashboardPage() {
               ) : (
                 <div className="space-y-2">
                   {data.commissions.map(com => (
-                    <div key={com.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`commission-${com.id}`}>
-                      <div className="flex items-center gap-3">
+                    <div key={com.id} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`commission-${com.id}`}>
+                      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                         <Badge variant={STATUS_COLORS[com.status] as any || 'outline'} className="text-xs capitalize">
                           {com.status}
                         </Badge>
@@ -379,7 +379,7 @@ export default function AffiliateDashboardPage() {
                   ))}
                 </div>
               )}
-              <div className="mt-4 p-3 rounded-md bg-muted/50 text-xs text-muted-foreground" data-testid="text-earnings-breakdown">
+              <div className="mt-4 p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-xs text-muted-foreground" data-testid="text-earnings-breakdown">
                 <div className="flex justify-between">
                   <span>Pending</span>
                   <span>${(data.stats.pendingEarnings / 100).toFixed(2)}</span>
@@ -412,8 +412,8 @@ export default function AffiliateDashboardPage() {
               ) : (
                 <div className="space-y-2">
                   {data.payouts.map(payout => (
-                    <div key={payout.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`payout-${payout.id}`}>
-                      <div className="flex items-center gap-3">
+                    <div key={payout.id} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`payout-${payout.id}`}>
+                      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                         <Badge variant={STATUS_COLORS[payout.status] as any || 'outline'} className="text-xs capitalize">
                           {payout.status}
                         </Badge>
@@ -448,9 +448,9 @@ export default function AffiliateDashboardPage() {
                   {assets.map(asset => {
                     const Icon = ASSET_TYPE_ICONS[asset.asset_type] || FileText
                     return (
-                      <div key={asset.id} className="p-4 rounded-md border" data-testid={`asset-${asset.id}`}>
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-start gap-3">
+                      <div key={asset.id} className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border" data-testid={`asset-${asset.id}`}>
+                        <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
+                          <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
                             <Icon className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
                             <div>
                               <p className="font-medium text-sm">{asset.title}</p>

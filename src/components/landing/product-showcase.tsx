@@ -23,8 +23,8 @@ export function ProductShowcase({ settings, className = '' }: ProductShowcasePro
   if (!settings.screenshotUrl) return null
 
   return (
-    <section className={`py-16 md:py-24 ${className}`} data-testid="section-product-showcase">
-      <div className="container mx-auto px-4">
+    <section className={`py-[var(--section-spacing,3.5rem)] md:py-24 ${className}`} data-testid="section-product-showcase">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" data-testid="text-showcase-headline">
           {settings.headline}
         </h2>
@@ -54,7 +54,7 @@ export function ProductShowcase({ settings, className = '' }: ProductShowcasePro
           )}
 
           <div className="relative">
-            <div className="relative rounded-lg overflow-hidden shadow-2xl border border-border/50">
+            <div className="relative rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-2xl border border-border/50">
               <div className="relative aspect-[16/10]">
                 <Image
                   src={settings.screenshotUrl}

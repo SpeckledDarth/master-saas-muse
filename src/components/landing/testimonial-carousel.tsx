@@ -51,13 +51,13 @@ export function TestimonialCarousel({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
         <h2 className="text-3xl font-bold text-center mb-12">
           {headline}
         </h2>
         
         <div className="max-w-4xl mx-auto relative">
-          <div className="bg-white/[0.09] rounded-xl p-8 md:p-12 shadow-sm border text-foreground relative overflow-hidden">
+          <div className="bg-white/[0.09] rounded-[var(--card-radius,0.75rem)] p-8 md:p-12 shadow-[var(--card-shadow)] border text-foreground relative overflow-hidden">
             <Quote className="absolute top-6 left-6 h-12 w-12 text-primary-200 dark:text-primary-800" />
             
             <div className="relative z-10 text-center">
@@ -65,7 +65,7 @@ export function TestimonialCarousel({
                 &quot;{current.quote}&quot;
               </p>
               
-              <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-col items-center gap-[var(--content-density-gap,1rem)]">
                 <Avatar className="h-16 w-16">
                   {current.avatarUrl && <AvatarImage src={current.avatarUrl} alt={current.name} />}
                   <AvatarFallback className="bg-primary-100 text-primary-800 dark:bg-primary-800 dark:text-primary-200 text-lg font-medium">
@@ -96,7 +96,7 @@ export function TestimonialCarousel({
               <Button
                 size="icon"
                 variant="outline"
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 rounded-full shadow-md"
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 rounded-full shadow-[var(--card-shadow)]"
                 onClick={goToPrev}
                 data-testid="button-testimonial-prev"
               >
@@ -106,7 +106,7 @@ export function TestimonialCarousel({
               <Button
                 size="icon"
                 variant="outline"
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 rounded-full shadow-md"
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 rounded-full shadow-[var(--card-shadow)]"
                 onClick={goToNext}
                 data-testid="button-testimonial-next"
               >

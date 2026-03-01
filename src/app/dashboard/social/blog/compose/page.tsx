@@ -39,7 +39,7 @@ function SeoPreview({ title, description, slug }: { title: string; description: 
             {displayDesc.length > 160 ? displayDesc.slice(0, 160) + '...' : displayDesc}
           </p>
         </div>
-        <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-3 text-xs text-muted-foreground">
           <span data-testid="text-title-length">Title: {title.length}/60</span>
           <span data-testid="text-desc-length">Description: {description.length}/160</span>
         </div>
@@ -218,9 +218,9 @@ function BlogComposePage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-row items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-3">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex flex-row items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <Link href="/dashboard/social/blog">
             <Button variant="ghost" size="icon" data-testid="button-back-blog">
               <ArrowLeft className="h-4 w-4" />
@@ -246,8 +246,8 @@ function BlogComposePage() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-4">
+      <div className="grid gap-[var(--content-density-gap,1rem)] lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Input
               placeholder="Article title..."
@@ -290,8 +290,8 @@ You can use Markdown formatting:
           </div>
 
           {showSeoPanel && (
-            <div className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-[var(--content-density-gap,1rem)]">
+              <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="seo-title">SEO Title</Label>
                   <Input
@@ -333,7 +333,7 @@ You can use Markdown formatting:
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <Card data-testid="card-publish-settings">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm">Publish To</CardTitle>
@@ -341,11 +341,11 @@ You can use Markdown formatting:
             </CardHeader>
             <CardContent className="space-y-3">
               {loadingConnections ? (
-                <div className="flex items-center justify-center py-4">
+                <div className="flex items-center justify-center py-[var(--card-padding,1.25rem)]">
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
               ) : connections.length === 0 ? (
-                <div className="text-center py-4">
+                <div className="text-center py-[var(--card-padding,1.25rem)]">
                   <p className="text-sm text-muted-foreground mb-2">No platforms connected yet</p>
                   <Link href="/dashboard/social/blog">
                     <Button variant="outline" size="sm" data-testid="button-connect-platforms">Connect Platforms</Button>
@@ -358,7 +358,7 @@ You can use Markdown formatting:
                   return (
                     <div
                       key={conn.id}
-                      className={`flex items-center justify-between rounded-lg border p-3 cursor-pointer transition-colors ${isSelected ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'}`}
+                      className={`flex items-center justify-between rounded-[var(--card-radius,0.75rem)] border p-3 cursor-pointer transition-colors ${isSelected ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'}`}
                       onClick={() => togglePlatform(conn.platform)}
                       data-testid={`toggle-platform-${conn.platform}`}
                     >
@@ -382,7 +382,7 @@ You can use Markdown formatting:
             <CardHeader className="pb-3">
               <CardTitle className="text-sm">Article Settings</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label htmlFor="cover-image">Cover Image URL</Label>
                 <Input

@@ -60,7 +60,7 @@ export function EarningsGoalSetter() {
     setSaving(false);
   };
 
-  if (loading) return <div data-testid="goal-loading" className="animate-pulse h-32 bg-muted rounded-lg" />;
+  if (loading) return <div data-testid="goal-loading" className="animate-pulse h-32 bg-muted rounded-[var(--card-radius,0.75rem)]" />;
 
   return (
     <div data-testid="earnings-goal-card" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
@@ -198,9 +198,9 @@ export function ReferralOfMonth() {
   if (!spotlight) return null;
 
   return (
-    <div data-testid="spotlight-card" className="rounded-lg border bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-4">
+    <div data-testid="spotlight-card" className="rounded-[var(--card-radius,0.75rem)] border bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">⭐ Partner of the Month — {spotlight.month}</h3>
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
         {spotlight.affiliate_avatar && (
           <img src={spotlight.affiliate_avatar} alt="" className="w-10 h-10 rounded-full" />
         )}
@@ -229,7 +229,7 @@ export function AffiliateManagerCard() {
   return (
     <div data-testid="affiliate-manager-card" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">👤 Your Affiliate Manager</h3>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
           PP
         </div>

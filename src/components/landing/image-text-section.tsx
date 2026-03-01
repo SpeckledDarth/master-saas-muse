@@ -27,11 +27,11 @@ function SingleBlock({ block, index }: { block: ImageTextBlock; index: number })
   
   return (
     <div 
-      className={`flex flex-col ${isImageLeft ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-8 md:gap-12 lg:gap-16`}
+      className={`flex flex-col ${isImageLeft ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-[var(--content-density-gap,1rem)] md:gap-12 lg:gap-16`}
       data-testid={`image-text-block-${block.id}`}
     >
       <div className="w-full md:w-1/2">
-        <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-lg">
+        <div className="relative aspect-[4/3] rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-[var(--card-shadow)]">
           {block.imageUrl ? (
             <Image
               src={block.imageUrl}
@@ -48,7 +48,7 @@ function SingleBlock({ block, index }: { block: ImageTextBlock; index: number })
         </div>
       </div>
       
-      <div className="w-full md:w-1/2 space-y-4">
+      <div className="w-full md:w-1/2 space-y-[var(--content-density-gap,1rem)]">
         <h3 className="text-2xl md:text-3xl font-bold">
           {block.headline}
         </h3>
@@ -73,8 +73,8 @@ export function ImageTextSection({ blocks, className = '' }: ImageTextSectionPro
   }
 
   return (
-    <section className={`py-16 md:py-24 ${className}`} data-testid="section-image-text">
-      <div className="container mx-auto px-4 space-y-16 md:space-y-24">
+    <section className={`py-[var(--section-spacing,3.5rem)] md:py-24 ${className}`} data-testid="section-image-text">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)] space-y-16 md:space-y-24">
         {blocks.map((block, index) => (
           <SingleBlock key={block.id} block={block} index={index} />
         ))}

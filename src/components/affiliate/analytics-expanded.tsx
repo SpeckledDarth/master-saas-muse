@@ -116,7 +116,7 @@ export function MoMScorecard({ data }: { data: Record<string, { current: number;
   return (
     <div data-testid="mom-scorecard" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📈 Period Scorecard</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         {metrics.map(m => {
           const d = data[m.key];
           if (!d) return null;
@@ -141,7 +141,7 @@ export function PersonalBestCard({ data }: { data: { month: string; amount_cents
   if (!data) return null;
 
   return (
-    <div data-testid="personal-best" className="rounded-lg border bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950/20 dark:to-primary-900/20 p-4">
+    <div data-testid="personal-best" className="rounded-[var(--card-radius,0.75rem)] border bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950/20 dark:to-primary-900/20 p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm">🏆 Personal Best</h3>
       <p className="text-2xl font-bold mt-1">${(data.amount_cents / 100).toFixed(2)}</p>
       <p className="text-xs text-muted-foreground">{data.month} — Can you beat it?</p>
@@ -201,7 +201,7 @@ export function DualAxisChart({ data }: { data: { dailyClicks: Record<string, nu
         <polyline points={convPoints} fill="none" stroke="hsl(var(--chart-2))" strokeWidth="2" />
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
       </svg>
-      <div className="flex items-center gap-4 justify-center text-xs text-muted-foreground mt-1">
+      <div className="flex items-center gap-[var(--content-density-gap,1rem)] justify-center text-xs text-muted-foreground mt-1">
         <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-[hsl(var(--chart-1))] inline-block" /> Clicks</span>
         <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-[hsl(var(--chart-2))] inline-block" /> Conversions</span>
       </div>
@@ -256,11 +256,11 @@ export function ExpandedAnalyticsSection() {
       .catch(() => setLoading(false));
   }, [period]);
 
-  if (loading) return <div className="animate-pulse space-y-4">{[1, 2, 3].map(i => <div key={i} className="h-32 bg-muted rounded-lg" />)}</div>;
+  if (loading) return <div className="animate-pulse space-y-[var(--content-density-gap,1rem)]">{[1, 2, 3].map(i => <div key={i} className="h-32 bg-muted rounded-[var(--card-radius,0.75rem)]" />)}</div>;
   if (!data) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Expanded Analytics</h2>
         <div className="flex gap-1">
@@ -272,7 +272,7 @@ export function ExpandedAnalyticsSection() {
         </div>
       </div>
       <MoMScorecard data={data.scorecard} />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <PersonalBestCard data={data.personalBest} />
         <EfficiencyMetrics data={data.efficiency} />
       </div>

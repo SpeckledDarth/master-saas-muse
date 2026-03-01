@@ -28,7 +28,7 @@ function SuccessContent() {
           Thank you for your subscription. Your account has been upgraded.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-[var(--content-density-gap,1rem)]">
         <p className="text-sm text-muted-foreground">
           You will receive a confirmation email shortly with your subscription details.
         </p>
@@ -47,10 +47,10 @@ function SuccessContent() {
 
 export default function CheckoutSuccessPage() {
   return (
-    <div className="container mx-auto px-4 py-16 flex items-center justify-center min-h-[60vh]">
+    <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)] flex items-center justify-center min-h-[60vh]">
       <Suspense fallback={
         <Card className="max-w-md w-full text-center">
-          <CardContent className="flex items-center justify-center py-8">
+          <CardContent className="flex items-center justify-center py-[var(--section-spacing,3.5rem)]">
             <Loader2 className="h-8 w-8 animate-spin" />
           </CardContent>
         </Card>

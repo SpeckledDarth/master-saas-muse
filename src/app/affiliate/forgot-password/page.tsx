@@ -58,7 +58,7 @@ export default function AffiliateForgotPasswordPage() {
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleResetPassword}>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               {message && (
                 <div
                   className={`p-3 rounded-md text-sm ${

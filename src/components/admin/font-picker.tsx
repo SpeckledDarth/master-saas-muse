@@ -103,8 +103,8 @@ export function FontPicker({
           Choose fonts for headings and body text with live preview
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-2 gap-6">
+      <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+        <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label>Heading Font</Label>
             <Select value={headingFont || 'system'} onValueChange={v => { if (v !== 'system') loadGoogleFont(v); onHeadingFontChange(v) }}>
@@ -154,7 +154,7 @@ export function FontPicker({
           <Label>Gradient headings (uses primary to accent color)</Label>
         </div>
 
-        <div className="p-5 rounded-md border space-y-3">
+        <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border space-y-3">
           <p className="text-xs text-muted-foreground mb-3">Preview</p>
           <h1 className="text-2xl font-bold" style={headingStyle as React.CSSProperties} data-testid="text-heading-preview">
             The quick brown fox jumps

@@ -341,7 +341,7 @@ function NewsletterPreview({ shades, isDark }: { shades: Record<string, string>;
           <div
             key={item.name}
             className={cn(
-              "flex items-center gap-[var(--content-density-gap,1rem)] rounded-xl border-2 p-[var(--card-padding,1.25rem)] cursor-pointer hover-elevate active-elevate-2",
+              "flex items-center gap-[var(--content-density-gap,1rem)] rounded-[var(--card-radius,0.75rem)] border-2 p-[var(--card-padding,1.25rem)] cursor-pointer hover-elevate active-elevate-2",
               item.active ? 'border-current' : 'border-border'
             )}
             style={item.active ? { borderColor: activeBorderColor } : undefined}
@@ -382,7 +382,7 @@ function SchedulePreview({ shades, isDark }: { shades: Record<string, string>; i
         {events.map(e => (
           <div
             key={e.time}
-            className="flex gap-[var(--content-density-gap,1rem)] rounded-xl p-[var(--card-padding,1.25rem)] cursor-pointer hover-elevate active-elevate-2"
+            className="flex gap-[var(--content-density-gap,1rem)] rounded-[var(--card-radius,0.75rem)] p-[var(--card-padding,1.25rem)] cursor-pointer hover-elevate active-elevate-2"
             style={{ backgroundColor: shades[e.shade] }}
           >
             <div className="shrink-0 text-center">
@@ -494,7 +494,7 @@ function PricingPreview() {
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
           {plans.map(plan => (
-            <div key={plan.name} className={cn('rounded-xl border-2 p-5 space-y-[var(--content-density-gap,1rem)] cursor-pointer hover-elevate active-elevate-2', plan.featured ? 'border-primary-600 dark:border-primary-400' : 'border-border')}>
+            <div key={plan.name} className={cn('rounded-[var(--card-radius,0.75rem)] border-2 p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)] cursor-pointer hover-elevate active-elevate-2', plan.featured ? 'border-primary-600 dark:border-primary-400' : 'border-border')}>
               <div>
                 <p className="text-[30px] font-semibold leading-tight">{plan.name}</p>
                 <p className="text-[15px] text-muted-foreground mt-1">{plan.desc}</p>
@@ -543,7 +543,7 @@ function TicketsPreview({ shades, isDark }: { shades: Record<string, string>; is
       </CardHeader>
       <CardContent className="space-y-3">
         {tickets.map(t => (
-          <div key={t.name} className="flex items-center gap-[var(--content-density-gap,1rem)] rounded-xl p-2 cursor-pointer hover-elevate active-elevate-2">
+          <div key={t.name} className="flex items-center gap-[var(--content-density-gap,1rem)] rounded-[var(--card-radius,0.75rem)] p-2 cursor-pointer hover-elevate active-elevate-2">
             <Avatar className="h-9 w-9">
               <AvatarFallback
                 className="text-xs"
@@ -576,8 +576,8 @@ function ContinueWatchingPreview() {
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
           {courses.map(c => (
-            <div key={c.title} className="space-y-2 cursor-pointer hover-elevate active-elevate-2 rounded-xl p-1">
-              <div className="group relative aspect-[16/10] rounded-xl overflow-hidden">
+            <div key={c.title} className="space-y-2 cursor-pointer hover-elevate active-elevate-2 rounded-[var(--card-radius,0.75rem)] p-1">
+              <div className="group relative aspect-[16/10] rounded-[var(--card-radius,0.75rem)] overflow-hidden">
                 <Image src={c.img} alt={c.title} fill className="object-cover" unoptimized />
                 <div className="absolute inset-0 bg-background/30 backdrop-blur-sm flex items-center justify-center invisible group-hover:visible transition-all">
                   <Play className="w-8 h-8 text-foreground" />
@@ -639,7 +639,7 @@ function FeatureCardsPreview({ shades, isDark }: { shades: Record<string, string
       <CardContent className="pt-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
           {features.map(f => (
-            <div key={f.title} className="rounded-xl border p-5 space-y-3 cursor-pointer hover-elevate active-elevate-2">
+            <div key={f.title} className="rounded-[var(--card-radius,0.75rem)] border p-[var(--card-padding,1.25rem)] space-y-3 cursor-pointer hover-elevate active-elevate-2">
               <div className="w-10 h-10 rounded-[var(--card-radius,0.75rem)] flex items-center justify-center" style={{ backgroundColor: shades[bgShades[f.bgIdx]] }}>
                 <f.icon className="w-5 h-5" style={{ color: iconColor }} />
               </div>
@@ -762,7 +762,7 @@ function BookCardPreview({ shades }: { shades: Record<string, string> }) {
           className="absolute inset-0"
           style={{ background: `linear-gradient(to top, ${shades['950']}ee, ${shades['950']}33, transparent)` }}
         />
-        <div className="absolute bottom-0 left-0 right-0 p-5">
+        <div className="absolute bottom-0 left-0 right-0 p-[var(--card-padding,1.25rem)]">
           <Badge variant="secondary" className="mb-2 text-[15px]">MUST CO. OF NIT</Badge>
           <p className="text-[30px] font-bold leading-tight text-white dark:text-black">Design Principles Handbook</p>
           <Button size="sm" variant="outline" className="mt-3" data-testid="button-book-continue">
@@ -1023,7 +1023,7 @@ export default function PalettePage() {
       </div>
 
       <div
-        className="rounded-xl p-[var(--section-spacing,1.5rem)] transition-colors duration-300 bg-background text-foreground"
+        className="rounded-[var(--card-radius,0.75rem)] p-[var(--section-spacing,1.5rem)] transition-colors duration-300 bg-background text-foreground"
         style={cssOverrides as React.CSSProperties}
       >
         <p className="text-[15px] font-medium text-muted-foreground mb-[var(--content-density-gap,1rem)] uppercase tracking-wider">Live Preview</p>

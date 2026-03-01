@@ -55,7 +55,7 @@ export function SocialUpgradeBanner() {
 
   return (
     <div
-      className="sticky top-0 z-50 flex items-center justify-between gap-3 bg-primary-600 dark:bg-primary-400 px-4 py-2"
+      className="sticky top-0 z-50 flex items-center justify-between gap-[var(--content-density-gap,1rem)] bg-primary-600 dark:bg-primary-400 px-[var(--card-padding,1.25rem)] py-2"
       data-testid="banner-upgrade"
     >
       <p className="text-sm text-white dark:text-black">{message}</p>

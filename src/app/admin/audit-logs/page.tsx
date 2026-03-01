@@ -363,7 +363,7 @@ export default function AuditLogsPage() {
   return (
     <Suspense fallback={
       <div className="py-[var(--section-spacing,1.5rem)] px-[var(--section-spacing,1.5rem)]">
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-[var(--section-spacing,3.5rem)]">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </div>

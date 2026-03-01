@@ -71,7 +71,7 @@ export function RelatedRecords({ entityType, entityId, userId }: RelatedRecordsP
   if (groups.length === 0) return null
 
   return (
-    <div className="space-y-4" data-testid="related-records">
+    <div className="space-y-[var(--content-density-gap,1rem)]" data-testid="related-records">
       <h3 className="text-sm font-medium">Related Records</h3>
       {groups.map((group, gi) => (
         <div key={gi} className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] overflow-hidden" data-testid={`related-group-${gi}`}>

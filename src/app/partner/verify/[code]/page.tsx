@@ -47,9 +47,9 @@ export default function VerifyBadgePage({ params }: { params: Promise<{ code: st
 
   if (error || !result) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="min-h-screen flex items-center justify-center bg-background p-[var(--card-padding,1.25rem)]">
         <Card className="w-full max-w-md">
-          <CardContent className="pt-6 text-center space-y-4">
+          <CardContent className="pt-6 text-center space-y-[var(--content-density-gap,1rem)]">
             <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
               <ShieldX className="h-8 w-8 text-destructive" />
             </div>
@@ -69,7 +69,7 @@ export default function VerifyBadgePage({ params }: { params: Promise<{ code: st
   const badgeLabel = BADGE_LABELS[result.badge_type] || result.badge_type.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4" data-testid="page-badge-verify">
+    <div className="min-h-screen flex items-center justify-center bg-background p-[var(--card-padding,1.25rem)]" data-testid="page-badge-verify">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="w-16 h-16 rounded-full bg-[hsl(var(--success)/0.1)] flex items-center justify-center mx-auto mb-2">
@@ -77,22 +77,22 @@ export default function VerifyBadgePage({ params }: { params: Promise<{ code: st
           </div>
           <CardTitle className="text-xl" data-testid="text-verify-valid">Verified Badge</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4 text-center">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)] text-center">
           <div className="flex items-center justify-center gap-2">
             <Award className="h-5 w-5 text-primary" />
             <Badge variant="secondary" className="text-sm" data-testid="badge-type-display">{badgeLabel}</Badge>
           </div>
 
           <div className="space-y-2 text-sm">
-            <div className="flex items-center justify-between px-4 py-2 rounded-md bg-muted/50">
+            <div className="flex items-center justify-between px-[var(--card-padding,1.25rem)] py-2 rounded-[var(--card-radius,0.75rem)] bg-muted/50">
               <span className="text-muted-foreground">Partner</span>
               <span className="font-medium" data-testid="text-affiliate-name">{result.affiliate_name}</span>
             </div>
-            <div className="flex items-center justify-between px-4 py-2 rounded-md bg-muted/50">
+            <div className="flex items-center justify-between px-[var(--card-padding,1.25rem)] py-2 rounded-[var(--card-radius,0.75rem)] bg-muted/50">
               <span className="text-muted-foreground">Earnings Threshold</span>
               <span className="font-medium" data-testid="text-threshold">${(result.threshold_cents / 100).toLocaleString()}</span>
             </div>
-            <div className="flex items-center justify-between px-4 py-2 rounded-md bg-muted/50">
+            <div className="flex items-center justify-between px-[var(--card-padding,1.25rem)] py-2 rounded-[var(--card-radius,0.75rem)] bg-muted/50">
               <span className="text-muted-foreground">Awarded</span>
               <span className="font-medium" data-testid="text-awarded-date">{new Date(result.awarded_at).toLocaleDateString()}</span>
             </div>

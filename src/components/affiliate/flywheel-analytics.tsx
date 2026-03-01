@@ -147,7 +147,7 @@ export function NetGrowthCard({ data }: { data: ChurnData['netGrowth'] }) {
     <div data-testid="net-growth" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">📊 Net Referral Growth</h3>
       <p className={`text-3xl font-bold ${color}`}>{isPositive ? '+' : ''}{data.net}</p>
-      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+      <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-2 text-xs text-muted-foreground">
         <span className="text-[hsl(var(--success))]">+{data.new} new</span>
         <span className="text-[hsl(var(--danger))]">-{data.churned} churned</span>
         <span>{trendIcon} vs prev period ({data.previousNet >= 0 ? '+' : ''}{data.previousNet})</span>
@@ -247,7 +247,7 @@ export function TrialBenchmarks({ data }: { data: CohortData['benchmark'] }) {
   return (
     <div data-testid="trial-benchmarks" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">🎯 Trial-to-Paid Benchmark</h3>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <div className="text-center p-3 bg-muted/30 rounded">
           <p className="text-xs text-muted-foreground">Your Rate</p>
           <p className={`text-2xl font-bold ${isAbove ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--warning))]'}`}>{data.yourRate}%</p>
@@ -284,7 +284,7 @@ export function RevenuePieChart({ data }: { data: SourcesData['revenueBySource']
   return (
     <div data-testid="revenue-pie" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">🥧 Revenue by Source</h3>
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
         <svg viewBox="0 0 200 200" className="w-32 h-32 flex-shrink-0">
           {slices.map((s, i) => <path key={i} d={s.path} fill={s.color} opacity="0.85" />)}
         </svg>
@@ -473,7 +473,7 @@ export function AIInsightsPanel({ data }: { data: AIAnalyticsData }) {
           const meta = labels[key] || { icon: '💡', title: key.replace(/_/g, ' ') };
           const isExpanded = expanded === key;
           return (
-            <div key={key} data-testid={`ai-insight-${key}`} className="border rounded-lg overflow-hidden">
+            <div key={key} data-testid={`ai-insight-${key}`} className="border rounded-[var(--card-radius,0.75rem)] overflow-hidden">
               <button onClick={() => setExpanded(isExpanded ? null : key)} className="w-full flex items-center justify-between p-3 text-left hover:bg-muted/30 transition-colors">
                 <span className="text-sm font-medium">{meta.icon} {meta.title}</span>
                 <span className="text-xs text-muted-foreground">{isExpanded ? '▲' : '▼'}</span>
@@ -498,7 +498,7 @@ export function BestTimeToPost({ data }: { data: AIAnalyticsData['bestTimeToPost
   const maxDayClicks = Math.max(...dayData.map(d => d.count), 1);
 
   return (
-    <div data-testid="best-time-to-post" className="rounded-lg border bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950/20 dark:to-primary-900/20 p-4">
+    <div data-testid="best-time-to-post" className="rounded-[var(--card-radius,0.75rem)] border bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950/20 dark:to-primary-900/20 p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">⏰ Best Time to Post</h3>
       {data.bestDay && data.bestHour !== null ? (
         <p className="text-lg font-bold">{data.bestDay}s at {data.bestHour}:00</p>
@@ -553,10 +553,10 @@ export function FlywheelAnalyticsSection() {
       .catch(() => setAiLoading(false));
   };
 
-  if (loading) return <div className="animate-pulse space-y-4">{[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-muted rounded-lg" />)}</div>;
+  if (loading) return <div className="animate-pulse space-y-[var(--content-density-gap,1rem)]">{[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-muted rounded-[var(--card-radius,0.75rem)]" />)}</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Flywheel Intelligence</h2>
         <div className="flex gap-1">
@@ -571,11 +571,11 @@ export function FlywheelAnalyticsSection() {
       {churnData && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Churn Intelligence</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <ChurnRateCard data={churnData.churnRate} />
             <NetGrowthCard data={churnData.netGrowth} />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)] mt-4">
             <ChurnReasonsChart reasons={churnData.churnReasons} />
             <ChurnTimingChart timing={churnData.churnTiming} />
           </div>
@@ -589,7 +589,7 @@ export function FlywheelAnalyticsSection() {
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Cohort & Trends</h3>
           <RetentionCurve data={cohortData.retentionCurve} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)] mt-4">
             <ConversionTrendLine data={cohortData.conversionTrend} />
             <TrialBenchmarks data={cohortData.benchmark} />
           </div>
@@ -599,14 +599,14 @@ export function FlywheelAnalyticsSection() {
       {sourcesData && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Revenue & Traffic</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <RevenuePieChart data={sourcesData.revenueBySource} />
             <CumulativeEarningsChart data={sourcesData.cumulativeEarnings} />
           </div>
           <div className="mt-4">
             <DropoffAnalysis data={sourcesData.dropoff} />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)] mt-4">
             <GeoBreakdown data={sourcesData.geo} />
             <DeviceBreakdown data={sourcesData.devices} />
           </div>
@@ -619,13 +619,13 @@ export function FlywheelAnalyticsSection() {
       <div>
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">AI Intelligence</h3>
         {!aiData && !aiLoading && (
-          <button data-testid="load-ai-insights" onClick={loadAIInsights} className="w-full p-4 rounded-lg border border-dashed hover:bg-muted/30 transition-colors text-center">
+          <button data-testid="load-ai-insights" onClick={loadAIInsights} className="w-full p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border border-dashed hover:bg-muted/30 transition-colors text-center">
             <p className="text-sm font-medium">🤖 Generate AI Insights</p>
             <p className="text-xs text-muted-foreground mt-1">AI analyzes your real data to provide personalized recommendations</p>
           </button>
         )}
         {aiLoading && (
-          <div className="p-4 rounded-lg border text-center animate-pulse">
+          <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border text-center animate-pulse">
             <p className="text-sm">🤖 Analyzing your data...</p>
             <p className="text-xs text-muted-foreground mt-1">This may take 10-15 seconds</p>
           </div>

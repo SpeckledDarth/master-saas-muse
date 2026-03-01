@@ -35,10 +35,10 @@ function Section({ title, icon: Icon, children, defaultOpen = false }: {
 }) {
   const [open, setOpen] = useState(defaultOpen)
   return (
-    <div className="border rounded-lg">
+    <div className="border rounded-[var(--card-radius,0.75rem)]">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+        className="w-full flex items-center justify-between p-[var(--card-padding,1.25rem)] hover:bg-muted/50 transition-colors"
         data-testid={`section-toggle-${title.toLowerCase().replace(/\s+/g, '-')}`}
       >
         <div className="flex items-center gap-2">
@@ -48,7 +48,7 @@ function Section({ title, icon: Icon, children, defaultOpen = false }: {
         <ChevronDown className={cn("w-4 h-4 transition-transform", open && "rotate-180")} />
       </button>
       {open && (
-        <div className="px-4 pb-4 space-y-4">
+        <div className="px-[var(--card-padding,1.25rem)] pb-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
           <Separator />
           {children}
         </div>
@@ -98,7 +98,7 @@ export function TypographySection() {
 
   return (
     <Section title="Typography" icon={Type} defaultOpen>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         {(['h1', 'h2', 'h3'] as const).map(tag => {
           const sizeKey = `${tag}FontSize` as keyof BrandingSettings
           const weightKey = `${tag}FontWeight` as keyof BrandingSettings
@@ -106,7 +106,7 @@ export function TypographySection() {
           const transformKey = `${tag}TextTransform` as keyof BrandingSettings
           const defaults = { h1: { size: '2.25rem', weight: '700' }, h2: { size: '1.5rem', weight: '600' }, h3: { size: '1.25rem', weight: '600' } }
           return (
-            <div key={tag} className="space-y-3 p-3 border rounded-md">
+            <div key={tag} className="space-y-3 p-3 border rounded-[var(--card-radius,0.75rem)]">
               <h4 className="text-sm font-medium uppercase">{tag.toUpperCase()}</h4>
               <OptionGroup label="Size">
                 <Select
@@ -183,7 +183,74 @@ export function TypographySection() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+        <OptionGroup label="Heading Font">
+          <Select
+            value={b.headingFont || 'system'}
+            onValueChange={v => updateBranding('headingFont', v)}
+          >
+            <SelectTrigger className="h-8 text-xs" data-testid="select-heading-font">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="system">System Default</SelectItem>
+              <SelectItem value="Inter">Inter</SelectItem>
+              <SelectItem value="DM Sans">DM Sans</SelectItem>
+              <SelectItem value="Plus Jakarta Sans">Plus Jakarta Sans</SelectItem>
+              <SelectItem value="Outfit">Outfit</SelectItem>
+              <SelectItem value="Manrope">Manrope</SelectItem>
+              <SelectItem value="Space Grotesk">Space Grotesk</SelectItem>
+              <SelectItem value="Sora">Sora</SelectItem>
+              <SelectItem value="Poppins">Poppins</SelectItem>
+              <SelectItem value="Nunito">Nunito</SelectItem>
+              <SelectItem value="Raleway">Raleway</SelectItem>
+              <SelectItem value="Montserrat">Montserrat</SelectItem>
+              <SelectItem value="Lora">Lora (Serif)</SelectItem>
+              <SelectItem value="Playfair Display">Playfair Display (Serif)</SelectItem>
+              <SelectItem value="Merriweather">Merriweather (Serif)</SelectItem>
+              <SelectItem value="Source Serif 4">Source Serif 4 (Serif)</SelectItem>
+              <SelectItem value="Crimson Pro">Crimson Pro (Serif)</SelectItem>
+              <SelectItem value="DM Serif Display">DM Serif Display (Serif)</SelectItem>
+              <SelectItem value="JetBrains Mono">JetBrains Mono (Mono)</SelectItem>
+              <SelectItem value="Fira Code">Fira Code (Mono)</SelectItem>
+            </SelectContent>
+          </Select>
+        </OptionGroup>
+        <OptionGroup label="Body Font">
+          <Select
+            value={b.bodyFont || 'system'}
+            onValueChange={v => updateBranding('bodyFont', v)}
+          >
+            <SelectTrigger className="h-8 text-xs" data-testid="select-body-font">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="system">System Default</SelectItem>
+              <SelectItem value="Inter">Inter</SelectItem>
+              <SelectItem value="DM Sans">DM Sans</SelectItem>
+              <SelectItem value="Plus Jakarta Sans">Plus Jakarta Sans</SelectItem>
+              <SelectItem value="Outfit">Outfit</SelectItem>
+              <SelectItem value="Manrope">Manrope</SelectItem>
+              <SelectItem value="Space Grotesk">Space Grotesk</SelectItem>
+              <SelectItem value="Sora">Sora</SelectItem>
+              <SelectItem value="Poppins">Poppins</SelectItem>
+              <SelectItem value="Nunito">Nunito</SelectItem>
+              <SelectItem value="Raleway">Raleway</SelectItem>
+              <SelectItem value="Montserrat">Montserrat</SelectItem>
+              <SelectItem value="Lora">Lora (Serif)</SelectItem>
+              <SelectItem value="Playfair Display">Playfair Display (Serif)</SelectItem>
+              <SelectItem value="Merriweather">Merriweather (Serif)</SelectItem>
+              <SelectItem value="Source Serif 4">Source Serif 4 (Serif)</SelectItem>
+              <SelectItem value="Crimson Pro">Crimson Pro (Serif)</SelectItem>
+              <SelectItem value="DM Serif Display">DM Serif Display (Serif)</SelectItem>
+              <SelectItem value="JetBrains Mono">JetBrains Mono (Mono)</SelectItem>
+              <SelectItem value="Fira Code">Fira Code (Mono)</SelectItem>
+            </SelectContent>
+          </Select>
+        </OptionGroup>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <OptionGroup label="Heading Color Mode">
           <ToggleGroup
             value={b.headingColorMode || 'foreground'}
@@ -195,6 +262,49 @@ export function TypographySection() {
             onChange={v => updateBranding('headingColorMode', v)}
           />
         </OptionGroup>
+        <OptionGroup label="Heading Color">
+          <div className="flex items-center gap-2">
+            <ColorInput
+              value={b.headingColor || ''}
+              onChange={v => updateBranding('headingColor', v)}
+              data-testid="input-heading-color"
+            />
+            {b.headingColor && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => updateBranding('headingColor', undefined)}
+                data-testid="button-clear-heading-color"
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        </OptionGroup>
+        <OptionGroup label="Body Text Color">
+          <div className="flex items-center gap-2">
+            <ColorInput
+              value={b.bodyColor || ''}
+              onChange={v => updateBranding('bodyColor', v)}
+              data-testid="input-body-color"
+            />
+            {b.bodyColor && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => updateBranding('bodyColor', undefined)}
+                data-testid="button-clear-body-color"
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        </OptionGroup>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <OptionGroup label="Body Font Size">
           <Select
             value={b.bodyFontSize || '0.9375rem'}
@@ -230,12 +340,12 @@ export function TypographySection() {
       </div>
 
       <Card className="bg-muted/30">
-        <CardContent className="p-4 space-y-2">
+        <CardContent className="p-[var(--card-padding,1.25rem)] space-y-2">
           <p className="text-xs text-muted-foreground">Preview</p>
-          <h1 data-testid="text-preview-h1">Heading One</h1>
-          <h2 data-testid="text-preview-h2">Heading Two</h2>
-          <h3 data-testid="text-preview-h3">Heading Three</h3>
-          <p data-testid="text-preview-body">Body text looks like this. The quick brown fox jumps over the lazy dog.</p>
+          <h1 data-testid="text-preview-h1" style={{ fontFamily: b.headingFont && b.headingFont !== 'system' ? `"${b.headingFont}", sans-serif` : undefined, color: b.headingColor || undefined }}>Heading One</h1>
+          <h2 data-testid="text-preview-h2" style={{ fontFamily: b.headingFont && b.headingFont !== 'system' ? `"${b.headingFont}", sans-serif` : undefined, color: b.headingColor || undefined }}>Heading Two</h2>
+          <h3 data-testid="text-preview-h3" style={{ fontFamily: b.headingFont && b.headingFont !== 'system' ? `"${b.headingFont}", sans-serif` : undefined, color: b.headingColor || undefined }}>Heading Three</h3>
+          <p data-testid="text-preview-body" style={{ fontFamily: b.bodyFont && b.bodyFont !== 'system' ? `"${b.bodyFont}", sans-serif` : undefined, color: b.bodyColor || undefined }}>Body text looks like this. The quick brown fox jumps over the lazy dog.</p>
         </CardContent>
       </Card>
     </Section>
@@ -248,8 +358,8 @@ export function ComponentStyleSection() {
 
   return (
     <Section title="Component Style" icon={Layers} defaultOpen>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="space-y-3 p-3 border rounded-md">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
+        <div className="space-y-3 p-3 border rounded-[var(--card-radius,0.75rem)]">
           <h4 className="text-sm font-medium">Cards</h4>
           <OptionGroup label="Padding">
             <ToggleGroup
@@ -311,7 +421,7 @@ export function ComponentStyleSection() {
           </OptionGroup>
         </div>
 
-        <div className="space-y-3 p-3 border rounded-md">
+        <div className="space-y-3 p-3 border rounded-[var(--card-radius,0.75rem)]">
           <h4 className="text-sm font-medium">Buttons</h4>
           <OptionGroup label="Size">
             <ToggleGroup
@@ -355,7 +465,7 @@ export function ComponentStyleSection() {
           </div>
         </div>
 
-        <div className="space-y-3 p-3 border rounded-md">
+        <div className="space-y-3 p-3 border rounded-[var(--card-radius,0.75rem)]">
           <h4 className="text-sm font-medium">Other</h4>
           <OptionGroup label="Badge Shape">
             <ToggleGroup
@@ -380,9 +490,9 @@ export function ComponentStyleSection() {
       </div>
 
       <Card className="bg-muted/30">
-        <CardContent className="p-4 space-y-3">
+        <CardContent className="p-[var(--card-padding,1.25rem)] space-y-3">
           <p className="text-xs text-muted-foreground">Preview</p>
-          <div className="flex flex-wrap gap-3 items-center">
+          <div className="flex flex-wrap gap-[var(--content-density-gap,1rem)] items-center">
             <Button data-testid="preview-btn-primary">Primary</Button>
             <Button variant="outline" data-testid="preview-btn-outline">Outline</Button>
             <Button variant="secondary" data-testid="preview-btn-secondary">Secondary</Button>
@@ -399,7 +509,7 @@ export function LayoutSection() {
 
   return (
     <Section title="Layout" icon={Layout}>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <OptionGroup label="Content Density">
           <ToggleGroup
             value={b.contentDensity || 'spacious'}
@@ -472,7 +582,7 @@ export function InteractiveSection() {
 
   return (
     <Section title="Interactive States" icon={MousePointer}>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <OptionGroup label="Hover Effect">
           <ToggleGroup
             value={b.hoverEffect || 'lift'}
@@ -509,8 +619,8 @@ export function InteractiveSection() {
           />
         </OptionGroup>
       </div>
-      <div className="flex flex-wrap gap-6">
-        <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap gap-[var(--content-density-gap,1rem)]">
+        <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
           <Label className="text-xs text-muted-foreground">Card click feedback</Label>
           <Switch
             checked={b.cardClickFeedback || false}
@@ -518,7 +628,7 @@ export function InteractiveSection() {
             data-testid="switch-card-click"
           />
         </div>
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
           <Label className="text-xs text-muted-foreground">Page transition fade</Label>
           <Switch
             checked={b.pageTransitionFade !== false}
@@ -553,7 +663,7 @@ export function DarkModeSection() {
         {b.darkModeOption === 'force-dark' && 'The site will always use dark mode. The toggle will be hidden.'}
         {(!b.darkModeOption || b.darkModeOption === 'user-choice') && 'Users can switch between light and dark mode. Their preference is saved.'}
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <OptionGroup label="Dark Card Depth">
           <ToggleGroup
             value={b.darkCardDepth || 'default'}
@@ -587,8 +697,8 @@ export function DataVizSection() {
 
   return (
     <Section title="Data Visualization" icon={BarChart3}>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="space-y-3 p-3 border rounded-md">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
+        <div className="space-y-3 p-3 border rounded-[var(--card-radius,0.75rem)]">
           <h4 className="text-sm font-medium">Bars</h4>
           <OptionGroup label="Thickness">
             <ToggleGroup
@@ -614,7 +724,7 @@ export function DataVizSection() {
           </OptionGroup>
         </div>
 
-        <div className="space-y-3 p-3 border rounded-md">
+        <div className="space-y-3 p-3 border rounded-[var(--card-radius,0.75rem)]">
           <h4 className="text-sm font-medium">Lines</h4>
           <OptionGroup label="Width">
             <ToggleGroup
@@ -648,7 +758,7 @@ export function DataVizSection() {
           </div>
         </div>
 
-        <div className="space-y-3 p-3 border rounded-md">
+        <div className="space-y-3 p-3 border rounded-[var(--card-radius,0.75rem)]">
           <h4 className="text-sm font-medium">Grid & Fill</h4>
           <OptionGroup label="Grid Lines">
             <ToggleGroup
@@ -689,7 +799,7 @@ export function DataVizSection() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <OptionGroup label="Color Strategy">
           <ToggleGroup
             value={b.chartColorStrategy || 'monochromatic'}
@@ -720,7 +830,7 @@ export function TablesSection() {
 
   return (
     <Section title="Tables" icon={Table2}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <OptionGroup label="Row Style">
           <ToggleGroup
             value={b.tableStyle || 'clean'}
@@ -760,7 +870,7 @@ export function LoadingStatesSection() {
 
   return (
     <Section title="Loading & States" icon={Loader2}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <OptionGroup label="Skeleton Animation">
           <ToggleGroup
             value={b.skeletonStyle || 'pulse'}
@@ -784,7 +894,7 @@ export function LoadingStatesSection() {
         </OptionGroup>
       </div>
       <Card className="bg-muted/30">
-        <CardContent className="p-4">
+        <CardContent className="p-[var(--card-padding,1.25rem)]">
           <p className="text-xs text-muted-foreground mb-3">Skeleton Preview</p>
           <div className="space-y-2">
             <div className="skeleton h-4 w-3/4 bg-muted rounded" />
@@ -837,7 +947,7 @@ export function FormsSection() {
 
   return (
     <Section title="Forms" icon={FormInput}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <OptionGroup label="Label Position">
           <ToggleGroup
             value={b.labelPosition || 'above'}
@@ -880,8 +990,8 @@ export function ScrollPageSection() {
 
   return (
     <Section title="Scroll & Page" icon={MousePointer}>
-      <div className="flex flex-wrap gap-6">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap gap-[var(--content-density-gap,1rem)]">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <Label className="text-xs text-muted-foreground">Smooth scroll</Label>
           <Switch
             checked={b.smoothScroll !== false}
@@ -889,7 +999,7 @@ export function ScrollPageSection() {
             data-testid="switch-smooth-scroll"
           />
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <Label className="text-xs text-muted-foreground">Scroll-to-top button</Label>
           <Switch
             checked={b.scrollToTopButton !== false}
@@ -908,8 +1018,8 @@ export function AccessibilitySection() {
 
   return (
     <Section title="Accessibility" icon={Accessibility}>
-      <div className="flex flex-wrap gap-6">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap gap-[var(--content-density-gap,1rem)]">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <Label className="text-xs text-muted-foreground">WCAG AA contrast enforcement</Label>
           <Switch
             checked={b.contrastEnforcement !== false}
@@ -917,7 +1027,7 @@ export function AccessibilitySection() {
             data-testid="switch-contrast"
           />
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <Label className="text-xs text-muted-foreground">Respect reduced motion</Label>
           <Switch
             checked={b.respectReducedMotion !== false}
@@ -947,7 +1057,7 @@ export function SemanticColorsSection() {
           ? 'These colors are auto-harmonized from your primary color. Override any color manually, or reset to harmonized defaults.'
           : 'Set a primary color first to auto-generate harmonious defaults, or pick colors manually.'}
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <div>
           <ColorInput
             label={b.successColor ? 'Success' : 'Success (auto-harmonized)'}
@@ -1014,7 +1124,7 @@ export function DividerSection() {
         />
       </OptionGroup>
       <Card className="bg-muted/30">
-        <CardContent className="p-4 space-y-3">
+        <CardContent className="p-[var(--card-padding,1.25rem)] space-y-3">
           <p className="text-xs text-muted-foreground">Preview</p>
           <p className="text-sm">Content above the divider</p>
           <Separator />
@@ -1031,7 +1141,7 @@ export function PrintSection() {
 
   return (
     <Section title="Print" icon={Printer}>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
         <Label className="text-xs text-muted-foreground">Print-friendly stylesheet</Label>
         <Switch
           checked={b.printStyles !== false}
@@ -1113,7 +1223,7 @@ export function PresetsSection() {
 
   return (
     <Section title="Presets & Reset" icon={Palette} defaultOpen>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
         {designPresets.map(preset => {
           const isActive = activePreset === preset.name
           return (
@@ -1121,7 +1231,7 @@ export function PresetsSection() {
               key={preset.name}
               onClick={() => applyPreset(preset.name)}
               className={cn(
-                "p-3 border-2 rounded-lg text-left transition-all space-y-1 relative",
+                "p-3 border-2 rounded-[var(--card-radius,0.75rem)] text-left transition-all space-y-1 relative",
                 isActive
                   ? "border-primary bg-primary/5 ring-1 ring-primary/20"
                   : "border-border hover:bg-muted/50 hover:border-muted-foreground/30"

@@ -167,8 +167,8 @@ export function BulkImport({ onImported }: { onImported?: () => void }) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
-          <div className="flex items-center gap-3 flex-wrap">
+        <div className="space-y-[var(--content-density-gap,1rem)] flex-1 overflow-hidden flex flex-col">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
             <input
               ref={fileRef}
               type="file"
@@ -186,7 +186,7 @@ export function BulkImport({ onImported }: { onImported?: () => void }) {
 
           {rows.length > 0 && (
             <>
-              <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <Badge variant="secondary" data-testid="badge-total-rows">{rows.length} rows</Badge>
                 <Badge variant="default" data-testid="badge-valid-rows">{validRows.length} valid</Badge>
                 {errorRows.length > 0 && (
@@ -194,7 +194,7 @@ export function BulkImport({ onImported }: { onImported?: () => void }) {
                 )}
               </div>
 
-              <div className="overflow-auto flex-1 border rounded-md">
+              <div className="overflow-auto flex-1 border rounded-[var(--card-radius,0.75rem)]">
                 <Table>
                   <TableHeader>
                     <TableRow>

@@ -167,7 +167,7 @@ function AffiliateSetPasswordPage() {
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSetPassword}>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               {message && (
                 <div
                   className={`p-3 rounded-md text-sm flex items-center gap-2 ${

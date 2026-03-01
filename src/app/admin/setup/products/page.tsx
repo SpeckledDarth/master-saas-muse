@@ -289,7 +289,7 @@ export default function ProductsPage() {
         </CardHeader>
         <CardContent>
           {products.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground" data-testid="text-no-products">
+            <div className="text-center py-[var(--section-spacing,3.5rem)] text-muted-foreground" data-testid="text-no-products">
               <Package className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] opacity-30" />
               <p className="font-medium">No products registered yet</p>
               <p className="text-sm mt-1">Click &quot;Add Product&quot; to register your first product</p>
@@ -398,7 +398,7 @@ export default function ProductsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-[var(--content-density-gap,1rem)] py-4">
+          <div className="space-y-[var(--content-density-gap,1rem)] py-[var(--card-padding,1.25rem)]">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label htmlFor="product-slug">Slug</Label>
@@ -485,7 +485,7 @@ export default function ProductsPage() {
               </div>
 
               {form.tierDefinitions.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
+                <p className="text-sm text-muted-foreground text-center py-[var(--card-padding,1.25rem)]">
                   No tiers defined. Click &quot;Add Tier&quot; to create one.
                 </p>
               )}

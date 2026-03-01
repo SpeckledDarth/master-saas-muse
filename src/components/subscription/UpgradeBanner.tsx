@@ -22,10 +22,10 @@ export function UpgradeBanner({ feature, requiredTier, showDismiss = true }: Upg
 
   return (
     <Card className="border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-950" data-testid="banner-upgrade">
-      <CardContent className="py-4">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900">
+      <CardContent className="py-[var(--card-padding,1.25rem)]">
+        <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
+            <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-primary-100 dark:bg-primary-900">
               <Sparkles className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             </div>
             <div>

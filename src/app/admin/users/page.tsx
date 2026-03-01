@@ -542,7 +542,7 @@ export default function UsersPage() {
             <DialogDescription>View detailed information about this user</DialogDescription>
           </DialogHeader>
           {detailLoading ? (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center py-[var(--section-spacing,3.5rem)]">
               <Loader2 className="h-8 w-8 animate-spin" data-testid="loader-user-detail" />
             </div>
           ) : userDetail ? (
@@ -740,7 +740,7 @@ export default function UsersPage() {
               <TabsContent value="notes" className="mt-4 space-y-[var(--content-density-gap,1rem)]">
                 <div className="space-y-3">
                   {userDetail.notes.length === 0 ? (
-                    <div className="text-center py-6 text-muted-foreground" data-testid="text-no-notes">
+                    <div className="text-center py-[var(--card-padding,1.25rem)] text-muted-foreground" data-testid="text-no-notes">
                       <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
                       <p>No notes yet</p>
                     </div>

@@ -118,7 +118,7 @@ export function FeedbackWidget() {
             </Button>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-[var(--content-density-gap,1rem)]">
             {!user && (
               <div className="space-y-2">
                 <Label htmlFor="feedback-email">Your Email</Label>

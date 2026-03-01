@@ -215,9 +215,9 @@ export default function SocialOverviewPage() {
 
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-row items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-3">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex flex-row items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <Avatar className="h-12 w-12" data-testid="avatar-user-overview">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.user_metadata?.full_name || ''} />
             <AvatarFallback className="bg-muted text-muted-foreground text-sm">
@@ -243,7 +243,7 @@ export default function SocialOverviewPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-posts-this-month">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Posts This Month <HelpTooltip text="The number of posts created across all your connected platforms this calendar month." /></CardTitle>
@@ -338,7 +338,7 @@ export default function SocialOverviewPage() {
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
               <div className="flex flex-col items-center justify-center text-center">
                 <div className={`text-4xl font-bold ${flywheel.healthScore >= 70 ? 'text-[hsl(var(--success))]' : flywheel.healthScore >= 40 ? 'text-[hsl(var(--warning))]' : 'text-[hsl(var(--danger))]'}`} data-testid="text-flywheel-overview-score">
                   {flywheel.healthScore}
@@ -396,7 +396,7 @@ export default function SocialOverviewPage() {
             </div>
 
             {flywheel.nextAction && (
-              <div className="mt-4 pt-4 border-t flex items-center justify-between gap-3 flex-wrap">
+              <div className="mt-4 pt-4 border-t flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-primary shrink-0" />
                   <p className="text-sm text-muted-foreground">{flywheel.nextAction.message}</p>
@@ -412,7 +412,7 @@ export default function SocialOverviewPage() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-connected-accounts-list">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
             <CardTitle className="text-base">Connected Accounts <HelpTooltip text="Your linked social media accounts and their current connection status." /></CardTitle>
@@ -422,7 +422,7 @@ export default function SocialOverviewPage() {
           </CardHeader>
           <CardContent>
             {accounts.length === 0 ? (
-              <div className="text-center py-6">
+              <div className="text-center py-[var(--card-padding,1.25rem)]">
                 <Link2 className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">No accounts connected yet</p>
                 <Button variant="outline" size="sm" className="mt-3" asChild data-testid="button-connect-account-cta">
@@ -434,7 +434,7 @@ export default function SocialOverviewPage() {
                 {accounts.map(account => (
                   <div
                     key={account.id}
-                    className="flex items-center gap-3 p-2.5 rounded-md border"
+                    className="flex items-center gap-[var(--content-density-gap,1rem)] p-2.5 rounded-[var(--card-radius,0.75rem)] border"
                     data-testid={`account-${account.id}`}
                   >
                     <div className="relative">
@@ -472,7 +472,7 @@ export default function SocialOverviewPage() {
               ].map(alert => (
                 <div
                   key={alert.id}
-                  className="flex items-start gap-3 p-3 rounded-md border"
+                  className="flex items-start gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border"
                   data-testid={`alert-${alert.id}`}
                 >
                   <div className="flex-1 min-w-0">
@@ -505,7 +505,7 @@ export default function SocialOverviewPage() {
               { platform: 'facebook', day: 'Wed & Fri', time: '12:00 PM - 2:00 PM', engagement: 'High' },
               { platform: 'linkedin', day: 'Tue & Wed', time: '8:00 AM - 10:00 AM', engagement: 'Medium' },
             ].map(slot => (
-              <div key={slot.platform} className="flex items-center gap-3 p-2.5 rounded-md border" data-testid={`best-time-${slot.platform}`}>
+              <div key={slot.platform} className="flex items-center gap-[var(--content-density-gap,1rem)] p-2.5 rounded-[var(--card-radius,0.75rem)] border" data-testid={`best-time-${slot.platform}`}>
                 <PlatformIconCircle platform={slot.platform} size="sm" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium">{slot.day}</p>
@@ -535,7 +535,7 @@ export default function SocialOverviewPage() {
                 return (
                   <div
                     key={post.id}
-                    className="flex items-start gap-3 p-3 rounded-md border cursor-pointer hover-elevate active-elevate-2"
+                    className="flex items-start gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border cursor-pointer hover-elevate active-elevate-2"
                     onClick={() => setDetailPost(post as unknown as PostDetailData)}
                     data-testid={`recent-post-${post.id}`}
                   >

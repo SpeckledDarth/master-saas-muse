@@ -141,7 +141,7 @@ export default function ApprovePage({ params }: { params: Promise<{ token: strin
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background" data-testid="loading-state">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-[var(--content-density-gap,1rem)]">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
           <p className="text-muted-foreground">Loading approval portal...</p>
         </div>
@@ -154,7 +154,7 @@ export default function ApprovePage({ params }: { params: Promise<{ token: strin
       <div className="min-h-screen flex items-center justify-center bg-background" data-testid="error-state">
         <Card className="max-w-md w-full mx-4">
           <CardContent className="pt-6">
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-[var(--content-density-gap,1rem)]">
               <AlertCircle className="w-12 h-12 mx-auto text-destructive" />
               <h2 className="text-lg font-semibold" data-testid="text-error-title">Unable to Load</h2>
               <p className="text-muted-foreground" data-testid="text-error-message">{error}</p>
@@ -168,7 +168,7 @@ export default function ApprovePage({ params }: { params: Promise<{ token: strin
   return (
     <div className="min-h-screen bg-background" data-testid="approval-page">
       <header className="border-b bg-background sticky top-0 z-50">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between gap-4 flex-wrap">
+        <div className="max-w-3xl mx-auto px-[var(--card-padding,1.25rem)] py-[var(--card-padding,1.25rem)] flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
             <span className="font-semibold text-lg" data-testid="text-brand-name">PassivePost</span>
@@ -181,7 +181,7 @@ export default function ApprovePage({ params }: { params: Promise<{ token: strin
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8 space-y-4">
+      <main className="max-w-3xl mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)] space-y-[var(--content-density-gap,1rem)]">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold" data-testid="text-page-title">Content Approval</h1>
           <p className="text-muted-foreground" data-testid="text-page-description">
@@ -213,14 +213,14 @@ export default function ApprovePage({ params }: { params: Promise<{ token: strin
                 </span>
               )}
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
               <p className="text-sm whitespace-pre-wrap" data-testid={`text-content-${post.id}`}>
                 {post.content}
               </p>
 
               {post.message && (
                 <div
-                  className={`text-sm px-3 py-2 rounded-md ${post.messageType === 'success' ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]' : 'bg-destructive/10 text-destructive'}`}
+                  className={`text-sm px-3 py-2 rounded-[var(--card-radius,0.75rem)] ${post.messageType === 'success' ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]' : 'bg-destructive/10 text-destructive'}`}
                   data-testid={`text-message-${post.id}`}
                 >
                   {post.message}
@@ -285,7 +285,7 @@ export default function ApprovePage({ params }: { params: Promise<{ token: strin
       </main>
 
       <footer className="border-t mt-12">
-        <div className="max-w-3xl mx-auto px-4 py-6 text-center text-xs text-muted-foreground">
+        <div className="max-w-3xl mx-auto px-[var(--card-padding,1.25rem)] py-[var(--card-padding,1.25rem)] text-center text-xs text-muted-foreground">
           Powered by PassivePost
         </div>
       </footer>

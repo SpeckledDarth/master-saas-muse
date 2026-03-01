@@ -115,7 +115,7 @@ export function QRCodeGenerator({ referralUrl }: { referralUrl: string }) {
   return (
     <div data-testid="qr-code-card" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📱 QR Code</h3>
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-col items-center gap-[var(--content-density-gap,1rem)]">
         {qrSvg ? (
           <div dangerouslySetInnerHTML={{ __html: qrSvg }} className="bg-white p-2 rounded" />
         ) : (
@@ -187,7 +187,7 @@ export function MediaKitPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="animate-pulse h-48 bg-muted rounded-lg" />;
+  if (loading) return <div className="animate-pulse h-48 bg-muted rounded-[var(--card-radius,0.75rem)]" />;
   if (!kit) return null;
 
   return (
@@ -240,7 +240,7 @@ export function StarterKit() {
   if (loading || assets.length === 0) return null;
 
   return (
-    <div data-testid="starter-kit-card" className="rounded-lg border bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-4">
+    <div data-testid="starter-kit-card" className="rounded-[var(--card-radius,0.75rem)] border bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">🎁 Starter Kit</h3>
       <p className="text-xs text-muted-foreground mb-3">Get started with these essential resources:</p>
       <div className="space-y-1">

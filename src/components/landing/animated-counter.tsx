@@ -109,14 +109,14 @@ export function AnimatedCounterSection({ metrics, headline }: AnimatedCounterPro
   }
 
   return (
-    <section className="py-16 bg-primary-50 dark:bg-primary-950" data-testid="section-metrics">
-      <div className="container mx-auto px-4">
+    <section className="py-[var(--section-spacing,3.5rem)] bg-primary-50 dark:bg-primary-950" data-testid="section-metrics">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
         {headline && (
           <h2 className="text-2xl font-bold text-center mb-12 text-muted-foreground">
             {headline}
           </h2>
         )}
-        <div className={`grid gap-8 sm:gap-10 ${
+        <div className={`grid gap-[var(--content-density-gap,1rem)] sm:gap-10 ${
           metrics.length === 1 ? 'grid-cols-1 max-w-xs' :
           metrics.length === 2 ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl' :
           metrics.length === 3 ? 'grid-cols-1 sm:grid-cols-3 max-w-4xl' :

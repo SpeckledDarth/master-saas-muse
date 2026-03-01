@@ -120,7 +120,7 @@ function SignupForm() {
               We've sent a confirmation link to <strong>{email}</strong>
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <p className="text-sm text-muted-foreground text-center">
               Click the link in your email to activate your account.
             </p>
@@ -145,7 +145,7 @@ function SignupForm() {
           <CardTitle className="text-2xl">Create an account</CardTitle>
           <CardDescription>Get started with your free account</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           {(features.googleOAuth || features.githubOAuth || features.appleOAuth || features.twitterOAuth) && (
             <>
               <div className="grid grid-cols-2 gap-2">
@@ -208,7 +208,7 @@ function SignupForm() {
             </>
           )}
 
-          <form onSubmit={handleEmailSignup} className="space-y-4">
+          <form onSubmit={handleEmailSignup} className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input

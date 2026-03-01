@@ -18,7 +18,7 @@ export default function FeatureSubPage() {
     return (
       <div className="flex flex-col min-h-screen">
         <section className="relative min-h-[400px] flex items-center justify-center bg-muted/50">
-          <div className="container mx-auto px-4 text-center">
+          <div className="container mx-auto px-[var(--card-padding,1.25rem)] text-center">
             <div className="h-12 w-64 mx-auto mb-6 bg-muted animate-pulse rounded" />
             <div className="h-6 w-96 mx-auto mb-8 bg-muted animate-pulse rounded" />
           </div>
@@ -70,7 +70,7 @@ export default function FeatureSubPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20" />
         )}
 
-        <div className="relative z-10 container mx-auto px-4 text-center">
+        <div className="relative z-10 container mx-auto px-[var(--card-padding,1.25rem)] text-center">
           <h1
             className={`text-3xl md:text-5xl font-bold mb-6 ${page.heroBackgroundImageUrl ? 'text-white' : ''}`}
             data-testid="text-feature-hero-headline"
@@ -98,8 +98,8 @@ export default function FeatureSubPage() {
         </div>
 
         {page.heroImageUrl && (
-          <div className="relative z-10 container mx-auto px-4 mt-8">
-            <div className="max-w-4xl mx-auto relative rounded-lg overflow-hidden shadow-2xl border border-border/50">
+          <div className="relative z-10 container mx-auto px-[var(--card-padding,1.25rem)] mt-8">
+            <div className="max-w-4xl mx-auto relative rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-2xl border border-border/50">
               <div className="relative aspect-[16/10]">
                 <Image
                   src={page.heroImageUrl}

@@ -76,7 +76,7 @@ export function Header() {
   if (loading || !settings) {
     return (
       <header className="sticky top-0 z-50 w-full border-b bg-transparent h-14">
-        <div className="container flex h-14 items-center justify-between gap-4" />
+        <div className="container flex h-14 items-center justify-between gap-[var(--content-density-gap,1rem)]" />
       </header>
     )
   }
@@ -119,7 +119,7 @@ export function Header() {
         "top-0 z-50 w-full transition-all duration-300",
         isSticky ? "sticky" : "relative",
         !customBg && (scrolled 
-          ? "bg-background/80 backdrop-blur-lg shadow-sm" 
+          ? "bg-background/80 backdrop-blur-lg shadow-[var(--card-shadow)]" 
           : isTransparent 
             ? "bg-transparent backdrop-blur" 
             : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"),
@@ -134,7 +134,7 @@ export function Header() {
     >
       <div 
         className={cn(
-          "container mx-auto px-4 md:px-8 flex items-center gap-4 transition-all duration-300",
+          "container mx-auto px-[var(--card-padding,1.25rem)] md:px-[var(--card-padding,1.25rem)] flex items-center gap-[var(--content-density-gap,1rem)] transition-all duration-300",
           logoPosition === 'center' ? "justify-center" : "justify-between"
         )}
         style={{ height: currentHeaderHeight }}
@@ -210,7 +210,7 @@ export function Header() {
           )}
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-[var(--content-density-gap,1rem)]">
           {settings?.navigation?.items?.filter(item => item.enabled).map(item => (
             <Link
               key={item.id}
@@ -257,7 +257,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="left" className="w-[280px] p-0">
               <div className="flex flex-col h-full">
-                <div className="p-4 border-b">
+                <div className="p-[var(--card-padding,1.25rem)] border-b">
                   <Link href="/" className="flex items-center space-x-2" data-testid="link-mobile-home">
                     {branding?.logoUrl ? (
                       <Image
@@ -273,7 +273,7 @@ export function Header() {
                     )}
                   </Link>
                 </div>
-                <nav className="flex-1 p-4 space-y-1">
+                <nav className="flex-1 p-[var(--card-padding,1.25rem)] space-y-1">
                   {settings?.navigation?.items?.filter(item => item.enabled).map(item => (
                     <SheetClose asChild key={item.id}>
                       <Link

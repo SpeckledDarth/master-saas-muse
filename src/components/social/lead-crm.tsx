@@ -137,8 +137,8 @@ export function LeadCrm() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-semibold" data-testid="text-lead-crm-title">
             Lead CRM
@@ -157,7 +157,7 @@ export function LeadCrm() {
               <DialogHeader>
                 <DialogTitle>Add New Lead</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 pt-2">
+              <div className="space-y-[var(--content-density-gap,1rem)] pt-2">
                 <div className="space-y-2">
                   <Label htmlFor="lead-name">Name</Label>
                   <Input
@@ -217,7 +217,7 @@ export function LeadCrm() {
         </div>
       </div>
 
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -244,7 +244,7 @@ export function LeadCrm() {
 
       {loading && (
         <Card>
-          <CardContent className="py-12 text-center">
+          <CardContent className="py-[var(--section-spacing,3.5rem)] text-center">
             <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">Loading leads...</p>
           </CardContent>
@@ -253,7 +253,7 @@ export function LeadCrm() {
 
       {!loading && filteredLeads.length === 0 && (
         <Card>
-          <CardContent className="py-12 text-center">
+          <CardContent className="py-[var(--section-spacing,3.5rem)] text-center">
             <p className="text-muted-foreground">
               {leads.length === 0 ? 'No leads yet. Add your first lead to get started.' : 'No leads match your filters.'}
             </p>

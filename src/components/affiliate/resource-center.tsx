@@ -70,7 +70,7 @@ export function KnowledgeBasePanel() {
   };
 
   return (
-    <div data-testid="knowledge-base-panel" className="space-y-4">
+    <div data-testid="knowledge-base-panel" className="space-y-[var(--content-density-gap,1rem)]">
       <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">Help Center</h3>
 
@@ -104,12 +104,12 @@ export function KnowledgeBasePanel() {
             <div className="h-10 bg-muted rounded" />
           </div>
         ) : error ? (
-          <div className="text-center py-6">
+          <div className="text-center py-[var(--section-spacing,3.5rem)]">
             <p className="text-sm text-muted-foreground" data-testid="text-kb-error">{error}</p>
             <button onClick={loadArticles} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-kb">Retry</button>
           </div>
         ) : articles.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-kb-articles">
+          <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,3.5rem)]" data-testid="text-no-kb-articles">
             {search || category !== 'all' ? 'No articles match your search.' : 'No help articles available yet.'}
           </p>
         ) : (
@@ -120,7 +120,7 @@ export function KnowledgeBasePanel() {
                   onClick={() => toggleArticle(article.slug)}
                   aria-expanded={expanded === article.slug}
                   aria-label={`${expanded === article.slug ? 'Collapse' : 'Expand'} article: ${article.title}`}
-                  className="w-full text-left p-3 rounded-md border hover:bg-muted/30 transition-colors flex items-center justify-between"
+                  className="w-full text-left p-3 rounded-[var(--card-radius,0.75rem)] border hover:bg-muted/30 transition-colors flex items-center justify-between"
                   data-testid={`button-toggle-kb-${article.slug}`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
@@ -130,7 +130,7 @@ export function KnowledgeBasePanel() {
                   <span className="text-xs text-muted-foreground shrink-0 ml-2">{expanded === article.slug ? '−' : '+'}</span>
                 </button>
                 {expanded === article.slug && (
-                  <div className="p-4 border border-t-0 rounded-b-md bg-muted/10 text-sm leading-relaxed whitespace-pre-wrap" data-testid={`kb-content-${article.slug}`}>
+                  <div className="p-[var(--card-padding,1.25rem)] border border-t-0 rounded-b-[var(--card-radius,0.75rem)] bg-muted/10 text-sm leading-relaxed whitespace-pre-wrap" data-testid={`kb-content-${article.slug}`}>
                     {String(article.body ?? '')}
                   </div>
                 )}
@@ -189,7 +189,7 @@ export function SwipeFileLibrary() {
   };
 
   return (
-    <div data-testid="swipe-file-library" className="space-y-4">
+    <div data-testid="swipe-file-library" className="space-y-[var(--content-density-gap,1rem)]">
       <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-sm">Email Swipe Files</h3>
@@ -224,16 +224,16 @@ export function SwipeFileLibrary() {
             <div className="h-16 bg-muted rounded" />
           </div>
         ) : error ? (
-          <div className="text-center py-6">
+          <div className="text-center py-[var(--section-spacing,3.5rem)]">
             <p className="text-sm text-muted-foreground" data-testid="text-swipe-error">{error}</p>
             <button onClick={loadFiles} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-swipe-files">Retry</button>
           </div>
         ) : files.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-swipe-files">No swipe files available.</p>
+          <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,3.5rem)]" data-testid="text-no-swipe-files">No swipe files available.</p>
         ) : (
           <div className="space-y-2" role="list" aria-label="Email swipe files">
             {files.map(file => (
-              <div key={file.id} role="listitem" className="rounded-md border overflow-hidden" data-testid={`swipe-file-${file.id}`}>
+              <div key={file.id} role="listitem" className="rounded-[var(--card-radius,0.75rem)] border overflow-hidden" data-testid={`swipe-file-${file.id}`}>
                 <div className="flex items-center justify-between p-3">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className={`text-[10px] px-1.5 py-0.5 rounded capitalize shrink-0 ${CATEGORY_COLORS[file.category] || 'bg-muted text-muted-foreground'}`}>
@@ -331,7 +331,7 @@ export function PromotionalCalendarPanel() {
 
   if (events.length === 0) return (
     <div data-testid="promo-calendar-empty" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
-      <p className="text-sm text-muted-foreground py-4">No upcoming promotions scheduled.</p>
+      <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">No upcoming promotions scheduled.</p>
     </div>
   );
 
@@ -339,13 +339,13 @@ export function PromotionalCalendarPanel() {
   const upcomingEvents = events.filter(e => e.status === 'upcoming');
 
   return (
-    <div data-testid="promotional-calendar-panel" className="space-y-4">
+    <div data-testid="promotional-calendar-panel" className="space-y-[var(--content-density-gap,1rem)]">
       {activeEvents.length > 0 && (
         <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-3">Active Promotions</h3>
           <div className="space-y-3">
             {activeEvents.map(event => (
-              <div key={event.id} className="p-3 rounded-md border border-[hsl(var(--success)/0.2)] dark:border-[hsl(var(--success)/0.3)] bg-[hsl(var(--success)/0.05)] dark:bg-[hsl(var(--success)/0.1)]" data-testid={`promo-active-${event.id}`}>
+              <div key={event.id} className="p-3 rounded-[var(--card-radius,0.75rem)] border border-[hsl(var(--success)/0.2)] dark:border-[hsl(var(--success)/0.3)] bg-[hsl(var(--success)/0.05)] dark:bg-[hsl(var(--success)/0.1)]" data-testid={`promo-active-${event.id}`}>
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm" data-testid={`promo-status-${event.id}`}>{STATUS_ICONS[event.status]}</span>
@@ -383,7 +383,7 @@ export function PromotionalCalendarPanel() {
           <h3 className="font-semibold text-sm mb-3">Upcoming Promotions</h3>
           <div className="space-y-2">
             {upcomingEvents.map(event => (
-              <div key={event.id} className="p-3 rounded-md border" data-testid={`promo-upcoming-${event.id}`}>
+              <div key={event.id} className="p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`promo-upcoming-${event.id}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm">{event.title}</span>

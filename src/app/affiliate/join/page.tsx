@@ -76,7 +76,7 @@ export default function AffiliateJoinPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-white/10 border-border">
-          <CardContent className="pt-8 pb-6 text-center">
+          <CardContent className="pt-8 pb-[var(--card-padding,1.25rem)] text-center">
             <div className="w-16 h-16 rounded-full bg-[hsl(var(--success)/0.1)] flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="h-8 w-8 text-[hsl(var(--success))]" />
             </div>
@@ -110,7 +110,7 @@ export default function AffiliateJoinPage() {
             <CardDescription>Fill out the form below to apply. No account needed — we'll set everything up once you're approved.</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name *</Label>
                 <Input
@@ -149,7 +149,7 @@ export default function AffiliateJoinPage() {
 
               <div className="space-y-3">
                 <Label>How will you promote? * <span className="text-muted-foreground font-normal">(select all that apply)</span></Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                   {PROMOTION_METHODS.map((method) => (
                     <label
                       key={method.value}
@@ -198,7 +198,7 @@ export default function AffiliateJoinPage() {
               </div>
 
               {error && (
-                <div className="text-sm text-destructive bg-destructive/10 rounded-lg p-3" data-testid="text-error">
+                <div className="text-sm text-destructive bg-destructive/10 rounded-[var(--card-radius,0.75rem)] p-3" data-testid="text-error">
                   {error}
                 </div>
               )}

@@ -54,17 +54,17 @@ export default function FAQPage() {
         testId="faq"
       />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto space-y-4">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
+        <div className="max-w-3xl mx-auto space-y-[var(--content-density-gap,1rem)]">
         {faqItems.length > 0 ? (
           faqItems.map((item) => (
             <Card key={item.id} className="overflow-hidden">
               <button
                 onClick={() => toggleItem(item.id)}
-                className="w-full text-left p-6 flex items-center justify-between gap-4 hover-elevate active-elevate-2"
+                className="w-full text-left p-[var(--card-padding,1.25rem)] flex items-center justify-between gap-[var(--content-density-gap,1rem)] hover-elevate active-elevate-2"
                 data-testid={`button-faq-${item.id}`}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
                   <HelpCircle className="h-5 w-5 text-primary-600 dark:text-primary-400 mt-0.5 shrink-0" />
                   <span className="font-medium" data-testid={`text-faq-question-${item.id}`}>
                     {item.question}
@@ -77,7 +77,7 @@ export default function FAQPage() {
                 )}
               </button>
               {openItems.has(item.id) && (
-                <CardContent className="pt-0 pb-6 px-6">
+                <CardContent className="pt-0 pb-[var(--card-padding,1.25rem)] px-[var(--card-padding,1.25rem)]">
                   <div className="pl-8 text-muted-foreground whitespace-pre-wrap" data-testid={`text-faq-answer-${item.id}`}>
                     {item.answer}
                   </div>

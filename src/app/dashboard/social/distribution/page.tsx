@@ -150,8 +150,8 @@ export default function DistributionIntelligencePage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-distribution-title">
             Distribution Intelligence <HelpTooltip text="Optimize how and where your content reaches your audience with hashtag tracking, audience personas, and competitor gap analysis." />
@@ -187,9 +187,9 @@ export default function DistributionIntelligencePage() {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Hashtag</th>
-                    <th className="text-right py-2 px-4 font-medium text-muted-foreground">Usage</th>
-                    <th className="text-right py-2 px-4 font-medium text-muted-foreground">Avg Engagement</th>
-                    <th className="text-right py-2 px-4 font-medium text-muted-foreground">Total Engagement</th>
+                    <th className="text-right py-2 px-[var(--card-padding,1.25rem)] font-medium text-muted-foreground">Usage</th>
+                    <th className="text-right py-2 px-[var(--card-padding,1.25rem)] font-medium text-muted-foreground">Avg Engagement</th>
+                    <th className="text-right py-2 px-[var(--card-padding,1.25rem)] font-medium text-muted-foreground">Total Engagement</th>
                     <th className="text-right py-2 pl-4 font-medium text-muted-foreground">Trend</th>
                   </tr>
                 </thead>
@@ -200,9 +200,9 @@ export default function DistributionIntelligencePage() {
                     return (
                       <tr key={i} className="border-b last:border-0" data-testid={`row-hashtag-${i}`}>
                         <td className="py-2 pr-4 font-medium" data-testid={`text-hashtag-name-${i}`}>{entry.hashtag}</td>
-                        <td className="py-2 px-4 text-right text-muted-foreground" data-testid={`text-hashtag-usage-${i}`}>{entry.usageCount}</td>
-                        <td className="py-2 px-4 text-right" data-testid={`text-hashtag-avg-${i}`}>{entry.avgEngagement.toFixed(1)}</td>
-                        <td className="py-2 px-4 text-right text-muted-foreground" data-testid={`text-hashtag-total-${i}`}>{entry.totalEngagement}</td>
+                        <td className="py-2 px-[var(--card-padding,1.25rem)] text-right text-muted-foreground" data-testid={`text-hashtag-usage-${i}`}>{entry.usageCount}</td>
+                        <td className="py-2 px-[var(--card-padding,1.25rem)] text-right" data-testid={`text-hashtag-avg-${i}`}>{entry.avgEngagement.toFixed(1)}</td>
+                        <td className="py-2 px-[var(--card-padding,1.25rem)] text-right text-muted-foreground" data-testid={`text-hashtag-total-${i}`}>{entry.totalEngagement}</td>
                         <td className="py-2 pl-4 text-right">
                           <Badge variant="outline" className={`${trendInfo.color} no-default-hover-elevate no-default-active-elevate`} data-testid={`badge-hashtag-trend-${i}`}>
                             <TrendIcon className="h-3 w-3 mr-1" />
@@ -216,14 +216,14 @@ export default function DistributionIntelligencePage() {
               </table>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground py-4" data-testid="text-hashtag-empty">
+            <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]" data-testid="text-hashtag-empty">
               No hashtag data available yet. Start posting with hashtags to see performance tracking.
             </p>
           )}
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-audience-personas">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
             <CardTitle className="text-base flex items-center gap-2">
@@ -232,7 +232,7 @@ export default function DistributionIntelligencePage() {
               <HelpTooltip text="Generate AI-powered audience personas based on your content history, showing demographics, interests, and optimal engagement strategies." />
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <Button onClick={handleBuildPersonas} disabled={buildingPersonas} data-testid="button-build-personas">
               {buildingPersonas ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Users className="mr-2 h-4 w-4" />}
               Build Personas
@@ -241,7 +241,7 @@ export default function DistributionIntelligencePage() {
             {personas.length > 0 && (
               <div className="space-y-3 border-t pt-4" data-testid="section-persona-results">
                 {personas.map((persona, i) => (
-                  <div key={i} className="p-3 rounded-md border space-y-2" data-testid={`card-persona-${i}`}>
+                  <div key={i} className="p-3 rounded-[var(--card-radius,0.75rem)] border space-y-2" data-testid={`card-persona-${i}`}>
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <p className="font-medium" data-testid={`text-persona-name-${i}`}>{persona.name}</p>
                       <Badge variant="secondary" className="text-xs" data-testid={`badge-persona-age-${i}`}>{persona.ageRange}</Badge>
@@ -265,7 +265,7 @@ export default function DistributionIntelligencePage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 flex-wrap text-sm text-muted-foreground">
+                    <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap text-sm text-muted-foreground">
                       <span data-testid={`text-persona-platform-${i}`}>
                         Platform: <span className="text-foreground font-medium">{persona.preferredPlatform}</span>
                       </span>
@@ -288,9 +288,9 @@ export default function DistributionIntelligencePage() {
               <HelpTooltip text="Identify content gaps by analyzing your competitors. Enter up to 3 competitors to discover untapped topics and opportunities." />
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             {competitors.map((comp, i) => (
-              <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-3" data-testid={`section-competitor-input-${i}`}>
+              <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]" data-testid={`section-competitor-input-${i}`}>
                 <div className="space-y-1">
                   <Label htmlFor={`comp-name-${i}`} className="text-xs">Competitor {i + 1} Name</Label>
                   <Input
@@ -337,7 +337,7 @@ export default function DistributionIntelligencePage() {
             {gaps.length > 0 && (
               <div className="space-y-3 border-t pt-4" data-testid="section-gap-results">
                 {gaps.map((gap, i) => (
-                  <div key={i} className="p-3 rounded-md border space-y-2" data-testid={`card-gap-${i}`}>
+                  <div key={i} className="p-3 rounded-[var(--card-radius,0.75rem)] border space-y-2" data-testid={`card-gap-${i}`}>
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <p className="font-medium text-sm" data-testid={`text-gap-topic-${i}`}>{gap.topic}</p>
                       <div className="flex items-center gap-1.5">

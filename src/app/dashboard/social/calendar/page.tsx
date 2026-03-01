@@ -267,7 +267,7 @@ export default function SocialCalendarPage() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="p-[var(--card-padding,1.25rem)]">
         <Card data-testid="error-state-calendar">
           <CardContent className="py-12 text-center">
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -283,7 +283,7 @@ export default function SocialCalendarPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Post Calendar <HelpTooltip text="See all your scheduled and published posts laid out on a calendar." /></h1>
         <p className="text-muted-foreground mt-1" data-testid="text-page-description">
@@ -351,7 +351,7 @@ export default function SocialCalendarPage() {
       {calendarPosts.length === 0 ? (
         <Card data-testid="empty-state-calendar">
           <CardContent className="py-12 text-center">
-            <div className="flex items-center justify-center gap-3 mb-4" data-testid="empty-icon-composition">
+            <div className="flex items-center justify-center gap-[var(--content-density-gap,1rem)] mb-4" data-testid="empty-icon-composition">
               <Clock className="h-8 w-8 text-muted-foreground/40" />
               <CalendarDays className="h-12 w-12 text-muted-foreground" />
               <Send className="h-8 w-8 text-muted-foreground/40" />
@@ -425,7 +425,7 @@ export default function SocialCalendarPage() {
                     <button
                       onClick={() => setSelectedDate(dateKey)}
                       className={`
-                        relative min-h-[60px] p-1 text-left rounded-md transition-colors
+                        relative min-h-[60px] p-1 text-left rounded-[var(--card-radius,0.75rem)] transition-colors
                         ${isCurrentMonth ? '' : 'opacity-40'}
                         ${isToday ? 'ring-2 ring-primary' : ''}
                         ${isSelected ? 'bg-accent' : ''}
@@ -513,7 +513,7 @@ export default function SocialCalendarPage() {
               </CardHeader>
               <CardContent>
                 {selectedDayPosts.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-posts-day">
+                  <p className="text-sm text-muted-foreground text-center py-[var(--card-padding,1.25rem)]" data-testid="text-no-posts-day">
                     No posts scheduled for this day
                   </p>
                 ) : (
@@ -521,7 +521,7 @@ export default function SocialCalendarPage() {
                     {selectedDayPosts.map(post => (
                       <div
                         key={post.id}
-                        className="flex items-start gap-3 p-3 rounded-md border cursor-pointer hover-elevate active-elevate-2"
+                        className="flex items-start gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border cursor-pointer hover-elevate active-elevate-2"
                         onClick={() => setDetailPost(post)}
                         data-testid={`card-post-${post.id}`}
                       >
@@ -558,7 +558,7 @@ export default function SocialCalendarPage() {
 
           {viewMode === 'quarter' && (
             <div data-testid="card-quarter-view">
-              <div className="flex items-center justify-between gap-4 flex-wrap mb-4">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap mb-4">
                 <Button
                   variant="outline"
                   size="icon"
@@ -589,10 +589,10 @@ export default function SocialCalendarPage() {
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-testid="quarter-grid">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]" data-testid="quarter-grid">
                 {quarterMonths.map(qm => (
                   <Card key={`${qm.year}-${qm.month}`} className="overflow-visible">
-                    <CardContent className="p-4">
+                    <CardContent className="p-[var(--card-padding,1.25rem)]">
                       <h3
                         className="text-base font-semibold text-center mb-3"
                         data-testid={`text-quarter-month-${qm.year}-${qm.month}`}
@@ -620,7 +620,7 @@ export default function SocialCalendarPage() {
                               key={index}
                               onClick={() => setSelectedDate(dateKey)}
                               className={`
-                                relative flex flex-col items-center justify-center py-1.5 rounded-md text-sm transition-colors
+                                relative flex flex-col items-center justify-center py-1.5 rounded-[var(--card-radius,0.75rem)] text-sm transition-colors
                                 ${isCurrentMonth ? '' : 'opacity-30'}
                                 ${isToday ? 'ring-1 ring-primary font-bold' : ''}
                                 ${isSelected ? 'bg-accent' : ''}
@@ -664,7 +664,7 @@ export default function SocialCalendarPage() {
               </CardHeader>
               <CardContent>
                 {selectedDayPosts.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-posts-day-quarter">
+                  <p className="text-sm text-muted-foreground text-center py-[var(--card-padding,1.25rem)]" data-testid="text-no-posts-day-quarter">
                     No posts scheduled for this day
                   </p>
                 ) : (
@@ -672,7 +672,7 @@ export default function SocialCalendarPage() {
                     {selectedDayPosts.map(post => (
                       <div
                         key={post.id}
-                        className="flex items-start gap-3 p-3 rounded-md border cursor-pointer hover-elevate active-elevate-2"
+                        className="flex items-start gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border cursor-pointer hover-elevate active-elevate-2"
                         onClick={() => setDetailPost(post)}
                         data-testid={`card-post-quarter-${post.id}`}
                       >
@@ -732,7 +732,7 @@ export default function SocialCalendarPage() {
                     const dayPosts = postsByDate[dateKey] || []
                     const isToday = dateKey === todayKey
                     return (
-                      <div key={dateKey} className={`p-3 rounded-md border ${isToday ? 'ring-2 ring-primary' : ''}`} data-testid={`week-day-${dateKey}`}>
+                      <div key={dateKey} className={`p-3 rounded-[var(--card-radius,0.75rem)] border ${isToday ? 'ring-2 ring-primary' : ''}`} data-testid={`week-day-${dateKey}`}>
                         <div className="flex items-center justify-between gap-2 mb-2">
                           <span className="text-sm font-medium">{day.toLocaleDateString('default', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
                           <Badge variant="outline" className="text-xs">{dayPosts.length} post{dayPosts.length !== 1 ? 's' : ''}</Badge>

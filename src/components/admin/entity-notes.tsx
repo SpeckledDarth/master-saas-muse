@@ -84,14 +84,14 @@ export function EntityNotes({ entityType, entityId }: EntityNotesProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12" data-testid="loading-notes">
+      <div className="flex items-center justify-center py-[var(--section-spacing,3.5rem)]" data-testid="loading-notes">
         <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-4" data-testid="entity-notes">
+    <div className="space-y-[var(--content-density-gap,1rem)]" data-testid="entity-notes">
       <div className="flex gap-2">
         <Textarea
           placeholder="Add a note..."
@@ -113,7 +113,7 @@ export function EntityNotes({ entityType, entityId }: EntityNotesProps) {
       </div>
 
       {notes.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground" data-testid="empty-notes">
+        <div className="text-center py-[var(--section-spacing,3.5rem)] text-muted-foreground" data-testid="empty-notes">
           <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm">No notes yet</p>
         </div>

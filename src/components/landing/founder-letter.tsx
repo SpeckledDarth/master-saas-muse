@@ -27,10 +27,10 @@ export function FounderLetter({ settings, className = '' }: FounderLetterProps) 
     .toUpperCase()
 
   return (
-    <section className={`py-16 md:py-24 ${className}`} data-testid="section-founder-letter">
-      <div className="container mx-auto px-4">
+    <section className={`py-[var(--section-spacing,3.5rem)] md:py-24 ${className}`} data-testid="section-founder-letter">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
         {settings.backgroundImageUrl && (
-          <div className="relative w-full h-48 md:h-64 rounded-lg overflow-hidden mb-10">
+          <div className="relative w-full h-48 md:h-64 rounded-[var(--card-radius,0.75rem)] overflow-hidden mb-10">
             <Image
               src={settings.backgroundImageUrl}
               alt="Team photo"
@@ -47,15 +47,15 @@ export function FounderLetter({ settings, className = '' }: FounderLetterProps) 
             {settings.headline}
           </h3>
 
-          <div className="space-y-4 text-muted-foreground leading-relaxed" data-testid="text-founder-letter-body">
+          <div className="space-y-[var(--content-density-gap,1rem)] text-muted-foreground leading-relaxed" data-testid="text-founder-letter-body">
             {settings.body.split('\n\n').map((paragraph, i) => (
               <p key={i}>{paragraph}</p>
             ))}
           </div>
 
-          <div className="mt-10 flex items-center gap-4">
+          <div className="mt-10 flex items-center gap-[var(--content-density-gap,1rem)]">
             {settings.signatureImageUrl ? (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-[var(--content-density-gap,1rem)]">
                 <p className="text-muted-foreground">Sincerely,</p>
                 <div className="relative h-12 w-40">
                   <Image

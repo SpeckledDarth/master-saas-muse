@@ -48,9 +48,9 @@ export default function PartnerLandingPage() {
 
   if (error || !data) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4" data-testid="error-partner-page">
+      <div className="flex items-center justify-center min-h-screen p-[var(--card-padding,1.25rem)]" data-testid="error-partner-page">
         <Card className="w-full max-w-md">
-          <CardContent className="pt-8 pb-6 text-center">
+          <CardContent className="pt-8 pb-[var(--card-padding,1.25rem)] text-center">
             <h2 className="text-xl font-bold mb-2">Page Not Found</h2>
             <p className="text-muted-foreground mb-4">This partner page doesn't exist or is no longer active.</p>
             <Link href="/">
@@ -69,10 +69,10 @@ export default function PartnerLandingPage() {
   return (
     <div className="min-h-screen bg-background" data-testid="page-partner-landing">
       <div
-        className="w-full py-20 px-4"
+        className="w-full py-20 px-[var(--card-padding,1.25rem)]"
         style={{ background: `linear-gradient(135deg, ${themeColor}22, ${themeColor}08)` }}
       >
-        <div className="max-w-2xl mx-auto text-center space-y-6">
+        <div className="max-w-2xl mx-auto text-center space-y-[var(--content-density-gap,1rem)]">
           {page.photo_url && (
             <div className="flex justify-center mb-4">
               <img
@@ -113,7 +113,7 @@ export default function PartnerLandingPage() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+      <div className="max-w-2xl mx-auto py-[var(--section-spacing,3.5rem)] px-[var(--card-padding,1.25rem)] text-center">
         <p className="text-sm text-muted-foreground">
           Referred by a trusted partner
         </p>

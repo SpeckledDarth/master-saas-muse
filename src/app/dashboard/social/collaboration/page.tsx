@@ -108,8 +108,8 @@ export default function CollaborationPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-collaboration-title">
             Client Collaboration
@@ -133,7 +133,7 @@ export default function CollaborationPage() {
             Create Approval Link
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           {draftsLoading ? (
             <div className="flex items-center justify-center py-8" data-testid="loading-drafts">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -156,7 +156,7 @@ export default function CollaborationPage() {
                 {drafts.map((draft, i) => (
                   <div
                     key={draft.id}
-                    className="flex items-start gap-3 p-3 rounded-md border"
+                    className="flex items-start gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border"
                     data-testid={`row-draft-${i}`}
                   >
                     <Checkbox
@@ -189,7 +189,7 @@ export default function CollaborationPage() {
               </Button>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground py-4" data-testid="text-no-drafts">
+            <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]" data-testid="text-no-drafts">
               No draft posts available. Create some draft posts first.
             </p>
           )}
@@ -209,12 +209,12 @@ export default function CollaborationPage() {
               {approvalLinks.map((link, i) => (
                 <div
                   key={i}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-md border"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border"
                   data-testid={`row-approval-link-${i}`}
                 >
                   <div className="space-y-1 flex-1 min-w-0">
                     <p className="text-sm font-mono truncate" data-testid={`text-approval-url-${i}`}>{link.url}</p>
-                    <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">
+                    <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap text-xs text-muted-foreground">
                       <span data-testid={`text-approval-created-${i}`}>Created: {new Date(link.createdAt).toLocaleDateString()}</span>
                       <span data-testid={`text-approval-expires-${i}`}>Expires: {new Date(link.expiresAt).toLocaleDateString()}</span>
                       <Badge variant="secondary" className="text-xs" data-testid={`badge-approval-posts-${i}`}>
@@ -235,7 +235,7 @@ export default function CollaborationPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground py-4" data-testid="text-no-approval-links">
+            <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]" data-testid="text-no-approval-links">
               No approval links generated yet. Select draft posts above and generate a link.
             </p>
           )}

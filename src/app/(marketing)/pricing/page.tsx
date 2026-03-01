@@ -94,7 +94,7 @@ export default function PricingPage() {
 
   if (loading || stripeLoading) {
     return (
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
         <div className="text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
           <p className="text-muted-foreground mb-12 flex items-center justify-center gap-2">
@@ -147,9 +147,9 @@ export default function PricingPage() {
         testId="pricing"
       />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
         <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-2 p-1 bg-muted rounded-lg">
+        <div className="inline-flex items-center gap-2 p-1 bg-muted rounded-[var(--card-radius,0.75rem)]">
           <Button
             variant={billingInterval === 'month' ? 'default' : 'ghost'}
             size="sm"
@@ -176,7 +176,7 @@ export default function PricingPage() {
           const layout = pricing?.cardLayout || 'auto'
           const colsClass = layout === '2' ? 'md:grid-cols-2' : layout === '3' ? 'md:grid-cols-2 lg:grid-cols-3' : layout === '4' ? 'md:grid-cols-2 lg:grid-cols-4' : totalCards <= 2 ? 'md:grid-cols-2' : totalCards === 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'
           return (
-            <div className={`grid gap-8 max-w-6xl mx-auto ${colsClass}`}>
+            <div className={`grid gap-[var(--content-density-gap,1rem)] max-w-6xl mx-auto ${colsClass}`}>
               {pricing?.showFreePlan !== false && (
                 <Card data-testid="card-plan-free">
                   <CardHeader>
@@ -220,7 +220,7 @@ export default function PricingPage() {
                 return (
                   <Card 
                     key={product.id} 
-                    className={isPopular ? 'border-primary-600 dark:border-primary-400 shadow-lg' : ''}
+                    className={isPopular ? 'border-primary-600 dark:border-primary-400 shadow-[var(--card-shadow)]' : ''}
                     data-testid={`card-plan-${product.id}`}
                   >
                     <CardHeader>
@@ -272,7 +272,7 @@ export default function PricingPage() {
           )
         })()
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)] md:gap-[var(--content-density-gap,1rem)] max-w-5xl mx-auto">
           {(pricing?.plans || []).map((plan) => {
             const displayPrice = billingInterval === 'year' 
               ? Math.round(plan.price * 12 * 0.8) 
@@ -281,7 +281,7 @@ export default function PricingPage() {
             return (
               <Card 
                 key={plan.id} 
-                className={plan.highlighted ? 'border-primary-600 dark:border-primary-400 shadow-lg' : ''}
+                className={plan.highlighted ? 'border-primary-600 dark:border-primary-400 shadow-[var(--card-shadow)]' : ''}
                 data-testid={`card-plan-${plan.id}`}
               >
                 <CardHeader>

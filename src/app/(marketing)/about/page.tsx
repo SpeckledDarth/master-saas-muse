@@ -37,11 +37,11 @@ export default function AboutPage() {
         testId="about"
       />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
         <div className="max-w-4xl mx-auto space-y-12">
         <section>
           <Card>
-            <CardContent className="p-4 md:p-8">
+            <CardContent className="p-[var(--card-padding,1.25rem)] md:p-8">
               <h2 className="text-xl md:text-2xl font-semibold mb-4 flex items-center gap-2" data-testid="text-our-story">
                 <Heart className="h-6 w-6 text-primary-600 dark:text-primary-400 flex-shrink-0" />
                 Our Story
@@ -55,7 +55,7 @@ export default function AboutPage() {
 
         <section>
           <Card>
-            <CardContent className="p-4 md:p-8">
+            <CardContent className="p-[var(--card-padding,1.25rem)] md:p-8">
               <h2 className="text-xl md:text-2xl font-semibold mb-4 flex items-center gap-2" data-testid="text-our-mission">
                 <Target className="h-6 w-6 text-primary-600 dark:text-primary-400 flex-shrink-0" />
                 Our Mission
@@ -72,10 +72,10 @@ export default function AboutPage() {
             <h2 className="text-2xl font-semibold mb-6 text-center" data-testid="text-our-values">
               Our Values
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
               {about.values.map((value, index) => (
                 <Card key={index} className="text-center hover-elevate">
-                  <CardContent className="p-6">
+                  <CardContent className="p-[var(--card-padding,1.25rem)]">
                     <p className="font-medium" data-testid={`text-value-${index}`}>{value}</p>
                   </CardContent>
                 </Card>
@@ -89,10 +89,10 @@ export default function AboutPage() {
             <h2 className="text-2xl font-semibold mb-6 text-center" data-testid="text-team-headline">
               {about.teamHeadline || 'Meet Our Team'}
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
               {about.team.map((member) => (
                 <Card key={member.id} className="text-center hover-elevate">
-                  <CardContent className="p-6">
+                  <CardContent className="p-[var(--card-padding,1.25rem)]">
                     {member.imageUrl ? (
                       <img
                         src={member.imageUrl}
@@ -126,7 +126,7 @@ export default function AboutPage() {
 
         <section className="text-center">
           <Card>
-            <CardContent className="p-4 md:p-8">
+            <CardContent className="p-[var(--card-padding,1.25rem)] md:p-8">
               <h2 className="text-xl md:text-2xl font-semibold mb-4" data-testid="text-contact-cta">
                 Want to learn more?
               </h2>

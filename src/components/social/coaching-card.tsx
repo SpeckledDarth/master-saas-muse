@@ -61,7 +61,7 @@ export function CoachingCard({ className }: { className?: string }) {
           background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)',
         }}
       />
-      <CardContent className="relative flex items-start gap-3 py-4 px-5">
+      <CardContent className="relative flex items-start gap-[var(--content-density-gap,1rem)] py-[var(--card-padding,1.25rem)] px-[var(--card-padding,1.25rem)]">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900">
           <Lightbulb className="h-4 w-4 text-primary-700 dark:text-primary-300" />
         </div>

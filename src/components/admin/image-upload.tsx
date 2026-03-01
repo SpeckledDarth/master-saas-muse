@@ -112,7 +112,7 @@ export function ImageUpload({
   function renderPositionSliders() {
     if (!hasPositionControls || !value) return null
     return (
-      <div className="grid grid-cols-2 gap-3" style={{ maxWidth: resolvedMaxWidth }}>
+      <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]" style={{ maxWidth: resolvedMaxWidth }}>
         {onPositionXChange && (
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Horizontal: {positionX ?? 50}%</Label>
@@ -149,7 +149,7 @@ export function ImageUpload({
     return (
       <div className="space-y-2">
         <Label>{label}</Label>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           <div
             className="relative shrink-0"
             style={{ width: resolvedMaxWidth, height: resolvedMaxWidth }}
@@ -238,7 +238,7 @@ export function ImageUpload({
         {value ? (
           <div className="relative group">
             <div
-              className="relative rounded-lg border overflow-hidden bg-muted"
+              className="relative rounded-[var(--card-radius,0.75rem)] border overflow-hidden bg-muted"
               style={{ aspectRatio }}
             >
               <img
@@ -262,7 +262,7 @@ export function ImageUpload({
           </div>
         ) : (
           <div
-            className="relative rounded-lg border-2 border-dashed border-muted-foreground/25 transition-colors cursor-pointer hover-elevate active-elevate-2"
+            className="relative rounded-[var(--card-radius,0.75rem)] border-2 border-dashed border-muted-foreground/25 transition-colors cursor-pointer hover-elevate active-elevate-2"
             style={{ aspectRatio }}
             onClick={() => fileInputRef.current?.click()}
             data-testid={`${testId}-dropzone`}

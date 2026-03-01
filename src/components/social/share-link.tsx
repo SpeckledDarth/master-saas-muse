@@ -44,7 +44,7 @@ export function ShareLink() {
   if (loading) {
     return (
       <Card>
-        <CardContent className="py-8 text-center text-muted-foreground">
+        <CardContent className="py-[var(--section-spacing,3.5rem)] text-center text-muted-foreground">
           <div className="animate-pulse">Loading your share link...</div>
         </CardContent>
       </Card>
@@ -74,7 +74,7 @@ export function ShareLink() {
         </CardTitle>
         <CardDescription>Share your unique link and track referrals</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-[var(--content-density-gap,1rem)]">
         <div className="flex gap-2">
           <Input
             value={link.shareUrl}
@@ -87,15 +87,15 @@ export function ShareLink() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+        <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50">
             <MousePointerClick className="h-5 w-5 text-primary" />
             <div>
               <div className="text-xl font-bold" data-testid="text-referral-clicks">{link.clicks}</div>
               <div className="text-xs text-muted-foreground">Clicks</div>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50">
             <Users className="h-5 w-5 text-primary" />
             <div>
               <div className="text-xl font-bold" data-testid="text-referral-signups">{link.signups}</div>

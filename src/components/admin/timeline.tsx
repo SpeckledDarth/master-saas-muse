@@ -87,9 +87,9 @@ interface TimelineProps {
 
 function TimelineSkeleton({ count = 5 }: { count?: number }) {
   return (
-    <div className="space-y-4" data-testid="timeline-skeleton">
+    <div className="space-y-[var(--content-density-gap,1rem)]" data-testid="timeline-skeleton">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="flex gap-3 animate-pulse">
+        <div key={i} className="flex gap-[var(--content-density-gap,1rem)] animate-pulse">
           <div className="h-8 w-8 rounded-full bg-muted shrink-0" />
           <div className="flex-1 space-y-2 pt-1">
             <div className="h-3.5 bg-muted rounded w-3/4" />
@@ -110,7 +110,7 @@ export function Timeline({ events, loading, emptyMessage, maxItems, compact, cla
 
   if (displayEvents.length === 0) {
     return (
-      <div className="flex items-center justify-center py-8 text-sm text-muted-foreground" data-testid="timeline-empty">
+      <div className="flex items-center justify-center py-[var(--section-spacing,3.5rem)] text-sm text-muted-foreground" data-testid="timeline-empty">
         <Activity className="h-4 w-4 mr-2 opacity-50" />
         {emptyMessage || 'No activity yet'}
       </div>
@@ -129,7 +129,7 @@ export function Timeline({ events, loading, emptyMessage, maxItems, compact, cla
           const content = (
             <div
               className={cn(
-                'flex gap-3 relative group',
+                'flex gap-[var(--content-density-gap,1rem)] relative group',
                 compact ? 'py-1.5' : 'py-2.5',
                 event.href && 'cursor-pointer'
               )}

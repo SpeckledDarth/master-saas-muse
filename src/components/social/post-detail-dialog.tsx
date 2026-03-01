@@ -67,7 +67,7 @@ export function PostDetailDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg" data-testid="dialog-post-detail">
         <DialogHeader>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
             <PlatformIconCircle platform={post.platform} size="lg" />
             <div className="flex-1 min-w-0">
               <DialogTitle className="text-base" data-testid="text-detail-platform">
@@ -87,16 +87,16 @@ export function PostDetailDialog({
           </div>
         </DialogHeader>
 
-        <div className="space-y-4 mt-2">
-          <div className="rounded-md border p-4" data-testid="section-detail-content">
+        <div className="space-y-[var(--content-density-gap,1rem)] mt-2">
+          <div className="rounded-[var(--card-radius,0.75rem)] border p-[var(--card-padding,1.25rem)]" data-testid="section-detail-content">
             <p className="text-sm whitespace-pre-wrap leading-relaxed">{post.content}</p>
           </div>
 
           {hasEngagement && (
             <Card data-testid="card-detail-engagement">
-              <CardContent className="py-4">
+              <CardContent className="py-[var(--card-padding,1.25rem)]">
                 <p className="text-xs font-medium text-muted-foreground mb-3">Engagement</p>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                   {typeof post.engagement_likes === 'number' && (
                     <div className="flex items-center gap-2" data-testid="detail-likes">
                       <Heart className="h-4 w-4 text-chart-1" />

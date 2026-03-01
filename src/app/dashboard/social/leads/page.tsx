@@ -166,8 +166,8 @@ export default function LeadsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)] max-w-4xl mx-auto">
+      <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2" data-testid="text-leads-title">
             <Target className="h-6 w-6" />
@@ -201,7 +201,7 @@ export default function LeadsPage() {
 
       {activeSection === 'leads' && (
         <>
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -272,7 +272,7 @@ export default function LeadsPage() {
                       <MessageSquare className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                       <p className="text-sm">{lead.snippet}</p>
                     </div>
-                    <div className="rounded-md bg-muted p-3">
+                    <div className="rounded-[var(--card-radius,0.75rem)] bg-muted p-3">
                       <p className="text-xs text-muted-foreground mb-1 font-medium">Suggested Reply <HelpTooltip text="AI drafts a reply based on the lead's message and your brand voice. Edit it before sending if you'd like." /></p>
                       <p className="text-sm">{lead.suggestedReply}</p>
                     </div>
@@ -296,8 +296,8 @@ export default function LeadsPage() {
       )}
 
       {activeSection === 'gig-alerts' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
             <div>
               <p className="text-sm text-muted-foreground" data-testid="text-gig-monitoring">
                 Monitoring keywords based on your niche
@@ -368,7 +368,7 @@ export default function LeadsPage() {
                     </div>
                     {alert.status === 'new' && (
                       <div className="space-y-3">
-                        <div className="rounded-md bg-muted p-3">
+                        <div className="rounded-[var(--card-radius,0.75rem)] bg-muted p-3">
                           <p className="text-xs text-muted-foreground mb-2 font-medium">Quick Reply Templates</p>
                           <div className="space-y-2">
                             {replyTemplates.slice(0, 3).map((tmpl, ti) => (

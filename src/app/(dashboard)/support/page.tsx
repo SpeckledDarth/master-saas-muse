@@ -155,8 +155,8 @@ function TicketDetail({
   const StatusIcon = status.icon
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3 flex-wrap">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
         <Button variant="ghost" size="icon" onClick={onBack} data-testid="button-back-tickets">
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -184,7 +184,7 @@ function TicketDetail({
       )}
 
       <DSCard data-testid="card-ticket-comments">
-        <DSCardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap">
+        <DSCardHeader className="flex flex-row items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
           <div>
             <DSCardTitle className="text-lg">Comments</DSCardTitle>
             <DSCardDescription>{comments.length} comment{comments.length !== 1 ? 's' : ''}</DSCardDescription>
@@ -196,7 +196,7 @@ function TicketDetail({
             </Button>
           )}
         </DSCardHeader>
-        <DSCardContent className="space-y-4">
+        <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
           {isLoading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -333,7 +333,7 @@ export default function SupportPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
+      <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] mb-8 flex-wrap">
         <div>
           <h1 className="text-3xl font-bold" data-testid="text-support-title">Support</h1>
           <p className="text-muted-foreground mt-1">View and manage your support tickets</p>
@@ -350,7 +350,7 @@ export default function SupportPage() {
               <DialogTitle>Create Support Ticket</DialogTitle>
               <DialogDescription>Describe your issue and we&apos;ll get back to you as soon as possible.</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 pt-2">
+            <div className="space-y-[var(--content-density-gap,1rem)] pt-2">
               <div className="space-y-2">
                 <Label htmlFor="ticket-subject">Subject</Label>
                 <Input
@@ -373,7 +373,7 @@ export default function SupportPage() {
                   data-testid="input-ticket-description"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                 <div className="space-y-2">
                   <Label>Priority</Label>
                   <Select value={newPriority} onValueChange={setNewPriority}>
@@ -462,7 +462,7 @@ export default function SupportPage() {
                 onClick={() => setSelectedTicket(ticket)}
                 data-testid={`ticket-${ticket.id}`}
               >
-                <DSCardContent className="py-4 flex items-center gap-4 flex-wrap">
+                <DSCardContent className="py-[var(--card-padding,1.25rem)] flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate" data-testid={`text-ticket-subject-${ticket.id}`}>{ticket.subject}</p>
                     <p className="text-sm text-muted-foreground">

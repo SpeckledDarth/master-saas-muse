@@ -303,7 +303,7 @@ export default function AdminDashboard() {
             <div className="h-4 bg-muted rounded w-1/3 mb-4" />
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex gap-3">
+                <div key={i} className="flex gap-[var(--content-density-gap,1rem)]">
                   <div className="h-8 w-8 rounded-full bg-muted" />
                   <div className="flex-1 space-y-2">
                     <div className="h-3 bg-muted rounded w-3/4" />
@@ -432,7 +432,7 @@ export default function AdminDashboard() {
             <Link
               key={alert.id}
               href={alert.href}
-              className={`rounded-[var(--card-radius,0.75rem)] border p-[var(--card-padding,1.25rem)] flex items-center gap-3 hover:opacity-80 transition-opacity ${SEVERITY_STYLES[alert.severity] || SEVERITY_STYLES.info}`}
+              className={`rounded-[var(--card-radius,0.75rem)] border p-[var(--card-padding,1.25rem)] flex items-center gap-[var(--content-density-gap,1rem)] hover:opacity-80 transition-opacity ${SEVERITY_STYLES[alert.severity] || SEVERITY_STYLES.info}`}
               data-testid={`alert-${alert.id}`}
             >
               <AlertTriangle className="h-4 w-4 shrink-0" />
@@ -454,7 +454,7 @@ export default function AdminDashboard() {
           </DSCardHeader>
           <DSCardContent>
             {metricsLoading ? (
-              <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+              <div className="flex justify-center py-[var(--section-spacing,3.5rem)]"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
             ) : (
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -478,7 +478,7 @@ export default function AdminDashboard() {
           </DSCardHeader>
           <DSCardContent>
             {metricsLoading ? (
-              <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+              <div className="flex justify-center py-[var(--section-spacing,3.5rem)]"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
             ) : (
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -510,7 +510,7 @@ export default function AdminDashboard() {
           {dashLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex gap-3 animate-pulse">
+                <div key={i} className="flex gap-[var(--content-density-gap,1rem)] animate-pulse">
                   <div className="h-8 w-8 rounded-full bg-muted" />
                   <div className="flex-1 space-y-2">
                     <div className="h-3 bg-muted rounded w-3/4" />
@@ -576,11 +576,11 @@ export default function AdminDashboard() {
         </DSCardHeader>
         <DSCardContent>
           {waterfallLoading ? (
-            <div className="flex justify-center py-8">
+            <div className="flex justify-center py-[var(--section-spacing,3.5rem)]">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : waterfall.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-waterfall-empty">No revenue waterfall data available yet</p>
+            <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,3.5rem)]" data-testid="text-waterfall-empty">No revenue waterfall data available yet</p>
           ) : (
             <>
               <div className="h-[350px]" data-testid="chart-revenue-waterfall">
@@ -636,7 +636,7 @@ export default function AdminDashboard() {
         </DSCardHeader>
         <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
           <DSGrid cols={{ default: 1, sm: 2 }}>
-            <div className="flex items-start gap-3 p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]">
+            <div className="flex items-start gap-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]">
               <Clock className="h-5 w-5 mt-0.5 text-muted-foreground" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Weekly Report</p>
@@ -649,7 +649,7 @@ export default function AdminDashboard() {
                 )}
               </div>
             </div>
-            <div className="flex items-start gap-3 p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]">
+            <div className="flex items-start gap-[var(--content-density-gap,1rem)] p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)]">
               <Calendar className="h-5 w-5 mt-0.5 text-muted-foreground" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Monthly Report</p>

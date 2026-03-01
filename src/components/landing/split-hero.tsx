@@ -53,14 +53,14 @@ export function SplitHero({
   const gapPx = gap * 4
   
   return (
-    <section className={`py-16 md:py-24 ${bgClasses[background]} ${className}`} data-testid="section-split-hero">
-      <div className="container mx-auto px-4 flex justify-center">
+    <section className={`py-[var(--section-spacing,3.5rem)] md:py-24 ${bgClasses[background]} ${className}`} data-testid="section-split-hero">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)] flex justify-center">
         <div 
           className={`grid grid-cols-1 md:grid-cols-[auto_auto] items-center ${isImageLeft ? '[&>*:first-child]:md:order-2' : ''}`}
           style={{ gap: `${gapPx}px` }}
           data-gap={gap}
         >
-          <div className="space-y-6 max-w-lg text-center md:text-left">
+          <div className="space-y-[var(--content-density-gap,1rem)] max-w-lg text-center md:text-left">
             <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold leading-tight text-foreground">
               {animatedWords.length > 0 ? (
                 <AnimatedWords words={animatedWords} />
@@ -76,7 +76,7 @@ export function SplitHero({
             )}
             
             {(primaryButtonText || secondaryButtonText) && (
-              <div className="flex flex-wrap gap-4 pt-4 justify-center md:justify-start">
+              <div className="flex flex-wrap gap-[var(--content-density-gap,1rem)] pt-4 justify-center md:justify-start">
                 {primaryButtonText && primaryButtonLink && (
                   <Button size="lg" asChild data-testid="button-split-hero-primary">
                     <Link href={primaryButtonLink}>
@@ -98,7 +98,7 @@ export function SplitHero({
           
           <div>
             <div 
-              className="relative rounded-xl overflow-hidden shadow-2xl w-full max-w-[90vw] md:max-w-none mx-auto max-h-[250px] md:max-h-none"
+              className="relative rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-2xl w-full max-w-[90vw] md:max-w-none mx-auto max-h-[250px] md:max-h-none"
               style={{ height: `${imageHeight}px`, width: 'auto', aspectRatio: '4/3' }}
             >
               {imageUrl ? (

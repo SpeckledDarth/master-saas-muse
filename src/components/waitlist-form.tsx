@@ -51,7 +51,7 @@ export function WaitlistForm({ className }: WaitlistFormProps) {
 
   if (submitted) {
     return (
-      <div className={`text-center p-8 ${className}`}>
+      <div className={`text-center p-[var(--card-padding,1.25rem)] ${className}`}>
         <Sparkles className="h-12 w-12 mx-auto mb-4 text-primary-600 dark:text-primary-400" />
         <h3 className="text-xl font-semibold mb-2">You're on the list!</h3>
         <p className="text-muted-foreground">
@@ -63,7 +63,7 @@ export function WaitlistForm({ className }: WaitlistFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className={className}>
-      <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+      <div className="flex flex-col sm:flex-row gap-[var(--content-density-gap,1rem)] max-w-md mx-auto">
         <Input
           type="email"
           placeholder="Enter your email"

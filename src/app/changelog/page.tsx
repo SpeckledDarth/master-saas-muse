@@ -29,7 +29,7 @@ export default async function ChangelogPage() {
     .order('published_at', { ascending: false })
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-4xl font-bold mb-4">Changelog</h1>
         <p className="text-muted-foreground mb-8">
@@ -38,17 +38,17 @@ export default async function ChangelogPage() {
 
         {!posts || posts.length === 0 ? (
           <Card>
-            <CardContent className="py-12 text-center text-muted-foreground">
+            <CardContent className="py-[var(--section-spacing,3.5rem)] text-center text-muted-foreground">
               No changelog entries yet. Check back soon!
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-[var(--content-density-gap,1rem)]">
             {posts.map((post) => (
               <Card key={post.id} className="relative">
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-600 dark:bg-primary-400 rounded-l-lg" />
                 <CardHeader>
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)] mb-2">
                     <Badge variant="outline">
                       {post.published_at 
                         ? new Date(post.published_at).toLocaleDateString('en-US', {

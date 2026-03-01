@@ -226,7 +226,7 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
 
   const topNav = (
     <nav className="border-b bg-background" data-testid="nav-admin-topbar" ref={dropdownRef}>
-      <div className="flex items-center gap-1 px-4 h-11">
+      <div className="flex items-center gap-1 px-[var(--card-padding,1.25rem)] h-11">
         {visibleSections.map(section => {
           const Icon = section.icon
           const isCurrent = section.label === activeSection
@@ -292,7 +292,7 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
         })}
       </div>
 
-      <div className="flex items-center gap-0.5 px-4 h-9 border-t bg-muted/30 overflow-x-auto scrollbar-hide" data-testid="nav-admin-subnav">
+      <div className="flex items-center gap-0.5 px-[var(--card-padding,1.25rem)] h-9 border-t bg-muted/30 overflow-x-auto scrollbar-hide" data-testid="nav-admin-subnav">
         {currentItems.map(item => {
           const ItemIcon = item.icon
           return (
@@ -344,7 +344,7 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
                   return (
                     <Link key={item.label} href={item.href} data-testid={`link-mobile-${item.label.toLowerCase().replace(/\s+/g, '-')}`}>
                       <div className={cn(
-                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                        'flex items-center gap-[var(--content-density-gap,1rem)] rounded-md px-3 py-2 text-sm font-medium transition-colors',
                         isActive(item.href)
                           ? 'bg-primary/10 text-primary'
                           : 'text-muted-foreground hover:bg-muted hover:text-foreground'

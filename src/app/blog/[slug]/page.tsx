@@ -81,7 +81,7 @@ export default async function BlogPostPage({ params }: Props) {
   const readTime = estimateReadTime(post.content || '')
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-[var(--card-padding,1.25rem)] py-[var(--section-spacing,3.5rem)]">
       <div className="max-w-3xl mx-auto">
         <Link href="/blog">
           <Button variant="ghost" className="mb-8 group">
@@ -92,7 +92,7 @@ export default async function BlogPostPage({ params }: Props) {
 
         <article>
           <header className="mb-8 pb-8 border-b">
-            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+            <div className="flex items-center gap-[var(--content-density-gap,1rem)] text-sm text-muted-foreground mb-4">
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
                 <span>
@@ -116,12 +116,12 @@ export default async function BlogPostPage({ params }: Props) {
             )}
           </header>
 
-          <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-primary-600 dark:prose-a:text-primary-400 hover:prose-a:text-primary-500 dark:hover:prose-a:text-primary-300 prose-img:rounded-lg">
+          <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-primary-600 dark:prose-a:text-primary-400 hover:prose-a:text-primary-500 dark:hover:prose-a:text-primary-300 prose-img:rounded-[var(--card-radius,0.75rem)]">
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </div>
 
           <footer className="mt-12 pt-8 border-t">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-[var(--content-density-gap,1rem)]">
               <p className="text-muted-foreground">
                 Thanks for reading! Stay tuned for more updates.
               </p>

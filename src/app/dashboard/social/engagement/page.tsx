@@ -148,7 +148,7 @@ export default function EngagementAnalyticsPage() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="p-[var(--card-padding,1.25rem)]">
         <Card data-testid="error-state-engagement">
           <CardContent className="py-12 text-center">
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -167,7 +167,7 @@ export default function EngagementAnalyticsPage() {
 
   if (!hasData) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold" data-testid="text-page-title">Engagement Analytics</h1>
@@ -233,8 +233,8 @@ export default function EngagementAnalyticsPage() {
   const winner = aiAvgEng > manualAvgEng ? 'ai' : manualAvgEng > aiAvgEng ? 'manual' : 'tie'
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex items-center justify-between flex-wrap gap-[var(--content-density-gap,1rem)]">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-page-title">Engagement Analytics</h1>
           <p className="text-muted-foreground mt-1">
@@ -262,7 +262,7 @@ export default function EngagementAnalyticsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-week-likes">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Likes (7d) <HelpTooltip text="Total likes across all platforms in the last 7 days." /></CardTitle>
@@ -316,7 +316,7 @@ export default function EngagementAnalyticsPage() {
             <CardTitle className="text-base">Top Performing Post This Week</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
               <Badge variant="outline" className="capitalize shrink-0">{topPost.platform}</Badge>
               <div className="flex-1 min-w-0">
                 <p className="text-sm truncate">{topPost.content}</p>
@@ -329,7 +329,7 @@ export default function EngagementAnalyticsPage() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-total-posts">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Posts <HelpTooltip text="The total number of posts you've published across all connected platforms." /></CardTitle>
@@ -377,7 +377,7 @@ export default function EngagementAnalyticsPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         {dailyTrend.length > 0 && (
           <Card data-testid="card-daily-engagement-trend">
             <CardHeader>
@@ -464,8 +464,8 @@ export default function EngagementAnalyticsPage() {
           <CardTitle className="text-base">AI vs. Manual Performance <HelpTooltip text="Compares how AI-written posts perform against ones you wrote yourself, so you can see which approach gets more engagement." /></CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className={`p-4 rounded-md border ${winner === 'ai' ? 'ring-2 ring-primary' : ''}`} data-testid="section-ai-performance">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+            <div className={`p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border ${winner === 'ai' ? 'ring-2 ring-primary' : ''}`} data-testid="section-ai-performance">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">AI-Generated</span>
@@ -482,7 +482,7 @@ export default function EngagementAnalyticsPage() {
                 </div>
               </div>
             </div>
-            <div className={`p-4 rounded-md border ${winner === 'manual' ? 'ring-2 ring-primary' : ''}`} data-testid="section-manual-performance">
+            <div className={`p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border ${winner === 'manual' ? 'ring-2 ring-primary' : ''}`} data-testid="section-manual-performance">
               <div className="flex items-center gap-2 mb-3">
                 <Users className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">Manually Written</span>

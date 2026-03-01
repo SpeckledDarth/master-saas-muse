@@ -29,7 +29,7 @@ interface CustomerStoriesProps {
 function StoryCard({ story }: { story: CustomerStory }) {
   const content = (
     <div 
-      className="group relative rounded-xl overflow-hidden h-80 transition-transform hover:scale-[1.02]"
+      className="group relative rounded-[var(--card-radius,0.75rem)] overflow-hidden h-80 transition-transform hover:scale-[1.02]"
       data-testid={`story-card-${story.id}`}
     >
       {story.backgroundImageUrl ? (
@@ -44,7 +44,7 @@ function StoryCard({ story }: { story: CustomerStory }) {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+      <div className="absolute bottom-0 left-0 right-0 p-[var(--card-padding,1.25rem)] text-white">
         {story.companyLogoUrl && (
           <div className="mb-4">
             <img
@@ -57,7 +57,7 @@ function StoryCard({ story }: { story: CustomerStory }) {
         {story.quote && (
           <p className="text-sm mb-4 line-clamp-3 opacity-90">"{story.quote}"</p>
         )}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
           {story.personPhotoUrl && (
             <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white/30">
               <Image
@@ -103,12 +103,12 @@ export function CustomerStories({ stories, headline, className = '' }: CustomerS
   }
 
   return (
-    <section className={`py-16 md:py-24 ${className}`} data-testid="section-customer-stories">
-      <div className="container mx-auto px-4">
+    <section className={`py-[var(--section-spacing,3.5rem)] md:py-24 ${className}`} data-testid="section-customer-stories">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
           {title}
         </h2>
-        <div className={`grid gap-6 ${
+        <div className={`grid gap-[var(--content-density-gap,1rem)] ${
           storyList.length === 1 ? 'max-w-lg mx-auto' :
           storyList.length === 2 ? 'md:grid-cols-2 max-w-3xl mx-auto' :
           storyList.length === 3 ? 'md:grid-cols-3' :

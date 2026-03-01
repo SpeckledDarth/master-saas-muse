@@ -503,7 +503,7 @@ export default function ProfilePage() {
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <h1 className="text-3xl font-bold mb-8" data-testid="text-profile-title">Profile</h1>
 
-      <div className="space-y-6">
+      <div className="space-y-[var(--content-density-gap,1rem)]">
         <DSCard data-testid="card-profile-info">
           <DSCardHeader>
             <div className="flex items-center gap-2">
@@ -512,8 +512,8 @@ export default function ProfilePage() {
             </div>
             <DSCardDescription>Your account details and avatar</DSCardDescription>
           </DSCardHeader>
-          <DSCardContent className="space-y-4">
-            <div className="flex items-center gap-4">
+          <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
+            <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
               <div className="relative">
                 <Avatar className="h-20 w-20">
                   <AvatarImage src={avatarUrl || user?.user_metadata?.avatar_url} alt={user?.email} />
@@ -553,8 +553,8 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <form onSubmit={handleProfileUpdate} className="pt-4 border-t space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
+            <form onSubmit={handleProfileUpdate} className="pt-4 border-t space-y-[var(--content-density-gap,1rem)]">
+              <div className="grid md:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                 <div>
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
@@ -613,7 +613,7 @@ export default function ProfilePage() {
                     placeholder="Street address"
                     data-testid="input-address"
                   />
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                     <Input 
                       value={city} 
                       onChange={(e) => setCity(e.target.value)}
@@ -627,7 +627,7 @@ export default function ProfilePage() {
                       data-testid="input-state"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
                     <Input 
                       value={zipCode} 
                       onChange={(e) => setZipCode(e.target.value)}
@@ -665,7 +665,7 @@ export default function ProfilePage() {
             <DSCardDescription>Change your email address</DSCardDescription>
           </DSCardHeader>
           <DSCardContent>
-            <form onSubmit={handleEmailUpdate} className="space-y-4">
+            <form onSubmit={handleEmailUpdate} className="space-y-[var(--content-density-gap,1rem)]">
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -703,9 +703,9 @@ export default function ProfilePage() {
           </DSCardHeader>
           <DSCardContent className="space-y-3">
             {hasPasswordAuth() && (
-              <div className="flex items-center justify-between p-3 rounded-lg border" data-testid="provider-email">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-muted">
+              <div className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid="provider-email">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
+                  <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted">
                     <Mail className="h-4 w-4" />
                   </div>
                   <div>
@@ -727,11 +727,11 @@ export default function ProfilePage() {
               return (
                 <div 
                   key={provider.id}
-                  className="flex items-center justify-between p-3 rounded-lg border"
+                  className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border"
                   data-testid={`provider-${provider.id}`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-muted">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
+                    <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted">
                       <ProviderIcon className="h-4 w-4" />
                     </div>
                     <div>
@@ -797,9 +797,9 @@ export default function ProfilePage() {
             <DSCardDescription>Your current plan and billing</DSCardDescription>
           </DSCardHeader>
           <DSCardContent>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${tierInfo.color}`}>
+            <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
+                <div className={`p-2 rounded-[var(--card-radius,0.75rem)] ${tierInfo.color}`}>
                   <TierIcon className="h-5 w-5" />
                 </div>
                 <div>
@@ -832,7 +832,7 @@ export default function ProfilePage() {
             </div>
             <DSCardDescription>Choose which emails you&apos;d like to receive</DSCardDescription>
           </DSCardHeader>
-          <DSCardContent className="space-y-4">
+          <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
             {emailPrefsLoading ? (
               <div className="flex justify-center py-4">
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -849,7 +849,7 @@ export default function ProfilePage() {
                   { key: 'affiliate_updates', label: 'Affiliate Updates', desc: 'Commission notifications, tier changes, and program news' },
                   { key: 'support_responses', label: 'Support Responses', desc: 'Replies to your support tickets' },
                 ].map(({ key, label, desc }) => (
-                  <div key={key} className="flex items-center justify-between gap-4">
+                  <div key={key} className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">{label}</p>
                       <p className="text-xs text-muted-foreground">{desc}</p>
@@ -884,7 +884,7 @@ export default function ProfilePage() {
             <DSCardDescription>Update your password to keep your account secure</DSCardDescription>
           </DSCardHeader>
           <DSCardContent>
-            <form onSubmit={handlePasswordUpdate} className="space-y-4">
+            <form onSubmit={handlePasswordUpdate} className="space-y-[var(--content-density-gap,1rem)]">
               <div>
                 <Label htmlFor="new-password">New Password</Label>
                 <Input
@@ -920,7 +920,7 @@ export default function ProfilePage() {
         </DSCard>
 
         <DSCard data-testid="card-signout">
-          <DSCardContent className="py-6">
+          <DSCardContent className="py-[var(--card-padding,1.25rem)]">
             <Button 
               variant="destructive" 
               onClick={handleSignOut}

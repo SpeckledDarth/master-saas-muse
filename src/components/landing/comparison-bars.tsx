@@ -46,10 +46,10 @@ export function ComparisonBars({ settings, className = '' }: ComparisonBarsProps
   return (
     <section
       ref={sectionRef}
-      className={`py-16 md:py-24 ${className}`}
+      className={`py-[var(--section-spacing,3.5rem)] md:py-24 ${className}`}
       data-testid="section-comparison-bars"
     >
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-[var(--card-padding,1.25rem)]">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" data-testid="text-comparison-headline">
           {settings.headline}
         </h2>
@@ -59,10 +59,10 @@ export function ComparisonBars({ settings, className = '' }: ComparisonBarsProps
           </p>
         )}
 
-        <div className="max-w-2xl mx-auto space-y-4">
+        <div className="max-w-2xl mx-auto space-y-[var(--content-density-gap,1rem)]">
           {settings.items.map((item) => (
             <div key={item.id} className="space-y-2" data-testid={`comparison-item-${item.id}`}>
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
                 <span className="text-sm text-muted-foreground">{item.label}</span>
                 <span className={`text-sm font-bold tabular-nums ${item.highlighted ? 'text-primary-600 dark:text-primary-400' : ''}`}>
                   {item.value}

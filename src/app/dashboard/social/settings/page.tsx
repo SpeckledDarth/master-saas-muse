@@ -120,7 +120,7 @@ export default function SocialSettingsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Settings</h1>
         <p className="text-muted-foreground mt-1">
@@ -158,8 +158,8 @@ export default function SocialSettingsPage() {
             Control how posts are created and scheduled by default.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-between gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-0.5">
               <Label htmlFor="auto-approve">Auto-Approve AI Posts <HelpTooltip text="When on, AI posts skip the approval queue and get scheduled automatically." /></Label>
               <p className="text-xs text-muted-foreground">
@@ -224,7 +224,7 @@ export default function SocialSettingsPage() {
             <p className="text-xs text-muted-foreground">
               Posts will not be published during these hours.
             </p>
-            <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-wrap">
               <div className="space-y-1">
                 <Label htmlFor="quiet-start" className="text-xs text-muted-foreground">Start</Label>
                 <Select
@@ -275,8 +275,8 @@ export default function SocialSettingsPage() {
             Choose how you want to be notified about your social media activity.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-between gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-0.5">
               <Label htmlFor="notif-email">Email Notifications <HelpTooltip text="Get email alerts when posts fail, trends appear, or your weekly summary is ready." /></Label>
               <p className="text-xs text-muted-foreground">
@@ -293,7 +293,7 @@ export default function SocialSettingsPage() {
 
           <Separator />
 
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-0.5">
               <Label htmlFor="notif-inapp">In-App Notifications <HelpTooltip text="See alerts inside your dashboard for post status updates, trend alerts, and activity." /></Label>
               <p className="text-xs text-muted-foreground">

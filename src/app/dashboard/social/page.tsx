@@ -354,7 +354,7 @@ function SocialAccountsContent() {
 
   if (moduleDisabled) {
     return (
-      <div className="p-6">
+      <div className="p-[var(--card-padding,1.25rem)]">
         <Card>
           <CardHeader>
             <CardTitle data-testid="text-social-disabled-title">Social Module Not Enabled</CardTitle>
@@ -368,10 +368,10 @@ function SocialAccountsContent() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-[var(--card-padding,1.25rem)]">
       {oauthError && (
-        <div className="mb-4 p-4 rounded-lg border border-[hsl(var(--danger))] bg-[hsl(var(--danger)/0.1)]" data-testid="banner-oauth-error">
-          <div className="flex items-start justify-between gap-3">
+        <div className="mb-4 p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border border-[hsl(var(--danger))] bg-[hsl(var(--danger)/0.1)]" data-testid="banner-oauth-error">
+          <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
             <div className="flex-1">
               <h3 className="font-semibold text-[hsl(var(--danger))] mb-1">Connection Error</h3>
               <p className="text-sm text-[hsl(var(--danger))] whitespace-pre-wrap break-words">{oauthError}</p>
@@ -383,8 +383,8 @@ function SocialAccountsContent() {
         </div>
       )}
       {oauthSuccess && (
-        <div className="mb-4 p-4 rounded-lg border border-[hsl(var(--success))] bg-[hsl(var(--success)/0.1)]" data-testid="banner-oauth-success">
-          <div className="flex items-start justify-between gap-3">
+        <div className="mb-4 p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border border-[hsl(var(--success))] bg-[hsl(var(--success)/0.1)]" data-testid="banner-oauth-success">
+          <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
             <div className="flex-1">
               <h3 className="font-semibold text-[hsl(var(--success))] mb-1">Connected!</h3>
               <p className="text-sm text-[hsl(var(--success))]">{oauthSuccess}</p>
@@ -395,7 +395,7 @@ function SocialAccountsContent() {
           </div>
         </div>
       )}
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap mb-6">
+      <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap mb-6">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-social-title">
             Connected Social Accounts <HelpTooltip text="Link your social media accounts so PassivePost can post on your behalf." />
@@ -422,17 +422,17 @@ function SocialAccountsContent() {
         )}
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-[var(--content-density-gap,1rem)]">
         {PLATFORMS.map(platform => {
           const account = getAccountForPlatform(platform.id)
           const brandColor = getPlatformColor(platform.id)
 
           return (
             <Card key={platform.id} data-testid={`card-platform-${platform.id}`}>
-              <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-2">
-                <div className="flex items-center gap-3">
+              <CardHeader className="flex flex-row items-center justify-between gap-[var(--content-density-gap,1rem)] space-y-0 pb-2">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <div
-                    className="flex h-10 w-10 items-center justify-center rounded-md"
+                    className="flex h-10 w-10 items-center justify-center rounded-[var(--card-radius,0.75rem)]"
                     style={{ backgroundColor: `${brandColor}14` }}
                   >
                     <PlatformIcon platform={platform.id} className="h-5 w-5" />
@@ -523,7 +523,7 @@ function SocialAccountsContent() {
               </CardHeader>
               {account && (
                 <CardContent data-testid={`content-details-${platform.id}`}>
-                  <div className="flex flex-row items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                  <div className="flex flex-row items-center gap-[var(--content-density-gap,1rem)] text-sm text-muted-foreground flex-wrap">
                     {account.display_name && (
                       <span data-testid={`text-display-name-${platform.id}`}>
                         {account.display_name}
@@ -549,9 +549,9 @@ function SocialAccountsContent() {
       </div>
 
       <Card className="mt-6" data-testid="card-blog-platforms-link">
-        <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-2">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted">
+        <CardHeader className="flex flex-row items-center justify-between gap-[var(--content-density-gap,1rem)] space-y-0 pb-2">
+          <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[var(--card-radius,0.75rem)] bg-muted">
               <BookOpen className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
@@ -581,7 +581,7 @@ function SocialAccountsContent() {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-4">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
                 <div className="space-y-1">
                   <p className="text-sm font-medium">How it works:</p>
                   <ol className="space-y-2 ml-1">
@@ -601,7 +601,7 @@ function SocialAccountsContent() {
                 </p>
 
                 {PLATFORM_GUIDES[selectedPlatform].note && (
-                  <div className="flex items-start gap-2 rounded-lg border bg-muted/50 p-3">
+                  <div className="flex items-start gap-2 rounded-[var(--card-radius,0.75rem)] border bg-muted/50 p-3">
                     <ShieldCheck className="h-4 w-4 shrink-0 text-[hsl(var(--success))] mt-0.5" />
                     <p className="text-xs text-muted-foreground">
                       {PLATFORM_GUIDES[selectedPlatform].note}

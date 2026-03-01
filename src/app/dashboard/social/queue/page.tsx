@@ -135,7 +135,7 @@ export default function ApprovalQueuePage() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="p-[var(--card-padding,1.25rem)]">
         <Card data-testid="error-state-queue">
           <CardContent className="py-12 text-center">
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -151,7 +151,7 @@ export default function ApprovalQueuePage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Approval Queue <HelpTooltip text="AI-generated posts land here for your review before going live. You control what gets published." /></h1>
         <p className="text-muted-foreground mt-1">
@@ -177,7 +177,7 @@ export default function ApprovalQueuePage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-[var(--content-density-gap,1rem)]">
           <p className="text-sm text-muted-foreground" data-testid="text-queue-count">
             {posts.length} post{posts.length !== 1 ? 's' : ''} waiting for review
             <HelpTooltip text="Approve moves a post to your schedule. Reject removes it. Edit lets you tweak the text first." />
@@ -209,7 +209,7 @@ export default function ApprovalQueuePage() {
                   </span>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-[var(--content-density-gap,1rem)]">
                 {editingId === post.id ? (
                   <Textarea
                     value={editContent}

@@ -97,10 +97,10 @@ export default function SecurityPage() {
         <p className="text-muted-foreground mt-2">Manage your account security settings</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-[var(--content-density-gap,1rem)]">
         <DSCard data-testid="card-change-password">
           <DSCardHeader>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
               <Lock className="h-5 w-5 text-muted-foreground" />
               <div>
                 <DSCardTitle className="text-lg">Change Password</DSCardTitle>
@@ -112,7 +112,7 @@ export default function SecurityPage() {
               </div>
             </div>
           </DSCardHeader>
-          <DSCardContent className="space-y-4">
+          <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label htmlFor="new-password">New Password</Label>
               <Input
@@ -148,8 +148,8 @@ export default function SecurityPage() {
 
         <DSCard data-testid="card-two-factor">
           <DSCardHeader>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                 <Smartphone className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <DSCardTitle className="text-lg">Two-Factor Authentication</DSCardTitle>
@@ -169,7 +169,7 @@ export default function SecurityPage() {
 
         <DSCard data-testid="card-login-activity">
           <DSCardHeader>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
               <Clock className="h-5 w-5 text-muted-foreground" />
               <div>
                 <DSCardTitle className="text-lg">Login Activity</DSCardTitle>
@@ -177,14 +177,14 @@ export default function SecurityPage() {
               </div>
             </div>
           </DSCardHeader>
-          <DSCardContent className="space-y-4">
-            <div className="flex items-center justify-between gap-4 py-2 border-b flex-wrap">
+          <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
+            <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] py-2 border-b flex-wrap">
               <div>
                 <p className="text-sm font-medium">Last Sign In</p>
                 <p className="text-sm text-muted-foreground" data-testid="text-last-login">{lastSignIn}</p>
               </div>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2 border-b flex-wrap">
+            <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] py-2 border-b flex-wrap">
               <div>
                 <p className="text-sm font-medium">Sign In Method</p>
                 <p className="text-sm text-muted-foreground" data-testid="text-auth-provider">
@@ -192,7 +192,7 @@ export default function SecurityPage() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2 flex-wrap">
+            <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] py-2 flex-wrap">
               <div>
                 <p className="text-sm font-medium">Email</p>
                 <p className="text-sm text-muted-foreground" data-testid="text-user-email">{user?.email}</p>

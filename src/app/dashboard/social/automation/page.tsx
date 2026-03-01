@@ -328,8 +328,8 @@ export default function ContentAutomationPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-automation-title">
             Content Automation <HelpTooltip text="Automate your content creation, repurposing, and distribution with AI-powered tools." />
@@ -354,8 +354,8 @@ export default function ContentAutomationPage() {
             <HelpTooltip text="Automatically fill your content calendar with AI-generated posts across your selected platforms." />
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label htmlFor="posts-per-week">Posts per Week</Label>
               <Input
@@ -408,8 +408,8 @@ export default function ContentAutomationPage() {
             <div className="mt-4 space-y-3 border-t pt-4" data-testid="section-calendar-results">
               <div className="space-y-2">
                 {calendarItems.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-md border" data-testid={`calendar-item-${i}`}>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted shrink-0">
+                  <div key={i} className="flex items-start gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`calendar-item-${i}`}>
+                    <div className="flex h-9 w-9 items-center justify-center rounded-[var(--card-radius,0.75rem)] bg-muted shrink-0">
                       <CalendarCheck className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -444,7 +444,7 @@ export default function ContentAutomationPage() {
             <HelpTooltip text="Select multiple blog articles and repurpose them all into social media snippets at once. Maximum 5 articles per batch." />
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           {articlesLoading ? (
             <div className="flex items-center justify-center py-8" data-testid="loading-articles">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -453,7 +453,7 @@ export default function ContentAutomationPage() {
             <>
               <div className="space-y-2 max-h-[300px] overflow-y-auto">
                 {articles.map(article => (
-                  <div key={article.id} className="flex items-center gap-3 p-2 rounded-md border" data-testid={`batch-article-${article.id}`}>
+                  <div key={article.id} className="flex items-center gap-[var(--content-density-gap,1rem)] p-2 rounded-[var(--card-radius,0.75rem)] border" data-testid={`batch-article-${article.id}`}>
                     <Checkbox
                       id={`batch-${article.id}`}
                       checked={selectedArticleIds.includes(article.id)}
@@ -482,11 +482,11 @@ export default function ContentAutomationPage() {
               </Button>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground py-4">No blog articles found. Create some articles first.</p>
+            <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">No blog articles found. Create some articles first.</p>
           )}
 
           {batchResults.length > 0 && (
-            <div className="mt-4 space-y-4 border-t pt-4" data-testid="section-batch-results">
+            <div className="mt-4 space-y-[var(--content-density-gap,1rem)] border-t pt-4" data-testid="section-batch-results">
               {batchResults.map((result, i) => (
                 <div key={i} className="space-y-2" data-testid={`batch-result-${i}`}>
                   <p className="text-sm font-medium flex items-center gap-2">
@@ -495,7 +495,7 @@ export default function ContentAutomationPage() {
                   </p>
                   <div className="space-y-1.5 pl-5">
                     {result.snippets.map((snippet, j) => (
-                      <div key={j} className="p-2 rounded-md border text-sm" data-testid={`batch-snippet-${i}-${j}`}>
+                      <div key={j} className="p-2 rounded-[var(--card-radius,0.75rem)] border text-sm" data-testid={`batch-snippet-${i}-${j}`}>
                         <Badge variant="secondary" className="text-xs mb-1">{PLATFORM_LABELS[snippet.platform] || snippet.platform}</Badge>
                         <p className="text-muted-foreground">{snippet.content}</p>
                       </div>
@@ -508,7 +508,7 @@ export default function ContentAutomationPage() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-blog-to-thread">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
             <CardTitle className="text-base flex items-center gap-2">
@@ -517,7 +517,7 @@ export default function ContentAutomationPage() {
               <HelpTooltip text="Convert a blog article into a Twitter/X thread format with numbered tweets." />
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Select Article</Label>
               <Select value={threadArticleId} onValueChange={setThreadArticleId}>
@@ -539,7 +539,7 @@ export default function ContentAutomationPage() {
             {threadResult.length > 0 && (
               <div className="mt-4 space-y-2 border-t pt-4" data-testid="section-thread-results">
                 {threadResult.map((tweet, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-md border" data-testid={`thread-tweet-${i}`}>
+                  <div key={i} className="flex items-start gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`thread-tweet-${i}`}>
                     <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-medium shrink-0">
                       {tweet.index || i + 1}
                     </span>
@@ -559,7 +559,7 @@ export default function ContentAutomationPage() {
               <HelpTooltip text="Transform a single blog article into multiple content formats: social snippets, threads, email blurbs, LinkedIn summaries, and Instagram captions." />
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Select Article</Label>
               <Select value={repurposeArticleId} onValueChange={setRepurposeArticleId}>
@@ -579,12 +579,12 @@ export default function ContentAutomationPage() {
             </Button>
 
             {repurposeResult && (
-              <div className="mt-4 space-y-4 border-t pt-4" data-testid="section-repurpose-results">
+              <div className="mt-4 space-y-[var(--content-density-gap,1rem)] border-t pt-4" data-testid="section-repurpose-results">
                 {repurposeResult.socialSnippets && repurposeResult.socialSnippets.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-sm font-medium">Social Snippets</p>
                     {repurposeResult.socialSnippets.map((snippet, i) => (
-                      <div key={i} className="p-2 rounded-md border text-sm" data-testid={`repurpose-snippet-${i}`}>
+                      <div key={i} className="p-2 rounded-[var(--card-radius,0.75rem)] border text-sm" data-testid={`repurpose-snippet-${i}`}>
                         <Badge variant="secondary" className="text-xs mb-1">{PLATFORM_LABELS[snippet.platform] || snippet.platform}</Badge>
                         <p className="text-muted-foreground">{snippet.content}</p>
                       </div>
@@ -607,21 +607,21 @@ export default function ContentAutomationPage() {
                 {repurposeResult.emailBlurb && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium">Email Blurb</p>
-                    <p className="text-sm text-muted-foreground p-2 rounded-md border" data-testid="text-repurpose-email">{repurposeResult.emailBlurb}</p>
+                    <p className="text-sm text-muted-foreground p-2 rounded-[var(--card-radius,0.75rem)] border" data-testid="text-repurpose-email">{repurposeResult.emailBlurb}</p>
                   </div>
                 )}
 
                 {repurposeResult.linkedinSummary && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium">LinkedIn Summary</p>
-                    <p className="text-sm text-muted-foreground p-2 rounded-md border" data-testid="text-repurpose-linkedin">{repurposeResult.linkedinSummary}</p>
+                    <p className="text-sm text-muted-foreground p-2 rounded-[var(--card-radius,0.75rem)] border" data-testid="text-repurpose-linkedin">{repurposeResult.linkedinSummary}</p>
                   </div>
                 )}
 
                 {repurposeResult.instagramCaption && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium">Instagram Caption</p>
-                    <p className="text-sm text-muted-foreground p-2 rounded-md border" data-testid="text-repurpose-instagram">{repurposeResult.instagramCaption}</p>
+                    <p className="text-sm text-muted-foreground p-2 rounded-[var(--card-radius,0.75rem)] border" data-testid="text-repurpose-instagram">{repurposeResult.instagramCaption}</p>
                   </div>
                 )}
               </div>
@@ -645,8 +645,8 @@ export default function ContentAutomationPage() {
             ) : crosspostTiming.length > 0 ? (
               <div className="space-y-3" data-testid="list-crosspost-timing">
                 {crosspostTiming.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-md border" data-testid={`crosspost-timing-${i}`}>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted shrink-0">
+                  <div key={i} className="flex items-start gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`crosspost-timing-${i}`}>
+                    <div className="flex h-9 w-9 items-center justify-center rounded-[var(--card-radius,0.75rem)] bg-muted shrink-0">
                       <Clock className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -664,7 +664,7 @@ export default function ContentAutomationPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground py-4">No timing recommendations available</p>
+              <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">No timing recommendations available</p>
             )}
           </CardContent>
         </Card>
@@ -677,7 +677,7 @@ export default function ContentAutomationPage() {
               <HelpTooltip text="Analyze your articles to determine which are evergreen, seasonal, or dated. Prioritize promoting evergreen content." />
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <Button onClick={handleEvergreenScan} disabled={evergreenLoading} data-testid="button-scan-articles">
               {evergreenLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Leaf className="mr-2 h-4 w-4" />}
               Scan Articles
@@ -686,7 +686,7 @@ export default function ContentAutomationPage() {
             {evergreenResults.length > 0 && (
               <div className="space-y-2" data-testid="section-evergreen-results">
                 {evergreenResults.map((article, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-md border" data-testid={`evergreen-article-${i}`}>
+                  <div key={i} className="flex items-start gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`evergreen-article-${i}`}>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-medium truncate" data-testid={`text-evergreen-title-${i}`}>{article.title}</span>
@@ -722,7 +722,7 @@ export default function ContentAutomationPage() {
             ) : staleDrafts.length > 0 ? (
               <div className="space-y-2" data-testid="list-draft-warnings">
                 {staleDrafts.map((draft, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-md border" data-testid={`draft-warning-${i}`}>
+                  <div key={i} className="flex items-center gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`draft-warning-${i}`}>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-medium truncate" data-testid={`text-draft-title-${i}`}>{draft.title}</span>
@@ -739,7 +739,7 @@ export default function ContentAutomationPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground py-4">No stale drafts found</p>
+              <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">No stale drafts found</p>
             )}
           </CardContent>
         </Card>
@@ -760,7 +760,7 @@ export default function ContentAutomationPage() {
             ) : decayAlerts.length > 0 ? (
               <div className="space-y-2" data-testid="list-content-decay">
                 {decayAlerts.map((alert, i) => (
-                  <div key={i} className="p-3 rounded-md border space-y-1" data-testid={`decay-alert-${i}`}>
+                  <div key={i} className="p-3 rounded-[var(--card-radius,0.75rem)] border space-y-1" data-testid={`decay-alert-${i}`}>
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium truncate" data-testid={`text-decay-title-${i}`}>{alert.title}</span>
                       <Badge variant="destructive" className="text-xs" data-testid={`badge-decay-drop-${i}`}>
@@ -772,7 +772,7 @@ export default function ContentAutomationPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground py-4">No content decay detected</p>
+              <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">No content decay detected</p>
             )}
           </CardContent>
         </Card>
@@ -793,10 +793,10 @@ export default function ContentAutomationPage() {
             ) : recyclingQueue.length > 0 ? (
               <div className="space-y-2" data-testid="list-recycling-queue">
                 {recyclingQueue.map((post, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-md border" data-testid={`recycling-post-${i}`}>
+                  <div key={i} className="flex items-start gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`recycling-post-${i}`}>
                     <div className="flex-1 min-w-0">
                       <span className="text-sm font-medium truncate block" data-testid={`text-recycling-title-${i}`}>{post.title}</span>
-                      <div className="flex items-center gap-3 mt-1 flex-wrap">
+                      <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-1 flex-wrap">
                         <span className="text-xs text-muted-foreground" data-testid={`text-recycling-score-${i}`}>
                           Engagement: {post.engagementScore}
                         </span>
@@ -809,7 +809,7 @@ export default function ContentAutomationPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground py-4">No recyclable content found</p>
+              <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">No recyclable content found</p>
             )}
           </CardContent>
         </Card>

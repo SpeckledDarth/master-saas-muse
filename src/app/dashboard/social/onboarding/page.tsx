@@ -219,7 +219,7 @@ function OnboardingContent() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
       <div>
         <h1 className="text-2xl font-bold" data-testid="text-page-title">Get Started with Social Scheduling</h1>
         <p className="text-muted-foreground mt-1">Set up your social media posting in a few quick steps.</p>
@@ -229,7 +229,7 @@ function OnboardingContent() {
         {STEPS.map((step, idx) => (
           <div key={step.id} className="flex items-center gap-2">
             <div
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-[var(--card-radius,0.75rem)] text-sm ${
                 currentStep === step.id
                   ? 'bg-primary-600 dark:bg-primary-400 text-white dark:text-black'
                   : currentStep > step.id
@@ -258,16 +258,16 @@ function OnboardingContent() {
               Link the social media accounts you want to post to. You can add more later.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             {PLATFORMS.map(platform => {
               const isConnected = connectedPlatforms.includes(platform.id)
               return (
                 <div
                   key={platform.id}
-                  className="flex items-center justify-between gap-4 p-3 border rounded-md"
+                  className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] p-3 border rounded-[var(--card-radius,0.75rem)]"
                   data-testid={`platform-row-${platform.id}`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                     <platform.icon className="h-5 w-5" />
                     <div>
                       <p className="font-medium text-sm">{platform.name}</p>
@@ -294,7 +294,7 @@ function OnboardingContent() {
             })}
 
             {connectedPlatforms.includes('facebook') === false && (
-              <div className="flex items-start gap-2 p-3 bg-muted rounded-md text-sm">
+              <div className="flex items-start gap-2 p-3 bg-muted rounded-[var(--card-radius,0.75rem)] text-sm">
                 <AlertCircle className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
                 <p className="text-muted-foreground">
                   Facebook posting requires a Facebook Page. If you don&apos;t have one yet,
@@ -328,7 +328,7 @@ function OnboardingContent() {
               This helps our AI generate posts that sound like you.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label htmlFor="tone">Tone</Label>
               <div className="flex flex-wrap gap-2">
@@ -430,14 +430,14 @@ function OnboardingContent() {
               Choose how often to post and whether you want to review posts before they go live.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="space-y-2">
               <Label>Posting Frequency</Label>
               <div className="grid grid-cols-2 gap-2">
                 {FREQUENCY_OPTIONS.map(freq => (
                   <div
                     key={freq}
-                    className={`p-3 border rounded-md cursor-pointer text-sm hover-elevate active-elevate-2 ${
+                    className={`p-3 border rounded-[var(--card-radius,0.75rem)] cursor-pointer text-sm hover-elevate active-elevate-2 ${
                       postingPrefs.frequency === freq ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-950' : ''
                     }`}
                     onClick={() => setPostingPrefs(prev => ({ ...prev, frequency: freq }))}
@@ -451,7 +451,7 @@ function OnboardingContent() {
 
             <div className="space-y-3 pt-2">
               <div
-                className={`flex items-center justify-between p-3 border rounded-md cursor-pointer hover-elevate active-elevate-2 ${
+                className={`flex items-center justify-between p-3 border rounded-[var(--card-radius,0.75rem)] cursor-pointer hover-elevate active-elevate-2 ${
                   postingPrefs.requireApproval ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-950' : ''
                 }`}
                 onClick={() => setPostingPrefs(prev => ({ ...prev, requireApproval: !prev.requireApproval }))}
@@ -467,7 +467,7 @@ function OnboardingContent() {
               </div>
 
               <div
-                className={`flex items-center justify-between p-3 border rounded-md cursor-pointer hover-elevate active-elevate-2 ${
+                className={`flex items-center justify-between p-3 border rounded-[var(--card-radius,0.75rem)] cursor-pointer hover-elevate active-elevate-2 ${
                   postingPrefs.autoHashtags ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-950' : ''
                 }`}
                 onClick={() => setPostingPrefs(prev => ({ ...prev, autoHashtags: !prev.autoHashtags }))}
@@ -513,11 +513,11 @@ function OnboardingContent() {
               PassivePost will start working for you. Your social media presence is about to grow.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             <Separator />
             <p className="text-sm font-medium text-muted-foreground">Setup Summary</p>
             <div className="space-y-3">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <span className="text-sm text-muted-foreground">Connected Platforms</span>
                 <div className="flex gap-1 flex-wrap">
                   {connectedPlatforms.length > 0 ? connectedPlatforms.map(p => {
@@ -532,25 +532,25 @@ function OnboardingContent() {
                   )}
                 </div>
               </div>
-              <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <span className="text-sm text-muted-foreground">Brand Voice</span>
                 <span className="text-sm font-medium capitalize" data-testid="text-summary-tone">{brandPrefs.tone || 'Not set'}</span>
               </div>
-              <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <span className="text-sm text-muted-foreground">Niche</span>
                 <span className="text-sm font-medium" data-testid="text-summary-niche">{brandPrefs.niche || 'Not set'}</span>
               </div>
-              <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <span className="text-sm text-muted-foreground">Posting Frequency</span>
                 <span className="text-sm font-medium" data-testid="text-summary-frequency">{postingPrefs.frequency}</span>
               </div>
-              <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <span className="text-sm text-muted-foreground">Review before posting</span>
                 <Badge variant={postingPrefs.requireApproval ? 'default' : 'outline'} data-testid="badge-summary-approval">
                   {postingPrefs.requireApproval ? 'Yes' : 'No'}
                 </Badge>
               </div>
-              <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                 <span className="text-sm text-muted-foreground">Auto-hashtags</span>
                 <Badge variant={postingPrefs.autoHashtags ? 'default' : 'outline'} data-testid="badge-summary-hashtags">
                   {postingPrefs.autoHashtags ? 'On' : 'Off'}
@@ -562,7 +562,7 @@ function OnboardingContent() {
               You can update any of these settings later from your dashboard.
             </p>
           </CardContent>
-          <CardFooter className="flex flex-col gap-3 pt-0">
+          <CardFooter className="flex flex-col gap-[var(--content-density-gap,1rem)] pt-0">
             <Button
               className="w-full"
               size="lg"
@@ -589,7 +589,7 @@ function OnboardingContent() {
 
 export default function SocialOnboardingPage() {
   return (
-    <Suspense fallback={<div className="p-6"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></div>}>
+    <Suspense fallback={<div className="p-[var(--card-padding,1.25rem)]"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></div>}>
       <OnboardingContent />
     </Suspense>
   )

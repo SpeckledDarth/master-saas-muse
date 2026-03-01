@@ -311,7 +311,7 @@ export function AdminSidebarNav({ isAppAdmin, permissions }: AdminSidebarNavProp
 
   return (
     <Sidebar>
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="p-[var(--card-padding,1.25rem)]">
         <Link href="/admin" className="flex items-center gap-2" data-testid="link-admin-home">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <Settings className="h-4 w-4" />
@@ -423,7 +423,7 @@ export function AdminSidebarNav({ isAppAdmin, permissions }: AdminSidebarNavProp
         ) : null}
       </SidebarContent>
 
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-[var(--card-padding,1.25rem)]">
         <div className="border-t pt-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -147,8 +147,8 @@ export default function EngagementRetentionPage() {
   const filteredTemplates = templates.filter(t => t.industry === selectedIndustry)
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-retention-title">
             Engagement &amp; Retention
@@ -165,7 +165,7 @@ export default function EngagementRetentionPage() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-content-streak">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
             <CardTitle className="text-base flex items-center gap-2">
@@ -179,8 +179,8 @@ export default function EngagementRetentionPage() {
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : streak ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
+                <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                   <Flame className="h-10 w-10 text-[hsl(var(--warning))]" />
                   <div>
                     <p className="text-4xl font-bold" data-testid="text-streak-current">{streak.currentStreak}</p>
@@ -212,7 +212,7 @@ export default function EngagementRetentionPage() {
                 )}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground py-4">Unable to load streak data</p>
+              <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">Unable to load streak data</p>
             )}
           </CardContent>
         </Card>
@@ -230,17 +230,17 @@ export default function EngagementRetentionPage() {
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : digest ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="text-center p-2 rounded-md border">
+              <div className="space-y-[var(--content-density-gap,1rem)]">
+                <div className="grid grid-cols-3 gap-[var(--content-density-gap,1rem)]">
+                  <div className="text-center p-2 rounded-[var(--card-radius,0.75rem)] border">
                     <p className="text-lg font-bold" data-testid="text-digest-posts">{digest.postsCreated}</p>
                     <p className="text-xs text-muted-foreground">Posts</p>
                   </div>
-                  <div className="text-center p-2 rounded-md border">
+                  <div className="text-center p-2 rounded-[var(--card-radius,0.75rem)] border">
                     <p className="text-lg font-bold" data-testid="text-digest-blogs">{digest.blogsWritten}</p>
                     <p className="text-xs text-muted-foreground">Blogs</p>
                   </div>
-                  <div className="text-center p-2 rounded-md border">
+                  <div className="text-center p-2 rounded-[var(--card-radius,0.75rem)] border">
                     <p className="text-lg font-bold" data-testid="text-digest-snippets">{digest.snippetsGenerated}</p>
                     <p className="text-xs text-muted-foreground">Snippets</p>
                   </div>
@@ -295,7 +295,7 @@ export default function EngagementRetentionPage() {
                 )}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground py-4">Unable to load digest preview</p>
+              <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]">Unable to load digest preview</p>
             )}
           </CardContent>
         </Card>
@@ -326,7 +326,7 @@ export default function EngagementRetentionPage() {
               {industries.map(industry => (
                 <TabsContent key={industry} value={industry}>
                   {filteredTemplates.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
                       {filteredTemplates.map((template, i) => (
                         <Card key={template.id || i} className="flex flex-col" data-testid={`card-template-${i}`}>
                           <CardContent className="pt-4 flex-1 space-y-3">
@@ -339,7 +339,7 @@ export default function EngagementRetentionPage() {
                               {template.content}
                             </p>
                           </CardContent>
-                          <div className="p-4 pt-0">
+                          <div className="p-[var(--card-padding,1.25rem)] pt-0">
                             <Button
                               variant="outline"
                               size="sm"
@@ -355,7 +355,7 @@ export default function EngagementRetentionPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground py-4" data-testid="text-no-templates">
+                    <p className="text-sm text-muted-foreground py-[var(--card-padding,1.25rem)]" data-testid="text-no-templates">
                       No templates available for {industry}
                     </p>
                   )}
@@ -366,7 +366,7 @@ export default function EngagementRetentionPage() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-public-scorecard">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
             <CardTitle className="text-base flex items-center gap-2">
@@ -374,8 +374,8 @@ export default function EngagementRetentionPage() {
               Public Scorecard
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-end gap-3 flex-wrap">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+            <div className="flex items-end gap-[var(--content-density-gap,1rem)] flex-wrap">
               <div className="space-y-2 flex-1 min-w-[200px]">
                 <Label htmlFor="scorecard-username">Username</Label>
                 <Input
@@ -400,20 +400,20 @@ export default function EngagementRetentionPage() {
               <div className="space-y-3 border-t pt-4" data-testid="section-scorecard-results">
                 <p className="text-lg font-bold" data-testid="text-scorecard-username">{scorecard.username}</p>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-2 rounded-md border">
+                <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+                  <div className="text-center p-2 rounded-[var(--card-radius,0.75rem)] border">
                     <p className="text-lg font-bold" data-testid="text-scorecard-posts">{scorecard.postsPublished}</p>
                     <p className="text-xs text-muted-foreground">Posts Published</p>
                   </div>
-                  <div className="text-center p-2 rounded-md border">
+                  <div className="text-center p-2 rounded-[var(--card-radius,0.75rem)] border">
                     <p className="text-lg font-bold" data-testid="text-scorecard-blogs">{scorecard.blogsWritten}</p>
                     <p className="text-xs text-muted-foreground">Blogs Written</p>
                   </div>
-                  <div className="text-center p-2 rounded-md border">
+                  <div className="text-center p-2 rounded-[var(--card-radius,0.75rem)] border">
                     <p className="text-lg font-bold" data-testid="text-scorecard-engagement">{scorecard.totalEngagement}</p>
                     <p className="text-xs text-muted-foreground">Total Engagement</p>
                   </div>
-                  <div className="text-center p-2 rounded-md border">
+                  <div className="text-center p-2 rounded-[var(--card-radius,0.75rem)] border">
                     <p className="text-lg font-bold" data-testid="text-scorecard-flywheel">{scorecard.flywheelScore}</p>
                     <p className="text-xs text-muted-foreground">Flywheel Score</p>
                   </div>

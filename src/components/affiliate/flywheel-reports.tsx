@@ -64,7 +64,7 @@ export function ConnectedAnalyticsDashboard({ data }: { data: ConnectedOverview 
   );
 
   return (
-    <div data-testid="connected-dashboard" className="space-y-4">
+    <div data-testid="connected-dashboard" className="space-y-[var(--content-density-gap,1rem)]">
       <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">🔗 Connected Platforms — Merged View</h3>
         <div className="grid grid-cols-4 gap-2 mb-4">
@@ -122,10 +122,10 @@ export function FinancialOverviewPanel({ data }: { data: FinancialData }) {
   const maxVal = Math.max(...breakdown.map(m => Math.max(m.earned, m.spent)), 1);
 
   return (
-    <div data-testid="financial-overview" className="space-y-4">
+    <div data-testid="financial-overview" className="space-y-[var(--content-density-gap,1rem)]">
       <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">💰 Unified Financial View</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-[var(--content-density-gap,1rem)] mb-4">
           <div className="text-center p-2 bg-[hsl(var(--success)/0.08)] dark:bg-[hsl(var(--success)/0.12)] rounded">
             <p className="text-[10px] text-muted-foreground">Total Earned</p>
             <p className="text-lg font-bold text-[hsl(var(--success))]">{fmt(data.overview.totalEarned)}</p>
@@ -162,7 +162,7 @@ export function FinancialOverviewPanel({ data }: { data: FinancialData }) {
                 </div>
               ))}
             </div>
-            <div className="flex items-center gap-4 mt-2 text-[10px] text-muted-foreground">
+            <div className="flex items-center gap-[var(--content-density-gap,1rem)] mt-2 text-[10px] text-muted-foreground">
               <span className="flex items-center gap-1"><span className="w-2 h-2 bg-[hsl(var(--success)/0.7)] rounded-sm" /> Earned</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 bg-[hsl(var(--danger)/0.5)] rounded-sm" /> Spent</span>
             </div>
@@ -172,7 +172,7 @@ export function FinancialOverviewPanel({ data }: { data: FinancialData }) {
 
       <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">📈 Projections</h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
           <div className="p-2 bg-muted/30 rounded">
             <p className="text-[10px] text-muted-foreground">Avg Monthly Earnings</p>
             <p className="text-sm font-bold">{fmt(data.projections.avgMonthlyEarnings)}</p>
@@ -200,9 +200,9 @@ export function FinancialOverviewPanel({ data }: { data: FinancialData }) {
 
 export function PredictiveIntelligencePanel({ data }: { data: PredictionsData }) {
   return (
-    <div data-testid="predictions" className="space-y-4">
+    <div data-testid="predictions" className="space-y-[var(--content-density-gap,1rem)]">
       {data.tierProjection && (
-        <div className="rounded-lg border bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950/20 dark:to-primary-900/20 p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950/20 dark:to-primary-900/20 p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-2">🎯 Tier Trajectory</h3>
           <p className="text-xs">Current: <strong>{data.tierProjection.currentTier}</strong> → Next: <strong>{data.tierProjection.nextTier}</strong></p>
           <div className="mt-2 space-y-1 text-xs text-muted-foreground">
@@ -282,7 +282,7 @@ export function PredictiveIntelligencePanel({ data }: { data: PredictionsData })
 
 export function ContentIntelligencePanel({ data }: { data: ContentIntelligenceData }) {
   return (
-    <div data-testid="content-intelligence" className="space-y-4">
+    <div data-testid="content-intelligence" className="space-y-[var(--content-density-gap,1rem)]">
       <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">📊 Promotion Frequency Analysis</h3>
         <div className="grid grid-cols-3 gap-2 mb-3">
@@ -558,10 +558,10 @@ export function FlywheelReportsSection() {
       .catch(() => setContentLoading(false));
   };
 
-  if (loading) return <div className="animate-pulse space-y-4">{[1, 2, 3].map(i => <div key={i} className="h-32 bg-muted rounded-lg" />)}</div>;
+  if (loading) return <div className="animate-pulse space-y-[var(--content-density-gap,1rem)]">{[1, 2, 3].map(i => <div key={i} className="h-32 bg-muted rounded-[var(--card-radius,0.75rem)]" />)}</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Reports & Intelligence</h2>
         <LastUpdated timestamp={lastUpdated} />
@@ -589,24 +589,24 @@ export function FlywheelReportsSection() {
       <div>
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Content Intelligence</h3>
         {!contentData && !contentLoading && (
-          <button data-testid="load-content-intel" onClick={loadContentIntel} className="w-full p-4 rounded-lg border border-dashed hover:bg-muted/30 transition-colors text-center">
+          <button data-testid="load-content-intel" onClick={loadContentIntel} className="w-full p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border border-dashed hover:bg-muted/30 transition-colors text-center">
             <p className="text-sm font-medium">📊 Analyze Content Patterns</p>
             <p className="text-xs text-muted-foreground mt-1">See how your posting frequency affects conversions</p>
           </button>
         )}
-        {contentLoading && <div className="p-4 rounded-lg border text-center animate-pulse"><p className="text-sm">📊 Analyzing patterns...</p></div>}
+        {contentLoading && <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border text-center animate-pulse"><p className="text-sm">📊 Analyzing patterns...</p></div>}
         {contentData && <ContentIntelligencePanel data={contentData} />}
       </div>
 
       <div>
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Predictive Intelligence</h3>
         {!predictionsData && !predictionsLoading && (
-          <button data-testid="load-predictions" onClick={loadPredictions} className="w-full p-4 rounded-lg border border-dashed hover:bg-muted/30 transition-colors text-center">
+          <button data-testid="load-predictions" onClick={loadPredictions} className="w-full p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border border-dashed hover:bg-muted/30 transition-colors text-center">
             <p className="text-sm font-medium">🔮 Generate Predictions</p>
             <p className="text-xs text-muted-foreground mt-1">AI predicts tier trajectory, churn windows, and seasonal trends</p>
           </button>
         )}
-        {predictionsLoading && <div className="p-4 rounded-lg border text-center animate-pulse"><p className="text-sm">🔮 Generating predictions...</p></div>}
+        {predictionsLoading && <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border text-center animate-pulse"><p className="text-sm">🔮 Generating predictions...</p></div>}
         {predictionsData && <PredictiveIntelligencePanel data={predictionsData} />}
       </div>
     </div>

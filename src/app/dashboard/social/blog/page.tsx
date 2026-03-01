@@ -125,9 +125,9 @@ function BlogConnectionForm({ platform, form, setForm, saving, onConnect, onCanc
   const guide = BLOG_SETUP_GUIDES[platform]
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--content-density-gap,1rem)]">
       {config.beta && (
-        <div className="rounded-lg border border-[hsl(var(--warning))] bg-[hsl(var(--warning)/0.1)] p-3">
+        <div className="rounded-[var(--card-radius,0.75rem)] border border-[hsl(var(--warning))] bg-[hsl(var(--warning)/0.1)] p-3">
           <div className="flex items-start gap-2">
             <AlertTriangle className="h-4 w-4 text-[hsl(var(--warning))] shrink-0 mt-0.5" />
             <p className="text-sm text-[hsl(var(--warning))]">
@@ -138,7 +138,7 @@ function BlogConnectionForm({ platform, form, setForm, saving, onConnect, onCanc
       )}
 
       {guide && (
-        <div className="rounded-lg border bg-muted/30">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-muted/30">
           <button
             type="button"
             onClick={() => setShowGuide(!showGuide)}
@@ -167,7 +167,7 @@ function BlogConnectionForm({ platform, form, setForm, saving, onConnect, onCanc
                 ))}
               </ol>
               <p className="text-xs text-muted-foreground italic">{guide.time}</p>
-              <div className="flex items-start gap-2 rounded-md border bg-muted/50 p-2.5">
+              <div className="flex items-start gap-2 rounded-[var(--card-radius,0.75rem)] border bg-muted/50 p-2.5">
                 <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--success))] mt-0.5" />
                 <p className="text-xs text-muted-foreground">{guide.security}</p>
               </div>
@@ -419,8 +419,8 @@ export default function BlogDashboardPage() {
   const momentumLabel = m?.momentum === 'accelerating' ? 'Accelerating' : m?.momentum === 'decelerating' ? 'Decelerating' : 'Steady'
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
+    <div className="p-[var(--card-padding,1.25rem)] space-y-[var(--content-density-gap,1rem)]">
+      <div className="flex flex-row items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
         <div>
           <h1 className="text-2xl font-bold" data-testid="text-blog-title">
             Blog Dashboard <HelpTooltip text="Your blog publishing hub. Write articles, cross-post to multiple platforms, and repurpose into social media snippets." />
@@ -445,7 +445,7 @@ export default function BlogDashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
         <Card data-testid="card-total-articles">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Articles <HelpTooltip text="Total blog articles you've created across all time." /></CardTitle>
@@ -500,8 +500,8 @@ export default function BlogDashboardPage() {
       {m?.nextAction && (
         <Card className="border-primary/30 bg-primary/5" data-testid="card-next-action">
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
+              <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
                   <TrendingUp className="h-5 w-5 text-primary" />
                 </div>
@@ -525,7 +525,7 @@ export default function BlogDashboardPage() {
           <CardHeader>
             <CardTitle className="text-base">Flywheel Breakdown <HelpTooltip text="Each pillar of the content flywheel scored out of 25. Improve weak areas to boost your overall score." /></CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             {[
               { label: 'Writing', value: m.breakdown.writing, max: 25, desc: 'Blog articles created this month' },
               { label: 'Cross-Posting', value: m.breakdown.crossPosting, max: 25, desc: 'Articles distributed to multiple platforms' },
@@ -558,10 +558,10 @@ export default function BlogDashboardPage() {
               {m.articlePerformance.map(article => (
                 <div
                   key={article.id}
-                  className="flex items-start gap-3 p-3 rounded-md border hover-elevate"
+                  className="flex items-start gap-[var(--content-density-gap,1rem)] p-3 rounded-[var(--card-radius,0.75rem)] border hover-elevate"
                   data-testid={`article-perf-${article.id}`}
                 >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted shrink-0">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-[var(--card-radius,0.75rem)] bg-muted shrink-0">
                     <FileText className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -630,7 +630,7 @@ export default function BlogDashboardPage() {
         </button>
 
         {showConnections && (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-[var(--content-density-gap,1rem)] md:grid-cols-2 lg:grid-cols-3">
             {Object.entries(BLOG_PLATFORM_CONFIG).map(([key, config]) => {
               const platform = key as BlogPlatform
               const conn = connections.find(c => c.platform === platform)
@@ -639,9 +639,9 @@ export default function BlogDashboardPage() {
               return (
                 <Card key={platform} className="hover-elevate" data-testid={`card-blog-platform-${platform}`}>
                   <CardContent className="pt-6">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                    <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
+                      <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-[var(--card-radius,0.75rem)] bg-muted">
                           <PlatformBlogIcon platform={platform} />
                         </div>
                         <div>
@@ -745,8 +745,8 @@ export default function BlogDashboardPage() {
                             </DialogHeader>
 
                             {isLinkedIn ? (
-                              <div className="space-y-4">
-                                <div className="rounded-lg border border-[hsl(var(--info))] bg-[hsl(var(--info)/0.1)] p-3">
+                              <div className="space-y-[var(--content-density-gap,1rem)]">
+                                <div className="rounded-[var(--card-radius,0.75rem)] border border-[hsl(var(--info))] bg-[hsl(var(--info)/0.1)] p-3">
                                   <p className="text-sm text-[hsl(var(--info))]">
                                     This will use your connected LinkedIn social account to publish articles. Make sure your LinkedIn account is connected in the Accounts page first.
                                   </p>

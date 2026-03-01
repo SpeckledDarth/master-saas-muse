@@ -521,7 +521,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                 {transactions.length === 0 ? (
                   <p className="text-sm text-muted-foreground py-2">No transactions found</p>
                 ) : (
-                  <div className="overflow-hidden rounded-md border">
+                  <div className="overflow-hidden rounded-[var(--card-radius,0.75rem)] border">
                     <table className="w-full text-sm" data-testid="summary-table-transactions">
                       <thead>
                         <tr className="border-b bg-muted/30">
@@ -588,20 +588,20 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-2">
-                    <div className="rounded-md border p-3 text-center">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-[var(--content-density-gap,1rem)] py-2">
+                    <div className="rounded-[var(--card-radius,0.75rem)] border p-3 text-center">
                       <p className="text-lg font-bold tabular-nums">{affiliateSummary.referrals ?? 0}</p>
                       <p className="text-xs text-muted-foreground">Referrals</p>
                     </div>
-                    <div className="rounded-md border p-3 text-center">
+                    <div className="rounded-[var(--card-radius,0.75rem)] border p-3 text-center">
                       <p className="text-lg font-bold tabular-nums">{formatCurrency(affiliateSummary.totalEarnings ?? 0)}</p>
                       <p className="text-xs text-muted-foreground">Total Earnings</p>
                     </div>
-                    <div className="rounded-md border p-3 text-center">
+                    <div className="rounded-[var(--card-radius,0.75rem)] border p-3 text-center">
                       <p className="text-lg font-bold tabular-nums">{formatCurrency(affiliateSummary.pendingEarnings ?? 0)}</p>
                       <p className="text-xs text-muted-foreground">Pending</p>
                     </div>
-                    <div className="rounded-md border p-3 text-center">
+                    <div className="rounded-[var(--card-radius,0.75rem)] border p-3 text-center">
                       <p className="text-lg font-bold tabular-nums">{affiliateSummary.tier ?? 'Standard'}</p>
                       <p className="text-xs text-muted-foreground">Tier</p>
                     </div>
@@ -627,7 +627,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                       <Link
                         key={ticket.id}
                         href={`/admin/feedback/${ticket.id}`}
-                        className="flex items-start justify-between gap-2 rounded-md border p-3 hover:bg-muted/30 transition-colors"
+                        className="flex items-start justify-between gap-2 rounded-[var(--card-radius,0.75rem)] border p-3 hover:bg-muted/30 transition-colors"
                         data-testid={`link-ticket-${ticket.id}`}
                       >
                         <div className="min-w-0">
@@ -681,10 +681,10 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                 ) : (
                   <div className="space-y-2 py-1">
                     {contracts.map((contract: any) => (
-                      <div key={contract.id} className="flex items-start justify-between gap-2 rounded-md border p-3" data-testid={`summary-contract-${contract.id}`}>
+                      <div key={contract.id} className="flex items-start justify-between gap-2 rounded-[var(--card-radius,0.75rem)] border p-3" data-testid={`summary-contract-${contract.id}`}>
                         <div>
                           <p className="text-sm font-medium">{contract.title || 'Untitled Contract'}</p>
-                          <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
+                          <div className="flex gap-[var(--content-density-gap,1rem)] mt-1 text-xs text-muted-foreground">
                             {contract.type && <span className="capitalize">{contract.type}</span>}
                             {contract.signed_at && <span>Signed: {formatDate(contract.signed_at)}</span>}
                             {contract.expires_at && <span>Expires: {formatDate(contract.expires_at)}</span>}
@@ -722,11 +722,11 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionTrigger>
               <AccordionContent>
                 {contactLoading ? (
-                  <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                  <div className="flex justify-center py-[var(--card-padding,1.25rem)]"><Loader2 className="h-4 w-4 animate-spin" /></div>
                 ) : (
                   <div className="space-y-2 py-1">
                     {phones.map((p: any) => (
-                      <div key={p.id} className="flex items-center justify-between gap-2 rounded-md border p-3" data-testid={`contact-phone-${p.id}`}>
+                      <div key={p.id} className="flex items-center justify-between gap-2 rounded-[var(--card-radius,0.75rem)] border p-3" data-testid={`contact-phone-${p.id}`}>
                         <div className="flex items-center gap-2 min-w-0">
                           {p.is_primary && <Star className="h-3 w-3 text-[hsl(var(--warning))] fill-[hsl(var(--warning))] shrink-0" />}
                           <span className="text-xs font-medium text-muted-foreground shrink-0">{p.label}</span>
@@ -751,7 +751,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                       <p className="text-sm text-muted-foreground py-2">No phone numbers</p>
                     )}
                     {(showAddPhone || editingContact?.type === 'phones') && (
-                      <div className="rounded-md border p-3 space-y-2" data-testid="form-add-phone">
+                      <div className="rounded-[var(--card-radius,0.75rem)] border p-3 space-y-2" data-testid="form-add-phone">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <Label className="text-xs">Label</Label>
@@ -799,11 +799,11 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionTrigger>
               <AccordionContent>
                 {contactLoading ? (
-                  <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                  <div className="flex justify-center py-[var(--card-padding,1.25rem)]"><Loader2 className="h-4 w-4 animate-spin" /></div>
                 ) : (
                   <div className="space-y-2 py-1">
                     {emails.map((e: any) => (
-                      <div key={e.id} className="flex items-center justify-between gap-2 rounded-md border p-3" data-testid={`contact-email-${e.id}`}>
+                      <div key={e.id} className="flex items-center justify-between gap-2 rounded-[var(--card-radius,0.75rem)] border p-3" data-testid={`contact-email-${e.id}`}>
                         <div className="flex items-center gap-2 min-w-0">
                           {e.is_primary && <Star className="h-3 w-3 text-[hsl(var(--warning))] fill-[hsl(var(--warning))] shrink-0" />}
                           <span className="text-xs font-medium text-muted-foreground shrink-0">{e.label}</span>
@@ -829,7 +829,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                       <p className="text-sm text-muted-foreground py-2">No additional email addresses</p>
                     )}
                     {(showAddEmail || editingContact?.type === 'emails') && (
-                      <div className="rounded-md border p-3 space-y-2" data-testid="form-add-email">
+                      <div className="rounded-[var(--card-radius,0.75rem)] border p-3 space-y-2" data-testid="form-add-email">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <Label className="text-xs">Label</Label>
@@ -876,11 +876,11 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionTrigger>
               <AccordionContent>
                 {contactLoading ? (
-                  <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                  <div className="flex justify-center py-[var(--card-padding,1.25rem)]"><Loader2 className="h-4 w-4 animate-spin" /></div>
                 ) : (
                   <div className="space-y-2 py-1">
                     {addresses.map((a: any) => (
-                      <div key={a.id} className="flex items-center justify-between gap-2 rounded-md border p-3" data-testid={`contact-address-${a.id}`}>
+                      <div key={a.id} className="flex items-center justify-between gap-2 rounded-[var(--card-radius,0.75rem)] border p-3" data-testid={`contact-address-${a.id}`}>
                         <div className="flex items-center gap-2 min-w-0">
                           {a.is_primary && <Star className="h-3 w-3 text-[hsl(var(--warning))] fill-[hsl(var(--warning))] shrink-0" />}
                           <span className="text-xs font-medium text-muted-foreground shrink-0">{a.label}</span>
@@ -905,7 +905,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                       <p className="text-sm text-muted-foreground py-2">No addresses</p>
                     )}
                     {(showAddAddress || editingContact?.type === 'addresses') && (
-                      <div className="rounded-md border p-3 space-y-2" data-testid="form-add-address">
+                      <div className="rounded-[var(--card-radius,0.75rem)] border p-3 space-y-2" data-testid="form-add-address">
                         <div>
                           <Label className="text-xs">Label</Label>
                           <Select value={contactForm.label || 'Home'} onValueChange={v => setContactForm(f => ({ ...f, label: v }))}>
@@ -971,11 +971,11 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionTrigger>
               <AccordionContent>
                 {contactLoading ? (
-                  <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                  <div className="flex justify-center py-[var(--card-padding,1.25rem)]"><Loader2 className="h-4 w-4 animate-spin" /></div>
                 ) : (
                   <div className="space-y-2 py-1">
                     {socialLinks.map((s: any) => (
-                      <div key={s.id} className="flex items-center justify-between gap-2 rounded-md border p-3" data-testid={`contact-social-${s.id}`}>
+                      <div key={s.id} className="flex items-center justify-between gap-2 rounded-[var(--card-radius,0.75rem)] border p-3" data-testid={`contact-social-${s.id}`}>
                         <div className="flex items-center gap-2 min-w-0">
                           <Globe className="h-3 w-3 text-muted-foreground shrink-0" />
                           <span className="text-xs font-medium text-muted-foreground shrink-0 capitalize">{s.platform}</span>
@@ -995,7 +995,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                       <p className="text-sm text-muted-foreground py-2">No social links</p>
                     )}
                     {(showAddSocial || editingContact?.type === 'social-links') && (
-                      <div className="rounded-md border p-3 space-y-2" data-testid="form-add-social">
+                      <div className="rounded-[var(--card-radius,0.75rem)] border p-3 space-y-2" data-testid="form-add-social">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <Label className="text-xs">Platform</Label>
@@ -1177,7 +1177,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
       {activeTab === 'transactions' && (
         <div data-testid="tab-content-transactions">
           {transactions.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground" data-testid="empty-transactions">
+            <div className="text-center py-[var(--section-spacing,3.5rem)] text-muted-foreground" data-testid="empty-transactions">
               <DollarSign className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p>No transactions found</p>
             </div>
@@ -1232,7 +1232,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
       {activeTab === 'support' && (
         <div data-testid="tab-content-support">
           {tickets.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground" data-testid="empty-tickets">
+            <div className="text-center py-[var(--section-spacing,3.5rem)] text-muted-foreground" data-testid="empty-tickets">
               <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p>No support tickets</p>
             </div>
@@ -1277,7 +1277,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
       {activeTab === 'contracts' && (
         <div data-testid="tab-content-contracts">
           {contracts.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground" data-testid="empty-contracts">
+            <div className="text-center py-[var(--section-spacing,3.5rem)] text-muted-foreground" data-testid="empty-contracts">
               <ScrollText className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p>No contracts</p>
             </div>
