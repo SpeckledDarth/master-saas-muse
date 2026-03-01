@@ -38,23 +38,39 @@ This design system took days to build. Sessions that ignore it and hardcode valu
 | `border`, `border-2` on cards | `border-[length:var(--card-border-width)]` | `--card-border-width` |
 | `border-solid`, `border-dashed` | `border-[var(--card-border-style)]` | `--card-border-style` |
 
-### Primary & Accent 950 Scale (CORRECT — Do Not Remove)
+### Primary & Accent 950 Scale — MANDATORY (Do Not Remove, Do Not "Fix")
 
-The project uses a full Tailwind 950 numeric color scale for `primary` and `accent`. These are defined in `tailwind.config.ts` and resolve to CSS variables (`--primary-50` through `--primary-950`, `--accent-50` through `--accent-950`) set in `globals.css`. The palette page regenerates these values when the admin changes the primary color.
+This project uses a full Tailwind 950 numeric color scale for `primary` and `accent`. This is a foundational architectural decision, not a suggestion. Removing or replacing 950 scale usage is a VIOLATION of the design system.
 
-**These classes are palette-controlled and CORRECT:**
+**How it works (the architecture):**
+1. `tailwind.config.ts` (lines 29–43) defines `primary-50` through `primary-950`, each resolving to `hsl(var(--primary-50))`, `hsl(var(--primary-100))`, etc.
+2. `src/app/globals.css` (lines 17–27) defines default HSL values for each step of the scale
+3. The palette page (`/admin/setup/palette`) regenerates the full 50–950 scale whenever the admin changes the primary color
+4. Components use Tailwind classes like `text-primary-600` which Tailwind resolves to the CSS variable, which the palette controls
+5. Result: changing one color on the palette page automatically updates every component site-wide
+
+**These classes are palette-controlled and CORRECT — do NOT alter them:**
 - `text-primary-600`, `bg-primary-100`, `border-primary-400`, `text-primary-800`
 - `text-accent-500`, `bg-accent-100`, `border-accent-600`
 - Any `primary-{50-950}` or `accent-{50-950}` variant
 
-**Standard light/dark shade pattern:**
+**Standard light/dark shade pattern (this IS the correct approach):**
 ```tsx
 text-primary-600 dark:text-primary-400
 bg-primary-100 dark:bg-primary-900
 border-primary-600 dark:border-primary-400
 ```
 
-**Do NOT "fix" these** by replacing them with `text-primary` or `text-[hsl(var(--primary))]`. The 950 scale gives precise shade control that the base `text-primary` class cannot provide.
+**VIOLATIONS (do NOT do these):**
+- Replacing `text-primary-600 dark:text-primary-400` with `text-primary` — this REMOVES shade control. The 950 scale exists to provide precise light/dark variation that `text-primary` alone cannot.
+- Replacing `text-primary-600` with `text-[hsl(var(--primary))]` — the 950 scale is the correct pattern. Do not bypass it.
+- Flagging 950 scale usage as "hardcoded" — it is NOT hardcoded. It resolves to CSS variables controlled by the palette.
+
+**Decision tree — choosing the right color pattern:**
+1. Need a color for success/warning/danger/info feedback? → Use semantic tokens: `text-[hsl(var(--success))]`, `bg-[hsl(var(--warning)/0.1)]`
+2. Need a brand-colored element with shade variation? → Use the 950 scale: `text-primary-600 dark:text-primary-400`, `bg-accent-100`
+3. Need a base brand color without shade variation? → Use `text-primary`, `bg-primary`
+4. Considering a named Tailwind color like `text-green-600` or `bg-blue-50`? → VIOLATION. These bypass the palette. Use semantic tokens or the 950 scale instead.
 
 ### Semantic Colors
 
@@ -109,24 +125,30 @@ Use these instead of raw shadcn components:
 | `<DSSection>` | `@/components/ui/ds-section` | Section with auto vertical spacing from palette |
 | `<DSGrid>` | `@/components/ui/ds-grid` | Grid with auto gap from content density setting |
 
-## NEVER DO
+## NEVER DO (VIOLATIONS)
 
-1. Hardcode Tailwind color classes: `text-green-600`, `bg-amber-100`, `text-red-500`, `text-blue-*`, `bg-green-*`
-2. Hardcode spacing on cards: `p-4`, `p-6`, `px-8`
-3. Hardcode border radius: `rounded-lg`, `rounded-xl`, `rounded-md`
-4. Hardcode shadows: `shadow-sm`, `shadow-md`, `shadow-lg`
-5. Hardcode grid gaps: `gap-3`, `gap-4`, `gap-6`
-6. Hardcode section spacing: `space-y-6`, `space-y-8`, `py-8`, `py-12`
-7. Hardcode chart colors: `fill="#22c55e"`, `stroke="hsl(142 71% 45%)"`
-8. Use `hsl(var(--primary))` directly in charts — use `chartConfig.colors[n]` instead
+1. Use named Tailwind color classes: `text-green-600`, `bg-amber-100`, `text-red-500`, `text-blue-*`, `bg-green-*` — these bypass the palette
+2. Replace `text-primary-600 dark:text-primary-400` with `text-primary` — this removes shade control and is WRONG
+3. Replace 950 scale usage with `text-[hsl(var(--primary))]` — the 950 scale is the correct pattern
+4. Flag 950 scale classes as "hardcoded" — they resolve to CSS variables and are palette-controlled
+5. Hardcode spacing on cards: `p-4`, `p-6`, `px-8` — use `p-[var(--card-padding)]`
+6. Hardcode border radius: `rounded-lg`, `rounded-xl`, `rounded-md` — use `rounded-[var(--card-radius)]`
+7. Hardcode shadows: `shadow-sm`, `shadow-md`, `shadow-lg` — use `shadow-[var(--card-shadow)]`
+8. Hardcode grid gaps: `gap-3`, `gap-4`, `gap-6` — use `gap-[var(--content-density-gap)]`
+9. Hardcode section spacing: `space-y-6`, `space-y-8`, `py-8`, `py-12` — use `space-y-[var(--section-spacing)]`
+10. Hardcode chart colors: `fill="#22c55e"`, `stroke="hsl(142 71% 45%)"` — use `chartConfig.colors[n]`
+11. Use `hsl(var(--primary))` directly in charts — use `chartConfig.colors[n]` instead
+12. Use raw `Card` component instead of `DSCard` — raw Card bypasses palette padding, radius, shadow, and border
 
-## ALWAYS DO
+## ALWAYS DO (MANDATORY)
 
-1. Use CSS variable classes: `p-[var(--card-padding)]`, `gap-[var(--content-density-gap)]`
-2. Use semantic color tokens: `text-[hsl(var(--success))]`, `text-[hsl(var(--warning))]`
-3. Use `useChartConfig()` hook for ALL chart styling
-4. Use DS wrapper components (`DSCard`, `DSSection`, `DSGrid`) when possible
-5. Use palette-aware Tailwind classes: `text-primary`, `text-destructive`, `text-muted-foreground`
+1. Use CSS variable classes for spacing: `p-[var(--card-padding)]`, `gap-[var(--content-density-gap)]`
+2. Use the 950 scale for brand color shade variation: `text-primary-600 dark:text-primary-400`, `bg-primary-100 dark:bg-primary-900`
+3. Use semantic color tokens for feedback: `text-[hsl(var(--success))]`, `text-[hsl(var(--warning))]`, `text-[hsl(var(--danger))]`, `text-[hsl(var(--info))]`
+4. Use `useChartConfig()` hook for ALL chart styling
+5. Use DS wrapper components (`DSCard`, `DSSection`, `DSGrid`) — never raw `Card`
+6. Use palette-aware Tailwind classes: `text-primary`, `text-primary-{50-950}`, `text-accent-{50-950}`, `text-destructive`, `text-muted-foreground`, `bg-card`, `bg-muted`
+7. When unsure if a color class is palette-controlled, check `tailwind.config.ts` — if it resolves to `hsl(var(--...))`, it's safe
 
 ## Exceptions (allowed hardcoded values)
 

@@ -9,6 +9,19 @@ This project comprises two distinct but related components: MuseKit and PassiveP
 
 Future products built on MuseKit will operate independently with separate repositories, databases, Stripe accounts, and Vercel deployments. The core distinction is that MuseKit serves the founder/developer, while PassivePost serves content creators.
 
+## PROJECT LAWS — Non-Negotiable
+
+These laws apply to every session, every task, every file. They are always in effect. Violating them costs the user weeks of rework. Read the full details in the referenced skills — these summaries exist as a second layer of enforcement because skills have been skimmed or ignored in the past.
+
+### LAW 1: Stack Identity
+This is a **Vercel + Next.js (App Router) + Supabase Postgres** project. Replit is a code editor ONLY — the user NEVER tests here. Production is on Vercel + Supabase. Never suggest the Replit preview. Never use Vite patterns (`import.meta.env`). Full details: session-guard skill → LAW 1, `docs/LESSONS_LEARNED.md`.
+
+### LAW 2: Color Model — Single Source of Truth
+The palette page (`/admin/setup/palette`) controls ALL visual styling via CSS variables. The Tailwind 950 scale (`primary-50` through `primary-950`, `accent-50` through `accent-950`) resolves to CSS variables and IS the design system. Classes like `text-primary-600 dark:text-primary-400` are CORRECT and palette-controlled — do NOT replace them. Named Tailwind colors (`text-green-600`, `bg-red-500`, `text-blue-*`) are FORBIDDEN — they bypass the palette. Full details: session-guard skill → LAW 2, design-system skill, `docs/DESIGN_SYSTEM_RULES.md`.
+
+### LAW 3: When In Doubt — ASK
+If confused about the stack, color model, or any design system pattern — STOP and ask the user before writing code. Do not guess. Do not assume. Bad work costs more than a clarifying question. Full details: session-guard skill → LAW 3.
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
