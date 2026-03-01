@@ -6,7 +6,10 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, ArrowLeft, ExternalLink, Mail, UserCog, X, Plus, Tag, CreditCard, Activity, MessageSquare, FileText, ScrollText, DollarSign, Send, LayoutGrid, ChevronDown, Megaphone } from 'lucide-react'
+import { Loader2, ArrowLeft, ExternalLink, Mail, UserCog, X, Plus, Tag, CreditCard, Activity, MessageSquare, FileText, ScrollText, DollarSign, Send, LayoutGrid, ChevronDown, Megaphone, Phone, MapPin, Globe, Trash2, Star, Pencil, Link2 } from 'lucide-react'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AdminBreadcrumbs } from '@/components/admin/breadcrumbs'
 import { Timeline, type TimelineEvent } from '@/components/admin/timeline'
 import { EntityNotes } from '@/components/admin/entity-notes'
@@ -119,6 +122,20 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
   const [savingProfile, setSavingProfile] = useState(false)
   const [savedProfile, setSavedProfile] = useState(false)
 
+  const [phones, setPhones] = useState<any[]>([])
+  const [emails, setEmails] = useState<any[]>([])
+  const [addresses, setAddresses] = useState<any[]>([])
+  const [socialLinks, setSocialLinks] = useState<any[]>([])
+  const [contactLoading, setContactLoading] = useState(false)
+  const [showAddPhone, setShowAddPhone] = useState(false)
+  const [showAddEmail, setShowAddEmail] = useState(false)
+  const [showAddAddress, setShowAddAddress] = useState(false)
+  const [showAddSocial, setShowAddSocial] = useState(false)
+  const [editingContact, setEditingContact] = useState<{ type: string; item: any } | null>(null)
+  const [deleteContact, setDeleteContact] = useState<{ type: string; id: string; label: string } | null>(null)
+  const [contactForm, setContactForm] = useState<Record<string, any>>({})
+  const [savingContact, setSavingContact] = useState(false)
+
   const fetchData = useCallback(async () => {
     try {
       const res = await fetch(`/api/admin/crm/${userId}`)
@@ -137,6 +154,11 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
             state: result.profile.state || '',
             postal_code: result.profile.postal_code || '',
             country: result.profile.country || '',
+            first_name: result.profile.first_name || '',
+            last_name: result.profile.last_name || '',
+            company: result.profile.company || '',
+            job_title: result.profile.job_title || '',
+            website: result.profile.website || '',
           })
         } else {
           setProfileForm({
@@ -149,6 +171,11 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
             state: '',
             postal_code: '',
             country: '',
+            first_name: '',
+            last_name: '',
+            company: '',
+            job_title: '',
+            website: '',
           })
         }
       }
@@ -208,6 +235,69 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
     } finally {
       setSavingProfile(false)
     }
+  }
+
+  const fetchContacts = useCallback(async () => {
+    setContactLoading(true)
+    try {
+      const [phonesRes, emailsRes, addressesRes, socialRes] = await Promise.all([
+        fetch(`/api/admin/crm/${userId}/phones`),
+        fetch(`/api/admin/crm/${userId}/emails`),
+        fetch(`/api/admin/crm/${userId}/addresses`),
+        fetch(`/api/admin/crm/${userId}/social-links`),
+      ])
+      if (phonesRes.ok) { const d = await phonesRes.json(); setPhones(d.phones || []) }
+      if (emailsRes.ok) { const d = await emailsRes.json(); setEmails(d.emails || []) }
+      if (addressesRes.ok) { const d = await addressesRes.json(); setAddresses(d.addresses || []) }
+      if (socialRes.ok) { const d = await socialRes.json(); setSocialLinks(d.socialLinks || []) }
+    } catch {} finally { setContactLoading(false) }
+  }, [userId])
+
+  useEffect(() => { fetchContacts() }, [fetchContacts])
+
+  async function saveContact(type: string, method: 'POST' | 'PUT') {
+    setSavingContact(true)
+    try {
+      const endpoint = type === 'social-links' ? 'social-links' : type
+      const res = await fetch(`/api/admin/crm/${userId}/${endpoint}`, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contactForm),
+      })
+      if (res.ok) {
+        setShowAddPhone(false)
+        setShowAddEmail(false)
+        setShowAddAddress(false)
+        setShowAddSocial(false)
+        setEditingContact(null)
+        setContactForm({})
+        fetchContacts()
+      }
+    } catch {} finally { setSavingContact(false) }
+  }
+
+  async function handleDeleteContact() {
+    if (!deleteContact) return
+    try {
+      const endpoint = deleteContact.type === 'social-links' ? 'social-links' : deleteContact.type
+      const res = await fetch(`/api/admin/crm/${userId}/${endpoint}?id=${deleteContact.id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setDeleteContact(null)
+        fetchContacts()
+      }
+    } catch {}
+  }
+
+  async function togglePrimary(type: string, id: string) {
+    try {
+      const endpoint = type === 'social-links' ? 'social-links' : type
+      await fetch(`/api/admin/crm/${userId}/${endpoint}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, is_primary: true }),
+      })
+      fetchContacts()
+    } catch {}
   }
 
   async function handleImpersonate() {
@@ -621,12 +711,356 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                 <EntityNotes entityType="user" entityId={userId} />
               </AccordionContent>
             </AccordionItem>
+
+            <AccordionItem value="phones" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+              <AccordionTrigger className="py-3" data-testid="accordion-phones">
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Phone Numbers</span>
+                  <span className="text-xs text-muted-foreground ml-1">({phones.length})</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                {contactLoading ? (
+                  <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                ) : (
+                  <div className="space-y-2 py-1">
+                    {phones.map((p: any) => (
+                      <div key={p.id} className="flex items-center justify-between gap-2 rounded-md border p-3" data-testid={`contact-phone-${p.id}`}>
+                        <div className="flex items-center gap-2 min-w-0">
+                          {p.is_primary && <Star className="h-3 w-3 text-[hsl(var(--warning))] fill-[hsl(var(--warning))] shrink-0" />}
+                          <span className="text-xs font-medium text-muted-foreground shrink-0">{p.label}</span>
+                          <span className="text-sm truncate">{p.phone_number}</span>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {!p.is_primary && (
+                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => togglePrimary('phones', p.id)} data-testid={`button-primary-phone-${p.id}`} title="Set as primary">
+                              <Star className="h-3 w-3" />
+                            </Button>
+                          )}
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingContact({ type: 'phones', item: p }); setContactForm({ id: p.id, label: p.label, phone_number: p.phone_number, is_primary: p.is_primary }) }} data-testid={`button-edit-phone-${p.id}`}>
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleteContact({ type: 'phones', id: p.id, label: p.phone_number })} data-testid={`button-delete-phone-${p.id}`}>
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    {phones.length === 0 && !showAddPhone && (
+                      <p className="text-sm text-muted-foreground py-2">No phone numbers</p>
+                    )}
+                    {(showAddPhone || editingContact?.type === 'phones') && (
+                      <div className="rounded-md border p-3 space-y-2" data-testid="form-add-phone">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <Label className="text-xs">Label</Label>
+                            <Select value={contactForm.label || 'Mobile'} onValueChange={v => setContactForm(f => ({ ...f, label: v }))}>
+                              <SelectTrigger data-testid="select-phone-label"><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Mobile">Mobile</SelectItem>
+                                <SelectItem value="Home">Home</SelectItem>
+                                <SelectItem value="Work">Work</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-xs">Phone Number</Label>
+                            <Input value={contactForm.phone_number || ''} onChange={e => setContactForm(f => ({ ...f, phone_number: e.target.value }))} placeholder="+1 (555) 123-4567" data-testid="input-phone-number" />
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => saveContact('phones', editingContact?.type === 'phones' ? 'PUT' : 'POST')} disabled={savingContact} data-testid="button-save-phone">
+                            {savingContact && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
+                            {editingContact?.type === 'phones' ? 'Update' : 'Add'}
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => { setShowAddPhone(false); setEditingContact(null); setContactForm({}) }} data-testid="button-cancel-phone">Cancel</Button>
+                        </div>
+                      </div>
+                    )}
+                    {!showAddPhone && editingContact?.type !== 'phones' && (
+                      <Button size="sm" variant="outline" onClick={() => { setShowAddPhone(true); setContactForm({ label: 'Mobile' }) }} data-testid="button-add-phone">
+                        <Plus className="h-3 w-3 mr-1" /> Add Phone
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="emails" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+              <AccordionTrigger className="py-3" data-testid="accordion-emails">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Email Addresses</span>
+                  <span className="text-xs text-muted-foreground ml-1">({emails.length})</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                {contactLoading ? (
+                  <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                ) : (
+                  <div className="space-y-2 py-1">
+                    {emails.map((e: any) => (
+                      <div key={e.id} className="flex items-center justify-between gap-2 rounded-md border p-3" data-testid={`contact-email-${e.id}`}>
+                        <div className="flex items-center gap-2 min-w-0">
+                          {e.is_primary && <Star className="h-3 w-3 text-[hsl(var(--warning))] fill-[hsl(var(--warning))] shrink-0" />}
+                          <span className="text-xs font-medium text-muted-foreground shrink-0">{e.label}</span>
+                          <span className="text-sm truncate">{e.email}</span>
+                          {e.is_verified && <span className="text-[10px] px-1.5 py-0.5 rounded bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]">Verified</span>}
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {!e.is_primary && (
+                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => togglePrimary('emails', e.id)} data-testid={`button-primary-email-${e.id}`} title="Set as primary">
+                              <Star className="h-3 w-3" />
+                            </Button>
+                          )}
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingContact({ type: 'emails', item: e }); setContactForm({ id: e.id, label: e.label, email: e.email, is_primary: e.is_primary }) }} data-testid={`button-edit-email-${e.id}`}>
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleteContact({ type: 'emails', id: e.id, label: e.email })} data-testid={`button-delete-email-${e.id}`}>
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    {emails.length === 0 && !showAddEmail && (
+                      <p className="text-sm text-muted-foreground py-2">No additional email addresses</p>
+                    )}
+                    {(showAddEmail || editingContact?.type === 'emails') && (
+                      <div className="rounded-md border p-3 space-y-2" data-testid="form-add-email">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <Label className="text-xs">Label</Label>
+                            <Select value={contactForm.label || 'Personal'} onValueChange={v => setContactForm(f => ({ ...f, label: v }))}>
+                              <SelectTrigger data-testid="select-email-label"><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Personal">Personal</SelectItem>
+                                <SelectItem value="Work">Work</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-xs">Email</Label>
+                            <Input type="email" value={contactForm.email || ''} onChange={e => setContactForm(f => ({ ...f, email: e.target.value }))} placeholder="email@example.com" data-testid="input-email-address" />
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => saveContact('emails', editingContact?.type === 'emails' ? 'PUT' : 'POST')} disabled={savingContact} data-testid="button-save-email">
+                            {savingContact && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
+                            {editingContact?.type === 'emails' ? 'Update' : 'Add'}
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => { setShowAddEmail(false); setEditingContact(null); setContactForm({}) }} data-testid="button-cancel-email">Cancel</Button>
+                        </div>
+                      </div>
+                    )}
+                    {!showAddEmail && editingContact?.type !== 'emails' && (
+                      <Button size="sm" variant="outline" onClick={() => { setShowAddEmail(true); setContactForm({ label: 'Personal' }) }} data-testid="button-add-email">
+                        <Plus className="h-3 w-3 mr-1" /> Add Email
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="addresses" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+              <AccordionTrigger className="py-3" data-testid="accordion-addresses">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Addresses</span>
+                  <span className="text-xs text-muted-foreground ml-1">({addresses.length})</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                {contactLoading ? (
+                  <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                ) : (
+                  <div className="space-y-2 py-1">
+                    {addresses.map((a: any) => (
+                      <div key={a.id} className="flex items-center justify-between gap-2 rounded-md border p-3" data-testid={`contact-address-${a.id}`}>
+                        <div className="flex items-center gap-2 min-w-0">
+                          {a.is_primary && <Star className="h-3 w-3 text-[hsl(var(--warning))] fill-[hsl(var(--warning))] shrink-0" />}
+                          <span className="text-xs font-medium text-muted-foreground shrink-0">{a.label}</span>
+                          <span className="text-sm truncate">{[a.street, a.city, a.state, a.zip, a.country].filter(Boolean).join(', ')}</span>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {!a.is_primary && (
+                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => togglePrimary('addresses', a.id)} data-testid={`button-primary-address-${a.id}`} title="Set as primary">
+                              <Star className="h-3 w-3" />
+                            </Button>
+                          )}
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingContact({ type: 'addresses', item: a }); setContactForm({ id: a.id, label: a.label, street: a.street, city: a.city, state: a.state, zip: a.zip, country: a.country, is_primary: a.is_primary }) }} data-testid={`button-edit-address-${a.id}`}>
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleteContact({ type: 'addresses', id: a.id, label: a.label })} data-testid={`button-delete-address-${a.id}`}>
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    {addresses.length === 0 && !showAddAddress && (
+                      <p className="text-sm text-muted-foreground py-2">No addresses</p>
+                    )}
+                    {(showAddAddress || editingContact?.type === 'addresses') && (
+                      <div className="rounded-md border p-3 space-y-2" data-testid="form-add-address">
+                        <div>
+                          <Label className="text-xs">Label</Label>
+                          <Select value={contactForm.label || 'Home'} onValueChange={v => setContactForm(f => ({ ...f, label: v }))}>
+                            <SelectTrigger data-testid="select-address-label"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Home">Home</SelectItem>
+                              <SelectItem value="Work">Work</SelectItem>
+                              <SelectItem value="Shipping">Shipping</SelectItem>
+                              <SelectItem value="Billing">Billing</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label className="text-xs">Street</Label>
+                          <Input value={contactForm.street || ''} onChange={e => setContactForm(f => ({ ...f, street: e.target.value }))} placeholder="123 Main St" data-testid="input-address-street" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <Label className="text-xs">City</Label>
+                            <Input value={contactForm.city || ''} onChange={e => setContactForm(f => ({ ...f, city: e.target.value }))} data-testid="input-address-city" />
+                          </div>
+                          <div>
+                            <Label className="text-xs">State</Label>
+                            <Input value={contactForm.state || ''} onChange={e => setContactForm(f => ({ ...f, state: e.target.value }))} data-testid="input-address-state" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <Label className="text-xs">ZIP</Label>
+                            <Input value={contactForm.zip || ''} onChange={e => setContactForm(f => ({ ...f, zip: e.target.value }))} data-testid="input-address-zip" />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Country</Label>
+                            <Input value={contactForm.country || 'US'} onChange={e => setContactForm(f => ({ ...f, country: e.target.value }))} data-testid="input-address-country" />
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => saveContact('addresses', editingContact?.type === 'addresses' ? 'PUT' : 'POST')} disabled={savingContact} data-testid="button-save-address">
+                            {savingContact && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
+                            {editingContact?.type === 'addresses' ? 'Update' : 'Add'}
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => { setShowAddAddress(false); setEditingContact(null); setContactForm({}) }} data-testid="button-cancel-address">Cancel</Button>
+                        </div>
+                      </div>
+                    )}
+                    {!showAddAddress && editingContact?.type !== 'addresses' && (
+                      <Button size="sm" variant="outline" onClick={() => { setShowAddAddress(true); setContactForm({ label: 'Home', country: 'US' }) }} data-testid="button-add-address">
+                        <Plus className="h-3 w-3 mr-1" /> Add Address
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="social-links" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+              <AccordionTrigger className="py-3" data-testid="accordion-social-links">
+                <div className="flex items-center gap-2">
+                  <Link2 className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Social Links</span>
+                  <span className="text-xs text-muted-foreground ml-1">({socialLinks.length})</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                {contactLoading ? (
+                  <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                ) : (
+                  <div className="space-y-2 py-1">
+                    {socialLinks.map((s: any) => (
+                      <div key={s.id} className="flex items-center justify-between gap-2 rounded-md border p-3" data-testid={`contact-social-${s.id}`}>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Globe className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span className="text-xs font-medium text-muted-foreground shrink-0 capitalize">{s.platform}</span>
+                          <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline truncate">{s.url}</a>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingContact({ type: 'social-links', item: s }); setContactForm({ id: s.id, platform: s.platform, url: s.url }) }} data-testid={`button-edit-social-${s.id}`}>
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleteContact({ type: 'social-links', id: s.id, label: s.platform })} data-testid={`button-delete-social-${s.id}`}>
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    {socialLinks.length === 0 && !showAddSocial && (
+                      <p className="text-sm text-muted-foreground py-2">No social links</p>
+                    )}
+                    {(showAddSocial || editingContact?.type === 'social-links') && (
+                      <div className="rounded-md border p-3 space-y-2" data-testid="form-add-social">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <Label className="text-xs">Platform</Label>
+                            <Select value={contactForm.platform || 'twitter'} onValueChange={v => setContactForm(f => ({ ...f, platform: v }))}>
+                              <SelectTrigger data-testid="select-social-platform"><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="twitter">Twitter / X</SelectItem>
+                                <SelectItem value="linkedin">LinkedIn</SelectItem>
+                                <SelectItem value="instagram">Instagram</SelectItem>
+                                <SelectItem value="facebook">Facebook</SelectItem>
+                                <SelectItem value="youtube">YouTube</SelectItem>
+                                <SelectItem value="tiktok">TikTok</SelectItem>
+                                <SelectItem value="github">GitHub</SelectItem>
+                                <SelectItem value="website">Website</SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-xs">URL</Label>
+                            <Input value={contactForm.url || ''} onChange={e => setContactForm(f => ({ ...f, url: e.target.value }))} placeholder="https://..." data-testid="input-social-url" />
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => saveContact('social-links', editingContact?.type === 'social-links' ? 'PUT' : 'POST')} disabled={savingContact} data-testid="button-save-social">
+                            {savingContact && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
+                            {editingContact?.type === 'social-links' ? 'Update' : 'Add'}
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => { setShowAddSocial(false); setEditingContact(null); setContactForm({}) }} data-testid="button-cancel-social">Cancel</Button>
+                        </div>
+                      </div>
+                    )}
+                    {!showAddSocial && editingContact?.type !== 'social-links' && (
+                      <Button size="sm" variant="outline" onClick={() => { setShowAddSocial(true); setContactForm({ platform: 'twitter' }) }} data-testid="button-add-social">
+                        <Plus className="h-3 w-3 mr-1" /> Add Social Link
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
         </div>
       )}
 
       {activeTab === 'profile' && (
         <div className="max-w-2xl space-y-[var(--content-density-gap,1rem)]" data-testid="tab-content-profile">
+          <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">First Name</label>
+              <Input
+                value={profileForm.first_name || ''}
+                onChange={(e) => setProfileForm(prev => ({ ...prev, first_name: e.target.value }))}
+                data-testid="input-first-name"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Last Name</label>
+              <Input
+                value={profileForm.last_name || ''}
+                onChange={(e) => setProfileForm(prev => ({ ...prev, last_name: e.target.value }))}
+                data-testid="input-last-name"
+              />
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Display Name</label>
@@ -644,6 +1078,33 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
                 data-testid="input-phone"
               />
             </div>
+          </div>
+          <div className="grid grid-cols-2 gap-[var(--content-density-gap,1rem)]">
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Company</label>
+              <Input
+                value={profileForm.company || ''}
+                onChange={(e) => setProfileForm(prev => ({ ...prev, company: e.target.value }))}
+                data-testid="input-company"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Job Title</label>
+              <Input
+                value={profileForm.job_title || ''}
+                onChange={(e) => setProfileForm(prev => ({ ...prev, job_title: e.target.value }))}
+                data-testid="input-job-title"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">Website</label>
+            <Input
+              value={profileForm.website || ''}
+              onChange={(e) => setProfileForm(prev => ({ ...prev, website: e.target.value }))}
+              placeholder="https://..."
+              data-testid="input-website"
+            />
           </div>
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1 block">Bio</label>
@@ -843,6 +1304,15 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
           )}
         </div>
       )}
+      <ConfirmDialog
+        open={!!deleteContact}
+        onOpenChange={(open) => { if (!open) setDeleteContact(null) }}
+        title="Delete Contact Record"
+        description={`Delete "${deleteContact?.label || ''}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        variant="destructive"
+        onConfirm={handleDeleteContact}
+      />
     </div>
   )
 }

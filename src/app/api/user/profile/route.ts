@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
       'display_name', 'avatar_url', 'phone',
       'address_line1', 'address_line2', 'city', 'state', 'postal_code', 'country',
       'bio', 'timezone', 'preferences',
+      'first_name', 'last_name', 'company', 'job_title', 'website',
     ]
 
     const profileData: Record<string, any> = {
@@ -166,5 +167,10 @@ function buildDefaultProfile(userId: string) {
     bio: '',
     timezone: 'UTC',
     preferences: {},
+    first_name: '',
+    last_name: '',
+    company: '',
+    job_title: '',
+    website: '',
   }
 }
