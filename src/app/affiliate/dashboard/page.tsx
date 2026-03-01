@@ -176,6 +176,9 @@ interface MarketingAsset {
   asset_type: string
   content: string | null
   file_url: string | null
+  file_name: string | null
+  file_size: number | null
+  file_type: string | null
 }
 
 interface LeaderboardEntry {
