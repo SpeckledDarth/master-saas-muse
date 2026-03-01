@@ -83,7 +83,9 @@ border-primary-600 dark:border-primary-400
 | `text-gray-400`, `text-gray-500` | `text-muted-foreground` | `--muted-foreground` |
 
 **Allowed Tailwind color classes** (these ARE CSS variables, not hardcoded):
-`text-primary`, `text-primary-{50-950}`, `text-accent-{50-950}`, `text-destructive`, `text-muted-foreground`, `text-foreground`, `bg-card`, `bg-background`, `bg-muted`, `bg-primary`, `bg-primary-{50-950}`, `bg-accent-{50-950}`, `border-border`, `border-input`, `border-primary-{50-950}`, `border-accent-{50-950}`
+`text-primary`, `text-primary-{50-950}`, `text-accent-{50-950}`, `text-destructive`, `text-muted-foreground`, `text-foreground`, `bg-[var(--card-bg)]`, `bg-background`, `bg-muted`, `bg-primary`, `bg-primary-{50-950}`, `bg-accent-{50-950}`, `border-border`, `border-input`, `border-primary-{50-950}`, `border-accent-{50-950}`
+
+**⚠ `bg-card` is NOT allowed for card elements.** Use `bg-[var(--card-bg)]` or DSCard instead. `bg-card` resolves to solid `hsl(var(--card))` which doesn't match the transparent card background `--card-bg: rgba(255, 255, 255, 0.09)`.
 
 ### Typography
 

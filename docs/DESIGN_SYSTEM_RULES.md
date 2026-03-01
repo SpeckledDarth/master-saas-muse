@@ -46,6 +46,14 @@ This document is the single source of truth for how to style components in Passi
 | `border`, `border-2` on cards | `border-[length:var(--card-border-width)]` | `--card-border-width` | Card Border Width (0/1px/2px) |
 | `border-solid`, `border-dashed` | `border-[var(--card-border-style)]` | `--card-border-style` | Card Border Style (solid/dashed/none) |
 
+### Card Background
+
+| Instead of... | Use... | CSS Variable | Notes |
+|---|---|---|---|
+| `bg-card` on raw divs/Links | `bg-[var(--card-bg)]` | `--card-bg` | Transparent glass background (rgba). The Card/DSCard component applies this automatically. Raw elements MUST use `bg-[var(--card-bg)]` instead of `bg-card`. |
+
+**Why not `bg-card`?** The `bg-card` Tailwind class resolves to `hsl(var(--card))` — a SOLID opaque color. The actual card background is `--card-bg: rgba(255, 255, 255, 0.09)` — a transparent overlay. These are visually different. The Card component uses `--card-bg`. Any raw element styled as a card must also use `--card-bg`.
+
 ### Colors — Semantic Tokens
 
 | Instead of... | Use... | CSS Variable | Notes |
@@ -61,7 +69,9 @@ This document is the single source of truth for how to style components in Passi
 | `text-muted-foreground` | `text-muted-foreground` (OK) | `--muted-foreground` | Already a CSS variable class |
 
 **Allowed Tailwind color classes** (these ARE CSS variables, not hardcoded):
-`text-primary`, `text-destructive`, `text-muted-foreground`, `text-foreground`, `bg-card`, `bg-background`, `bg-muted`, `bg-primary`, `border-border`, `border-input`
+`text-primary`, `text-destructive`, `text-muted-foreground`, `text-foreground`, `bg-[var(--card-bg)]`, `bg-background`, `bg-muted`, `bg-primary`, `border-border`, `border-input`
+
+**⚠ `bg-card` is NOT allowed for card elements.** Use `bg-[var(--card-bg)]` or DSCard instead. `bg-card` resolves to a solid opaque color that doesn't match the transparent card background.
 
 **NEVER use these** (hardcoded, bypass the palette):
 `text-green-*`, `text-red-*`, `text-amber-*`, `text-yellow-*`, `text-blue-*`, `bg-green-*`, `bg-red-*`, `bg-amber-*`, `bg-yellow-*`, `bg-blue-*`

@@ -104,7 +104,7 @@ function KPISkeleton() {
   return (
     <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] animate-pulse">
+        <div key={i} className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] animate-pulse">
           <div className="h-3 bg-muted rounded w-2/3 mb-3" />
           <div className="h-7 bg-muted rounded w-1/2 mb-1" />
           <div className="h-3 bg-muted rounded w-1/3" />
@@ -299,7 +299,7 @@ export default function AdminDashboard() {
         </div>
         <KPISkeleton />
         <DSGrid cols={{ default: 1, lg: 3 }}>
-          <div className="lg:col-span-2 rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] animate-pulse">
+          <div className="lg:col-span-2 rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] animate-pulse">
             <div className="h-4 bg-muted rounded w-1/3 mb-4" />
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -313,7 +313,7 @@ export default function AdminDashboard() {
               ))}
             </div>
           </div>
-          <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] animate-pulse">
+          <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] animate-pulse">
             <div className="h-4 bg-muted rounded w-1/2 mb-4" />
             <div className="h-20 bg-muted rounded" />
           </div>
@@ -363,7 +363,7 @@ export default function AdminDashboard() {
               <Link
                 key={kpi.label}
                 href={kpi.href}
-                className="rounded-[var(--card-radius,0.75rem)] border-[length:var(--card-border-width,1px)] border-[var(--card-border-style,solid)] border-border bg-card p-[var(--card-padding,1.25rem)] shadow-[var(--card-shadow,0_1px_2px_0_rgb(0_0_0/0.05))] hover:bg-muted/30 transition-colors group"
+                className="rounded-[var(--card-radius,0.75rem)] border-[length:var(--card-border-width,1px)] border-[var(--card-border-style,solid)] border-border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] shadow-[var(--card-shadow,0_1px_2px_0_rgb(0_0_0/0.05))] hover:bg-muted/30 transition-colors group"
                 data-testid={`card-kpi-${kpi.label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -497,7 +497,7 @@ export default function AdminDashboard() {
       </DSGrid>
 
       <DSGrid cols={{ default: 1, lg: 3 }}>
-        <div className="lg:col-span-2 rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="section-activity">
+        <div className="lg:col-span-2 rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="section-activity">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-medium flex items-center gap-2">
               <Activity className="h-4 w-4 text-muted-foreground" />
@@ -530,7 +530,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="space-y-[var(--content-density-gap,1rem)]">
-          <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="section-revenue-trend">
+          <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="section-revenue-trend">
             <h2 className="text-sm font-medium mb-4">Revenue (7 days)</h2>
             <SparklineChart data={revenueTrend} />
             {revenueTrend.length > 0 && (
@@ -545,14 +545,14 @@ export default function AdminDashboard() {
 
           {!metricsLoading && metrics && (
             <DSGrid cols={{ default: 2 }}>
-              <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-feedback-count">
+              <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-feedback-count">
                 <div className="flex items-center gap-2 mb-2">
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">Feedback</span>
                 </div>
                 <p className="text-xl font-bold" data-testid="text-feedback-count">{metrics.totalFeedback ?? 0}</p>
               </div>
-              <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-waitlist-count">
+              <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-waitlist-count">
                 <div className="flex items-center gap-2 mb-2">
                   <ListChecks className="h-4 w-4 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">Waitlist</span>
