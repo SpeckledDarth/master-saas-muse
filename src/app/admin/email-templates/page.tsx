@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -276,8 +276,8 @@ export default function EmailTemplatesPage() {
         </Button>
       </div>
 
-      <Card className="bg-[hsl(var(--info)/0.1)] border-[hsl(var(--info)/0.2)]">
-        <CardContent className="pt-6">
+      <DSCard className="bg-[hsl(var(--info)/0.1)] border-[hsl(var(--info)/0.2)]">
+        <DSCardContent className="pt-6">
           <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
             <Info className="h-5 w-5 text-[hsl(var(--info))] mt-0.5 shrink-0" />
             <div className="text-sm">
@@ -292,12 +292,12 @@ export default function EmailTemplatesPage() {
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
 
       {templates.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
+        <DSCard>
+          <DSCardContent className="py-12 text-center text-muted-foreground">
             <Mail className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] opacity-50" />
             <p className="text-lg font-medium mb-2">No email templates yet</p>
             <p className="mb-[var(--content-density-gap,1rem)]">Create your first template to start sending branded emails.</p>
@@ -305,21 +305,21 @@ export default function EmailTemplatesPage() {
               <Plus className="h-4 w-4 mr-2" />
               Create Template
             </Button>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       ) : (
         <div className="grid gap-[var(--content-density-gap,1rem)]">
           {templates.map((template) => (
-            <Card key={template.id} data-testid={`template-${template.name}`}>
-              <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-[var(--content-density-gap,1rem)] space-y-0">
+            <DSCard key={template.id} data-testid={`template-${template.name}`}>
+              <DSCardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-[var(--content-density-gap,1rem)] space-y-0">
                 <div className="min-w-0 flex-1">
-                  <CardTitle className="text-lg capitalize flex items-center gap-2 flex-wrap">
+                  <DSCardTitle className="text-lg capitalize flex items-center gap-2 flex-wrap">
                     {template.name.replace(/_/g, ' ')}
                     {template.category && template.category !== 'general' && (
                       <Badge variant="outline" className="text-[10px] capitalize font-normal">{template.category}</Badge>
                     )}
-                  </CardTitle>
-                  <CardDescription className="truncate">{template.description}</CardDescription>
+                  </DSCardTitle>
+                  <DSCardDescription className="truncate">{template.description}</DSCardDescription>
                 </div>
                 <div className="flex items-center gap-2 shrink-0 flex-wrap">
                   <Button
@@ -355,8 +355,8 @@ export default function EmailTemplatesPage() {
                     )}
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent>
+              </DSCardHeader>
+              <DSCardContent>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Subject:</span>
@@ -366,8 +366,8 @@ export default function EmailTemplatesPage() {
                     {template.body.substring(0, 150)}...
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </DSCardContent>
+            </DSCard>
           ))}
         </div>
       )}
@@ -499,11 +499,11 @@ export default function EmailTemplatesPage() {
                 />
               </div>
               
-              <Card className="bg-muted/50">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-sm">All Variables</CardTitle>
-                </CardHeader>
-                <CardContent className="py-2">
+              <DSCard className="bg-muted/50">
+                <DSCardHeader className="py-3">
+                  <DSCardTitle className="text-sm">All Variables</DSCardTitle>
+                </DSCardHeader>
+                <DSCardContent className="py-2">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
                     {ALL_VARIABLES.map(v => (
                       <div 
@@ -517,24 +517,24 @@ export default function EmailTemplatesPage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </DSCardContent>
+              </DSCard>
             </TabsContent>
             
             <TabsContent value="preview" className="flex-1 overflow-auto mt-4" data-testid="email-preview">
-              <Card>
-                <CardHeader className="border-b">
+              <DSCard>
+                <DSCardHeader className="border-b">
                   <div className="text-sm text-muted-foreground">Subject:</div>
-                  <CardTitle className="text-lg">{previewContent.subject}</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-6">
+                  <DSCardTitle className="text-lg">{previewContent.subject}</DSCardTitle>
+                </DSCardHeader>
+                <DSCardContent className="pt-6">
                   <div className="prose prose-sm dark:prose-invert max-w-none">
                     {previewContent.body.split('\n').map((line, i) => (
                       <p key={i} className="my-2">{line || <br />}</p>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </DSCardContent>
+              </DSCard>
               <p className="text-xs text-muted-foreground mt-4 text-center">
                 This is a plain text preview. The actual email will include your branding (logo, colors, footer).
               </p>

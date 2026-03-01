@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardHeader, DSCardTitle, DSCardDescription } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -163,22 +163,22 @@ export default function SSODashboard() {
       </div>
 
       {warning && (
-        <Card className="mb-[var(--content-density-gap,1rem)] border-[hsl(var(--warning)/0.5)]">
-          <CardContent className="pt-4 pb-4">
+        <DSCard className="mb-[var(--content-density-gap,1rem)] border-[hsl(var(--warning)/0.5)]">
+          <DSCardContent className="pt-4 pb-4">
             <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
               <AlertTriangle className="h-5 w-5 text-[hsl(var(--warning))] mt-0.5 shrink-0" />
               <p className="text-sm" data-testid="text-sso-warning">{warning}</p>
             </div>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       )}
 
-      <Card className="mb-[var(--content-density-gap,1rem)]">
-        <CardHeader>
-          <CardTitle className="text-lg">SAML Configuration</CardTitle>
-          <CardDescription>Provide these URLs to your identity provider (Okta, Azure AD, Google Workspace, etc.)</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+      <DSCard className="mb-[var(--content-density-gap,1rem)]">
+        <DSCardHeader>
+          <DSCardTitle className="text-lg">SAML Configuration</DSCardTitle>
+          <DSCardDescription>Provide these URLs to your identity provider (Okta, Azure AD, Google Workspace, etc.)</DSCardDescription>
+        </DSCardHeader>
+        <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="space-y-2">
             <Label className="text-sm text-muted-foreground">SP Metadata URL</Label>
             <div className="flex items-center gap-2">
@@ -207,16 +207,16 @@ export default function SSODashboard() {
               </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
 
       {showAddForm && (
-        <Card className="mb-[var(--content-density-gap,1rem)]">
-          <CardHeader>
-            <CardTitle className="text-lg">Add Identity Provider</CardTitle>
-            <CardDescription>Connect an external SAML 2.0 identity provider</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <DSCard className="mb-[var(--content-density-gap,1rem)]">
+          <DSCardHeader>
+            <DSCardTitle className="text-lg">Add Identity Provider</DSCardTitle>
+            <DSCardDescription>Connect an external SAML 2.0 identity provider</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent>
             <form onSubmit={handleAddProvider} className="space-y-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label htmlFor="metadataUrl">IdP Metadata URL</Label>
@@ -261,16 +261,16 @@ export default function SSODashboard() {
                 </Button>
               </div>
             </form>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       )}
 
       <div className="space-y-[var(--content-density-gap,1rem)]">
         <h2 className="text-lg font-semibold">Identity Providers ({providers.length})</h2>
 
         {providers.length === 0 ? (
-          <Card>
-            <CardContent className="py-[var(--section-spacing,1.5rem)] text-center">
+          <DSCard>
+            <DSCardContent className="py-[var(--section-spacing,1.5rem)] text-center">
               <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
               <p className="text-muted-foreground" data-testid="text-no-providers">
                 No SSO providers configured yet
@@ -278,12 +278,12 @@ export default function SSODashboard() {
               <p className="text-sm text-muted-foreground mt-1">
                 Add an identity provider to enable enterprise single sign-on
               </p>
-            </CardContent>
-          </Card>
+            </DSCardContent>
+          </DSCard>
         ) : (
           providers.map((provider) => (
-            <Card key={provider.id} data-testid={`card-sso-provider-${provider.id}`}>
-              <CardContent className="pt-4 pb-4">
+            <DSCard key={provider.id} data-testid={`card-sso-provider-${provider.id}`}>
+              <DSCardContent className="pt-4 pb-4">
                 <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                   <div className="space-y-2 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -323,8 +323,8 @@ export default function SSODashboard() {
                     Remove
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </DSCardContent>
+            </DSCard>
           ))
         )}
       </div>

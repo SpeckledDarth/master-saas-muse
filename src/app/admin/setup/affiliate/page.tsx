@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -3034,7 +3034,7 @@ export default function AffiliateSettingsPage() {
                             />
                           )}
                           {assetForm.file_url && assetForm.upload_mode === 'upload' && (
-                            <p className="text-xs text-green-600 flex items-center gap-1">
+                            <p className="text-xs text-[hsl(var(--success))] flex items-center gap-1">
                               <CheckCircle className="h-3 w-3" /> Uploaded: {assetForm.file_name || 'File ready'}
                             </p>
                           )}
@@ -3532,7 +3532,7 @@ export default function AffiliateSettingsPage() {
                     <div className="flex items-center gap-2">
                       <p className="text-2xl font-bold">{broadcastStats.avgOpenRate.toFixed(1)}%</p>
                       {broadcastStats.trendDirection !== 'flat' && (
-                        <span className={`flex items-center text-xs font-medium ${broadcastStats.trendDirection === 'up' ? 'text-green-600' : 'text-red-500'}`} data-testid="trend-indicator">
+                        <span className={`flex items-center text-xs font-medium ${broadcastStats.trendDirection === 'up' ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--danger))]'}`} data-testid="trend-indicator">
                           {broadcastStats.trendDirection === 'up' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
                           {Math.abs(broadcastStats.trendValue).toFixed(1)}%
                         </span>

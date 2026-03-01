@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Loader2, TrendingDown, Users, BarChart3 } from 'lucide-react'
 
 interface FunnelStep {
@@ -44,8 +44,8 @@ export default function FunnelAdminPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
-        <Card>
-          <CardContent className="pt-6">
+        <DSCard>
+          <DSCardContent className="pt-6">
             <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
               <Users className="h-8 w-8 text-primary" />
               <div>
@@ -53,10 +53,10 @@ export default function FunnelAdminPage() {
                 <div className="text-sm text-muted-foreground">Started Onboarding</div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
+          </DSCardContent>
+        </DSCard>
+        <DSCard>
+          <DSCardContent className="pt-6">
             <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
               <BarChart3 className="h-8 w-8 text-[hsl(var(--success))]" />
               <div>
@@ -66,10 +66,10 @@ export default function FunnelAdminPage() {
                 <div className="text-sm text-muted-foreground">Completed All Steps</div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
+          </DSCardContent>
+        </DSCard>
+        <DSCard>
+          <DSCardContent className="pt-6">
             <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
               <TrendingDown className="h-8 w-8 text-[hsl(var(--warning))]" />
               <div>
@@ -81,16 +81,16 @@ export default function FunnelAdminPage() {
                 <div className="text-sm text-muted-foreground">Completion Rate</div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       </div>
 
-      <Card data-testid="card-funnel-steps">
-        <CardHeader>
-          <CardTitle>Step-by-Step Breakdown</CardTitle>
-          <CardDescription>See where users drop off in the onboarding flow</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <DSCard data-testid="card-funnel-steps">
+        <DSCardHeader>
+          <DSCardTitle>Step-by-Step Breakdown</DSCardTitle>
+          <DSCardDescription>See where users drop off in the onboarding flow</DSCardDescription>
+        </DSCardHeader>
+        <DSCardContent>
           {funnel.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-20" />
@@ -137,8 +137,8 @@ export default function FunnelAdminPage() {
               })}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
     </div>
   )
 }

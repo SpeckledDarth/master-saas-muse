@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -458,21 +458,21 @@ export default function TeamPage() {
       </div>
 
       <Collapsible open={rolesInfoOpen} onOpenChange={setRolesInfoOpen}>
-        <Card>
+        <DSCard>
           <CollapsibleTrigger asChild>
-            <CardHeader className="cursor-pointer hover-elevate active-elevate-2">
-              <CardTitle className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
+            <DSCardHeader className="cursor-pointer hover-elevate active-elevate-2">
+              <DSCardTitle className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
                 <span className="flex items-center gap-2">
                   <Info className="h-5 w-5" />
                   Role Permissions Reference
                 </span>
                 {rolesInfoOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </CardTitle>
-              <CardDescription>Click to see what each team role can do</CardDescription>
-            </CardHeader>
+              </DSCardTitle>
+              <DSCardDescription>Click to see what each team role can do</DSCardDescription>
+            </DSCardHeader>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <CardContent className="pt-0">
+            <DSCardContent className="pt-0">
               <div className="grid gap-[var(--content-density-gap,1rem)] md:grid-cols-2">
                 <div className="p-[var(--card-padding,1.25rem)] border rounded-[var(--card-radius,0.75rem)] space-y-2">
                   <div className="flex items-center gap-2">
@@ -526,9 +526,9 @@ export default function TeamPage() {
                   </ul>
                 </div>
               </div>
-            </CardContent>
+            </DSCardContent>
           </CollapsibleContent>
-        </Card>
+        </DSCard>
       </Collapsible>
 
       <div className="space-y-[var(--content-density-gap,1rem)]">

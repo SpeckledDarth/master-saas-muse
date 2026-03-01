@@ -7,7 +7,7 @@ import { useSettings } from '@/hooks/use-settings'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { ArrowLeft, Mail, Loader2 } from 'lucide-react'
 
 export default function AffiliateForgotPasswordPage() {
@@ -47,7 +47,7 @@ export default function AffiliateForgotPasswordPage() {
           </Link>
         </div>
 
-        <Card className="bg-white/10 border-gray-500/50">
+        <Card className="bg-white/10 border-border">
           <CardHeader className="text-center">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
               <Mail className="h-6 w-6 text-primary" />
@@ -63,8 +63,8 @@ export default function AffiliateForgotPasswordPage() {
                 <div
                   className={`p-3 rounded-md text-sm ${
                     message.type === 'success'
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                      : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                      ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]'
+                      : 'bg-destructive/10 text-destructive'
                   }`}
                   data-testid="text-forgot-message"
                 >

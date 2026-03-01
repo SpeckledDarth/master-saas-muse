@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRight, Calendar, FileText } from 'lucide-react'
 

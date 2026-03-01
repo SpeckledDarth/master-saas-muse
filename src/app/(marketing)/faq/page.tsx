@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSettings } from '@/hooks/use-settings'
-import { Card, CardContent } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Loader2, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
 import Link from 'next/link'

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useSettings } from '@/hooks/use-settings'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent } from '@/components/ui/ds-card'
 import { DollarSign, Users, BarChart, Megaphone, Clock, Shield, ArrowRight, CheckCircle, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -29,7 +29,7 @@ function TestimonialsSection() {
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {testimonials.map(t => (
-            <Card key={t.id} className="bg-white/10 border-gray-500/50" data-testid={`testimonial-${t.id}`}>
+            <Card key={t.id} className="bg-white/10 border-border" data-testid={`testimonial-${t.id}`}>
               <CardContent className="pt-6 pb-4 px-6">
                 <p className="text-sm text-muted-foreground mb-4 italic">&ldquo;{t.quote}&rdquo;</p>
                 <div className="flex items-center gap-3">
@@ -135,7 +135,7 @@ export default function AffiliateLandingPage() {
               { step: '2', title: 'Share', description: 'Get your unique referral link and marketing materials. Share with your audience.', icon: Megaphone },
               { step: '3', title: 'Earn', description: `Earn ${commissionRate}% on every payment your referrals make for ${commissionDuration} months.`, icon: DollarSign },
             ].map(item => (
-              <Card key={item.step} className="bg-white/10 border-gray-500/50 text-center" data-testid={`card-step-${item.step}`}>
+              <Card key={item.step} className="bg-white/10 border-border text-center" data-testid={`card-step-${item.step}`}>
                 <CardContent className="pt-8 pb-6 px-6">
                   <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mx-auto mb-4">
                     <item.icon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
@@ -199,7 +199,7 @@ export default function AffiliateLandingPage() {
               'Community Leaders',
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 p-3" data-testid={`audience-${i}`}>
-                <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
+                <CheckCircle className="h-5 w-5 text-[hsl(var(--success))] shrink-0" />
                 <span className="text-black dark:text-white">{item}</span>
               </div>
             ))}

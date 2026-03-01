@@ -1134,7 +1134,7 @@ export function PresetsSection() {
       {importStatus && (
         <p className={cn(
           "text-xs",
-          importStatus.includes('Invalid') ? 'text-destructive' : 'text-green-600 dark:text-green-400'
+          importStatus.includes('Invalid') ? 'text-destructive' : 'text-[hsl(var(--success))]'
         )} data-testid="text-import-status">
           {importStatus}
         </p>

@@ -8,7 +8,7 @@ import { useSettings } from '@/hooks/use-settings'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Loader2, CheckCircle, ArrowLeft, Lock } from 'lucide-react'
 
 export default function AffiliateSetPasswordPageWrapper() {
@@ -107,7 +107,7 @@ function AffiliateSetPasswordPage() {
   if (checkingSession) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 border-gray-500/50">
+        <Card className="w-full max-w-md bg-white/10 border-border">
           <CardContent className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin" />
           </CardContent>
@@ -120,10 +120,10 @@ function AffiliateSetPasswordPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <Card className="bg-white/10 border-gray-500/50">
+          <Card className="bg-white/10 border-border">
             <CardHeader className="text-center">
-              <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mx-auto mb-2">
-                <Lock className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              <div className="w-12 h-12 rounded-full bg-[hsl(var(--warning)/0.1)] flex items-center justify-center mx-auto mb-2">
+                <Lock className="h-6 w-6 text-[hsl(var(--warning))]" />
               </div>
               <CardTitle className="text-2xl text-black dark:text-white" data-testid="text-expired-title">Link Expired or Invalid</CardTitle>
               <CardDescription>
@@ -156,7 +156,7 @@ function AffiliateSetPasswordPage() {
           </Link>
         </div>
 
-        <Card className="bg-white/10 border-gray-500/50">
+        <Card className="bg-white/10 border-border">
           <CardHeader className="text-center">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
               <Lock className="h-6 w-6 text-primary" />
@@ -172,8 +172,8 @@ function AffiliateSetPasswordPage() {
                 <div
                   className={`p-3 rounded-md text-sm flex items-center gap-2 ${
                     message.type === 'success'
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                      : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                      ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]'
+                      : 'bg-destructive/10 text-destructive'
                   }`}
                   data-testid="text-set-password-message"
                 >

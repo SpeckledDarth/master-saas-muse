@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Loader2, ShieldCheck, ShieldX, Award } from 'lucide-react'
@@ -72,8 +72,8 @@ export default function VerifyBadgePage({ params }: { params: Promise<{ code: st
     <div className="min-h-screen flex items-center justify-center bg-background p-4" data-testid="page-badge-verify">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-2">
-            <ShieldCheck className="h-8 w-8 text-green-600 dark:text-green-400" />
+          <div className="w-16 h-16 rounded-full bg-[hsl(var(--success)/0.1)] flex items-center justify-center mx-auto mb-2">
+            <ShieldCheck className="h-8 w-8 text-[hsl(var(--success))]" />
           </div>
           <CardTitle className="text-xl" data-testid="text-verify-valid">Verified Badge</CardTitle>
         </CardHeader>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -23,9 +23,9 @@ interface SubscriptionInfo {
 }
 
 const tierConfig = {
-  free: { name: 'Free', icon: Sparkles, color: 'bg-gray-100 dark:bg-gray-800' },
-  pro: { name: 'Pro', icon: Crown, color: 'bg-blue-100 dark:bg-blue-900' },
-  team: { name: 'Team', icon: Users, color: 'bg-purple-100 dark:bg-purple-900' },
+  free: { name: 'Free', icon: Sparkles, color: 'bg-muted' },
+  pro: { name: 'Pro', icon: Crown, color: 'bg-[hsl(var(--info)/0.1)]' },
+  team: { name: 'Team', icon: Users, color: 'bg-accent-100 dark:bg-accent-900' },
 }
 
 const oauthProviders = [
@@ -504,15 +504,15 @@ export default function ProfilePage() {
       <h1 className="text-3xl font-bold mb-8" data-testid="text-profile-title">Profile</h1>
 
       <div className="space-y-6">
-        <Card data-testid="card-profile-info">
-          <CardHeader>
+        <DSCard data-testid="card-profile-info">
+          <DSCardHeader>
             <div className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              <CardTitle>Profile Information</CardTitle>
+              <DSCardTitle>Profile Information</DSCardTitle>
             </div>
-            <CardDescription>Your account details and avatar</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            <DSCardDescription>Your account details and avatar</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="relative">
                 <Avatar className="h-20 w-20">
@@ -653,18 +653,18 @@ export default function ProfilePage() {
                 Save Profile
               </Button>
             </form>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
 
-        <Card data-testid="card-email">
-          <CardHeader>
+        <DSCard data-testid="card-email">
+          <DSCardHeader>
             <div className="flex items-center gap-2">
               <Mail className="h-5 w-5" />
-              <CardTitle>Email Address</CardTitle>
+              <DSCardTitle>Email Address</DSCardTitle>
             </div>
-            <CardDescription>Change your email address</CardDescription>
-          </CardHeader>
-          <CardContent>
+            <DSCardDescription>Change your email address</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent>
             <form onSubmit={handleEmailUpdate} className="space-y-4">
               <div>
                 <Label htmlFor="email">Email</Label>
@@ -690,18 +690,18 @@ export default function ProfilePage() {
                 Update Email
               </Button>
             </form>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
 
-        <Card data-testid="card-connected-accounts">
-          <CardHeader>
+        <DSCard data-testid="card-connected-accounts">
+          <DSCardHeader>
             <div className="flex items-center gap-2">
               <Link2 className="h-5 w-5" />
-              <CardTitle>Connected Accounts</CardTitle>
+              <DSCardTitle>Connected Accounts</DSCardTitle>
             </div>
-            <CardDescription>Manage your sign-in methods and linked accounts</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
+            <DSCardDescription>Manage your sign-in methods and linked accounts</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent className="space-y-3">
             {hasPasswordAuth() && (
               <div className="flex items-center justify-between p-3 rounded-lg border" data-testid="provider-email">
                 <div className="flex items-center gap-3">
@@ -785,18 +785,18 @@ export default function ProfilePage() {
             <p className="text-xs text-muted-foreground pt-2" data-testid="text-connected-accounts-help">
               Linking multiple accounts lets you sign in with any of them.
             </p>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
 
-        <Card data-testid="card-subscription">
-          <CardHeader>
+        <DSCard data-testid="card-subscription">
+          <DSCardHeader>
             <div className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              <CardTitle>Subscription</CardTitle>
+              <DSCardTitle>Subscription</DSCardTitle>
             </div>
-            <CardDescription>Your current plan and billing</CardDescription>
-          </CardHeader>
-          <CardContent>
+            <DSCardDescription>Your current plan and billing</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent>
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-lg ${tierInfo.color}`}>
@@ -821,18 +821,18 @@ export default function ProfilePage() {
                 Manage Subscription
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
 
-        <Card data-testid="card-email-preferences">
-          <CardHeader>
+        <DSCard data-testid="card-email-preferences">
+          <DSCardHeader>
             <div className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              <CardTitle>Email Preferences</CardTitle>
+              <DSCardTitle>Email Preferences</DSCardTitle>
             </div>
-            <CardDescription>Choose which emails you&apos;d like to receive</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            <DSCardDescription>Choose which emails you&apos;d like to receive</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent className="space-y-4">
             {emailPrefsLoading ? (
               <div className="flex justify-center py-4">
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -872,18 +872,18 @@ export default function ProfilePage() {
                 </Button>
               </>
             )}
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
 
-        <Card data-testid="card-password">
-          <CardHeader>
+        <DSCard data-testid="card-password">
+          <DSCardHeader>
             <div className="flex items-center gap-2">
               <Lock className="h-5 w-5" />
-              <CardTitle>Change Password</CardTitle>
+              <DSCardTitle>Change Password</DSCardTitle>
             </div>
-            <CardDescription>Update your password to keep your account secure</CardDescription>
-          </CardHeader>
-          <CardContent>
+            <DSCardDescription>Update your password to keep your account secure</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent>
             <form onSubmit={handlePasswordUpdate} className="space-y-4">
               <div>
                 <Label htmlFor="new-password">New Password</Label>
@@ -916,11 +916,11 @@ export default function ProfilePage() {
                 Update Password
               </Button>
             </form>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
 
-        <Card data-testid="card-signout">
-          <CardContent className="py-6">
+        <DSCard data-testid="card-signout">
+          <DSCardContent className="py-6">
             <Button 
               variant="destructive" 
               onClick={handleSignOut}
@@ -934,8 +934,8 @@ export default function ProfilePage() {
               )}
               Sign Out
             </Button>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       </div>
     </div>
   )

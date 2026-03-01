@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -176,18 +176,18 @@ function TicketDetail({
       </div>
 
       {ticket.description && (
-        <Card data-testid="card-ticket-description">
-          <CardContent className="pt-6">
+        <DSCard data-testid="card-ticket-description">
+          <DSCardContent className="pt-6">
             <p className="text-sm whitespace-pre-wrap">{ticket.description}</p>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       )}
 
-      <Card data-testid="card-ticket-comments">
-        <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap">
+      <DSCard data-testid="card-ticket-comments">
+        <DSCardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap">
           <div>
-            <CardTitle className="text-lg">Comments</CardTitle>
-            <CardDescription>{comments.length} comment{comments.length !== 1 ? 's' : ''}</CardDescription>
+            <DSCardTitle className="text-lg">Comments</DSCardTitle>
+            <DSCardDescription>{comments.length} comment{comments.length !== 1 ? 's' : ''}</DSCardDescription>
           </div>
           {ticket.status !== 'closed' && (
             <Button variant="outline" size="sm" onClick={handleClose} data-testid="button-close-ticket">
@@ -195,8 +195,8 @@ function TicketDetail({
               Close Ticket
             </Button>
           )}
-        </CardHeader>
-        <CardContent className="space-y-4">
+        </DSCardHeader>
+        <DSCardContent className="space-y-4">
           {isLoading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -238,8 +238,8 @@ function TicketDetail({
               </Button>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
     </div>
   )
 }
@@ -440,15 +440,15 @@ export default function SupportPage() {
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" data-testid="loader-tickets" />
         </div>
       ) : tickets.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
+        <DSCard>
+          <DSCardContent className="py-12 text-center">
             <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <p className="text-lg font-medium mb-1" data-testid="text-no-tickets">No tickets found</p>
             <p className="text-sm text-muted-foreground">
               {statusFilter === 'all' ? "You haven't submitted any support tickets yet." : `No ${statusConfig[statusFilter]?.label?.toLowerCase() || statusFilter} tickets.`}
             </p>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       ) : (
         <div className="space-y-3">
           {tickets.map((ticket) => {
@@ -462,7 +462,7 @@ export default function SupportPage() {
                 onClick={() => setSelectedTicket(ticket)}
                 data-testid={`ticket-${ticket.id}`}
               >
-                <CardContent className="py-4 flex items-center gap-4 flex-wrap">
+                <DSCardContent className="py-4 flex items-center gap-4 flex-wrap">
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate" data-testid={`text-ticket-subject-${ticket.id}`}>{ticket.subject}</p>
                     <p className="text-sm text-muted-foreground">
@@ -477,8 +477,8 @@ export default function SupportPage() {
                       {s.label}
                     </Badge>
                   </div>
-                </CardContent>
-              </Card>
+                </DSCardContent>
+              </DSCard>
             )
           })}
         </div>

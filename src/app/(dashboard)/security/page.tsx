@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -98,21 +98,21 @@ export default function SecurityPage() {
       </div>
 
       <div className="space-y-6">
-        <Card data-testid="card-change-password">
-          <CardHeader>
+        <DSCard data-testid="card-change-password">
+          <DSCardHeader>
             <div className="flex items-center gap-3">
               <Lock className="h-5 w-5 text-muted-foreground" />
               <div>
-                <CardTitle className="text-lg">Change Password</CardTitle>
-                <CardDescription>
+                <DSCardTitle className="text-lg">Change Password</DSCardTitle>
+                <DSCardDescription>
                   {isOAuth
                     ? `You signed in with ${authProvider}. Password change may not apply.`
                     : 'Update your account password'}
-                </CardDescription>
+                </DSCardDescription>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          </DSCardHeader>
+          <DSCardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="new-password">New Password</Label>
               <Input
@@ -143,41 +143,41 @@ export default function SecurityPage() {
               {isChanging ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Lock className="h-4 w-4 mr-2" />}
               Update Password
             </Button>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
 
-        <Card data-testid="card-two-factor">
-          <CardHeader>
+        <DSCard data-testid="card-two-factor">
+          <DSCardHeader>
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
                 <Smartphone className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <CardTitle className="text-lg">Two-Factor Authentication</CardTitle>
-                  <CardDescription>Add an extra layer of security to your account</CardDescription>
+                  <DSCardTitle className="text-lg">Two-Factor Authentication</DSCardTitle>
+                  <DSCardDescription>Add an extra layer of security to your account</DSCardDescription>
                 </div>
               </div>
               <Badge variant="secondary" data-testid="badge-2fa-status">Coming Soon</Badge>
             </div>
-          </CardHeader>
-          <CardContent>
+          </DSCardHeader>
+          <DSCardContent>
             <p className="text-sm text-muted-foreground">
               Two-factor authentication adds an additional layer of security by requiring a verification code
               from your phone when signing in. This feature will be available soon.
             </p>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
 
-        <Card data-testid="card-login-activity">
-          <CardHeader>
+        <DSCard data-testid="card-login-activity">
+          <DSCardHeader>
             <div className="flex items-center gap-3">
               <Clock className="h-5 w-5 text-muted-foreground" />
               <div>
-                <CardTitle className="text-lg">Login Activity</CardTitle>
-                <CardDescription>Recent account access information</CardDescription>
+                <DSCardTitle className="text-lg">Login Activity</DSCardTitle>
+                <DSCardDescription>Recent account access information</DSCardDescription>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          </DSCardHeader>
+          <DSCardContent className="space-y-4">
             <div className="flex items-center justify-between gap-4 py-2 border-b flex-wrap">
               <div>
                 <p className="text-sm font-medium">Last Sign In</p>
@@ -204,8 +204,8 @@ export default function SecurityPage() {
                 </Badge>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       </div>
     </div>
   )

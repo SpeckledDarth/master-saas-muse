@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -198,9 +198,9 @@ export default function OnboardingPage() {
           ))}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <DSCard>
+          <DSCardHeader>
+            <DSCardTitle className="flex items-center gap-2">
               {activeSteps[currentStep - 1]?.icon && (
                 <span className="text-primary">
                   {(() => {
@@ -210,10 +210,10 @@ export default function OnboardingPage() {
                 </span>
               )}
               {activeSteps[currentStep - 1]?.title}
-            </CardTitle>
-            <CardDescription>{activeSteps[currentStep - 1]?.description}</CardDescription>
-          </CardHeader>
-          <CardContent>
+            </DSCardTitle>
+            <DSCardDescription>{activeSteps[currentStep - 1]?.description}</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent>
             {currentStep === 1 && (
               <div className="space-y-[var(--content-density-gap,1rem)]">
                 <div className="space-y-2">
@@ -339,8 +339,8 @@ export default function OnboardingPage() {
                 {currentStep < activeSteps.length && <ChevronRight className="h-4 w-4 ml-1" />}
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       </div>
     </div>
   )

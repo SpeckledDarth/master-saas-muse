@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -186,33 +186,33 @@ export default function TestimonialsPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
-        <Card>
-          <CardContent className="pt-6 text-center">
+        <DSCard>
+          <DSCardContent className="pt-6 text-center">
             <div className="text-3xl font-bold" data-testid="text-total-count">{testimonials.length}</div>
             <p className="text-sm text-muted-foreground">Total</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
+          </DSCardContent>
+        </DSCard>
+        <DSCard>
+          <DSCardContent className="pt-6 text-center">
             <div className="text-3xl font-bold text-[hsl(var(--success))]" data-testid="text-approved-count">{approvedCount}</div>
             <p className="text-sm text-muted-foreground">Approved</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
+          </DSCardContent>
+        </DSCard>
+        <DSCard>
+          <DSCardContent className="pt-6 text-center">
             <div className="text-3xl font-bold text-[hsl(var(--warning))]" data-testid="text-featured-count">{featuredCount}</div>
             <p className="text-sm text-muted-foreground">Featured</p>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       </div>
 
       {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{editingId ? 'Edit Testimonial' : 'Add New Testimonial'}</CardTitle>
-            <CardDescription>Fill in the customer details and their testimonial</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+        <DSCard>
+          <DSCardHeader>
+            <DSCardTitle>{editingId ? 'Edit Testimonial' : 'Add New Testimonial'}</DSCardTitle>
+            <DSCardDescription>Fill in the customer details and their testimonial</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
               <div className="space-y-2">
                 <Label>Name *</Label>
@@ -320,17 +320,17 @@ export default function TestimonialsPage() {
                 Cancel
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       )}
 
       {loading ? (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">Loading testimonials...</CardContent>
-        </Card>
+        <DSCard>
+          <DSCardContent className="py-12 text-center text-muted-foreground">Loading testimonials...</DSCardContent>
+        </DSCard>
       ) : testimonials.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
+        <DSCard>
+          <DSCardContent className="py-12 text-center text-muted-foreground">
             <Quote className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] opacity-30" />
             <p className="text-lg font-medium mb-2">No testimonials yet</p>
             <p className="mb-[var(--content-density-gap,1rem)]">Add your first customer testimonial to display on your site</p>
@@ -338,15 +338,15 @@ export default function TestimonialsPage() {
               <Plus className="h-4 w-4 mr-2" />
               Add First Testimonial
             </Button>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       ) : (
         <div className="space-y-3">
           {testimonials.map(t => {
             const initials = t.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
             return (
-              <Card key={t.id} className={`${t.featured ? 'border-[hsl(var(--warning))]' : ''}`} data-testid={`card-testimonial-${t.id}`}>
-                <CardContent className="py-4">
+              <DSCard key={t.id} className={`${t.featured ? 'border-[hsl(var(--warning))]' : ''}`} data-testid={`card-testimonial-${t.id}`}>
+                <DSCardContent className="py-4">
                   <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
                     <Avatar className="h-12 w-12 flex-shrink-0">
                       {t.avatar_url && <AvatarImage src={t.avatar_url} alt={t.name} />}
@@ -396,8 +396,8 @@ export default function TestimonialsPage() {
                       </Button>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </DSCardContent>
+              </DSCard>
             )
           })}
         </div>

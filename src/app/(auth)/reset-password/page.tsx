@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card';
+import { CardFooter } from '@/components/ui/card';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -48,8 +49,8 @@ export default function ResetPasswordPage() {
               <div
                 className={`p-3 rounded-md text-sm ${
                   message.type === 'success'
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                    ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]'
+                    : 'bg-[hsl(var(--danger)/0.1)] text-[hsl(var(--danger))]'
                 }`}
                 data-testid="status-message"
               >

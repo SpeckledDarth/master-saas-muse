@@ -224,9 +224,9 @@ export function Header() {
               {item.label}
               {item.badge && (
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                  item.badge === 'new' ? 'bg-green-500/20 text-green-600 dark:text-green-400' :
-                  item.badge === 'beta' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' :
-                  'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                  item.badge === 'new' ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]' :
+                  item.badge === 'beta' ? 'bg-[hsl(var(--info)/0.1)] text-[hsl(var(--info))]' :
+                  'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]'
                 }`}>
                   {item.badge === 'new' ? 'New' : item.badge === 'beta' ? 'Beta' : 'Soon'}
                 </span>
@@ -284,9 +284,9 @@ export function Header() {
                         {item.label}
                         {item.badge && (
                           <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                            item.badge === 'new' ? 'bg-green-500/20 text-green-600 dark:text-green-400' :
-                            item.badge === 'beta' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' :
-                            'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                            item.badge === 'new' ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]' :
+                            item.badge === 'beta' ? 'bg-[hsl(var(--info)/0.1)] text-[hsl(var(--info))]' :
+                            'bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))]'
                           }`}>
                             {item.badge === 'new' ? 'New' : item.badge === 'beta' ? 'Beta' : 'Soon'}
                           </span>

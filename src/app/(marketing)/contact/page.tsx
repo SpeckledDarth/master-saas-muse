@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSettings } from '@/hooks/use-settings'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -138,7 +138,7 @@ export default function ContactPage() {
             <CardContent>
               {submitted ? (
                 <div className="text-center py-8">
-                  <Check className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                  <Check className="h-12 w-12 text-[hsl(var(--success))] mx-auto mb-4" />
                   <p className="text-lg font-medium mb-2" data-testid="text-success">
                     Message Sent!
                   </p>

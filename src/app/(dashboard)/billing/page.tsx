@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
+import { CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -93,19 +94,19 @@ const tierConfig = {
     name: 'Free',
     description: 'Basic features for getting started',
     icon: Sparkles,
-    color: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200',
+    color: 'bg-muted text-muted-foreground',
   },
   pro: {
     name: 'Pro',
     description: 'For professionals and growing teams',
     icon: Crown,
-    color: 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
+    color: 'bg-[hsl(var(--info)/0.1)] text-[hsl(var(--info))]',
   },
   team: {
     name: 'Team',
     description: 'For larger organizations',
     icon: Users,
-    color: 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200',
+    color: 'bg-accent-100 dark:bg-accent-900 text-accent-700 dark:text-accent-300',
   },
 }
 
@@ -318,34 +319,34 @@ export default function BillingPage() {
 
       <div className="space-y-6">
         {subscriptionError ? (
-          <Card data-testid="card-subscription-error">
-            <CardContent className="py-8 text-center">
+          <DSCard data-testid="card-subscription-error">
+            <DSCardContent className="py-8 text-center">
               <p className="text-destructive font-medium mb-2">Unable to load subscription information</p>
               <p className="text-sm text-muted-foreground mb-4">Please try again or contact support if the issue persists.</p>
               <Button variant="outline" onClick={() => window.location.reload()} data-testid="button-retry-subscription">
                 Try Again
               </Button>
-            </CardContent>
-          </Card>
+            </DSCardContent>
+          </DSCard>
         ) : (
-        <Card data-testid="card-subscription-status">
-          <CardHeader>
+        <DSCard data-testid="card-subscription-status">
+          <DSCardHeader>
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-md ${tierInfo.color}`}>
                   <TierIcon className="h-5 w-5" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl">{tierInfo.name} Plan</CardTitle>
-                  <CardDescription>{tierInfo.description}</CardDescription>
+                  <DSCardTitle className="text-xl">{tierInfo.name} Plan</DSCardTitle>
+                  <DSCardDescription>{tierInfo.description}</DSCardDescription>
                 </div>
               </div>
               <Badge variant={statusInfo.variant} data-testid="badge-subscription-status">
                 {statusInfo.label}
               </Badge>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          </DSCardHeader>
+          <DSCardContent className="space-y-4">
             {subscription && subscription.status !== 'free' && subscription.currentPeriodEnd && (
               <div className="flex items-center justify-between gap-4 py-3 border-t flex-wrap">
                 <div className="flex items-center gap-2">
@@ -364,7 +365,7 @@ export default function BillingPage() {
                   </div>
                 </div>
                 {subscription.cancelAtPeriodEnd && (
-                  <Badge variant="outline" className="text-amber-600 border-amber-600">
+                  <Badge variant="outline" className="text-[hsl(var(--warning))] border-[hsl(var(--warning))]">
                     Canceling
                   </Badge>
                 )}
@@ -398,19 +399,19 @@ export default function BillingPage() {
                 </Button>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
         )}
 
         {subscription && subscription.status !== 'free' && subscription.currentPeriodEnd && (
-          <Card data-testid="card-billing-reminder">
-            <CardHeader>
+          <DSCard data-testid="card-billing-reminder">
+            <DSCardHeader>
               <div className="flex items-center gap-2">
                 <Bell className="h-5 w-5 text-muted-foreground" />
-                <CardTitle className="text-lg">Upcoming Payment</CardTitle>
+                <DSCardTitle className="text-lg">Upcoming Payment</DSCardTitle>
               </div>
-            </CardHeader>
-            <CardContent>
+            </DSCardHeader>
+            <DSCardContent>
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <div>
                   <p className="text-sm text-muted-foreground" data-testid="text-next-payment-info">
@@ -422,7 +423,7 @@ export default function BillingPage() {
                     const daysUntil = Math.ceil((new Date(subscription.currentPeriodEnd!).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
                     if (daysUntil <= 7 && daysUntil > 0) {
                       return (
-                        <Badge variant="outline" className="mt-2 text-amber-600 border-amber-600" data-testid="badge-payment-soon">
+                        <Badge variant="outline" className="mt-2 text-[hsl(var(--warning))] border-[hsl(var(--warning))]" data-testid="badge-payment-soon">
                           Payment in {daysUntil} day{daysUntil !== 1 ? 's' : ''}
                         </Badge>
                       )
@@ -435,25 +436,25 @@ export default function BillingPage() {
                   Update Payment Method
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </DSCardContent>
+          </DSCard>
         )}
 
-        <Card data-testid="card-plan-features">
-          <CardHeader>
+        <DSCard data-testid="card-plan-features">
+          <DSCardHeader>
             <div className="flex items-center gap-2">
               <Package className="h-5 w-5 text-muted-foreground" />
-              <CardTitle className="text-lg">Plan Features</CardTitle>
+              <DSCardTitle className="text-lg">Plan Features</DSCardTitle>
             </div>
-            <CardDescription>What&apos;s included in your {tierInfo.name} plan</CardDescription>
-          </CardHeader>
-          <CardContent>
+            <DSCardDescription>What&apos;s included in your {tierInfo.name} plan</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent>
             {(!subscription || subscription.tier === 'free') ? (
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {['Social post scheduling', 'Basic analytics', '3 connected accounts', 'Community support'].map((feature, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                      <CheckCircle className="h-4 w-4 text-[hsl(var(--success))] shrink-0" />
                       <span data-testid={`text-free-feature-${i}`}>{feature}</span>
                     </div>
                   ))}
@@ -474,7 +475,7 @@ export default function BillingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {['Unlimited scheduling', 'Advanced analytics', 'AI content tools', 'Priority support', 'Blog integration', 'Revenue tracking', '10 connected accounts', 'Brand voice AI', 'Engagement insights', 'Lead generation'].map((feature, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-[hsl(var(--success))] shrink-0" />
                     <span data-testid={`text-pro-feature-${i}`}>{feature}</span>
                   </div>
                 ))}
@@ -483,34 +484,34 @@ export default function BillingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {['Everything in Pro', 'Unlimited accounts', 'Team collaboration', 'Approval workflows', 'Custom branding', 'API access', 'Dedicated support', 'SSO integration'].map((feature, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-[hsl(var(--success))] shrink-0" />
                     <span data-testid={`text-team-feature-${i}`}>{feature}</span>
                   </div>
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
 
         {usageInsights && (
-          <Card data-testid="card-usage-insights">
-            <CardHeader>
+          <DSCard data-testid="card-usage-insights">
+            <DSCardHeader>
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-muted-foreground" />
-                <CardTitle className="text-lg">Usage Insights</CardTitle>
+                <DSCardTitle className="text-lg">Usage Insights</DSCardTitle>
               </div>
-              <CardDescription>Your activity this {usageInsights.monthName}</CardDescription>
-            </CardHeader>
-            <CardContent>
+              <DSCardDescription>Your activity this {usageInsights.monthName}</DSCardDescription>
+            </DSCardHeader>
+            <DSCardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-1">
                   <p className="text-2xl font-bold" data-testid="text-posts-this-month">{usageInsights.postsThisMonth}</p>
                   <p className="text-sm text-muted-foreground">Posts this month</p>
                   <div className="flex items-center gap-1 text-xs">
                     {usageInsights.postsDelta > 0 ? (
-                      <><TrendingUp className="h-3 w-3 text-green-500" /><span className="text-green-600" data-testid="text-posts-delta">+{usageInsights.postsDelta} from {usageInsights.lastMonthName}</span></>
+                      <><TrendingUp className="h-3 w-3 text-[hsl(var(--success))]" /><span className="text-[hsl(var(--success))]" data-testid="text-posts-delta">+{usageInsights.postsDelta} from {usageInsights.lastMonthName}</span></>
                     ) : usageInsights.postsDelta < 0 ? (
-                      <><TrendingDown className="h-3 w-3 text-red-500" /><span className="text-red-600" data-testid="text-posts-delta">{usageInsights.postsDelta} from {usageInsights.lastMonthName}</span></>
+                      <><TrendingDown className="h-3 w-3 text-[hsl(var(--danger))]" /><span className="text-[hsl(var(--danger))]" data-testid="text-posts-delta">{usageInsights.postsDelta} from {usageInsights.lastMonthName}</span></>
                     ) : (
                       <><Minus className="h-3 w-3 text-muted-foreground" /><span className="text-muted-foreground" data-testid="text-posts-delta">Same as {usageInsights.lastMonthName}</span></>
                     )}
@@ -525,18 +526,18 @@ export default function BillingPage() {
                   <p className="text-sm text-muted-foreground">Support tickets</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </DSCardContent>
+          </DSCard>
         )}
 
-        <Card data-testid="card-payment-method">
-          <CardHeader>
+        <DSCard data-testid="card-payment-method">
+          <DSCardHeader>
             <div className="flex items-center gap-2">
               <CreditCard className="h-5 w-5 text-muted-foreground" />
-              <CardTitle className="text-lg">Payment Method</CardTitle>
+              <DSCardTitle className="text-lg">Payment Method</DSCardTitle>
             </div>
-          </CardHeader>
-          <CardContent>
+          </DSCardHeader>
+          <DSCardContent>
             {subscription && subscription.status !== 'free' ? (
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <p className="text-sm text-muted-foreground">
@@ -562,15 +563,15 @@ export default function BillingPage() {
                 No payment method on file. Upgrade your plan to add a payment method.
               </p>
             )}
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
 
-        <Card data-testid="card-invoice-history">
-          <CardHeader>
+        <DSCard data-testid="card-invoice-history">
+          <DSCardHeader>
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-2">
                 <Receipt className="h-5 w-5 text-muted-foreground" />
-                <CardTitle className="text-lg">Invoice History</CardTitle>
+                <DSCardTitle className="text-lg">Invoice History</DSCardTitle>
               </div>
               <Select value={invoiceFilter} onValueChange={(val) => { setInvoiceFilter(val); setInvoicePage(0) }}>
                 <SelectTrigger className="w-full sm:w-[140px]" data-testid="select-invoice-filter">
@@ -585,9 +586,9 @@ export default function BillingPage() {
                 </SelectContent>
               </Select>
             </div>
-            <CardDescription>View and download your past invoices</CardDescription>
-          </CardHeader>
-          <CardContent>
+            <DSCardDescription>View and download your past invoices</DSCardDescription>
+          </DSCardHeader>
+          <DSCardContent>
             {invoicesLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" data-testid="loader-invoices" />
@@ -684,7 +685,7 @@ export default function BillingPage() {
               </Table>
               </div>
             )}
-          </CardContent>
+          </DSCardContent>
           {totalPages > 1 && (
             <CardFooter className="flex items-center justify-between gap-4 flex-wrap">
               <p className="text-sm text-muted-foreground" data-testid="text-invoice-count">
@@ -715,13 +716,13 @@ export default function BillingPage() {
               </div>
             </CardFooter>
           )}
-        </Card>
+        </DSCard>
 
-        <Card data-testid="card-billing-help">
-          <CardHeader>
-            <CardTitle className="text-lg">Need Help?</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <DSCard data-testid="card-billing-help">
+          <DSCardHeader>
+            <DSCardTitle className="text-lg">Need Help?</DSCardTitle>
+          </DSCardHeader>
+          <DSCardContent>
             <p className="text-sm text-muted-foreground mb-4">
               If you have questions about your subscription or need assistance with billing,
               please contact our support team.
@@ -729,8 +730,8 @@ export default function BillingPage() {
             <Button variant="outline" size="sm" data-testid="button-contact-support">
               Contact Support
             </Button>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       </div>
 
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>

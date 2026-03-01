@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -232,50 +232,50 @@ export default function DiscountCodesPage() {
       </div>
 
       <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        <Card data-testid="stat-total-codes">
-          <CardContent className="pt-4 pb-3">
+        <DSCard data-testid="stat-total-codes">
+          <DSCardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2">
               <Tag className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Total Codes</span>
             </div>
             <p className="text-2xl font-bold mt-1">{stats.totalCodes}</p>
-          </CardContent>
-        </Card>
-        <Card data-testid="stat-active-codes">
-          <CardContent className="pt-4 pb-3">
+          </DSCardContent>
+        </DSCard>
+        <DSCard data-testid="stat-active-codes">
+          <DSCardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2">
               <TicketPercent className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Active</span>
             </div>
             <p className="text-2xl font-bold mt-1">{stats.activeCodes}</p>
-          </CardContent>
-        </Card>
-        <Card data-testid="stat-total-redemptions">
-          <CardContent className="pt-4 pb-3">
+          </DSCardContent>
+        </DSCard>
+        <DSCard data-testid="stat-total-redemptions">
+          <DSCardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2">
               <Percent className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Redemptions</span>
             </div>
             <p className="text-2xl font-bold mt-1">{stats.totalRedemptions}</p>
-          </CardContent>
-        </Card>
-        <Card data-testid="stat-total-discount">
-          <CardContent className="pt-4 pb-3">
+          </DSCardContent>
+        </DSCard>
+        <DSCard data-testid="stat-total-discount">
+          <DSCardContent className="pt-4 pb-3">
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Discount Given</span>
             </div>
             <p className="text-2xl font-bold mt-1">${(stats.totalDiscountGiven / 100).toFixed(2)}</p>
-          </CardContent>
-        </Card>
+          </DSCardContent>
+        </DSCard>
       </div>
 
-      <Card data-testid="card-discount-codes">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+      <DSCard data-testid="card-discount-codes">
+        <DSCardHeader className="flex flex-row items-center justify-between space-y-0">
           <div className="flex items-center gap-[var(--content-density-gap,1rem)] flex-1">
             <div>
-              <CardTitle className="text-base">Codes</CardTitle>
-              <CardDescription>Manage your discount and promotional codes</CardDescription>
+              <DSCardTitle className="text-base">Codes</DSCardTitle>
+              <DSCardDescription>Manage your discount and promotional codes</DSCardDescription>
             </div>
             <div className="flex items-center gap-2 ml-auto">
               <Input
@@ -450,8 +450,8 @@ export default function DiscountCodesPage() {
               </div>
             </DialogContent>
           </Dialog>
-        </CardHeader>
-        <CardContent>
+        </DSCardHeader>
+        <DSCardContent>
           {codes.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-[var(--section-spacing,1.5rem)]" data-testid="text-no-codes">
               No discount codes yet. Create your first one above.
@@ -513,8 +513,8 @@ export default function DiscountCodesPage() {
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
 
       <Dialog open={!!detailCode} onOpenChange={(open) => { if (!open) setDetailCode(null) }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" data-testid="dialog-code-detail">

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Loader2, RefreshCw, Trash2, RotateCcw, Activity, Clock, CheckCircle2, XCircle, Pause, Zap } from 'lucide-react'
@@ -212,23 +212,23 @@ export default function QueueDashboard() {
             { label: 'Delayed', value: metrics.delayed, icon: Pause, color: 'text-[hsl(var(--warning))]' },
             { label: 'Paused', value: metrics.paused, icon: Pause, color: 'text-muted-foreground' },
           ].map(({ label, value, icon: Icon, color }) => (
-            <Card key={label}>
-              <CardContent className="pt-4 pb-4">
+            <DSCard key={label}>
+              <DSCardContent className="pt-4 pb-4">
                 <div className="flex items-center gap-2">
                   <Icon className={`h-4 w-4 ${color}`} />
                   <span className="text-sm text-muted-foreground">{label}</span>
                 </div>
                 <p className="text-2xl font-bold mt-1" data-testid={`text-queue-${label.toLowerCase()}`}>{value}</p>
-              </CardContent>
-            </Card>
+              </DSCardContent>
+            </DSCard>
           ))}
         </div>
       )}
 
-      <Card>
-        <CardHeader>
+      <DSCard>
+        <DSCardHeader>
           <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
-            <CardTitle className="text-lg">Recent Jobs</CardTitle>
+            <DSCardTitle className="text-lg">Recent Jobs</DSCardTitle>
             <div className="flex items-center gap-1 flex-wrap">
               {statusFilters.map(({ key, label, icon: Icon }) => (
                 <Button
@@ -244,8 +244,8 @@ export default function QueueDashboard() {
               ))}
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </DSCardHeader>
+        <DSCardContent>
           {jobs.length === 0 ? (
             <p className="text-center text-muted-foreground py-[var(--section-spacing,1.5rem)]" data-testid="text-no-jobs">
               No {jobFilter} jobs found
@@ -289,8 +289,8 @@ export default function QueueDashboard() {
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, Loader2 } from 'lucide-react'
 
@@ -21,7 +21,7 @@ function SuccessContent() {
     <Card className="max-w-md w-full text-center" data-testid="card-checkout-success">
       <CardHeader>
         <div className="flex justify-center mb-4">
-          <CheckCircle className="h-16 w-16 text-green-500" />
+          <CheckCircle className="h-16 w-16 text-[hsl(var(--success))]" />
         </div>
         <CardTitle className="text-2xl" data-testid="text-success-title">Payment Successful!</CardTitle>
         <CardDescription data-testid="text-success-description">

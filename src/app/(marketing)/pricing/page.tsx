@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
+import { CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Check, Loader2 } from 'lucide-react'
 import { useSettings } from '@/hooks/use-settings'
@@ -194,7 +195,7 @@ export default function PricingPage() {
                     <ul className="space-y-3">
                       {(pricing?.freePlanFeatures || ['Basic features', 'Up to 100 items', 'Community support']).map((feature: string, i: number) => (
                         <li key={i} className="flex items-start gap-2">
-                          <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <Check className="h-4 w-4 text-[hsl(var(--success))] flex-shrink-0 mt-0.5" />
                           <span className="text-sm">{feature}</span>
                         </li>
                       ))}
@@ -246,7 +247,7 @@ export default function PricingPage() {
                         <ul className="space-y-3">
                           {product.metadata.features.split(',').map((feature, i) => (
                             <li key={i} className="flex items-start gap-2">
-                              <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <Check className="h-4 w-4 text-[hsl(var(--success))] flex-shrink-0 mt-0.5" />
                               <span className="text-sm">{feature.trim()}</span>
                             </li>
                           ))}
@@ -301,7 +302,7 @@ export default function PricingPage() {
                 <ul className="space-y-3">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2">
-                      <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <Check className="h-4 w-4 text-[hsl(var(--success))] flex-shrink-0 mt-0.5" />
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo, Suspense } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle, DSCardDescription as CardDescription } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -30,12 +30,12 @@ function SeoPreview({ title, description, slug }: { title: string; description: 
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="rounded-lg border p-4 bg-white dark:bg-gray-950 space-y-1">
-          <p className="text-xs text-green-700 dark:text-green-400 truncate" data-testid="text-seo-url">{displayUrl}</p>
-          <p className="text-lg text-blue-700 dark:text-blue-400 font-medium leading-tight line-clamp-1 hover:underline cursor-pointer" data-testid="text-seo-title">
+        <div className="rounded-lg border p-4 bg-card space-y-1">
+          <p className="text-xs text-[hsl(var(--success))] truncate" data-testid="text-seo-url">{displayUrl}</p>
+          <p className="text-lg text-[hsl(var(--info))] font-medium leading-tight line-clamp-1 hover:underline cursor-pointer" data-testid="text-seo-title">
             {displayTitle.length > 60 ? displayTitle.slice(0, 60) + '...' : displayTitle}
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2" data-testid="text-seo-description">
+          <p className="text-sm text-muted-foreground line-clamp-2" data-testid="text-seo-description">
             {displayDesc.length > 160 ? displayDesc.slice(0, 160) + '...' : displayDesc}
           </p>
         </div>
@@ -367,7 +367,7 @@ You can use Markdown formatting:
                         <span className="text-sm font-medium">{config?.name || conn.platform}</span>
                       </div>
                       {conn.is_valid ? (
-                        <Badge variant="outline" className="text-green-600 dark:text-green-400 text-[10px]">Ready</Badge>
+                        <Badge variant="outline" className="text-[hsl(var(--success))] text-[10px]">Ready</Badge>
                       ) : (
                         <Badge variant="destructive" className="text-[10px]">Error</Badge>
                       )}

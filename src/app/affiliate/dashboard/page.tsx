@@ -57,7 +57,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useSettings } from '@/hooks/use-settings'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -7044,7 +7044,7 @@ function StandaloneAffiliateDashboard() {
   if (!data || (!data.link?.is_affiliate && !isAdminViewer)) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 border-gray-500/50">
+        <Card className="w-full max-w-md bg-white/10 border-border">
           <CardContent className="pt-8 pb-6 text-center">
             <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <h2 className="text-xl font-bold text-black dark:text-white mb-2" data-testid="text-no-affiliate">Not an Affiliate Yet</h2>

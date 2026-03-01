@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -127,10 +127,10 @@ function BlogConnectionForm({ platform, form, setForm, saving, onConnect, onCanc
   return (
     <div className="space-y-4">
       {config.beta && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950 p-3">
+        <div className="rounded-lg border border-[hsl(var(--warning))] bg-[hsl(var(--warning)/0.1)] p-3">
           <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-            <p className="text-sm text-amber-800 dark:text-amber-200">
+            <AlertTriangle className="h-4 w-4 text-[hsl(var(--warning))] shrink-0 mt-0.5" />
+            <p className="text-sm text-[hsl(var(--warning))]">
               This integration is in beta and uses an unofficial API. It may break without notice.
             </p>
           </div>
@@ -168,7 +168,7 @@ function BlogConnectionForm({ platform, form, setForm, saving, onConnect, onCanc
               </ol>
               <p className="text-xs text-muted-foreground italic">{guide.time}</p>
               <div className="flex items-start gap-2 rounded-md border bg-muted/50 p-2.5">
-                <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-green-600 dark:text-green-400 mt-0.5" />
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--success))] mt-0.5" />
                 <p className="text-xs text-muted-foreground">{guide.security}</p>
               </div>
             </div>
@@ -414,7 +414,7 @@ export default function BlogDashboardPage() {
 
   const m = metrics
   const score = m?.healthScore ?? 0
-  const scoreColor = score >= 70 ? 'text-green-600 dark:text-green-400' : score >= 40 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'
+  const scoreColor = score >= 70 ? 'text-[hsl(var(--success))]' : score >= 40 ? 'text-[hsl(var(--warning))]' : 'text-[hsl(var(--danger))]'
   const MomentumIcon = m?.momentum === 'accelerating' ? ArrowUp : m?.momentum === 'decelerating' ? ArrowDown : Minus
   const momentumLabel = m?.momentum === 'accelerating' ? 'Accelerating' : m?.momentum === 'decelerating' ? 'Decelerating' : 'Steady'
 
@@ -490,7 +490,7 @@ export default function BlogDashboardPage() {
               <span className="text-sm text-muted-foreground">/ 100</span>
             </div>
             <div className="flex items-center gap-1 mt-1">
-              <MomentumIcon className={`h-3.5 w-3.5 ${m?.momentum === 'accelerating' ? 'text-green-500' : m?.momentum === 'decelerating' ? 'text-red-500' : 'text-muted-foreground'}`} />
+              <MomentumIcon className={`h-3.5 w-3.5 ${m?.momentum === 'accelerating' ? 'text-[hsl(var(--success))]' : m?.momentum === 'decelerating' ? 'text-[hsl(var(--danger))]' : 'text-muted-foreground'}`} />
               <span className="text-xs text-muted-foreground">{momentumLabel}</span>
             </div>
           </CardContent>
@@ -746,8 +746,8 @@ export default function BlogDashboardPage() {
 
                             {isLinkedIn ? (
                               <div className="space-y-4">
-                                <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950 p-3">
-                                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                                <div className="rounded-lg border border-[hsl(var(--info))] bg-[hsl(var(--info)/0.1)] p-3">
+                                  <p className="text-sm text-[hsl(var(--info))]">
                                     This will use your connected LinkedIn social account to publish articles. Make sure your LinkedIn account is connected in the Accounts page first.
                                   </p>
                                 </div>

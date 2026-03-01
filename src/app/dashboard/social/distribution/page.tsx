@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -39,21 +39,21 @@ interface CompetitorGap {
 }
 
 const TREND_CONFIG: Record<string, { icon: typeof TrendingUp; color: string; label: string }> = {
-  up: { icon: TrendingUp, color: 'text-green-600 dark:text-green-400', label: 'Up' },
-  down: { icon: TrendingDown, color: 'text-red-600 dark:text-red-400', label: 'Down' },
+  up: { icon: TrendingUp, color: 'text-[hsl(var(--success))]', label: 'Up' },
+  down: { icon: TrendingDown, color: 'text-[hsl(var(--danger))]', label: 'Down' },
   stable: { icon: Minus, color: 'text-muted-foreground', label: 'Stable' },
 }
 
 const DIFFICULTY_VARIANT: Record<string, string> = {
-  easy: 'text-green-600 dark:text-green-400 border-green-600/30 dark:border-green-400/30',
-  medium: 'text-yellow-600 dark:text-yellow-400 border-yellow-600/30 dark:border-yellow-400/30',
-  hard: 'text-red-600 dark:text-red-400 border-red-600/30 dark:border-red-400/30',
+  easy: 'text-[hsl(var(--success))] border-[hsl(var(--success)/0.3)]',
+  medium: 'text-[hsl(var(--warning))] border-[hsl(var(--warning)/0.3)]',
+  hard: 'text-[hsl(var(--danger))] border-[hsl(var(--danger)/0.3)]',
 }
 
 const IMPACT_VARIANT: Record<string, string> = {
   low: 'text-muted-foreground border-muted-foreground/30',
-  medium: 'text-blue-600 dark:text-blue-400 border-blue-600/30 dark:border-blue-400/30',
-  high: 'text-green-600 dark:text-green-400 border-green-600/30 dark:border-green-400/30',
+  medium: 'text-[hsl(var(--info))] border-[hsl(var(--info)/0.3)]',
+  high: 'text-[hsl(var(--success))] border-[hsl(var(--success)/0.3)]',
 }
 
 export default function DistributionIntelligencePage() {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -72,17 +72,17 @@ interface CannibalizationPair {
 }
 
 const GRADE_COLORS: Record<string, string> = {
-  A: 'text-green-600 dark:text-green-400',
-  B: 'text-blue-600 dark:text-blue-400',
-  C: 'text-yellow-600 dark:text-yellow-400',
-  D: 'text-red-600 dark:text-red-400',
+  A: 'text-[hsl(var(--success))]',
+  B: 'text-[hsl(var(--info))]',
+  C: 'text-[hsl(var(--warning))]',
+  D: 'text-[hsl(var(--danger))]',
 }
 
 const MIX_COLORS: Record<string, string> = {
-  promotional: 'bg-red-500',
-  educational: 'bg-blue-500',
-  entertaining: 'bg-yellow-500',
-  inspirational: 'bg-purple-500',
+  promotional: 'bg-[hsl(var(--danger))]',
+  educational: 'bg-[hsl(var(--info))]',
+  entertaining: 'bg-[hsl(var(--warning))]',
+  inspirational: 'bg-accent-500',
 }
 
 const MIX_LABELS: Record<string, string> = {
@@ -618,7 +618,7 @@ export default function ContentIntelligencePage() {
                 <div className="space-y-4" data-testid="section-tone-results">
                   <div className="flex items-center gap-4 flex-wrap">
                     <div className="text-center">
-                      <p className={`text-3xl font-bold ${(toneDrift.alignment ?? 0) >= 70 ? 'text-green-600 dark:text-green-400' : (toneDrift.alignment ?? 0) >= 40 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`} data-testid="text-tone-alignment">
+                      <p className={`text-3xl font-bold ${(toneDrift.alignment ?? 0) >= 70 ? 'text-[hsl(var(--success))]' : (toneDrift.alignment ?? 0) >= 40 ? 'text-[hsl(var(--warning))]' : 'text-[hsl(var(--danger))]'}`} data-testid="text-tone-alignment">
                         {toneDrift.alignment ?? 0}
                       </p>
                       <p className="text-xs text-muted-foreground">Alignment Score</p>

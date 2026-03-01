@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle, DSCardDescription as CardDescription } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { ExternalLink, Globe, UserPlus, LogIn, LayoutDashboard, Settings, ArrowLeft } from 'lucide-react'
 
@@ -69,7 +69,7 @@ export default function AffiliateTestLinksPage() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-lg border border-dashed border-yellow-500/50 bg-yellow-500/5 p-4 text-sm text-yellow-700 dark:text-yellow-400">
+        <div className="mt-10 rounded-lg border border-dashed border-[hsl(var(--warning)/0.5)] bg-[hsl(var(--warning)/0.05)] p-4 text-sm text-[hsl(var(--warning))]">
           This is a temporary developer page. Remember to remove <code className="font-mono">/affiliate/test-links</code> before going live.
         </div>
       </div>

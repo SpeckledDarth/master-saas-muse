@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Loader2, Pen, Trash2, FileText, ArrowLeft, Clock, CheckCircle, XCircle, Repeat, ExternalLink, AlertCircle, Search, Sparkles, CalendarCheck } from 'lucide-react'
@@ -21,10 +21,10 @@ const STATUS_TABS: { label: string; value: string }[] = [
 
 function getStatusIcon(status: BlogPostStatus) {
   switch (status) {
-    case 'published': return <CheckCircle className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
-    case 'scheduled': return <Clock className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+    case 'published': return <CheckCircle className="h-3.5 w-3.5 text-[hsl(var(--success))]" />
+    case 'scheduled': return <Clock className="h-3.5 w-3.5 text-[hsl(var(--info))]" />
     case 'failed': return <XCircle className="h-3.5 w-3.5 text-destructive" />
-    case 'publishing': return <Loader2 className="h-3.5 w-3.5 animate-spin text-amber-600" />
+    case 'publishing': return <Loader2 className="h-3.5 w-3.5 animate-spin text-[hsl(var(--warning))]" />
     default: return <FileText className="h-3.5 w-3.5 text-muted-foreground" />
   }
 }

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Metadata } from 'next'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Badge } from '@/components/ui/badge'
 import ReactMarkdown from 'react-markdown'
 

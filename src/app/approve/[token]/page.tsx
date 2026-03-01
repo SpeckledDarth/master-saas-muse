@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
@@ -117,21 +117,21 @@ export default function ApprovePage({ params }: { params: Promise<{ token: strin
 
   function getPlatformColor(platform: string): string {
     const colors: Record<string, string> = {
-      twitter: 'bg-sky-500/10 text-sky-700 dark:text-sky-400',
-      x: 'bg-neutral-500/10 text-neutral-700 dark:text-neutral-400',
-      facebook: 'bg-blue-500/10 text-blue-700 dark:text-blue-400',
-      instagram: 'bg-pink-500/10 text-pink-700 dark:text-pink-400',
-      linkedin: 'bg-blue-600/10 text-blue-800 dark:text-blue-300',
-      tiktok: 'bg-neutral-500/10 text-neutral-700 dark:text-neutral-400',
-      threads: 'bg-neutral-500/10 text-neutral-700 dark:text-neutral-400',
+      twitter: 'bg-[hsl(var(--info)/0.1)] text-[hsl(var(--info))]',
+      x: 'bg-muted text-muted-foreground',
+      facebook: 'bg-[hsl(var(--info)/0.1)] text-[hsl(var(--info))]',
+      instagram: 'bg-accent-100 dark:bg-accent-900/30 text-accent-600 dark:text-accent-400',
+      linkedin: 'bg-[hsl(var(--info)/0.1)] text-[hsl(var(--info))]',
+      tiktok: 'bg-muted text-muted-foreground',
+      threads: 'bg-muted text-muted-foreground',
     }
     return colors[platform.toLowerCase()] || 'bg-muted text-muted-foreground'
   }
 
   function getStatusBadge(post: PostState) {
-    if (post.actionTaken === 'approve') return <Badge data-testid={`badge-status-${post.id}`} className="bg-green-500/10 text-green-700 dark:text-green-400 no-default-hover-elevate no-default-active-elevate">Approved</Badge>
-    if (post.actionTaken === 'reject') return <Badge data-testid={`badge-status-${post.id}`} className="bg-red-500/10 text-red-700 dark:text-red-400 no-default-hover-elevate no-default-active-elevate">Rejected</Badge>
-    if (post.actionTaken === 'request_changes') return <Badge data-testid={`badge-status-${post.id}`} className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 no-default-hover-elevate no-default-active-elevate">Changes Requested</Badge>
+    if (post.actionTaken === 'approve') return <Badge data-testid={`badge-status-${post.id}`} className="bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))] no-default-hover-elevate no-default-active-elevate">Approved</Badge>
+    if (post.actionTaken === 'reject') return <Badge data-testid={`badge-status-${post.id}`} className="bg-destructive/10 text-destructive no-default-hover-elevate no-default-active-elevate">Rejected</Badge>
+    if (post.actionTaken === 'request_changes') return <Badge data-testid={`badge-status-${post.id}`} className="bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))] no-default-hover-elevate no-default-active-elevate">Changes Requested</Badge>
     if (post.status === 'scheduled') return <Badge data-testid={`badge-status-${post.id}`} variant="secondary"><Clock className="w-3 h-3 mr-1" />Scheduled</Badge>
     if (post.status === 'draft') return <Badge data-testid={`badge-status-${post.id}`} variant="secondary">Draft</Badge>
     if (post.status === 'pending_approval') return <Badge data-testid={`badge-status-${post.id}`} variant="outline">Pending</Badge>
@@ -220,7 +220,7 @@ export default function ApprovePage({ params }: { params: Promise<{ token: strin
 
               {post.message && (
                 <div
-                  className={`text-sm px-3 py-2 rounded-md ${post.messageType === 'success' ? 'bg-green-500/10 text-green-700 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}
+                  className={`text-sm px-3 py-2 rounded-md ${post.messageType === 'success' ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]' : 'bg-destructive/10 text-destructive'}`}
                   data-testid={`text-message-${post.id}`}
                 >
                   {post.message}
@@ -243,7 +243,7 @@ export default function ApprovePage({ params }: { params: Promise<{ token: strin
                       size="sm"
                       onClick={() => handleAction(post.id, 'approve')}
                       disabled={post.loading}
-                      className="bg-green-600 hover:bg-green-600 text-white border-green-700"
+                      className="bg-[hsl(var(--success))] hover:bg-[hsl(var(--success))] text-white border-[hsl(var(--success))]"
                       data-testid={`button-approve-${post.id}`}
                     >
                       {post.loading ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Check className="w-4 h-4 mr-1" />}
@@ -270,7 +270,7 @@ export default function ApprovePage({ params }: { params: Promise<{ token: strin
                         }
                       }}
                       disabled={post.loading}
-                      className="border-yellow-500/50 text-yellow-700 dark:text-yellow-400"
+                      className="border-[hsl(var(--warning)/0.5)] text-[hsl(var(--warning))]"
                       data-testid={`button-request-changes-${post.id}`}
                     >
                       {post.loading ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <MessageSquare className="w-4 h-4 mr-1" />}

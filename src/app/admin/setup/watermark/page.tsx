@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -72,17 +72,17 @@ export default function WatermarkAdminPage() {
         </p>
       </div>
 
-      <Card data-testid="card-watermark-settings">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <DSCard data-testid="card-watermark-settings">
+        <DSCardHeader>
+          <DSCardTitle className="flex items-center gap-2">
             <Stamp className="h-5 w-5" />
             Post Watermark
-          </CardTitle>
-          <CardDescription>
+          </DSCardTitle>
+          <DSCardDescription>
             When enabled, a text line is appended to every published post
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          </DSCardDescription>
+        </DSCardHeader>
+        <DSCardContent className="space-y-[var(--content-density-gap,1rem)]">
           <div className="flex items-center justify-between">
             <div>
               <Label htmlFor="watermark-toggle">Enable Watermark</Label>
@@ -125,8 +125,8 @@ export default function WatermarkAdminPage() {
             {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
             Save Watermark Settings
           </Button>
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
     </div>
   )
 }

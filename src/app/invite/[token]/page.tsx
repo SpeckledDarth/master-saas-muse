@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Loader2, CheckCircle, XCircle, Mail } from 'lucide-react'
 
 interface InvitationDetails {
@@ -140,7 +140,7 @@ export default function InvitePage() {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="flex flex-col items-center py-12">
-            <CheckCircle className="h-12 w-12 text-green-500" />
+            <CheckCircle className="h-12 w-12 text-[hsl(var(--success))]" />
             <h2 className="mt-4 text-xl font-semibold">Welcome to the team!</h2>
             <p className="mt-2 text-muted-foreground">Redirecting to dashboard...</p>
           </CardContent>

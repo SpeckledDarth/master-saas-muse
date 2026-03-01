@@ -1,7 +1,7 @@
 'use client'
 
 import { useSettings } from '@/hooks/use-settings'
-import { Card, CardContent } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent } from '@/components/ui/ds-card'
 import { Loader2, Users, Target, Heart } from 'lucide-react'
 import { PageHero } from '@/components/page-hero'
 

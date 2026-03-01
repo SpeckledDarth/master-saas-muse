@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
@@ -244,10 +244,10 @@ export default function TicketDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)]">
         <div className="lg:col-span-2 space-y-[var(--content-density-gap,1rem)]">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Description</CardTitle>
-              <CardDescription className="flex items-center gap-2 flex-wrap">
+          <DSCard>
+            <DSCardHeader>
+              <DSCardTitle className="text-base">Description</DSCardTitle>
+              <DSCardDescription className="flex items-center gap-2 flex-wrap">
                 <Clock className="h-3 w-3" />
                 Created {new Date(ticket.created_at).toLocaleString()}
                 {ticket.updated_at && (
@@ -256,26 +256,26 @@ export default function TicketDetailPage() {
                     Updated {new Date(ticket.updated_at).toLocaleString()}
                   </>
                 )}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </DSCardDescription>
+            </DSCardHeader>
+            <DSCardContent>
               <p className="whitespace-pre-wrap" data-testid="text-ticket-description">
                 {ticket.description || 'No description provided.'}
               </p>
-            </CardContent>
-          </Card>
+            </DSCardContent>
+          </DSCard>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
+          <DSCard>
+            <DSCardHeader>
+              <DSCardTitle className="text-base flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
                 Messages
                 {comments.length > 0 && (
                   <Badge variant="secondary">{comments.length}</Badge>
                 )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </DSCardTitle>
+            </DSCardHeader>
+            <DSCardContent className="space-y-4">
               {comments.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-comments">
                   No messages yet. Add a reply below.
@@ -341,16 +341,16 @@ export default function TicketDetailPage() {
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </DSCardContent>
+          </DSCard>
         </div>
 
         <div className="space-y-[var(--content-density-gap,1rem)]">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <DSCard>
+            <DSCardHeader>
+              <DSCardTitle className="text-base">Details</DSCardTitle>
+            </DSCardHeader>
+            <DSCardContent className="space-y-4">
               <div>
                 <Label className="text-xs text-muted-foreground">Status</Label>
                 <Select
@@ -428,14 +428,14 @@ export default function TicketDetailPage() {
                   </p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </DSCardContent>
+          </DSCard>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
+          <DSCard>
+            <DSCardHeader>
+              <DSCardTitle className="text-base">Quick Actions</DSCardTitle>
+            </DSCardHeader>
+            <DSCardContent className="space-y-2">
               {ticket.status !== 'resolved' && (
                 <Button
                   variant="outline"
@@ -472,8 +472,8 @@ export default function TicketDetailPage() {
                   Reopen Ticket
                 </Button>
               )}
-            </CardContent>
-          </Card>
+            </DSCardContent>
+          </DSCard>
         </div>
       </div>
     </div>

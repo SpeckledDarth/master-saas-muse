@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Lightbulb, ChevronRight, X } from 'lucide-react'
 

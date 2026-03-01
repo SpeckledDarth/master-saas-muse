@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -58,25 +58,25 @@ interface ReportCard {
 }
 
 const GRADE_COLORS: Record<string, string> = {
-  A: 'text-green-600 dark:text-green-400',
-  B: 'text-blue-600 dark:text-blue-400',
-  C: 'text-yellow-600 dark:text-yellow-400',
-  D: 'text-orange-600 dark:text-orange-400',
-  F: 'text-red-600 dark:text-red-400',
+  A: 'text-[hsl(var(--success))]',
+  B: 'text-[hsl(var(--info))]',
+  C: 'text-[hsl(var(--warning))]',
+  D: 'text-[hsl(var(--warning))]',
+  F: 'text-[hsl(var(--danger))]',
 }
 
 const GRADE_BG: Record<string, string> = {
-  A: 'bg-green-100 dark:bg-green-900/30',
-  B: 'bg-blue-100 dark:bg-blue-900/30',
-  C: 'bg-yellow-100 dark:bg-yellow-900/30',
-  D: 'bg-orange-100 dark:bg-orange-900/30',
-  F: 'bg-red-100 dark:bg-red-900/30',
+  A: 'bg-[hsl(var(--success)/0.1)]',
+  B: 'bg-[hsl(var(--info)/0.1)]',
+  C: 'bg-[hsl(var(--warning)/0.1)]',
+  D: 'bg-[hsl(var(--warning)/0.1)]',
+  F: 'bg-[hsl(var(--danger)/0.1)]',
 }
 
 const MIX_COLORS: Record<string, string> = {
-  promotional: 'bg-red-500',
-  educational: 'bg-blue-500',
-  entertaining: 'bg-yellow-500',
+  promotional: 'bg-[hsl(var(--danger))]',
+  educational: 'bg-[hsl(var(--info))]',
+  entertaining: 'bg-[hsl(var(--warning))]',
 }
 
 const MIX_LABELS: Record<string, string> = {
@@ -411,7 +411,7 @@ export default function RevenueROIPage() {
                 {reportCard.topPost && (
                   <div className="p-4 rounded-md border space-y-1" data-testid="section-top-post">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
+                      <TrendingUp className="h-3.5 w-3.5 text-[hsl(var(--success))]" />
                       <span className="text-sm font-medium">Top Post</span>
                     </div>
                     <Badge variant="secondary" className="text-xs" data-testid="badge-top-post-platform">{reportCard.topPost.platform}</Badge>
@@ -422,7 +422,7 @@ export default function RevenueROIPage() {
                 {reportCard.worstPost && (
                   <div className="p-4 rounded-md border space-y-1" data-testid="section-worst-post">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="h-3.5 w-3.5 text-red-600 dark:text-red-400 rotate-180" />
+                      <TrendingUp className="h-3.5 w-3.5 text-[hsl(var(--danger))] rotate-180" />
                       <span className="text-sm font-medium">Worst Post</span>
                     </div>
                     <Badge variant="secondary" className="text-xs" data-testid="badge-worst-post-platform">{reportCard.worstPost.platform}</Badge>

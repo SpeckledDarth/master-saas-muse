@@ -219,7 +219,7 @@ export function BulkImport({ onImported }: { onImported?: () => void }) {
                               {row.error}
                             </span>
                           ) : (
-                            <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                            <span className="flex items-center gap-1 text-xs text-[hsl(var(--success))]">
                               <CheckCircle2 className="h-3 w-3 flex-shrink-0" />
                               Valid
                             </span>
@@ -233,7 +233,7 @@ export function BulkImport({ onImported }: { onImported?: () => void }) {
 
               {result && (
                 <div className="flex items-center gap-2 text-sm" data-testid="text-import-result">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <CheckCircle2 className="h-4 w-4 text-[hsl(var(--success))]" />
                   {result.imported} posts imported.
                   {result.errors.length > 0 && (
                     <span className="text-destructive">{result.errors.length} failed.</span>

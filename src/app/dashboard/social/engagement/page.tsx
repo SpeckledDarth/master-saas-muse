@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Loader2, BarChart3, TrendingUp, Users, Sparkles, AlertCircle, RefreshCw, Heart, MessageSquare, Share2, Eye } from 'lucide-react'
@@ -266,7 +266,7 @@ export default function EngagementAnalyticsPage() {
         <Card data-testid="card-week-likes">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Likes (7d) <HelpTooltip text="Total likes across all platforms in the last 7 days." /></CardTitle>
-            <Heart className="h-4 w-4 text-red-500" />
+            <Heart className="h-4 w-4 text-[hsl(var(--danger))]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-week-likes">{formatNumber(weekMetrics.likes)}</div>
@@ -277,7 +277,7 @@ export default function EngagementAnalyticsPage() {
         <Card data-testid="card-week-comments">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Comments (7d) <HelpTooltip text="Total comments and replies across all platforms in the last 7 days." /></CardTitle>
-            <MessageSquare className="h-4 w-4 text-blue-500" />
+            <MessageSquare className="h-4 w-4 text-[hsl(var(--info))]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-week-comments">{formatNumber(weekMetrics.comments)}</div>
@@ -288,7 +288,7 @@ export default function EngagementAnalyticsPage() {
         <Card data-testid="card-week-shares">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Shares (7d) <HelpTooltip text="Total shares and retweets across all platforms in the last 7 days." /></CardTitle>
-            <Share2 className="h-4 w-4 text-green-500" />
+            <Share2 className="h-4 w-4 text-[hsl(var(--success))]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-week-shares">{formatNumber(weekMetrics.shares)}</div>
@@ -299,7 +299,7 @@ export default function EngagementAnalyticsPage() {
         <Card data-testid="card-week-impressions">
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Impressions (7d) <HelpTooltip text="Total times your posts were shown to people in the last 7 days." /></CardTitle>
-            <Eye className="h-4 w-4 text-purple-500" />
+            <Eye className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold" data-testid="text-week-impressions">{formatNumber(weekMetrics.impressions)}</div>

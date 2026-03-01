@@ -8,7 +8,7 @@ import { useSettings } from '@/hooks/use-settings'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 
 export default function AffiliateLoginPage() {
@@ -78,7 +78,7 @@ export default function AffiliateLoginPage() {
   if (magicLinkSent) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 border-gray-500/50">
+        <Card className="w-full max-w-md bg-white/10 border-border">
           <CardContent className="pt-8 pb-6 text-center">
             <div className="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto mb-4">
               <Mail className="h-8 w-8 text-primary-600 dark:text-primary-400" />
@@ -105,7 +105,7 @@ export default function AffiliateLoginPage() {
           </Link>
         </div>
 
-        <Card className="bg-white/10 border-gray-500/50">
+        <Card className="bg-white/10 border-border">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-black dark:text-white" data-testid="text-login-title">Affiliate Login</CardTitle>
             <CardDescription>Access your {appName} affiliate dashboard</CardDescription>
@@ -127,7 +127,7 @@ export default function AffiliateLoginPage() {
                 </div>
 
                 {error && (
-                  <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3" data-testid="text-login-error">
+                  <div className="text-sm text-destructive bg-destructive/10 rounded-lg p-3" data-testid="text-login-error">
                     {error}
                   </div>
                 )}
@@ -182,7 +182,7 @@ export default function AffiliateLoginPage() {
                 </div>
 
                 {error && (
-                  <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3" data-testid="text-login-error">
+                  <div className="text-sm text-destructive bg-destructive/10 rounded-lg p-3" data-testid="text-login-error">
                     {error}
                   </div>
                 )}

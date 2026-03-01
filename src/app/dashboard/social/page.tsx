@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Loader2, Check, X, RefreshCw, Unlink } from 'lucide-react'
@@ -370,11 +370,11 @@ function SocialAccountsContent() {
   return (
     <div className="p-6">
       {oauthError && (
-        <div className="mb-4 p-4 rounded-lg border border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-800" data-testid="banner-oauth-error">
+        <div className="mb-4 p-4 rounded-lg border border-[hsl(var(--danger))] bg-[hsl(var(--danger)/0.1)]" data-testid="banner-oauth-error">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
-              <h3 className="font-semibold text-red-800 dark:text-red-300 mb-1">Connection Error</h3>
-              <p className="text-sm text-red-700 dark:text-red-400 whitespace-pre-wrap break-words">{oauthError}</p>
+              <h3 className="font-semibold text-[hsl(var(--danger))] mb-1">Connection Error</h3>
+              <p className="text-sm text-[hsl(var(--danger))] whitespace-pre-wrap break-words">{oauthError}</p>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setOauthError(null)} className="shrink-0 h-7 w-7" data-testid="button-dismiss-oauth-error">
               <X className="h-4 w-4" />
@@ -383,11 +383,11 @@ function SocialAccountsContent() {
         </div>
       )}
       {oauthSuccess && (
-        <div className="mb-4 p-4 rounded-lg border border-green-300 bg-green-50 dark:bg-green-950/30 dark:border-green-800" data-testid="banner-oauth-success">
+        <div className="mb-4 p-4 rounded-lg border border-[hsl(var(--success))] bg-[hsl(var(--success)/0.1)]" data-testid="banner-oauth-success">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
-              <h3 className="font-semibold text-green-800 dark:text-green-300 mb-1">Connected!</h3>
-              <p className="text-sm text-green-700 dark:text-green-400">{oauthSuccess}</p>
+              <h3 className="font-semibold text-[hsl(var(--success))] mb-1">Connected!</h3>
+              <p className="text-sm text-[hsl(var(--success))]">{oauthSuccess}</p>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setOauthSuccess(null)} className="shrink-0 h-7 w-7" data-testid="button-dismiss-oauth-success">
               <X className="h-4 w-4" />
@@ -602,7 +602,7 @@ function SocialAccountsContent() {
 
                 {PLATFORM_GUIDES[selectedPlatform].note && (
                   <div className="flex items-start gap-2 rounded-lg border bg-muted/50 p-3">
-                    <ShieldCheck className="h-4 w-4 shrink-0 text-green-600 dark:text-green-400 mt-0.5" />
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-[hsl(var(--success))] mt-0.5" />
                     <p className="text-xs text-muted-foreground">
                       {PLATFORM_GUIDES[selectedPlatform].note}
                     </p>

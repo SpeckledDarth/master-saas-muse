@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, ArrowLeft, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
@@ -48,48 +48,48 @@ function OAuthErrorContent() {
           </div>
 
           {isCallbackMismatch && (
-            <div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
-              <p className="text-sm text-amber-800 dark:text-amber-200">
+            <div className="rounded-md bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
+              <p className="text-sm text-[hsl(var(--warning))]">
                 This usually means the callback URL in your {platformName} developer app settings doesn&apos;t match your site URL. Check the developer portal and update it.
               </p>
             </div>
           )}
 
           {isExpired && (
-            <div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
-              <p className="text-sm text-amber-800 dark:text-amber-200">
+            <div className="rounded-md bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
+              <p className="text-sm text-[hsl(var(--warning))]">
                 The authorization request expired. This happens if you wait too long on the authorization page. Please try again.
               </p>
             </div>
           )}
 
           {isTokenFailed && (
-            <div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
-              <p className="text-sm text-amber-800 dark:text-amber-200">
+            <div className="rounded-md bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
+              <p className="text-sm text-[hsl(var(--warning))]">
                 The token exchange with {platformName} failed. Check that your API credentials (Client ID and Secret) are correct in the admin settings.
               </p>
             </div>
           )}
 
           {isDenied && (
-            <div className="rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
-              <p className="text-sm text-blue-800 dark:text-blue-200">
+            <div className="rounded-md bg-[hsl(var(--info)/0.1)] border border-[hsl(var(--info)/0.3)] p-3">
+              <p className="text-sm text-[hsl(var(--info))]">
                 No worries — you can try connecting again whenever you&apos;re ready. Just click &quot;Try Again&quot; below.
               </p>
             </div>
           )}
 
           {isTimeout && (
-            <div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
-              <p className="text-sm text-amber-800 dark:text-amber-200">
+            <div className="rounded-md bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
+              <p className="text-sm text-[hsl(var(--warning))]">
                 The request to {platformName} timed out. This can happen if {platformName}&apos;s servers are slow. Wait a moment and try again.
               </p>
             </div>
           )}
 
           {isCredentials && (
-            <div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
-              <p className="text-sm text-amber-800 dark:text-amber-200">
+            <div className="rounded-md bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
+              <p className="text-sm text-[hsl(var(--warning))]">
                 Your {platformName} API credentials may not be set up yet. Go to Admin Settings to add the Client ID and Secret.
               </p>
             </div>

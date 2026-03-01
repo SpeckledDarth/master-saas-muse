@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, CardContent } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent } from '@/components/ui/ds-card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Heart, MessageCircle, Repeat2, Share, ThumbsUp, Send, Globe, MoreHorizontal } from 'lucide-react'
 
@@ -20,7 +20,7 @@ const CHAR_LIMITS: Record<string, number> = {
 function getCharColor(length: number, limit: number): string {
   const ratio = length / limit
   if (ratio >= 1) return 'text-destructive'
-  if (ratio >= 0.9) return 'text-yellow-600 dark:text-yellow-400'
+  if (ratio >= 0.9) return 'text-[hsl(var(--warning))]'
   return 'text-muted-foreground'
 }
 

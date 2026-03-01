@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardDescription, DSCardHeader, DSCardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -209,22 +209,22 @@ export default function ContentPage() {
 
   function PostCard({ post }: { post: Post }) {
     return (
-      <Card data-testid={`post-${post.id}`}>
-        <CardHeader className="flex flex-row items-center justify-between gap-[var(--content-density-gap,1rem)] space-y-0">
+      <DSCard data-testid={`post-${post.id}`}>
+        <DSCardHeader className="flex flex-row items-center justify-between gap-[var(--content-density-gap,1rem)] space-y-0">
           <div 
             className="cursor-pointer hover:opacity-80 min-w-0 flex-1"
             onClick={() => window.open(`/blog/${post.slug}`, '_blank')}
             data-testid={`link-view-post-${post.id}`}
           >
-            <CardTitle className="text-lg flex items-center gap-2">
+            <DSCardTitle className="text-lg flex items-center gap-2">
               {post.type === 'changelog' && <Megaphone className="h-4 w-4 shrink-0" />}
               <span className="truncate">{post.title}</span>
               <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0" />
-            </CardTitle>
-            <CardDescription>
+            </DSCardTitle>
+            <DSCardDescription>
               {post.type === 'blog' && <span>/blog/{post.slug} • </span>}
               {new Date(post.created_at).toLocaleDateString()}
-            </CardDescription>
+            </DSCardDescription>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Badge variant={post.published ? 'default' : 'secondary'}>
@@ -264,13 +264,13 @@ export default function ContentPage() {
               )}
             </Button>
           </div>
-        </CardHeader>
+        </DSCardHeader>
         {post.excerpt && (
-          <CardContent>
+          <DSCardContent>
             <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>
-          </CardContent>
+          </DSCardContent>
         )}
-      </Card>
+      </DSCard>
     )
   }
 
@@ -303,13 +303,13 @@ export default function ContentPage() {
           </div>
           
           {blogPosts.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
+            <DSCard>
+              <DSCardContent className="py-12 text-center">
                 <FileText className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] text-muted-foreground opacity-50" />
                 <p className="text-lg font-medium mb-2">No blog posts yet</p>
                 <p className="text-muted-foreground">Create your first blog post to share with your audience.</p>
-              </CardContent>
-            </Card>
+              </DSCardContent>
+            </DSCard>
           ) : (
             <div className="space-y-[var(--content-density-gap,1rem)]">
               {blogPosts.map((post) => (
@@ -328,13 +328,13 @@ export default function ContentPage() {
           </div>
           
           {changelogPosts.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
+            <DSCard>
+              <DSCardContent className="py-12 text-center">
                 <Megaphone className="h-12 w-12 mx-auto mb-[var(--content-density-gap,1rem)] text-muted-foreground opacity-50" />
                 <p className="text-lg font-medium mb-2">No changelog entries yet</p>
                 <p className="text-muted-foreground">Document your first product update or feature release.</p>
-              </CardContent>
-            </Card>
+              </DSCardContent>
+            </DSCard>
           ) : (
             <div className="space-y-[var(--content-density-gap,1rem)]">
               {changelogPosts.map((post) => (
@@ -434,21 +434,21 @@ export default function ContentPage() {
             </TabsContent>
             
             <TabsContent value="preview" className="flex-1 overflow-auto mt-4" data-testid="markdown-preview">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl">{form.title || 'Untitled'}</CardTitle>
+              <DSCard>
+                <DSCardHeader>
+                  <DSCardTitle className="text-2xl">{form.title || 'Untitled'}</DSCardTitle>
                   {form.excerpt && (
-                    <CardDescription className="text-base">{form.excerpt}</CardDescription>
+                    <DSCardDescription className="text-base">{form.excerpt}</DSCardDescription>
                   )}
-                </CardHeader>
-                <CardContent>
+                </DSCardHeader>
+                <DSCardContent>
                   {form.content ? (
                     <MarkdownPreview content={form.content} />
                   ) : (
                     <p className="text-muted-foreground italic">No content yet...</p>
                   )}
-                </CardContent>
-              </Card>
+                </DSCardContent>
+              </DSCard>
             </TabsContent>
           </Tabs>
           

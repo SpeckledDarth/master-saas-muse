@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -340,15 +340,15 @@ export default function SocialOverviewPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="flex flex-col items-center justify-center text-center">
-                <div className={`text-4xl font-bold ${flywheel.healthScore >= 70 ? 'text-green-600 dark:text-green-400' : flywheel.healthScore >= 40 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`} data-testid="text-flywheel-overview-score">
+                <div className={`text-4xl font-bold ${flywheel.healthScore >= 70 ? 'text-[hsl(var(--success))]' : flywheel.healthScore >= 40 ? 'text-[hsl(var(--warning))]' : 'text-[hsl(var(--danger))]'}`} data-testid="text-flywheel-overview-score">
                   {flywheel.healthScore}
                 </div>
                 <span className="text-sm text-muted-foreground mt-1">out of 100</span>
                 <div className="flex items-center gap-1 mt-2">
                   {flywheel.momentum === 'accelerating' ? (
-                    <ArrowUp className="h-4 w-4 text-green-500" />
+                    <ArrowUp className="h-4 w-4 text-[hsl(var(--success))]" />
                   ) : flywheel.momentum === 'decelerating' ? (
-                    <ArrowDown className="h-4 w-4 text-red-500" />
+                    <ArrowDown className="h-4 w-4 text-[hsl(var(--danger))]" />
                   ) : (
                     <Minus className="h-4 w-4 text-muted-foreground" />
                   )}

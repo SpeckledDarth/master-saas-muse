@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardDescription as CardDescription, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2, CheckCircle, ArrowLeft } from 'lucide-react'
 
@@ -75,10 +75,10 @@ export default function AffiliateJoinPage() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 border-gray-500/50">
+        <Card className="w-full max-w-md bg-white/10 border-border">
           <CardContent className="pt-8 pb-6 text-center">
-            <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+            <div className="w-16 h-16 rounded-full bg-[hsl(var(--success)/0.1)] flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="h-8 w-8 text-[hsl(var(--success))]" />
             </div>
             <h2 className="text-2xl font-bold text-black dark:text-white mb-2" data-testid="text-success-title">Application Submitted!</h2>
             <p className="text-muted-foreground mb-6">
@@ -104,7 +104,7 @@ export default function AffiliateJoinPage() {
           </Link>
         </div>
 
-        <Card className="bg-white/10 border-gray-500/50">
+        <Card className="bg-white/10 border-border">
           <CardHeader>
             <CardTitle className="text-2xl text-black dark:text-white" data-testid="text-join-title">Join the {appName} Affiliate Program</CardTitle>
             <CardDescription>Fill out the form below to apply. No account needed — we'll set everything up once you're approved.</CardDescription>
@@ -198,7 +198,7 @@ export default function AffiliateJoinPage() {
               </div>
 
               {error && (
-                <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3" data-testid="text-error">
+                <div className="text-sm text-destructive bg-destructive/10 rounded-lg p-3" data-testid="text-error">
                   {error}
                 </div>
               )}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent, DSCardHeader as CardHeader, DSCardTitle as CardTitle } from '@/components/ui/ds-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -181,7 +181,7 @@ export default function EngagementRetentionPage() {
             ) : streak ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <Flame className="h-10 w-10 text-orange-500" />
+                  <Flame className="h-10 w-10 text-[hsl(var(--warning))]" />
                   <div>
                     <p className="text-4xl font-bold" data-testid="text-streak-current">{streak.currentStreak}</p>
                     <p className="text-sm text-muted-foreground">day streak</p>

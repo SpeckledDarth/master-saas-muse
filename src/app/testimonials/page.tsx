@@ -168,7 +168,7 @@ function TestimonialCard({ testimonial: t, large = false }: { testimonial: Testi
   const initials = t.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
 
   return (
-    <div className={`rounded-xl border border-gray-500/50 bg-white/[0.09] p-6 ${large ? 'md:p-8' : ''} text-black dark:text-white relative`} data-testid={`card-public-testimonial-${t.id}`}>
+    <div className={`rounded-xl border bg-card p-6 ${large ? 'md:p-8' : ''} relative`} data-testid={`card-public-testimonial-${t.id}`}>
       <Quote className="absolute top-4 right-4 h-8 w-8 text-primary-200 dark:text-primary-800 opacity-50" />
       <p className={`text-muted-foreground italic leading-relaxed mb-6 ${large ? 'text-lg' : 'text-sm'}`}>
         &quot;{t.quote}&quot;
@@ -176,7 +176,7 @@ function TestimonialCard({ testimonial: t, large = false }: { testimonial: Testi
       {t.rating && (
         <div className="flex gap-0.5 mb-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Star key={i} className={`h-4 w-4 ${i < t.rating! ? 'text-yellow-500 fill-current' : 'text-gray-300'}`} />
+            <Star key={i} className={`h-4 w-4 ${i < t.rating! ? 'text-[hsl(var(--warning))] fill-current' : 'text-muted-foreground'}`} />
           ))}
         </div>
       )}

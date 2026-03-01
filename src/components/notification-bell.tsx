@@ -113,7 +113,7 @@ export function NotificationBell() {
                   onClick={() => markRead(n.id, n.link)}
                   data-testid={`notification-item-${n.id}`}
                 >
-                  <TypeIcon className={`h-5 w-5 shrink-0 mt-0.5 ${n.type === 'error' ? 'text-destructive' : n.type === 'warning' ? 'text-yellow-500' : n.type === 'success' ? 'text-green-500' : 'text-muted-foreground'}`} />
+                  <TypeIcon className={`h-5 w-5 shrink-0 mt-0.5 ${n.type === 'error' ? 'text-destructive' : n.type === 'warning' ? 'text-[hsl(var(--warning))]' : n.type === 'success' ? 'text-[hsl(var(--success))]' : 'text-muted-foreground'}`} />
                   <div className="flex-1 min-w-0">
                     <p className={`text-sm ${!n.read ? 'font-medium' : ''}`} data-testid={`text-notification-title-${n.id}`}>{n.title}</p>
                     <p className="text-xs text-muted-foreground truncate" data-testid={`text-notification-message-${n.id}`}>{n.message}</p>

@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
+import { DSCard as Card, DSCardContent as CardContent } from '@/components/ui/ds-card'
 import { PlatformIconCircle, getPlatformName } from '@/components/social/platform-icon'
 import { Clock, Sparkles, Heart, MessageCircle, Share2, MousePointerClick, Calendar, AlertCircle } from 'lucide-react'
 

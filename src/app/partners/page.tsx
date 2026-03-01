@@ -50,11 +50,11 @@ export default function PartnersPage() {
   useEffect(() => { loadDirectory(); }, [loadDirectory]);
 
   const TIER_COLORS: Record<string, string> = {
-    bronze: 'bg-amber-700 text-white',
-    silver: 'bg-gray-400 text-white',
-    gold: 'bg-yellow-500 text-white',
-    platinum: 'bg-gray-600 text-white',
-    diamond: 'bg-blue-500 text-white',
+    bronze: 'bg-[hsl(var(--warning)/0.3)] text-[hsl(var(--warning))]',
+    silver: 'bg-muted text-muted-foreground',
+    gold: 'bg-[hsl(var(--warning)/0.2)] text-[hsl(var(--warning))]',
+    platinum: 'bg-muted text-foreground',
+    diamond: 'bg-[hsl(var(--info)/0.2)] text-[hsl(var(--info))]',
   };
 
   return (
@@ -133,7 +133,7 @@ export default function PartnersPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     {aff.is_top_performer && (
-                      <span className="text-[9px] px-1.5 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded font-medium" data-testid={`partner-top-${aff.id}`}>Top</span>
+                      <span className="text-[9px] px-1.5 py-0.5 bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))] rounded font-medium" data-testid={`partner-top-${aff.id}`}>Top</span>
                     )}
                     {aff.tier_name && (
                       <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${TIER_COLORS[aff.tier_name.toLowerCase()] || 'bg-muted text-muted-foreground'}`} data-testid={`partner-tier-${aff.id}`}>
