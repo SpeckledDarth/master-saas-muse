@@ -5,6 +5,7 @@ import crypto from 'crypto'
 import { getEmailClient } from '@/lib/email/client'
 import { sendEmail } from '@/lib/email/service'
 import { logAuditEvent } from '@/lib/affiliate/audit'
+import { generateBrandedCode } from '@/lib/affiliate/discount-codes'
 
 export async function POST(request: NextRequest) {
   try {
@@ -187,6 +188,15 @@ export async function POST(request: NextRequest) {
         user_id: affiliateUserId,
         role: 'affiliate',
       })
+    }
+
+    try {
+      const discountCode = await generateBrandedCode(admin, application.name, affiliateUserId)
+      if (discountCode) {
+        console.log(`Auto-generated discount code "${discountCode}" for affiliate ${application.name}`)
+      }
+    } catch (codeErr) {
+      console.error('Failed to auto-generate discount code:', codeErr)
     }
 
     const { error: approveError } = await admin

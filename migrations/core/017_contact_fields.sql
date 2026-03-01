@@ -65,3 +65,6 @@ ALTER TABLE contracts ADD COLUMN IF NOT EXISTS terms JSONB;
 -- GAP-3/GAP-4: Add locked cookie duration and min payout to referral_links
 ALTER TABLE referral_links ADD COLUMN IF NOT EXISTS locked_cookie_duration_days INTEGER;
 ALTER TABLE referral_links ADD COLUMN IF NOT EXISTS locked_min_payout_cents INTEGER;
+
+-- Sprint 9A: Discount code rename cooldown tracking
+ALTER TABLE affiliate_discount_codes ADD COLUMN IF NOT EXISTS last_renamed_at TIMESTAMPTZ;

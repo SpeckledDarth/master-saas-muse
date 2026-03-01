@@ -73,7 +73,7 @@ import {
   Bell, Bookmark, Download, QrCode, Key, Trash2, Eye, EyeOff, Globe, Palette,
   Webhook, Send, AlertTriangle, RefreshCw, MessageSquare,
   ChevronDown, ChevronRight, Briefcase, UserCheck, UserX, CircleDot,
-  GripVertical, Plus, RotateCcw, X,
+  GripVertical, Plus, RotateCcw, X, Pencil,
   Youtube, Play, ThumbsUp, MessageCircle, ArrowRight, Activity,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
@@ -655,6 +655,12 @@ function StandaloneAffiliateDashboard() {
   const [codeRequests, setCodeRequests] = useState<any[]>([])
   const [newCodeRequest, setNewCodeRequest] = useState('')
   const [codeRequestSubmitting, setCodeRequestSubmitting] = useState(false)
+  const [renameCode, setRenameCode] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
+  const [renaming, setRenaming] = useState(false)
+  const [renameSuggestions, setRenameSuggestions] = useState<string[]>([])
+  const [renameError, setRenameError] = useState('')
+  const [affiliateDisplayName, setAffiliateDisplayName] = useState('')
 
   const [linkPresets, setLinkPresets] = useState<any[]>([])
   const [presetName, setPresetName] = useState('')
@@ -1356,6 +1362,7 @@ function StandaloneAffiliateDashboard() {
         const data = await res.json()
         setDiscountCodes(data.codes || [])
         setCodeRequests(data.requests || [])
+        if (data.displayName) setAffiliateDisplayName(data.displayName)
       }
     } catch {}
   }, [])
@@ -1391,6 +1398,35 @@ function StandaloneAffiliateDashboard() {
       toast({ title: 'Error', description: 'Failed to submit request', variant: 'destructive' })
     }
     setCodeRequestSubmitting(false)
+  }
+
+  const handleRenameCode = async (codeId: string) => {
+    if (!renameValue.trim()) return
+    setRenaming(true)
+    setRenameError('')
+    setRenameSuggestions([])
+    try {
+      const res = await fetch('/api/affiliate/discount-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'rename', code_id: codeId, new_code: renameValue }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        toast({ title: 'Code renamed!', description: `Your code is now ${data.code}` })
+        setRenameCode(null)
+        setRenameValue('')
+        fetchDiscountCodes()
+      } else if (data.taken && data.suggestions) {
+        setRenameError(data.error)
+        setRenameSuggestions(data.suggestions)
+      } else {
+        setRenameError(data.error || 'Failed to rename')
+      }
+    } catch {
+      setRenameError('Failed to rename code')
+    }
+    setRenaming(false)
   }
 
   const saveLinkPreset = async () => {
@@ -4624,32 +4660,130 @@ function StandaloneAffiliateDashboard() {
             <Gift className="h-4 w-4" />
             Your Promo Code
           </CardTitle>
-          <CardDescription>Share your personal discount code with potential customers</CardDescription>
+          <CardDescription>Your personal brand in action — share your code with potential customers</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="p-3 rounded-md bg-muted/30 text-xs text-muted-foreground" data-testid="text-code-coaching">
+            Your discount code is your personal brand in action. Choose something memorable that your audience will associate with YOU — your name, your show, your catchphrase. Great codes are short, easy to say out loud, and easy to remember. Codes are first-come, first-served — the more unique to your brand, the better!
+          </div>
+
           {discountCodes.length > 0 ? (
-            <div className="space-y-2">
-              {discountCodes.map(code => (
-                <div key={code.id} className="flex items-center justify-between p-3 rounded-md bg-muted/40" data-testid={`discount-code-${code.id}`}>
-                  <div>
-                    <span className="font-mono font-bold text-lg">{code.code}</span>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <Badge variant="secondary" className="text-xs">{code.discount_percent}% off</Badge>
-                      {code.is_active ? (
-                        <Badge variant="outline" className="text-xs text-[hsl(var(--success))]">Active</Badge>
-                      ) : (
-                        <Badge variant="outline" className="text-xs text-muted-foreground">Inactive</Badge>
-                      )}
-                      {code.current_uses !== undefined && (
-                        <span className="text-xs text-muted-foreground">{code.current_uses} uses</span>
-                      )}
+            <div className="space-y-3">
+              {discountCodes.map(code => {
+                const cooldownEnd = code.last_renamed_at
+                  ? new Date(new Date(code.last_renamed_at).getTime() + 30 * 24 * 60 * 60 * 1000)
+                  : null
+                const canRename = !cooldownEnd || cooldownEnd <= new Date()
+                const cooldownDays = cooldownEnd && cooldownEnd > new Date()
+                  ? Math.ceil((cooldownEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+                  : 0
+
+                return (
+                  <div key={code.id} data-testid={`discount-code-${code.id}`}>
+                    <div className="flex items-center justify-between p-3 rounded-md bg-muted/40">
+                      <div>
+                        <span className="font-mono font-bold text-lg" data-testid={`text-code-value-${code.id}`}>{code.code}</span>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <Badge variant="secondary" className="text-xs">{code.discount_percent}% off</Badge>
+                          {code.is_active ? (
+                            <Badge variant="outline" className="text-xs text-[hsl(var(--success))]">Active</Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-xs text-muted-foreground">Inactive</Badge>
+                          )}
+                          {code.current_uses !== undefined && (
+                            <span className="text-xs text-muted-foreground">{code.current_uses} uses</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(code.code); toast({ title: 'Copied!', description: 'Promo code copied to clipboard.' }) }} data-testid={`button-copy-code-${code.id}`}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        {code.is_active && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              if (renameCode === code.id) {
+                                setRenameCode(null)
+                                setRenameValue('')
+                                setRenameError('')
+                                setRenameSuggestions([])
+                              } else {
+                                setRenameCode(code.id)
+                                setRenameValue(code.code)
+                                setRenameError('')
+                                setRenameSuggestions([])
+                              }
+                            }}
+                            disabled={!canRename}
+                            title={canRename ? 'Rename your code' : `Rename available in ${cooldownDays} days`}
+                            data-testid={`button-rename-code-${code.id}`}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
+
+                    {!canRename && (
+                      <p className="text-[10px] text-muted-foreground mt-1 px-1">
+                        Rename available in {cooldownDays} day{cooldownDays !== 1 ? 's' : ''}. Cooldown prevents confusion with existing content that references your current code.
+                      </p>
+                    )}
+
+                    {renameCode === code.id && (
+                      <div className="mt-2 p-3 rounded-md border space-y-2" data-testid="form-rename-code">
+                        <Label className="text-xs font-medium">Rename Your Code</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            value={renameValue}
+                            onChange={e => { setRenameValue(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')); setRenameError(''); setRenameSuggestions([]) }}
+                            placeholder="YOURNEWCODE"
+                            maxLength={20}
+                            className="font-mono flex-1"
+                            data-testid="input-rename-code"
+                          />
+                          <Button size="sm" onClick={() => handleRenameCode(code.id)} disabled={renaming || !renameValue.trim() || renameValue === code.code} data-testid="button-confirm-rename">
+                            {renaming ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => { setRenameCode(null); setRenameValue(''); setRenameError(''); setRenameSuggestions([]) }} data-testid="button-cancel-rename">
+                            Cancel
+                          </Button>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">Uppercase letters and numbers only, 4-20 characters. You can rename once every 30 days.</p>
+
+                        {renameError && (
+                          <div className="p-2 rounded-md bg-destructive/10 text-xs text-destructive" data-testid="text-rename-error">
+                            {renameError}
+                          </div>
+                        )}
+
+                        {renameSuggestions.length > 0 && (
+                          <div className="space-y-1" data-testid="rename-suggestions">
+                            <Label className="text-xs text-muted-foreground">Try one of these instead:</Label>
+                            <div className="flex flex-wrap gap-1">
+                              {renameSuggestions.map(s => (
+                                <Button key={s} variant="outline" size="sm" className="h-7 text-xs font-mono" onClick={() => { setRenameValue(s); setRenameError(''); setRenameSuggestions([]) }} data-testid={`button-suggestion-${s}`}>
+                                  {s}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(code.code); toast({ title: 'Copied!', description: 'Promo code copied to clipboard.' }) }} data-testid={`button-copy-code-${code.id}`}>
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+                )
+              })}
+
+              <div className="p-3 rounded-md bg-muted/30 text-xs text-muted-foreground" data-testid="text-code-protip">
+                <strong>Pro tip:</strong> Say your code out loud. If it's easy to say on a podcast or livestream, your audience is more likely to remember it.
+              </div>
+
+              <div className="p-3 rounded-md bg-muted/30 text-xs text-muted-foreground" data-testid="text-code-performance">
+                Every use of your code earns you commission. Share it in your bio, your email signature, your content descriptions. Even if someone uses your code 5 years from now, you'll still earn credit under your active terms.
+              </div>
             </div>
           ) : (
             <div className="text-center py-4 space-y-3">

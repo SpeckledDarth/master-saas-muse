@@ -1,7 +1,7 @@
 # UX Overhaul Blueprint — PassivePost Admin Dashboard
 
 > **Created:** February 28, 2026
-> **Status:** Sprints 1–7B COMPLETE — Sprints 8A–9C NOT STARTED (restructured from 3 sprints to 7 sub-sprints)
+> **Status:** Sprints 1–9A COMPLETE — Sprints 9B–9C NOT STARTED (restructured from 3 sprints to 7 sub-sprints)
 > **Scope:** Fix all UI/UX inconsistencies, bugs, and implement all agreed Feature Requests from human QA testing of the Admin Dashboard (Sections 0.3–1.20e of Testing Plan)
 > **Estimated Sessions:** 15 sprints (one session each)
 
@@ -19,9 +19,9 @@
 | 6B | Remaining Page Conversions + Verification | COMPLETE | UX-04, UX-13, WC-04, WC-08 |
 | 7A | Confirm Dialogs + Small UX Fixes + EditableSettingsGroup Component | COMPLETE | UX-06 (remaining), UX-11, UX-14, FR-13 (component only) |
 | 7B | Affiliate Settings Edit-Protection + Best Practices Reset | COMPLETE | FR-05, FR-13 (affiliate settings) |
-| 8A | Contact Fields: Database + API + CRM UI | NOT STARTED | FR-01 |
-| 8B | Grandfathering Gaps | NOT STARTED | FR-06 (GAP-1–6) |
-| 9A | Discount Code Auto-Generation + Self-Branding | NOT STARTED | FR-07 |
+| 8A | Contact Fields: Database + API + CRM UI | COMPLETE | FR-01 |
+| 8B | Grandfathering Gaps | COMPLETE | FR-06 (GAP-1–6) |
+| 9A | Discount Code Auto-Generation + Self-Branding | COMPLETE | FR-07 |
 | 9B | Broadcast Summary Cards + File Upload | NOT STARTED | FR-02, FR-09 |
 | 9C | Settings Edit-Protection on Remaining Pages | NOT STARTED | FR-13 (remaining pages) |
 
