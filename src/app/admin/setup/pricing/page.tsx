@@ -87,8 +87,7 @@ export default function PricingPage() {
           <div className="flex items-center justify-between gap-2">
             <div>
               <h3
-                className="text-base font-semibold text-foreground flex items-center gap-2"
-                style={{ fontSize: 'var(--h3-size, 1.125rem)', fontWeight: 'var(--h3-weight, 600)' }}
+                className="flex items-center gap-2"
               >
                 Paid Pricing Plans <InfoTooltip text="Revenue-generating subscription tiers managed through Stripe. Changes in Stripe automatically sync to your pricing page." />
               </h3>

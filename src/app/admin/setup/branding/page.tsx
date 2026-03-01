@@ -2,7 +2,7 @@
 
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
 import { InfoTooltip } from '../components'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DSCard, DSCardContent, DSCardHeader } from '@/components/ui/ds-card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
@@ -23,17 +23,17 @@ export default function BrandingPage() {
 
   return (
     <div className="space-y-[var(--content-density-gap,1rem)]">
-      <Card className="bg-[hsl(var(--info)/0.1)] border-[hsl(var(--info)/0.3)]">
-        <CardHeader>
-          <CardTitle className="text-[hsl(var(--info))]">Branding & Hero Tips</CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-[hsl(var(--info))] space-y-2">
+      <DSCard className="bg-[hsl(var(--info)/0.1)] border-[hsl(var(--info)/0.3)]">
+        <DSCardHeader>
+          <h3 className="text-[hsl(var(--info))]">Branding & Hero Tips</h3>
+        </DSCardHeader>
+        <DSCardContent className="text-sm text-[hsl(var(--info))] space-y-2">
           <p><strong>Hero Styles:</strong> Choose from 5 styles - Full Width Background (default), Split Layout, Video Background, Pattern/Texture, or Floating Mockup.</p>
           <p><strong>Animated Words:</strong> Add 2+ comma-separated words (e.g., "fast, secure, reliable") to create a cycling animation after your app name. Click outside the field to save.</p>
           <p><strong>Video Hero:</strong> Paste a YouTube embed URL, Vimeo URL, or direct .mp4 link. The video replaces the static image and plays automatically (muted, looping).</p>
           <p><strong>Announcement Bar:</strong> Scroll down to enable a top banner for promotions, product launches, or important updates.</p>
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
 
       <EditableSettingsGroup
         title="Branding Identity & Hero"
@@ -484,8 +484,8 @@ export default function BrandingPage() {
         </div>
       </EditableSettingsGroup>
 
-      <Card>
-        <CardContent className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] py-4">
+      <DSCard>
+        <DSCardContent className="flex items-center justify-between gap-[var(--content-density-gap,1rem)]">
           <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
             <div className="p-2 rounded-[var(--card-radius,0.75rem)]" style={{ backgroundColor: settings.branding.primaryColor }}>
               <Paintbrush className="h-5 w-5 text-white" />
@@ -500,8 +500,8 @@ export default function BrandingPage() {
               Open Palette Builder
             </Button>
           </Link>
-        </CardContent>
-      </Card>
+        </DSCardContent>
+      </DSCard>
 
       <FontPicker
         headingFont={settings.branding.headingFont || 'system'}

@@ -38,6 +38,24 @@ This design system took days to build. Sessions that ignore it and hardcode valu
 | `border`, `border-2` on cards | `border-[length:var(--card-border-width)]` | `--card-border-width` |
 | `border-solid`, `border-dashed` | `border-[var(--card-border-style)]` | `--card-border-style` |
 
+### Primary & Accent 950 Scale (CORRECT — Do Not Remove)
+
+The project uses a full Tailwind 950 numeric color scale for `primary` and `accent`. These are defined in `tailwind.config.ts` and resolve to CSS variables (`--primary-50` through `--primary-950`, `--accent-50` through `--accent-950`) set in `globals.css`. The palette page regenerates these values when the admin changes the primary color.
+
+**These classes are palette-controlled and CORRECT:**
+- `text-primary-600`, `bg-primary-100`, `border-primary-400`, `text-primary-800`
+- `text-accent-500`, `bg-accent-100`, `border-accent-600`
+- Any `primary-{50-950}` or `accent-{50-950}` variant
+
+**Standard light/dark shade pattern:**
+```tsx
+text-primary-600 dark:text-primary-400
+bg-primary-100 dark:bg-primary-900
+border-primary-600 dark:border-primary-400
+```
+
+**Do NOT "fix" these** by replacing them with `text-primary` or `text-[hsl(var(--primary))]`. The 950 scale gives precise shade control that the base `text-primary` class cannot provide.
+
 ### Semantic Colors
 
 | Instead of... | Use... | CSS Variable |
@@ -49,7 +67,7 @@ This design system took days to build. Sessions that ignore it and hardcode valu
 | `text-gray-400`, `text-gray-500` | `text-muted-foreground` | `--muted-foreground` |
 
 **Allowed Tailwind color classes** (these ARE CSS variables, not hardcoded):
-`text-primary`, `text-destructive`, `text-muted-foreground`, `text-foreground`, `bg-card`, `bg-background`, `bg-muted`, `bg-primary`, `border-border`, `border-input`
+`text-primary`, `text-primary-{50-950}`, `text-accent-{50-950}`, `text-destructive`, `text-muted-foreground`, `text-foreground`, `bg-card`, `bg-background`, `bg-muted`, `bg-primary`, `bg-primary-{50-950}`, `bg-accent-{50-950}`, `border-border`, `border-input`, `border-primary-{50-950}`, `border-accent-{50-950}`
 
 ### Typography
 

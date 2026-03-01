@@ -18,6 +18,25 @@ This skill exists because previous sessions lost focus, touched off-limits files
 
 If the user asks you to do something unrelated to this sprint, do exactly what they ask — but do NOT expand the scope or touch anything else.
 
+## STACK FUNDAMENTALS (non-negotiable — applies to ALL work in ALL sessions)
+
+These are not per-sprint rules. They are permanent. Violating them costs the user days of rework.
+
+### 1. Stack Identity
+This is a **Vercel + Next.js + Supabase Postgres** project. It is NOT Replit + Vite. The user tests ONLY on the live Vercel deployment (triggered by git push to GitHub). Never suggest using the Replit preview panel. Never use Vite-specific patterns (e.g., `import.meta.env`). Reference: `docs/LESSONS_LEARNED.md`
+
+### 2. Color Model — Single Source of Truth
+The Color Palette page (`/admin/setup/palette`) controls ALL visual styling via CSS variables. This is the single source of truth for the entire site. Every component must consume palette-generated variables. Reference: `docs/DESIGN_SYSTEM_RULES.md`
+
+**The Tailwind 950 scale IS the design system:**
+- `primary-50` through `primary-950` and `accent-50` through `accent-950` are defined in `tailwind.config.ts` and resolve to CSS variables (`--primary-50`, `--primary-100`, etc.)
+- Classes like `text-primary-600 dark:text-primary-400`, `bg-primary-100`, `border-accent-500` are CORRECT — they are palette-controlled
+- Do NOT "fix" these by replacing them with `text-primary` or `text-[hsl(var(--primary))]`
+- Named Tailwind colors (`text-green-600`, `bg-red-500`, `text-blue-400`, `bg-amber-100`, etc.) are FORBIDDEN — they bypass the palette
+
+### 3. When In Doubt — ASK
+If you are confused about the stack, the color model, or any design system pattern — STOP and ask the user for clarification before writing code. Do not guess. Do not assume. Do not proceed with work you are unsure about. A 30-second question saves days of rework.
+
 ## DO NOT TOUCH
 
 These files and topics are OFF-LIMITS unless the user explicitly asks:
