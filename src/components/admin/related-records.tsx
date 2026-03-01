@@ -59,7 +59,7 @@ export function RelatedRecords({ entityType, entityId, userId }: RelatedRecordsP
 
   if (loading) {
     return (
-      <div className="rounded-lg border bg-card p-4" data-testid="related-records-loading">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="related-records-loading">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
           Loading related records...
@@ -74,7 +74,7 @@ export function RelatedRecords({ entityType, entityId, userId }: RelatedRecordsP
     <div className="space-y-4" data-testid="related-records">
       <h3 className="text-sm font-medium">Related Records</h3>
       {groups.map((group, gi) => (
-        <div key={gi} className="rounded-lg border bg-card overflow-hidden" data-testid={`related-group-${gi}`}>
+        <div key={gi} className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] overflow-hidden" data-testid={`related-group-${gi}`}>
           <div className="px-3 py-2 bg-muted/30 border-b">
             <p className="text-xs font-medium text-muted-foreground">{group.label}</p>
           </div>

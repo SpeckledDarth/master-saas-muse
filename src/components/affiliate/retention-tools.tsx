@@ -60,7 +60,7 @@ export function EarningsProjectionsPanel() {
   useEffect(() => { loadProjections(); }, []);
 
   if (loading) return (
-    <div data-testid="earnings-projections-loading" className="rounded-lg border bg-card p-6 text-center">
+    <div data-testid="earnings-projections-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
       <div className="animate-pulse space-y-3">
         <div className="h-4 bg-muted rounded w-1/3 mx-auto" />
         <div className="h-20 bg-muted rounded" />
@@ -69,7 +69,7 @@ export function EarningsProjectionsPanel() {
   );
 
   if (error) return (
-    <div data-testid="earnings-projections-error" className="rounded-lg border bg-card p-4 text-center">
+    <div data-testid="earnings-projections-error" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
       <p className="text-sm text-muted-foreground">{error}</p>
       <button onClick={loadProjections} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-projections">Retry</button>
     </div>
@@ -81,7 +81,7 @@ export function EarningsProjectionsPanel() {
 
   return (
     <div data-testid="earnings-projections" className="space-y-4">
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">This Month's Pace</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div className="text-center p-2 bg-muted/30 rounded">
@@ -104,7 +104,7 @@ export function EarningsProjectionsPanel() {
       </div>
 
       {data.monthlyProjections && data.monthlyProjections.length > 0 && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-3">Forward Projections</h3>
           <div className="space-y-2">
             {data.monthlyProjections.map(m => (
@@ -125,7 +125,7 @@ export function EarningsProjectionsPanel() {
         </div>
       )}
 
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-2">Annual Projection</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div className="text-center p-2 bg-muted/30 rounded">
@@ -144,7 +144,7 @@ export function EarningsProjectionsPanel() {
       </div>
 
       {data.tierProjection && data.tierProjection.nextTier && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-2">Tier Trajectory</h3>
           <p className="text-xs text-muted-foreground">
             Currently <strong>{data.tierProjection.currentTier}</strong> — need {data.tierProjection.referralsNeeded} more referrals to reach <strong>{data.tierProjection.nextTier}</strong>
@@ -157,7 +157,7 @@ export function EarningsProjectionsPanel() {
       )}
 
       {data.milestoneProjections && data.milestoneProjections.length > 0 && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-2">Upcoming Milestone Bonuses</h3>
           <div className="space-y-2">
             {data.milestoneProjections.slice(0, 3).map(m => (
@@ -177,7 +177,7 @@ export function EarningsProjectionsPanel() {
       )}
 
       {data.goalProjections && data.goalProjections.length > 0 && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-2">Goal Progress</h3>
           <div className="space-y-3">
             {data.goalProjections.map(g => {
@@ -207,7 +207,7 @@ export function EarningsProjectionsPanel() {
       )}
 
       {data.historicalMonthly && data.historicalMonthly.length > 0 && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-sm">Historical Trend</h3>
             <ExportButton data={data.historicalMonthly.map(h => ({ Month: h.month, Earnings: (h.earnings / 100).toFixed(2) }))} filename="earnings-history" />
@@ -255,14 +255,14 @@ export function PayoutHistoryPanel() {
   useEffect(() => { loadPayouts(); }, []);
 
   if (error && !data) return (
-    <div data-testid="payout-history-error" className="rounded-lg border bg-card p-4 text-center">
+    <div data-testid="payout-history-error" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
       <p className="text-sm text-muted-foreground">{error}</p>
       <button onClick={() => loadPayouts(1)} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-payouts">Retry</button>
     </div>
   );
 
   if (loading && !data) return (
-    <div data-testid="payout-history-loading" className="rounded-lg border bg-card p-4">
+    <div data-testid="payout-history-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <div className="animate-pulse space-y-3">
         <div className="h-4 bg-muted rounded w-1/3" />
         <div className="h-16 bg-muted rounded" />
@@ -273,7 +273,7 @@ export function PayoutHistoryPanel() {
 
   return (
     <div data-testid="payout-history-panel" className="space-y-4">
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="font-semibold text-sm">Payout History</h3>
           <div className="flex items-center gap-2 flex-wrap">
@@ -401,7 +401,7 @@ export function TaxCenterPanel() {
 
   return (
     <div data-testid="tax-center-panel" className="space-y-4">
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-sm">Tax Summary</h3>
           <div className="flex items-center gap-2">
@@ -498,7 +498,7 @@ export function CommissionRenewalStatsPanel({ stats }: { stats: RenewalStats | n
   if (!stats || stats.totalRequests === 0) return null;
 
   return (
-    <div data-testid="renewal-stats-panel" className="rounded-lg border bg-card p-4">
+    <div data-testid="renewal-stats-panel" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">Renewal Performance</h3>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <div className="text-center p-2 bg-muted/30 rounded">

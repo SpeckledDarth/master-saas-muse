@@ -120,7 +120,7 @@ export default function PartnersPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label="Partner directory">
             {affiliates.map(aff => (
-              <div key={aff.id} role="listitem" className="rounded-lg border bg-card p-5 hover:shadow-md transition-shadow" data-testid={`partner-card-${aff.id}`}>
+              <div key={aff.id} role="listitem" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] hover:shadow-[var(--card-shadow)] transition-shadow" data-testid={`partner-card-${aff.id}`}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">

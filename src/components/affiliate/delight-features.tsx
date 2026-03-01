@@ -86,7 +86,7 @@ export function WeeklyChallengesPanel() {
   };
 
   if (loading) return (
-    <div data-testid="challenges-loading" className="rounded-lg border bg-card p-4">
+    <div data-testid="challenges-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <div className="animate-pulse space-y-2">
         <div className="h-4 bg-muted rounded w-1/3" />
         <div className="h-16 bg-muted rounded" />
@@ -95,21 +95,21 @@ export function WeeklyChallengesPanel() {
   );
 
   if (error) return (
-    <div data-testid="challenges-error" className="rounded-lg border bg-card p-4 text-center">
+    <div data-testid="challenges-error" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
       <p className="text-sm text-muted-foreground">{error}</p>
       <button onClick={loadChallenges} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-challenges">Retry</button>
     </div>
   );
 
   if (challenges.length === 0) return (
-    <div data-testid="challenges-empty" className="rounded-lg border bg-card p-4 text-center">
+    <div data-testid="challenges-empty" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
       <p className="text-sm text-muted-foreground py-4">No active challenges right now. Check back soon!</p>
     </div>
   );
 
   return (
     <div data-testid="weekly-challenges-panel" className="space-y-3">
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-sm">Active Challenges</h3>
           <span className="text-[10px] text-muted-foreground">{challenges.length} active</span>
@@ -192,7 +192,7 @@ export function CaseStudyLibrary() {
   };
 
   if (loading) return (
-    <div data-testid="case-studies-loading" className="rounded-lg border bg-card p-4">
+    <div data-testid="case-studies-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <div className="animate-pulse space-y-2">
         <div className="h-4 bg-muted rounded w-1/3" />
         <div className="h-20 bg-muted rounded" />
@@ -201,21 +201,21 @@ export function CaseStudyLibrary() {
   );
 
   if (error) return (
-    <div data-testid="case-studies-error" className="rounded-lg border bg-card p-4 text-center">
+    <div data-testid="case-studies-error" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
       <p className="text-sm text-muted-foreground">{error}</p>
       <button onClick={loadStudies} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-case-studies">Retry</button>
     </div>
   );
 
   if (studies.length === 0) return (
-    <div data-testid="case-studies-empty" className="rounded-lg border bg-card p-4 text-center">
+    <div data-testid="case-studies-empty" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
       <p className="text-sm text-muted-foreground py-4">No success stories available yet.</p>
     </div>
   );
 
   return (
     <div data-testid="case-study-library" className="space-y-3">
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">Success Stories</h3>
         <div className="space-y-3">
           {studies.map(study => (
@@ -330,7 +330,7 @@ export function PromotionQuizPanel() {
   };
 
   if (step === 'intro') return (
-    <div data-testid="promotion-quiz-panel" className="rounded-lg border bg-card p-4">
+    <div data-testid="promotion-quiz-panel" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">Your Promotion Strategy</h3>
       <p className="text-xs text-muted-foreground mb-3">
         Take a short quiz about your content style and audience. Our AI will generate a personalized 30-day promotion playbook just for you.
@@ -350,7 +350,7 @@ export function PromotionQuizPanel() {
   );
 
   if (step === 'loading') return (
-    <div data-testid="quiz-loading" className="rounded-lg border bg-card p-4 text-center py-8">
+    <div data-testid="quiz-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center py-8">
       <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-3" role="status" aria-label="Generating playbook" />
       <p className="text-sm font-medium">Generating your playbook...</p>
       <p className="text-xs text-muted-foreground mt-1">Our AI is analyzing your profile and building a custom plan.</p>
@@ -358,7 +358,7 @@ export function PromotionQuizPanel() {
   );
 
   if (step === 'result' && playbook) return (
-    <div data-testid="quiz-result" className="rounded-lg border bg-card p-4">
+    <div data-testid="quiz-result" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">Your 30-Day Promotion Playbook</h3>
         <button
@@ -396,7 +396,7 @@ export function PromotionQuizPanel() {
   if (!q) return null;
 
   return (
-    <div data-testid="quiz-questions" className="rounded-lg border bg-card p-4">
+    <div data-testid="quiz-questions" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">Promotion Strategy Quiz</h3>
         <span className="text-[10px] text-muted-foreground">{currentQ + 1}/{questions.length}</span>
@@ -462,14 +462,14 @@ export function AudienceAnalyzerPanel() {
   };
 
   if (error && !loading) return (
-    <div data-testid="audience-error" className="rounded-lg border bg-card p-4 text-center">
+    <div data-testid="audience-error" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
       <p className="text-sm text-muted-foreground">{error}</p>
       <button onClick={analyze} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-audience">Retry</button>
     </div>
   );
 
   if (!insights && !loading) return (
-    <div data-testid="audience-analyzer-panel" className="rounded-lg border bg-card p-4">
+    <div data-testid="audience-analyzer-panel" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">Audience Analyzer</h3>
       <p className="text-xs text-muted-foreground mb-3">
         Discover who your audience is, where they come from, and what converts best. AI-powered insights included.
@@ -484,7 +484,7 @@ export function AudienceAnalyzerPanel() {
   );
 
   if (loading) return (
-    <div data-testid="audience-loading" className="rounded-lg border bg-card p-4 text-center py-8">
+    <div data-testid="audience-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center py-8">
       <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-3" role="status" aria-label="Analyzing audience" />
       <p className="text-sm font-medium">Analyzing your audience...</p>
       <p className="text-xs text-muted-foreground mt-1">Crunching click data, conversions, and platform metrics.</p>
@@ -495,7 +495,7 @@ export function AudienceAnalyzerPanel() {
 
   return (
     <div data-testid="audience-insights" className="space-y-3">
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-sm">Audience Insights</h3>
           <button
@@ -615,7 +615,7 @@ export function AffiliateDirectoryPreview() {
   };
 
   if (!loaded) return (
-    <div data-testid="directory-loading" className="rounded-lg border bg-card p-4">
+    <div data-testid="directory-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <div className="animate-pulse space-y-2">
         <div className="h-4 bg-muted rounded w-1/3" />
         <div className="h-10 bg-muted rounded" />
@@ -624,7 +624,7 @@ export function AffiliateDirectoryPreview() {
   );
 
   return (
-    <div data-testid="directory-preview" className="rounded-lg border bg-card p-4">
+    <div data-testid="directory-preview" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">Partner Directory</h3>
       <p className="text-xs text-muted-foreground mb-3">
         Opt in to appear on our public partner directory. Showcase your profile, tier badge, and social links to potential collaborators.

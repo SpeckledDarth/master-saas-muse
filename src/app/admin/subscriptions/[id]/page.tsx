@@ -93,7 +93,7 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
-        <Link href={`/admin/crm/${user.id}`} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] hover:bg-muted/30 transition-colors block" data-testid="card-customer">
+        <Link href={`/admin/crm/${user.id}`} className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] hover:bg-muted/30 transition-colors block" data-testid="card-customer">
           <p className="text-xs text-muted-foreground mb-2">Customer</p>
           <div className="flex items-center gap-2">
             {user.avatar_url ? (
@@ -110,7 +110,7 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
           </div>
         </Link>
 
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-sub-details">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-sub-details">
           <p className="text-xs text-muted-foreground mb-2">Subscription Details</p>
           <div className="space-y-1 text-sm">
             {sub.stripe_subscription_id && (
@@ -125,7 +125,7 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
           </div>
         </div>
 
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-amount">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-amount">
           <p className="text-xs text-muted-foreground mb-2">Amount</p>
           <p className="text-2xl font-bold">{formatCurrency(sub.price_amount || 0)}</p>
           <p className="text-xs text-muted-foreground">per month</p>
@@ -152,7 +152,7 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
       {invoices && invoices.length > 0 && (
         <div className="mb-[var(--content-density-gap,1rem)]" data-testid="section-invoice-history">
           <h3 className="text-sm font-medium mb-3">Invoice History</h3>
-          <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
+          <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/30">

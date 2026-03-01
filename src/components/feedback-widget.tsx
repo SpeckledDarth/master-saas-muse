@@ -105,7 +105,7 @@ export function FeedbackWidget() {
       </Button>
 
       {open && (
-        <div ref={panelRef} className="fixed bottom-20 right-4 w-80 bg-card border rounded-lg shadow-xl z-50 p-4">
+        <div ref={panelRef} className="fixed bottom-20 right-4 w-80 bg-[var(--card-bg)] border rounded-[var(--card-radius,0.75rem)] shadow-xl z-50 p-[var(--card-padding,1.25rem)]">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">Send Feedback</h3>
             <Button

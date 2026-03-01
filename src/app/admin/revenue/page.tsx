@@ -152,7 +152,7 @@ export default function RevenuePage() {
       </div>
 
       <div className="grid grid-cols-3 gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-total-revenue">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-total-revenue">
           <p className="text-xs text-muted-foreground mb-1">Total Revenue</p>
           <div className="flex items-center justify-between gap-2">
             <p className="text-lg font-bold text-[hsl(var(--success))]">{formatCurrency(summary.totalRevenue)}</p>
@@ -162,11 +162,11 @@ export default function RevenuePage() {
           </div>
           <p className="text-[10px] text-muted-foreground mt-1">30-day trend</p>
         </div>
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-pending-commissions">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-pending-commissions">
           <p className="text-xs text-muted-foreground mb-1">Pending Commissions</p>
           <p className="text-lg font-bold text-[hsl(var(--warning))]">{formatCurrency(summary.pendingCommissions)}</p>
         </div>
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-outstanding-payouts">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-outstanding-payouts">
           <p className="text-xs text-muted-foreground mb-1">Outstanding Payouts</p>
           <p className="text-lg font-bold text-primary">{formatCurrency(summary.outstandingPayouts)}</p>
         </div>
@@ -250,7 +250,7 @@ export default function RevenuePage() {
         {total > 0 ? `Showing ${startIdx}-${endIdx} of ${total} transactions` : 'No transactions found'}
       </div>
 
-      <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm" data-testid="table-revenue">
             <thead>

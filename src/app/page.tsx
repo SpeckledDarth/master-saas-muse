@@ -583,7 +583,7 @@ function FeatureCard({ icon, title, description, index = 0 }: { icon: string; ti
   const darkBgs = ['dark:bg-primary-700', 'dark:bg-primary-800', 'dark:bg-primary-900']
   const bgIdx = index % 3
   return (
-    <div className="p-6 rounded-lg border bg-card text-card-foreground" data-testid={`card-feature-${title.toLowerCase().replace(/\s+/g, '-')}`}>
+    <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] text-card-foreground" data-testid={`card-feature-${title.toLowerCase().replace(/\s+/g, '-')}`}>
       <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-4 ${lightBgs[bgIdx]} ${darkBgs[bgIdx]}`}>
         {iconMap[icon] || <Zap className="h-5 w-5 text-primary-800 dark:text-primary-200" />}
       </div>
@@ -597,7 +597,7 @@ function TestimonialCard({ name, role, company, quote, avatarUrl, companyLogoUrl
   const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
   
   return (
-    <div className="p-6 rounded-lg border bg-card text-card-foreground relative" data-testid={`card-testimonial-${name.toLowerCase().replace(/\s+/g, '-')}`}>
+    <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] text-card-foreground relative" data-testid={`card-testimonial-${name.toLowerCase().replace(/\s+/g, '-')}`}>
       <Quote className="absolute top-4 right-4 h-8 w-8 text-primary-200 dark:text-primary-800" />
       <p className="text-black/70 dark:text-white/70 mb-6 italic leading-relaxed">&quot;{quote}&quot;</p>
       <div className="flex items-center gap-4">
@@ -622,7 +622,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   
   return (
     <div 
-      className="border rounded-lg bg-card overflow-hidden"
+      className="border rounded-[var(--card-radius,0.75rem)] bg-[var(--card-bg)] overflow-hidden"
       data-testid={`faq-item-${question.toLowerCase().replace(/\s+/g, '-').substring(0, 20)}`}
     >
       <Button

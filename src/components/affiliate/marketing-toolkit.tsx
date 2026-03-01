@@ -65,7 +65,7 @@ export function LinkShortener() {
   };
 
   return (
-    <div data-testid="link-shortener-card" className="rounded-lg border bg-card p-4">
+    <div data-testid="link-shortener-card" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">🔗 Link Shortener</h3>
         <button data-testid="btn-create-short-link" onClick={() => setShowForm(!showForm)} className="text-xs text-primary hover:underline">
@@ -113,7 +113,7 @@ export function QRCodeGenerator({ referralUrl }: { referralUrl: string }) {
   }, [referralUrl]);
 
   return (
-    <div data-testid="qr-code-card" className="rounded-lg border bg-card p-4">
+    <div data-testid="qr-code-card" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📱 QR Code</h3>
       <div className="flex flex-col items-center gap-3">
         {qrSvg ? (
@@ -191,7 +191,7 @@ export function MediaKitPage() {
   if (!kit) return null;
 
   return (
-    <div data-testid="media-kit-card" className="rounded-lg border bg-card p-4">
+    <div data-testid="media-kit-card" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📋 Your Media Kit</h3>
       <div className="space-y-3">
         <div className="p-3 bg-muted/30 rounded">
@@ -290,7 +290,7 @@ export function CopyPasteCaptions({ referralCode, referralUrl }: { referralCode:
   };
 
   return (
-    <div data-testid="copy-paste-captions" className="rounded-lg border bg-card p-4">
+    <div data-testid="copy-paste-captions" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📝 Ready-to-Post Captions</h3>
       <p className="text-xs text-muted-foreground mb-3">Your referral code ({referralCode}) is auto-inserted. Just copy and post!</p>
       <div className="space-y-2 max-h-64 overflow-y-auto">

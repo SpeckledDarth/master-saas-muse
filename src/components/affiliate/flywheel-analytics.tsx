@@ -58,7 +58,7 @@ const CHART_COLORS = [
 export function ChurnRateCard({ data }: { data: ChurnData['churnRate'] }) {
   const color = data.rate < 5 ? 'text-[hsl(var(--success))]' : data.rate < 10 ? 'text-[hsl(var(--warning))]' : 'text-[hsl(var(--danger))]';
   return (
-    <div data-testid="churn-rate-card" className="rounded-lg border bg-card p-4">
+    <div data-testid="churn-rate-card" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">📉 Churn Rate</h3>
       <p className={`text-3xl font-bold ${color}`}>{data.rate}%</p>
       <p className="text-xs text-muted-foreground mt-1">
@@ -73,7 +73,7 @@ export function ChurnReasonsChart({ reasons }: { reasons: ChurnData['churnReason
   const colors = ['bg-[hsl(var(--chart-4))]', 'bg-[hsl(var(--chart-3))]', 'bg-[hsl(var(--warning))]', 'bg-[hsl(var(--chart-1))]', 'bg-[hsl(var(--chart-5))]', 'bg-muted-foreground/60'];
 
   return (
-    <div data-testid="churn-reasons" className="rounded-lg border bg-card p-4">
+    <div data-testid="churn-reasons" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">❓ Why They Left</h3>
       <div className="space-y-2">
         {reasons.map((r, i) => (
@@ -97,7 +97,7 @@ export function ChurnTimingChart({ timing }: { timing: ChurnData['churnTiming'] 
   const maxCount = Math.max(...timing.map(t => t.count), 1);
 
   return (
-    <div data-testid="churn-timing" className="rounded-lg border bg-card p-4">
+    <div data-testid="churn-timing" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">⏱️ When They Churn</h3>
       <div className="flex items-end gap-1 h-24">
         {timing.map(t => (
@@ -116,14 +116,14 @@ export function ChurnTimingChart({ timing }: { timing: ChurnData['churnTiming'] 
 
 export function AtRiskAlerts({ alerts }: { alerts: ChurnData['atRisk'] }) {
   if (alerts.length === 0) return (
-    <div data-testid="at-risk-empty" className="rounded-lg border bg-card p-4">
+    <div data-testid="at-risk-empty" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm">✅ No At-Risk Referrals</h3>
       <p className="text-xs text-muted-foreground mt-1">All your active referrals are engaged!</p>
     </div>
   );
 
   return (
-    <div data-testid="at-risk-alerts" className="rounded-lg border bg-card p-4">
+    <div data-testid="at-risk-alerts" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">⚠️ At-Risk Referrals</h3>
       <div className="space-y-2">
         {alerts.slice(0, 5).map(a => (
@@ -144,7 +144,7 @@ export function NetGrowthCard({ data }: { data: ChurnData['netGrowth'] }) {
   const trendIcon = data.trend === 'up' ? '↑' : data.trend === 'down' ? '↓' : '→';
 
   return (
-    <div data-testid="net-growth" className="rounded-lg border bg-card p-4">
+    <div data-testid="net-growth" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">📊 Net Referral Growth</h3>
       <p className={`text-3xl font-bold ${color}`}>{isPositive ? '+' : ''}{data.net}</p>
       <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
@@ -171,7 +171,7 @@ export function RetentionCurve({ data }: { data: CohortData['retentionCurve'] })
   const areaPoints = `${padding},${height - padding} ${points} ${padding + ((data.length - 1) / (data.length - 1 || 1)) * (width - 2 * padding)},${height - padding}`;
 
   return (
-    <div data-testid="retention-curve" className="rounded-lg border bg-card p-4">
+    <div data-testid="retention-curve" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📈 Referral Retention Curve</h3>
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
         <polygon points={areaPoints} fill="url(#retentionGrad)" />
@@ -217,7 +217,7 @@ export function ConversionTrendLine({ data }: { data: CohortData['conversionTren
   }).join(' ');
 
   return (
-    <div data-testid="conversion-trend" className="rounded-lg border bg-card p-4">
+    <div data-testid="conversion-trend" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📉 Conversion Rate Over Time</h3>
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
         <polyline points={points} fill="none" stroke="hsl(var(--chart-2))" strokeWidth="2" />
@@ -245,7 +245,7 @@ export function TrialBenchmarks({ data }: { data: CohortData['benchmark'] }) {
   const isAbove = data.yourRate >= data.averageRate;
 
   return (
-    <div data-testid="trial-benchmarks" className="rounded-lg border bg-card p-4">
+    <div data-testid="trial-benchmarks" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">🎯 Trial-to-Paid Benchmark</h3>
       <div className="grid grid-cols-2 gap-3">
         <div className="text-center p-3 bg-muted/30 rounded">
@@ -282,7 +282,7 @@ export function RevenuePieChart({ data }: { data: SourcesData['revenueBySource']
   });
 
   return (
-    <div data-testid="revenue-pie" className="rounded-lg border bg-card p-4">
+    <div data-testid="revenue-pie" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">🥧 Revenue by Source</h3>
       <div className="flex items-start gap-4">
         <svg viewBox="0 0 200 200" className="w-32 h-32 flex-shrink-0">
@@ -318,7 +318,7 @@ export function CumulativeEarningsChart({ data }: { data: SourcesData['cumulativ
   const areaPoints = `${padding},${height - padding} ${points} ${padding + ((data.length - 1) / (data.length - 1 || 1)) * (width - 2 * padding)},${height - padding}`;
 
   return (
-    <div data-testid="cumulative-earnings" className="rounded-lg border bg-card p-4">
+    <div data-testid="cumulative-earnings" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">💰 Cumulative Lifetime Earnings</h3>
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
         <polygon points={areaPoints} fill="url(#earningsGrad)" />
@@ -356,7 +356,7 @@ export function DropoffAnalysis({ data }: { data: SourcesData['dropoff'] }) {
   const maxVal = Math.max(...stages.map(s => s.value), 1);
 
   return (
-    <div data-testid="dropoff-analysis" className="rounded-lg border bg-card p-4">
+    <div data-testid="dropoff-analysis" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">🔻 Conversion Funnel (Latest Period)</h3>
       <div className="space-y-2">
         {stages.map((stage, i) => {
@@ -395,7 +395,7 @@ export function GeoBreakdown({ data }: { data: SourcesData['geo'] }) {
   if (data.length === 0) return null;
 
   return (
-    <div data-testid="geo-breakdown" className="rounded-lg border bg-card p-4">
+    <div data-testid="geo-breakdown" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">🌍 Geographic Breakdown</h3>
       <div className="space-y-1.5">
         {data.slice(0, 10).map(g => (
@@ -419,7 +419,7 @@ export function DeviceBreakdown({ data }: { data: SourcesData['devices'] }) {
   const colors: Record<string, string> = { mobile: 'bg-[hsl(var(--chart-1))]', desktop: 'bg-[hsl(var(--chart-2))]', tablet: 'bg-[hsl(var(--chart-5))]', unknown: 'bg-muted-foreground/60' };
 
   return (
-    <div data-testid="device-breakdown" className="rounded-lg border bg-card p-4">
+    <div data-testid="device-breakdown" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📱 Device Breakdown</h3>
       <div className="flex items-center gap-2 mb-3">
         {data.map(d => (
@@ -441,7 +441,7 @@ export function DeviceBreakdown({ data }: { data: SourcesData['devices'] }) {
 
 export function RepeatVisitors({ data }: { data: SourcesData['repeatVisitors'] }) {
   return (
-    <div data-testid="repeat-visitors" className="rounded-lg border bg-card p-4">
+    <div data-testid="repeat-visitors" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">🔄 Repeat Visitors</h3>
       <p className="text-2xl font-bold">{data.total}</p>
       <p className="text-xs text-muted-foreground">
@@ -465,7 +465,7 @@ export function AIInsightsPanel({ data }: { data: AIAnalyticsData }) {
   };
 
   return (
-    <div data-testid="ai-insights" className="rounded-lg border bg-card p-4">
+    <div data-testid="ai-insights" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">🤖 AI Analytics Intelligence</h3>
       <p className="text-[10px] text-muted-foreground mb-3">Powered by your real performance data · Generated {new Date(data.generatedAt).toLocaleDateString()}</p>
       <div className="space-y-2">

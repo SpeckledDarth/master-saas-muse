@@ -63,7 +63,7 @@ export function EarningsGoalSetter() {
   if (loading) return <div data-testid="goal-loading" className="animate-pulse h-32 bg-muted rounded-lg" />;
 
   return (
-    <div data-testid="earnings-goal-card" className="rounded-lg border bg-card p-4">
+    <div data-testid="earnings-goal-card" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">🎯 Earnings Goal</h3>
         <button data-testid="btn-set-goal" onClick={() => setShowForm(!showForm)} className="text-xs text-primary hover:underline">
@@ -143,7 +143,7 @@ export function CommissionDisputes() {
   };
 
   return (
-    <div data-testid="commission-disputes-card" className="rounded-lg border bg-card p-4">
+    <div data-testid="commission-disputes-card" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">⚖️ Commission Disputes</h3>
         <button data-testid="btn-new-dispute" onClick={() => setShowForm(!showForm)} className="text-xs text-primary hover:underline">
@@ -216,7 +216,7 @@ export function ReferralOfMonth() {
 
 export function GracePeriodNotice() {
   return (
-    <div data-testid="grace-period-notice" className="rounded-lg border bg-card p-4">
+    <div data-testid="grace-period-notice" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-1">🛡️ Churn Grace Period</h3>
       <p className="text-sm text-muted-foreground">
         If a referral cancels, they have 30 days to resubscribe. If they come back, your commission continues uninterrupted.
@@ -227,7 +227,7 @@ export function GracePeriodNotice() {
 
 export function AffiliateManagerCard() {
   return (
-    <div data-testid="affiliate-manager-card" className="rounded-lg border bg-card p-4">
+    <div data-testid="affiliate-manager-card" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">👤 Your Affiliate Manager</h3>
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">

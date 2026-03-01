@@ -217,7 +217,7 @@ export default function CRMPage() {
         {total > 0 ? `Showing ${startIdx}-${endIdx} of ${total} contacts` : 'No contacts found'}
       </div>
 
-      <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm" data-testid="table-crm">
             <thead>

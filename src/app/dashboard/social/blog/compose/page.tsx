@@ -30,7 +30,7 @@ function SeoPreview({ title, description, slug }: { title: string; description: 
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="rounded-lg border p-4 bg-card space-y-1">
+        <div className="rounded-[var(--card-radius,0.75rem)] border p-[var(--card-padding,1.25rem)] bg-[var(--card-bg)] space-y-1">
           <p className="text-xs text-[hsl(var(--success))] truncate" data-testid="text-seo-url">{displayUrl}</p>
           <p className="text-lg text-[hsl(var(--info))] font-medium leading-tight line-clamp-1 hover:underline cursor-pointer" data-testid="text-seo-title">
             {displayTitle.length > 60 ? displayTitle.slice(0, 60) + '...' : displayTitle}

@@ -18,7 +18,7 @@ const HOURS = Array.from({ length: 24 }, (_, i) => i);
 export function ClickHeatmap({ data }: { data: Record<string, number> }) {
   if (!data || Object.keys(data).length === 0) {
     return (
-      <div data-testid="click-heatmap-empty" className="rounded-lg border bg-card p-4">
+      <div data-testid="click-heatmap-empty" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-2">🗓️ Click Heatmap</h3>
         <p className="text-sm text-muted-foreground">Not enough click data yet. Keep promoting!</p>
       </div>
@@ -28,7 +28,7 @@ export function ClickHeatmap({ data }: { data: Record<string, number> }) {
   const maxVal = Math.max(...Object.values(data), 1);
 
   return (
-    <div data-testid="click-heatmap" className="rounded-lg border bg-card p-4">
+    <div data-testid="click-heatmap" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">🗓️ Click Heatmap (Day × Hour)</h3>
       <div className="overflow-x-auto">
         <div className="min-w-[600px]">
@@ -81,7 +81,7 @@ export function ConversionByChannel({ data }: { data: Record<string, { clicks: n
   const maxClicks = Math.max(...channels.map(([, v]) => v.clicks), 1);
 
   return (
-    <div data-testid="conversion-by-channel" className="rounded-lg border bg-card p-4">
+    <div data-testid="conversion-by-channel" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📊 Conversion Rate by Channel</h3>
       <div className="space-y-2">
         {channels.map(([channel, stats]) => {
@@ -114,7 +114,7 @@ export function MoMScorecard({ data }: { data: Record<string, { current: number;
   ];
 
   return (
-    <div data-testid="mom-scorecard" className="rounded-lg border bg-card p-4">
+    <div data-testid="mom-scorecard" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📈 Period Scorecard</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {metrics.map(m => {
@@ -151,7 +151,7 @@ export function PersonalBestCard({ data }: { data: { month: string; amount_cents
 
 export function EfficiencyMetrics({ data }: { data: { earningsPerClick: number; earningsPerSignup: number; conversionRate: number } }) {
   return (
-    <div data-testid="efficiency-metrics" className="rounded-lg border bg-card p-4">
+    <div data-testid="efficiency-metrics" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">⚡ Efficiency Metrics</h3>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
         <div className="p-2 bg-muted/30 rounded">
@@ -194,7 +194,7 @@ export function DualAxisChart({ data }: { data: { dailyClicks: Record<string, nu
   }).join(' ');
 
   return (
-    <div data-testid="dual-axis-chart" className="rounded-lg border bg-card p-4">
+    <div data-testid="dual-axis-chart" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📉 Clicks vs Conversions</h3>
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
         <polyline points={clickPoints} fill="none" stroke="hsl(var(--chart-1))" strokeWidth="2" />
@@ -213,7 +213,7 @@ export function CampaignComparison({ campaigns }: { campaigns: any[] }) {
   if (!campaigns || campaigns.length === 0) return null;
 
   return (
-    <div data-testid="campaign-comparison" className="rounded-lg border bg-card p-4">
+    <div data-testid="campaign-comparison" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📋 Campaign Comparison</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">

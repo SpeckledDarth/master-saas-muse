@@ -71,7 +71,7 @@ export function KnowledgeBasePanel() {
 
   return (
     <div data-testid="knowledge-base-panel" className="space-y-4">
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">Help Center</h3>
 
         <div className="flex flex-wrap gap-2 mb-3">
@@ -190,7 +190,7 @@ export function SwipeFileLibrary() {
 
   return (
     <div data-testid="swipe-file-library" className="space-y-4">
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-sm">Email Swipe Files</h3>
           <p className="text-[10px] text-muted-foreground">Pre-written emails with your code & link</p>
@@ -314,7 +314,7 @@ export function PromotionalCalendarPanel() {
   };
 
   if (loading) return (
-    <div data-testid="promo-calendar-loading" className="rounded-lg border bg-card p-4">
+    <div data-testid="promo-calendar-loading" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <div className="animate-pulse space-y-2">
         <div className="h-4 bg-muted rounded w-1/3" />
         <div className="h-16 bg-muted rounded" />
@@ -323,14 +323,14 @@ export function PromotionalCalendarPanel() {
   );
 
   if (error) return (
-    <div data-testid="promo-calendar-error" className="rounded-lg border bg-card p-4 text-center">
+    <div data-testid="promo-calendar-error" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
       <p className="text-sm text-muted-foreground">{error}</p>
       <button onClick={loadEvents} className="text-xs text-primary mt-2 hover:underline" data-testid="button-retry-promo-calendar">Retry</button>
     </div>
   );
 
   if (events.length === 0) return (
-    <div data-testid="promo-calendar-empty" className="rounded-lg border bg-card p-4 text-center">
+    <div data-testid="promo-calendar-empty" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
       <p className="text-sm text-muted-foreground py-4">No upcoming promotions scheduled.</p>
     </div>
   );
@@ -341,7 +341,7 @@ export function PromotionalCalendarPanel() {
   return (
     <div data-testid="promotional-calendar-panel" className="space-y-4">
       {activeEvents.length > 0 && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-3">Active Promotions</h3>
           <div className="space-y-3">
             {activeEvents.map(event => (
@@ -379,7 +379,7 @@ export function PromotionalCalendarPanel() {
       )}
 
       {upcomingEvents.length > 0 && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-3">Upcoming Promotions</h3>
           <div className="space-y-2">
             {upcomingEvents.map(event => (

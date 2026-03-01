@@ -131,7 +131,7 @@ export function AdminDataTable<T>({
         className={cn(
           'rounded-[var(--card-radius,0.75rem)]',
           'border-[length:var(--card-border-width,1px)] border-[var(--card-border-style,solid)] border-border',
-          'bg-card'
+          'bg-[var(--card-bg)]'
         )}
         data-testid={`${testId}-loading`}
       >
@@ -154,7 +154,7 @@ export function AdminDataTable<T>({
         className={cn(
           'rounded-[var(--card-radius,0.75rem)]',
           'border-[length:var(--card-border-width,1px)] border-[var(--card-border-style,solid)] border-border',
-          'bg-card',
+          'bg-[var(--card-bg)]',
           'p-[var(--card-padding,1.25rem)]',
           'flex flex-col items-center justify-center py-16 text-center'
         )}
@@ -178,7 +178,7 @@ export function AdminDataTable<T>({
         className={cn(
           'rounded-[var(--card-radius,0.75rem)]',
           'border-[length:var(--card-border-width,1px)] border-[var(--card-border-style,solid)] border-border',
-          'bg-card overflow-hidden'
+          'bg-[var(--card-bg)] overflow-hidden'
         )}
       >
         <Table>

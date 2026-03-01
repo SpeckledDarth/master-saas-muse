@@ -75,7 +75,7 @@ export function SocialProofPopup({
       }`}
       data-testid="social-proof-popup"
     >
-      <div className="bg-card rounded-lg shadow-lg border p-4 flex items-start gap-3">
+      <div className="bg-[var(--card-bg)] rounded-[var(--card-radius,0.75rem)] shadow-[var(--card-shadow)] border p-[var(--card-padding,1.25rem)] flex items-start gap-3">
         <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center flex-shrink-0">
           <span className="text-sm font-bold text-primary-700 dark:text-primary-300">
             {current.name[0]}

@@ -120,7 +120,7 @@ export function EntityNotes({ entityType, entityId }: EntityNotesProps) {
       ) : (
         <div className="space-y-3">
           {notes.map(note => (
-            <div key={note.id} className="group rounded-lg border bg-card p-3" data-testid={`note-${note.id}`}>
+            <div key={note.id} className="group rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid={`note-${note.id}`}>
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">

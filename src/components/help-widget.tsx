@@ -132,7 +132,7 @@ export function HelpWidget({
       {isOpen && (
         <div
           ref={panelRef}
-          className="fixed z-50 rounded-lg border bg-card shadow-xl flex flex-col"
+          className="fixed z-50 rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] shadow-xl flex flex-col"
           style={{
             bottom: '5rem',
             right: position === 'bottom-left' ? undefined : '1.5rem',

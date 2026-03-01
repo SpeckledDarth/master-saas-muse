@@ -433,33 +433,33 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-total-revenue">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-total-revenue">
           <p className="text-xs text-muted-foreground mb-1">Total Revenue</p>
           <p className="text-lg font-bold">{formatCurrency(user.totalRevenue)}</p>
         </div>
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-plan">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-plan">
           <p className="text-xs text-muted-foreground mb-1">Current Plan</p>
           <p className="text-lg font-bold capitalize">{user.plan}</p>
         </div>
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-health">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-health">
           <p className="text-xs text-muted-foreground mb-1">Health Score</p>
           <div className="flex items-center gap-2">
             <span className={`inline-block h-2.5 w-2.5 rounded-full ${healthDot(user.healthScore)}`} />
             <p className={`text-lg font-bold ${healthColor(user.healthScore)}`}>{user.healthScore}</p>
           </div>
         </div>
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-member-since">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-member-since">
           <p className="text-xs text-muted-foreground mb-1">Member Since</p>
           <p className="text-lg font-bold">{formatDate(user.created_at)}</p>
         </div>
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-last-login">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-last-login">
           <p className="text-xs text-muted-foreground mb-1">Days Since Login</p>
           <p className="text-lg font-bold">{user.daysSinceLogin > 900 ? 'Never' : user.daysSinceLogin}</p>
         </div>
       </div>
 
       {affiliateSummary && (
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)] mb-[var(--content-density-gap,1rem)]" data-testid="card-affiliate-summary">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] mb-[var(--content-density-gap,1rem)]" data-testid="card-affiliate-summary">
           <h3 className="text-sm font-medium mb-3">Affiliate Summary</h3>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-[var(--content-density-gap,1rem)] text-sm">
             <div>
@@ -509,7 +509,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
       {activeTab === 'summary' && (
         <div data-testid="tab-content-summary">
           <Accordion type="multiple" defaultValue={['transactions', 'support', 'activity']} className="space-y-2">
-            <AccordionItem value="transactions" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+            <AccordionItem value="transactions" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] px-[var(--card-padding,1.25rem)]">
               <AccordionTrigger className="py-3" data-testid="accordion-transactions">
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -580,7 +580,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
             </AccordionItem>
 
             {affiliateSummary && (
-              <AccordionItem value="affiliate" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+              <AccordionItem value="affiliate" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] px-[var(--card-padding,1.25rem)]">
                 <AccordionTrigger className="py-3" data-testid="accordion-affiliate">
                   <div className="flex items-center gap-2">
                     <Megaphone className="h-4 w-4 text-muted-foreground" />
@@ -610,7 +610,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionItem>
             )}
 
-            <AccordionItem value="support" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+            <AccordionItem value="support" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] px-[var(--card-padding,1.25rem)]">
               <AccordionTrigger className="py-3" data-testid="accordion-support">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
@@ -649,7 +649,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="activity" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+            <AccordionItem value="activity" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] px-[var(--card-padding,1.25rem)]">
               <AccordionTrigger className="py-3" data-testid="accordion-activity">
                 <div className="flex items-center gap-2">
                   <Activity className="h-4 w-4 text-muted-foreground" />
@@ -667,7 +667,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="contracts" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+            <AccordionItem value="contracts" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] px-[var(--card-padding,1.25rem)]">
               <AccordionTrigger className="py-3" data-testid="accordion-contracts">
                 <div className="flex items-center gap-2">
                   <ScrollText className="h-4 w-4 text-muted-foreground" />
@@ -700,7 +700,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="notes" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+            <AccordionItem value="notes" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] px-[var(--card-padding,1.25rem)]">
               <AccordionTrigger className="py-3" data-testid="accordion-notes">
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-muted-foreground" />
@@ -712,7 +712,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="phones" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+            <AccordionItem value="phones" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] px-[var(--card-padding,1.25rem)]">
               <AccordionTrigger className="py-3" data-testid="accordion-phones">
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4 text-muted-foreground" />
@@ -789,7 +789,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="emails" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+            <AccordionItem value="emails" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] px-[var(--card-padding,1.25rem)]">
               <AccordionTrigger className="py-3" data-testid="accordion-emails">
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
@@ -866,7 +866,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="addresses" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+            <AccordionItem value="addresses" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] px-[var(--card-padding,1.25rem)]">
               <AccordionTrigger className="py-3" data-testid="accordion-addresses">
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
@@ -961,7 +961,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="social-links" className="rounded-[var(--card-radius,0.75rem)] border bg-card px-[var(--card-padding,1.25rem)]">
+            <AccordionItem value="social-links" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] px-[var(--card-padding,1.25rem)]">
               <AccordionTrigger className="py-3" data-testid="accordion-social-links">
                 <div className="flex items-center gap-2">
                   <Link2 className="h-4 w-4 text-muted-foreground" />
@@ -1182,7 +1182,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
               <p>No transactions found</p>
             </div>
           ) : (
-            <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
+            <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] overflow-hidden">
               <table className="w-full text-sm" data-testid="table-transactions">
                 <thead>
                   <tr className="border-b bg-muted/30">
@@ -1239,7 +1239,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
           ) : (
             <div className="space-y-3">
               {tickets.map((ticket: any) => (
-                <div key={ticket.id} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid={`ticket-${ticket.id}`}>
+                <div key={ticket.id} className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid={`ticket-${ticket.id}`}>
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h4 className="font-medium text-foreground">{ticket.subject || ticket.title || 'Untitled Ticket'}</h4>
@@ -1284,7 +1284,7 @@ export default function CRMDetailPage({ params }: { params: Promise<{ userId: st
           ) : (
             <div className="space-y-3">
               {contracts.map((contract: any) => (
-                <div key={contract.id} className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid={`contract-${contract.id}`}>
+                <div key={contract.id} className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid={`contract-${contract.id}`}>
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h4 className="font-medium text-foreground">{contract.title || 'Untitled Contract'}</h4>

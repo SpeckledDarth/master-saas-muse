@@ -58,14 +58,14 @@ function fmt(cents: number) { return '$' + (cents / 100).toLocaleString(undefine
 
 export function ConnectedAnalyticsDashboard({ data }: { data: ConnectedOverview }) {
   if (!data?.platformComparison?.length) return (
-    <div data-testid="connected-empty" className="rounded-lg border bg-card p-4 text-center">
+    <div data-testid="connected-empty" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)] text-center">
       <p className="text-sm text-muted-foreground">No connected platforms yet. Connect YouTube, Instagram, or LinkedIn to see merged analytics.</p>
     </div>
   );
 
   return (
     <div data-testid="connected-dashboard" className="space-y-4">
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">🔗 Connected Platforms — Merged View</h3>
         <div className="grid grid-cols-4 gap-2 mb-4">
           <div className="text-center p-2 bg-muted/30 rounded">
@@ -123,7 +123,7 @@ export function FinancialOverviewPanel({ data }: { data: FinancialData }) {
 
   return (
     <div data-testid="financial-overview" className="space-y-4">
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">💰 Unified Financial View</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           <div className="text-center p-2 bg-[hsl(var(--success)/0.08)] dark:bg-[hsl(var(--success)/0.12)] rounded">
@@ -170,7 +170,7 @@ export function FinancialOverviewPanel({ data }: { data: FinancialData }) {
         )}
       </div>
 
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">📈 Projections</h3>
         <div className="grid grid-cols-2 gap-3">
           <div className="p-2 bg-muted/30 rounded">
@@ -218,14 +218,14 @@ export function PredictiveIntelligencePanel({ data }: { data: PredictionsData })
       )}
 
       {data.churnPrediction && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-2">⚠️ Churn Risk Window</h3>
           <p className="text-xs text-muted-foreground">{data.churnPrediction}</p>
         </div>
       )}
 
       {data.seasonalPattern && data.seasonalPattern.length > 0 && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-3">📅 Seasonal Pattern</h3>
           <div className="flex items-end gap-1 h-16">
             {data.seasonalPattern.map(s => {
@@ -242,7 +242,7 @@ export function PredictiveIntelligencePanel({ data }: { data: PredictionsData })
       )}
 
       {data.nextMilestone && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-2">🎯 Next Milestone</h3>
           <p className="text-sm font-medium">{data.nextMilestone.name}</p>
           <div className="flex items-center gap-2 mt-2">
@@ -256,7 +256,7 @@ export function PredictiveIntelligencePanel({ data }: { data: PredictionsData })
       )}
 
       {data.activeContests && data.activeContests.length > 0 && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-2">🏆 Active Contests</h3>
           <div className="space-y-2">
             {data.activeContests.map(c => (
@@ -270,7 +270,7 @@ export function PredictiveIntelligencePanel({ data }: { data: PredictionsData })
       )}
 
       {data.aiPredictions && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-2">🔮 AI Predictions</h3>
           <p className="text-xs text-muted-foreground whitespace-pre-wrap leading-relaxed">{data.aiPredictions}</p>
           <p className="text-[10px] text-muted-foreground mt-2">Generated {new Date(data.generatedAt).toLocaleDateString()}</p>
@@ -283,7 +283,7 @@ export function PredictiveIntelligencePanel({ data }: { data: PredictionsData })
 export function ContentIntelligencePanel({ data }: { data: ContentIntelligenceData }) {
   return (
     <div data-testid="content-intelligence" className="space-y-4">
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
         <h3 className="font-semibold text-sm mb-3">📊 Promotion Frequency Analysis</h3>
         <div className="grid grid-cols-3 gap-2 mb-3">
           <div className="text-center p-2 bg-muted/30 rounded">
@@ -303,7 +303,7 @@ export function ContentIntelligencePanel({ data }: { data: ContentIntelligenceDa
       </div>
 
       {data.platformCorrelation.length > 0 && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-3">🔗 Platform → Clicks Correlation</h3>
           <div className="space-y-2">
             {data.platformCorrelation.map(p => (
@@ -321,14 +321,14 @@ export function ContentIntelligencePanel({ data }: { data: ContentIntelligenceDa
       )}
 
       {data.aiRecommendations && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-2">🤖 AI Frequency Recommendations</h3>
           <p className="text-xs text-muted-foreground whitespace-pre-wrap leading-relaxed">{data.aiRecommendations}</p>
         </div>
       )}
 
       {data.suggestedTools && data.suggestedTools.length > 0 && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
           <h3 className="font-semibold text-sm mb-3">🛠️ Recommended Tools</h3>
           <div className="space-y-2">
             {data.suggestedTools.map(t => (
@@ -364,7 +364,7 @@ export function CustomRangeReportPanel() {
   };
 
   return (
-    <div data-testid="custom-range-report" className="rounded-lg border bg-card p-4">
+    <div data-testid="custom-range-report" className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-3">📅 Custom Date Range Report</h3>
       <div className="flex flex-wrap items-end gap-2 mb-3">
         <div>

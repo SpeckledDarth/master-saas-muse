@@ -225,7 +225,7 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
   }
 
   const topNav = (
-    <nav className="border-b bg-card" data-testid="nav-admin-topbar" ref={dropdownRef}>
+    <nav className="border-b bg-background" data-testid="nav-admin-topbar" ref={dropdownRef}>
       <div className="flex items-center gap-1 px-4 h-11">
         {visibleSections.map(section => {
           const Icon = section.icon
@@ -384,7 +384,7 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden" data-testid="overlay-mobile-sidebar">
           <div className="fixed inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <div className="fixed inset-y-0 left-0 w-72 bg-card border-r shadow-xl z-50">
+          <div className="fixed inset-y-0 left-0 w-72 bg-background border-r shadow-xl z-50">
             {mobileSidebarContent}
           </div>
         </div>

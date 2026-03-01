@@ -139,15 +139,15 @@ export default function SubscriptionsPage() {
       </div>
 
       <div className="grid grid-cols-3 gap-[var(--content-density-gap,1rem)] mb-[var(--content-density-gap,1rem)]">
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-total-active">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-total-active">
           <p className="text-xs text-muted-foreground mb-1">Total Active</p>
           <p className="text-lg font-bold">{summary.totalActive}</p>
         </div>
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-mrr">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-mrr">
           <p className="text-xs text-muted-foreground mb-1">Monthly Recurring Revenue</p>
           <p className="text-lg font-bold text-[hsl(var(--success))]">{formatCurrency(summary.mrr)}</p>
         </div>
-        <div className="rounded-[var(--card-radius,0.75rem)] border bg-card p-[var(--card-padding,1.25rem)]" data-testid="card-churn-risk">
+        <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] p-[var(--card-padding,1.25rem)]" data-testid="card-churn-risk">
           <p className="text-xs text-muted-foreground mb-1">Churn Risk</p>
           <p className={`text-lg font-bold ${summary.churnRiskCount > 0 ? 'text-destructive' : 'text-foreground'}`}>
             {summary.churnRiskCount}
@@ -204,7 +204,7 @@ export default function SubscriptionsPage() {
         {total > 0 ? `Showing ${startIdx}-${endIdx} of ${total} subscriptions` : 'No subscriptions found'}
       </div>
 
-      <div className="rounded-[var(--card-radius,0.75rem)] border bg-card overflow-hidden">
+      <div className="rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm" data-testid="table-subscriptions">
             <thead>
