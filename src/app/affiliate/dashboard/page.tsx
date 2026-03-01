@@ -6161,22 +6161,46 @@ function StandaloneAffiliateDashboard() {
                           </Button>
                         </div>
                       </div>
-                      {contract.metadata?.commission_rate && (
-                        <div className="mt-3 p-3 rounded-md bg-muted/40">
-                          <div className="flex items-center gap-4 text-sm">
-                            <div>
-                              <span className="text-xs text-muted-foreground">Commission Rate</span>
-                              <p className="font-medium">{contract.metadata.commission_rate}%</p>
-                            </div>
-                            {contract.metadata?.rate_lock_text && (
-                              <div className="flex-1">
-                                <span className="text-xs text-muted-foreground">Rate Lock Guarantee</span>
-                                <p className="text-xs">{contract.metadata.rate_lock_text}</p>
+                      {(contract.terms || contract.metadata?.commission_rate) && (() => {
+                        const terms = contract.terms || contract.metadata || {}
+                        const monthsRemaining = contract.expiry_date
+                          ? Math.max(0, Math.ceil((new Date(contract.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30.44)))
+                          : null
+                        return (
+                          <div className="mt-3 p-3 rounded-md bg-muted/40" data-testid={`contract-terms-${contract.id}`}>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                              <div>
+                                <span className="text-xs text-muted-foreground">Commission Rate</span>
+                                <p className="font-medium">{terms.commission_rate}%</p>
                               </div>
+                              <div>
+                                <span className="text-xs text-muted-foreground">Duration</span>
+                                <p className="font-medium">{terms.duration_months} months</p>
+                              </div>
+                              {terms.cookie_duration_days != null && (
+                                <div>
+                                  <span className="text-xs text-muted-foreground">Cookie Duration</span>
+                                  <p className="font-medium">{terms.cookie_duration_days} days</p>
+                                </div>
+                              )}
+                              {terms.min_payout_cents != null && (
+                                <div>
+                                  <span className="text-xs text-muted-foreground">Min Payout</span>
+                                  <p className="font-medium">${(terms.min_payout_cents / 100).toFixed(2)}</p>
+                                </div>
+                              )}
+                            </div>
+                            {monthsRemaining != null && isActive && (
+                              <p className="text-xs text-muted-foreground mt-2">
+                                {monthsRemaining > 0 ? `${monthsRemaining} month${monthsRemaining !== 1 ? 's' : ''} remaining` : 'Term expired'}
+                              </p>
+                            )}
+                            {contract.metadata?.rate_lock_text && (
+                              <p className="text-xs text-muted-foreground mt-1">{contract.metadata.rate_lock_text}</p>
                             )}
                           </div>
-                        </div>
-                      )}
+                        )
+                      })()}
                     </div>
                     {isExpanded && contract.body && (
                       <div className="border-t px-4 py-3">

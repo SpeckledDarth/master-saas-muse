@@ -29,6 +29,8 @@ export interface AffiliateLink {
   is_affiliate: boolean
   locked_commission_rate: number | null
   locked_duration_months: number | null
+  locked_cookie_duration_days: number | null
+  locked_min_payout_cents: number | null
   locked_at: string | null
   current_tier_id: string | null
   total_earnings_cents: number
@@ -126,16 +128,53 @@ export async function lockInAffiliateTerms(userId: string): Promise<void> {
   const settings = await getAffiliateSettings()
   if (!settings) return
 
+  const now = new Date().toISOString()
+  const lockedTerms = {
+    commission_rate: settings.commission_rate,
+    duration_months: settings.commission_duration_months,
+    cookie_duration_days: settings.cookie_duration_days,
+    min_payout_cents: settings.min_payout_cents,
+  }
+
   await admin
     .from('referral_links')
     .update({
       is_affiliate: true,
       locked_commission_rate: settings.commission_rate,
       locked_duration_months: settings.commission_duration_months,
-      locked_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      locked_cookie_duration_days: settings.cookie_duration_days,
+      locked_min_payout_cents: settings.min_payout_cents,
+      locked_at: now,
+      updated_at: now,
     })
     .eq('user_id', userId)
+
+  const effectiveDate = new Date()
+  const expiryDate = new Date(effectiveDate)
+  expiryDate.setMonth(expiryDate.getMonth() + settings.commission_duration_months)
+
+  await admin
+    .from('contracts')
+    .insert({
+      user_id: userId,
+      title: 'Affiliate Terms Agreement',
+      body: `This agreement confirms your enrollment in the affiliate program with the following locked terms:\n\n• Commission Rate: ${settings.commission_rate}%\n• Duration: ${settings.commission_duration_months} months\n• Cookie Duration: ${settings.cookie_duration_days} days\n• Minimum Payout: $${(settings.min_payout_cents / 100).toFixed(2)}\n\nThese terms are locked at enrollment and will not change even if global program settings are updated.`,
+      version: 1,
+      status: 'active',
+      contract_type: 'affiliate_terms',
+      effective_date: effectiveDate.toISOString(),
+      expiry_date: expiryDate.toISOString(),
+      signed_at: now,
+      signed_by: userId,
+      terms: lockedTerms,
+      metadata: {
+        commission_rate: settings.commission_rate,
+        rate_lock_text: `Locked at ${settings.commission_rate}% on enrollment`,
+        cookie_duration_days: settings.cookie_duration_days,
+        min_payout_cents: settings.min_payout_cents,
+        duration_months: settings.commission_duration_months,
+      },
+    })
 }
 
 export function getCommissionRate(link: AffiliateLink, tiers: AffiliateTier[]): number {

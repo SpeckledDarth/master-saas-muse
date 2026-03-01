@@ -57,3 +57,11 @@ CREATE TABLE IF NOT EXISTS user_social_links (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_user_social_links_user_id ON user_social_links(user_id);
+
+-- Sprint 8B: Grandfathering Gaps
+-- GAP-1/GAP-2: Add terms JSONB to contracts for machine-readable locked values
+ALTER TABLE contracts ADD COLUMN IF NOT EXISTS terms JSONB;
+
+-- GAP-3/GAP-4: Add locked cookie duration and min payout to referral_links
+ALTER TABLE referral_links ADD COLUMN IF NOT EXISTS locked_cookie_duration_days INTEGER;
+ALTER TABLE referral_links ADD COLUMN IF NOT EXISTS locked_min_payout_cents INTEGER;
