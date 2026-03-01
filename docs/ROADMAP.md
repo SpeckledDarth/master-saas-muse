@@ -975,9 +975,28 @@ Pages converted:
 
 ---
 
+---
+
+### Session — March 1, 2026 (Color Model Compliance Audit — Documentation)
+
+Created the `docs/UX-UI Dashboard Cleanup/` folder to consolidate all UX overhaul tracking documents. Moved `UX_OVERHAUL_BLUEPRINT.md` and `BLUEPRINT_ERRATA.md` into the new folder, and created `COLOR_MODEL_COMPLIANCE.md` — a comprehensive tracking document for the 39 named Tailwind color violations and 72 raw Card→DSCard migrations identified by a full codebase audit.
+
+**No code changes.** This session created the tracking infrastructure only.
+
+**Compliance status:** 0 of 11 sprints complete. All 10 build sprints (T001–T010) are independent and can run in parallel. T011 (verification) is blocked until all build sprints are done.
+
+**Files created/moved:**
+- `docs/UX-UI Dashboard Cleanup/COLOR_MODEL_COMPLIANCE.md` (NEW)
+- `docs/UX-UI Dashboard Cleanup/UX_OVERHAUL_BLUEPRINT.md` (moved from `docs/`)
+- `docs/UX-UI Dashboard Cleanup/BLUEPRINT_ERRATA.md` (moved from `docs/`)
+- Updated `replit.md` — added UX-UI Dashboard Cleanup folder section
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience
 - `docs/FEATURE_INVENTORY.md` — Complete feature list with access levels and pricing tiers
 - `docs/LESSONS_LEARNED.md` — Anti-patterns and debugging lessons from development
 - `docs/musekit/AFFILIATE_ENHANCEMENTS.md` — Detailed specs for the 32 affiliate enhancement features
+- `docs/UX-UI Dashboard Cleanup/COLOR_MODEL_COMPLIANCE.md` — Active: color violation + Card migration tracking

@@ -85,6 +85,16 @@ The `docs/` folder contains exactly 5 active documents. **Never merge them. Neve
 | `LESSONS_LEARNED.md` | **What we've learned** — anti-patterns and rules | Every session — add new lessons |
 | `ROADMAP.md` | **Execution state** — what's done, what's next | Every session — update progress |
 
+### UX-UI Dashboard Cleanup Folder
+
+The `docs/UX-UI Dashboard Cleanup/` folder tracks the full history of the dashboard UX overhaul. **Load these when doing any color/Card compliance work.**
+
+| Document | Role | Status |
+|----------|------|--------|
+| `UX_OVERHAUL_BLUEPRINT.md` | Original 15-sprint UX plan | ALL 15 SPRINTS COMPLETE |
+| `BLUEPRINT_ERRATA.md` | 9 corrections to the original plan | ALL 9 ISSUES FIXED |
+| `COLOR_MODEL_COMPLIANCE.md` | 39 color violations + 72 Card→DSCard migrations | NOT STARTED |
+
 ## System Architecture
 The project is built on Next.js 16+ (App Router), React 18+, and TypeScript, utilizing Tailwind CSS, shadcn/ui, and next-themes for styling. TanStack Query manages server state. Supabase provides PostgreSQL, authentication, RLS, and storage, supporting multi-tenancy. Deployment is exclusively on Vercel.
 
