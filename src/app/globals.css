@@ -209,7 +209,13 @@
 [data-custom-heading-color] :is(h1, h2, h3, h4, h5, h6) {
   color: var(--heading-color) !important;
 }
-[data-custom-body-color] {
+[data-custom-body-color],
+[data-custom-body-color] p,
+[data-custom-body-color] span:not(.badge),
+[data-custom-body-color] li,
+[data-custom-body-color] td,
+[data-custom-body-color] label,
+[data-custom-body-color] div:not([class*="text-"]):not([class*="badge"]):not([class*="alert"]) {
   color: var(--body-color) !important;
 }
 
