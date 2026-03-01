@@ -876,6 +876,55 @@ Documentation-only session. No code changes.
 
 ---
 
+### Session — March 1, 2026 (UX Overhaul Blueprint — Sprint 7A)
+
+**Sprint 7A: Confirm Dialogs + Small UX Fixes + EditableSettingsGroup Component** — COMPLETE
+
+Tasks completed:
+1. **S7A-T1** — Replaced 7 remaining browser `confirm()` calls with ConfirmDialog across 6 files:
+   - `src/app/admin/setup/integrations/page.tsx` — delete integration value (inside KeyRow sub-component)
+   - `src/app/admin/setup/passivepost/page.tsx` — delete social key value (inside SocialKeyRow sub-component)
+   - `src/app/admin/setup/affiliate/page.tsx` — delete affiliate member + delete application (2 ConfirmDialogs)
+   - `src/app/admin/email-templates/page.tsx` — delete email template
+   - `src/app/admin/blog/page.tsx` — delete blog post
+   - `src/app/admin/sso/page.tsx` — remove SSO provider
+2. **S7A-T2** — UX-11: Added role change confirmation on Users page — Select onValueChange now sets `pendingRoleChange` state, ConfirmDialog shows "Change role from X to Y?" before calling the API. UX-14: Added "Clear Dates" button on Revenue page that conditionally appears when date filters are active, resets both dateFrom/dateTo and pagination.
+3. **S7A-T3** — Built reusable `<EditableSettingsGroup>` component at `src/components/admin/editable-settings-group.tsx`. Props: title, description?, children, onSave, isSaving?. Uses DSCard wrapper, `<fieldset disabled>` for read-only mode, pencil Edit button toggles to Save/Cancel. All styling via design system CSS variables.
+
+**Done Test PASSED:** `grep -rn "confirm(" src/app/admin/ | grep -v ConfirmDialog | grep -v onConfirm | grep -v confirmText | grep -v confirmLabel | grep -v confirmButton | grep -v import | grep -v "//"` returns zero results. Role change shows confirmation dialog. Revenue has Clear Dates button. EditableSettingsGroup component exists and matches spec.
+
+**Files created:** `src/components/admin/editable-settings-group.tsx`
+**Files modified:** `src/app/admin/setup/integrations/page.tsx`, `src/app/admin/setup/passivepost/page.tsx`, `src/app/admin/setup/affiliate/page.tsx`, `src/app/admin/email-templates/page.tsx`, `src/app/admin/blog/page.tsx`, `src/app/admin/sso/page.tsx`, `src/app/admin/users/page.tsx`, `src/app/admin/revenue/page.tsx`
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
+**Blueprint status:** 10 of 15 sprints complete (1 through 7A). Next sprint: 7B.
+
+---
+
+### Session — March 1, 2026 (UX Overhaul Blueprint — Sprint 7B)
+
+**Sprint 7B: Affiliate Settings Edit-Protection + Best Practices Reset** — COMPLETE
+
+Tasks completed:
+1. **S7B-T1** — Applied EditableSettingsGroup to all 7 affiliate settings sections: Commission Settings, Leaderboard Settings, Re-Engagement Settings, Payout Automation, Two-Tier Referrals, Fraud Detection, and Surveys. Each group is independently editable — clicking Edit on one group does not unlock others. Each group's Save calls the existing `/api/affiliate/settings` PUT endpoint. Removed the old single Card wrapper and bottom-sticky Save button. Added HelpTooltip info icons with reasoning text to all settings field labels (from Design Decision #9).
+
+2. **S7B-T2** — Added "Reset to Best Practices" button at the top of the settings tab. ConfirmDialog warns before reset. Restores all 7 applicable defaults from Design Decision #9: commission_rate=20, cookie_duration_days=60, min_payout_cents=5000, commission_duration_months=12, attribution_conflict_policy=first_touch, two_tier_enabled=true, second_tier_commission_rate=5. (Commission Type and Auto-Approve are not separate settings fields in the current schema — commission type is always recurring by design, and auto-approve is application-level not a settings field.)
+
+**Also completed (stale doc fixes from prior session):**
+- Updated session-guard CURRENT SPRINT from 7A to 7B (then to 8A after completion)
+- Added Sprint 7A session log to ROADMAP.md
+- Updated FEATURE_INVENTORY.md with Sprint 7A additions (ConfirmDialog system, EditableSettingsGroup, role change confirmation, Clear Dates button)
+- Updated blueprint Progress Tracker: 7B → COMPLETE, status header updated
+
+**Files modified:** `src/app/admin/setup/affiliate/page.tsx`, `docs/UX_OVERHAUL_BLUEPRINT.md`, `.agents/skills/session-guard/SKILL.md`, `docs/ROADMAP.md`, `docs/FEATURE_INVENTORY.md`
+
+**No database changes.** No new environment variables. No Supabase migrations needed.
+
+**Blueprint status:** 10 of 15 sprints complete (1 through 7B). Next sprint: 8A. Remaining: 8A, 8B, 9A, 9B, 9C.
+
+---
+
 ## Related Documentation
 
 - `docs/PRODUCT_IDENTITY.md` — Product vision, positioning, and target audience

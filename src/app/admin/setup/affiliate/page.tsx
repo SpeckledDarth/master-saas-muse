@@ -27,6 +27,7 @@ import SortableHeader from '@/components/admin/SortableHeader'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sparkline } from '@/components/admin/sparkline'
 import { ConfirmDialog } from '@/components/admin/confirm-dialog'
+import { EditableSettingsGroup } from '@/components/admin/editable-settings-group'
 
 interface Settings {
   commission_rate: number
@@ -1175,6 +1176,7 @@ export default function AffiliateSettingsPage() {
 
   const [memberToDelete, setMemberToDelete] = useState<{ userId: string; email: string } | null>(null)
   const [appToDelete, setAppToDelete] = useState<{ appId: string; email: string } | null>(null)
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
 
   const handleDeleteMember = async (userId: string, email: string) => {
     setDeletingMember(userId)
@@ -1401,6 +1403,51 @@ export default function AffiliateSettingsPage() {
       toast({ title: 'Settings saved', description: 'Affiliate program settings updated. Existing affiliates keep their locked-in terms.' })
     } catch {
       toast({ title: 'Error', description: 'Failed to save settings', variant: 'destructive' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const saveSettingsGroup = async () => {
+    setSaving(true)
+    try {
+      const res = await fetch('/api/affiliate/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      })
+      if (!res.ok) throw new Error('Failed to save')
+      toast({ title: 'Settings saved', description: 'Affiliate program settings updated. Existing affiliates keep their locked-in terms.' })
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save settings', variant: 'destructive' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const resetToBestPractices = async () => {
+    const bestPractices: Partial<Settings> = {
+      commission_rate: 20,
+      cookie_duration_days: 60,
+      min_payout_cents: 5000,
+      commission_duration_months: 12,
+      attribution_conflict_policy: 'first_touch',
+      two_tier_enabled: true,
+      second_tier_commission_rate: 5,
+    }
+    const updated = { ...settings, ...bestPractices }
+    setSettings(updated)
+    setSaving(true)
+    try {
+      const res = await fetch('/api/affiliate/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      })
+      if (!res.ok) throw new Error('Failed to save')
+      toast({ title: 'Reset complete', description: 'All settings restored to recommended best practices. Existing affiliates keep their locked-in terms.' })
+    } catch {
+      toast({ title: 'Error', description: 'Failed to reset settings', variant: 'destructive' })
     } finally {
       setSaving(false)
     }
@@ -2422,15 +2469,27 @@ export default function AffiliateSettingsPage() {
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-[var(--content-density-gap,1rem)] mt-4">
-          <Card data-testid="card-commission-settings">
-            <CardHeader>
-              <CardTitle className="text-base">Commission Settings</CardTitle>
-              <CardDescription>Changes only apply to new affiliates. Existing affiliates keep their locked-in terms.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-[var(--content-density-gap,1rem)]">
+          <div className="flex items-center justify-between" data-testid="settings-reset-bar">
+            <p className="text-sm text-muted-foreground">Changes only apply to new affiliates. Existing affiliates keep their locked-in terms.</p>
+            <Button variant="outline" size="sm" onClick={() => setShowResetConfirm(true)} data-testid="button-reset-best-practices">
+              <RefreshCw className="h-4 w-4 mr-1" />
+              Reset to Best Practices
+            </Button>
+          </div>
+
+          <EditableSettingsGroup
+            title="Commission Settings"
+            description="Core commission rates, durations, and attribution rules."
+            onSave={saveSettingsGroup}
+            isSaving={saving}
+          >
+            <div className="space-y-[var(--content-density-gap,1rem)]">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>Program Active</Label>
+                  <Label className="flex items-center gap-1">
+                    Program Active
+                    <HelpTooltip text="Master switch for the entire affiliate program. When disabled, no new referrals are tracked and the affiliate dashboard is hidden." />
+                  </Label>
                   <p className="text-xs text-muted-foreground">Enable or disable the affiliate program</p>
                 </div>
                 <Switch
@@ -2443,7 +2502,7 @@ export default function AffiliateSettingsPage() {
                 <div>
                   <Label htmlFor="commission-rate" className="flex items-center gap-1">
                     Commission Rate (%)
-                    <HelpTooltip text="The percentage of each payment from referred customers that goes to the affiliate. Changes only apply to new affiliates — existing affiliates keep their locked-in rate." />
+                    <HelpTooltip text="Industry standard for SaaS recurring is 20%. High enough to attract affiliates, sustainable for the business." />
                   </Label>
                   <Input
                     id="commission-rate"
@@ -2458,7 +2517,10 @@ export default function AffiliateSettingsPage() {
                   <p className="text-xs text-muted-foreground mt-1">Percentage of each referred payment</p>
                 </div>
                 <div>
-                  <Label htmlFor="duration">Commission Duration (months)</Label>
+                  <Label htmlFor="duration" className="flex items-center gap-1">
+                    Commission Duration (months)
+                    <HelpTooltip text="Full year of recurring commissions motivates affiliates to bring customers who stick around." />
+                  </Label>
                   <Input
                     id="duration"
                     type="number"
@@ -2471,7 +2533,10 @@ export default function AffiliateSettingsPage() {
                   <p className="text-xs text-muted-foreground mt-1">How long commissions are earned per referral</p>
                 </div>
                 <div>
-                  <Label htmlFor="min-payout">Minimum Payout ($)</Label>
+                  <Label htmlFor="min-payout" className="flex items-center gap-1">
+                    Minimum Payout ($)
+                    <HelpTooltip text="Low enough to not frustrate new affiliates, high enough to avoid micro-payout processing costs." />
+                  </Label>
                   <Input
                     id="min-payout"
                     type="number"
@@ -2486,7 +2551,7 @@ export default function AffiliateSettingsPage() {
                 <div>
                   <Label htmlFor="cookie-days" className="flex items-center gap-1">
                     Cookie Duration (days)
-                    <HelpTooltip text="How many days after clicking a referral link the affiliate gets credit for a signup. Longer durations are more affiliate-friendly." />
+                    <HelpTooltip text="Generous enough to capture delayed conversions. 30 is stingy, 90+ is unusual for SaaS." />
                   </Label>
                   <Input
                     id="cookie-days"
@@ -2503,7 +2568,7 @@ export default function AffiliateSettingsPage() {
               <div className="border-t pt-4 mt-4">
                 <Label htmlFor="attribution-policy" className="flex items-center gap-1">
                   Attribution Conflict Policy
-                  <HelpTooltip text="When a customer clicks one affiliate's referral link but uses a different affiliate's discount code, this policy decides who earns the commission." />
+                  <HelpTooltip text="Simple, clear, avoids disputes between affiliates. First-touch is easy to explain and defend." />
                 </Label>
                 <p className="text-xs text-muted-foreground mb-2">When both a referral cookie and a discount code point to different affiliates, who gets the commission?</p>
                 <Select value={settings.attribution_conflict_policy || 'cookie_wins'} onValueChange={v => setSettings(s => ({ ...s, attribution_conflict_policy: v }))}>
@@ -2518,162 +2583,222 @@ export default function AffiliateSettingsPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          </EditableSettingsGroup>
 
-              <div className="border-t pt-4 mt-4">
-                <h4 className="text-sm font-medium mb-3">Leaderboard Settings</h4>
-                <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
-                  <div>
-                    <Label>Leaderboard Enabled</Label>
-                    <p className="text-xs text-muted-foreground">Show a ranked leaderboard on the affiliate dashboard</p>
-                  </div>
-                  <Switch
-                    checked={settings.leaderboard_enabled}
-                    onCheckedChange={(v) => setSettings(s => ({ ...s, leaderboard_enabled: v }))}
-                    data-testid="switch-leaderboard-enabled"
-                  />
-                </div>
-                {settings.leaderboard_enabled && (
-                  <div>
-                    <Label>Privacy Mode</Label>
-                    <p className="text-xs text-muted-foreground mb-2">How affiliate names appear on the leaderboard</p>
-                    <Select value={settings.leaderboard_privacy_mode} onValueChange={v => setSettings(s => ({ ...s, leaderboard_privacy_mode: v }))}>
-                      <SelectTrigger className="w-full sm:w-64" data-testid="select-leaderboard-privacy">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="initials">Initials Only (e.g., J.S.)</SelectItem>
-                        <SelectItem value="full_name">Full Name (opt-in)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t pt-4 mt-4">
-                <h4 className="text-sm font-medium mb-3 flex items-center gap-1">
-                  Re-Engagement Settings
-                  <HelpTooltip text="Automated emails sent to dormant affiliates encouraging them to start promoting again." />
-                </h4>
-                <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
-                  <div>
-                    <Label>Re-Engagement Emails</Label>
-                    <p className="text-xs text-muted-foreground">Automatically email dormant affiliates to re-activate them</p>
-                  </div>
-                  <Switch
-                    checked={settings.reengagement_enabled}
-                    onCheckedChange={(v) => setSettings(s => ({ ...s, reengagement_enabled: v }))}
-                    data-testid="switch-reengagement-enabled"
-                  />
-                </div>
-                {settings.reengagement_enabled && (
-                  <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
-                    <div>
-                      <Label className="flex items-center gap-1">
-                        Dormancy Threshold (days)
-                        <HelpTooltip text="Number of days without any referral activity before an affiliate is considered dormant and eligible for re-engagement emails." />
-                      </Label>
-                      <Input type="number" min="7" max="180" value={settings.dormancy_threshold_days || ''} onChange={e => setSettings(s => ({ ...s, dormancy_threshold_days: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-dormancy-days" />
-                      <p className="text-xs text-muted-foreground mt-1">Days of inactivity before sending re-engagement</p>
-                    </div>
-                    <div>
-                      <Label>Max Re-Engagement Emails</Label>
-                      <Input type="number" min="1" max="10" value={settings.max_reengagement_emails || ''} onChange={e => setSettings(s => ({ ...s, max_reengagement_emails: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-max-reengagement" />
-                      <p className="text-xs text-muted-foreground mt-1">Maximum emails to send per dormant affiliate</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t pt-4 mt-4">
-                <h4 className="text-sm font-medium mb-3">Payout Automation</h4>
-                <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
-                  <div>
-                    <Label>Automatic Batch Generation</Label>
-                    <p className="text-xs text-muted-foreground">Auto-generate payout batches on a schedule</p>
-                  </div>
-                  <Switch
-                    checked={settings.auto_batch_enabled}
-                    onCheckedChange={(v) => setSettings(s => ({ ...s, auto_batch_enabled: v }))}
-                    data-testid="switch-auto-batch"
-                  />
-                </div>
-                {settings.auto_batch_enabled && (
-                  <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
-                    <div>
-                      <Label>Schedule Day of Month</Label>
-                      <Input type="number" min="1" max="28" value={settings.payout_schedule_day || ''} onChange={e => setSettings(s => ({ ...s, payout_schedule_day: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-payout-schedule-day" />
-                      <p className="text-xs text-muted-foreground mt-1">Day of month to auto-generate batches</p>
-                    </div>
-                    <div>
-                      <Label>Auto-Approve Threshold ($)</Label>
-                      <Input type="number" min="0" step="50" value={settings.auto_approve_threshold_cents ? settings.auto_approve_threshold_cents / 100 : ''} onChange={e => setSettings(s => ({ ...s, auto_approve_threshold_cents: e.target.value === '' ? 0 : Math.round(parseFloat(e.target.value) * 100) }))} data-testid="input-auto-approve-threshold" />
-                      <p className="text-xs text-muted-foreground mt-1">Batches under this amount auto-approve (0 = manual only)</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t pt-4 mt-4">
-                <h4 className="text-sm font-medium mb-3">Two-Tier Referrals</h4>
-                <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
-                  <div>
-                    <Label>Enable Two-Tier Commissions</Label>
-                    <p className="text-xs text-muted-foreground">Affiliates earn a percentage when their recruited affiliates make sales</p>
-                  </div>
-                  <Switch
-                    checked={settings.two_tier_enabled}
-                    onCheckedChange={(v) => setSettings(s => ({ ...s, two_tier_enabled: v }))}
-                    data-testid="switch-two-tier-enabled"
-                  />
-                </div>
-                {settings.two_tier_enabled && (
-                  <div>
-                    <Label>Second-Tier Commission Rate (%)</Label>
-                    <Input type="number" min="0" max="50" step="0.5" value={settings.second_tier_commission_rate || ''} onChange={e => setSettings(s => ({ ...s, second_tier_commission_rate: e.target.value === '' ? 0 : parseFloat(e.target.value) }))} data-testid="input-second-tier-rate" className="w-full sm:w-32" />
-                    <p className="text-xs text-muted-foreground mt-1">Percentage of recruited affiliate's commission paid to recruiter</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t pt-4 mt-4">
-                <h4 className="text-sm font-medium mb-3">Fraud Detection</h4>
-                <div className="flex items-center justify-between mb-[var(--content-density-gap,1rem)]">
-                  <div>
-                    <Label>Enable Fraud Scoring</Label>
-                    <p className="text-xs text-muted-foreground">Automatically score affiliates for suspicious behavior</p>
-                  </div>
-                  <Switch
-                    checked={settings.fraud_scoring_enabled}
-                    onCheckedChange={(v) => setSettings(s => ({ ...s, fraud_scoring_enabled: v }))}
-                    data-testid="switch-fraud-scoring"
-                  />
-                </div>
-                {settings.fraud_scoring_enabled && (
-                  <div>
-                    <Label>Auto-Pause Threshold (0-100)</Label>
-                    <Input type="number" min="0" max="100" value={settings.fraud_auto_pause_threshold || ''} onChange={e => setSettings(s => ({ ...s, fraud_auto_pause_threshold: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-fraud-threshold" className="w-full sm:w-32" />
-                    <p className="text-xs text-muted-foreground mt-1">Affiliates with fraud score above this are auto-paused (default: 60)</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t pt-4 mt-4">
-                <h4 className="text-sm font-medium mb-3">Surveys</h4>
+          <EditableSettingsGroup
+            title="Leaderboard Settings"
+            description="Ranked leaderboard visibility and privacy options."
+            onSave={saveSettingsGroup}
+            isSaving={saving}
+          >
+            <div className="space-y-[var(--content-density-gap,1rem)]">
+              <div className="flex items-center justify-between">
                 <div>
-                  <Label>Survey Interval (days)</Label>
-                  <Input type="number" min="30" max="365" value={settings.survey_interval_days || ''} onChange={e => setSettings(s => ({ ...s, survey_interval_days: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-survey-interval" className="w-full sm:w-32" />
-                  <p className="text-xs text-muted-foreground mt-1">How often affiliates are prompted to complete a satisfaction survey</p>
+                  <Label className="flex items-center gap-1">
+                    Leaderboard Enabled
+                    <HelpTooltip text="Gamification drives affiliate performance. A visible leaderboard motivates affiliates to compete for top positions." />
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Show a ranked leaderboard on the affiliate dashboard</p>
                 </div>
+                <Switch
+                  checked={settings.leaderboard_enabled}
+                  onCheckedChange={(v) => setSettings(s => ({ ...s, leaderboard_enabled: v }))}
+                  data-testid="switch-leaderboard-enabled"
+                />
               </div>
+              {settings.leaderboard_enabled && (
+                <div>
+                  <Label className="flex items-center gap-1">
+                    Privacy Mode
+                    <HelpTooltip text="Controls how affiliate names appear on the public leaderboard. Initials protect privacy while still enabling competition." />
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-2">How affiliate names appear on the leaderboard</p>
+                  <Select value={settings.leaderboard_privacy_mode} onValueChange={v => setSettings(s => ({ ...s, leaderboard_privacy_mode: v }))}>
+                    <SelectTrigger className="w-full sm:w-64" data-testid="select-leaderboard-privacy">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="initials">Initials Only (e.g., J.S.)</SelectItem>
+                      <SelectItem value="full_name">Full Name (opt-in)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+          </EditableSettingsGroup>
 
-              <div className="border-t pt-4 mt-4 sticky bottom-0 bg-background pb-2">
-                <Button onClick={saveSettings} disabled={saving} data-testid="button-save-settings" className="w-full sm:w-auto">
-                  {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                  Save Settings
-                </Button>
+          <EditableSettingsGroup
+            title="Re-Engagement Settings"
+            description="Automated emails sent to dormant affiliates encouraging them to start promoting again."
+            onSave={saveSettingsGroup}
+            isSaving={saving}
+          >
+            <div className="space-y-[var(--content-density-gap,1rem)]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="flex items-center gap-1">
+                    Re-Engagement Emails
+                    <HelpTooltip text="Automated emails sent to dormant affiliates encouraging them to start promoting again. Recovers lost promotional activity." />
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Automatically email dormant affiliates to re-activate them</p>
+                </div>
+                <Switch
+                  checked={settings.reengagement_enabled}
+                  onCheckedChange={(v) => setSettings(s => ({ ...s, reengagement_enabled: v }))}
+                  data-testid="switch-reengagement-enabled"
+                />
               </div>
-            </CardContent>
-          </Card>
+              {settings.reengagement_enabled && (
+                <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
+                  <div>
+                    <Label className="flex items-center gap-1">
+                      Dormancy Threshold (days)
+                      <HelpTooltip text="Number of days without any referral activity before an affiliate is considered dormant and eligible for re-engagement emails." />
+                    </Label>
+                    <Input type="number" min="7" max="180" value={settings.dormancy_threshold_days || ''} onChange={e => setSettings(s => ({ ...s, dormancy_threshold_days: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-dormancy-days" />
+                    <p className="text-xs text-muted-foreground mt-1">Days of inactivity before sending re-engagement</p>
+                  </div>
+                  <div>
+                    <Label className="flex items-center gap-1">
+                      Max Re-Engagement Emails
+                      <HelpTooltip text="Limits how many re-engagement emails each dormant affiliate receives. Prevents email fatigue and spam complaints." />
+                    </Label>
+                    <Input type="number" min="1" max="10" value={settings.max_reengagement_emails || ''} onChange={e => setSettings(s => ({ ...s, max_reengagement_emails: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-max-reengagement" />
+                    <p className="text-xs text-muted-foreground mt-1">Maximum emails to send per dormant affiliate</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </EditableSettingsGroup>
+
+          <EditableSettingsGroup
+            title="Payout Automation"
+            description="Automatic batch generation and approval rules."
+            onSave={saveSettingsGroup}
+            isSaving={saving}
+          >
+            <div className="space-y-[var(--content-density-gap,1rem)]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="flex items-center gap-1">
+                    Automatic Batch Generation
+                    <HelpTooltip text="When enabled, payout batches are auto-generated on a schedule instead of requiring manual creation each cycle." />
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Auto-generate payout batches on a schedule</p>
+                </div>
+                <Switch
+                  checked={settings.auto_batch_enabled}
+                  onCheckedChange={(v) => setSettings(s => ({ ...s, auto_batch_enabled: v }))}
+                  data-testid="switch-auto-batch"
+                />
+              </div>
+              {settings.auto_batch_enabled && (
+                <div className="grid gap-[var(--content-density-gap,1rem)] sm:grid-cols-2">
+                  <div>
+                    <Label className="flex items-center gap-1">
+                      Schedule Day of Month
+                      <HelpTooltip text="The day each month when payout batches are automatically generated. Use 1-28 to avoid end-of-month date issues." />
+                    </Label>
+                    <Input type="number" min="1" max="28" value={settings.payout_schedule_day || ''} onChange={e => setSettings(s => ({ ...s, payout_schedule_day: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-payout-schedule-day" />
+                    <p className="text-xs text-muted-foreground mt-1">Day of month to auto-generate batches</p>
+                  </div>
+                  <div>
+                    <Label className="flex items-center gap-1">
+                      Auto-Approve Threshold ($)
+                      <HelpTooltip text="Payout batches under this amount are automatically approved. Set to 0 to require manual approval for all batches." />
+                    </Label>
+                    <Input type="number" min="0" step="50" value={settings.auto_approve_threshold_cents ? settings.auto_approve_threshold_cents / 100 : ''} onChange={e => setSettings(s => ({ ...s, auto_approve_threshold_cents: e.target.value === '' ? 0 : Math.round(parseFloat(e.target.value) * 100) }))} data-testid="input-auto-approve-threshold" />
+                    <p className="text-xs text-muted-foreground mt-1">Batches under this amount auto-approve (0 = manual only)</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </EditableSettingsGroup>
+
+          <EditableSettingsGroup
+            title="Two-Tier Referrals"
+            description="Affiliates earn a percentage when their recruited affiliates make sales."
+            onSave={saveSettingsGroup}
+            isSaving={saving}
+          >
+            <div className="space-y-[var(--content-density-gap,1rem)]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="flex items-center gap-1">
+                    Enable Two-Tier Commissions
+                    <HelpTooltip text="Two-tier referrals let affiliates recruit other affiliates and earn a percentage of their sales. Drives organic program growth." />
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Affiliates earn a percentage when their recruited affiliates make sales</p>
+                </div>
+                <Switch
+                  checked={settings.two_tier_enabled}
+                  onCheckedChange={(v) => setSettings(s => ({ ...s, two_tier_enabled: v }))}
+                  data-testid="switch-two-tier-enabled"
+                />
+              </div>
+              {settings.two_tier_enabled && (
+                <div>
+                  <Label className="flex items-center gap-1">
+                    Second-Tier Commission Rate (%)
+                    <HelpTooltip text="The percentage of the recruited affiliate's commission that goes to the recruiter. 5% is a common starting point." />
+                  </Label>
+                  <Input type="number" min="0" max="50" step="0.5" value={settings.second_tier_commission_rate || ''} onChange={e => setSettings(s => ({ ...s, second_tier_commission_rate: e.target.value === '' ? 0 : parseFloat(e.target.value) }))} data-testid="input-second-tier-rate" className="w-full sm:w-32" />
+                  <p className="text-xs text-muted-foreground mt-1">Percentage of recruited affiliate's commission paid to recruiter</p>
+                </div>
+              )}
+            </div>
+          </EditableSettingsGroup>
+
+          <EditableSettingsGroup
+            title="Fraud Detection"
+            description="Automatic fraud scoring and affiliate suspension rules."
+            onSave={saveSettingsGroup}
+            isSaving={saving}
+          >
+            <div className="space-y-[var(--content-density-gap,1rem)]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="flex items-center gap-1">
+                    Enable Fraud Scoring
+                    <HelpTooltip text="Automatically scores affiliates for suspicious behavior patterns like self-referrals, unusual click patterns, or rapid signups." />
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Automatically score affiliates for suspicious behavior</p>
+                </div>
+                <Switch
+                  checked={settings.fraud_scoring_enabled}
+                  onCheckedChange={(v) => setSettings(s => ({ ...s, fraud_scoring_enabled: v }))}
+                  data-testid="switch-fraud-scoring"
+                />
+              </div>
+              {settings.fraud_scoring_enabled && (
+                <div>
+                  <Label className="flex items-center gap-1">
+                    Auto-Pause Threshold (0-100)
+                    <HelpTooltip text="Affiliates with a fraud score above this threshold are automatically paused. Lower values are more aggressive." />
+                  </Label>
+                  <Input type="number" min="0" max="100" value={settings.fraud_auto_pause_threshold || ''} onChange={e => setSettings(s => ({ ...s, fraud_auto_pause_threshold: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-fraud-threshold" className="w-full sm:w-32" />
+                  <p className="text-xs text-muted-foreground mt-1">Affiliates with fraud score above this are auto-paused (default: 60)</p>
+                </div>
+              )}
+            </div>
+          </EditableSettingsGroup>
+
+          <EditableSettingsGroup
+            title="Surveys"
+            description="Affiliate satisfaction survey frequency."
+            onSave={saveSettingsGroup}
+            isSaving={saving}
+          >
+            <div>
+              <Label className="flex items-center gap-1">
+                Survey Interval (days)
+                <HelpTooltip text="How often affiliates are prompted to complete a satisfaction survey. 90 days balances feedback frequency with survey fatigue." />
+              </Label>
+              <Input type="number" min="30" max="365" value={settings.survey_interval_days || ''} onChange={e => setSettings(s => ({ ...s, survey_interval_days: e.target.value === '' ? 0 : parseInt(e.target.value) }))} data-testid="input-survey-interval" className="w-full sm:w-32" />
+              <p className="text-xs text-muted-foreground mt-1">How often affiliates are prompted to complete a satisfaction survey</p>
+            </div>
+          </EditableSettingsGroup>
         </TabsContent>
 
         <TabsContent value="tiers" className="space-y-[var(--content-density-gap,1rem)] mt-4">
@@ -3831,6 +3956,15 @@ export default function AffiliateSettingsPage() {
         onRecalcFraud={handleRecalcFraud}
         suspendingMember={suspendingMember}
         recalcFraud={recalcFraud}
+      />
+
+      <ConfirmDialog
+        open={showResetConfirm}
+        onOpenChange={setShowResetConfirm}
+        title="Reset to Best Practices"
+        description="This will restore all affiliate settings to the recommended defaults: 20% commission, 60-day cookie, $50 minimum payout, 12-month duration, first-touch attribution, and two-tier referrals enabled. Existing affiliates keep their locked-in terms."
+        confirmLabel="Reset All Settings"
+        onConfirm={() => { setShowResetConfirm(false); resetToBestPractices() }}
       />
 
       <ConfirmDialog
