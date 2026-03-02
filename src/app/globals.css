@@ -78,6 +78,7 @@
     --btn-padding: 0.5rem 1rem;
     --btn-font-weight: 600;
     --btn-text-transform: none;
+    --btn-radius: 9999px;
     --badge-radius: 9999px;
     --input-radius: 0.75rem;
 

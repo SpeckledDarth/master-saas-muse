@@ -240,7 +240,7 @@ export function StarterKit() {
   if (loading || assets.length === 0) return null;
 
   return (
-    <div data-testid="starter-kit-card" className="rounded-[var(--card-radius,0.75rem)] border bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-[var(--card-padding,1.25rem)]">
+    <div data-testid="starter-kit-card" className="rounded-[var(--card-radius,0.75rem)] border bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-950/20 dark:to-accent-950/20 p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">🎁 Starter Kit</h3>
       <p className="text-xs text-muted-foreground mb-3">Get started with these essential resources:</p>
       <div className="space-y-1">

@@ -198,7 +198,7 @@ export function ReferralOfMonth() {
   if (!spotlight) return null;
 
   return (
-    <div data-testid="spotlight-card" className="rounded-[var(--card-radius,0.75rem)] border bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-[var(--card-padding,1.25rem)]">
+    <div data-testid="spotlight-card" className="rounded-[var(--card-radius,0.75rem)] border bg-gradient-to-r from-accent-50 to-primary-50 dark:from-accent-950/20 dark:to-primary-950/20 p-[var(--card-padding,1.25rem)]">
       <h3 className="font-semibold text-sm mb-2">⭐ Partner of the Month — {spotlight.month}</h3>
       <div className="flex items-start gap-[var(--content-density-gap,1rem)]">
         {spotlight.affiliate_avatar && (
