@@ -559,64 +559,68 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
   useEffect(() => {
     if (!settings) return
     
-    const root = document.documentElement
-    const isDark = resolvedTheme === 'dark'
-    
-    if (settings.branding.primaryColor) {
-      const hsl = hexToHSL(settings.branding.primaryColor)
-      if (hsl) {
-        root.style.setProperty('--primary', hsl)
-        root.style.setProperty('--primary-foreground', getContrastForeground(settings.branding.primaryColor))
+    try {
+      const root = document.documentElement
+      const isDark = resolvedTheme === 'dark'
+      
+      if (settings.branding.primaryColor) {
+        const hsl = hexToHSL(settings.branding.primaryColor)
+        if (hsl) {
+          root.style.setProperty('--primary', hsl)
+          root.style.setProperty('--primary-foreground', getContrastForeground(settings.branding.primaryColor))
+        }
+        applyShadeScale(root, 'primary', settings.branding.primaryColor)
+        applyChartColors(root, settings.branding.primaryColor, isDark)
       }
-      applyShadeScale(root, 'primary', settings.branding.primaryColor)
-      applyChartColors(root, settings.branding.primaryColor, isDark)
-    }
-    if (settings.branding.accentColor) {
-      applyShadeScale(root, 'accent', settings.branding.accentColor)
-    }
-    root.style.setProperty('--accent', isDark ? '0 0% 15%' : '0 0% 95%')
-    root.style.setProperty('--accent-foreground', isDark ? '0 0% 90%' : '0 0% 15%')
-    
-    const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
-    applyTheme(theme)
-    
-    const siteBgOverride = isDark ? settings.branding.siteBgDarkOverride : settings.branding.siteBgLightOverride
-    if (siteBgOverride) {
-      const hsl = hexToHSL(siteBgOverride)
-      if (hsl) {
-        root.style.setProperty('--background', hsl)
-        root.style.setProperty('--popover', hsl)
+      if (settings.branding.accentColor) {
+        applyShadeScale(root, 'accent', settings.branding.accentColor)
       }
-    } else if (settings.branding.primaryColor) {
-      const scale = generateShadeScaleHsl(settings.branding.primaryColor)
-      const bgShade = isDark ? scale['800'] : scale['100']
-      if (bgShade) {
-        root.style.setProperty('--background', bgShade)
-        root.style.setProperty('--popover', bgShade)
-      }
-    }
-
-    if (settings.branding.primaryColor) {
-      const scale = generateShadeScaleHsl(settings.branding.primaryColor)
-      if (!theme?.foreground) {
-        const fgShade = isDark ? scale['100'] : scale['900']
-        if (fgShade) {
-          root.style.setProperty('--foreground', fgShade)
-          root.style.setProperty('--popover-foreground', fgShade)
-          root.style.setProperty('--card-foreground', fgShade)
+      root.style.setProperty('--accent', isDark ? '0 0% 15%' : '0 0% 95%')
+      root.style.setProperty('--accent-foreground', isDark ? '0 0% 90%' : '0 0% 15%')
+      
+      const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
+      applyTheme(theme)
+      
+      const siteBgOverride = isDark ? settings.branding.siteBgDarkOverride : settings.branding.siteBgLightOverride
+      if (siteBgOverride) {
+        const hsl = hexToHSL(siteBgOverride)
+        if (hsl) {
+          root.style.setProperty('--background', hsl)
+          root.style.setProperty('--popover', hsl)
+        }
+      } else if (settings.branding.primaryColor) {
+        const scale = generateShadeScaleHsl(settings.branding.primaryColor)
+        const bgShade = isDark ? scale['800'] : scale['100']
+        if (bgShade) {
+          root.style.setProperty('--background', bgShade)
+          root.style.setProperty('--popover', bgShade)
         }
       }
-      if (!theme?.border) {
-        root.style.setProperty('--border', '0 0% 50%')
-        root.style.setProperty('--input', '0 0% 50%')
-      }
-      const mutedShade = isDark ? scale['700'] : scale['200']
-      const mutedFgShade = isDark ? scale['300'] : scale['600']
-      if (mutedShade) root.style.setProperty('--muted', mutedShade)
-      if (mutedFgShade) root.style.setProperty('--muted-foreground', mutedFgShade)
-    }
 
-    applyDesignSystemVars(root, settings.branding, isDark)
+      if (settings.branding.primaryColor) {
+        const scale = generateShadeScaleHsl(settings.branding.primaryColor)
+        if (!theme?.foreground) {
+          const fgShade = isDark ? scale['100'] : scale['900']
+          if (fgShade) {
+            root.style.setProperty('--foreground', fgShade)
+            root.style.setProperty('--popover-foreground', fgShade)
+            root.style.setProperty('--card-foreground', fgShade)
+          }
+        }
+        if (!theme?.border) {
+          root.style.setProperty('--border', '0 0% 50%')
+          root.style.setProperty('--input', '0 0% 50%')
+        }
+        const mutedShade = isDark ? scale['700'] : scale['200']
+        const mutedFgShade = isDark ? scale['300'] : scale['600']
+        if (mutedShade) root.style.setProperty('--muted', mutedShade)
+        if (mutedFgShade) root.style.setProperty('--muted-foreground', mutedFgShade)
+      }
+
+      applyDesignSystemVars(root, settings.branding, isDark)
+    } catch (err) {
+      console.error('[useThemeFromSettings] Error applying CSS variables:', err)
+    }
   }, [settings?.branding, resolvedTheme])
   
   useEffect(() => {
@@ -646,45 +650,49 @@ export function useThemeFromSettings(settings: SiteSettings | null) {
     if (!settings) return
     
     const applyAllColors = () => {
-      const root = document.documentElement
-      const isDark = root.classList.contains('dark')
-      
-      const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
-      applyTheme(theme)
-      
-      if (settings.branding.primaryColor) {
-        const hsl = hexToHSL(settings.branding.primaryColor)
-        if (hsl) {
-          root.style.setProperty('--primary', hsl)
-          root.style.setProperty('--primary-foreground', getContrastForeground(settings.branding.primaryColor))
+      try {
+        const root = document.documentElement
+        const isDark = root.classList.contains('dark')
+        
+        const theme = isDark ? settings.branding.darkTheme : settings.branding.lightTheme
+        applyTheme(theme)
+        
+        if (settings.branding.primaryColor) {
+          const hsl = hexToHSL(settings.branding.primaryColor)
+          if (hsl) {
+            root.style.setProperty('--primary', hsl)
+            root.style.setProperty('--primary-foreground', getContrastForeground(settings.branding.primaryColor))
+          }
+          applyShadeScale(root, 'primary', settings.branding.primaryColor)
+          applyChartColors(root, settings.branding.primaryColor, isDark)
         }
-        applyShadeScale(root, 'primary', settings.branding.primaryColor)
-        applyChartColors(root, settings.branding.primaryColor, isDark)
-      }
-      
-      if (settings.branding.accentColor) {
-        applyShadeScale(root, 'accent', settings.branding.accentColor)
-      }
-      root.style.setProperty('--accent', isDark ? '0 0% 15%' : '0 0% 95%')
-      root.style.setProperty('--accent-foreground', isDark ? '0 0% 90%' : '0 0% 15%')
-      
-      const siteBgOverride = isDark ? settings.branding.siteBgDarkOverride : settings.branding.siteBgLightOverride
-      if (siteBgOverride) {
-        const hsl = hexToHSL(siteBgOverride)
-        if (hsl) {
-          root.style.setProperty('--background', hsl)
-          root.style.setProperty('--popover', hsl)
+        
+        if (settings.branding.accentColor) {
+          applyShadeScale(root, 'accent', settings.branding.accentColor)
         }
-      } else if (settings.branding.primaryColor) {
-        const scale = generateShadeScaleHsl(settings.branding.primaryColor)
-        const bgShade = isDark ? scale['950'] : scale['50']
-        if (bgShade) {
-          root.style.setProperty('--background', bgShade)
-          root.style.setProperty('--popover', bgShade)
+        root.style.setProperty('--accent', isDark ? '0 0% 15%' : '0 0% 95%')
+        root.style.setProperty('--accent-foreground', isDark ? '0 0% 90%' : '0 0% 15%')
+        
+        const siteBgOverride = isDark ? settings.branding.siteBgDarkOverride : settings.branding.siteBgLightOverride
+        if (siteBgOverride) {
+          const hsl = hexToHSL(siteBgOverride)
+          if (hsl) {
+            root.style.setProperty('--background', hsl)
+            root.style.setProperty('--popover', hsl)
+          }
+        } else if (settings.branding.primaryColor) {
+          const scale = generateShadeScaleHsl(settings.branding.primaryColor)
+          const bgShade = isDark ? scale['950'] : scale['50']
+          if (bgShade) {
+            root.style.setProperty('--background', bgShade)
+            root.style.setProperty('--popover', bgShade)
+          }
         }
-      }
 
-      applyDesignSystemVars(root, settings.branding, isDark)
+        applyDesignSystemVars(root, settings.branding, isDark)
+      } catch (err) {
+        console.error('[useThemeFromSettings] MutationObserver error:', err)
+      }
     }
     
     const observer = new MutationObserver((mutations) => {
