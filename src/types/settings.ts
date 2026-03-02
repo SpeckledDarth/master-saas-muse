@@ -37,7 +37,7 @@ export interface BrandingSettings {
   logoIconUrl?: string | null
   siteBgLightOverride?: string | null
   siteBgDarkOverride?: string | null
-  buttonRadius?: 'pill' | 'rounded'
+  buttonRadius?: 'pill' | 'rounded' | 'square'
 
   h1FontSize?: string
   h1FontWeight?: string
