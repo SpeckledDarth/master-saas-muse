@@ -174,7 +174,7 @@ export function SocialSidebar() {
     <Sidebar>
       <SidebarHeader className="p-[var(--card-padding,1.25rem)]">
         <Link href="/dashboard/social/overview" className="flex items-center gap-2" data-testid="link-social-home">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <div className="flex h-8 w-8 items-center justify-center rounded-[var(--btn-radius,9999px)] bg-primary text-primary-foreground">
             <Sparkles className="h-4 w-4" />
           </div>
           <div className="flex flex-col">
@@ -226,7 +226,7 @@ export function SocialSidebar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex items-center gap-2 w-full rounded-md p-2 text-left text-sm hover-elevate"
+                className="flex items-center gap-2 w-full rounded-[var(--card-radius,0.75rem)] p-2 text-left text-sm hover-elevate"
                 data-testid="button-sidebar-user-menu"
               >
                 <Avatar className="h-8 w-8">

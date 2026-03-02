@@ -208,7 +208,7 @@ function TicketDetail({
               {comments.map((comment) => (
                 <div
                   key={comment.id}
-                  className="rounded-md border p-3 space-y-1"
+                  className="rounded-[var(--card-radius,0.75rem)] border p-3 space-y-1"
                   data-testid={`comment-${comment.id}`}
                 >
                   <p className="text-sm whitespace-pre-wrap">{comment.body}</p>

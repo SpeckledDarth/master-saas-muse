@@ -206,7 +206,7 @@ export default function BlogPostsPage() {
             placeholder="Search articles..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full rounded-md border bg-background px-8 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-[var(--input-radius,0.75rem)] border bg-background px-8 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             data-testid="input-search-blog-posts"
           />
         </div>

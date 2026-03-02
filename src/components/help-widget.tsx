@@ -117,7 +117,7 @@ export function HelpWidget({
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed z-50 rounded-full p-3 shadow-lg text-white"
+        className="fixed z-50 rounded-full p-3 shadow-[var(--card-shadow)] text-white"
         style={{
           backgroundColor: color || '#6366f1',
           bottom: '1.5rem',
@@ -132,7 +132,7 @@ export function HelpWidget({
       {isOpen && (
         <div
           ref={panelRef}
-          className="fixed z-50 rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] shadow-xl flex flex-col"
+          className="fixed z-50 rounded-[var(--card-radius,0.75rem)] border bg-[var(--card-bg)] shadow-[var(--card-shadow)] flex flex-col"
           style={{
             bottom: '5rem',
             right: position === 'bottom-left' ? undefined : '1.5rem',
@@ -187,7 +187,7 @@ export function HelpWidget({
               <select
                 value={heardFrom}
                 onChange={(e) => setHeardFrom(e.target.value)}
-                className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs"
+                className="w-full h-8 rounded-[var(--input-radius,0.75rem)] border border-input bg-background px-2 text-xs"
                 data-testid="select-help-heard-from"
               >
                 <option value="">Select...</option>

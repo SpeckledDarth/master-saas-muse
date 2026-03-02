@@ -47,7 +47,7 @@ export default function ResetPasswordPage() {
           <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             {message && (
               <div
-                className={`p-3 rounded-md text-sm ${
+                className={`p-3 rounded-[var(--card-radius,0.75rem)] text-sm ${
                   message.type === 'success'
                     ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]'
                     : 'bg-[hsl(var(--danger)/0.1)] text-[hsl(var(--danger))]'

@@ -41,14 +41,14 @@ function OAuthErrorContent() {
             We couldn&apos;t connect your {platformName} account.
           </p>
           
-          <div className="rounded-md bg-destructive/5 border border-destructive/20 p-3">
+          <div className="rounded-[var(--card-radius,0.75rem)] bg-destructive/5 border border-destructive/20 p-3">
             <p className="text-sm text-destructive" data-testid="text-oauth-error-detail">
               {error}
             </p>
           </div>
 
           {isCallbackMismatch && (
-            <div className="rounded-md bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
+            <div className="rounded-[var(--card-radius,0.75rem)] bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
               <p className="text-sm text-[hsl(var(--warning))]">
                 This usually means the callback URL in your {platformName} developer app settings doesn&apos;t match your site URL. Check the developer portal and update it.
               </p>
@@ -56,7 +56,7 @@ function OAuthErrorContent() {
           )}
 
           {isExpired && (
-            <div className="rounded-md bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
+            <div className="rounded-[var(--card-radius,0.75rem)] bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
               <p className="text-sm text-[hsl(var(--warning))]">
                 The authorization request expired. This happens if you wait too long on the authorization page. Please try again.
               </p>
@@ -64,7 +64,7 @@ function OAuthErrorContent() {
           )}
 
           {isTokenFailed && (
-            <div className="rounded-md bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
+            <div className="rounded-[var(--card-radius,0.75rem)] bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
               <p className="text-sm text-[hsl(var(--warning))]">
                 The token exchange with {platformName} failed. Check that your API credentials (Client ID and Secret) are correct in the admin settings.
               </p>
@@ -72,7 +72,7 @@ function OAuthErrorContent() {
           )}
 
           {isDenied && (
-            <div className="rounded-md bg-[hsl(var(--info)/0.1)] border border-[hsl(var(--info)/0.3)] p-3">
+            <div className="rounded-[var(--card-radius,0.75rem)] bg-[hsl(var(--info)/0.1)] border border-[hsl(var(--info)/0.3)] p-3">
               <p className="text-sm text-[hsl(var(--info))]">
                 No worries — you can try connecting again whenever you&apos;re ready. Just click &quot;Try Again&quot; below.
               </p>
@@ -80,7 +80,7 @@ function OAuthErrorContent() {
           )}
 
           {isTimeout && (
-            <div className="rounded-md bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
+            <div className="rounded-[var(--card-radius,0.75rem)] bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
               <p className="text-sm text-[hsl(var(--warning))]">
                 The request to {platformName} timed out. This can happen if {platformName}&apos;s servers are slow. Wait a moment and try again.
               </p>
@@ -88,7 +88,7 @@ function OAuthErrorContent() {
           )}
 
           {isCredentials && (
-            <div className="rounded-md bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
+            <div className="rounded-[var(--card-radius,0.75rem)] bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)] p-3">
               <p className="text-sm text-[hsl(var(--warning))]">
                 Your {platformName} API credentials may not be set up yet. Go to Admin Settings to add the Client ID and Secret.
               </p>

@@ -2206,7 +2206,7 @@ function StandaloneAffiliateDashboard() {
                   const achieved = milestoneData.currentReferrals >= ms.referral_threshold
                   const progress = Math.min((milestoneData.currentReferrals / ms.referral_threshold) * 100, 100)
                   return (
-                    <div key={ms.id} className={`p-3 rounded-md border ${achieved ? 'border-[hsl(var(--success)/0.3)] bg-[hsl(var(--success)/0.05)] dark:bg-[hsl(var(--success)/0.1)]' : ''}`} data-testid={`milestone-progress-${ms.id}`}>
+                    <div key={ms.id} className={`p-3 rounded-[var(--card-radius,0.75rem)] border ${achieved ? 'border-[hsl(var(--success)/0.3)] bg-[hsl(var(--success)/0.05)] dark:bg-[hsl(var(--success)/0.1)]' : ''}`} data-testid={`milestone-progress-${ms.id}`}>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium">{S(ms.name)}</span>
                         <span className="text-sm font-medium text-[hsl(var(--success))]">
@@ -2250,7 +2250,7 @@ function StandaloneAffiliateDashboard() {
                   const isActive = contest.status === 'active' && now >= start && now <= end
                   const daysLeft = isActive ? Math.max(0, Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))) : null
                   return (
-                    <div key={contest.id} className={`p-[var(--card-padding,1.25rem)] rounded-md border ${isActive ? 'border-[hsl(var(--warning)/0.5)]' : ''}`} data-testid={`contest-${contest.id}`}>
+                    <div key={contest.id} className={`p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border ${isActive ? 'border-[hsl(var(--warning)/0.5)]' : ''}`} data-testid={`contest-${contest.id}`}>
                       <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)]">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -2340,7 +2340,7 @@ function StandaloneAffiliateDashboard() {
                   Leaderboard
                 </CardTitle>
                 <div className="flex gap-1">
-                  <div className="flex border rounded-md overflow-hidden">
+                  <div className="flex border rounded-[var(--card-radius,0.75rem)] overflow-hidden">
                     {([['month', 'Month'], ['last_month', 'Last'], ['all', 'All']] as const).map(([val, lbl]) => (
                       <button
                         key={val}
@@ -2350,7 +2350,7 @@ function StandaloneAffiliateDashboard() {
                       >{lbl}</button>
                     ))}
                   </div>
-                  <div className="flex border rounded-md overflow-hidden">
+                  <div className="flex border rounded-[var(--card-radius,0.75rem)] overflow-hidden">
                     {([['referrals', 'Refs'], ['earnings', '$']] as const).map(([val, lbl]) => (
                       <button
                         key={val}
@@ -2371,7 +2371,7 @@ function StandaloneAffiliateDashboard() {
                   {leaderboard.map(entry => (
                     <div
                       key={entry.rank}
-                      className={`flex items-center justify-between p-2 rounded-md text-sm ${entry.isYou ? 'bg-primary/10 border border-primary/30 font-medium' : ''}`}
+                      className={`flex items-center justify-between p-2 rounded-[var(--card-radius,0.75rem)] text-sm ${entry.isYou ? 'bg-primary/10 border border-primary/30 font-medium' : ''}`}
                       data-testid={`leaderboard-rank-${entry.rank}`}
                     >
                       <div className="flex items-center gap-2">
@@ -2406,7 +2406,7 @@ function StandaloneAffiliateDashboard() {
                 <BarChart3 className="h-4 w-4" />
                 Conversion Funnel
               </CardTitle>
-              <div className="flex border rounded-md overflow-hidden">
+              <div className="flex border rounded-[var(--card-radius,0.75rem)] overflow-hidden">
                 {([['7d', '7d'], ['30d', '30d'], ['90d', '90d'], ['all', 'All']] as const).map(([val, lbl]) => (
                   <button
                     key={val}
@@ -2501,7 +2501,7 @@ function StandaloneAffiliateDashboard() {
                 return (
                   <div
                     key={i}
-                    className={`p-3 rounded-md border ${priorityColors[tip.priority]}`}
+                    className={`p-3 rounded-[var(--card-radius,0.75rem)] border ${priorityColors[tip.priority]}`}
                     data-testid={`coach-tip-${i}`}
                   >
                     <div className="flex items-start justify-between gap-2 mb-1">
@@ -2556,28 +2556,28 @@ function StandaloneAffiliateDashboard() {
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-[var(--content-density-gap,1rem)]">
-                <div className="p-3 rounded-md border" data-testid="stat-yt-videos">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid="stat-yt-videos">
                   <div className="flex items-center gap-1.5 mb-1">
                     <Play className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Videos</span>
                   </div>
                   <p className="text-lg font-bold">{N(youtubeAnalytics.channelStats?.totalVideos)}</p>
                 </div>
-                <div className="p-3 rounded-md border" data-testid="stat-yt-views">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid="stat-yt-views">
                   <div className="flex items-center gap-1.5 mb-1">
                     <Eye className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Total Views</span>
                   </div>
                   <p className="text-lg font-bold">{N(youtubeAnalytics.channelStats?.totalViews).toLocaleString()}</p>
                 </div>
-                <div className="p-3 rounded-md border" data-testid="stat-yt-likes">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid="stat-yt-likes">
                   <div className="flex items-center gap-1.5 mb-1">
                     <ThumbsUp className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Likes</span>
                   </div>
                   <p className="text-lg font-bold">{N(youtubeAnalytics.channelStats?.totalLikes).toLocaleString()}</p>
                 </div>
-                <div className="p-3 rounded-md border" data-testid="stat-yt-comments">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid="stat-yt-comments">
                   <div className="flex items-center gap-1.5 mb-1">
                     <MessageCircle className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Comments</span>
@@ -2587,7 +2587,7 @@ function StandaloneAffiliateDashboard() {
               </div>
 
               {youtubeAnalytics.attribution && (
-                <div className="p-3 rounded-md border bg-muted/30" data-testid="card-yt-attribution">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] border bg-muted/30" data-testid="card-yt-attribution">
                   <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
                     <Activity className="h-3.5 w-3.5" />
                     Referral Attribution
@@ -2619,7 +2619,7 @@ function StandaloneAffiliateDashboard() {
                   <p className="text-sm font-medium mb-2">Recent Videos</p>
                   <div className="space-y-2">
                     {youtubeAnalytics.videos.slice(0, 5).map((video: any) => (
-                      <div key={video.id} className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] p-2 rounded-md border" data-testid={`video-${video.id}`}>
+                      <div key={video.id} className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] p-2 rounded-[var(--card-radius,0.75rem)] border" data-testid={`video-${video.id}`}>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{S(video.title)}</p>
                           <p className="text-[10px] text-muted-foreground">
@@ -2880,16 +2880,16 @@ function StandaloneAffiliateDashboard() {
               onDragOver={(e) => handleWidgetDragOver(e, widgetId)}
               onDrop={() => handleWidgetDrop(widgetId)}
               onDragEnd={handleWidgetDragEnd}
-              className={`relative transition-all ${isDragging ? 'opacity-40' : ''} ${isDragOver ? 'ring-2 ring-primary ring-offset-2 rounded-md' : ''}`}
+              className={`relative transition-all ${isDragging ? 'opacity-40' : ''} ${isDragOver ? 'ring-2 ring-primary ring-offset-2 rounded-[var(--card-radius,0.75rem)]' : ''}`}
               data-testid={`widget-wrapper-${widgetId}`}
             >
               <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
-                <div className="cursor-grab active:cursor-grabbing p-1.5 rounded-md bg-background/80 border shadow-[var(--card-shadow)]" data-testid={`drag-handle-${widgetId}`}>
+                <div className="cursor-grab active:cursor-grabbing p-1.5 rounded-[var(--card-radius,0.75rem)] bg-background/80 border shadow-[var(--card-shadow)]" data-testid={`drag-handle-${widgetId}`}>
                   <GripVertical className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <button
                   onClick={() => hideWidget(widgetId)}
-                  className="p-1.5 rounded-md bg-background/80 border shadow-[var(--card-shadow)]"
+                  className="p-1.5 rounded-[var(--card-radius,0.75rem)] bg-background/80 border shadow-[var(--card-shadow)]"
                   data-testid={`button-hide-widget-${widgetId}`}
                 >
                   <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -2942,7 +2942,7 @@ function StandaloneAffiliateDashboard() {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-lg font-semibold" data-testid="text-referrals-heading">Referrals ({data.referrals.length})</h2>
         <div className="flex gap-2 flex-wrap">
-          <div className="flex rounded-md border overflow-hidden">
+          <div className="flex rounded-[var(--card-radius,0.75rem)] border overflow-hidden">
             <button
               className={`px-3 py-1 text-xs font-medium transition-colors ${referralView === 'list' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}`}
               onClick={() => setReferralView('list')}
@@ -3041,7 +3041,7 @@ function StandaloneAffiliateDashboard() {
                     const daysSinceSignup = Math.floor((Date.now() - new Date(ref.created_at).getTime()) / (1000 * 60 * 60 * 24))
                     const monthlyLTV = daysSinceSignup > 0 ? (revenue / daysSinceSignup) * 30 : 0
                     return (
-                      <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`portfolio-referral-${ref.id}`}>
+                      <div key={ref.id} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`portfolio-referral-${ref.id}`}>
                         <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                           <div className="w-8 h-8 rounded-full bg-[hsl(var(--success)/0.1)] flex items-center justify-center">
                             <UserCheck className="h-4 w-4 text-[hsl(var(--success))]" />
@@ -3076,7 +3076,7 @@ function StandaloneAffiliateDashboard() {
               <CardContent>
                 <div className="space-y-2">
                   {trialReferrals.map(ref => (
-                    <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`portfolio-trial-${ref.id}`}>
+                    <div key={ref.id} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`portfolio-trial-${ref.id}`}>
                       <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                         <div className="w-8 h-8 rounded-full bg-[hsl(var(--warning)/0.1)] flex items-center justify-center">
                           <Clock className="h-4 w-4 text-[hsl(var(--warning))]" />
@@ -3109,7 +3109,7 @@ function StandaloneAffiliateDashboard() {
                   {churnedReferrals.map(ref => {
                     const revenue = referralCommissions[ref.id] || 0
                     return (
-                      <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border opacity-75" data-testid={`portfolio-churned-${ref.id}`}>
+                      <div key={ref.id} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border opacity-75" data-testid={`portfolio-churned-${ref.id}`}>
                         <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                           <div className="w-8 h-8 rounded-full bg-[hsl(var(--danger)/0.1)] flex items-center justify-center">
                             <UserX className="h-4 w-4 text-[hsl(var(--danger))]" />
@@ -3147,7 +3147,7 @@ function StandaloneAffiliateDashboard() {
           ) : (
             <div className="space-y-2">
               {filteredReferrals.map(ref => (
-                <div key={ref.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`referral-${ref.id}`}>
+                <div key={ref.id} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`referral-${ref.id}`}>
                   <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                     <Badge variant={STATUS_COLORS[ref.status] as any || 'outline'} className="text-xs capitalize">
                       {S(ref.status).replace('_', ' ')}
@@ -3182,7 +3182,7 @@ function StandaloneAffiliateDashboard() {
               {Object.entries(sourceBreakdown)
                 .sort(([, a], [, b]) => b.referrals - a.referrals)
                 .map(([tag, srcData]) => (
-                  <div key={tag} className="flex items-center justify-between p-3 rounded-md border" data-testid={`source-${tag}`}>
+                  <div key={tag} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`source-${tag}`}>
                     <Badge variant="outline" className="text-xs font-mono">{tag}</Badge>
                     <div className="flex items-center gap-[var(--content-density-gap,1rem)] text-sm">
                       <span>{srcData.referrals} signup{srcData.referrals !== 1 ? 's' : ''}</span>
@@ -3228,7 +3228,7 @@ function StandaloneAffiliateDashboard() {
                   {expiringReferrals.map((ref: any) => {
                     const hasPending = renewals.some(r => r.referral_id === ref.id && r.status === 'pending')
                     return (
-                      <div key={ref.id} className="p-3 rounded-md border space-y-2" data-testid={`expiring-referral-${ref.id}`}>
+                      <div key={ref.id} className="p-3 rounded-[var(--card-radius,0.75rem)] border space-y-2" data-testid={`expiring-referral-${ref.id}`}>
                         <div className="flex items-center justify-between flex-wrap gap-2">
                           <div>
                             <p className="text-sm font-medium">Referral #{ref.id.slice(0, 8)}</p>
@@ -3303,7 +3303,7 @@ function StandaloneAffiliateDashboard() {
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Renewal History</p>
                   {renewals.map((r: any) => (
-                    <div key={r.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`renewal-${r.id}`}>
+                    <div key={r.id} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`renewal-${r.id}`}>
                       <div>
                         <p className="text-sm">Referral #{r.referral_id?.slice(0, 8)}</p>
                         <p className="text-xs text-muted-foreground">
@@ -3440,7 +3440,7 @@ function StandaloneAffiliateDashboard() {
                 })()
 
                 return (
-                <div key={com.id} className="rounded-md border" data-testid={`commission-${com.id}`}>
+                <div key={com.id} className="rounded-[var(--card-radius,0.75rem)] border" data-testid={`commission-${com.id}`}>
                   <button
                     className="w-full flex items-center justify-between p-3 text-left"
                     onClick={() => setExpandedCommission(isExpanded ? null : com.id)}
@@ -3545,7 +3545,7 @@ function StandaloneAffiliateDashboard() {
             ) : (
               <div className="space-y-2">
                 {data.secondTierCommissions!.map(stc => (
-                  <div key={stc.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`second-tier-commission-${stc.id}`}>
+                  <div key={stc.id} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`second-tier-commission-${stc.id}`}>
                     <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                       <Badge variant="secondary" className="text-xs">
                         Tier 2
@@ -3649,7 +3649,7 @@ function StandaloneAffiliateDashboard() {
           </div>
         </div>
 
-        <div className="flex rounded-md border overflow-hidden mb-4">
+        <div className="flex rounded-[var(--card-radius,0.75rem)] border overflow-hidden mb-4">
           {(['overview', 'referrals', 'history', 'tools'] as const).map(tab => (
             <button
               key={tab}
@@ -3701,25 +3701,25 @@ function StandaloneAffiliateDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="p-3 rounded-md bg-muted/50 text-center">
+                    <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center">
                       <p className="text-xs text-muted-foreground">Daily Avg</p>
                       <p className="text-sm font-bold" data-testid="text-daily-avg">
                         ${((financialTools.projection.dailyAvg || 0) / 100).toFixed(2)}
                       </p>
                     </div>
-                    <div className="p-3 rounded-md bg-muted/50 text-center">
+                    <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center">
                       <p className="text-xs text-muted-foreground">This Month</p>
                       <p className="text-sm font-bold" data-testid="text-month-earnings">
                         ${((financialTools.projection.currentMonthEarnings || 0) / 100).toFixed(2)}
                       </p>
                     </div>
-                    <div className="p-3 rounded-md bg-muted/50 text-center">
+                    <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center">
                       <p className="text-xs text-muted-foreground">Month Projected</p>
                       <p className="text-sm font-bold" data-testid="text-projected-monthly">
                         ${((financialTools.projection.projectedMonthly || 0) / 100).toFixed(2)}
                       </p>
                     </div>
-                    <div className="p-3 rounded-md bg-primary/10 text-center">
+                    <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-primary/10 text-center">
                       <p className="text-xs text-muted-foreground">Annual Projected</p>
                       <p className="text-lg font-bold text-primary" data-testid="text-projected-annual">
                         ${((financialTools.projection.projectedAnnual || 0) / 100).toFixed(2)}
@@ -3761,9 +3761,9 @@ function StandaloneAffiliateDashboard() {
                             ${((financialTools.revenueShare.yourEarnings || 0) / 100).toFixed(2)}
                           </span>
                         </div>
-                        <div className="h-3 bg-muted rounded-md overflow-hidden">
+                        <div className="h-3 bg-muted rounded-[var(--card-radius,0.75rem)] overflow-hidden">
                           <div
-                            className="h-full rounded-md bg-primary transition-all"
+                            className="h-full rounded-[var(--card-radius,0.75rem)] bg-primary transition-all"
                             style={{ width: `${financialTools.revenueShare.yourPercentage || 0}%` }}
                           />
                         </div>
@@ -3777,9 +3777,9 @@ function StandaloneAffiliateDashboard() {
                             ${((financialTools.revenueShare.platformShare || 0) / 100).toFixed(2)}
                           </span>
                         </div>
-                        <div className="h-3 bg-muted rounded-md overflow-hidden">
+                        <div className="h-3 bg-muted rounded-[var(--card-radius,0.75rem)] overflow-hidden">
                           <div
-                            className="h-full rounded-md bg-muted-foreground/30 transition-all"
+                            className="h-full rounded-[var(--card-radius,0.75rem)] bg-muted-foreground/30 transition-all"
                             style={{ width: `${100 - (financialTools.revenueShare.yourPercentage || 0)}%` }}
                           />
                         </div>
@@ -3805,17 +3805,17 @@ function StandaloneAffiliateDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-3">
-                    <div className="p-3 rounded-md bg-muted/50 text-center">
+                    <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center">
                       <p className="text-xs text-muted-foreground">Subscription</p>
                       <p className="text-sm font-bold">-${((financialTools.expenseOffset.subscriptionCostCents || 0) / 100).toFixed(2)}</p>
                     </div>
-                    <div className="p-3 rounded-md bg-muted/50 text-center">
+                    <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center">
                       <p className="text-xs text-muted-foreground">This Month</p>
                       <p className="text-sm font-bold text-[hsl(var(--success))]">
                         +${((financialTools.expenseOffset.monthlyEarnings || 0) / 100).toFixed(2)}
                       </p>
                     </div>
-                    <div className={`p-3 rounded-md text-center ${financialTools.expenseOffset.monthlyNet >= 0 ? 'bg-[hsl(var(--success)/0.1)]' : 'bg-[hsl(var(--danger)/0.1)]'}`}>
+                    <div className={`p-3 rounded-[var(--card-radius,0.75rem)] text-center ${financialTools.expenseOffset.monthlyNet >= 0 ? 'bg-[hsl(var(--success)/0.1)]' : 'bg-[hsl(var(--danger)/0.1)]'}`}>
                       <p className="text-xs text-muted-foreground">Net</p>
                       <p className={`text-sm font-bold ${financialTools.expenseOffset.monthlyNet >= 0 ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--danger))]'}`} data-testid="text-monthly-net">
                         {financialTools.expenseOffset.monthlyNet >= 0 ? '+' : ''}${((financialTools.expenseOffset.monthlyNet || 0) / 100).toFixed(2)}
@@ -3844,7 +3844,7 @@ function StandaloneAffiliateDashboard() {
                 <CardContent>
                   <div className="space-y-2">
                     {financialTools.churnAlerts.slice(0, 5).map((alert: any, i: number) => (
-                      <div key={i} className="flex items-center justify-between p-3 rounded-md border" data-testid={`churn-alert-${i}`}>
+                      <div key={i} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`churn-alert-${i}`}>
                         <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                           <div className="w-8 h-8 rounded-full bg-[hsl(var(--danger)/0.1)] flex items-center justify-center">
                             <UserX className="h-4 w-4 text-[hsl(var(--danger))]" />
@@ -3951,9 +3951,9 @@ function StandaloneAffiliateDashboard() {
                             </div>
                             <span className="text-sm font-bold">${(ref.totalEarnings / 100).toFixed(2)}</span>
                           </div>
-                          <div className="h-2 bg-muted rounded-md overflow-hidden">
+                          <div className="h-2 bg-muted rounded-[var(--card-radius,0.75rem)] overflow-hidden">
                             <div
-                              className={`h-full rounded-md transition-all ${ref.status === 'churned' ? 'bg-[hsl(var(--danger))]' : 'bg-primary/70'}`}
+                              className={`h-full rounded-[var(--card-radius,0.75rem)] transition-all ${ref.status === 'churned' ? 'bg-[hsl(var(--danger))]' : 'bg-primary/70'}`}
                               style={{ width: `${Math.max((ref.totalEarnings / maxEarn) * 100, 2)}%` }}
                             />
                           </div>
@@ -3988,7 +3988,7 @@ function StandaloneAffiliateDashboard() {
                 <CardContent>
                   <div className="space-y-3">
                     {financialTools.multiYearHistory.map((yr: any) => (
-                      <div key={yr.year} className="p-3 rounded-md border" data-testid={`year-history-${yr.year}`}>
+                      <div key={yr.year} className="p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`year-history-${yr.year}`}>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-bold">{S(yr.year)}</span>
                           <span className="text-sm font-bold text-primary">${(N(yr.earnings) / 100).toFixed(2)}</span>
@@ -4078,11 +4078,11 @@ function StandaloneAffiliateDashboard() {
                   const annualEarning = monthlyEarning * 12
                   return (
                     <div className="grid gap-[var(--content-density-gap,1rem)] grid-cols-1 sm:grid-cols-2">
-                      <div className="p-3 rounded-md bg-muted/50 text-center">
+                      <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center">
                         <p className="text-xs text-muted-foreground">Monthly Earnings</p>
                         <p className="text-lg font-bold" data-testid="text-calc-monthly">${monthlyEarning.toFixed(2)}</p>
                       </div>
-                      <div className="p-3 rounded-md bg-primary/10 text-center">
+                      <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-primary/10 text-center">
                         <p className="text-xs text-muted-foreground">Annual Earnings</p>
                         <p className="text-lg font-bold text-primary" data-testid="text-calc-annual">${annualEarning.toFixed(2)}</p>
                       </div>
@@ -4109,7 +4109,7 @@ function StandaloneAffiliateDashboard() {
                   return (
                     <div className="space-y-2">
                       {months.map(m => (
-                        <div key={m} className="flex items-center justify-between p-3 rounded-md border" data-testid={`split-month-${m}`}>
+                        <div key={m} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`split-month-${m}`}>
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium">{m} month{m !== 1 ? 's' : ''}</span>
                             <span className="text-xs text-muted-foreground">at ${price}/mo</span>
@@ -4219,7 +4219,7 @@ function StandaloneAffiliateDashboard() {
           ) : (
             <div className="space-y-2">
               {sortedPayouts.map(payout => (
-                <div key={payout.id} className="flex items-center justify-between p-3 rounded-md border" data-testid={`payout-${payout.id}`}>
+                <div key={payout.id} className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] border" data-testid={`payout-${payout.id}`}>
                   <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
                     <Badge variant={STATUS_COLORS[payout.status] as any || 'outline'} className="text-xs capitalize">
                       {S(payout.status)}
@@ -4635,7 +4635,7 @@ function StandaloneAffiliateDashboard() {
           {linkPresets.length > 0 ? (
             <div className="space-y-1.5">
               {linkPresets.map(p => (
-                <div key={p.id} className="flex items-center justify-between px-3 py-2 rounded-md bg-muted/40 text-sm" data-testid={`preset-${p.id}`}>
+                <div key={p.id} className="flex items-center justify-between px-3 py-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40 text-sm" data-testid={`preset-${p.id}`}>
                   <div className="flex-1 min-w-0">
                     <span className="font-medium">{S(p.name)}</span>
                     <span className="text-xs text-muted-foreground ml-2">{S(p.page_path)}{p.source_tag ? ` (${S(p.source_tag)})` : ''}</span>
@@ -4666,7 +4666,7 @@ function StandaloneAffiliateDashboard() {
           <CardDescription>Your personal brand in action — share your code with potential customers</CardDescription>
         </CardHeader>
         <CardContent className="space-y-[var(--content-density-gap,1rem)]">
-          <div className="p-3 rounded-md bg-muted/30 text-xs text-muted-foreground" data-testid="text-code-coaching">
+          <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/30 text-xs text-muted-foreground" data-testid="text-code-coaching">
             Your discount code is your personal brand in action. Choose something memorable that your audience will associate with YOU — your name, your show, your catchphrase. Great codes are short, easy to say out loud, and easy to remember. Codes are first-come, first-served — the more unique to your brand, the better!
           </div>
 
@@ -4683,7 +4683,7 @@ function StandaloneAffiliateDashboard() {
 
                 return (
                   <div key={code.id} data-testid={`discount-code-${code.id}`}>
-                    <div className="flex items-center justify-between p-3 rounded-md bg-muted/40">
+                    <div className="flex items-center justify-between p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40">
                       <div>
                         <span className="font-mono font-bold text-lg" data-testid={`text-code-value-${code.id}`}>{code.code}</span>
                         <div className="flex items-center gap-2 mt-0.5">
@@ -4736,7 +4736,7 @@ function StandaloneAffiliateDashboard() {
                     )}
 
                     {renameCode === code.id && (
-                      <div className="mt-2 p-3 rounded-md border space-y-2" data-testid="form-rename-code">
+                      <div className="mt-2 p-3 rounded-[var(--card-radius,0.75rem)] border space-y-2" data-testid="form-rename-code">
                         <Label className="text-xs font-medium">Rename Your Code</Label>
                         <div className="flex gap-2">
                           <Input
@@ -4757,7 +4757,7 @@ function StandaloneAffiliateDashboard() {
                         <p className="text-[10px] text-muted-foreground">Uppercase letters and numbers only, 4-20 characters. You can rename once every 30 days.</p>
 
                         {renameError && (
-                          <div className="p-2 rounded-md bg-destructive/10 text-xs text-destructive" data-testid="text-rename-error">
+                          <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-destructive/10 text-xs text-destructive" data-testid="text-rename-error">
                             {renameError}
                           </div>
                         )}
@@ -4780,11 +4780,11 @@ function StandaloneAffiliateDashboard() {
                 )
               })}
 
-              <div className="p-3 rounded-md bg-muted/30 text-xs text-muted-foreground" data-testid="text-code-protip">
+              <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/30 text-xs text-muted-foreground" data-testid="text-code-protip">
                 <strong>Pro tip:</strong> Say your code out loud. If it's easy to say on a podcast or livestream, your audience is more likely to remember it.
               </div>
 
-              <div className="p-3 rounded-md bg-muted/30 text-xs text-muted-foreground" data-testid="text-code-performance">
+              <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/30 text-xs text-muted-foreground" data-testid="text-code-performance">
                 Every use of your code earns you commission. Share it in your bio, your email signature, your content descriptions. Even if someone uses your code 5 years from now, you'll still earn credit under your active terms.
               </div>
             </div>
@@ -4850,7 +4850,7 @@ function StandaloneAffiliateDashboard() {
               </a>
             </Button>
           </div>
-          <div className="mt-3 p-3 rounded-md bg-muted/40">
+          <div className="mt-3 p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40">
             <Label className="text-xs text-muted-foreground mb-1 block">Quick Copy Text</Label>
             <p className="text-xs mb-2">Check out {appName}! Sign up with my link for a special offer: {data?.link?.shareUrl || ""}</p>
             <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { navigator.clipboard.writeText(`Check out ${appName}! Sign up with my link for a special offer: ${data?.link?.shareUrl || ""}`); toast({ title: 'Copied!', description: 'Sharing text copied to clipboard.' }) }} data-testid="button-copy-share-text">
@@ -4925,7 +4925,7 @@ function StandaloneAffiliateDashboard() {
                       type="color"
                       value={lpThemeColor}
                       onChange={e => setLpThemeColor(e.target.value)}
-                      className="w-9 h-9 rounded-md border cursor-pointer"
+                      className="w-9 h-9 rounded-[var(--card-radius,0.75rem)] border cursor-pointer"
                       data-testid="input-lp-color"
                     />
                     <Input
@@ -4962,7 +4962,7 @@ function StandaloneAffiliateDashboard() {
                 )}
               </div>
               {landingPage?.slug && (
-                <div className="p-3 rounded-md bg-muted/40 space-y-1.5">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40 space-y-1.5">
                   <Label className="text-xs text-muted-foreground">Your Landing Page URL</Label>
                   <div className="flex items-center gap-2">
                     <Input
@@ -5057,7 +5057,7 @@ function StandaloneAffiliateDashboard() {
           </Button>
           {aiWriterPost && (
             <div className="space-y-3">
-              <div className="p-3 rounded-md bg-muted/40 text-sm whitespace-pre-wrap" data-testid="text-ai-writer-post">
+              <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40 text-sm whitespace-pre-wrap" data-testid="text-ai-writer-post">
                 {aiWriterPost}
               </div>
               {aiWriterHashtags.length > 0 && (
@@ -5145,7 +5145,7 @@ function StandaloneAffiliateDashboard() {
           </Button>
           {aiToolResult && aiToolActive === 'email' && (
             <div className="space-y-3">
-              <div className="p-3 rounded-md bg-muted/40 space-y-2">
+              <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40 space-y-2">
                 <p className="text-xs font-medium text-muted-foreground">Subject Line:</p>
                 <p className="text-sm font-medium" data-testid="text-ai-email-subject">{aiToolResult.subject}</p>
                 <p className="text-xs font-medium text-muted-foreground mt-2">Email Body:</p>
@@ -5205,7 +5205,7 @@ function StandaloneAffiliateDashboard() {
           </Button>
           {aiToolResult && aiToolActive === 'blog' && (
             <div className="space-y-3">
-              <div className="p-3 rounded-md bg-muted/40 space-y-3">
+              <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40 space-y-3">
                 <div>
                   <p className="text-xs font-medium text-muted-foreground">Title:</p>
                   <p className="text-sm font-semibold" data-testid="text-ai-blog-title">{aiToolResult.title}</p>
@@ -5320,7 +5320,7 @@ function StandaloneAffiliateDashboard() {
           </Button>
           {aiToolResult && aiToolActive === 'video' && (
             <div className="space-y-3">
-              <div className="p-3 rounded-md bg-muted/40 space-y-3">
+              <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40 space-y-3">
                 <div>
                   <p className="text-xs font-medium text-muted-foreground">Title:</p>
                   <p className="text-sm font-semibold" data-testid="text-ai-video-title">{aiToolResult.title}</p>
@@ -5426,7 +5426,7 @@ function StandaloneAffiliateDashboard() {
           {aiToolResult && aiToolActive === 'adcopy' && (
             <div className="space-y-3">
               {aiToolResult.variations?.map((v: any, i: number) => (
-                <div key={i} className="p-3 rounded-md bg-muted/40 space-y-2" data-testid={`ad-variation-${i}`}>
+                <div key={i} className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40 space-y-2" data-testid={`ad-variation-${i}`}>
                   <Badge variant="secondary" className="text-xs">{v.angle || `Variation ${i + 1}`}</Badge>
                   <p className="text-sm font-semibold">{v.headline}</p>
                   <p className="text-xs">{v.primaryText}</p>
@@ -5437,7 +5437,7 @@ function StandaloneAffiliateDashboard() {
                 </div>
               ))}
               {aiToolResult.tips?.length > 0 && (
-                <div className="p-3 rounded-md bg-muted/20 space-y-1">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/20 space-y-1">
                   <p className="text-xs font-medium text-muted-foreground">Tips:</p>
                   {aiToolResult.tips.map((tip: string, i: number) => (
                     <p key={i} className="text-xs text-muted-foreground">- {tip}</p>
@@ -5491,7 +5491,7 @@ function StandaloneAffiliateDashboard() {
           </Button>
           {aiToolResult && aiToolActive === 'audience' && (
             <div className="space-y-3">
-              <div className="p-3 rounded-md bg-muted/40 space-y-3">
+              <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40 space-y-3">
                 <div>
                   <p className="text-xs font-medium text-muted-foreground">Generated Content:</p>
                   <p className="text-sm whitespace-pre-wrap" data-testid="text-ai-audience-content">{aiToolResult.content}</p>
@@ -5573,7 +5573,7 @@ function StandaloneAffiliateDashboard() {
           </Button>
           {aiToolResult && aiToolActive === 'pitch' && (
             <div className="space-y-3">
-              <div className="p-3 rounded-md bg-muted/40 space-y-3">
+              <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40 space-y-3">
                 {aiToolResult.subjectLine && (
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">Subject Line:</p>
@@ -5639,7 +5639,7 @@ function StandaloneAffiliateDashboard() {
           {aiToolResult && aiToolActive === 'objection' && (
             <div className="space-y-3">
               {aiToolResult.responses?.map((r: any, i: number) => (
-                <div key={i} className="p-3 rounded-md bg-muted/40 space-y-2" data-testid={`objection-response-${i}`}>
+                <div key={i} className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40 space-y-2" data-testid={`objection-response-${i}`}>
                   <Badge variant="secondary" className="text-xs">{r.approach}</Badge>
                   <p className="text-sm">{r.response}</p>
                   <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => copyAiToolContent(r.response)} data-testid={`button-copy-objection-${i}`}>
@@ -5648,7 +5648,7 @@ function StandaloneAffiliateDashboard() {
                 </div>
               ))}
               {aiToolResult.alternativeFraming && (
-                <div className="p-3 rounded-md bg-muted/20">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/20">
                   <p className="text-xs font-medium text-muted-foreground">Alternative Value Framing:</p>
                   <p className="text-sm" data-testid="text-ai-objection-framing">{aiToolResult.alternativeFraming}</p>
                 </div>
@@ -5708,7 +5708,7 @@ function StandaloneAffiliateDashboard() {
           {aiToolResult && aiToolActive === 'promo' && (
             <div className="space-y-3">
               {aiToolResult.ideas?.map((idea: any, i: number) => (
-                <div key={i} className="p-3 rounded-md bg-muted/40 space-y-2" data-testid={`promo-idea-${i}`}>
+                <div key={i} className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40 space-y-2" data-testid={`promo-idea-${i}`}>
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm font-medium">{idea.title}</p>
                     <Badge variant={idea.effort === 'low' ? 'secondary' : idea.effort === 'high' ? 'destructive' : 'outline'} className="text-[10px]">
@@ -5730,7 +5730,7 @@ function StandaloneAffiliateDashboard() {
                 </div>
               ))}
               {aiToolResult.weeklyPlan && (
-                <div className="p-3 rounded-md bg-muted/20">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/20">
                   <p className="text-xs font-medium text-muted-foreground">Suggested Weekly Plan:</p>
                   <p className="text-xs whitespace-pre-wrap" data-testid="text-ai-promo-plan">{aiToolResult.weeklyPlan}</p>
                 </div>
@@ -5764,26 +5764,26 @@ function StandaloneAffiliateDashboard() {
             <div className="space-y-3">
               {aiToolResult.currentStats && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                  <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40 text-center">
                     <p className="text-lg font-bold" data-testid="text-conv-clicks">{aiToolResult.currentStats.clicks}</p>
                     <p className="text-[10px] text-muted-foreground">Clicks</p>
                   </div>
-                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                  <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40 text-center">
                     <p className="text-lg font-bold" data-testid="text-conv-signups">{aiToolResult.currentStats.signups}</p>
                     <p className="text-[10px] text-muted-foreground">Signups</p>
                   </div>
-                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                  <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40 text-center">
                     <p className="text-lg font-bold" data-testid="text-conv-rate">{aiToolResult.currentStats.conversionRate}%</p>
                     <p className="text-[10px] text-muted-foreground">Conv. Rate</p>
                   </div>
-                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                  <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40 text-center">
                     <p className="text-lg font-bold" data-testid="text-conv-earnings">${aiToolResult.currentStats.earnings}</p>
                     <p className="text-[10px] text-muted-foreground">Earnings</p>
                   </div>
                 </div>
               )}
               {aiToolResult.analysis && (
-                <div className="p-3 rounded-md bg-muted/40">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40">
                   <p className="text-xs font-medium text-muted-foreground">Analysis:</p>
                   <p className="text-sm" data-testid="text-ai-conversion-analysis">{aiToolResult.analysis}</p>
                 </div>
@@ -5792,7 +5792,7 @@ function StandaloneAffiliateDashboard() {
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-muted-foreground">Optimization Tips:</p>
                   {aiToolResult.optimizationTips.map((tip: any, i: number) => (
-                    <div key={i} className="p-2 rounded-md bg-muted/40" data-testid={`optimization-tip-${i}`}>
+                    <div key={i} className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40" data-testid={`optimization-tip-${i}`}>
                       <p className="text-sm font-medium">{tip.area}</p>
                       <p className="text-xs">{tip.suggestion}</p>
                       {tip.expectedImpact && <p className="text-[10px] text-muted-foreground">Expected: {tip.expectedImpact}</p>}
@@ -5804,7 +5804,7 @@ function StandaloneAffiliateDashboard() {
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-muted-foreground">Follow-up Templates:</p>
                   {aiToolResult.followUpTemplates.map((t: any, i: number) => (
-                    <div key={i} className="p-2 rounded-md bg-muted/40 space-y-1" data-testid={`followup-template-${i}`}>
+                    <div key={i} className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40 space-y-1" data-testid={`followup-template-${i}`}>
                       <p className="text-xs font-medium">{t.scenario}</p>
                       <p className="text-xs">{t.message}</p>
                       <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => copyAiToolContent(t.message)} data-testid={`button-copy-followup-${i}`}>
@@ -5846,7 +5846,7 @@ function StandaloneAffiliateDashboard() {
           {aiToolResult && aiToolActive === 'onboarding' && (
             <div className="space-y-3">
               {aiToolResult.greeting && (
-                <div className="p-3 rounded-md bg-muted/40">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40">
                   <p className="text-sm" data-testid="text-ai-onboarding-greeting">{aiToolResult.greeting}</p>
                   {aiToolResult.currentPhase && (
                     <Badge variant="secondary" className="text-xs mt-2 capitalize">{aiToolResult.currentPhase.replace(/_/g, ' ')}</Badge>
@@ -5855,26 +5855,26 @@ function StandaloneAffiliateDashboard() {
               )}
               {aiToolResult.stats && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                  <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40 text-center">
                     <p className="text-lg font-bold">{aiToolResult.stats.daysActive}</p>
                     <p className="text-[10px] text-muted-foreground">Days Active</p>
                   </div>
-                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                  <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40 text-center">
                     <p className="text-lg font-bold">{aiToolResult.stats.clicks}</p>
                     <p className="text-[10px] text-muted-foreground">Clicks</p>
                   </div>
-                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                  <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40 text-center">
                     <p className="text-lg font-bold">{aiToolResult.stats.signups}</p>
                     <p className="text-[10px] text-muted-foreground">Signups</p>
                   </div>
-                  <div className="p-2 rounded-md bg-muted/40 text-center">
+                  <div className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40 text-center">
                     <p className="text-lg font-bold">${aiToolResult.stats.earnings}</p>
                     <p className="text-[10px] text-muted-foreground">Earnings</p>
                   </div>
                 </div>
               )}
               {aiToolResult.quickWins?.length > 0 && (
-                <div className="p-3 rounded-md bg-muted/20 space-y-1">
+                <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/20 space-y-1">
                   <p className="text-xs font-medium text-muted-foreground">Quick Wins (do these now!):</p>
                   {aiToolResult.quickWins.map((qw: string, i: number) => (
                     <p key={i} className="text-xs ml-2" data-testid={`quick-win-${i}`}>- {qw}</p>
@@ -5885,7 +5885,7 @@ function StandaloneAffiliateDashboard() {
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-muted-foreground">Your Week Plan:</p>
                   {aiToolResult.weekPlan.map((day: any, i: number) => (
-                    <div key={i} className="p-2 rounded-md bg-muted/40 flex items-start gap-[var(--content-density-gap,1rem)]" data-testid={`week-plan-day-${i}`}>
+                    <div key={i} className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40 flex items-start gap-[var(--content-density-gap,1rem)]" data-testid={`week-plan-day-${i}`}>
                       <div className="shrink-0 w-12 text-center">
                         <p className="text-xs font-bold">Day {day.day}</p>
                         <Badge variant={day.priority === 'high' ? 'default' : day.priority === 'low' ? 'outline' : 'secondary'} className="text-[10px] mt-0.5">
@@ -5904,7 +5904,7 @@ function StandaloneAffiliateDashboard() {
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-muted-foreground">Helpful Resources:</p>
                   {aiToolResult.resources.map((res: any, i: number) => (
-                    <div key={i} className="p-2 rounded-md bg-muted/40" data-testid={`onboarding-resource-${i}`}>
+                    <div key={i} className="p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/40" data-testid={`onboarding-resource-${i}`}>
                       <p className="text-sm font-medium">{res.title}</p>
                       <p className="text-xs text-muted-foreground">{res.description}</p>
                       {res.action && <p className="text-xs mt-1">{res.action}</p>}
@@ -5930,7 +5930,7 @@ function StandaloneAffiliateDashboard() {
         </CardHeader>
         <CardContent className="space-y-[var(--content-density-gap,1rem)]">
           {webhookSecret && (
-            <div className="p-3 rounded-md bg-[hsl(var(--warning)/0.05)] dark:bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.2)] dark:border-[hsl(var(--warning)/0.3)] space-y-2">
+            <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-[hsl(var(--warning)/0.05)] dark:bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.2)] dark:border-[hsl(var(--warning)/0.3)] space-y-2">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-[hsl(var(--warning))]" />
                 <span className="text-sm font-medium text-[hsl(var(--warning))]">Signing Secret (copy now — shown only once)</span>
@@ -5988,7 +5988,7 @@ function StandaloneAffiliateDashboard() {
             <div className="space-y-2 border-t pt-3">
               <Label className="text-xs text-muted-foreground">Your Webhooks</Label>
               {webhooks.map(wh => (
-                <div key={wh.id} className="rounded-md bg-muted/40 p-3 space-y-2" data-testid={`webhook-${wh.id}`}>
+                <div key={wh.id} className="rounded-[var(--card-radius,0.75rem)] bg-muted/40 p-3 space-y-2" data-testid={`webhook-${wh.id}`}>
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-mono truncate">{wh.url}</p>
@@ -6211,7 +6211,7 @@ function StandaloneAffiliateDashboard() {
               <FileText className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">No contracts found.</p>
               {data?.terms && (
-                <div className="mt-4 p-[var(--card-padding,1.25rem)] rounded-md bg-muted/40">
+                <div className="mt-4 p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] bg-muted/40">
                   <p className="text-sm font-medium">Your Current Terms</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)] mt-3 text-sm">
                     <div>
@@ -6240,7 +6240,7 @@ function StandaloneAffiliateDashboard() {
                 const isDraft = contract.status === 'draft'
                 const isExpanded = expandedContract === contract.id
                 return (
-                  <div key={contract.id} className={`rounded-md border ${isActive ? 'border-primary/30' : ''}`} data-testid={`contract-${contract.id}`}>
+                  <div key={contract.id} className={`rounded-[var(--card-radius,0.75rem)] border ${isActive ? 'border-primary/30' : ''}`} data-testid={`contract-${contract.id}`}>
                     <div className="p-[var(--card-padding,1.25rem)]">
                       <div className="flex items-start justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
                         <div className="flex-1 min-w-0">
@@ -6304,7 +6304,7 @@ function StandaloneAffiliateDashboard() {
                           ? Math.max(0, Math.ceil((new Date(contract.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30.44)))
                           : null
                         return (
-                          <div className="mt-3 p-3 rounded-md bg-muted/40" data-testid={`contract-terms-${contract.id}`}>
+                          <div className="mt-3 p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40" data-testid={`contract-terms-${contract.id}`}>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-[var(--content-density-gap,1rem)] text-sm">
                               <div>
                                 <span className="text-xs text-muted-foreground">Commission Rate</span>
@@ -6615,7 +6615,7 @@ function StandaloneAffiliateDashboard() {
           </div>
 
           {newlyGeneratedKey && (
-            <div className="p-3 rounded-md bg-muted/50 border border-primary/20">
+            <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 border border-primary/20">
               <Label className="text-xs font-medium text-primary">New API Key (copy now, shown only once)</Label>
               <div className="flex items-center gap-2 mt-1">
                 <code className="text-xs font-mono flex-1 break-all" data-testid="text-new-api-key">{newlyGeneratedKey}</code>
@@ -6645,7 +6645,7 @@ function StandaloneAffiliateDashboard() {
           ) : (
             <div className="space-y-2">
               {apiKeys.map(k => (
-                <div key={k.id} className="flex items-center justify-between p-2 rounded-md bg-muted/30" data-testid={`api-key-${k.id}`}>
+                <div key={k.id} className="flex items-center justify-between p-2 rounded-[var(--card-radius,0.75rem)] bg-muted/30" data-testid={`api-key-${k.id}`}>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium">{k.name}</span>
@@ -6713,7 +6713,7 @@ function StandaloneAffiliateDashboard() {
                 const verifyUrl = typeof window !== 'undefined' ? `${window.location.origin}/partner/verify/${badge.verification_code}` : `/partner/verify/${badge.verification_code}`
                 const embedCode = `<a href="${verifyUrl}" target="_blank" rel="noopener">${label} - Verified</a>`
                 return (
-                  <div key={badge.id} className="p-3 rounded-md bg-muted/40 space-y-2" data-testid={`badge-${badge.id}`}>
+                  <div key={badge.id} className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/40 space-y-2" data-testid={`badge-${badge.id}`}>
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       <div className="flex items-center gap-2">
                         <Award className="h-4 w-4 text-primary" />
@@ -6786,7 +6786,7 @@ function StandaloneAffiliateDashboard() {
                 value={surveyFeedback}
                 onChange={e => setSurveyFeedback(e.target.value)}
                 placeholder="Tell us what you love or what we can improve..."
-                className="mt-1 w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="mt-1 w-full min-h-[80px] rounded-[var(--card-radius,0.75rem)] border border-input bg-background px-3 py-2 text-sm"
                 data-testid="textarea-survey-feedback"
               />
             </div>
@@ -6906,7 +6906,7 @@ function StandaloneAffiliateDashboard() {
                   className={`flex ${msg.sender_role === 'affiliate' ? 'justify-end' : 'justify-start'}`}
                   data-testid={`message-item-${msg.id}`}
                 >
-                  <div className={`max-w-[80%] rounded-md p-3 text-sm ${
+                  <div className={`max-w-[80%] rounded-[var(--card-radius,0.75rem)] p-3 text-sm ${
                     msg.sender_role === 'affiliate'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
@@ -6956,19 +6956,19 @@ function StandaloneAffiliateDashboard() {
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>As an affiliate partner, you agree to promote {appName} ethically and in accordance with our program guidelines.</p>
           <div className="space-y-2">
-            <div className="p-3 rounded-md bg-muted/50">
+            <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50">
               <p className="font-medium text-foreground text-xs mb-1">Commission Structure</p>
               <p className="text-xs">You earn a commission on every paying customer you refer. Commission rates are based on your tier level and may include locked-in rates from your acceptance terms.</p>
             </div>
-            <div className="p-3 rounded-md bg-muted/50">
+            <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50">
               <p className="font-medium text-foreground text-xs mb-1">Payouts</p>
               <p className="text-xs">Payouts are processed once your approved balance reaches the minimum threshold (${((data?.settings?.minPayoutCents || 0) / 100).toFixed(2)}). Payouts are reviewed and processed by our team.</p>
             </div>
-            <div className="p-3 rounded-md bg-muted/50">
+            <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50">
               <p className="font-medium text-foreground text-xs mb-1">Prohibited Activities</p>
               <p className="text-xs">Self-referrals, misleading claims, spam, and cookie stuffing are strictly prohibited and may result in account termination.</p>
             </div>
-            <div className="p-3 rounded-md bg-muted/50">
+            <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50">
               <p className="font-medium text-foreground text-xs mb-1">Need Help?</p>
               <p className="text-xs">Contact us at support@{appName.toLowerCase().replace(/\s+/g, '')}.com for any questions about the affiliate program.</p>
             </div>
@@ -7300,9 +7300,9 @@ function StandaloneAffiliateDashboard() {
                         )}
                       </div>
                     </div>
-                    <div className="h-6 bg-muted rounded-md overflow-hidden">
+                    <div className="h-6 bg-muted rounded-[var(--card-radius,0.75rem)] overflow-hidden">
                       <div
-                        className={`h-full rounded-md ${colors[i]} transition-all duration-500`}
+                        className={`h-full rounded-[var(--card-radius,0.75rem)] ${colors[i]} transition-all duration-500`}
                         style={{ width: `${width}%` }}
                       />
                     </div>
@@ -7408,19 +7408,19 @@ function StandaloneAffiliateDashboard() {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--content-density-gap,1rem)]">
-                  <div className="p-3 rounded-md bg-muted/50 text-center">
+                  <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center">
                     <p className="text-xs text-muted-foreground">Your Earnings</p>
                     <p className="text-sm font-bold" data-testid="text-your-earnings">${(bm.yourEarnings / 100).toFixed(2)}</p>
                   </div>
-                  <div className="p-3 rounded-md bg-muted/50 text-center">
+                  <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center">
                     <p className="text-xs text-muted-foreground">Avg. Earnings</p>
                     <p className="text-sm font-bold" data-testid="text-avg-earnings">${(bm.avgEarnings / 100).toFixed(2)}</p>
                   </div>
-                  <div className="p-3 rounded-md bg-muted/50 text-center">
+                  <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center">
                     <p className="text-xs text-muted-foreground">Your Referrals</p>
                     <p className="text-sm font-bold" data-testid="text-your-referrals">{bm.yourReferrals}</p>
                   </div>
-                  <div className="p-3 rounded-md bg-muted/50 text-center">
+                  <div className="p-3 rounded-[var(--card-radius,0.75rem)] bg-muted/50 text-center">
                     <p className="text-xs text-muted-foreground">Avg. Referrals</p>
                     <p className="text-sm font-bold" data-testid="text-avg-referrals">{bm.avgReferrals}</p>
                   </div>
@@ -7451,9 +7451,9 @@ function StandaloneAffiliateDashboard() {
                           <span className="text-sm font-bold">${(s.earnings / 100).toFixed(2)}</span>
                         </div>
                       </div>
-                      <div className="h-4 bg-muted rounded-md overflow-hidden">
+                      <div className="h-4 bg-muted rounded-[var(--card-radius,0.75rem)] overflow-hidden">
                         <div
-                          className="h-full rounded-md bg-primary/70 transition-all duration-500"
+                          className="h-full rounded-[var(--card-radius,0.75rem)] bg-primary/70 transition-all duration-500"
                           style={{ width: `${Math.max((s.earnings / maxSourceEarnings) * 100, 4)}%` }}
                         />
                       </div>
@@ -7533,7 +7533,7 @@ function StandaloneAffiliateDashboard() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate('announcements')}
-                className="relative p-2 rounded-md hover:bg-muted"
+                className="relative p-2 rounded-[var(--card-radius,0.75rem)] hover:bg-muted"
                 data-testid="button-notifications"
               >
                 <Bell className="h-4 w-4" />
@@ -7568,7 +7568,7 @@ function StandaloneAffiliateDashboard() {
                     key={item.key}
                     onClick={() => navigate(item.key)}
                     className={`
-                      w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors
+                      w-full flex items-center gap-2.5 px-3 py-2 rounded-[var(--card-radius,0.75rem)] text-sm transition-colors
                       ${isActive
                         ? 'bg-primary/10 text-primary font-medium'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -7602,7 +7602,7 @@ function StandaloneAffiliateDashboard() {
 
       {showTour && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40" data-testid="tour-overlay">
-          <Card className="relative z-[101] w-full max-w-md mx-4 shadow-2xl border bg-[var(--card-bg)]">
+          <Card className="relative z-[101] w-full max-w-md mx-4 shadow-[var(--card-shadow)] border bg-[var(--card-bg)]">
             <CardContent className="pt-6 pb-[var(--card-padding,1.25rem)]">
               <div className="text-center space-y-[var(--content-density-gap,1rem)]">
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">

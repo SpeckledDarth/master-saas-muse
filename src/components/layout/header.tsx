@@ -278,7 +278,7 @@ export function Header() {
                     <SheetClose asChild key={item.id}>
                       <Link
                         href={item.href}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover-elevate"
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-[var(--btn-radius,9999px)] hover-elevate"
                         data-testid={`link-mobile-nav-${item.id}`}
                       >
                         {item.label}
@@ -298,7 +298,7 @@ export function Header() {
                     <SheetClose asChild key={page.id}>
                       <Link
                         href={`/p/${page.slug}`}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover-elevate"
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-[var(--btn-radius,9999px)] hover-elevate"
                         data-testid={`link-mobile-custom-${page.slug}`}
                       >
                         {page.name}

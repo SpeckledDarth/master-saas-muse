@@ -98,7 +98,7 @@ export function SplitHero({
           
           <div>
             <div 
-              className="relative rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-2xl w-full max-w-[90vw] md:max-w-none mx-auto max-h-[250px] md:max-h-none"
+              className="relative rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-[var(--card-shadow)] w-full max-w-[90vw] md:max-w-none mx-auto max-h-[250px] md:max-h-none"
               style={{ height: `${imageHeight}px`, width: 'auto', aspectRatio: '4/3' }}
             >
               {imageUrl ? (

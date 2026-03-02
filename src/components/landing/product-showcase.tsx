@@ -36,7 +36,7 @@ export function ProductShowcase({ settings, className = '' }: ProductShowcasePro
 
         <div className="relative max-w-5xl mx-auto">
           {settings.backgroundImageUrl && (
-            <div className="absolute inset-0 -inset-x-8 -inset-y-8 rounded-2xl overflow-hidden">
+            <div className="absolute inset-0 -inset-x-8 -inset-y-8 rounded-[var(--card-radius,0.75rem)] overflow-hidden">
               <Image
                 src={settings.backgroundImageUrl}
                 alt=""
@@ -50,11 +50,11 @@ export function ProductShowcase({ settings, className = '' }: ProductShowcasePro
           )}
 
           {!settings.backgroundImageUrl && settings.backgroundGradient !== false && (
-            <div className="absolute inset-0 -inset-x-8 -inset-y-8 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10" />
+            <div className="absolute inset-0 -inset-x-8 -inset-y-8 rounded-[var(--card-radius,0.75rem)] bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10" />
           )}
 
           <div className="relative">
-            <div className="relative rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-2xl border border-border/50">
+            <div className="relative rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-[var(--card-shadow)] border border-border/50">
               <div className="relative aspect-[16/10]">
                 <Image
                   src={settings.screenshotUrl}

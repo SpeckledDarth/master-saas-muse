@@ -156,18 +156,18 @@ function LivePreview({
         <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border space-y-3" style={{ backgroundColor: '#ffffff' }}>
           <p className="text-xs font-medium" style={{ color: '#374151' }}>Light Mode</p>
           <div className="flex gap-2">
-            <div className="px-3 py-1.5 rounded-md text-xs font-medium text-white" style={{ backgroundColor: primaryColor }}>
+            <div className="px-3 py-1.5 rounded-[var(--btn-radius,9999px)] text-xs font-medium text-white" style={{ backgroundColor: primaryColor }}>
               Primary Button
             </div>
-            <div className="px-3 py-1.5 rounded-md text-xs font-medium border" style={{ borderColor: primaryColor, color: primaryColor }}>
+            <div className="px-3 py-1.5 rounded-[var(--btn-radius,9999px)] text-xs font-medium border" style={{ borderColor: primaryColor, color: primaryColor }}>
               Outline
             </div>
           </div>
           <div className="flex gap-2">
-            <div className="px-2 py-0.5 rounded-sm text-[10px] font-medium text-white" style={{ backgroundColor: accentColor }}>
+            <div className="px-2 py-0.5 rounded-[var(--badge-radius,9999px)] text-[10px] font-medium text-white" style={{ backgroundColor: accentColor }}>
               Badge
             </div>
-            <div className="px-2 py-0.5 rounded-sm text-[10px] font-medium" style={{ backgroundColor: primaryShades['100'], color: primaryShades['700'] }}>
+            <div className="px-2 py-0.5 rounded-[var(--badge-radius,9999px)] text-[10px] font-medium" style={{ backgroundColor: primaryShades['100'], color: primaryShades['700'] }}>
               Soft Badge
             </div>
           </div>
@@ -181,18 +181,18 @@ function LivePreview({
         <div className="p-[var(--card-padding,1.25rem)] rounded-[var(--card-radius,0.75rem)] border space-y-3" style={{ backgroundColor: '#0a0a1a' }}>
           <p className="text-xs font-medium" style={{ color: '#e5e7eb' }}>Dark Mode</p>
           <div className="flex gap-2">
-            <div className="px-3 py-1.5 rounded-md text-xs font-medium text-white" style={{ backgroundColor: primaryColor }}>
+            <div className="px-3 py-1.5 rounded-[var(--btn-radius,9999px)] text-xs font-medium text-white" style={{ backgroundColor: primaryColor }}>
               Primary Button
             </div>
-            <div className="px-3 py-1.5 rounded-md text-xs font-medium border" style={{ borderColor: primaryShades['400'], color: primaryShades['400'] }}>
+            <div className="px-3 py-1.5 rounded-[var(--btn-radius,9999px)] text-xs font-medium border" style={{ borderColor: primaryShades['400'], color: primaryShades['400'] }}>
               Outline
             </div>
           </div>
           <div className="flex gap-2">
-            <div className="px-2 py-0.5 rounded-sm text-[10px] font-medium text-white" style={{ backgroundColor: accentColor }}>
+            <div className="px-2 py-0.5 rounded-[var(--badge-radius,9999px)] text-[10px] font-medium text-white" style={{ backgroundColor: accentColor }}>
               Badge
             </div>
-            <div className="px-2 py-0.5 rounded-sm text-[10px] font-medium" style={{ backgroundColor: primaryShades['900'], color: primaryShades['300'] }}>
+            <div className="px-2 py-0.5 rounded-[var(--badge-radius,9999px)] text-[10px] font-medium" style={{ backgroundColor: primaryShades['900'], color: primaryShades['300'] }}>
               Soft Badge
             </div>
           </div>
@@ -280,7 +280,7 @@ export function ColorPaletteBuilder({
             <button
               key={preset.name}
               onClick={() => applyPreset(preset)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs font-medium hover-elevate active-elevate-2 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[var(--btn-radius,9999px)] border text-xs font-medium hover-elevate active-elevate-2 transition-colors cursor-pointer"
               data-testid={`preset-${preset.name.toLowerCase()}`}
             >
               <div className="flex">
@@ -292,7 +292,7 @@ export function ColorPaletteBuilder({
           ))}
           <button
             onClick={randomizeColors}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs font-medium hover-elevate active-elevate-2 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[var(--btn-radius,9999px)] border text-xs font-medium hover-elevate active-elevate-2 transition-colors cursor-pointer"
             data-testid="button-randomize-colors"
           >
             <Shuffle className="w-3 h-3" />

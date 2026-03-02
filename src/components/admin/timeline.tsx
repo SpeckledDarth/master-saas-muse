@@ -173,7 +173,7 @@ export function Timeline({ events, loading, emptyMessage, maxItems, compact, cla
 
           if (event.href) {
             return (
-              <Link key={event.id} href={event.href} className="block hover:bg-muted/50 rounded-md px-1 -mx-1 transition-colors">
+              <Link key={event.id} href={event.href} className="block hover:bg-muted/50 rounded-[var(--card-radius,0.75rem)] px-1 -mx-1 transition-colors">
                 {content}
               </Link>
             )

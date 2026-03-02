@@ -72,7 +72,7 @@ function ToggleGroup({ value, options, onChange }: {
   onChange: (v: any) => void
 }) {
   return (
-    <div className="flex rounded-md border overflow-hidden">
+    <div className="flex rounded-[var(--input-radius,0.75rem)] border overflow-hidden">
       {options.map(opt => (
         <button
           key={opt.value}
@@ -464,6 +464,18 @@ export function ComponentStyleSection() {
 
         <div className="space-y-3 p-3 border rounded-[var(--card-radius,0.75rem)]">
           <h4 className="text-sm font-medium">Buttons</h4>
+          <OptionGroup label="Border Radius">
+            <ToggleGroup
+              value={b.buttonRadius || 'pill'}
+              options={[
+                { value: 'pill', label: 'Pill' },
+                { value: 'rounded', label: 'Rounded' },
+                { value: 'square', label: 'Square' },
+              ]}
+              onChange={v => updateBranding('buttonRadius', v)}
+              data-testid="toggle-btn-radius"
+            />
+          </OptionGroup>
           <OptionGroup label="Size">
             <ToggleGroup
               value={b.buttonSize || 'default'}
@@ -966,7 +978,7 @@ export function NotificationsSection() {
               key={opt.value}
               onClick={() => updateBranding('toastPosition', opt.value)}
               className={cn(
-                "px-3 py-2 text-xs rounded-md border transition-colors",
+                "px-3 py-2 text-xs rounded-[var(--btn-radius,9999px)] border transition-colors",
                 (b.toastPosition || 'top-right') === opt.value
                   ? "bg-primary text-primary-foreground border-primary"
                   : "hover:bg-muted"

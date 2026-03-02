@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useSetupSettingsContext } from '@/hooks/use-setup-settings-context'
+import { resolveComponentVars, resolveLayoutVars } from '@/hooks/use-settings'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ColorInput } from '@/components/admin/color-input'
@@ -907,6 +908,16 @@ export default function PalettePage() {
     bodyColorDark: settings.branding.bodyColorDark,
   }), [settings.branding.headingColorLight, settings.branding.headingColorDark, settings.branding.bodyColorLight, settings.branding.bodyColorDark])
   const cssOverrides = useMemo(() => getCssOverrides(shades, darkMode, bgOverrides, typoColors), [shades, darkMode, bgOverrides, typoColors])
+
+  useEffect(() => {
+    const root = document.documentElement
+    const componentVars = resolveComponentVars(settings.branding)
+    const layoutVars = resolveLayoutVars(settings.branding)
+    const allVars = { ...componentVars, ...layoutVars }
+    Object.entries(allVars).forEach(([key, value]) => {
+      root.style.setProperty(key, value)
+    })
+  }, [settings.branding])
 
   const handleColorChange = useCallback((hex: string) => {
     setLocalColor(hex)

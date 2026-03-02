@@ -97,7 +97,7 @@ export function FeedbackWidget() {
       <Button
         ref={buttonRef}
         onClick={open ? () => setOpen(false) : handleOpen}
-        className="fixed bottom-4 right-4 rounded-full w-14 h-14 shadow-lg z-50"
+        className="fixed bottom-4 right-4 rounded-full w-14 h-14 shadow-[var(--card-shadow)] z-50"
         size="icon"
         data-testid="button-feedback"
       >
@@ -105,7 +105,7 @@ export function FeedbackWidget() {
       </Button>
 
       {open && (
-        <div ref={panelRef} className="fixed bottom-20 right-4 w-80 bg-[var(--card-bg)] border rounded-[var(--card-radius,0.75rem)] shadow-xl z-50 p-[var(--card-padding,1.25rem)]">
+        <div ref={panelRef} className="fixed bottom-20 right-4 w-80 bg-[var(--card-bg)] border rounded-[var(--card-radius,0.75rem)] shadow-[var(--card-shadow)] z-50 p-[var(--card-padding,1.25rem)]">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">Send Feedback</h3>
             <Button
@@ -150,7 +150,7 @@ export function FeedbackWidget() {
               <select
                 value={heardFrom}
                 onChange={(e) => setHeardFrom(e.target.value)}
-                className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+                className="w-full h-9 rounded-[var(--input-radius,0.75rem)] border border-input bg-background px-3 text-sm"
                 data-testid="select-heard-from"
               >
                 <option value="">Select...</option>
@@ -174,7 +174,7 @@ export function FeedbackWidget() {
                     key={i}
                     type="button"
                     onClick={() => setNpsScore(npsScore === i ? null : i)}
-                    className={`h-7 text-xs rounded-md font-medium transition-colors ${
+                    className={`h-7 text-xs rounded-[var(--btn-radius,9999px)] font-medium transition-colors ${
                       npsScore === i
                         ? 'bg-primary-600 text-white dark:bg-primary-400 dark:text-black'
                         : 'bg-muted text-muted-foreground hover-elevate'

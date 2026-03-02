@@ -124,7 +124,7 @@ function SignupForm() {
             <p className="text-sm text-muted-foreground text-center">
               Click the link in your email to activate your account.
             </p>
-            <div className="rounded-md bg-muted p-3">
+            <div className="rounded-[var(--card-radius,0.75rem)] bg-muted p-3">
               <p className="text-sm text-muted-foreground text-center">
                 <strong>No email?</strong> Check your spam folder, or if you already have an account,{' '}
                 <Link href="/login" className="text-primary-600 dark:text-primary-400 hover:underline" data-testid="link-login-from-success">

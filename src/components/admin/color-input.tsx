@@ -80,7 +80,7 @@ export function ColorInput({
           <PopoverTrigger asChild>
             <button
               type="button"
-              className="w-9 min-h-9 flex-shrink-0 rounded-md border border-input cursor-pointer transition-shadow hover:ring-2 hover:ring-ring/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="w-9 min-h-9 flex-shrink-0 rounded-[var(--input-radius,0.75rem)] border border-input cursor-pointer transition-shadow hover:ring-2 hover:ring-ring/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               style={{ backgroundColor: resolvedColor }}
               data-testid={`${testId}-picker`}
               aria-label={label ? `Pick ${label}` : 'Pick color'}

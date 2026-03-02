@@ -241,7 +241,7 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
                   setOpenDropdown(isDropdownOpen ? null : section.label)
                 }}
                 className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--btn-radius,9999px)] text-sm font-medium transition-colors whitespace-nowrap',
                   isCurrent
                     ? 'bg-primary/10 text-primary'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -260,7 +260,7 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute top-full left-0 mt-1 z-50 min-w-[200px] rounded-md border bg-popover p-1 shadow-lg" data-testid={`dropdown-${section.label.toLowerCase()}`}>
+                <div className="absolute top-full left-0 mt-1 z-50 min-w-[200px] rounded-[var(--card-radius,0.75rem)] border bg-popover p-1 shadow-[var(--card-shadow)]" data-testid={`dropdown-${section.label.toLowerCase()}`}>
                   {visibleItems.map(item => {
                     const ItemIcon = item.icon
                     return (
@@ -300,7 +300,7 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
               key={item.label}
               href={item.href}
               className={cn(
-                'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors whitespace-nowrap',
+                'flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--btn-radius,9999px)] text-xs font-medium transition-colors whitespace-nowrap',
                 isActive(item.href)
                   ? 'bg-primary/10 text-primary'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -344,7 +344,7 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
                   return (
                     <Link key={item.label} href={item.href} data-testid={`link-mobile-${item.label.toLowerCase().replace(/\s+/g, '-')}`}>
                       <div className={cn(
-                        'flex items-center gap-[var(--content-density-gap,1rem)] rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                        'flex items-center gap-[var(--content-density-gap,1rem)] rounded-[var(--btn-radius,9999px)] px-3 py-2 text-sm font-medium transition-colors',
                         isActive(item.href)
                           ? 'bg-primary/10 text-primary'
                           : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -384,7 +384,7 @@ export function AdminSidebar({ isAppAdmin, permissions }: AdminSidebarProps) {
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden" data-testid="overlay-mobile-sidebar">
           <div className="fixed inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <div className="fixed inset-y-0 left-0 w-72 bg-background border-r shadow-xl z-50">
+          <div className="fixed inset-y-0 left-0 w-72 bg-background border-r shadow-[var(--card-shadow)] z-50">
             {mobileSidebarContent}
           </div>
         </div>

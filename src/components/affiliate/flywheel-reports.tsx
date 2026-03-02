@@ -451,7 +451,7 @@ export function MetricTooltip({ children, tip }: { children: React.ReactNode; ti
     <span className="relative inline-block" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
       {children}
       {show && (
-        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-foreground text-background text-[10px] rounded shadow-lg whitespace-nowrap z-50 max-w-[200px] text-center">
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-foreground text-background text-[10px] rounded shadow-[var(--card-shadow)] whitespace-nowrap z-50 max-w-[200px] text-center">
           {tip}
         </span>
       )}

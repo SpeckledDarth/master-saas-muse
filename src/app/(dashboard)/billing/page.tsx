@@ -333,7 +333,7 @@ export default function BillingPage() {
           <DSCardHeader>
             <div className="flex items-center justify-between gap-[var(--content-density-gap,1rem)] flex-wrap">
               <div className="flex items-center gap-[var(--content-density-gap,1rem)]">
-                <div className={`p-2 rounded-md ${tierInfo.color}`}>
+                <div className={`p-2 rounded-[var(--card-radius,0.75rem)] ${tierInfo.color}`}>
                   <TierIcon className="h-5 w-5" />
                 </div>
                 <div>

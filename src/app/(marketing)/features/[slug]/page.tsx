@@ -99,7 +99,7 @@ export default function FeatureSubPage() {
 
         {page.heroImageUrl && (
           <div className="relative z-10 container mx-auto px-[var(--card-padding,1.25rem)] mt-8">
-            <div className="max-w-4xl mx-auto relative rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-2xl border border-border/50">
+            <div className="max-w-4xl mx-auto relative rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-[var(--card-shadow)] border border-border/50">
               <div className="relative aspect-[16/10]">
                 <Image
                   src={page.heroImageUrl}

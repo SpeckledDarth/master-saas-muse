@@ -345,7 +345,7 @@ function resolveTypographyVars(b: SiteSettings['branding'], isDark?: boolean): R
   return vars
 }
 
-function resolveComponentVars(b: SiteSettings['branding']): Record<string, string> {
+export function resolveComponentVars(b: SiteSettings['branding']): Record<string, string> {
   const vars: Record<string, string> = {}
 
   const paddingMap = { compact: '0.75rem', default: '1.25rem', spacious: '1.75rem' }
@@ -365,7 +365,7 @@ function resolveComponentVars(b: SiteSettings['branding']): Record<string, strin
   if (b.cardShadow !== undefined) vars['--card-shadow'] = shadowMap[b.cardShadow] || shadowMap.sm
   if (b.cardBorderWidth !== undefined) vars['--card-border-width'] = `${b.cardBorderWidth}px`
   if (b.cardBorderStyle !== undefined) vars['--card-border-style'] = b.cardBorderStyle === 'none' ? 'none' : b.cardBorderStyle
-  const btnRadiusMap = { pill: '9999px', rounded: '0.375rem' }
+  const btnRadiusMap: Record<string, string> = { pill: '9999px', rounded: '0.375rem', square: '0.125rem' }
   if (b.buttonRadius !== undefined) vars['--btn-radius'] = btnRadiusMap[b.buttonRadius] || btnRadiusMap.pill
   if (b.buttonSize !== undefined) vars['--btn-padding'] = btnPadMap[b.buttonSize] || btnPadMap.default
   if (b.buttonFontWeight !== undefined) vars['--btn-font-weight'] = fontWeightMap[b.buttonFontWeight] || fontWeightMap.semibold
@@ -379,7 +379,7 @@ function resolveComponentVars(b: SiteSettings['branding']): Record<string, strin
   return vars
 }
 
-function resolveLayoutVars(b: SiteSettings['branding']): Record<string, string> {
+export function resolveLayoutVars(b: SiteSettings['branding']): Record<string, string> {
   const vars: Record<string, string> = {}
   const gapMap = { compact: '0.5rem', default: '1rem', spacious: '1.5rem' }
   const sectionMap = { compact: '2rem', default: '3.5rem', spacious: '5rem' }

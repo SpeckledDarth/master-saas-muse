@@ -110,7 +110,7 @@ export function QuickGenerateFab() {
       <Button
         size="icon"
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 right-6 z-40 rounded-full shadow-lg"
+        className="fixed bottom-20 right-6 z-40 rounded-full shadow-[var(--card-shadow)]"
         data-testid="button-fab-quick-generate"
       >
         <Zap />

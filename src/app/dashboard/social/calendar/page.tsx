@@ -742,7 +742,7 @@ export default function SocialCalendarPage() {
                         ) : (
                           <div className="space-y-1.5">
                             {dayPosts.map(post => (
-                              <div key={post.id} className="flex items-center gap-2 text-xs cursor-pointer hover-elevate active-elevate-2 rounded-sm p-1 -m-1" onClick={() => setDetailPost(post)}>
+                              <div key={post.id} className="flex items-center gap-2 text-xs cursor-pointer hover-elevate active-elevate-2 rounded-[var(--card-radius,0.75rem)] p-1 -m-1" onClick={() => setDetailPost(post)}>
                                 <span className={`block h-2 w-2 rounded-full shrink-0 ${getPlatformDotClass(post.platform)}`} />
                                 <span className="truncate flex-1">{post.content}</span>
                                 <Badge variant={STATUS_VARIANT[post.status] || 'outline'} className="text-xs shrink-0">{post.status}</Badge>

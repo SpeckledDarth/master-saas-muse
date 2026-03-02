@@ -94,7 +94,7 @@ export default function UpdatePasswordPage() {
           <CardContent className="space-y-[var(--content-density-gap,1rem)]">
             {message && (
               <div
-                className={`p-3 rounded-md text-sm flex items-center gap-2 ${
+                className={`p-3 rounded-[var(--card-radius,0.75rem)] text-sm flex items-center gap-2 ${
                   message.type === 'success'
                     ? 'bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))]'
                     : 'bg-[hsl(var(--danger)/0.1)] text-[hsl(var(--danger))]'

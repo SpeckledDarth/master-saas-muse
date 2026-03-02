@@ -320,7 +320,7 @@ export default function HomePage() {
                 return (
                   <div
                     key={i}
-                    className="absolute rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-xl"
+                    className="absolute rounded-[var(--card-radius,0.75rem)] overflow-hidden shadow-[var(--card-shadow)]"
                     style={{
                       top: pos.top,
                       left: pos.left,
